@@ -19,6 +19,9 @@ protected:
     virtual void UpdateAf() override;
     virtual void CreateUI() override;
     CUIArtefactDetectorElite& ui();
+
+    virtual void UpdateZones() override;
+    virtual void DisableUIDetection() override;
 };
 
 class CScientificDetector : public CEliteDetector
@@ -28,12 +31,8 @@ class CScientificDetector : public CEliteDetector
 public:
     CScientificDetector();
     virtual ~CScientificDetector();
-    virtual void Load(LPCSTR section) override;
-    virtual void OnH_B_Independent(bool just_before_destroy) override;
-    virtual void shedule_Update(u32 dt) override;
     virtual LPCSTR ui_xml_tag() const override { return "scientific"; }
 
 protected:
-    virtual void UpfateWork() override;
-    CZoneList m_zones;
+    virtual void UpdateWork() override;
 };

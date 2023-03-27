@@ -8,7 +8,6 @@ enum EGameActions
     kDOWN,
     kJUMP,
     kCROUCH,
-    kCROUCH_TOGGLE,
     kACCEL,
     kSPRINT_TOGGLE,
 
@@ -36,8 +35,10 @@ enum EGameActions
     kWPN_4,
     kWPN_5,
     kWPN_6,
+    kWPN_7, // kARTEFACT
     kWPN_8, // kDETECTOR
     kLASER_ON,
+    kFLASHLIGHT,
     kWPN_NEXT,
     kWPN_FIRE,
     kWPN_ZOOM,
@@ -52,7 +53,6 @@ enum EGameActions
     kDROP,
     kUSE,
     kSCORES,
-    kFLASHLIGHT,
     kCHAT_TEAM,
     kSCREENSHOT,
     kQUIT,
@@ -85,13 +85,23 @@ enum EGameActions
     kSPEECH_MENU_8,
     kSPEECH_MENU_9,
 
-    kUSE_BANDAGE,
-    kUSE_MEDKIT,
-
     kQUICK_SAVE,
     kQUICK_LOAD,
 
-    kARTEFACT,
+    kUSE_QUICK_SLOT_0,
+    kUSE_QUICK_SLOT_1,
+    kUSE_QUICK_SLOT_2,
+    kUSE_QUICK_SLOT_3,
+
+    kCHECKGEAR,
+    kCHECKACTIVEITEM,
+    kKICK,
+    kADDITIONAL_ACTION,
+
+    kQUICK_THROW_GRENADE,
+    kQUICK_KNIFE_STAB,
+
+    kDROP_BACKPACK,
 
     kLASTACTION = u32(-3),
     kNOTBINDED = u32(-2),

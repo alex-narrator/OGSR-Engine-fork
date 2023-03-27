@@ -31,6 +31,7 @@ void CActor::cam_Set(EActorCameras style)
     cam_active = style;
     old_cam->OnDeactivate();
     cam_Active()->OnActivate(old_cam);
+    UpdateVisorEfects();
 }
 float CActor::f_Ladder_cam_limit = 1.f;
 void CActor::cam_SetLadder()
@@ -143,7 +144,7 @@ float cam_HeightInterpolationSpeed = 8.f;
 #include "physics.h"
 #include "PHActivationShape.h"
 #include "debug_renderer.h"
-
+#include "ActorCondition.h"
 void CActor::cam_Update(float dt, float fFOV)
 {
     /* перенесено ниже
@@ -177,10 +178,10 @@ void CActor::cam_Update(float dt, float fFOV)
     // Alex ADD: smooth crouch fix
     if (CurrentHeight != CameraHeight())
     {
-        float smoothK = cam_HeightInterpolationSpeed * dt;
+        float power_factor = conditions().GetPower();
+        float smoothK = cam_HeightInterpolationSpeed * power_factor * dt;
         if (smoothK > 1.0f)
             smoothK = 1.0f;
-
         CurrentHeight = (CurrentHeight * (1.0f - smoothK)) + (CameraHeight() * smoothK);
     }
 

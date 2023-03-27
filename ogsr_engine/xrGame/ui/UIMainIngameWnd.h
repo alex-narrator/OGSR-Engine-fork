@@ -13,18 +13,35 @@
 #include "UIMotionIcon.h"
 #include "../hudsound.h"
 #include "../script_export_space.h"
+#include "../inventory.h"
 
 struct GAME_NEWS_DATA;
 
 class CUIPdaMsgListItem;
 class CLAItem;
 class CUIZoneMap;
-class CUIArtefactPanel;
+class CUIBeltPanel;
+class CUISlotPanel;
+class CUIVestPanel;
 class CUIScrollView;
 class CActor;
 class CWeapon;
 class CMissile;
 class CInventoryItem;
+
+class CUIXml;
+class CUIStatic;
+
+// Енумы элементов худа
+enum EHUDElement
+{
+    ePDA,
+    eDetector,
+    eActiveItem,
+    eGear,
+    eArmor,
+    eArmorPower,
+};
 
 class CUIMainIngameWnd : public CUIWindow
 {
@@ -37,9 +54,9 @@ public:
     virtual void Update();
 
     bool OnKeyboardPress(int dik);
+    bool OnKeyboardHold(int cmd);
 
 protected:
-    //CUIStatic UIStaticDiskIO;
     CUIStatic UIStaticHealth;
     CUIStatic UIStaticArmor;
     CUIStatic UIStaticQuickHelp;
@@ -49,15 +66,16 @@ protected:
     CUIMotionIcon UIMotionIcon;
     CUIZoneMap* UIZoneMap;
 
-    //иконка, показывающая количество активных PDA
+    // иконка, показывающая количество активных PDA
     CUIStatic UIPdaOnline;
 
-    //изображение оружия
+    // изображение оружия
     CUIStatic UIWeaponBack;
     CUIStatic UIWeaponSignAmmo;
     CUIStatic UIWeaponIcon;
-
-    Frect UIWeaponIcon_rect;
+    Frect UIWeaponIcon_rect{};
+    // заряд екзоскелету
+    CUIStatic UIOutfitPowerStatic;
 
 public:
     CUIStatic* GetPDAOnline() { return &UIPdaOnline; };
@@ -76,14 +94,14 @@ protected:
     CUIStatic UIStarvationIcon;
     CUIStatic UIPsyHealthIcon;
     CUIStatic UIInvincibleIcon;
-    CUIStatic UIThirstIcon;
-    //	CUIStatic			UISleepIcon;
-    //	CUIStatic			UIArtefactIcon;
+    CUIStatic UISafehouseIcon;
 
     CUIScrollView* m_UIIcons{};
 
 public:
-    CUIArtefactPanel* m_artefactPanel;
+    CUIBeltPanel* m_beltPanel;
+    CUISlotPanel* m_slotPanel;
+    CUIVestPanel* m_vestPanel;
 
 public:
     // Енумы соответсвующие предупреждающим иконкам
@@ -96,9 +114,7 @@ public:
         ewiStarvation,
         ewiPsyHealth,
         ewiInvincible,
-        ewiThirst,
-        //		ewiSleep,
-        //		ewiArtefact,
+        ewiSafehouse,
     };
 
     // Задаем цвет соответствующей иконке
@@ -137,11 +153,8 @@ protected:
     DEF_MAP(FlashingIcons, EFlashingIcons, CUIStatic*);
     FlashingIcons m_FlashingIcons;
 
-    //для текущего активного актера и оружия
+    // для текущего активного актера и оружия
     CActor* m_pActor;
-    CWeapon* m_pWeapon;
-    CMissile* m_pGrenade;
-    CInventoryItem* m_pItem;
 
     // Отображение подсказок при наведении прицела на объект
     void RenderQuickInfos();
@@ -165,6 +178,8 @@ protected:
 
 public:
     void SetPickUpItem(CInventoryItem* PickUpItem);
+
+    bool IsHUDElementAllowed(EHUDElement element);
 
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };

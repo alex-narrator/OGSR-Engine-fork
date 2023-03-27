@@ -15,6 +15,7 @@ class motion_marks;
 class CMotionDef;
 
 #include "actor_defs.h"
+#include "hudsound.h"
 
 class CHUDState
 {
@@ -34,11 +35,14 @@ public:
         eSprintStart,
         eSprintEnd,
         eBore,
-        eDeviceSwitch,
+        //eDeviceSwitch,
         eThrowStart,
         eReady,
         eThrow,
         eThrowEnd,
+        eActivating,
+        eShutter,
+        eKick,
     };
 
 private:
@@ -84,17 +88,19 @@ protected: //чтоб нельзя было вызвать на прямую
     };
 
     // Motion data
-    const CMotionDef* m_current_motion_def;
+    const CMotionDef* m_current_motion_def{};
     shared_str m_current_motion;
     u32 m_dwMotionCurrTm;
     u32 m_dwMotionStartTm;
     u32 m_dwMotionEndTm;
     u32 m_startedMotionState;
 
-    bool m_bStopAtEndAnimIsRunning;
+    bool m_bStopAtEndAnimIsRunning{};
     bool SprintType{};
     bool BobbingEnable{};
-    u32 m_dwStateTime;
+    u32 m_dwStateTime{};
+
+    HUD_SOUND sndOnItemTake, sndCheckout, sndCheckGear;
 
 public:
     virtual void Load(LPCSTR section);
@@ -142,6 +148,7 @@ public:
     virtual void PlayAnimIdle();
     bool TryPlayAnimIdle();
     virtual bool IsZoomed() const { return false; }
+    virtual void OnZoomOut(bool = false){};
     // virtual void	PlayAnimBore		();
     virtual void PlayAnimIdleMoving();
     virtual void PlayAnimIdleMovingSlow();
@@ -151,6 +158,15 @@ public:
     virtual void PlayAnimIdleMovingCrouch();
     virtual void PlayAnimIdleMovingCrouchSlow();
     virtual void PlayAnimDeviceSwitch(){};
+
+    virtual void PlayAnimOnItemTake();
+    virtual void PlayAnimCheckout();
+    virtual void PlayAnimCheckGear();
+
+    virtual void OnKick();
+    virtual void switch2_Kick();
+    virtual void PlayAnimKick();
+    virtual bool IsKick() const { return GetState() == eKick; }
 
     virtual bool NeedBlendAnm();
 
@@ -196,7 +212,7 @@ protected:
     u32 dwXF_Frame;
 
 protected:
-    u32 m_animation_slot;
+    u32 m_animation_slot{u32(-1)};
 
 public:
     IC u32 animation_slot() { return m_animation_slot; }
@@ -293,8 +309,9 @@ protected:
     u32 skip_updated_frame{};
     bool HudInertionAllowed() const { return m_huditem_flags.test(fl_inertion_allow); }
     void AllowHudInertion(BOOL B) { m_huditem_flags.set(fl_inertion_allow, B); }
-    void TimeLockAnimation();
-    virtual void DeviceUpdate(){};
+    //void TimeLockAnimation();
+    //virtual void DeviceUpdate(){};
+    float m_fAimInertionK;
 
 private:
     shared_str world_sect;

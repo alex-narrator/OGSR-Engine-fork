@@ -1,0 +1,211 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;	MEDICAL
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[antirad]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+$spawn 			= "food and drugs\antirad"
+$prefetch 		= 32
+class			= II_ANTIR
+cform           = skeleton
+visual          = equipments\item_antirad.ogf
+description		= enc_equipment_medi_antirad1
+
+inv_name			= Antirad
+inv_name_short		= Antirad
+inv_weight			= 0.1
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 18
+inv_grid_y			= 12
+cost				= 300
+
+; eatable item
+eat_health = 0
+eat_satiety = 0
+eat_power = 0
+eat_radiation = -1.0
+eat_wounds_heal = 0
+eat_portions_num = 1
+
+use_sound 		= interface\inv_pills
+
+; food item
+animation_slot		= 4
+
+;hud item
+hud = wpn_vodka_hud
+
+default_to_ruck = true
+belt = true
+vest = true
+slot = 12,13,14,15
+
+
+[medkit]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+$spawn 				= "food and drugs\medkit"
+$prefetch 			= 8
+class				= II_MEDKI
+cform				= skeleton
+visual				= equipments\item_aptechka.ogf
+description			= enc_equipment_medi_medkit1
+inv_name			= Medkit
+inv_name_short		= Medkit
+inv_weight			= 0.3	;0.2
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 9
+inv_grid_y			= 30
+cost				= 150
+
+; eatable item
+;eat_health			= 0.6
+;eat_satiety			= 0
+;eat_power			= 0.0
+;eat_radiation		= -0.1
+;eat_wounds_heal	= 0.3
+eat_portions_num	= 1
+;eat_max_power		= 0.1
+
+boost_health = 1
+boost_time = 10
+
+use_sound 		= interface\inv_medkit
+
+; food item
+animation_slot		= 4
+
+default_to_ruck 	= true
+belt = true
+vest = true
+slot = 12,13,14,15
+
+;hud item
+hud = wpn_vodka_hud
+
+[medkit_army]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+$spawn 				= "food and drugs\medkit_army"
+$prefetch 			= 8
+class				= II_MEDKI
+cform				= skeleton
+visual				= equipments\item_aptechka3.ogf
+description			= enc_equipment_medi_medkit2
+inv_name			= Medkit_army
+inv_name_short		= Medkit_army
+inv_weight			= 0.3	;0.2
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 11
+inv_grid_y			= 30
+cost				= 220
+
+; eatable item
+eat_health			= 1.0
+eat_satiety			= 0
+eat_power			= 0.0
+eat_radiation		= -0.1
+eat_wounds_heal	= 1.0
+eat_portions_num	= 1
+eat_max_power		= 0.1
+
+use_sound 		= interface\inv_medkit
+
+; food item
+animation_slot		= 4
+
+default_to_ruck = true
+belt = true
+vest = true
+slot = 12,13,14,15
+
+;hud item
+hud = wpn_vodka_hud
+
+[medkit_scientic]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+$spawn 				= "food and drugs\medkit_scientic"
+$prefetch 			= 8
+class				= II_MEDKI
+cform				= skeleton
+visual				= equipments\item_aptechka2.ogf
+description			= enc_equipment_medi_medkit3
+inv_name			= Medkit_scientific
+inv_name_short		= Medkit_scientific
+inv_weight			= 0.3	;0.2
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 10
+inv_grid_y			= 30
+cost				= 200
+
+; eatable item
+eat_health			= 1.0
+eat_satiety			= 0
+eat_power			= 0.0
+eat_radiation		= -1.0
+eat_wounds_heal	= 0.3
+eat_portions_num	= 1
+eat_max_power		= 0.1
+
+use_sound 		= interface\inv_medkit
+
+; food item
+animation_slot		= 4
+
+default_to_ruck = true
+belt = true
+vest = true
+slot = 12,13,14,15
+
+;hud item
+hud = wpn_vodka_hud
+
+[bandage]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+$spawn 				= "food and drugs\bandage"
+$prefetch 			= 8
+class				= II_BANDG
+cform				= skeleton
+visual				= equipments\item_bandage.ogf
+description			= enc_equipment_medi_bandage1
+
+inv_name			= bandage
+inv_name_short		= bandage
+inv_weight			= 0.1	;0.2
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 3
+inv_grid_y			= 18
+cost				= 20
+
+; eatable item
+eat_health = 	0.1
+eat_satiety = 	0
+eat_power = 	0.0
+eat_radiation = 0.0
+eat_wounds_heal = 1.0
+eat_portions_num = 1	;100
+
+use_sound 		= interface\inv_bandage
+
+; food item
+animation_slot		= 4
+
+default_to_ruck = true
+belt = true
+vest = true
+slot = 12,13,14,15
+
+;hud item
+hud = wpn_vodka_hud

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="cant_walk">
+		<text>Немає сил</text>
+	</string>
+	<string id="cant_walk_weight">
+		<text>Перевантаження</text>
+	</string>
+	<string id="dar_poltergeist_hold_the_door">
+		<text>Хтось тримає двері</text>
+	</string>
+	<string id="Global Map">
+		<text>Загальна мапа</text>
+	</string>
+	<string id="gun_jammed">
+		<text>ЗАТРИМКА. \nНатисніть [$$ACTION_ADDITIONAL_ACTION$$]+[$$ACTION_WPN_RELOAD$$] для усунення</text>
+	</string>
+	<string id="inventory_box_use">
+		<text>Обшукати ящик [$$ACTION_USE$$]</text>
+	</string>
+	<string id="Local Map">
+		<text>Місцева мапа</text>
+	</string>
+	<string id="st_game_saved">
+		<text>гру збережено</text>
+	</string>
+	<string id="tip_car_locked">
+		<text>Заблоковано</text>
+	</string>
+	<string id="tip_car_use">
+		<text>Відчинити [$$ACTION_USE$$]</text>
+	</string>
+	<string id="tip_door_close">
+		<text>Натисніть [$$ACTION_USE$$], щоб зачинити двері</text>
+	</string>
+	<string id="tip_door_coded">
+		<text>Двері під кодовим замком</text>
+	</string>
+	<string id="tip_door_decode">
+		<text>Натисніть [$$ACTION_USE$$], для декодування</text>
+	</string>
+	<string id="tip_door_decoding">
+		<text>Триває процес декодування</text>
+	</string>
+	<string id="tip_door_locked">
+		<text>Двері зачинено</text>
+	</string>
+	<string id="tip_door_open">
+		<text>Натисніть [$$ACTION_USE$$], щоб відчинити</text>
+	</string>
+	<string id="tip_gate_close">
+		<text>Натисніть [$$ACTION_USE$$] щоб зачинити ворота</text>
+	</string>
+	<string id="tip_gate_locked">
+		<text>Ворота заблоковано</text>
+	</string>
+	<string id="tip_gate_open">
+		<text>Натисніть [$$ACTION_USE$$] щоб відчинити ворота</text>
+	</string>
+	<string id="tip_monolith">
+		<text>ЗАГАДАТИ БАЖАННЯ [$$ACTION_USE$$]</text>
+	</string>
+</string_table>

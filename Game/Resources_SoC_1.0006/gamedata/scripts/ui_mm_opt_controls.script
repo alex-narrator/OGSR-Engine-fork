@@ -7,18 +7,40 @@ end
 function opt_controls:__finalize()
 end
 
+local tab = "controls"
+local mm = ui_mm_opt_main
+
+local controls_opt_params = {
+	--"option name", "option control type", "option tip name", "option tip text"
+	{ "mousesens", 					"track", "controls_settings_name_mousesens", 					"controls_settings_desc_mousesens"					},
+	{ "mouseinvert", 				"check", "controls_settings_name_mouseinvert", 					"controls_settings_desc_mouseinvert"				},
+	{ "missile_force_grow_speed", 	"track", "controls_settings_name_missile_force_grow_speed", 	"controls_settings_desc_missile_force_grow_speed"	},
+	{ "hold_to_aim", 				"check", "controls_settings_name_hold_to_aim", 					"controls_settings_desc_hold_to_aim"				},
+	{ "switch_slot", 				"check", "controls_settings_name_switch_slot", 					"controls_settings_desc_switch_slot"				},
+	{ "input_exclusive", 			"check", "controls_settings_name_input_exclusive", 				"controls_settings_desc_input_exclusive"			},
+}
+
 function opt_controls:InitControls(x, y, xml, handler)
 	self:Init(x, y, 738, 416)
 	self:SetAutoDelete(true)
 
 	xml:InitFrame("frame", self)
 
-	xml:InitStatic("tab_controls:cap_mousesens", self)
 	xml:InitLabel("tab_controls:cap_keyboardsetup", self)
-	xml:InitLabel("tab_controls:cap_keyboardsetup", self)
-	xml:InitTrackBar("tab_controls:track_mousesens", self)
-	xml:InitCheck("tab_controls:check_mouseinvert", self)
+	
 	xml:InitKeyBinding("tab_controls:key_binding", self)
+	
+	for i =1, #controls_opt_params do
+		local opt, ctrl, tip_name, tip_text = unpack(controls_opt_params[i])
+
+		local static = xml[mm.get_control(ctrl)](xml, "tab_"..tab..":"..ctrl.."_"..opt, self)
+		if ctrl == "track" then
+			static = xml:InitStatic("tab_"..tab..":cap_"..opt, self)
+		end
+			
+		mm.init_hint(handler, static, opt, tip_name, tip_text)
+
+	end
 
 	local btn = xml:Init3tButton("tab_controls:btn_default", self)
 	handler:Register(btn, "btn_keyb_default")

@@ -18,12 +18,12 @@ struct ITEM_TYPE
     shared_str nightvision_particle;
 };
 
-//описание зоны, обнаруженной детектором
+// описание зоны, обнаруженной детектором
 struct ITEM_INFO
 {
     ITEM_TYPE* curr_ref{};
     float snd_time{};
-    //текущая частота работы датчика
+    // текущая частота работы датчика
     float cur_period{};
     // particle for night-vision mode
     CParticlesObject* pParticle{};
@@ -127,6 +127,16 @@ public:
     int m_af_rank;
 };
 
+class CZoneList : public CDetectList<CCustomZone>
+{
+protected:
+    virtual BOOL feel_touch_contact(CObject* O) override;
+
+public:
+    CZoneList() = default;
+    virtual ~CZoneList();
+};
+
 class CUIArtefactDetectorBase;
 
 class CCustomDetector : public CHudItemObject
@@ -137,6 +147,7 @@ protected:
     CUIArtefactDetectorBase* m_ui{};
     bool m_bFastAnimMode{};
     bool m_bNeedActivation{};
+    shared_str m_nightvision_particle{};
 
 public:
     CCustomDetector() = default;
@@ -151,10 +162,13 @@ public:
     virtual void shedule_Update(u32 dt) override;
     virtual void UpdateCL() override;
 
-    bool IsWorking() const;
+    virtual bool IsPowerOn() const;
+    virtual void Switch(bool);
 
-    virtual void OnMoveToSlot() override;
+    virtual void OnMoveToSlot(EItemPlace prevPlace) override;
     virtual void OnMoveToRuck(EItemPlace prevPlace) override;
+    virtual void OnMoveToBelt(EItemPlace prevPlace) override;
+    virtual void OnMoveToVest(EItemPlace prevPlace) override;
 
     virtual void OnActiveItem() override;
     virtual void OnHiddenItem() override;
@@ -165,38 +179,40 @@ public:
     void ToggleDetector(bool bFastMode);
     void HideDetector(bool bFastMode);
     void ShowDetector(bool bFastMode);
-    float m_fAfDetectRadius;
+    float m_fDetectRadius{};
     virtual bool CheckCompatibility(CHudItem* itm) override;
 
     virtual u32 ef_detector_type() const override { return 1; }
 
+    bool IsZoomed() const override;
+    bool IsAiming() const;
+
 protected:
     bool CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate);
-    void TurnDetectorInternal(bool b);
+    // void TurnDetectorInternal(bool b);
     // void UpdateNightVisionMode(bool b_off);
     void UpdateVisibility();
-    virtual void UpfateWork();
+    virtual void UpdateWork();
     virtual void UpdateAf() {}
     virtual void CreateUI() {}
 
-    bool m_bWorking;
-    float m_fAfVisRadius;
-    float m_fDecayRate; // Alundaio
+    virtual void TryMakeArtefactVisible(CArtefact*);
+    virtual void UpdateZones() {}
+    virtual void UpdateNightVisionMode();
+
+    virtual void DisableUIDetection(){};
+
+    bool m_bWorking{};
+    float m_fAfVisRadius{};
+    float m_fDecayRate{}; // Alundaio
     CAfList m_artefacts;
+    CZoneList m_zones;
 
     HUD_SOUND sndShow, sndHide;
 
     virtual size_t GetWeaponTypeForCollision() const override { return Detector; }
     virtual Fvector GetPositionForCollision() override;
     virtual Fvector GetDirectionForCollision() override;
-};
 
-class CZoneList : public CDetectList<CCustomZone>
-{
-protected:
-    virtual BOOL feel_touch_contact(CObject* O) override;
-
-public:
-    CZoneList() = default;
-    virtual ~CZoneList();
+    virtual u8 GetCurrentHudOffsetIdx() const override { return IsAiming(); };
 };

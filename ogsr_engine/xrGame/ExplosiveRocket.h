@@ -16,8 +16,8 @@ private:
     friend CRocketLauncher;
 
 public:
-    CExplosiveRocket(void);
-    virtual ~CExplosiveRocket(void);
+    CExplosiveRocket(void){};
+    virtual ~CExplosiveRocket(void){};
     virtual DLL_Pure* _construct();
 
 public:
@@ -68,7 +68,7 @@ public:
     virtual bool Useful() const;
 
 protected:
-    float m_safe_dist_to_explode;
+    float m_safe_dist_to_explode{};
     shared_str real_grenade_name;
 
 public:

@@ -24,8 +24,8 @@ public:
     bool m_bMobility;
     float m_fAccuracy;
     float m_fIntelligence;
-    u32 m_use_timeout;
-    u8 m_squad_index;
+    u32 m_use_timeout{5000};
+    u8 m_squad_index{u8(-1)};
 
 private:
     bool m_is_agresive;
@@ -150,13 +150,16 @@ public:
     virtual ALife::ERelationType tfGetRelationType(const CEntityAlive* tpEntityAlive) const;
     virtual bool is_relation_enemy(const CEntityAlive* tpEntityAlive) const;
 
+    virtual bool CheckEnemyStatus(CEntityAlive* tgt);
+    virtual bool critically_wounded() { return false; };
+
 public:
     MONSTER_COMMUNITY* monster_community;
 
 private:
     CEntityCondition* m_entity_condition;
-    CMaterialManager* m_material_manager;
-    bool b_eating;
+    CMaterialManager* m_material_manager{};
+    bool b_eating{};
 
 protected:
     virtual CEntityConditionSimple* create_entity_condition(CEntityConditionSimple* ec);
@@ -171,8 +174,8 @@ public:
 
 protected:
     u32 m_ef_creature_type;
-    u32 m_ef_weapon_type;
-    u32 m_ef_detector_type;
+    u32 m_ef_weapon_type{u32(-1)};
+    u32 m_ef_detector_type{u32(-1)};
 
 public:
     virtual u32 ef_creature_type() const;

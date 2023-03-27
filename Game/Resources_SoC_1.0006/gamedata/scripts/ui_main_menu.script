@@ -170,6 +170,10 @@ function main_menu:OnKeyboard(dik, keyboard_action)
 		elseif dik == DIK_keys.DIK_N then --personal_test
 			xpcall(function() dofile(getFS():update_path("$game_scripts$", "personal_test.lua")) end, log1)
 		end
+		
+		if dik == DIK_keys.DIK_Q then
+			get_console():execute( "quit" )
+		end
 	end
 
 	return true

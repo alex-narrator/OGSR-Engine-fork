@@ -183,6 +183,10 @@ void add_online_impl(CSE_ALifeDynamicObject* object, const bool& update_registri
         object->alife().server().Process_spawn(tNetPacket, clientID, FALSE, l_tpALifeInventoryItem->base());
         l_tpALifeDynamicObject->s_flags.And(u16(-1) ^ M_SPAWN_UPDATE);
         l_tpALifeDynamicObject->m_bOnline = true;
+
+        // щоб вміст контейнерів завантажився коли контейнер у персонажа в інвентарі
+        if (auto l_tpIC = smart_cast<CSE_InventoryContainer*>(l_tpALifeDynamicObject))
+            l_tpIC->add_online(update_registries);
     }
 
     if (!update_registries)

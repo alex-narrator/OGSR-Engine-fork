@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<w>
+    <eatable_params x="0" y="0" width="194" height="1">
+	
+		<influence_header width="194" height="20" complex_mode="1">
+			<text font="letterica16" x="0" y="0">st_influence_header</text>
+		</influence_header>
+		<boost_header width="194" height="20" complex_mode="1">
+			<text font="letterica16" x="0" y="0">st_boost_header</text>
+		</boost_header>
+	
+		<static_eat_health width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_eat_health>
+		
+		<static_eat_power width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_eat_power>
+		
+		<static_eat_max_power width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_eat_max_power>
+		
+		<static_eat_satiety width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_eat_satiety>
+		
+		<static_eat_radiation width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_eat_radiation>
+		
+		<static_eat_psyhealth width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_eat_psyhealth>
+		
+		<static_eat_alcohol width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_eat_alcohol>
+		
+		<static_eat_thirst width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_eat_thirst>
+		
+		<static_eat_wounds_heal width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_eat_wounds_heal>
+		
+		<static_boost_health width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_boost_health>	
+		<static_boost_power width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_boost_power>	
+		<static_boost_max_power width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_boost_max_power>
+		<static_boost_satiety width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_boost_satiety>	
+		<static_boost_radiation width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_boost_radiation>
+		<static_boost_psyhealth width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_boost_psyhealth>
+		<static_boost_alcohol width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_boost_alcohol>	
+		<static_boost_wounds_heal width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_boost_wounds_heal>		
+		<static_boost_sprint width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_boost_sprint>
+		<static_boost_jump width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_boost_jump>		
+		<static_boost_max_weight width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_boost_max_weight>
+		<static_burn_boost width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_burn_boost>
+		<static_strike_boost width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_strike_boost>		
+		<static_wound_boost width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_wound_boost>	
+		<static_radiation_boost width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_radiation_boost>	
+		<static_telepatic_boost width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_telepatic_boost>
+		<static_chemical_burn_boost width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_chemical_burn_boost>	
+		<static_explosion_boost width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_explosion_boost>		
+		<static_fire_wound_boost width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_fire_wound_boost>
+		<static_boost_time width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_boost_time>		
+	</eatable_params>
+</w>

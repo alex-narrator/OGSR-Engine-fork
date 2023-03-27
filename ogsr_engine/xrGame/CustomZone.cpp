@@ -21,45 +21,17 @@
 #include "script_game_object.h"
 
 //////////////////////////////////////////////////////////////////////////
-#define PREFETCHED_ARTEFACTS_NUM 1 //количество предварительно проспавненых артефактов
+constexpr auto PREFETCHED_ARTEFACTS_NUM = 1; // количество предварительно проспавненых артефактов;
 #define WIND_RADIUS (4 * Radius()) //расстояние до актера, когда появляется ветер
-#define FASTMODE_DISTANCE (50.f) // distance to camera from sphere, when zone switches to fast update sequence
+constexpr auto FASTMODE_DISTANCE = (50.f); // distance to camera from sphere, when zone switches to fast update sequence;
 
 CCustomZone::CCustomZone(void)
 {
     m_zone_flags.zero();
 
-    m_fMaxPower = 100.f;
-    m_fAttenuation = 1.f;
-    m_dwPeriod = 1100;
-    m_fEffectiveRadius = 0.75f;
-    m_bZoneActive = false;
-    m_eHitTypeBlowout = ALife::eHitTypeWound;
-    m_pLocalActor = NULL;
-    m_pIdleParticles = NULL;
-    m_pLight = NULL;
-    m_pIdleLight = NULL;
-    m_pIdleLAnim = NULL;
-
     m_StateTime.resize(eZoneStateMax);
     for (int i = 0; i < eZoneStateMax; i++)
         m_StateTime[i] = 0;
-
-    m_dwAffectFrameNum = 0;
-    m_fArtefactSpawnProbability = 0.f;
-    m_fThrowOutPower = 0.f;
-    m_fArtefactSpawnHeight = 0.f;
-    m_fBlowoutWindPowerMax = m_fStoreWindPower = 0.f;
-    m_fDistanceToCurEntity = flt_max;
-    m_ef_weapon_type = u32(-1);
-    m_owner_id = u32(-1);
-
-    m_effector = NULL;
-    m_bIdleObjectParticlesDontStop = FALSE;
-    m_b_always_fastmode = FALSE;
-
-    m_bBornOnBlowoutFlag = false;
-    m_keep_update = false;
 }
 
 CCustomZone::~CCustomZone(void)
@@ -174,7 +146,7 @@ void CCustomZone::Load(LPCSTR section)
     if (pSettings->line_exist(section, "idle_particles_dont_stop"))
         m_bIdleObjectParticlesDontStop = pSettings->r_bool(section, "idle_particles_dont_stop");
 
-    if (pSettings->line_exist(section, "postprocess"))
+    if (pSettings->line_exist(section, "postprocess") && !Core.Features.test(xrCore::Feature::no_zone_posteffect))
     {
         m_effector = xr_new<CZoneEffector>();
         m_effector->Load(pSettings->r_string(section, "postprocess"));
@@ -337,14 +309,18 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
     CSE_ALifeCustomZone* Z = smart_cast<CSE_ALifeCustomZone*>(e);
     VERIFY(Z);
 
-    m_fMaxPower = pSettings->r_float(cNameSect(), "max_start_power");
+    m_fMaxPower = Z->m_maxPower; // pSettings->r_float(cNameSect(), "max_start_power");
     m_fAttenuation = pSettings->r_float(cNameSect(), "attenuation");
     m_dwPeriod = pSettings->r_u32(cNameSect(), "period");
     m_owner_id = Z->m_owner_id;
+    m_zone_ttl = Z->m_zone_ttl;
     if (m_owner_id != u32(-1))
-        m_ttl = Device.dwTimeGlobal + 40000; // 40 sec
+    {
+        m_ttl = Device.dwTimeGlobal + 1000 * m_zone_ttl; // ttl in seconds
+        Msg("anomaly [%s] spawned with ttl [%d], m_fMaxPower [%.4f]", Name_script(), m_zone_ttl, m_fMaxPower);
+    }
     else
-        m_ttl = u32(-1);
+        m_ttl = m_zone_ttl;
 
     m_TimeToDisable = Z->m_disabled_time * 1000;
     m_TimeToEnable = Z->m_enabled_time * 1000;
@@ -595,7 +571,7 @@ void CCustomZone::shedule_Update(u32 dt)
 
     UpdateOnOffState();
 
-    if (LastBlowoutTime && (Device.dwTimeGlobal - LastBlowoutTime) > 300)
+    if (Device.dwTimeGlobal > m_ttl || LastBlowoutTime && (Device.dwTimeGlobal - LastBlowoutTime) > 300)
         DestroyObject();
 }
 
@@ -764,7 +740,7 @@ void CCustomZone::UpdateIdleLight()
 
     int frame = 0;
     u32 clr = m_pIdleLAnim->CalculateBGR(Device.fTimeGlobal, frame); // возвращает в формате BGR
-    Fcolor fclr;
+    Fcolor fclr{};
     fclr.set((float)color_get_B(clr) / 255.f, (float)color_get_G(clr) / 255.f, (float)color_get_R(clr) / 255.f, 1.f);
 
     float range = m_fIdleLightRange + m_fIdleLightRangeDelta * ::Random.randF(-1.f, 1.f);
@@ -860,7 +836,7 @@ void CCustomZone::PlayEntranceParticles(CGameObject* pObject)
             CParticlesObject* pParticles = CParticlesObject::Create(*particle_str, TRUE);
             Fmatrix xform;
 
-            Fvector dir;
+            Fvector dir{};
             if (fis_zero(vel.magnitude()))
                 dir.set(0, 1, 0);
             else
@@ -963,7 +939,7 @@ void CCustomZone::StopObjectIdleParticles(CGameObject* pObject)
 
 void CCustomZone::Hit(SHit* pHDS)
 {
-    Fmatrix M;
+    Fmatrix M{};
     M.identity();
     M.translate_over(pHDS->p_in_bone_space);
     M.mulA_43(XFORM());
@@ -1312,7 +1288,7 @@ void CCustomZone::BornArtefact(bool forced)
 
 void CCustomZone::ThrowOutArtefact(CArtefact* pArtefact)
 {
-    Fvector pos;
+    Fvector pos{};
     pos.set(Position());
     pos.y += m_fArtefactSpawnHeight;
     pArtefact->XFORM().c.set(pos);
@@ -1332,7 +1308,7 @@ void CCustomZone::ThrowOutArtefact(CArtefact* pArtefact)
     PP.w_vec3(pos);
     CGameObject::u_EventSend(PP);
 
-    Fvector dir;
+    Fvector dir{};
     dir.random_dir();
     dir.normalize();
     pArtefact->m_pPhysicsShell->applyImpulse(dir, m_fThrowOutPower);

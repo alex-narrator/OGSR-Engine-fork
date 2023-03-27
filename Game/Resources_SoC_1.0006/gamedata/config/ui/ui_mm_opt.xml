@@ -147,18 +147,14 @@
 			<list_font r="216" g="186" b="140" font="letterica16"/>
 		</list_fps_lock>
 		
-		<cap_fullscreen x="20" y="230" width="143" height="21">
-			<text font="letterica16" r="215" g="195" b="170">ui_mm_fullscreen</text>
-		</cap_fullscreen>
-		<check_fullscreen x="194" y="225" width="30" height="21">
+		<check_fullscreen x="20" y="230" width="92" height="21">
 			<options_item entry="rs_fullscreen" group="mm_opt_video"/>
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_fullscreen</text>
 		</check_fullscreen>
 
-		<cap_always_active x="55" y="260" width="143" height="21">
-			<text font="letterica16" r="215" g="195" b="170">ui_mm_always_active</text>
-		</cap_always_active>
-		<check_always_active x="20" y="258" width="30" height="21">
+		<check_always_active x="20" y="260" width="285" height="21">
 			<options_item entry="rs_always_active" group="mm_opt_video"/>
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_always_active</text>
 		</check_always_active>
 
 		<btn_advanced x="342" y="325" width="111" height="29">
@@ -610,6 +606,34 @@
 		<check_mt_texload x="249" y="0" width="30" height="21">
 			<options_item entry="r_mt_texload" group="mm_opt_video_adv"/>
 		</check_mt_texload>
+		
+		<cap_bloodmarks_on_dynamics x="5" y="5" width="143" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_bloodmarks_on_dynamics</text>
+		</cap_bloodmarks_on_dynamics>	
+		<check_bloodmarks_on_dynamics x="249" y="0" width="30" height="21">
+			<options_item entry="g_bloodmarks_on_dynamics" group="mm_opt_video_adv"/>
+		</check_bloodmarks_on_dynamics>
+		
+		<cap_cam_inert x="5" y="5" width="143" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_cam_inert</text>
+		</cap_cam_inert>
+		<track_cam_inert x="249" y="0" width="190" height="21" invert="0" step="0.1">
+			<options_item entry="cam_inert" group="mm_opt_video_adv"/>
+		</track_cam_inert>
+		
+		<cap_cam_height_speed x="5" y="5" width="143" height="21">
+			<text font="letterica16" r="195" g="195" b="170">ui_mm_cam_height_speed</text>
+		</cap_cam_height_speed>
+		<track_cam_height_speed x="249" y="0" width="190" height="21" step="1">
+			<options_item entry="g_cam_height_speed" group="mm_opt_video"/>
+		</track_cam_height_speed>
+		
+		<cap_cam_lookout_speed x="5" y="5" width="143" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_cam_lookout_speed</text>
+		</cap_cam_lookout_speed>
+		<track_cam_lookout_speed x="249" y="0" width="190" height="21" step="1">
+			<options_item entry="g_cam_lookout_speed" group="mm_opt_video"/>
+		</track_cam_lookout_speed>
 
 		<btn_to_simply x="342" y="325" width="111" height="29">
 			<text align="c" font="letterica16" r="227" g="199" b="178">ui_mm_simply</text>
@@ -656,7 +680,16 @@
 			<texture>ui_button_ordinary</texture>
 		</btn_default_set>
 	</tab_sound>
+	
+	<frame_gameplay x="18" y="135" width="435" height="180">
+		<texture>ui_cb_listbox</texture>		
+	</frame_gameplay>
+	
 	<tab_gameplay>
+	
+		<scroll_view	x="20" y="135" width="435" height="220" 
+					right_ident="0" left_ident="0" top_indent="0" bottom_indent="0" 
+					vert_interval="2" always_show_scroll="0" flip_vert="0"/>
 
 		<cap_difficulty x="20" y="25" width="143" height="21">
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_difficulty</text>
@@ -670,93 +703,118 @@
 			<list_font_s r="240" g="217" b="182"/>
 			<list_font r="216" g="186" b="140" font="letterica16"/>
 		</list_difficulty>
+		
+		<!-- game save mode -->
+		<cap_game_save_mode x="20" y="55" width="163" height="21" complex_mode = "1">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_game_save_mode</text>			
+		</cap_game_save_mode>
+		
+		<list_game_save_mode x="194" y="50" width="261" height="21" always_show_scroll="0" list_length="3">	
+			<options_item entry="g_save_mode" group="mm_opt_gameplay"/>
+			<text_color>
+				<e r="216" g="186" b="140"/>
+			</text_color>
+			<list_font_s r="240" g="217" b="182"/>
+			<list_font	 r="216" g="186" b="140" font="letterica16"/>
+		</list_game_save_mode>
+<!-- game save mode-->
 
-		<check_autopause x="20" y="55" width="243" height="21">
+		<check_autopause x="0" y="0" width="415" height="21">
 			<options_item entry="keypress_on_start" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_keypress_on_start</text>
 		</check_autopause>
 
-		<check_crosshair x="20" y="80" width="243" height="21">
+		<check_crosshair x="0" y="0" width="415" height="21">
 			<options_item entry="hud_crosshair" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_show_crosshair</text>
 		</check_crosshair>
 
-		<check_dyn_crosshair x="20" y="105" width="243" height="21">
+		<check_dyn_crosshair x="0" y="0" width="415" height="21">
 			<options_item entry="cl_dynamiccrosshair" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_dyn_crosshair</text>
 		</check_dyn_crosshair>
 
-		<check_show_weapon x="20" y="130" width="243" height="21">
-			<options_item entry="hud_weapon" group="mm_opt_gameplay"/>
-			<text font="letterica16" r="215" g="195" b="170">ui_mm_show_weapon</text>
-		</check_show_weapon>
-
-		<check_dist x="20" y="155" width="243" height="21">
+		<check_dist x="0" y="0" width="415" height="21">
 			<options_item entry="hud_crosshair_dist" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_crosshair_distance</text>
 		</check_dist>
 
-		<check_tips x="20" y="180" width="243" height="21">
+		<check_tips x="0" y="0" width="415" height="21">
 			<options_item entry="hud_info" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_tips</text>
 		</check_tips>
 
-		<check_ambient x="20" y="205" width="243" height="21">
+		<check_ambient x="0" y="0" width="415" height="21">
 			<options_item entry="g_music_tracks" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_ambient</text>
 		</check_ambient>
 
-		<check_build_crosshair x="20" y="230" width="243" height="21">
+		<check_build_crosshair x="0" y="0" width="415" height="21">
 			<options_item entry="hud_crosshair_build" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_build_crosshair</text>
 		</check_build_crosshair>
 
-		<check_crosshair_hard x="20" y="255" width="243" height="21">
+		<check_crosshair_hard x="0" y="0" width="415" height="21">
 			<options_item entry="hud_crosshair_hard" group="mm_opt_gameplay"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_crosshair_hard</text>
 		</check_crosshair_hard>
 
-		<check_aim_toggle x="20" y="280" width="243" height="21">
-			<options_item entry="wpn_aim_toggle" group="mm_opt_gameplay"/>
-			<text font="letterica16" r="215" g="195" b="170">ui_mm_aim_toggle</text>
-		</check_aim_toggle>
-		
-		<check_switch_slot x="20" y="305" width="243" height="21">
-			<options_item entry="g_mouse_wheel_switch_slot" group="mm_opt_gameplay"/>
-			<text font="letterica16" r="215" g="195" b="170">ui_mm_switch_slot</text>
-		</check_switch_slot>
-
-		<cap_font_scale_x x="195" y="55" width="143" height="21">
+		<cap_font_scale_x x="20" y="85" width="143" height="21">
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_font_scale_x</text>
 		</cap_font_scale_x>
-		<track_font_scale_x x="280" y="50" width="175" height="21" invert="0" step="0.01" min="0.5" max="2">
+		<track_font_scale_x x="194" y="80" width="261" height="21" invert="0" step="0.01" min="0.5" max="2">
 			<options_item entry="g_font_scale_x" group="mm_opt_gameplay"/>
 		</track_font_scale_x>
 
-		<cap_font_scale_y x="195" y="80" width="143" height="21">
+		<cap_font_scale_y x="20" y="105" width="143" height="21">
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_font_scale_y</text>
 		</cap_font_scale_y>
-		<track_font_scale_y x="280" y="75" width="175" height="21" invert="0" step="0.01" min="0.5" max="2">
+		<track_font_scale_y x="194" y="100" width="261" height="21" invert="0" step="0.01" min="0.5" max="2">
 			<options_item entry="g_font_scale_y" group="mm_opt_gameplay"/>
 		</track_font_scale_y>
 
 	</tab_gameplay>
 	<tab_controls>
-		<cap_mousesens x="20" y="25" width="150" height="21">
-			<text font="letterica16" r="215" g="195" b="170">ui_mm_mouse_sense</text>
-		</cap_mousesens>
 		<cap_keyboardsetup x="6" y="95" width="456" height="23">
 			<texture>ui_brokenline</texture>
 			<text font="letterica16" r="215" g="195" b="170" x="10">ui_mm_keyboard_setup</text>
 		</cap_keyboardsetup>
-	
-		<track_mousesens x="194" y="20" width="261" height="21" step="0.01">
+		
+		<cap_mousesens x="20" y="13" width="150" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_mouse_sense</text>
+		</cap_mousesens>
+		<track_mousesens x="194" y="10" width="261" height="21" step="0.01">
 			<options_item entry="mouse_sens" group="mm_opt_controls"/>
 		</track_mousesens>
-		<check_mouseinvert x="20" y="55" width="143" height="21">
+		
+		<cap_missile_force_grow_speed x="20" y="33" width="430" height="21">
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_missile_force_grow_speed</text>
+		</cap_missile_force_grow_speed>
+		<track_missile_force_grow_speed x="194" y="30" width="261" height="21" step="1">
+			<options_item entry="missile_force_grow_speed" group="mm_opt_controls"/>
+		</track_missile_force_grow_speed>		
+
+		<check_mouseinvert x="20" y="50" width="143" height="21">
 			<options_item entry="mouse_invert" group="mm_opt_controls"/>
 			<text font="letterica16" r="215" g="195" b="170">ui_mm_invert_mouse</text>
 		</check_mouseinvert>
+		
+		<check_hold_to_aim x="200" y="50" width="250" height="21">
+			<options_item entry="g_hold_to_aim" group="mm_opt_controls"/>
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_hold_to_aim</text>
+		</check_hold_to_aim>
+		
+	
+		<check_input_exclusive x="20" y="70" width="170" height="21">
+			<options_item entry="input_exclusive_mode" group="mm_opt_controls"/>
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_input_exclusive</text>
+		</check_input_exclusive>
+		
+		<check_switch_slot x="200" y="70" width="415" height="21">
+			<options_item entry="g_mouse_wheel_switch_slot" group="mm_opt_gameplay"/>
+			<text font="letterica16" r="215" g="195" b="170">ui_mm_switch_slot</text>
+		</check_switch_slot>
+		
 		<key_binding x="10" y="115" width="451" height="202">
 			<!-- headers -->
 			<header_1 x="0" y="0" width="229" height="17">

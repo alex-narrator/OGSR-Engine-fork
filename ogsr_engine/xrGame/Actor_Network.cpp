@@ -22,7 +22,6 @@
 
 #include "map_manager.h"
 #include "HUDManager.h"
-#include "ui/UIArtefactPanel.h"
 #include "GameTaskManager.h"
 #include "holder_custom.h"
 #include "actor_memory.h"
@@ -146,12 +145,11 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     // *** movement state - respawn
     mstate_wishful = 0;
     if (m_loaded_ph_box_id == 1 || m_loaded_ph_box_id == 3)
-        mstate_real = mcCrouch;
+        mstate_wishful = mcCrouch;
     else if (m_loaded_ph_box_id == 2 || m_loaded_ph_box_id == 4)
-        mstate_real = mcCrouch | mcAccel;
-    else
-        mstate_real = 0;
-    mstate_old = mstate_real;
+        mstate_wishful = mcCrouch | mcAccel;
+
+    mstate_old = mstate_real = 0;
     m_bJumpKeyPressed = FALSE;
 
     NET_SavedAccel.set(0, 0, 0);
@@ -306,7 +304,6 @@ void CActor::net_Relcase(CObject* O)
 
     memory().remove_links(O);
     m_pPhysics_support->in_NetRelcase(O);
-    conditions().net_Relcase(O);
 }
 
 BOOL CActor::net_Relevant() // relevant for export to server

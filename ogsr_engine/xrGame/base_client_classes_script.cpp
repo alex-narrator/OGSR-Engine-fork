@@ -123,7 +123,7 @@ void CObjectScript::script_register(lua_State* L)
                                           value("eBore", int(CHudItem::EHudStates::eBore)), value("eFire", int(CHudItem::EHudStates::eFire)),
                                           value("eFire2", int(CHudItem::EHudStates::eFire2)), value("eReload", int(CHudItem::EHudStates::eReload)),
                                           value("eMisfire", int(CHudItem::EHudStates::eMisfire)), value("eMagEmpty", int(CHudItem::EHudStates::eMagEmpty)),
-                                          value("eSwitch", int(CHudItem::EHudStates::eSwitch)), value("eDeviceSwitch", int(CHudItem::EHudStates::eDeviceSwitch)),
+                                          value("eSwitch", int(CHudItem::EHudStates::eSwitch)), /*value("eDeviceSwitch", int(CHudItem::EHudStates::eDeviceSwitch)),*/
                                           value("eThrowStart", int(CHudItem::EHudStates::eThrowStart)), value("eReady", int(CHudItem::EHudStates::eReady)),
                                           value("eThrow", int(CHudItem::EHudStates::eThrow)), value("eThrowEnd", int(CHudItem::EHudStates::eThrowEnd))]
                   .enum_("RestrictionSpace")

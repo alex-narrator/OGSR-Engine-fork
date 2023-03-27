@@ -32,40 +32,41 @@ public:
         eLimping = (1 << 8),
         eCantWalk = (1 << 9),
         eCantSprint = (1 << 10),
-
-        eCriticalThirstReached = (1 << 11),
     };
     Flags16 m_condition_flags;
 
 private:
     CActor* m_object;
     void UpdateTutorialThresholds();
-    void UpdateSatiety();
-    void UpdateThirst();
+    virtual void UpdateSatiety() override;
+    virtual void UpdateAlcohol() override;
+    virtual void UpdateHealth() override;
+    virtual void UpdatePower();
+    virtual void UpdateRadiation() override;
+    virtual void UpdatePsyHealth() override;
 
 public:
     CActorCondition(CActor* object);
-    virtual ~CActorCondition(void);
+    virtual ~CActorCondition(void){};
 
     virtual void LoadCondition(LPCSTR section);
     virtual void reinit();
 
     virtual CWound* ConditionHit(SHit* pHDS);
     virtual void UpdateCondition();
+    // скорость потери крови из всех открытых ран
+    virtual float BleedingSpeed();
 
     virtual void ChangeAlcohol(float value);
     virtual void ChangeSatiety(float value);
-    virtual void ChangeThirst(float value);
 
     // хромание при потере сил и здоровья
     virtual bool IsLimping();
     virtual bool IsCantWalk();
-    virtual bool IsCantWalkWeight();
     virtual bool IsCantSprint();
     virtual bool IsCantJump(float weight);
 
     void PowerHit(float power, bool apply_outfit);
-    virtual void UpdatePower();
 
     void ConditionJump(float weight);
     void ConditionWalk(float weight, bool accel, bool sprint);
@@ -74,11 +75,6 @@ public:
     float GetAlcohol() { return m_fAlcohol; }
     float GetPsy() { return 1.0f - GetPsyHealth(); }
     float GetSatiety() { return m_fSatiety; }
-    float GetThirst() { return m_fThirst; }
-    void SetMaxWalkWeight(float _weight) { m_MaxWalkWeight = _weight; }
-
-    void AffectDamage_InjuriousMaterialAndMonstersInfluence();
-    float GetInjuriousMaterialDamage();
 
 public:
     IC CActor& object() const
@@ -88,68 +84,77 @@ public:
     }
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
-    float m_MaxWalkWeight;
 
     bool DisableSprint(SHit* pHDS);
     float HitSlowmo(SHit* pHDS);
 
 protected:
-    float m_fAlcohol;
-    float m_fV_Alcohol;
+    float m_fAlcohol{};
+    float m_fV_Alcohol{};
     //--
-    float m_fSatiety;
-    float m_fSatietyLightLimit;
-    float m_fSatietyCriticalLimit;
-    float m_fV_Satiety;
-    float m_fV_SatietyPower;
-    float m_fV_SatietyHealth;
+    float m_fSatiety{1.f};
+    float m_fV_Satiety{};
+    float m_fV_SatietyPower{};
+    float m_fV_SatietyHealth{};
     //--
+    float m_fPowerLeakSpeed{};
+    float m_fV_Power{};
 
-    float m_fThirst;
-    float m_fThirstLightLimit;
-    float m_fThirstCriticalLimit;
-    float m_fV_Thirst;
-    float m_fV_ThirstPower;
-    float m_fV_ThirstHealth;
+    float m_fJumpPower{};
+    float m_fStandPower{};
+    float m_fWalkPower{};
+    float m_fJumpWeightPower{};
+    float m_fWalkWeightPower{};
+    float m_fOverweightWalkK{};
+    float m_fOverweightJumpK{};
+    float m_fAccelK{};
+    float m_fSprintK{};
 
-    float m_fPowerLeakSpeed;
-    float m_fV_Power;
+    bool m_bJumpRequirePower{};
 
-    float m_fJumpPower;
-    float m_fStandPower;
-    float m_fWalkPower;
-    float m_fJumpWeightPower;
-    float m_fWalkWeightPower;
-    float m_fOverweightWalkK;
-    float m_fOverweightJumpK;
-    float m_fAccelK;
-    float m_fSprintK;
+    // порог силы и здоровья меньше которого актер начинает хромать
+    float m_fLimpingPowerBegin{};
+    float m_fLimpingPowerEnd{};
+    float m_fCantWalkPowerBegin{};
+    float m_fCantWalkPowerEnd{};
 
-    bool m_bJumpRequirePower;
+    float m_fCantSprintPowerBegin{};
+    float m_fCantSprintPowerEnd{};
 
-    float m_f_time_affected;
-
-    //порог силы и здоровья меньше которого актер начинает хромать
-    float m_fLimpingPowerBegin;
-    float m_fLimpingPowerEnd;
-    float m_fCantWalkPowerBegin;
-    float m_fCantWalkPowerEnd;
-
-    float m_fCantSprintPowerBegin;
-    float m_fCantSprintPowerEnd;
-
-    float m_fLimpingHealthBegin;
-    float m_fLimpingHealthEnd;
-
-protected:
-    Feel::Touch* monsters_feel_touch;
-    float monsters_aura_radius;
+    float m_fLimpingHealthBegin{};
+    float m_fLimpingHealthEnd{};
 
 public:
-    void net_Relcase(CObject* O);
-    void set_monsters_aura_radius(float r)
-    {
-        if (r > monsters_aura_radius)
-            monsters_aura_radius = r;
-    };
+    float m_fBleedingPowerDecrease{};
+    //
+    float m_fMinPowerWalkJump{1.f};
+    //
+    float m_fMinHealthRadiation{1.f};
+    float m_fMinHealthRadiationTreshold{};
+    //
+    float m_fAlcoholSatietyIntens{1.f}; // коэфф. для рассчета интенсивности постэффекта опьянения от голода
+    //
+    float m_fExerciseStressFactor{1.f}; // фактор физнагрузки - множитель для коэффициента нагрузки актора при спринте и прыжке
+    //
+    float m_fZoomEffectorK{};
+    float m_fV_HardHoldPower{};
+
+    float GetSmoothOwerweightKoef();
+    // коэфф. регенерации актора - зависит от сытости и дозы облучения
+    float GetRegenK();
+    // коэффициент нагрузки актора
+    float GetStress();
+    // во сколько раз больше трясутся руки в прицеливании при полном отсутствии выносливости
+    float GetZoomEffectorKoef();
+
+    float AlcoholSatiety() { return m_fAlcohol * (1.0f + m_fAlcoholSatietyIntens - GetSatiety()); }
+
+    virtual float GetWoundIncarnation() override;
+    virtual float GetHealthRestore() override;
+
+    virtual float GetPsyHealthRestore() override;
+    virtual float GetPowerRestore() override;
+    virtual float GetMaxPowerRestore() override;
+    virtual float GetSatietyRestore() override;
+    virtual float GetAlcoholRestore() override;
 };

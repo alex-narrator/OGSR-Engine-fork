@@ -1,0 +1,37 @@
+<window>
+	<minimap>
+		<level_frame x="16" y="18" width="123" height="161"/>
+		
+		<background x="7" y="6" width="138" height="189" stretch="1"> 
+			<texture>ui_hud_map</texture>
+			
+			<dist_text x="129" y="12" width="0" height="0">
+				<text align="r" font="letterica16" color="ui_clr_1"/>
+			</dist_text>
+			
+			<no_power x="40" y="85" width="0" height="0" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="1" la_alpha="1">
+				<texture>ui_battery_low</texture>	
+				<text align="l" font="graffiti19" color="red">ui_st_no_power</text>
+			</no_power>
+			<current_time x="15" y="3" width="0" height="0">
+				<text align="l" font="letterica16" color="ui_clr_1"/>
+			</current_time>
+			<current_power x="75" y="3" width="0" height="0">
+				<text align="r" font="letterica16" color="ui_clr_1"/>
+			</current_power>
+			<current_power_low x="75" y="3" width="0" height="0" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="1" la_alpha="1">
+				<text align="r" font="letterica16" color="red"/>
+			</current_power_low>
+			
+		</background>
+		
+		<compass x="113" y="146" width="24" height="32" heading="1" stretch="1">
+			<texture>ui\ui_hud_map_arrow</texture>
+		</compass>
+		
+		<center width="4" height="4" alignment="c" stretch="1"> 
+			<texture >ui_minimap_point</texture>
+		</center>
+	
+	</minimap>
+</window>

@@ -25,17 +25,11 @@ ENGINE_API extern float psHUD_FOV_def;
 CHudItem::CHudItem()
 {
     m_huditem_flags.zero();
-    m_animation_slot = u32(-1);
     RenderHud(TRUE);
     EnableHudInertion(TRUE);
     AllowHudInertion(TRUE);
 
     m_bobbing = std::make_unique<CWeaponBobbing>(this);
-
-    m_bStopAtEndAnimIsRunning = false;
-    m_current_motion_def = nullptr;
-    
-    m_dwStateTime = 0;
 }
 
 DLL_Pure* CHudItem::_construct()
@@ -178,9 +172,21 @@ void CHudItem::Load(LPCSTR section)
     inertion_data.m_tendto_speed = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_tendto_speed", TENDTO_SPEED);
     inertion_data.m_tendto_speed_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_tendto_speed", TENDTO_SPEED_AIM);
     //--#SM+# End--
+
+    if (pSettings->line_exist(section, "snd_on_item_take"))
+        HUD_SOUND::LoadSound(section, "snd_on_item_take", sndOnItemTake);
+    if (pSettings->line_exist(section, "snd_check_gear"))
+        HUD_SOUND::LoadSound(section, "snd_check_gear", sndCheckGear);
+    if (pSettings->line_exist(section, "snd_checkout"))
+        HUD_SOUND::LoadSound(section, "snd_checkout", sndCheckout);
 }
 
-void CHudItem::PlaySound(HUD_SOUND& hud_snd, const Fvector& position, bool overlap) { HUD_SOUND::PlaySound(hud_snd, position, object().H_Root(), !!GetHUDmode(), false, overlap); }
+void CHudItem::PlaySound(HUD_SOUND& hud_snd, const Fvector& position, bool overlap) 
+{
+    if (hud_snd.sounds.empty())
+        return;
+    HUD_SOUND::PlaySound(hud_snd, position, object().H_Root(), !!GetHUDmode(), false, overlap);
+}
 
 void CHudItem::net_Destroy() { m_dwStateTime = 0; }
 
@@ -231,7 +237,7 @@ void CHudItem::OnEvent(NET_Packet& P, u16 type)
     case GE_WPN_STATE_CHANGE: {
         u8 S;
         P.r_u8(S);
-        OnStateSwitch(u32(S), GetState());
+        OnStateSwitch(u32(S), GetState());        
     }
     break;
     }
@@ -244,17 +250,28 @@ void CHudItem::OnStateSwitch(u32 S, u32 oldState)
     if (object().Remote())
         SetNextState(S);
 
-    if (S == eHidden)
+    switch (S)
     {
+    case eHidden: {
         m_nearwall_last_hud_fov = m_base_fov > 0.0f ? m_base_fov : psHUD_FOV_def;
         SprintType = false;
     }
-    else if (S == eSprintStart)
+    break;
+    case eSprintStart: {
         PlayAnimSprintStart();
-    else if (S == eSprintEnd)
+    }break;
+    case eSprintEnd: {
         PlayAnimSprintEnd();
-    else if (S != eIdle)
-        SprintType = false;
+    }break;
+    case eKick: {
+        switch2_Kick();
+    }break;
+    default: {
+        if (S != eIdle)
+            SprintType = false;
+    }
+    break;
+    }
 
     g_player_hud->updateMovementLayerState();
 }
@@ -316,7 +333,9 @@ void CHudItem::UpdateCL()
         }
     }
 
-    AllowHudBobbing((Core.Features.test(xrCore::Feature::wpn_bobbing) && allow_bobbing) || Actor()->PsyAuraAffect);
+    AllowHudBobbing((Core.Features.test(xrCore::Feature::wpn_bobbing) && allow_bobbing && !Actor()->IsHardHold()) || Actor()->PsyAuraAffect);
+    if (GetHUDmode())
+        Actor()->TryToBlockSprint(IsPending());
 }
 
 void CHudItem::OnH_A_Chield() {}
@@ -364,6 +383,9 @@ void CHudItem::on_a_hud_attach()
 
 u32 CHudItem::PlayHUDMotion(const char* M, const bool bMixIn, const u32 state, const bool randomAnim, float speed)
 {
+    HUD_SOUND::StopSound(sndCheckout);
+    HUD_SOUND::StopSound(sndCheckGear);
+
     auto Wpn = g_player_hud->attached_item(0);
     auto Det = g_player_hud->attached_item(1);
 
@@ -455,7 +477,7 @@ void CHudItem::PlayAnimIdle()
     auto wpn = smart_cast<CWeapon*>(this);
     PlayHUDMotion({(wpn && wpn->IsMisfire()) ?
                        "anm_idle_jammed" :
-                       ((wpn && ((wpn->GetAmmoElapsed() == 0 && !wpn->IsGrenadeMode()) || (wpn->GetAmmoElapsed2() == 0 && wpn->IsGrenadeMode()))) ? "anm_idle_empty" : "nullptr"),
+                       ((wpn && wpn->IsOpened()) ? "anm_idle_empty" : "nullptr"),
                    "anim_idle", "anm_idle"},
                   true, GetState());
 }
@@ -467,8 +489,8 @@ void CHudItem::PlayAnimSprintStart()
     xr_strconcat(guns_sprint_start_anm, "anm_idle_sprint_start",
                  (wpn && wpn->IsMisfire()) ?
                      "_jammed" :
-                     ((wpn && ((wpn->GetAmmoElapsed() == 0 && !wpn->IsGrenadeMode()) || (wpn->GetAmmoElapsed2() == 0 && wpn->IsGrenadeMode()))) ? "_empty" : ""),
-                 (wpn && wpn->IsGrenadeLauncherAttached()) ? (wpn && wpn->IsGrenadeMode() ? "_g" : "_w_gl") : "");
+                     ((wpn && wpn->IsOpened()) ? "_empty" : ""),
+                 (wpn && wpn->IsAddonAttached(eLauncher)) ? (wpn && wpn->IsGrenadeMode() ? "_g" : "_w_gl") : "");
     if (AnimationExist(guns_sprint_start_anm))
         PlayHUDMotion(guns_sprint_start_anm, true, GetState());
     else
@@ -485,8 +507,8 @@ void CHudItem::PlayAnimSprintEnd()
     xr_strconcat(guns_sprint_end_anm, "anm_idle_sprint_end",
                  (wpn && wpn->IsMisfire()) ?
                      "_jammed" :
-                     ((wpn && ((wpn->GetAmmoElapsed() == 0 && !wpn->IsGrenadeMode()) || (wpn->GetAmmoElapsed2() == 0 && wpn->IsGrenadeMode()))) ? "_empty" : ""),
-                 (wpn && wpn->IsGrenadeLauncherAttached()) ? (wpn && wpn->IsGrenadeMode() ? "_g" : "_w_gl") : "");
+                     ((wpn && wpn->IsOpened()) ? "_empty" : ""),
+                 (wpn && wpn->IsAddonAttached(eLauncher)) ? (wpn && wpn->IsGrenadeMode() ? "_g" : "_w_gl") : "");
     if (AnimationExist(guns_sprint_end_anm))
         PlayHUDMotion(guns_sprint_end_anm, true, GetState());
     else
@@ -579,7 +601,7 @@ void CHudItem::PlayAnimIdleMoving()
     PlayHUDMotion(
         {(wpn && wpn->IsMisfire()) ?
              "anm_idle_moving_jammed" :
-             ((wpn && ((wpn->GetAmmoElapsed() == 0 && !wpn->IsGrenadeMode()) || (wpn->GetAmmoElapsed2() == 0 && wpn->IsGrenadeMode()))) ? "anm_idle_moving_empty" : "nullptr"),
+             ((wpn && wpn->IsOpened()) ? "anm_idle_moving_empty" : "nullptr"),
          "anm_idle_moving", "anm_idle", "anim_idle_moving", "anim_idle"},
         true, GetState());
 }
@@ -590,7 +612,7 @@ void CHudItem::PlayAnimIdleMovingSlow()
     PlayHUDMotion(
         {(wpn && wpn->IsMisfire()) ?
              "anm_idle_moving_slow_jammed" :
-             ((wpn && ((wpn->GetAmmoElapsed() == 0 && !wpn->IsGrenadeMode()) || (wpn->GetAmmoElapsed2() == 0 && wpn->IsGrenadeMode()))) ? "anm_idle_moving_slow_empty" : "nullptr"),
+             ((wpn && wpn->IsOpened()) ? "anm_idle_moving_slow_empty" : "nullptr"),
          "anm_idle_moving_slow", "anm_idle_moving_slow", "anm_idle", "anim_idle_moving", "anim_idle"},
         true, GetState());
 }
@@ -600,7 +622,7 @@ void CHudItem::PlayAnimIdleMovingCrouch()
     auto wpn = smart_cast<CWeapon*>(this);
     PlayHUDMotion({(wpn && wpn->IsMisfire()) ?
                        "anm_idle_moving_crouch_jammed" :
-                       ((wpn && ((wpn->GetAmmoElapsed() == 0 && !wpn->IsGrenadeMode()) || (wpn->GetAmmoElapsed2() == 0 && wpn->IsGrenadeMode()))) ? "anm_idle_moving_crouch_empty" :
+                       ((wpn && wpn->IsOpened()) ? "anm_idle_moving_crouch_empty" :
                                                                                                                                                     "nullptr"),
                    "anm_idle_moving_crouch", "anm_idle_moving", "anm_idle", "anim_idle_moving", "anim_idle"},
                   true, GetState());
@@ -610,7 +632,7 @@ void CHudItem::PlayAnimIdleMovingCrouchSlow()
 {
     auto wpn = smart_cast<CWeapon*>(this);
     PlayHUDMotion({(wpn && wpn->IsMisfire()) ? "anm_idle_moving_crouch_slow_jammed" :
-                                               ((wpn && ((wpn->GetAmmoElapsed() == 0 && !wpn->IsGrenadeMode()) || (wpn->GetAmmoElapsed2() == 0 && wpn->IsGrenadeMode()))) ?
+                                               ((wpn && wpn->IsOpened()) ?
                                                     "anm_idle_moving_crouch_slow_empty" :
                                                     "nullptr"),
                    "anm_idle_moving_crouch_slow", "anm_idle_moving_crouch", "anm_idle_moving", "anm_idle", "anim_idle_moving", "anim_idle"},
@@ -623,7 +645,7 @@ void CHudItem::PlayAnimIdleSprint()
     PlayHUDMotion(
         {(wpn && wpn->IsMisfire()) ?
              "anm_idle_sprint_jammed" :
-             ((wpn && ((wpn->GetAmmoElapsed() == 0 && !wpn->IsGrenadeMode()) || (wpn->GetAmmoElapsed2() == 0 && wpn->IsGrenadeMode()))) ? "anm_idle_sprint_empty" : "nullptr"),
+             ((wpn && wpn->IsOpened()) ? "anm_idle_sprint_empty" : "nullptr"),
          "anm_idle_sprint", "anm_idle", "anim_idle_sprint", "anim_idle"},
         true, GetState());
 }
@@ -742,7 +764,7 @@ void CHudItem::UpdateCollision(Fmatrix& trans)
         if (delta > 30)
             speed_coef = 6;
         else
-            speed_coef = delta / 5;
+            speed_coef = (float)delta / 5;
 
     speed_coef = speed_coef * m_nearwall_hud_offset_speed;
     const Fvector pos_steps{fabsf(m_nearwall_target_hud_offset.x / DMGR_STEP_COEF) * speed_coef, fabsf(m_nearwall_target_hud_offset.y / DMGR_STEP_COEF) * speed_coef,
@@ -754,7 +776,7 @@ void CHudItem::UpdateCollision(Fmatrix& trans)
     if (RQ.range <= m_nearwall_dist_max)
         dist_coef = 1.f - (RQ.range - m_nearwall_dist_min) / (m_nearwall_dist_max - m_nearwall_dist_min);
 
-    const auto curr_offs = Fvector{}.mul(m_nearwall_target_hud_offset, dist_coef), curr_rot = Fvector{}.mul(m_nearwall_target_hud_rotate, dist_coef);
+    const Fvector curr_offs = Fvector{}.mul(m_nearwall_target_hud_offset, dist_coef), curr_rot = Fvector{}.mul(m_nearwall_target_hud_rotate, dist_coef);
     Fvector curr_offs_final{}, curr_rot_final{};
 
     if (curr_offs.x >= m_nearwall_last_pos.x)
@@ -842,11 +864,11 @@ void CHudItem::UpdateCollision(Fmatrix& trans)
     curr_offs_final.mul(1.f - m_fZoomRotationFactor);
     curr_rot_final.mul(1.f - m_fZoomRotationFactor);
 
-    Fmatrix hud_rotation;
+    Fmatrix hud_rotation{};
     hud_rotation.identity();
     hud_rotation.rotateX(curr_rot_final.x);
 
-    Fmatrix hud_rotation_y;
+    Fmatrix hud_rotation_y{};
     hud_rotation_y.identity();
     hud_rotation_y.rotateY(curr_rot_final.y);
     hud_rotation.mulA_43(hud_rotation_y);
@@ -862,23 +884,23 @@ void CHudItem::UpdateCollision(Fmatrix& trans)
 
 void CHudItem::UpdateInertion(Fmatrix& trans)
 {
-    if (HudInertionEnabled() && HudInertionAllowed())
+    if (HudInertionEnabled() && HudInertionAllowed() && !Actor()->IsHardHold())
     {
         Fmatrix xform;
         Fvector& origin = trans.c;
         xform = trans;
 
         // calc difference
-        Fvector diff_dir;
+        Fvector diff_dir{};
         diff_dir.sub(xform.k, inert_st_last_dir);
 
         // clamp by PI_DIV_2
-        Fvector last;
+        Fvector last{};
         last.normalize_safe(inert_st_last_dir);
         const float dot = last.dotproduct(xform.k);
         if (dot < EPS)
         {
-            Fvector v0;
+            Fvector v0{};
             v0.crossproduct(inert_st_last_dir, xform.k);
             inert_st_last_dir.crossproduct(xform.k, v0);
             diff_dir.sub(xform.k, inert_st_last_dir);
@@ -891,6 +913,10 @@ void CHudItem::UpdateInertion(Fmatrix& trans)
             float factor = GetInertionFactor();
             _tendto_speed = inertion_data.m_tendto_speed_aim - (inertion_data.m_tendto_speed_aim - inertion_data.m_tendto_speed) * factor;
             _origin_offset = inertion_data.m_origin_offset_aim - (inertion_data.m_origin_offset_aim - inertion_data.m_origin_offset) * factor;
+            // вплив адонів на інерцію у прицілюванні
+            clamp(m_fAimInertionK, -1.f, 1.f);
+            _origin_offset += (_origin_offset * m_fAimInertionK);
+            _tendto_speed -= (_tendto_speed * m_fAimInertionK);
         }
         else
         { // Худ в режиме "От бедра"
@@ -957,12 +983,13 @@ void CHudItem::UpdateHudAdditional(Fmatrix& trans, const bool need_update_collis
     //====================================================//
 
     auto pActor = smart_cast<const CActor*>(object().H_Parent());
+    const bool is_hard_hold = pActor->IsHardHold();
     const u32 iMovingState = pActor->MovingState();
     idx = b_aiming ? 1ui8 : 0ui8;
 
     //============= Боковой стрейф с оружием =============//
     {
-        const bool bEnabled = m_strafe_offset[2][idx].x;
+        const bool bEnabled = m_strafe_offset[2][idx].x && !is_hard_hold;
         if (!bEnabled)
             goto LOOKOUT_EFFECT;
 
@@ -1235,14 +1262,14 @@ APPLY_EFFECTS:
         trans.setHPB(_angle.x, _angle.y, _angle.z);
         trans.c = _pos;
 
-        Fmatrix hud_rotation;
+        Fmatrix hud_rotation{};
         hud_rotation.identity();
 
         if (b_aiming)
         {
             hud_rotation.rotateX(zr_rot.x);
 
-            Fmatrix hud_rotation_y;
+            Fmatrix hud_rotation_y{};
             hud_rotation_y.identity();
             hud_rotation_y.rotateY(zr_rot.y);
             hud_rotation.mulA_43(hud_rotation_y);
@@ -1348,7 +1375,7 @@ void CHudItem::CWeaponBobbing::Update(Fmatrix& m, Fmatrix& m2)
             float zoom_factor = m_fZoomFactor;
 
             auto wpn = smart_cast<CWeapon*>(parent_hud_item);
-            if (wpn && wpn->IsScopeAttached() && !wpn->IsGrenadeMode())
+            if (wpn && wpn->IsAddonAttached(eScope) && !wpn->IsGrenadeMode())
                 zoom_factor = m_fScopeZoomFactor;
 
             k2 *= zoom_factor;
@@ -1388,8 +1415,8 @@ void CHudItem::CWeaponBobbing::Update(Fmatrix& m, Fmatrix& m2)
 
         // применяем к матрице положения рук
 
-        Fvector dangle;
-        Fmatrix R, mR;
+        Fvector dangle{};
+        Fmatrix R{}, mR{};
 
         dangle.x = _cosA;
         dangle.z = _cosA;
@@ -1438,18 +1465,18 @@ void CHudItem::CorrectDirFromWorldToHud(Fvector& dir)
     dir.normalize();
 }
 
-void CHudItem::TimeLockAnimation()
-{
-    if (GetState() != eDeviceSwitch)
-        return;
-
-    string128 anm_time_param;
-    xr_strconcat(anm_time_param, "lock_time_end_", m_current_motion.c_str());
-    const float time = READ_IF_EXISTS(pSettings, r_float, HudSection(), anm_time_param, 0) * 1000.f; // Читаем с конфига время анимации (например, lock_time_end_anm_reload)
-    const float current_time = Device.dwTimeGlobal - m_dwMotionStartTm;
-    if (time && current_time >= time)
-        DeviceUpdate();
-}
+//void CHudItem::TimeLockAnimation()
+//{
+//    if (GetState() != eDeviceSwitch)
+//        return;
+//
+//    string128 anm_time_param;
+//    xr_strconcat(anm_time_param, "lock_time_end_", m_current_motion.c_str());
+//    const float time = READ_IF_EXISTS(pSettings, r_float, HudSection(), anm_time_param, 0) * 1000.f; // Читаем с конфига время анимации (например, lock_time_end_anm_reload)
+//    const float current_time = Device.dwTimeGlobal - m_dwMotionStartTm;
+//    if (time && current_time >= time)
+//        DeviceUpdate();
+//}
 
 void CHudItem::OnAnimationEnd(u32 state)
 {
@@ -1463,7 +1490,41 @@ void CHudItem::OnAnimationEnd(u32 state)
         SprintType = false;
         SwitchState(eIdle);
         break;
+    case eKick:
+        if (auto actor = smart_cast<CActor*>(object().H_Parent()))
+            actor->ActorKick();
+        SwitchState(eIdle);
+        break;
     }
 }
 
 bool CHudItem::AnmIdleMovingAllowed() const { return !HudBobbingAllowed() || Actor()->PsyAuraAffect; }
+
+void CHudItem::OnKick() { SwitchState(eKick); }
+void CHudItem::switch2_Kick()
+{
+    if (IsZoomed())
+        OnZoomOut();
+    PlayAnimKick();
+    SetPending(TRUE);
+}
+
+void CHudItem::PlayAnimOnItemTake()
+{
+    AnimationExist("anm_on_item_take") ? PlayHUDMotion("anm_on_item_take", true, GetState()) : PlayHUDMotion({"anim_draw", "anm_show"}, true, GetState(), false);
+    PlaySound(sndOnItemTake, object().Position());
+}
+
+void CHudItem::PlayAnimCheckout()
+{
+    AnimationExist("anm_checkout") ? PlayHUDMotion("anm_checkout", true, GetState()) : PlayHUDMotion({"anim_idle", "anm_bore"}, true, GetState(), false);
+    PlaySound(sndCheckout, object().Position());
+}
+
+void CHudItem::PlayAnimCheckGear()
+{
+    AnimationExist("anm_check_gear") ? PlayHUDMotion("anm_check_gear", true, GetState()) : PlayHUDMotion({"anim_draw", "anm_show"}, true, GetState(), false);
+    PlaySound(sndCheckGear, object().Position());
+}
+
+void CHudItem::PlayAnimKick() { AnimationExist("anm_kick") ? PlayHUDMotion("anm_kick", true, GetState()) : PlayHUDMotion({"anim_draw", "anm_show"}, true, GetState(), false); }

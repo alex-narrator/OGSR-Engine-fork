@@ -6,13 +6,17 @@
 #include "inventory.h"
 #include "level.h"
 #include "actor.h"
+#include "Addons.h"
+
+#include "hudmanager.h"
+#include "uigamecustom.h"
+#include "game_object_space.h"
 
 CWeaponShotgun::CWeaponShotgun(void) : CWeaponCustomPistol("TOZ34")
 {
     m_eSoundShotBoth = ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING);
     m_eSoundClose = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING);
     m_eSoundAddCartridge = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING);
-    m_bLockType = true; // Запрещает заряжать в дробовики патроны разного типа
 }
 
 CWeaponShotgun::~CWeaponShotgun(void)
@@ -21,11 +25,7 @@ CWeaponShotgun::~CWeaponShotgun(void)
     HUD_SOUND::DestroySound(sndShotBoth);
     HUD_SOUND::DestroySound(m_sndOpen);
     HUD_SOUND::DestroySound(m_sndAddCartridge);
-    HUD_SOUND::DestroySound(m_sndAddCartridgeEmpty);
     HUD_SOUND::DestroySound(m_sndClose);
-    HUD_SOUND::DestroySound(m_sndCloseEmpty);
-    HUD_SOUND::DestroySound(m_sndBreech);
-    HUD_SOUND::DestroySound(m_sndBreechJammed);
 }
 
 void CWeaponShotgun::net_Destroy() { inherited::net_Destroy(); }
@@ -46,25 +46,11 @@ void CWeaponShotgun::Load(LPCSTR section)
     {
         HUD_SOUND::LoadSound(section, "snd_open_weapon", m_sndOpen, m_eSoundOpen);
         HUD_SOUND::LoadSound(section, "snd_add_cartridge", m_sndAddCartridge, m_eSoundAddCartridge);
-        if (pSettings->line_exist(section, "snd_add_cartridge_empty"))
-            HUD_SOUND::LoadSound(section, "snd_add_cartridge_empty", m_sndAddCartridgeEmpty, m_eSoundAddCartridge);
         HUD_SOUND::LoadSound(section, "snd_close_weapon", m_sndClose, m_eSoundClose);
-        if (pSettings->line_exist(section, "snd_close_weapon_empty"))
-            HUD_SOUND::LoadSound(section, "snd_close_weapon_empty", m_sndCloseEmpty, m_eSoundClose);
-        if (pSettings->line_exist(section, "snd_breechblock"))
-            HUD_SOUND::LoadSound(section, "snd_breechblock", m_sndBreech, m_eSoundClose);
-        if (pSettings->line_exist(section, "snd_jam"))
-            HUD_SOUND::LoadSound(section, "snd_jam", m_sndBreechJammed, m_eSoundClose);
     }
 }
 
-void CWeaponShotgun::OnShot()
-{
-    inherited::OnShot();
-
-    if (/*!m_sndBreechJammed.sounds.empty() ||*/ !m_sndBreech.sounds.empty())
-        PlaySound(/*(IsMisfire() && !m_sndBreechJammed.sounds.empty()) ? m_sndBreechJammed :*/ m_sndBreech, get_LastFP());
-}
+void CWeaponShotgun::OnShot() { inherited::OnShot(); }
 
 void CWeaponShotgun::Fire2Start()
 {
@@ -73,7 +59,7 @@ void CWeaponShotgun::Fire2Start()
 
     inherited::Fire2Start();
 
-    if (IsValid())
+    if (IsValid() && !IsMisfire())
     {
         if (!IsWorking())
         {
@@ -104,14 +90,14 @@ void CWeaponShotgun::Fire2End()
 
 void CWeaponShotgun::OnShotBoth()
 {
-    //если патронов меньше, чем 2
+    // если патронов меньше, чем 2
     if (iAmmoElapsed < iMagazineSize)
     {
         OnShot();
         return;
     }
 
-    //звук выстрела дуплетом
+    // звук выстрела дуплетом
     PlaySound(sndShotBoth, get_LastFP());
 
     // Camera
@@ -125,11 +111,11 @@ void CWeaponShotgun::OnShotBoth()
     PHGetLinearVell(vel);
     OnShellDrop(get_LastSP(), vel);
 
-    //огонь из 2х стволов
+    // огонь из 2х стволов
     StartFlameParticles();
     StartFlameParticles2();
 
-    //дым из 2х стволов
+    // дым из 2х стволов
     if (ParentIsActor())
     {
         CParticlesObject* pSmokeParticles = NULL;
@@ -143,16 +129,13 @@ void CWeaponShotgun::UpdateCL()
 {
     float dt = Device.fTimeDelta;
 
-    //когда происходит апдейт состояния оружия
-    //ничего другого не делать
+    // когда происходит апдейт состояния оружия
+    // ничего другого не делать
     if (GetNextState() == GetState())
     {
         switch (GetState())
         {
         case eFire2:
-            // if (iAmmoElapsed > 0)
-            //	state_Fire(dt);
-
             if (fTime <= 0)
             {
                 if (iAmmoElapsed == 0)
@@ -186,7 +169,7 @@ void CWeaponShotgun::switch2_Fire2()
         SetPending(TRUE);
 
         // Fire
-        Fvector p1, d;
+        Fvector p1{}, d{};
         p1.set(get_LastFP());
         d.set(get_LastFD());
 
@@ -209,7 +192,7 @@ void CWeaponShotgun::switch2_Fire2()
 
         OnShotBoth();
 
-        //выстрел из обоих стволов
+        // выстрел из обоих стволов
         FireTrace(p1, d);
         FireTrace(p1, d);
         fTime += fTimeToFire * 2.f;
@@ -229,27 +212,13 @@ void CWeaponShotgun::UpdateSounds()
         m_sndOpen.set_position(get_LastFP());
     if (m_sndAddCartridge.playing())
         m_sndAddCartridge.set_position(get_LastFP());
-    if (m_sndAddCartridgeEmpty.playing())
-        m_sndAddCartridgeEmpty.set_position(get_LastFP());
     if (m_sndClose.playing())
         m_sndClose.set_position(get_LastFP());
-    if (m_sndCloseEmpty.playing())
-        m_sndCloseEmpty.set_position(get_LastFP());
-    if (m_sndBreech.playing())
-        m_sndBreech.set_position(get_LastFP());
-    if (m_sndBreechJammed.playing())
-        m_sndBreechJammed.set_position(get_LastFP());
 }
-
-#ifdef DUPLET_STATE_SWITCH
-void CWeaponShotgun::SwitchDuplet() { is_duplet_enabled = !is_duplet_enabled; }
-#endif
 
 bool CWeaponShotgun::Action(s32 cmd, u32 flags)
 {
-#ifdef DUPLET_STATE_SWITCH
-
-    if (is_duplet_enabled)
+    if (GetCurrentFireMode() == 2)
     {
         switch (cmd)
         {
@@ -268,36 +237,18 @@ bool CWeaponShotgun::Action(s32 cmd, u32 flags)
         }
     }
 
-#endif // !DUPLET_STATE_SWITCH
-
-    if (inherited::Action(cmd, flags))
+    if (inherited::Action(cmd, flags) && !(cmd == kWPN_ZOOM && m_bTriStateReload && GetState() == eReload))
         return true;
 
-    if (m_bTriStateReload && GetState() == eReload && !IsMisfire() && (cmd == kWPN_FIRE || cmd == kWPN_NEXT) && flags & CMD_START &&
-        (m_sub_state == eSubstateReloadInProcess || m_sub_state == eSubstateReloadBegin)) //остановить перезагрузку
+    bool reload_stop_action = (cmd == kWPN_FIRE || cmd == kWPN_NEXT || cmd == kWPN_RELOAD || cmd == kWPN_ZOOM);
+    if (m_bTriStateReload && GetState() == eReload && reload_stop_action && flags & CMD_START &&
+        m_sub_state != eSubstateReloadEnd) // остановить перезагрузку
     {
-        m_stop_triStateReload = true;
+        if (m_sub_state == eSubstateReloadInProcess)
+            AddCartridge(1);
+        m_sub_state = eSubstateReloadEnd;
         return true;
     }
-
-#ifndef DUPLET_STATE_SWITCH
-
-    //если оружие чем-то занято, то ничего не делать
-    if (IsPending())
-        return false;
-
-    switch (cmd)
-    {
-    case kWPN_ZOOM: {
-        if (flags & CMD_START)
-            Fire2Start();
-        else
-            Fire2End();
-    }
-        return true;
-    }
-
-#endif // !DUPLET_STATE_SWITCH
 
     return false;
 }
@@ -307,64 +258,49 @@ void CWeaponShotgun::OnAnimationEnd(u32 state)
     if (!m_bTriStateReload || state != eReload)
         return inherited::OnAnimationEnd(state);
 
-    auto ProcessReloadEnd = [this] {
-        if (IsMisfire())
-        {
-            SwitchMisfire(false);
-            if (iAmmoElapsed > 0) //
-                SetAmmoElapsed(iAmmoElapsed - 1); //
-        }
-        m_sub_state = eSubstateReloadBegin;
-        SwitchState(eIdle);
-    };
-
     switch (m_sub_state)
     {
     case eSubstateReloadBegin: {
-        if (IsMisfire() && has_anm_reload_jammed)
-            ProcessReloadEnd();
-        else
-        {
-            m_sub_state = IsMisfire() ? eSubstateReloadEnd : eSubstateReloadInProcess;
-            is_reload_empty = iAmmoElapsed == 0;
-            SwitchState(eReload);
-        }
-        break;
-    }
-    case eSubstateReloadInProcess: {
-        AddCartridge(1);
-        if (m_stop_triStateReload || !HaveCartridgeInInventory(1) || m_magazine.size() >= iMagazineSize)
-            m_sub_state = eSubstateReloadEnd;
-
+        m_sub_state = eSubstateReloadInProcess;
         SwitchState(eReload);
-        break;
     }
+    break;
+
+    case eSubstateReloadInProcess: {
+        if (0 != AddCartridge(1))
+        {
+            m_sub_state = eSubstateReloadEnd;
+        }
+        SwitchState(eReload);
+    }
+    break;
+
     case eSubstateReloadEnd: {
-        ProcessReloadEnd();
-        break;
+        m_sub_state = eSubstateReloadBegin;
+        SwitchState(eIdle);
     }
+    break;
     };
 }
 
 void CWeaponShotgun::Reload()
 {
-    OnZoomOut();
+    if (IsZoomed())
+        OnZoomOut();
     if (m_bTriStateReload)
     {
-        m_stop_triStateReload = false;
         TriStateReload();
     }
     else
-        TryReload();
+        inherited::Reload();
 }
 
 void CWeaponShotgun::TriStateReload()
 {
-    if (HaveCartridgeInInventory(1) || IsMisfire())
-    {
-        m_sub_state = eSubstateReloadBegin;
-        SwitchState(eReload);
-    }
+    if (!HaveCartridgeInInventory(1))
+        return;
+    m_sub_state = eSubstateReloadBegin;
+    SwitchState(eReload);
 }
 
 void CWeaponShotgun::OnStateSwitch(u32 S, u32 oldState)
@@ -377,52 +313,78 @@ void CWeaponShotgun::OnStateSwitch(u32 S, u32 oldState)
 
     CWeapon::OnStateSwitch(S, oldState);
 
+    if (m_magazine.size() >= (u32)iMagazineSize || !HaveCartridgeInInventory(1))
+    {
+        m_sub_state = eSubstateReloadEnd;
+    };
+
     switch (m_sub_state)
     {
-    case eSubstateReloadBegin: {
-        if (HaveCartridgeInInventory(1) || IsMisfire())
-        {
-            if (IsMisfire())
-            {
-                const char* Anm = iAmmoElapsed == 1 ? "anm_reload_jammed_last" : "anm_reload_jammed";
-                has_anm_reload_jammed = AnimationExist(Anm);
-                if (has_anm_reload_jammed)
-                {
-                    if (iAmmoElapsed == 1 && !sndReloadJammedLast.sounds.empty())
-                        PlaySound(sndReloadJammedLast, get_LastFP());
-                    else if (!sndReloadJammed.sounds.empty())
-                        PlaySound(sndReloadJammed, get_LastFP());
-
-                    PlayHUDMotion(Anm, true, GetState());
-                    SetPending(TRUE);
-                    break;
-                }
-            }
-            PlaySound(m_sndOpen, get_LastFP());
-            if (ParentIsActor())
-                PlayHUDMotion({"anim_open_weapon", "anm_open"}, true, GetState());
-            else //Временно заткнул баг с неперезарядкой винчестера у нпс, надо фиксить анимацию, но это будет сделано позже, потом этот код убрать!
-                PlayHUDMotion({"anim_add_cartridge", "anm_add_cartridge"}, true, GetState());
-            SetPending(TRUE);
-        }
-        break;
-    }
-    case eSubstateReloadInProcess: {
+    case eSubstateReloadBegin:
         if (HaveCartridgeInInventory(1))
-        {
-            PlaySound(iAmmoElapsed == 0 && !m_sndAddCartridgeEmpty.sounds.empty() ? m_sndAddCartridgeEmpty : m_sndAddCartridge, get_LastFP());
-            PlayHUDMotion({iAmmoElapsed == 0 ? "anm_add_cartridge_empty" : "nullptr", "anim_add_cartridge", "anm_add_cartridge"}, true, GetState());
-            SetPending(TRUE);
-        }
+            switch2_StartReload();
         break;
-    }
-    case eSubstateReloadEnd: {
-        PlayHUDMotion({IsMisfire() ? "anm_close_jammed" : (is_reload_empty ? "anm_close_empty" : "nullptr"), "anim_close_weapon", "anm_close"}, true, GetState());
-        PlaySound(((IsMisfire() || is_reload_empty) && !m_sndCloseEmpty.sounds.empty()) ? m_sndCloseEmpty : m_sndClose, get_LastFP());
-        SetPending(TRUE);
+    case eSubstateReloadInProcess:
+        if (HaveCartridgeInInventory(1))
+            switch2_AddCartgidge();
         break;
-    }
+    case eSubstateReloadEnd: switch2_EndReload(); break;
     };
+}
+
+void CWeaponShotgun::switch2_StartReload()
+{
+    PlaySound(m_sndOpen, get_LastFP());
+    PlayAnimOpenWeapon();
+    SetPending(TRUE);
+}
+
+void CWeaponShotgun::switch2_AddCartgidge()
+{
+    PlaySound(m_sndAddCartridge, get_LastFP());
+    PlayAnimAddOneCartridgeWeapon();
+    SetPending(TRUE);
+}
+
+void CWeaponShotgun::switch2_EndReload()
+{
+    PlaySound(m_sndClose, get_LastFP());
+    PlayAnimCloseWeapon();
+    SetPending(TRUE);
+}
+
+void CWeaponShotgun::PlayAnimOpenWeapon()
+{
+    VERIFY(GetState() == eReload);
+
+    PlayHUDMotion({"anim_open_weapon", "anm_open"}, false, GetState());
+}
+
+void CWeaponShotgun::PlayAnimAddOneCartridgeWeapon()
+{
+    VERIFY(GetState() == eReload);
+
+    PlayHUDMotion({"anim_add_cartridge", "anm_add_cartridge"}, false, GetState());
+}
+
+void CWeaponShotgun::PlayAnimCloseWeapon()
+{
+    VERIFY(GetState() == eReload);
+
+    PlayHUDMotion({"anim_close_weapon", "anm_close"}, false, GetState());
+}
+
+void CWeaponShotgun::PlayAnimShutter()
+{
+    VERIFY(GetState() == eShutter);
+    AnimationExist("anm_shutter") ? PlayHUDMotion("anm_shutter", true, GetState()) : PlayHUDMotion({"anm_shots"}, true, GetState());
+    PlaySound(sndShutter, get_LastFP());
+}
+void CWeaponShotgun::PlayAnimShutterMisfire()
+{
+    VERIFY(GetState() == eShutter);
+    AnimationExist("anm_shutter_misfire") ? PlayHUDMotion("anm_shutter_misfire", true, GetState()) : PlayHUDMotion({"anm_shots"}, true, GetState());
+    PlaySound(sndShutterMisfire, get_LastFP());
 }
 
 bool CWeaponShotgun::HaveCartridgeInInventory(u8 cnt)
@@ -432,39 +394,44 @@ bool CWeaponShotgun::HaveCartridgeInInventory(u8 cnt)
     if (!m_pCurrentInventory)
         return false;
 
-    if (m_set_next_ammoType_on_reload != u32(-1))
+    if (m_bDirectReload)
     {
-        m_ammoType = m_set_next_ammoType_on_reload;
-        m_set_next_ammoType_on_reload = u32(-1);
-        if (!m_magazine.empty())
-            UnloadMagazine();
+        m_bDirectReload = false;
     }
-
-    u32 ac = GetAmmoCount(m_ammoType, cnt);
-    if (ac == 0 && (m_magazine.empty() || !m_bLockType))
+    else
     {
-        u8 skip_ammo_type = m_ammoType;
-        for (u8 i = 0; i < u8(m_ammoTypes.size()); ++i)
+        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), ParentIsActor(), false));
+
+        if (!m_pAmmo)
         {
-            if (i == skip_ammo_type)
-                continue;
-            ac = GetAmmoCount(i, cnt);
-            if (ac >= cnt)
+            for (u32 i = 0; i < m_ammoTypes.size(); ++i)
             {
-                m_ammoType = i;
-                break;
+                // проверить патроны всех подходящих типов
+                m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[i].c_str(), ParentIsActor(), false));
+
+                if (m_pAmmo)
+                {
+                    m_ammoType = i;
+                    break;
+                }
             }
-            else if (ac > 0 && !m_ammoType)
-                m_ammoType = i;
         }
     }
-    m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoMinCurr(*m_ammoTypes[m_ammoType], ParentIsActor()));
 
-    return (m_pAmmo && ac >= cnt);
+    return m_pAmmo && m_pAmmo->m_boxCurr >= cnt;
 }
 
 u8 CWeaponShotgun::AddCartridge(u8 cnt)
 {
+    if (IsMisfire())
+    {
+        bMisfire = false;
+        if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
+        {
+            HUD().GetUI()->AddInfoMessage("item_state", "gun_not_jammed");
+        }
+    }
+
     if (m_set_next_ammoType_on_reload != u32(-1))
     {
         m_ammoType = m_set_next_ammoType_on_reload;
@@ -480,7 +447,7 @@ u8 CWeaponShotgun::AddCartridge(u8 cnt)
         m_DefaultCartridge.Load(*m_ammoTypes[m_ammoType], u8(m_ammoType));
 
     CCartridge l_cartridge = m_DefaultCartridge;
-    while (cnt && m_magazine.size() < (u32)iMagazineSize) // && m_pAmmo->Get(l_cartridge))
+    while (cnt && m_magazine.size() < (u32)iMagazineSize)
     {
         if (!unlimited_ammo())
         {
@@ -495,64 +462,97 @@ u8 CWeaponShotgun::AddCartridge(u8 cnt)
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
 
-    //выкинуть коробку патронов, если она пустая
+    // выкинуть коробку патронов, если она пустая
     if (m_pAmmo && !m_pAmmo->m_boxCurr)
         m_pAmmo->SetDropManual(TRUE);
 
     return cnt;
 }
 
-void CWeaponShotgun::net_Export(CSE_Abstract* E)
-{
-    inherited::net_Export(E);
-    CSE_ALifeItemWeaponShotGun* sg = smart_cast<CSE_ALifeItemWeaponShotGun*>(E);
-    sg->m_AmmoIDs.clear();
-    for (u32 i = 0; i < m_magazine.size(); i++)
-    {
-        CCartridge& l_cartridge = *(m_magazine.begin() + i);
-        sg->m_AmmoIDs.push_back(l_cartridge.m_LocalAmmoType);
-    }
-}
-
-void CWeaponShotgun::TryReload()
-{
-    if (m_pCurrentInventory)
-    {
-        if (HaveCartridgeInInventory(1) || unlimited_ammo() || (IsMisfire() && iAmmoElapsed))
-        {
-            SetPending(TRUE);
-            SwitchState(eReload);
-            return;
-        }
-    }
-}
-
-void CWeaponShotgun::ReloadMagazine()
-{ //Используется только при отключенном tri_state_reload
-    m_dwAmmoCurrentCalcFrame = 0;
-
-    if (IsMisfire())
-        SwitchMisfire(false);
-    else
-    {
-        if (!m_pCurrentInventory)
-            return;
-
-        u8 cnt = AddCartridge(1);
-        while (cnt == 0)
-            cnt = AddCartridge(1);
-    }
-}
-
 void CWeaponShotgun::StopHUDSounds()
 {
     HUD_SOUND::StopSound(m_sndOpen);
     HUD_SOUND::StopSound(m_sndAddCartridge);
-    HUD_SOUND::StopSound(m_sndAddCartridgeEmpty);
     HUD_SOUND::StopSound(m_sndClose);
-    HUD_SOUND::StopSound(m_sndCloseEmpty);
-    HUD_SOUND::StopSound(m_sndBreech);
-    HUD_SOUND::StopSound(m_sndBreechJammed);
-
     inherited::StopHUDSounds();
+}
+
+bool CWeaponShotgun::CanAttach(PIItem pIItem)
+{
+    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    if (pActor && !pActor->HasRequiredTool(pIItem))
+        return false;
+
+    auto pExtender = smart_cast<CExtender*>(pIItem);
+    if (pExtender && m_eExtenderStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
+        std::find(m_extenders.begin(), m_extenders.end(), pIItem->object().cNameSect()) != m_extenders.end())
+        return true;
+    else
+        return inherited::CanAttach(pIItem);
+}
+
+bool CWeaponShotgun::CanDetach(const char* item_section_name)
+{
+    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    if (pActor && !pActor->HasRequiredTool(item_section_name))
+        return false;
+
+    if (m_eExtenderStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
+        std::find(m_extenders.begin(), m_extenders.end(), item_section_name) != m_extenders.end())
+        return true;
+    else
+        return inherited::CanDetach(item_section_name);
+}
+
+bool CWeaponShotgun::Attach(PIItem pIItem, bool b_send_event)
+{
+    auto pExtender = smart_cast<CExtender*>(pIItem);
+
+    if (pExtender && CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender))
+    {
+        auto it = std::find(m_extenders.begin(), m_extenders.end(), pIItem->object().cNameSect());
+        m_cur_extender = (u8)std::distance(m_extenders.begin(), it);
+        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonExtender;
+
+        UnloadWeaponFull();
+
+        if (b_send_event)
+        {
+            pIItem->object().DestroyObject();
+        }
+        UpdateAddonsVisibility();
+        InitAddons();
+        return true;
+    }
+    else
+        return inherited::Attach(pIItem, b_send_event);
+}
+
+bool CWeaponShotgun::Detach(const char* item_section_name, bool b_spawn_item, float item_condition)
+{
+    if (CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
+        std::find(m_extenders.begin(), m_extenders.end(), item_section_name) != m_extenders.end())
+    {
+        UnloadWeaponFull();
+
+        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonExtender;
+
+        m_cur_extender = 0;
+
+        UpdateAddonsVisibility();
+        InitAddons();
+        return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
+    }
+    else
+        return inherited::Detach(item_section_name, b_spawn_item, item_condition);
+}
+
+void CWeaponShotgun::InitAddons()
+{
+    inherited::InitAddons();
+    iMagazineSize = pSettings->r_s32(cNameSect(), "ammo_mag_size");
+    if (IsAddonAttached(eExtender))
+    {
+        iMagazineSize += READ_IF_EXISTS(pSettings, r_u32, GetAddonName(eExtender), "ammo_mag_size", 0);
+    }
 }

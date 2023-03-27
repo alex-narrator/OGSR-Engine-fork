@@ -3,35 +3,38 @@
 
 class CUIXml;
 class CUIStatic;
+class CInventoryItem;
 
 class CUIArtefactParams : public CUIWindow
 {
 public:
     CUIArtefactParams();
     virtual ~CUIArtefactParams();
-    void InitFromXml(CUIXml& xml_doc);
-    bool Check(const shared_str& af_section);
-    void SetInfo(const shared_str& af_section);
+    void Init();
+    void SetInfo(CInventoryItem* obj);
 
 protected:
     enum
     {
-        _item_start = 0,
-        _item_health_restore_speed = _item_start,
-        _item_radiation_restore_speed,
-        _item_satiety_restore_speed,
-        _item_thirst_restore_speed,
-        _item_power_restore_speed,
-        _item_bleeding_restore_speed,
-        _item_psy_health_restore_speed,
-        _item_additional_inventory_weight,
-        _item_additional_inventory_weight2,
+        // restore
+        _item_health_restore,
+        _item_power_restore,
+        _item_max_power_restore,
+        _item_satiety_restore,
+        _item_radiation_restore,
+        _item_psy_health_restore,
+        _item_alcohol_restore,
+        _item_wounds_heal,
+        // additional
+        _item_additional_sprint,
+        _item_additional_jump,
+        _item_additional_weight,
 
-        _max_item_index1,
+        _hit_type_protection_index,
 
-        _item_burn_immunity = _max_item_index1,
-        _item_strike_immunity,
+        _item_burn_immunity = _hit_type_protection_index,
         _item_shock_immunity,
+        _item_strike_immunity,
         _item_wound_immunity,
         _item_radiation_immunity,
         _item_telepatic_immunity,
@@ -40,7 +43,6 @@ protected:
         _item_fire_wound_immunity,
 
         _max_item_index,
-
     };
     CUIStatic* m_info_items[_max_item_index];
 };

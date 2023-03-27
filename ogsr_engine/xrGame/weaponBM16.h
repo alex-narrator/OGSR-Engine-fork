@@ -16,7 +16,6 @@ public:
 
 protected:
     virtual void PlayAnimShoot();
-    virtual void PlayAnimFakeShoot() override;
     virtual void PlayAnimReload();
     virtual void PlayAnimShow();
     virtual void PlayAnimHide();
@@ -26,19 +25,16 @@ protected:
     virtual void PlayAnimIdleMovingCrouchSlow() override;
     virtual void PlayAnimIdleSprint();
     virtual void PlayAnimIdle();
-    virtual void PlayAnimCheckMisfire() override;
-    virtual void PlayAnimDeviceSwitch() override;
-    virtual void PlayAnimSprintStart() override;
-    virtual void PlayAnimSprintEnd() override;
+    virtual void PlayAnimShutter() override;
+    virtual void PlayAnimShutterMisfire() override;
+    virtual void PlayAnimOnItemTake() override;
+    virtual void PlayAnimCheckout() override;
+    virtual void PlayAnimCheckGear() override;
+    virtual void PlayAnimKick() override;
     virtual void PlayReloadSound();
     virtual void UpdateSounds() override;
 
     virtual size_t GetWeaponTypeForCollision() const override { return BM_16; }
-
-    const char* GetAnimAimName() override;
-
-private:
-    string128 guns_bm_aim_anm;
 
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };

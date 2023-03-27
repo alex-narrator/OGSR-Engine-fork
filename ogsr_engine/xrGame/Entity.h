@@ -112,6 +112,14 @@ public:
 
     void set_death_time();
 
+    bool find_in_parents(const u16 bone_to_find, const u16 from_bone, IKinematics& ca) const;
+    bool is_bone_head(IKinematics& K, u16 bone) const;
+    bool is_backstab_bone(IKinematics& K, u16 bone);
+    bool is_backstab(IKinematics& K, SHit* pHDS);
+    bool is_from_behind(const Fvector& direction) const;
+    bool b_disable_death_sound{};
+    virtual bool CheckEnemyStatus(CEntityAlive* tgt) { return false; }
+
 private:
     ALife::_OBJECT_ID m_killer_id;
 

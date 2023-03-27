@@ -240,9 +240,11 @@ void CUIWindow::script_register(lua_State* L)
                       value("TRADE_WND_CLOSED", int(TRADE_WND_CLOSED)),
 
                       // CUIInventroyWnd
-                      value("INVENTORY_DROP_ACTION", int(INVENTORY_DROP_ACTION)), value("INVENTORY_EAT_ACTION", int(INVENTORY_EAT_ACTION)),
-                      value("INVENTORY_TO_BELT_ACTION", int(INVENTORY_TO_BELT_ACTION)), value("INVENTORY_TO_SLOT_ACTION", int(INVENTORY_TO_SLOT_ACTION)),
-                      value("INVENTORY_TO_BAG_ACTION", int(INVENTORY_TO_BAG_ACTION)), value("INVENTORY_ATTACH_ADDON", int(INVENTORY_ATTACH_ADDON)),
-                      value("INVENTORY_DETACH_SCOPE_ADDON", int(INVENTORY_DETACH_SCOPE_ADDON)), value("INVENTORY_DETACH_SILENCER_ADDON", int(INVENTORY_DETACH_SILENCER_ADDON)),
-                      value("INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON", int(INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON))]];
+                      value("INVENTORY_DROP_ACTION", int(INVENTORY_DROP_ACTION)), 
+                          value("INVENTORY_EAT_ACTION", int(INVENTORY_EAT_ACTION)),
+                      value("INVENTORY_TO_BELT_ACTION", int(INVENTORY_TO_BELT_ACTION)), 
+                          value("INVENTORY_TO_SLOT_ACTION", int(INVENTORY_TO_SLOT_ACTION)),
+                      value("INVENTORY_TO_BAG_ACTION", int(INVENTORY_TO_BAG_ACTION)), 
+                          value("INVENTORY_ATTACH_ADDON", int(INVENTORY_ATTACH_ADDON))
+                  ]];
 }

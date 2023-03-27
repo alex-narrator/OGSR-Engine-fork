@@ -17,35 +17,15 @@
 #include "clsid_game.h"
 #include "game_cl_single.h"
 
-#define HIT_POWER_EPSILON 0.05f
-#define WALLMARK_SIZE 0.04f
+constexpr auto HIT_POWER_EPSILON = 0.05f;
+constexpr auto WALLMARK_SIZE = 0.04f;
 
 CShootingObject::CShootingObject(void)
 {
-    fTime = 0;
-    fTimeToFire = 0;
-    // fHitPower						= 0.0f;
     fvHitPower.set(0.0f, 0.0f, 0.0f, 0.0f);
-    m_fStartBulletSpeed = 1000.f;
 
-    m_vCurrentShootDir.set(0, 0, 0);
-    m_vCurrentShootPos.set(0, 0, 0);
-    m_iCurrentParentID = 0xFFFF;
-
-    m_fPredBulletTime = 0.0f;
-    m_bUseAimBullet = false;
-    m_fTimeToAim = 0.0f;
-
-    // particles
-    m_sFlameParticlesCurrent = m_sFlameParticles = NULL;
-    m_sSmokeParticlesCurrent = m_sSmokeParticles = NULL;
-    m_sShellParticles = NULL;
-    m_bForcedParticlesHudMode = false;
-    m_bParticlesHudMode = false;
-
-    bWorking = false;
-
-    light_render = 0;
+    m_vCurrentShootDir.set(Fvector{});
+    m_vCurrentShootPos.set(Fvector{});
 
     reinit();
 }
@@ -65,15 +45,11 @@ void CShootingObject::Load(LPCSTR section)
     //время затрачиваемое на выстрел
     fTimeToFire = pSettings->r_float(section, "rpm");
     VERIFY(fTimeToFire > 0.f);
-    // Alundaio: Two-shot burst rpm; used for Abakan/AN-94
-    fTimeToFire2 = READ_IF_EXISTS(pSettings, r_float, section, "rpm_mode_2", fTimeToFire);
-    VERIFY(fTimeToFire2 > 0.f);
     fTimeToFire = 60.f / fTimeToFire;
-    fTimeToFire2 = 60.f / fTimeToFire2;
 
-    // Cycle down RPM after first 2 shots; used for Abakan/AN-94
-    bCycleDown = !!READ_IF_EXISTS(pSettings, r_bool, section, "cycle_down", false);
-    // Alundaio: END
+    fTimeToFirePreffered = READ_IF_EXISTS(pSettings, r_float, section, "preffered_fire_mode_rpm", fTimeToFire);
+    VERIFY(fTimeToFirePreffered > 0.f);
+    fTimeToFirePreffered = 60.f / fTimeToFirePreffered;
 
     m_bForcedParticlesHudMode = !!pSettings->line_exist(section, "forced_particle_hud_mode");
     if (m_bForcedParticlesHudMode)
@@ -228,7 +204,7 @@ void CShootingObject::UpdateParticles(CParticlesObject*& pParticles, const Fvect
     if (!pParticles)
         return;
 
-    Fmatrix particles_pos;
+    Fmatrix particles_pos{};
     particles_pos.set(get_ParticlesXFORM());
     particles_pos.c.set(pos);
 
@@ -297,7 +273,7 @@ void CShootingObject::OnShellDrop(const Fvector& play_pos, const Fvector& parent
 
     CParticlesObject* pShellParticles = CParticlesObject::Create(*m_sShellParticles, TRUE);
 
-    Fmatrix particles_pos;
+    Fmatrix particles_pos{};
     particles_pos.set(get_ParticlesXFORM());
     particles_pos.c.set(play_pos);
 
@@ -352,7 +328,7 @@ void CShootingObject::UpdateFlameParticles()
     if (!m_pFlameParticles)
         return;
 
-    Fmatrix pos;
+    Fmatrix pos{};
     pos.set(get_ParticlesXFORM());
     pos.c.set(get_CurrentFirePoint());
 

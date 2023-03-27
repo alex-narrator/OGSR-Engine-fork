@@ -46,27 +46,19 @@ public:
 
     virtual void UpdateCL();
 
-    void Switch();
-    void Switch(bool light_on);
-    bool torch_active() const;
+    virtual void Switch();
+    virtual void Switch(bool);
+    virtual bool IsPowerOn() const;
 
     virtual bool can_be_attached() const;
     void calc_m_delta_h(float);
     float get_range() const;
 
-public:
-    void SwitchNightVision();
-    void SwitchNightVision(bool light_on);
-    void UpdateSwitchNightVision();
-
 protected:
-    bool m_bNightVisionEnabled{};
-    bool m_bNightVisionOn{};
+    HUD_SOUND sndTorchOn;
+    HUD_SOUND sndTorchOff;
 
-    HUD_SOUND m_NightVisionOnSnd;
-    HUD_SOUND m_NightVisionOffSnd;
-    HUD_SOUND m_NightVisionIdleSnd;
-    HUD_SOUND m_NightVisionBrokenSnd;
+    shared_str m_light_descr_sect{};
 
     enum EStats
     {
@@ -75,6 +67,8 @@ protected:
         eAttached = (1 << 2)
     };
 
+    void LoadLightDefinitions(shared_str light_sect);
+
 public:
     virtual bool use_parent_ai_locations() const { return (!H_Parent()); }
     virtual void create_physic_shell();
@@ -82,6 +76,7 @@ public:
     virtual void setup_physic_shell();
 
     virtual void afterDetach();
+    virtual void afterAttach();
     virtual void renderable_Render();
 
     // alpet: управление светом фонаря

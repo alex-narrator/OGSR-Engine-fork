@@ -101,6 +101,14 @@ extern int g_dof_zoom_near;
 
 ENGINE_API extern int g_3dscopes_fps_factor;
 
+extern float g_fForceGrowSpeed;
+
+ESaveGameMode g_eSaveGameMode{};
+xr_token save_game_mode_token[]{{"sg_default", eSaveGameDefault}, // класичний режим
+                                {"sg_no_enemies", eSaveGameEnemyCheck}, // збереження без ворогів поряд
+                                {"sg_safehouse", eSaveGameSafehouseCheck}, // збереження тільки у безпечних місцях
+                                {0, 0}};
+
 void get_files_list(xr_vector<shared_str>& files, LPCSTR dir, LPCSTR file_ext)
 {
     VERIFY(dir && file_ext);
@@ -891,14 +899,21 @@ public:
         if (!g_pGameLevel)
             return;
 
-        if (!pSettings->section_exist(args))
+		string256 section{};
+        u32 count{1};
+        sscanf(args, "%s %d", &section, &count);
+
+        if (!pSettings->section_exist(section))
         {
-            Msg("! Can't find section: %s", args);
+            Msg("! Can't find section: %s", section);
             return;
         }
 
         if (auto tpGame = smart_cast<game_sv_Single*>(Level().Server->game))
-            tpGame->alife().spawn_item(args, Actor()->Position(), Actor()->ai_location().level_vertex_id(), Actor()->ai_location().game_vertex_id(), ALife::_OBJECT_ID(-1));
+        {
+            for (u32 i = 0; i < count; ++i)
+                tpGame->alife().spawn_item(section, Actor()->Position(), Actor()->ai_location().level_vertex_id(), Actor()->ai_location().game_vertex_id(), ALife::_OBJECT_ID(-1));
+        }
     }
 
     virtual void fill_tips(vecTips& tips, u32 mode)
@@ -936,31 +951,37 @@ public:
         if (!g_pGameLevel)
             return;
 
-        if (!pSettings->section_exist(args))
+		string256 section{};
+        u32 count{1};
+        sscanf(args, "%s %d", &section, &count);
+
+        if (!pSettings->section_exist(section))
         {
-            Msg("! Can't find section: %s", args);
+            Msg("! Can't find section: %s", section);
             return;
         }
 
         if (auto tpGame = smart_cast<game_sv_Single*>(Level().Server->game))
         {
-            NET_Packet packet;
-            packet.w_begin(M_SPAWN);
-            packet.w_stringZ(args);
+            for (u32 i = 0; i < count; ++i)
+                Level().spawn_item(section, Actor()->Position(), Actor()->ai_location().level_vertex_id(), Actor()->ID());
+            //NET_Packet packet;
+            //packet.w_begin(M_SPAWN);
+            //packet.w_stringZ(section);
 
-            CSE_Abstract* item =
-                tpGame->alife().spawn_item(args, Actor()->Position(), Actor()->ai_location().level_vertex_id(), Actor()->ai_location().game_vertex_id(), 0, false);
-            item->Spawn_Write(packet, FALSE);
-            tpGame->alife().server().FreeID(item->ID, 0);
-            F_entity_Destroy(item);
+            //CSE_Abstract* item =
+            //    tpGame->alife().spawn_item(section, Actor()->Position(), Actor()->ai_location().level_vertex_id(), Actor()->ai_location().game_vertex_id(), 0, false);
+            //item->Spawn_Write(packet, FALSE);
+            //tpGame->alife().server().FreeID(item->ID, 0);
+            //F_entity_Destroy(item);
 
-            ClientID clientID;
-            clientID.set(0xffff);
+            //ClientID clientID;
+            //clientID.set(0xffff);
 
-            u16 dummy;
-            packet.r_begin(dummy);
-            VERIFY(dummy == M_SPAWN);
-            tpGame->alife().server().Process_spawn(packet, clientID);
+            //u16 dummy;
+            //packet.r_begin(dummy);
+            //VERIFY(dummy == M_SPAWN);
+            //tpGame->alife().server().Process_spawn(packet, clientID);
         }
     }
 
@@ -1364,7 +1385,7 @@ void CCC_RegisterCommands()
     //CMD4(CCC_Integer, "g_dof_zoom_far", &g_dof_zoom_far, 10, 100);
     //CMD4(CCC_Integer, "g_dof_zoom_near", &g_dof_zoom_near, 10, 100);
 
-    CMD3(CCC_Mask, "wpn_aim_toggle", &psActorFlags, AF_WPN_AIM_TOGGLE);
+    CMD3(CCC_Mask, "g_hold_to_aim", &psActorFlags, AF_HOLD_TO_AIM);
 
     // alife
 #ifdef DEBUG
@@ -1499,7 +1520,6 @@ void CCC_RegisterCommands()
     CMD1(CCC_SpawnToInventory, "g_spawn_to_inventory");
     CMD3(CCC_Mask, "g_god", &psActorFlags, AF_GODMODE);
     CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
-    CMD3(CCC_Mask, "g_ammunition_on_belt", &psActorFlags, AF_AMMO_ON_BELT);
     CMD3(CCC_Mask, "g_3d_scopes", &psActorFlags, AF_3D_SCOPES);
     CMD4(CCC_Integer, "g_3d_scopes_fps_factor", &g_3dscopes_fps_factor, 2, 5);
     CMD3(CCC_Mask, "g_crosshair_dbg", &psActorFlags, AF_CROSSHAIR_DBG);
@@ -1618,4 +1638,8 @@ void CCC_RegisterCommands()
 
     CMD4(CCC_Float, "g_cam_height_speed", &cam_HeightInterpolationSpeed, 4.0f, 16.0f);
     CMD4(CCC_Float, "g_cam_lookout_speed", &cam_LookoutSpeed, 1.0f, 4.0f);
+
+    CMD4(CCC_Float, "missile_force_grow_speed", &g_fForceGrowSpeed, 1.0f, 50.0f); // скорость замаха гранатой/болтом
+    CMD3(CCC_Mask, "g_bloodmarks_on_dynamics", &psActorFlags, AF_BLOODMARKS_ON_DYNAMIC);
+    CMD3(CCC_Token, "g_save_mode", (u32*)&g_eSaveGameMode, save_game_mode_token);
 }

@@ -13,8 +13,8 @@
 #include "UIPdaWnd.h"
 #include "UIDiaryWnd.h"
 
-#define TALK_XML "talk.xml"
-#define TRADE_CHARACTER_XML "trade_character.xml"
+constexpr auto TALK_XML = "talk.xml";
+constexpr auto TRADE_CHARACTER_XML = "trade_character.xml";
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +36,7 @@ void CUITalkDialogWnd::Init(float x, float y, float width, float height)
     AttachChild(&UIStaticBottom);
     CUIXmlInit::InitStatic(*m_uiXml, "bottom_background", 0, &UIStaticBottom);
 
-    //иконки с изображение нас и партнера по торговле
+    // иконки с изображение нас и партнера по торговле
     AttachChild(&UIOurIcon);
     CUIXmlInit::InitStatic(*m_uiXml, "left_character_icon", 0, &UIOurIcon);
     AttachChild(&UIOthersIcon);
@@ -46,7 +46,7 @@ void CUITalkDialogWnd::Init(float x, float y, float width, float height)
     UIOthersIcon.AttachChild(&UICharacterInfoRight);
     UICharacterInfoRight.Init(0.0f, 0.0f, UIOthersIcon.GetWidth(), UIOthersIcon.GetHeight(), TRADE_CHARACTER_XML);
 
-    //основной фрейм диалога
+    // основной фрейм диалога
     AttachChild(&UIDialogFrame);
     CUIXmlInit::InitFrameLine(*m_uiXml, "frame_line_window", 0, &UIDialogFrame);
     UIDialogFrame.UITitleText.SetElipsis(CUIStatic::eepEnd, 10);
@@ -55,26 +55,26 @@ void CUITalkDialogWnd::Init(float x, float y, float width, float height)
     CUIXmlInit::InitFrameLine(*m_uiXml, "frame_line_window", 1, &UIOurPhrasesFrame);
     UIOurPhrasesFrame.UITitleText.SetElipsis(CUIStatic::eepEnd, 10);
 
-    //Ответы
+    // Ответы
     UIAnswersList = xr_new<CUIScrollView>();
     UIAnswersList->SetAutoDelete(true);
     UIDialogFrame.AttachChild(UIAnswersList);
     CUIXmlInit::InitScrollView(*m_uiXml, "answers_list", 0, UIAnswersList);
     UIAnswersList->SetWindowName("---UIAnswersList");
 
-    //Вопросы
+    // Вопросы
     UIQuestionsList = xr_new<CUIScrollView>();
     UIQuestionsList->SetAutoDelete(true);
     UIOurPhrasesFrame.AttachChild(UIQuestionsList);
     CUIXmlInit::InitScrollView(*m_uiXml, "questions_list", 0, UIQuestionsList);
     UIQuestionsList->SetWindowName("---UIQuestionsList");
 
-    //кнопка перехода в режим торговли
+    // кнопка перехода в режим торговли
     AttachChild(&UIToTradeButton);
     CUIXmlInit::Init3tButton(*m_uiXml, "button", 0, &UIToTradeButton);
     UIToTradeButton.SetWindowName("trade_btn");
 
-    //Элементы автоматического добавления
+    // Элементы автоматического добавления
     CUIXmlInit::InitAutoStatic(*m_uiXml, "auto_static", this);
 
     // шрифт для индикации имени персонажа в окне разговора
@@ -91,12 +91,19 @@ void CUITalkDialogWnd::Init(float x, float y, float width, float height)
 }
 
 #include "UIInventoryUtilities.h"
-
+#include "../string_table.h"
 void CUITalkDialogWnd::Show()
 {
     InventoryUtilities::SendInfoToActor("ui_talk");
     inherited::Show(true);
     inherited::Enable(true);
+
+    // режим бартерной торговли
+    if (g_actor->HasPDAWorkable())
+        UIToTradeButton.SetText(*CStringTable().translate("ui_st_trade")); // напишем "торговать" на кнопке, вместо "бартер"
+    else
+        UIToTradeButton.SetText(*CStringTable().translate("ui_st_barter")); // напишем "бартер" на кнопке, вместо "торговать"
+    //
 
     ResetAll();
 }
@@ -116,8 +123,8 @@ void CUITalkDialogWnd::OnQuestionClicked(CUIWindow* w, void*)
 
 void CUITalkDialogWnd::OnTradeClicked(CUIWindow* w, void*) { GetTop()->SendMessage(this, TALK_DIALOG_TRADE_BUTTON_CLICKED); }
 
-//пересылаем сообщение родительскому окну для обработки
-//и фильтруем если оно пришло от нашего дочернего окна
+// пересылаем сообщение родительскому окну для обработки
+// и фильтруем если оно пришло от нашего дочернего окна
 void CUITalkDialogWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 
 void CUITalkDialogWnd::ClearAll()
@@ -135,12 +142,9 @@ void CUITalkDialogWnd::AddQuestion(LPCSTR str, LPCSTR value, int number)
     ++number; // zero-based index
     if (number <= 10)
     {
-        if (Core.Features.test(xrCore::Feature::show_dialog_numbers))
-        {
-            string16 buff;
-            sprintf_s(buff, "%d.", (number == 10) ? 0 : number);
-            itm->m_num_text->SetText(buff);
-        }
+        string16 buff;
+        sprintf_s(buff, "%d.", (number == 10) ? 0 : number);
+        itm->m_num_text->SetText(buff);
         itm->m_text->SetAccelerator(DIK_ESCAPE + number, 0);
     }
     itm->SetWindowName("question_item");
@@ -222,14 +226,11 @@ CUIQuestionItem::CUIQuestionItem(CUIXml* xml_doc, LPCSTR path)
     m_text->SetWindowName("text_button");
     AddCallback("text_button", BUTTON_CLICKED, fastdelegate::MakeDelegate(this, &CUIQuestionItem::OnTextClicked));
 
-    if (Core.Features.test(xrCore::Feature::show_dialog_numbers))
-    {
-        m_num_text = xr_new<CUIStatic>();
-        m_num_text->SetAutoDelete(true);
-        AttachChild(m_num_text);
-        strconcat(sizeof(str), str, path, ":num_text");
-        xml_init.InitStatic(*xml_doc, str, 0, m_num_text);
-    }
+    m_num_text = xr_new<CUIStatic>();
+    m_num_text->SetAutoDelete(true);
+    AttachChild(m_num_text);
+    strconcat(sizeof(str), str, path, ":num_text");
+    xml_init.InitStatic(*xml_doc, str, 0, m_num_text);
 }
 
 void CUIQuestionItem::Init(LPCSTR val, LPCSTR text)

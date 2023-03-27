@@ -284,10 +284,8 @@ CScriptGameObject* GetCarBodyTarget()
     CUICarBodyWnd* wnd = pGameSP->UICarBodyMenu;
     if (wnd == nullptr)
         return nullptr;
-    if (wnd->m_pOthersObject != nullptr)
-        return smart_cast<CGameObject*>(wnd->m_pOthersObject)->lua_game_object();
-    if (wnd->m_pInventoryBox != nullptr)
-        return (wnd->m_pInventoryBox->object().lua_game_object());
+    if (wnd->m_pOtherGO != nullptr)
+        return smart_cast<CGameObject*>(wnd->m_pOtherGO)->lua_game_object();
     return nullptr;
 }
 

@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<w>
+	<af_params x="0" y="0" width="194" height="1">
+		<static_health_restore_speed width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_health_restore_speed>
+
+		<static_radiation_restore_speed width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_radiation_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_radiation_restore_speed>
+
+		<static_satiety_restore_speed width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_satiety_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_satiety_restore_speed>
+
+		<static_power_restore_speed width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_power_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_power_restore_speed>
+		
+		<static_max_power_restore_speed width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_power_restore_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_max_power_restore_speed>
+
+		<static_wounds_heal_speed width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_wounds_heal_speed>
+		
+		<static_psy_health_restore_speed width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_psy_health_restore_speed>
+		
+		<static_alcohol_restore_speed width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_alcohol_restore_speed>
+
+<!-- добавочные параметры прыжка и скорости ходьбы - BEGIN -->
+		<static_additional_sprint width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_additional_sprint>
+
+		<static_additional_jump width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_additional_jump>
+		
+		<static_additional_max_weight width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_additional_weight</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_additional_max_weight>
+		
+		<static_additional_max_volume width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_additional_weight</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_additional_max_volume>
+<!-- добавочные параметры прыжка и скорости ходьбы - END -->
+
+		<static_burn_immunity width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_burn_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_burn_immunity>
+		<static_shock_immunity width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_shock_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_shock_immunity>
+		<static_strike_immunity width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_strike_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_strike_immunity>
+		<static_wound_immunity width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_wound_immunity>
+		<static_radiation_immunity width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_radiation_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_radiation_immunity>
+		<static_telepatic_immunity width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_telepatic_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_telepatic_immunity>
+		<static_chemical_burn_immunity width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_chemical_burn_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>			
+		</static_chemical_burn_immunity>
+		<static_explosion_immunity width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_explosion_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_explosion_immunity>
+		<static_fire_wound_immunity width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_fire_wound_immunity>
+	</af_params>
+</w>

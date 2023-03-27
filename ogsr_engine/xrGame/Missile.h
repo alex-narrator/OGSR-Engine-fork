@@ -35,8 +35,8 @@ public:
     virtual void OnAnimationEnd(u32 state);
     virtual void OnMotionMark(u32 state, const motion_marks& M);
 
-protected:
-    virtual void DeviceUpdate() override;
+//protected:
+//    virtual void DeviceUpdate() override;
 
 public:
     virtual void Show(bool = false);
@@ -50,8 +50,11 @@ public:
     virtual void State(u32 state, u32 oldState);
     virtual void OnStateSwitch(u32 S, u32 oldState);
     virtual void PlayAnimIdle();
-    virtual void PlayAnimDeviceSwitch() override;
+    //virtual void PlayAnimDeviceSwitch() override;
     virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
+
+    bool m_bIsQuickThrow{};
+    virtual void QuickThrow();
 
 protected:
     virtual void UpdateXForm();
@@ -84,17 +87,13 @@ protected:
 
     //параметры броска
 
-    float m_fMinForce, m_fConstForce, m_fMaxForce, m_fForceGrowSpeed;
+    float m_fMinForce, m_fMaxForce;
     
     bool m_constpower;
     float m_fThrowForce;
 
-    bool m_kick_on_explode{};
-    bool m_explode_by_timer_on_safe_dist{true};
-
-    float m_safe_dist_to_explode{};
-
-    bool has_already_contact{};
+    bool m_contacted{};
+    bool b_impact_fuze{};
 
 protected:
     //относительная точка и направление вылета гранаты
@@ -108,7 +107,9 @@ protected:
     HUD_SOUND sndPlaying;
     HUD_SOUND sndItemOn;
 
-    bool m_throwMotionMarksAvailable;
+    HUD_SOUND sndShow, sndHide;
+
+    bool m_throwMotionMarksAvailable{};
 
 protected:
     void setup_throw_params();
@@ -127,4 +128,7 @@ public:
     virtual u32 ef_weapon_type() const;
     IC u32 destroy_time() const { return m_dwDestroyTime; };
     static void ExitContactCallback(bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/);
+
+    virtual void Contact(CPhysicsShellHolder* obj) { m_contacted = true; };
+    bool Contacted() const { return m_contacted; };
 };

@@ -16,7 +16,7 @@ class IRender_Sector;
 
 extern const Fvector zero_vel;
 
-#define WEAPON_MATERIAL_NAME "objects\\bullet"
+constexpr auto WEAPON_MATERIAL_NAME = "objects\\bullet";
 
 class CShootingObject
 {
@@ -33,7 +33,7 @@ protected:
     Fvector m_vCurrentShootDir;
     Fvector m_vCurrentShootPos;
     // ID персонажа который иницировал действие
-    u16 m_iCurrentParentID;
+    u16 m_iCurrentParentID{0xFFFF};
 
     //////////////////////////////////////////////////////////////////////////
     // Fire Params
@@ -48,25 +48,26 @@ protected:
 
 public:
     IC BOOL IsWorking() const { return bWorking; }
-    virtual BOOL ParentMayHaveAimBullet() { return FALSE; }
-    virtual BOOL ParentIsActor() { return FALSE; }
+    virtual bool ParentMayHaveAimBullet() { return false; }
+    virtual bool ParentIsActor() const { return false; }
 
 protected:
     // Weapon fires now
-    bool bWorking;
+    bool bWorking{};
 
-    float fTimeToFire;
-    float fTimeToFire2;
-    bool bCycleDown;
+    float fTimeToFire{};
+    // скорострельность привилегированного режима стрельбы
+    float fTimeToFirePreffered{};
+
     ALife::EHitType m_eHitType;
     Fvector4 fvHitPower;
     // float					fHitPower;
     float fHitImpulse;
-    bool m_bForcedParticlesHudMode;
-    bool m_bParticlesHudMode;
+    bool m_bForcedParticlesHudMode{};
+    bool m_bParticlesHudMode{};
 
     //скорость вылета пули из ствола
-    float m_fStartBulletSpeed;
+    float m_fStartBulletSpeed{1000.f};
     //максимальное расстояние стрельбы
     float fireDistance;
 
@@ -76,7 +77,7 @@ protected:
     struct SRotation constDeviation; // постоянное отклонение пуль при стрельбе в радианах
 
     //счетчик времени, затрачиваемого на выстрел
-    float fTime;
+    float fTime{};
 
 protected:
     //для сталкеров, чтоб они знали эффективные границы использования
@@ -92,7 +93,7 @@ protected:
     float light_base_range;
     Fcolor light_build_color;
     float light_build_range;
-    ref_light light_render;
+    ref_light light_render{};
     float light_var_color;
     float light_var_range;
     float light_lifetime;
@@ -150,25 +151,25 @@ protected:
 
 protected:
     //имя пратиклов для гильз
-    shared_str m_sShellParticles;
+    shared_str m_sShellParticles{};
 
 public:
     Fvector vLoadedShellPoint;
-    float m_fPredBulletTime;
-    float m_fTimeToAim;
-    BOOL m_bUseAimBullet;
+    float m_fPredBulletTime{};
+    float m_fTimeToAim{};
+    BOOL m_bUseAimBullet{};
 
 protected:
     //имя пратиклов для огня
-    shared_str m_sFlameParticlesCurrent;
+    shared_str m_sFlameParticlesCurrent{};
     //для выстрела 1м и 2м видом стрельбы
-    shared_str m_sFlameParticles;
+    shared_str m_sFlameParticles{};
     //объект партиклов огня
     CParticlesObject* m_pFlameParticles;
 
     //имя пратиклов для дыма
-    shared_str m_sSmokeParticlesCurrent;
-    shared_str m_sSmokeParticles;
+    shared_str m_sSmokeParticlesCurrent{};
+    shared_str m_sSmokeParticles{};
 
     //имя партиклов следа от пули
     shared_str m_sShotParticles;

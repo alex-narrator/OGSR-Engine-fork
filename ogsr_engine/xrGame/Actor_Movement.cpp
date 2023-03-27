@@ -25,6 +25,10 @@
 #include "ActorEffector.h"
 #include "player_hud.h"
 
+#include "Artifact.h"
+#include "CustomOutfit.h"
+#include "InventoryContainer.h"
+
 static const float s_fLandingTime1 = 0.1f; // через сколько снять флаг Landing1 (т.е. включить следующую анимацию)
 static const float s_fLandingTime2 = 0.3f; // через сколько снять флаг Landing2 (т.е. включить следующую анимацию)
 static const float s_fJumpTime = 0.3f;
@@ -166,9 +170,11 @@ static bool crouch_stop = false;
 
 void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Jump, float dt)
 {
-    float cam_eff_factor = 0.0f;
+    float cam_eff_factor{};
     mstate_old = mstate_real;
-    vControlAccel.set(0, 0, 0);
+    vControlAccel.set(Fvector{});
+
+    float exo_factor = GetExoFactor();
 
     if (!(mstate_real & mcFall) && (character_physics_support()->movement()->Environment() == CPHMovementControl::peInAir))
     {
@@ -230,20 +236,46 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
 
         if ((mstate_wf & mcJump))
         {
-            float weight = 0.f;
-            if (Core.Features.test(xrCore::Feature::condition_jump_weight_mod))
-                weight = inventory().TotalWeight() / (inventory().GetMaxWeight() + ArtefactsAddWeight(false));
-            else
-                weight = inventory().TotalWeight() / MaxCarryWeight();
+            float weight = GetCarryWeight() / MaxCarryWeight();
 
             if (CanJump(weight))
             {
                 mstate_real |= mcJump;
                 m_bJumpKeyPressed = TRUE;
-                Jump = m_fJumpSpeed;
+                // custom jump speed
+                float jump_speed = m_fJumpSpeed;
+
+                jump_speed += m_fJumpSpeed * conditions().GetBoostedParams(eAdditionalJumpBoost);
+
+                auto placement = inventory().GetActiveArtefactPlace();
+                for (const auto& item : placement)
+                {
+                    auto artefact = smart_cast<CArtefact*>(item);
+                    if (artefact && !fis_zero(artefact->GetCondition()))
+                        jump_speed += m_fJumpSpeed * artefact->GetItemEffect(CInventoryItem::eAdditionalJump);
+                    auto container = smart_cast<CInventoryContainer*>(item);
+                    if (container)
+                    {
+                        jump_speed += m_fJumpSpeed * container->GetContainmentArtefactEffect(CInventoryItem::eAdditionalJump);
+                    }
+                }
+                auto outfit = GetOutfit();
+                if (outfit && !fis_zero(outfit->GetCondition()))
+                    jump_speed += m_fJumpSpeed * outfit->GetItemEffect(CInventoryItem::eAdditionalJump);
+                auto backpack = GetBackpack();
+                if (backpack && !fis_zero(backpack->GetCondition()))
+                    jump_speed += m_fJumpSpeed * backpack->GetItemEffect(CInventoryItem::eAdditionalJump);
+
+                jump_speed *= conditions().GetSmoothOwerweightKoef();
+                jump_speed *= exo_factor;
+                clamp(jump_speed, 0.0f, jump_speed);
+
+                character_physics_support()->movement()->SetJumpUpVelocity(jump_speed);
+
+                Jump = jump_speed;
                 m_fJumpTime = s_fJumpTime;
 
-                //уменьшить силу игрока из-за выполненого прыжка
+                // уменьшить силу игрока из-за выполненого прыжка
                 if (!GodMode())
                 {
                     conditions().ConditionJump(weight);
@@ -359,12 +391,16 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
             float scale = vControlAccel.magnitude();
             if (scale > EPS)
             {
-                scale = m_fWalkAccel / scale;
+                float walk_accel{m_fWalkAccel};
+                walk_accel *= conditions().GetSmoothOwerweightKoef();
+                clamp(walk_accel, 0.0f, walk_accel);
+
+                scale = walk_accel / scale;
                 if (bAccelerated)
                     if (mstate_real & mcBack)
-                        scale *= m_fRunBackFactor * m_fExoFactor;
+                        scale *= m_fRunBackFactor;
                     else
-                        scale *= m_fRunFactor * m_fExoFactor;
+                        scale *= m_fRunFactor;
                 else if (mstate_real & mcBack)
                     scale *= m_fWalkBackFactor;
 
@@ -372,13 +408,38 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                     scale *= m_fCrouchFactor;
                 if (mstate_real & mcClimb)
                     scale *= m_fClimbFactor;
+
+                // custom sprint factor
+                float sprint_k{m_fSprintFactor};
+                sprint_k += m_fSprintFactor * conditions().GetBoostedParams(eAdditionalSprintBoost);
+                auto placement = inventory().GetActiveArtefactPlace();
+                for (const auto& item : placement)
+                {
+                    auto artefact = smart_cast<CArtefact*>(item);
+                    if (artefact && !fis_zero(artefact->GetCondition()))
+                        sprint_k += m_fSprintFactor * artefact->GetItemEffect(CInventoryItem::eAdditionalSprint);
+                    auto container = smart_cast<CInventoryContainer*>(item);
+                    if (container)
+                    {
+                        sprint_k += m_fSprintFactor * container->GetContainmentArtefactEffect(CInventoryItem::eAdditionalSprint);
+                    }
+                }
+                auto outfit = GetOutfit();
+                if (outfit && !fis_zero(outfit->GetCondition()))
+                    sprint_k += m_fSprintFactor * outfit->GetItemEffect(CInventoryItem::eAdditionalSprint);
+                auto backpack = GetBackpack();
+                if (backpack && !fis_zero(backpack->GetCondition()))
+                    sprint_k += m_fSprintFactor * backpack->GetItemEffect(CInventoryItem::eAdditionalSprint);
+                sprint_k *= exo_factor;
+                clamp(m_fSprintFactor, 0.0f, m_fSprintFactor);
+
                 if (mstate_real & mcSprint)
-                    scale *= m_fSprintFactor * m_fExoFactor;
+                    scale *= sprint_k;
 
                 if (mstate_real & (mcLStrafe | mcRStrafe) && !(mstate_real & mcCrouch))
                 {
                     if (bAccelerated)
-                        scale *= m_fRun_StrafeFactor * m_fExoFactor;
+                        scale *= m_fRun_StrafeFactor;
                     else
                         scale *= m_fWalk_StrafeFactor;
                 }
@@ -621,7 +682,8 @@ bool isActorAccelerated(u32 mstate, bool ZoomMode)
 
 bool CActor::CanAccelerate()
 {
-    bool can_accel = !conditions().IsLimping() && !character_physics_support()->movement()->PHCapture() &&
+    bool can_accel = !conditions().IsLimping() && 
+        //!character_physics_support()->movement()->PHCapture() &&
         //		&& !m_bZoomAimingMode
         //		&& !(mstate_real&mcLookout)
         (m_time_lock_accel < Device.dwTimeGlobal);
@@ -645,7 +707,8 @@ bool CActor::CanSprint()
 bool CActor::CanJump(float weight)
 {
     bool can_Jump = /*!IsLimping() &&*/
-        !character_physics_support()->movement()->PHCapture() && ((mstate_real & mcJump) == 0) && (m_fJumpTime <= 0.f) &&
+        //!character_physics_support()->movement()->PHCapture() && 
+        ((mstate_real & mcJump) == 0) && (m_fJumpTime <= 0.f) &&
         (!m_hit_slowmo_jump || (fis_zero(hit_slowmo) && m_time_lock_accel < Device.dwTimeGlobal)) && !m_bJumpKeyPressed // && ((mstate_real&mcCrouch)==0);
         && !conditions().IsCantJump(weight);
 
@@ -658,15 +721,7 @@ bool CActor::CanMove()
     {
         if (mstate_wishful & mcAnyMove)
         {
-            HUD().GetUI()->AddInfoMessage("cant_walk");
-        }
-        return false;
-    }
-    else if (conditions().IsCantWalkWeight())
-    {
-        if (mstate_wishful & mcAnyMove)
-        {
-            HUD().GetUI()->AddInfoMessage("cant_walk_weight");
+            HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
         }
         return false;
     }

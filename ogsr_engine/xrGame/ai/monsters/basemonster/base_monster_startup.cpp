@@ -79,10 +79,8 @@ void CBaseMonster::Load(LPCSTR section)
 
     m_rank = (pSettings->line_exist(section, "rank")) ? int(pSettings->r_u32(section, "rank")) : 0;
 
-    //	if (pSettings->line_exist(section,"Spawn_Inventory_Item_Section")) {
-    //		m_item_section					= pSettings->r_string(section,"Spawn_Inventory_Item_Section");
-    //		m_spawn_probability				= pSettings->r_float(section,"Spawn_Inventory_Item_Probability");
-    //	} else m_spawn_probability			= 0.f;
+	m_item_section = READ_IF_EXISTS(pSettings, r_string, section, "Spawn_Inventory_Item_Section", nullptr);
+    m_spawn_probability = READ_IF_EXISTS(pSettings, r_float, section, "Spawn_Inventory_Item_Probability", 0.f);
 
     m_melee_rotation_factor = READ_IF_EXISTS(pSettings, r_float, section, "Melee_Rotation_Factor", 1.5f);
     berserk_always = !!READ_IF_EXISTS(pSettings, r_bool, section, "berserk_always", false);
@@ -116,6 +114,9 @@ void CBaseMonster::Load(LPCSTR section)
     m_base_aura.load_from_ini(pSettings, section);
 
     m_force_anti_aim = false;
+
+    m_fSkinDensityK = READ_IF_EXISTS(pSettings, r_float, section, "skin_density", 1.f);
+    clamp(m_fSkinDensityK, 1.f, m_fSkinDensityK);
 }
 
 void CBaseMonster::PostLoad(LPCSTR section)
@@ -329,13 +330,6 @@ BOOL CBaseMonster::net_Spawn(CSE_Abstract* DC)
     //			}
     //		}
     //	}
-
-    if (!fis_zero(m_psy_aura.max_distance()))
-        Actor()->conditions().set_monsters_aura_radius(m_psy_aura.max_distance());
-    if (!fis_zero(m_radiation_aura.max_distance()))
-        Actor()->conditions().set_monsters_aura_radius(m_radiation_aura.max_distance());
-    if (!fis_zero(m_fire_aura.max_distance()))
-        Actor()->conditions().set_monsters_aura_radius(m_fire_aura.max_distance());
 
     return (TRUE);
 }

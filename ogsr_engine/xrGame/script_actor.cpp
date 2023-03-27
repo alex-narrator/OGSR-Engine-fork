@@ -104,10 +104,10 @@ void CScriptActor::script_register(lua_State* L)
                .def_readwrite("satiety_health_v", &CActorCondition::m_fV_SatietyHealth)
                .def_readwrite("satiety_power_v", &CActorCondition::m_fV_SatietyPower)
 
-               .def_readwrite("thirst", &CActorCondition::m_fThirst)
-               .def_readwrite("thirst_v", &CActorCondition::m_fV_Thirst)
-               .def_readwrite("thirst_health_v", &CActorCondition::m_fV_ThirstHealth)
-               .def_readwrite("thirst_power_v", &CActorCondition::m_fV_ThirstPower)
+               //.def_readwrite("thirst", &CActorCondition::m_fThirst)
+               //.def_readwrite("thirst_v", &CActorCondition::m_fV_Thirst)
+               //.def_readwrite("thirst_health_v", &CActorCondition::m_fV_ThirstHealth)
+               //.def_readwrite("thirst_power_v", &CActorCondition::m_fV_ThirstPower)
 
                .def_readwrite("max_power_leak_speed", &CActorCondition::m_fPowerLeakSpeed)
                .def_readwrite("jump_power", &CActorCondition::m_fJumpPower)
@@ -119,7 +119,7 @@ void CScriptActor::script_register(lua_State* L)
                .def_readwrite("overweight_jump_k", &CActorCondition::m_fOverweightJumpK)
                .def_readwrite("accel_k", &CActorCondition::m_fAccelK)
                .def_readwrite("sprint_k", &CActorCondition::m_fSprintK)
-               .def_readwrite("max_walk_weight", &CActorCondition::m_MaxWalkWeight)
+               //.def_readwrite("max_walk_weight", &CActorCondition::m_MaxWalkWeight)
 
                //.def_readwrite("health_hit_part",			&CActorCondition::m_fHealthHitPart)
                .def_readwrite("power_hit_part", &CActorCondition::m_fPowerHitPart)
@@ -205,7 +205,6 @@ void CScriptActor::script_register(lua_State* L)
                .def("is_actor_creeping", &CActor::is_actor_creeping)
                .def("is_actor_climbing", &CActor::is_actor_climbing)
                .def("is_actor_moving", &CActor::is_actor_moving)
-               .def("UpdateArtefactsOnBelt", &CActor::UpdateArtefactsOnBelt)
                .def("IsDetectorActive", &CActor::IsDetectorActive),
            class_<CActorObject, bases<CActor, CEntityAlive>>("CActor") // хак с наследованием нужен для переопределения свойств. Luabind не поддерживает property getters override
 

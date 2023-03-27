@@ -93,6 +93,12 @@ void CInventoryItemObject::UpdateCL()
     CInventoryItem::UpdateCL();
 }
 
+void CInventoryItemObject::shedule_Update(u32 dt)
+{
+    CPhysicItem::shedule_Update(dt);
+    UpdateConditionDecrease();
+}
+
 void CInventoryItemObject::OnEvent(NET_Packet& P, u16 type)
 {
     CPhysicItem::OnEvent(P, type);

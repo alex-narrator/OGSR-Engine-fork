@@ -6,9 +6,9 @@
 
 class ENGINE_API CMotionDef;
 
-//размер очереди считается бесконечность
-//заканчиваем стрельбу, только, если кончились патроны
-#define WEAPON_ININITE_QUEUE -1
+// размер очереди считается бесконечность
+// заканчиваем стрельбу, только, если кончились патроны
+constexpr auto WEAPON_ININITE_QUEUE = -1;
 
 class CBinocularsVision;
 
@@ -25,20 +25,31 @@ protected:
     HUD_SOUND sndHide;
     HUD_SOUND sndShot;
     HUD_SOUND sndEmptyClick;
-    HUD_SOUND sndReload, sndReloadPartly, sndReloadJammed, sndReloadJammedLast;
+    HUD_SOUND sndReload, sndReloadPartly;
+    bool sndReloadPartlyExist{};
     HUD_SOUND sndFireModes;
     HUD_SOUND sndZoomChange;
-    HUD_SOUND sndTactItemOn;
+    //
+    HUD_SOUND sndShutter, sndShutterMisfire, sndUnload;
+    HUD_SOUND sndZoomIn;
+    HUD_SOUND sndZoomOut;
+    HUD_SOUND sndNightVisionOn;
+    HUD_SOUND sndNightVisionOff;
+    HUD_SOUND sndNightVisionIdle;
+    HUD_SOUND sndNightVisionBroken;
+
+    HUD_SOUND sndLaserSwitch;
+    HUD_SOUND sndFlashlightSwitch;
     HUD_SOUND sndAimStart, sndAimEnd;
-    HUD_SOUND sndItemOn;
-    //звук текущего выстрела
-    HUD_SOUND* m_pSndShotCurrent;
+
+    // звук текущего выстрела
+    HUD_SOUND* m_pSndShotCurrent{};
 
     virtual void StopHUDSounds();
 
-    //дополнительная информация о глушителе
-    LPCSTR m_sSilencerFlameParticles;
-    LPCSTR m_sSilencerSmokeParticles;
+    // дополнительная информация о глушителе
+    LPCSTR m_sSilencerFlameParticles{};
+    LPCSTR m_sSilencerSmokeParticles{};
     HUD_SOUND sndSilencerShot;
 
     ESoundTypes m_eSoundShow;
@@ -46,10 +57,33 @@ protected:
     ESoundTypes m_eSoundShot;
     ESoundTypes m_eSoundEmptyClick;
     ESoundTypes m_eSoundReload;
+    ESoundTypes m_eSoundShutter;
 
     // General
-    //кадр момента пересчета UpdateSounds
-    u32 dwUpdateSounds_Frame;
+    // кадр момента пересчета UpdateSounds
+    u32 dwUpdateSounds_Frame{};
+
+    // laser
+    float laserdot_attach_aim_dist{};
+    shared_str laserdot_attach_bone;
+    Fvector laserdot_world_attach_offset{};
+    ref_light laser_light_render;
+    CLAItem* laser_lanim{};
+    float laser_fBrightness{1.f};
+    bool m_bIsLaserOn{};
+    void UpdateLaser();
+
+    // flashlight
+    float flashlight_attach_aim_dist{};
+    shared_str flashlight_attach_bone;
+    Fvector flashlight_omni_attach_offset{}, flashlight_world_attach_offset{}, flashlight_omni_world_attach_offset{};
+    ref_light flashlight_render;
+    ref_light flashlight_omni;
+    ref_glow flashlight_glow;
+    CLAItem* flashlight_lanim{};
+    float flashlight_fBrightness{1.f};
+    bool m_bIsFlashlightOn{};
+    void UpdateFlashlight();
 
 protected:
     virtual void OnMagazineEmpty();
@@ -76,9 +110,14 @@ protected:
 
 protected:
     virtual void ReloadMagazine();
+    void ApplySilencerParams();
     void ApplySilencerKoeffs();
+    void ApplyStockParams();
+    void ApplyForendParams();
 
     virtual void state_Fire(float dt);
+    virtual void state_MagEmpty(float dt);
+    virtual void state_Misfire(float dt);
 
 public:
     CWeaponMagazined(LPCSTR name = "AK74", ESoundTypes eSoundType = SOUND_TYPE_WEAPON_SUBMACHINEGUN);
@@ -89,15 +128,8 @@ public:
 
     virtual void SetDefaults();
     virtual void FireStart();
-    virtual void FireEnd();
     virtual void Reload();
-    virtual void Misfire() override;
-    virtual void DeviceSwitch() override;
 
-protected:
-    virtual void DeviceUpdate() override;
-
-public:
     virtual void UpdateCL();
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
@@ -106,17 +138,28 @@ public:
     virtual void OnH_A_Chield();
 
     virtual bool Attach(PIItem pIItem, bool b_send_event);
-    virtual bool Detach(const char* item_section_name, bool b_spawn_item);
+    virtual bool Detach(const char* item_section_name, bool b_spawn_item, float item_condition = 1.f);
     virtual bool CanAttach(PIItem pIItem);
     virtual bool CanDetach(const char* item_section_name);
 
     virtual void InitAddons();
-    virtual void InitZoomParams(LPCSTR section, bool useTexture);
+    //	virtual void	InitZoomParams	(LPCSTR section, bool useTexture);
 
     virtual bool Action(s32 cmd, u32 flags);
     virtual void UnloadMagazine(bool spawn_ammo = true);
 
     virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
+
+    virtual void processing_deactivate() override
+    {
+        UpdateLaser();
+        UpdateFlashlight();
+        inherited::processing_deactivate();
+    }
+    Fvector laserdot_attach_offset{}, laser_pos{};
+    Fvector flashlight_attach_offset{}, flashlight_pos{};
+    virtual bool IsLaserOn() const { return m_bIsLaserOn; };
+    virtual bool IsFlashlightOn() const { return m_bIsFlashlightOn; };
 
     //////////////////////////////////////////////
     // для стрельбы очередями или одиночными
@@ -130,52 +173,62 @@ public:
     virtual void StopedAfterQueueFired(bool value) { m_bStopedAfterQueueFired = value; }
 
 protected:
-    //максимальный размер очереди, которой можно стрельнуть
-    int m_iQueueSize;
-    //количество реально выстреляных патронов
-    int m_iShotNum;
+    // максимальный размер очереди, которой можно стрельнуть
+    int m_iQueueSize = WEAPON_ININITE_QUEUE;
+    // количество реально выстреляных патронов
+    int m_iShotNum{};
     //  [7/20/2005]
-    //после какого патрона, при непрерывной стрельбе, начинается отдача (сделано из-зи Абакана)
-    int m_iShootEffectorStart;
-    Fvector m_vStartPos, m_vStartDir;
+    // после какого патрона, при непрерывной стрельбе, начинается отдача (сделано из-зи Абакана)
+    int m_iShootEffectorStart{};
+    Fvector m_vStartPos{}, m_vStartDir{};
     //  [7/20/2005]
-    //флаг того, что мы остановились после того как выстреляли
-    //ровно столько патронов, сколько было задано в m_iQueueSize
-    bool m_bStopedAfterQueueFired;
-    //флаг того, что хотя бы один выстрел мы должны сделать
+    // флаг того, что мы остановились после того как выстреляли
+    // ровно столько патронов, сколько было задано в m_iQueueSize
+    bool m_bStopedAfterQueueFired{};
+    // флаг того, что хотя бы один выстрел мы должны сделать
     //(даже если очень быстро нажали на курок и вызвалось FireEnd)
-    bool m_bFireSingleShot;
-    //режимы стрельбы
-    bool m_bHasDifferentFireModes;
+    bool m_bFireSingleShot{};
+    // режимы стрельбы
+    bool m_bHasDifferentFireModes{};
     xr_vector<int> m_aFireModes;
-    int m_iCurFireMode;
+    int m_iCurFireMode{};
     string16 m_sCurFireMode;
-    int m_iPrefferedFireMode;
+    int m_iPrefferedFireMode{-1};
     u32 m_fire_zoomout_time = u32(-1);
 
-    //переменная блокирует использование
-    //только разных типов патронов
-    bool m_bLockType;
+    // у оружия есть патронник
+    bool m_bHasChamber{true};
+    // присоединён ли магазин
+    bool m_bIsMagazineAttached{true};
 
-    const char* m_str_count_tmpl;
+    // переменная блокирует использование
+    // только разных типов патронов
+    bool m_bLockType{};
+
+    const char* m_str_count_tmpl{};
+
+    bool m_bShowAmmoCounter{};
 
     // режим выделения рамкой противников
 protected:
-    bool m_bVision;
-    CBinocularsVision* m_binoc_vision;
+    bool m_bVision{};
+    CBinocularsVision* m_binoc_vision{};
 
     //////////////////////////////////////////////
     // режим приближения
     //////////////////////////////////////////////
 public:
     virtual void OnZoomIn();
-    virtual void OnZoomOut();
+    virtual void OnZoomOut(bool = false);
     virtual void OnZoomChanged();
     virtual void OnNextFireMode(bool = false);
     virtual void OnPrevFireMode(bool = false);
     virtual bool HasFireModes() { return m_bHasDifferentFireModes; };
-    virtual int GetCurrentFireMode() { return m_bHasDifferentFireModes ? m_aFireModes[m_iCurFireMode] : 1; };
+    virtual int GetCurrentFireMode() const { return m_bHasDifferentFireModes ? m_aFireModes[m_iCurFireMode] : 1; };
     virtual LPCSTR GetCurrentFireModeStr() { return m_sCurFireMode; };
+    virtual shared_str GetAmmoElapsedStr() const;
+
+    virtual bool ShowAmmoCounter() const;
 
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
@@ -183,34 +236,112 @@ public:
 protected:
     virtual bool AllowFireWhileWorking() { return false; }
 
-    //виртуальные функции для проигрывания анимации HUD
+    // виртуальные функции для проигрывания анимации HUD
     virtual void PlayAnimShow();
     virtual void PlayAnimHide();
     virtual void PlayAnimReload();
     virtual void PlayAnimIdle();
 
-    bool LaserSwitch{}, TorchSwitch{}, HeadLampSwitch{}, NightVisionSwitch{};
-    bool CartridgeInTheChamberEnabled{};
-    u32 CartridgeInTheChamber{};
-
 private:
-    string128 guns_aim_anm;
+    string64 guns_aim_anm{};
 
 protected:
-    virtual const char* GetAnimAimName();
+    const char* GetAnimAimName();
 
     virtual void PlayAnimAim();
     virtual void PlayAnimShoot();
-    virtual void PlayAnimFakeShoot();
-    virtual void PlayAnimDeviceSwitch() override;
-    virtual void PlayAnimCheckMisfire();
     virtual void PlayReloadSound();
 
     virtual int ShotsFired() { return m_iShotNum; }
-    virtual float GetWeaponDeterioration();
+    virtual float GetWeaponDeterioration() const;
+    // для хранения состояния присоединённого прицела
+    float m_fAttachedScopeCondition{1.f};
+    // для хранения состояния присоединённого гранатомёта
+    float m_fAttachedGrenadeLauncherCondition{1.f};
+    // для хранения состояния присоединённого глушителя
+    float m_fAttachedSilencerCondition{1.f};
+    // износ самого глушителя при стрельбе
+    virtual float GetSilencerDeterioration();
+    virtual void DeteriorateSilencerAttachable(float);
 
     virtual void OnDrawUI();
     virtual void net_Relcase(CObject* object);
 
-    bool ScopeRespawn(PIItem);
+    //  bool ScopeRespawn( PIItem );
+public:
+    // Real Wolf.20.01.15
+    virtual bool TryToGetAmmo(u32);
+    //
+    LPCSTR m_NightVisionSect{};
+    bool m_bNightVisionOn{};
+    void SwitchNightVision(bool, bool);
+    void UpdateSwitchNightVision();
+    void SwitchNightVision();
+
+    virtual float GetConditionMisfireProbability() const;
+
+    // оружие использует отъёмный магазин
+    // virtual bool	HasDetachableMagazine	(bool = false) const;
+    // virtual bool	IsMagazineAttached		() const;
+
+    virtual bool IsAddonAttached(u32) const;
+    virtual bool AddonAttachable(u32, bool = false) const;
+    // у оружия есть патронник
+    virtual bool HasChamber() const { return m_bHasChamber; };
+    // разрядить кол-во патронов
+    virtual void UnloadAmmo(int unload_count, bool spawn_ammo = true, bool detach_magazine = false);
+    //
+    u32 GetMagazineCount() const;
+    //
+    virtual bool IsSingleReloading();
+    virtual bool AmmoTypeIsMagazine(u32 type) const;
+    virtual LPCSTR GetMagazineEmptySect(bool = false) const;
+    virtual LPCSTR GetCurrentMagazine_ShortName(bool = false);
+
+    // действие передёргивания затвора
+    virtual void ShutterAction();
+    // сохранение типа патрона в патроннике при смешанной зарядке
+    virtual void HandleCartridgeInChamber();
+
+    virtual float Weight() const;
+
+    virtual void LoadScopeParams(LPCSTR);
+    virtual void LoadLaserParams(LPCSTR);
+    virtual void LoadFlashlightParams(LPCSTR);
+    //
+    LPCSTR binoc_vision_sect{};
+    //
+    virtual void ChangeAttachedSilencerCondition(float);
+    virtual void ChangeAttachedScopeCondition(float);
+    virtual void ChangeAttachedGrenadeLauncherCondition(float);
+
+    virtual bool IsSilencerBroken() const;
+    virtual bool IsScopeBroken() const;
+    virtual bool IsGrenadeLauncherBroken() const;
+
+    virtual void Hit(SHit* pHDS);
+    virtual bool IsHitToAddon(SHit* pHDS);
+
+    virtual bool IsNightVisionEnabled() const { return m_bNightVisionEnabled; };
+    virtual bool IsVisionPresent() const { return m_bVision; };
+
+    virtual void SwitchLaser(bool on);
+    virtual void SwitchFlashlight(bool on);
+
+    virtual void UnloadWeaponFull();
+
+    virtual void UnloadAndDetachAllAddons();
+    virtual void PrepairItem();
+
+protected:
+    bool m_bNightVisionEnabled{};
+    bool m_bNightVisionSwitchedOn{true};
+    // передёргивание затвора
+    virtual void OnShutter();
+    virtual void switch2_Shutter();
+    virtual void PlayAnimShutter();
+    virtual void PlayAnimShutterMisfire();
+    virtual void PlayAnimFiremodes();
+
+    virtual void UpdateMagazineVisibility();
 };

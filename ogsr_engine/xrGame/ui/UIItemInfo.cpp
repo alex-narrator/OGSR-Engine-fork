@@ -14,27 +14,21 @@
 #include "../PhysicsShellHolder.h"
 #include "UIWpnParams.h"
 #include "ui_af_params.h"
+#include "UIEquipParams.h"
+#include "UIEatableParams.h"
+#include "UIArmorParams.h"
 
-CUIItemInfo::CUIItemInfo()
-{
-    UIItemImageSize.set(0.0f, 0.0f);
-    UICondProgresBar = NULL;
-    UICondition = NULL;
-    UICost = NULL;
-    UIWeight = NULL;
-    UIItemImage = NULL;
-    UIDesc = NULL;
-    UIWpnParams = NULL;
-    UIArtefactParams = NULL;
-    UIName = NULL;
-    m_pInvItem = NULL;
-    m_b_force_drawing = false;
-}
+#include "Weapon.h"
+
+CUIItemInfo::CUIItemInfo() {}
 
 CUIItemInfo::~CUIItemInfo()
 {
     xr_delete(UIWpnParams);
     xr_delete(UIArtefactParams);
+    xr_delete(UIEquipParams);
+    xr_delete(UIEatableParams);
+    xr_delete(UIArmorParams);
 }
 
 void CUIItemInfo::Init(LPCSTR xml_name)
@@ -71,7 +65,6 @@ void CUIItemInfo::Init(LPCSTR xml_name)
         UIWeight->SetAutoDelete(true);
         xml_init.InitStatic(uiXml, "static_weight", 0, UIWeight);
     }
-
     if (uiXml.NavigateToNode("static_cost", 0))
     {
         UICost = xr_new<CUIStatic>();
@@ -99,10 +92,19 @@ void CUIItemInfo::Init(LPCSTR xml_name)
     if (uiXml.NavigateToNode("descr_list", 0))
     {
         UIWpnParams = xr_new<CUIWpnParams>();
-        UIWpnParams->InitFromXml(uiXml);
+        UIWpnParams->Init();
 
         UIArtefactParams = xr_new<CUIArtefactParams>();
-        UIArtefactParams->InitFromXml(uiXml);
+        UIArtefactParams->Init();
+
+        UIEquipParams = xr_new<CUIEquipParams>();
+        UIEquipParams->Init();
+
+        UIEatableParams = xr_new<CUIEatableParams>();
+        UIEatableParams->Init();
+
+        UIArmorParams = xr_new<CUIArmorParams>();
+        UIArmorParams->Init();
 
         UIDesc = xr_new<CUIScrollView>();
         AttachChild(UIDesc);
@@ -135,6 +137,8 @@ void CUIItemInfo::Init(float x, float y, float width, float height, LPCSTR xml_n
     Init(xml_name);
 }
 
+using namespace InventoryUtilities;
+
 void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 {
     m_pInvItem = pInvItem;
@@ -148,18 +152,23 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
     }
     if (UIWeight)
     {
-        sprintf_s(str, "%3.2f kg", pInvItem->Weight());
+        sprintf_s(str, "%3.2f %s", pInvItem->Weight(), CStringTable().translate("st_kg").c_str());
         UIWeight->SetText(str);
     }
     if (UICost)
     {
-        sprintf_s(str, "%d RU", pInvItem->Cost()); // will be owerwritten in multiplayer
+        sprintf_s(str, "%d %s", pInvItem->Cost(), CStringTable().translate("ui_st_money_regional").c_str()); // will be owerwritten in multiplayer
         UICost->SetText(str);
+    }
+    if (UICondition)
+    {
+        sprintf_s(str, "%.0f%s", pInvItem->GetCondition() * 100.0f, "%");
+        UICondition->SetText(str);
     }
 
     if (UICondProgresBar)
     {
-        float cond = pInvItem->GetConditionToShow();
+        float cond = pInvItem->GetCondition();
         UICondProgresBar->Show(true);
         UICondProgresBar->SetProgressPos(cond * 100.0f + 1.0f - EPS);
     }
@@ -168,9 +177,12 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
     {
         UIDesc->Clear();
         VERIFY(0 == UIDesc->GetSize());
-        TryAddWpnInfo(pInvItem->object());
-        TryAddArtefactInfo(pInvItem->object().cNameSect());
-        TryAddCustomInfo(pInvItem->object());
+        TryAddWpnInfo(pInvItem);
+        TryAddArtefactInfo(pInvItem);
+        TryAddEquipInfo(pInvItem);
+        TryAddEatableInfo(pInvItem);
+        TryAddArmorInfo(pInvItem);
+        TryAddCustomInfo(pInvItem);
         if (m_desc_info.bShowDescrText)
         {
             CUIStatic* pItem = xr_new<CUIStatic>();
@@ -198,10 +210,12 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
         UIItemImage->GetUIStaticItem().SetRect(v_r);
         UIItemImage->SetWidth(_min(v_r.width(), UIItemImageSize.x));
         UIItemImage->SetHeight(_min(v_r.height(), UIItemImageSize.y));
+
+        TryAttachWpnAddonIcons(UIItemImage, pInvItem);
     }
 }
 
-void CUIItemInfo::TryAddWpnInfo(CPhysicsShellHolder& obj)
+void CUIItemInfo::TryAddWpnInfo(CInventoryItem* obj)
 {
     if (UIWpnParams->Check(obj))
     {
@@ -210,25 +224,49 @@ void CUIItemInfo::TryAddWpnInfo(CPhysicsShellHolder& obj)
     }
 }
 
-void CUIItemInfo::TryAddArtefactInfo(const shared_str& af_section)
+void CUIItemInfo::TryAddArtefactInfo(CInventoryItem* obj)
 {
-    if (UIArtefactParams->Check(af_section))
+    UIArtefactParams->SetInfo(obj);
+    UIDesc->AddWindow(UIArtefactParams, false);
+}
+
+void CUIItemInfo::TryAddEquipInfo(CInventoryItem* obj)
+{
+    if (UIEquipParams->Check(obj))
     {
-        UIArtefactParams->SetInfo(af_section);
-        UIDesc->AddWindow(UIArtefactParams, false);
+        UIEquipParams->SetInfo(obj);
+        UIDesc->AddWindow(UIEquipParams, false);
+    }
+}
+
+void CUIItemInfo::TryAddEatableInfo(CInventoryItem* obj)
+{
+    if (UIEatableParams->Check(obj))
+    {
+        UIEatableParams->SetInfo(obj);
+        UIDesc->AddWindow(UIEatableParams, false);
+    }
+}
+
+void CUIItemInfo::TryAddArmorInfo(CInventoryItem* obj)
+{
+    if (UIArmorParams->Check(obj))
+    {
+        UIArmorParams->SetInfo(obj);
+        UIDesc->AddWindow(UIArmorParams, false);
     }
 }
 
 #include "script_game_object.h"
 
-void CUIItemInfo::TryAddCustomInfo(CPhysicsShellHolder& obj)
+void CUIItemInfo::TryAddCustomInfo(CInventoryItem* obj)
 {
     if (pSettings->line_exist("engine_callbacks", "ui_item_info_callback"))
     {
         const char* callback = pSettings->r_string("engine_callbacks", "ui_item_info_callback");
         if (luabind::functor<void> lua_function; ai().script_engine().functor(callback, lua_function))
         {
-            lua_function(UIDesc, obj.lua_game_object());
+            lua_function(UIDesc, obj->object().lua_game_object());
         }
     }
 }
@@ -237,4 +275,37 @@ void CUIItemInfo::Draw()
 {
     if (m_pInvItem || m_b_force_drawing)
         inherited::Draw();
+}
+
+void CUIItemInfo::Update()
+{
+    if (m_pInvItem && m_pInvItem->NeedForcedDescriptionUpdate() && !m_pInvItem->GetDropManual())
+    {
+        if (UICondProgresBar)
+        {
+            float cond = m_pInvItem->GetCondition();
+            if (!UICondProgresBar->IsShown())
+                UICondProgresBar->Show(true);
+            UICondProgresBar->SetProgressPos(cond * 100.0f + 1.0f - EPS);
+        }
+
+        if (UICondition)
+        {
+            string256 str;
+            sprintf_s(str, "%.0f%s", m_pInvItem->GetCondition() * 100.0f, "%");
+            UICondition->SetText(str);
+        }
+
+        if (UIArtefactParams)
+        {
+            UIArtefactParams->SetInfo(m_pInvItem);
+        }
+
+        if (UIEquipParams)
+        {
+            UIEquipParams->SetInfo(m_pInvItem);
+        }
+    }
+
+    inherited::Update();
 }

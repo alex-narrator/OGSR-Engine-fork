@@ -67,10 +67,12 @@ public:
         FIAlwaysUntradable = (1 << 12),
         FIUngroupable = (1 << 13),
         FIHiddenForInventory = (1 << 14),
+        Fvest = (1 << 15),
+        Fbreakable = (1 << 16),
     };
     const u32 ClrEquipped = READ_IF_EXISTS(pSettings, r_color, "dragdrop", "color_equipped", color_argb(255, 255, 225, 0));
     const u32 ClrUntradable = READ_IF_EXISTS(pSettings, r_color, "dragdrop", "color_untradable", color_argb(255, 124, 0, 0));
-    Flags16 m_flags;
+    Flags32 m_flags;
     CIconParams m_icon_params;
 
 public:
@@ -84,21 +86,21 @@ public:
     virtual LPCSTR NameShort();
     //.	virtual LPCSTR				NameComplex			();
     shared_str ItemDescription() { return m_Description; }
-    virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count){};
+    virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count) /* {}*/;
     virtual bool NeedBriefInfo() { return m_need_brief_info; };
 
     virtual void OnEvent(NET_Packet& P, u16 type);
 
     virtual bool Useful() const; // !!! Переопределить. (см. в Inventory.cpp)
-    virtual bool Attach(PIItem pIItem, bool b_send_event) { return false; }
+    virtual bool Attach(PIItem, bool);
     virtual bool Detach(PIItem pIItem) { return false; }
-    //при детаче спаунится новая вещь при заданно названии секции
-    virtual bool Detach(const char* item_section_name, bool b_spawn_item);
-    virtual bool CanAttach(PIItem pIItem) { return false; }
-    virtual bool CanDetach(LPCSTR item_section_name) { return false; }
+    // при детаче спаунится новая вещь при заданно названии секции
+    virtual bool Detach(const char* item_section_name, bool b_spawn_item, float item_condition = 1.f);
+    virtual bool CanAttach(PIItem);
+    virtual bool CanDetach(const char*);
 
-    virtual EHandDependence HandDependence() const { return hd1Hand; };
-    virtual bool IsSingleHanded() const { return true; };
+    virtual EHandDependence HandDependence() const { return eHandDependence; };
+    virtual bool IsSingleHanded() const { return m_bIsSingleHanded; };
     virtual bool Activate(bool = false); // !!! Переопределить. (см. в Inventory.cpp)
     virtual void Deactivate(bool = false); // !!! Переопределить. (см. в Inventory.cpp)
     virtual bool Action(s32 cmd, u32 flags) { return false; } // true если известная команда, иначе false
@@ -122,35 +124,39 @@ public:
     BOOL IsInvalid() const;
 
     BOOL IsQuestItem() const { return m_flags.test(FIsQuestItem); }
-    virtual u32 Cost() const { return m_cost; }
+
+    virtual u32 Cost() const; //{ return m_cost;	}
     virtual void SetCost(u32 cost) { m_cost = cost; }
-    virtual float Weight() const { return m_weight; }
 
-    float m_fPsyHealthRestoreSpeed;
-    virtual float PsyHealthRestoreSpeed() const { return m_fPsyHealthRestoreSpeed; }
+    virtual float Weight() const; //	{ return m_weight;	}
+    virtual void SetWeight(float w) { m_weight = w; }
 
-    float m_fRadiationRestoreSpeed;
-    virtual float RadiationRestoreSpeed() const { return m_fRadiationRestoreSpeed; }
+    float m_fRadiationAccumFactor{}; // alpet: скорость появления вторичной радиактивности
+    float m_fRadiationAccumLimit{}; // alpet: предел вторичной радиоактивности
+
+    virtual u32 GetSlotEnabled() const { return m_uSlotEnabled; }
+    virtual bool IsModule() const { return m_uSlotEnabled != NO_ACTIVE_SLOT; }
+    virtual bool IsDropPouch() const { return m_uSlotEnabled == u32(-1); }
 
 public:
-    CInventory* m_pCurrentInventory;
+    CInventory* m_pCurrentInventory{};
 
     u32 m_cost;
     float m_weight;
-    shared_str m_Description;
-    CUIInventoryCellItem* m_cell_item;
+    shared_str m_Description{};
+    CUIInventoryCellItem* m_cell_item{};
 
-    shared_str m_name;
-    shared_str m_nameShort;
+    shared_str m_name{};
+    shared_str m_nameShort{};
     shared_str m_nameComplex;
 
-    EItemPlace m_eItemPlace;
+    EItemPlace m_eItemPlace{};
 
-    virtual void OnMoveToSlot();
-    virtual void OnMoveToBelt();
+    virtual void OnMoveToSlot(EItemPlace prevPlace);
+    virtual void OnMoveToBelt(EItemPlace prevPlace);
+    virtual void OnMoveToVest(EItemPlace prevPlace);
     virtual void OnMoveToRuck(EItemPlace prevPlace);
-    virtual void OnDrop(){};
-    virtual void OnBeforeDrop(){};
+    virtual void OnMoveOut(EItemPlace prevPlace);
 
     int GetGridWidth() const;
     int GetGridHeight() const;
@@ -162,10 +168,7 @@ public:
     bool GetInvShowCondition() const;
 
     float GetCondition() const { return m_fCondition; }
-    virtual float GetConditionToShow() const { return GetCondition(); }
-
     void ChangeCondition(float fDeltaCondition);
-
     virtual void SetCondition(float fNewCondition)
     {
         m_fCondition = fNewCondition;
@@ -183,23 +186,31 @@ public:
 
     bool Belt() { return !!m_flags.test(Fbelt); }
     void Belt(bool on_belt) { m_flags.set(Fbelt, on_belt); }
+    bool Vest() { return !!m_flags.test(Fvest); }
+    void Vest(bool on_vest) { m_flags.set(Fvest, on_vest); }
     bool Ruck() { return !!m_flags.test(Fruck); }
     void Ruck(bool on_ruck) { m_flags.set(Fruck, on_ruck); }
     bool RuckDefault() { return !!m_flags.test(FRuckDefault); }
 
     virtual bool CanTake() const { return !!m_flags.test(FCanTake); }
-    bool CanTrade() const;
+    virtual bool CanTrade() const;
     virtual bool IsNecessaryItem(CInventoryItem* item);
     virtual bool IsNecessaryItem(const shared_str& item_sect) { return false; };
 
 protected:
     xr_vector<u8> m_slots;
     LPCSTR m_slots_sect;
-    float m_fCondition;
+    float m_fCondition{1.f};
 
     float m_fControlInertionFactor;
     shared_str m_icon_name;
     bool m_need_brief_info;
+
+    // 0-используется без участия рук, 1-одна рука, 2-две руки
+    EHandDependence eHandDependence;
+    bool m_bIsSingleHanded;
+
+    u32 m_uSlotEnabled{NO_ACTIVE_SLOT};
 
     ////////// network //////////////////////////////////////////////////
 public:
@@ -210,9 +221,7 @@ public:
 
     virtual bool IsSprintAllowed() const { return !!m_flags.test(FAllowSprint); };
 
-    virtual float GetControlInertionFactor() const { return m_fControlInertionFactor; };
-
-    virtual bool StopSprintOnFire() { return true; }
+    virtual float GetControlInertionFactor();
 
 protected:
     virtual void UpdateXForm();
@@ -266,14 +275,123 @@ public:
     virtual CWeaponAmmo* cast_weapon_ammo() { return 0; }
     virtual CGameObject* cast_game_object() { return 0; };
 
-private:
-    u8 loaded_belt_index;
-    void SetLoadedBeltIndex(u8);
+    bool m_highlight_equipped{};
+    bool m_always_ungroupable{};
+
+    virtual void TryBreakToPieces(bool);
+    bool b_brake_item{};
+    // проміжок часу до повного розряджання
+    float m_fTTLOnDecrease{};
+    float m_fLastTimeCalled{};
+    virtual void UpdateConditionDecrease();
+    virtual void UpdatePowerConsumption();
+    virtual bool NeedForcedDescriptionUpdate() const;
+
+protected:
+    // партікли знищення
+    shared_str m_sBreakParticles;
+    // звук знищення
+    ref_sound sndBreaking;
 
 public:
-    u8 GetLoadedBeltIndex() { return loaded_belt_index; };
-    bool m_highlight_equipped;
-    bool m_always_ungroupable;
+    enum ItemEffects
+    {
+        // restore
+        eHealthRestoreSpeed,
+        ePowerRestoreSpeed,
+        eMaxPowerRestoreSpeed,
+        eSatietyRestoreSpeed,
+        eRadiationRestoreSpeed,
+        ePsyHealthRestoreSpeed,
+        eAlcoholRestoreSpeed,
+        eWoundsHealSpeed,
+        // additional
+        eAdditionalSprint,
+        eAdditionalJump,
+        eAdditionalWeight,
+
+        eEffectMax,
+    };
+
+    virtual float GetItemEffect(int) const;
+    virtual float GetHitTypeProtection(int) const;
+
+    xr_vector<shared_str> m_required_tools{};
+
+    xr_vector<shared_str> m_repair_items{};
+    float repair_condition_gain{};
+    float repair_condition_threshold{};
+    int repair_count{};
+
+    // статус джерела живлення
+    ALife::EPowerSourceStatus m_power_source_status{};
+    u8 m_cur_power_source{};
+    bool m_bIsPowerSourceAttached{true};
+
+    xr_vector<shared_str> m_power_sources{};
+
+    float m_fPowerConsumption{};
+
+    const shared_str GetPowerSourceName() const { return m_power_sources[m_cur_power_source]; }
+
+    virtual bool IsPowerSourceAttached() const;
+    virtual bool IsPowerSourceAttachable() const;
+
+    virtual bool IsPowerConsumer() const;
+    void ChangePowerLevel(float);
+    void SetPowerLevel(float);
+    virtual float GetPowerLevel() const { return m_fPowerLevel; };
+    virtual float GetPowerLevelToShow() const { return m_fPowerLevel / m_fPowerCapacity * 100.f; };
+    virtual float GetPowerConsumption() const { return m_fPowerConsumption; };
+    virtual float GetPowerCapacity() const { return m_fPowerCapacity; };
+    virtual bool CanBeCharged() const;
+    virtual void InitPowerSource();
+
+    virtual void Switch(bool);
+    virtual void Switch();
+    virtual bool IsPowerOn() const;
+
+    virtual void Recharge();
+
+    LPCSTR GetDetailPartSection() const { return m_detail_part_section; }
+    virtual void Disassemble();
+    virtual bool CanBeDisassembled();
+
+    LPCSTR GetAttachMenuTip() const { return m_sAttachMenuTip; };
+    LPCSTR GetDetachMenuTip() const { return m_sDetachMenuTip; };
+
+    LPCSTR GetRepairMenuTip() const { return m_sRepairMenuTip; };
+    LPCSTR GetDisassembleMenuTip() const { return m_sDisassembleMenuTip; };
+
+    virtual bool CanBeRepairedBy(PIItem) const;
+    virtual void Repair(PIItem);
+    virtual void PrepairItem();
+
+    virtual LPCSTR GetBoneName(int);
+    virtual float GetArmorByBone(int);
+    virtual float GetArmorHitFraction();
+    virtual bool HasArmorToDisplay(int);
+
+    virtual float GetPowerLoss() { return 1.f; };
+
+    virtual void Drop();
+    void Transfer(u16 from_id, u16 to_id);
+
+protected:
+    HitImmunity::HitTypeSVec m_HitTypeProtection;
+
+    svector<float, eEffectMax> m_ItemEffect;
+
+    float m_fPowerLevel{};
+    float m_fPowerCapacity{};
+    float m_fPowerConsumingUpdateTime;
+    float m_fAttachedPowerSourceCondition{1.f};
+
+    LPCSTR m_detail_part_section{};
+    LPCSTR m_sAttachMenuTip{};
+    LPCSTR m_sDetachMenuTip{};
+    LPCSTR m_sRepairMenuTip{};
+    LPCSTR m_sDisassembleMenuTip{};
 };
 
 #include "inventory_item_inline.h"

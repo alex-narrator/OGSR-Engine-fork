@@ -76,7 +76,7 @@ void CActor::g_fireParams(CHudItem* pHudItem, Fvector& fire_pos, Fvector& fire_d
     else if (auto weapon = smart_cast<CWeapon*>(pHudItem);
              weapon && !smart_cast<CWeaponKnife*>(pHudItem) && !smart_cast<CMissile*>(pHudItem) && !smart_cast<CWeaponBinoculars*>(pHudItem))
     {
-        if (psHUD_Flags.test(HUD_CROSSHAIR_HARD) && !(weapon->IsZoomed() && !weapon->IsRotatingToZoom()))
+        if (psHUD_Flags.test(HUD_CROSSHAIR_HARD) && !(weapon->IsZoomed() && !weapon->IsRotatingToZoom()) && !pHudItem->IsKick())
         {
             fire_dir = weapon->get_LastFD();
             fire_pos = weapon->get_LastShootPoint();
@@ -108,7 +108,7 @@ void CActor::SetWeaponHideState(u32 State, bool bSet, bool now)
         this->inventory().SetSlotsBlocked(State, bSet, now);
 }
 
-#define ENEMY_HIT_SPOT "mp_hit_sector_location"
+constexpr auto ENEMY_HIT_SPOT = "mp_hit_sector_location";
 BOOL g_bShowHitSectors = TRUE;
 
 void CActor::HitSector(CObject* who, CObject* weapon)
@@ -130,10 +130,10 @@ void CActor::HitSector(CObject* who, CObject* weapon)
         CWeapon* pWeapon = smart_cast<CWeapon*>(weapon);
         if (pWeapon)
         {
-            if (pWeapon->IsSilencerAttached())
+            if (pWeapon->IsAddonAttached(eSilencer))
             {
                 bShowHitSector = false;
-                if (pWeapon->IsGrenadeLauncherAttached())
+                if (pWeapon->IsAddonAttached(eLauncher))
                 {}
             }
         }
@@ -156,19 +156,14 @@ void CActor::on_weapon_shot_start(CWeapon* weapon)
     }
     R_ASSERT(effector);
 
+	bool use_recoil_compensation = pWM->m_bCamRecoilCompensation;
+
     if (pWM)
     {
         if (effector->IsSingleShot())
             update_camera(effector);
 
-        if (pWM->GetCurrentFireMode() == 1)
-        {
-            effector->SetSingleShoot(TRUE);
-        }
-        else
-        {
-            effector->SetSingleShoot(FALSE);
-        }
+        effector->SetSingleShoot(true);
     };
 
     effector->SetRndSeed(GetShotRndSeed());
@@ -177,7 +172,7 @@ void CActor::on_weapon_shot_start(CWeapon* weapon)
 
     if (pWM)
     {
-        if (pWM->GetCurrentFireMode() != 1)
+        if (!use_recoil_compensation)
         {
             effector->SetActive(FALSE);
             update_camera(effector);
@@ -208,7 +203,7 @@ void CActor::on_weapon_hide(CWeapon* weapon)
 Fvector CActor::weapon_recoil_delta_angle()
 {
     CCameraShotEffector* effector = smart_cast<CCameraShotEffector*>(Cameras().GetCamEffector(eCEShot));
-    Fvector result = {0.f, 0.f, 0.f};
+    Fvector result{};
 
     if (effector)
         effector->GetDeltaAngle(result);
@@ -219,7 +214,7 @@ Fvector CActor::weapon_recoil_delta_angle()
 Fvector CActor::weapon_recoil_last_delta()
 {
     CCameraShotEffector* effector = smart_cast<CCameraShotEffector*>(Cameras().GetCamEffector(eCEShot));
-    Fvector result = {0.f, 0.f, 0.f};
+    Fvector result{};
 
     if (effector)
         effector->GetLastDelta(result);

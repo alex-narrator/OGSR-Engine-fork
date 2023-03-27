@@ -91,9 +91,7 @@
 #include "WeaponMounted.h"
 #include "WeaponStatMgun.h"
 
-#include "scope.h"
-#include "silencer.h"
-#include "grenadelauncher.h"
+#include "Addons.h"
 
 #include "bolt.h"
 #include "medkit.h"
@@ -109,6 +107,10 @@
 #include "StalkerOutfit.h"
 #include "MilitaryOutfit.h"
 #include "ExoOutfit.h"
+
+#include "Helmet.h"
+#include "Warbelt.h"
+#include "Vest.h"
 
 #include "f1.h"
 #include "rgd5.h"
@@ -134,6 +136,9 @@
 
 #include "torch.h"
 #include "pda.h"
+
+#include "NightVisionDevice.h"
+#include "PowerBattery.h"
 
 #include "searchlight.h"
 
@@ -260,14 +265,19 @@ void CObjectFactory::register_classes()
     ADD(CScope, CSE_ALifeItem, CLSID_OBJECT_W_SCOPE, "wpn_scope");
     ADD(CSilencer, CSE_ALifeItem, CLSID_OBJECT_W_SILENCER, "wpn_silencer");
     ADD(CGrenadeLauncher, CSE_ALifeItem, CLSID_OBJECT_W_GLAUNCHER, "wpn_grenade_launcher");
+    ADD(CLaser, CSE_ALifeItem, CLSID_OBJECT_W_LASER, "wpn_laser");
+    ADD(CFlashlight, CSE_ALifeItem, CLSID_OBJECT_W_FLASHLIGHT, "wpn_flashlight");
+    ADD(CStock, CSE_ALifeItem, CLSID_OBJECT_W_STOCK, "wpn_stock");
+    ADD(CExtender, CSE_ALifeItem, CLSID_OBJECT_W_EXTENDER, "wpn_extender");
+    ADD(CForend, CSE_ALifeItem, CLSID_OBJECT_W_FOREND, "wpn_forend");
 
     // Inventory
     ADD(CBolt, CSE_ALifeItemBolt, CLSID_IITEM_BOLT, "obj_bolt");
-    ADD(CMedkit, CSE_ALifeItem, CLSID_IITEM_MEDKIT, "obj_medkit");
-    ADD(CMedkit, CSE_ALifeItem, CLSID_IITEM_BANDAGE, "obj_bandage");
-    ADD(CAntirad, CSE_ALifeItem, CLSID_IITEM_ANTIRAD, "obj_antirad");
-    ADD(CFoodItem, CSE_ALifeItem, CLSID_IITEM_FOOD, "obj_food");
-    ADD(CBottleItem, CSE_ALifeItem, CLSID_IITEM_BOTTLE, "obj_bottle");
+    ADD(CMedkit, CSE_ALifeItemEatable, CLSID_IITEM_MEDKIT, "obj_medkit");
+    ADD(CMedkit, CSE_ALifeItemEatable, CLSID_IITEM_BANDAGE, "obj_bandage");
+    ADD(CAntirad, CSE_ALifeItemEatable, CLSID_IITEM_ANTIRAD, "obj_antirad");
+    ADD(CFoodItem, CSE_ALifeItemEatable, CLSID_IITEM_FOOD, "obj_food");
+    ADD(CBottleItem, CSE_ALifeItemEatable, CLSID_IITEM_BOTTLE, "obj_bottle");
     ADD(CExplosiveItem, CSE_ALifeItemExplosive, CLSID_IITEM_EXPLOSIVE, "obj_explosive");
 
     // Info Document
@@ -279,6 +289,14 @@ void CObjectFactory::register_classes()
     ADD(CStalkerOutfit, CSE_ALifeItemCustomOutfit, CLSID_EQUIPMENT_STALKER, "equ_stalker");
     ADD(CMilitaryOutfit, CSE_ALifeItemCustomOutfit, CLSID_EQUIPMENT_MILITARY, "equ_military");
     ADD(CExoOutfit, CSE_ALifeItemCustomOutfit, CLSID_EQUIPMENT_EXO, "equ_exo");
+
+    // equipment
+    ADD(CWarbelt, CSE_ALifeItem, CLSID_WARBELT, "obj_warbelt");
+    ADD(CVest, CSE_ALifeItemVest, CLSID_VEST, "obj_vest");
+    ADD(CHelmet, CSE_ALifeItem, CLSID_HELMET, "obj_helmet");
+
+    // power battery
+    ADD(CPowerBattery, CSE_ALifeItemPowerBattery, CLSID_POWER_BATTERY, "obj_power_battery");
 
     // Grenades
     ADD(CF1, CSE_ALifeItemGrenade, CLSID_GRENADE_F1, "wpn_grenade_f1");
@@ -317,6 +335,7 @@ void CObjectFactory::register_classes()
     // Devices
     ADD(CTorch, CSE_ALifeItemTorch, CLSID_DEVICE_TORCH, "device_torch");
     ADD(CPda, CSE_ALifeItemPDA, CLSID_DEVICE_PDA, "device_pda");
+    ADD(CNightVisionDevice, CSE_ALifeItemNightVisionDevice, CLSID_DEVICE_NIGHT_VISION, "device_night_vision");
 
     // objects
     ADD(CProjector, CSE_ALifeObjectProjector, CLSID_OBJECT_PROJECTOR, "projector");

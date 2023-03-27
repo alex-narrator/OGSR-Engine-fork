@@ -8,91 +8,323 @@
 #include "stdafx.h"
 #include "Level.h"
 #include "InventoryContainer.h"
-#include "Artifact.h"
 
-CInventoryContainer::CInventoryContainer() : CCustomInventoryBox<CInventoryItemObject>() { open(); }
+#include "Actor.h"
+#include "Artifact.h"
+#include "Inventory.h"
+
+void CInventoryContainer::Load(LPCSTR section)
+{
+    inherited::Load(section);
+    m_bQuickDrop = READ_IF_EXISTS(pSettings, r_bool, section, "quick_drop", false);
+}
 
 u32 CInventoryContainer::Cost() const
 {
-    SItemsInfo info;
-    CalcItems(info);
-    return info.cost + m_cost;
-}
-
-float CInventoryContainer::RadiationRestoreSpeed() const
-{
-    SItemsInfo info;
-    CalcItems(info);
-
-    return Core.Features.test(xrCore::Feature::objects_radioactive) ? (m_fRadiationRestoreSpeed + info.info[0]) : info.info[0];
+    u32 res = inherited::Cost();
+    for (const auto& item_id : m_items)
+    {
+        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
+        if (itm)
+        {
+            res += itm->Cost();
+        }
+    }
+    if (m_pCurrentInventory)
+    {
+        if (auto actor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner()))
+        {
+            if (this == actor->GetBackpack())
+            {
+                for (const auto& item : m_pCurrentInventory->m_ruck)
+                {
+                    if (item)
+                        res += item->Cost();
+                }
+            }
+        }
+    }
+    return res;
 }
 
 float CInventoryContainer::Weight() const
 {
-    SItemsInfo info;
-    CalcItems(info);
-    return info.weight + m_weight;
-}
-
-u32 CInventoryContainer::CalcItems(SItemsInfo& info) const
-{
-    CObjectList& objs = Level().Objects;
-    u32 result = 0;
-    Memory.mem_fill(&info, 0, sizeof(info));
-
-    for (auto it = m_items.begin(); it != m_items.end(); it++)
+    float res = inherited::Weight();
+    for (const auto& item_id : m_items)
     {
-        u16 id = *it;
-        PIItem itm = smart_cast<PIItem>(objs.net_Find(id));
+        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
         if (itm)
         {
-            result++;
-            info.weight += itm->Weight();
-            info.cost += itm->Cost();
-            float rsp = itm->RadiationRestoreSpeed();
-            info.info[0] += rsp > 0 ? rsp : 0; // нейтрализаторы радиации из рюкзака не работают (артефакты в т.ч.)
+            res += itm->Weight();
         }
     }
-
-    return result;
+    return res;
 }
 
 bool CInventoryContainer::CanTrade() const
 {
     if (!IsEmpty()) // продавать можно только пустым
         return false;
+    if (m_pCurrentInventory)
+    {
+        if (auto actor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner()))
+        {
+            if (this == actor->GetBackpack())
+            {
+                return false;
+            }
+        }
+    }
     return inherited::CanTrade();
 }
 
-DLL_Pure* CInventoryContainer::_construct() { return inherited::_construct(); }
-
-BOOL CInventoryContainer::net_Spawn(CSE_Abstract* DC)
+void CInventoryContainer::shedule_Update(u32 dt)
 {
-    BOOL res = inherited::net_Spawn(DC);
-    if (cNameSect() == "shadow_inventory")
+    inherited::shedule_Update(dt);
+    UpdateDropTasks();
+}
+
+void CInventoryContainer::UpdateDropTasks()
+{
+    for (const auto& item_id : m_items)
     {
-        close();
-        inherited::set_tip_text("st_pick_rucksack");
+        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
+        VERIFY(itm);
+        UpdateDropItem(itm);
+    }
+}
+
+void CInventoryContainer::UpdateDropItem(PIItem pIItem)
+{
+    if (pIItem->GetDropManual())
+    {
+        pIItem->SetDropManual(FALSE);
+        pIItem->object().Position().set(Position()); // щоб реджектнутий об'єкт з'являвся на позиції батьківського контейнера
+        NET_Packet P;
+        pIItem->object().u_EventGen(P, GE_OWNERSHIP_REJECT, pIItem->object().H_Parent()->ID());
+        P.w_u16(pIItem->object().ID());
+        pIItem->object().u_EventSend(P);
+    } // dropManual
+}
+
+float CInventoryContainer::GetItemEffect(int effect) const
+{
+    bool for_rad = effect == eRadiationRestoreSpeed;
+    float res = inherited::GetItemEffect(effect);
+    for (const auto& item_id : m_items)
+    {
+        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
+        if (itm)
+        {
+            if (for_rad)
+            {
+                float rad = itm->GetItemEffect(effect);
+                rad *= (1.f - GetHitTypeProtection(ALife::eHitTypeRadiation));
+                res += rad;
+            }
+            else if (smart_cast<CArtefact*>(itm))
+                res += itm->GetItemEffect(effect);
+        }
     }
     return res;
 }
-void CInventoryContainer::OnEvent(NET_Packet& P, u16 type)
+
+bool CInventoryContainer::NeedForcedDescriptionUpdate() const
 {
-    inherited::OnEvent(P, type);
-    // if (GE_OWNERSHIP_TAKE == type)
-    //	Msg("CInventoryContainer %s received object", Name());
-    // if (GE_OWNERSHIP_REJECT == type)
-    //	Msg("CInventoryContainer %s lost object", Name());
+    for (const auto& item_id : m_items)
+    {
+        auto item = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
+        if (item)
+        {
+            if (auto artefact = smart_cast<CArtefact*>(item))
+            {
+                if (artefact->GetCondition() && artefact->m_fTTLOnDecrease)
+                    return true;
+            }
+        }
+    }
+    return inherited::NeedForcedDescriptionUpdate();
 }
 
-void CInventoryContainer::close()
+float CInventoryContainer::GetContainmentArtefactEffect(int effect) const
 {
-    m_opened = false;
-    inherited::set_tip_text_default();
+    float res{};
+    for (const auto& item_id : m_items)
+    {
+        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
+        if (itm && smart_cast<CArtefact*>(itm))
+        {
+            res += itm->GetItemEffect(effect);
+        }
+    }
+    return res;
 }
 
-void CInventoryContainer::open()
+float CInventoryContainer::GetContainmentArtefactProtection(int hit_type) const
 {
-    m_opened = true;
-    inherited::set_tip_text("container_use");
+    float res{};
+    for (const auto& item_id : m_items)
+    {
+        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
+        if (itm && smart_cast<CArtefact*>(itm))
+        {
+            res += itm->GetHitTypeProtection(hit_type);
+        }
+    }
+    return res;
+}
+
+bool CInventoryContainer::can_be_attached() const
+{
+    const auto actor = smart_cast<const CActor*>(H_Parent());
+    return actor ? (actor->GetBackpack() == this) : true;
+}
+
+void CInventoryContainer::Hit(SHit* pHDS)
+{
+    inherited::Hit(pHDS);
+
+    auto actor = smart_cast<CActor*>(H_Parent());
+    if (actor && actor->GetBackpack() == this)
+    {
+        HitItemsInBackPack(pHDS);
+        return;
+    }
+    HitItemsInContainer(pHDS);
+}
+
+void CInventoryContainer::HitItemsInBackPack(SHit* pHDS)
+{
+    TIItemContainer ruck = m_pCurrentInventory->m_ruck;
+    if (ruck.empty())
+        return;
+    pHDS->power *= (1.0f - GetHitTypeProtection(pHDS->type()));
+
+    switch (pHDS->type())
+    {
+    case ALife::eHitTypeFireWound:
+    case ALife::eHitTypeWound:
+    case ALife::eHitTypeWound_2: {
+        u32 random_item = ::Random.randI(0, ruck.size());
+        auto item = ruck[random_item];
+        if (item)
+            item->Hit(pHDS);
+    }
+    break;
+    default: {
+        for (const auto& item : ruck)
+        {
+            item->Hit(pHDS);
+        }
+    }
+    break;
+    }
+}
+
+void CInventoryContainer::HitItemsInContainer(SHit* pHDS)
+{
+    if (IsEmpty())
+        return;
+    pHDS->power *= (1.0f - GetHitTypeProtection(pHDS->type()));
+    PIItem item{};
+
+    switch (pHDS->type())
+    {
+    case ALife::eHitTypeFireWound:
+    case ALife::eHitTypeWound:
+    case ALife::eHitTypeWound_2: {
+        u32 random_item = ::Random.randI(0, m_items.size());
+        item = smart_cast<PIItem>(Level().Objects.net_Find(random_item));
+        if (item)
+            item->Hit(pHDS);
+    }
+    break;
+    default: {
+        for (const auto& item_id : m_items)
+        {
+            item = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
+            if (item)
+            {
+                item->Hit(pHDS);
+            }
+        }
+    }
+    break;
+    }
+}
+
+void CInventoryContainer::OnMoveToSlot(EItemPlace prevPlace)
+{
+    inherited::OnMoveToSlot(prevPlace);
+    auto& inv = m_pCurrentInventory;
+    if (inv)
+    {
+        auto pActor = smart_cast<CActor*>(inv->GetOwner());
+        if (pActor)
+        {
+            inv->BackpackItemsTransfer(this, false);
+        }
+    }
+}
+
+void CInventoryContainer::OnMoveOut(EItemPlace prevPlace)
+{
+    inherited::OnMoveOut(prevPlace);
+    auto& inv = m_pCurrentInventory;
+    if (inv && prevPlace == eItemPlaceSlot)
+    {
+        auto pActor = smart_cast<CActor*>(inv->GetOwner());
+        if (pActor)
+        {
+            inv->BackpackItemsTransfer(this, true);
+        }
+    }
+}
+
+bool CInventoryContainer::HasQuickDrop() const
+{
+    for (const auto slot : m_slots)
+    {
+        if (slot == BACKPACK_SLOT && m_bQuickDrop)
+            return true;
+    }
+    return false;
+}
+
+u32 CInventoryContainer::GetSameItemCount(shared_str sect) const
+{
+    u32 count{};
+    for (const auto& item_id : m_items)
+    {
+        auto item = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
+        if (item && item->object().cNameSect() == sect)
+        {
+            ++count;
+        }
+    }
+    return count;
+}
+
+void CInventoryContainer::AddUniqueItems(TIItemContainer& items_container) const
+{
+    auto is_unique = [](TIItemContainer& list, PIItem item) {
+        bool res{true};
+        for (const auto& _itm : list)
+        {
+            if (item->object().cNameSect() == _itm->object().cNameSect())
+            {
+                res = false;
+                break;
+            }
+        }
+        return res;
+    };
+
+    for (const auto& item_id : m_items)
+    {
+        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
+        VERIFY(itm);
+        if (is_unique(items_container, itm))
+            items_container.push_back(itm);
+    }
 }

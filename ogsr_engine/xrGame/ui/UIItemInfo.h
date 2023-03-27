@@ -7,7 +7,9 @@ class CUIScrollView;
 class CUIProgressBar;
 class CUIWpnParams;
 class CUIArtefactParams;
-class CPhysicsShellHolder;
+class CUIEquipParams;
+class CUIEatableParams;
+class CUIArmorParams;
 
 // extern const char * const 		fieldsCaptionColor;
 
@@ -21,7 +23,7 @@ private:
         u32 uDescClr;
         bool bShowDescrText;
     } m_desc_info{};
-    CInventoryItem* m_pInvItem;
+    CInventoryItem* m_pInvItem{};
 
 public:
     CUIItemInfo();
@@ -31,21 +33,28 @@ public:
     void Init(LPCSTR xml_name);
     void InitItem(CInventoryItem* pInvItem);
 
-    void TryAddWpnInfo(CPhysicsShellHolder& obj);
-    void TryAddArtefactInfo(const shared_str& af_section);
-    void TryAddCustomInfo(CPhysicsShellHolder& obj);
+    void TryAddWpnInfo(CInventoryItem* obj);
+    void TryAddArtefactInfo(CInventoryItem* obj);
+    void TryAddEquipInfo(CInventoryItem* obj);
+    void TryAddEatableInfo(CInventoryItem* obj);
+    void TryAddArmorInfo(CInventoryItem* obj);
+    void TryAddCustomInfo(CInventoryItem* obj);
 
     virtual void Draw();
-    bool m_b_force_drawing;
-    CUIStatic* UIName;
-    CUIStatic* UIWeight;
-    CUIStatic* UICost;
-    CUIStatic* UICondition;
-    CUIScrollView* UIDesc;
-    CUIProgressBar* UICondProgresBar;
-    CUIWpnParams* UIWpnParams;
-    CUIArtefactParams* UIArtefactParams;
+    virtual void Update();
+    bool m_b_force_drawing{};
+    CUIStatic* UIName{};
+    CUIStatic* UIWeight{};
+    CUIStatic* UICost{};
+    CUIStatic* UICondition{};
+    CUIScrollView* UIDesc{};
+    CUIProgressBar* UICondProgresBar{};
+    CUIWpnParams* UIWpnParams{};
+    CUIArtefactParams* UIArtefactParams{};
+    CUIEquipParams* UIEquipParams{};
+    CUIEatableParams* UIEatableParams{};
+    CUIArmorParams* UIArmorParams{};
 
-    Fvector2 UIItemImageSize;
+    Fvector2 UIItemImageSize{};
     CUIStatic* UIItemImage;
 };

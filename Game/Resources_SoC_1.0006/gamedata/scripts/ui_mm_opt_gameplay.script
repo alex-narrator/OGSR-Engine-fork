@@ -7,29 +7,51 @@ end
 function opt_gameplay:__finalize()
 end
 
-function opt_gameplay:InitControls(x, y, xml)
+local tab = "gameplay"
+local mm = ui_mm_opt_main
+
+local gameplay_opt_params = {
+	--"option name", "option control type", "option tip name", "option tip text"
+	{ "autopause", 					"check", "gameplay_settings_name_autopause", 					"gameplay_settings_desc_autopause"					},
+	
+	{ "tips", 						"check", "gameplay_settings_name_tips", 						"gameplay_settings_desc_tips"						},
+	{ "crosshair", 					"check", "gameplay_settings_name_crosshair", 					"gameplay_settings_desc_crosshair"					},
+	{ "dyn_crosshair", 				"check", "gameplay_settings_name_dyn_crosshair", 				"gameplay_settings_desc_dyn_crosshair"				},
+	{ "dist", 						"check", "gameplay_settings_name_crosshair_dist", 				"gameplay_settings_desc_crosshair_dist"				},
+	{ "build_crosshair", 			"check", "gameplay_settings_name_build_crosshair", 				"gameplay_settings_desc_build_crosshair"			},
+--	{ "show_weapon", 				"check", "gameplay_settings_name_show_weapon", 					"gameplay_settings_desc_show_weapon"				},
+	
+	{ "crosshair_hard", 			"check", "gameplay_settings_name_crosshair_hard", 				"gameplay_settings_desc_crosshair_hard"				},
+	{ "ambient", 					"check", "gameplay_settings_name_ambient", 						"gameplay_settings_desc_ambient"					},
+	
+	{ "font_scale_x", 				"track", "", "" },
+	{ "font_scale_y", 				"track", "", "" },
+	
+	{ "game_save_mode", 			"list", "gameplay_settings_name_game_save_mode", 				"gameplay_settings_desc_game_save_mode"				},
+	{ "difficulty", 				"list", "gameplay_settings_name_difficulty", 					"gameplay_settings_desc_difficulty"					},
+}
+
+function opt_gameplay:InitControls(x, y, xml, handler)
 	self:Init(x, y, 738, 416)
 	self:SetAutoDelete(true)
 
 	xml:InitFrame("frame", self)
+	xml:InitFrame("frame_gameplay", self)
+	self.scroll_view = xml:InitScrollView("tab_gameplay:scroll_view", self)
 
-	xml:InitStatic("tab_gameplay:cap_difficulty", self)
-
-	xml:InitCheck("tab_gameplay:check_autopause", self)
-	xml:InitCheck("tab_gameplay:check_tips", self)
-	xml:InitCheck("tab_gameplay:check_crosshair", self)
-	xml:InitCheck("tab_gameplay:check_dyn_crosshair", self)
-	xml:InitCheck("tab_gameplay:check_dist", self)
-	xml:InitCheck("tab_gameplay:check_ambient", self)
-	xml:InitCheck("tab_gameplay:check_build_crosshair", self)
-	xml:InitCheck("tab_gameplay:check_crosshair_hard", self)
-	xml:InitCheck("tab_gameplay:check_aim_toggle", self)
-	xml:InitCheck("tab_gameplay:check_switch_slot", self)
-
-	xml:InitStatic("tab_gameplay:cap_font_scale_x", self)
-	xml:InitTrackBar("tab_gameplay:track_font_scale_x", self)
-	xml:InitStatic("tab_gameplay:cap_font_scale_y", self)
-	xml:InitTrackBar("tab_gameplay:track_font_scale_y", self)
-
-	xml:InitComboBox("tab_gameplay:list_difficulty", self)
+	for i =1,#gameplay_opt_params do
+		local opt, ctrl, tip_name, tip_text = unpack(gameplay_opt_params[i])
+		
+		local static
+		
+		if ctrl == "list" or ctrl == "track" then --окремий випадок для комбобоксів
+			static = xml:InitStatic("tab_"..tab..":cap_"..opt, self) 				--статик з описом оції у меню
+			xml[mm.get_control(ctrl)](xml, "tab_"..tab..":"..ctrl.."_"..opt, self)	--сам комбобокс
+		else
+			static = xml[mm.get_control(ctrl)](xml, "tab_"..tab..":"..ctrl.."_"..opt, self.scroll_view)
+		end
+		
+		mm.init_hint(handler, static, opt, tip_name, tip_text)
+		
+	end
 end

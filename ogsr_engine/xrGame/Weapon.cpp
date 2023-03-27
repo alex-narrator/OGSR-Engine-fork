@@ -1,6 +1,7 @@
 // Weapon.cpp: implementation of the CWeapon class.
 //
 //////////////////////////////////////////////////////////////////////
+
 #include "stdafx.h"
 
 #include "Weapon.h"
@@ -14,6 +15,7 @@
 
 #include "actor.h"
 #include "actoreffector.h"
+#include "ActorCondition.h"
 #include "level.h"
 
 #include "xr_level_controller.h"
@@ -26,10 +28,17 @@
 #include "game_object_space.h"
 #include "script_game_object.h"
 
-#include "GamePersistent.h"
-#include "../xr_3da/x_ray.h"
+#include "string_table.h"
 
-#define ROTATION_TIME 0.25f
+#include "WeaponMagazinedWGrenade.h"
+#include "GamePersistent.h"
+
+#include "HUDManager.h"
+#include "UIGameCustom.h"
+#include "Torch.h"
+#include "NightVisionDevice.h"
+
+// constexpr auto ROTATION_TIME = 0.25f;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -39,56 +48,26 @@ CWeapon::CWeapon(LPCSTR name)
 {
     SetState(eHidden);
     SetNextState(eHidden);
-    m_sub_state = eSubstateReloadBegin;
-    m_idle_state = eIdle;
-    m_bTriStateReload = false;
     SetDefaults();
 
     m_Offset.identity();
     m_StrapOffset.identity();
-
-    iAmmoCurrent = -1;
-    m_dwAmmoCurrentCalcFrame = 0;
-
-    iAmmoElapsed = -1;
-    iMagazineSize = -1;
-    m_ammoType = 0;
-
-    eHandDependence = hdNone;
-
-    m_fZoomFactor = Core.Features.test(xrCore::Feature::ogse_wpn_zoom_system) ? 1.f : g_fov;
-
-    m_fZoomRotationFactor = 0.f;
-
-    m_pAmmo = nullptr;
-
-    m_pFlameParticles2 = nullptr;
-    m_sFlameParticles2 = nullptr;
-
-    m_fCurrentCartirdgeDisp = 1.f;
-
-    m_strap_bone0 = nullptr;
-    m_strap_bone1 = nullptr;
-    m_StrapOffset.identity();
-    m_strapped_mode = false;
-    m_can_be_strapped = false;
-    m_ef_main_weapon_type = u32(-1);
-    m_ef_weapon_type = u32(-1);
-    m_UIScope = nullptr;
-    m_set_next_ammoType_on_reload = u32(-1);
 }
 
 CWeapon::~CWeapon()
 {
     xr_delete(m_UIScope);
+    xr_delete(m_UIScopeSecond);
 
-    laser_light_render.destroy();
-    flashlight_render.destroy();
-    flashlight_omni.destroy();
-    flashlight_glow.destroy();
+    delete_data(m_scopes);
+    delete_data(m_silencers);
+    delete_data(m_glaunchers);
+    delete_data(m_lasers);
+    delete_data(m_flashlights);
+    delete_data(m_stocks);
+    delete_data(m_extenders);
+    delete_data(m_forends);
 }
-
-void CWeapon::Hit(SHit* pHDS) { inherited::Hit(pHDS); }
 
 void CWeapon::UpdateXForm()
 {
@@ -135,8 +114,8 @@ void CWeapon::UpdateXForm()
         Fmatrix& mL = V->LL_GetTransform(u16(boneL));
         Fmatrix& mR = V->LL_GetTransform(u16(boneR));
         // Calculate
-        Fmatrix mRes;
-        Fvector R, D, N;
+        Fmatrix mRes{};
+        Fvector R{}, D{}, N{};
         D.sub(mL.c, mR.c);
 
         if (fis_zero(D.magnitude()))
@@ -206,7 +185,7 @@ void CWeapon::ForceUpdateFireParticles()
         Fvector p, d;
         smart_cast<CEntity*>(H_Parent())->g_fireParams(this, p, d);
 
-        Fmatrix _pxf;
+        Fmatrix _pxf{};
         _pxf.k = d;
         _pxf.i.crossproduct(Fvector().set(0.0f, 1.0f, 0.0f), _pxf.k);
         _pxf.j.crossproduct(_pxf.k, _pxf.i);
@@ -276,7 +255,7 @@ void CWeapon::Load(LPCSTR section)
     ////////////////////////////////////////////////////
     // дисперсия стрельбы
 
-    //подбрасывание камеры во время отдачи
+    // подбрасывание камеры во время отдачи
     camMaxAngle = pSettings->r_float(section, "cam_max_angle");
     camMaxAngle = deg2rad(camMaxAngle);
     camRelaxSpeed = pSettings->r_float(section, "cam_relax_speed");
@@ -307,6 +286,7 @@ void CWeapon::Load(LPCSTR section)
     m_fPDM_disp_crouch = READ_IF_EXISTS(pSettings, r_float, section, "PDM_disp_crouch", 1.0f);
     m_fPDM_disp_crouch_no_acc = READ_IF_EXISTS(pSettings, r_float, section, "PDM_disp_crouch_no_acc", 1.0f);
     //  [8/2/2005]
+    m_bCamRecoilCompensation = !!READ_IF_EXISTS(pSettings, r_bool, section, "cam_recoil_compensation", true);
 
     fireDispersionConditionFactor = pSettings->r_float(section, "fire_dispersion_condition_factor");
     misfireProbability = pSettings->r_float(section, "misfire_probability");
@@ -322,72 +302,143 @@ void CWeapon::Load(LPCSTR section)
     else
         vLoadedFirePoint2 = vLoadedFirePoint;
 
-    // hands
-    eHandDependence = EHandDependence(pSettings->r_s32(section, "hand_dependence"));
-    m_bIsSingleHanded = true;
-    if (pSettings->line_exist(section, "single_handed"))
-        m_bIsSingleHanded = !!pSettings->r_bool(section, "single_handed");
-    //
     m_fMinRadius = pSettings->r_float(section, "min_radius");
     m_fMaxRadius = pSettings->r_float(section, "max_radius");
 
     // информация о возможных апгрейдах и их визуализации в инвентаре
-    m_eScopeStatus = (ALife::EWeaponAddonStatus)pSettings->r_s32(section, "scope_status");
-    m_eSilencerStatus = (ALife::EWeaponAddonStatus)pSettings->r_s32(section, "silencer_status");
-    m_eGrenadeLauncherStatus = (ALife::EWeaponAddonStatus)pSettings->r_s32(section, "grenade_launcher_status");
+    m_eScopeStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "scope_status", 0);
+    m_eSilencerStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "silencer_status", 0);
+    m_eGrenadeLauncherStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "grenade_launcher_status", 0);
+    m_eLaserStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "laser_status", 0);
+    m_eFlashlightStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "flashlight_status", 0);
+    m_eStockStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "stock_status", 0);
+    m_eExtenderStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "extender_status", 0);
+    m_eForendStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "forend_status", 0);
 
     m_bZoomEnabled = !!pSettings->r_bool(section, "zoom_enabled");
     m_bUseScopeZoom = !!READ_IF_EXISTS(pSettings, r_bool, section, "use_scope_zoom", false);
     m_bUseScopeGrenadeZoom = !!READ_IF_EXISTS(pSettings, r_bool, section, "use_scope_grenade_zoom", false);
+    m_bUseScopeDOF = !!READ_IF_EXISTS(pSettings, r_bool, section, "use_scope_dof", true);
+    m_bForceScopeDOF = !!READ_IF_EXISTS(pSettings, r_bool, section, "force_scope_dof", false);
     m_bScopeShowIndicators = !!READ_IF_EXISTS(pSettings, r_bool, section, "scope_show_indicators", true);
     m_bIgnoreScopeTexture = !!READ_IF_EXISTS(pSettings, r_bool, section, "ignore_scope_texture", false);
 
-    m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME);
-
-    m_bScopeDynamicZoom = false;
-    m_fScopeZoomFactor = 0;
-    m_fRTZoomFactor = 0;
-
     m_fZoomFactor = CurrentZoomFactor();
 
-    m_allScopeNames.clear();
     m_highlightAddons.clear();
+
+    LPCSTR str{};
     if (m_eScopeStatus == ALife::eAddonAttachable)
     {
-        m_sScopeName = pSettings->r_string(section, "scope_name");
-        m_iScopeX = pSettings->r_s32(section, "scope_x");
-        m_iScopeY = pSettings->r_s32(section, "scope_y");
-
-        m_allScopeNames.push_back(m_sScopeName);
-        if (pSettings->line_exist(section, "scope_names"))
+        if (pSettings->line_exist(section, "scope_name"))
         {
-            LPCSTR S = pSettings->r_string(section, "scope_names");
-            if (S && S[0])
+            str = pSettings->r_string(section, "scope_name");
+            for (int i = 0, count = _GetItemCount(str); i < count; ++i)
             {
-                string128 _scopeItem;
-                int count = _GetItemCount(S);
-                for (int it = 0; it < count; ++it)
-                {
-                    _GetItem(S, it, _scopeItem);
-                    m_allScopeNames.push_back(_scopeItem);
-                    m_highlightAddons.push_back(_scopeItem);
-                }
+                string128 scope_section;
+                _GetItem(str, i, scope_section);
+                m_scopes.push_back(scope_section);
+                m_highlightAddons.push_back(scope_section);
             }
         }
     }
-
     if (m_eSilencerStatus == ALife::eAddonAttachable)
     {
-        m_sSilencerName = pSettings->r_string(section, "silencer_name");
-        m_iSilencerX = pSettings->r_s32(section, "silencer_x");
-        m_iSilencerY = pSettings->r_s32(section, "silencer_y");
+        if (pSettings->line_exist(section, "silencer_name"))
+        {
+            str = pSettings->r_string(section, "silencer_name");
+            for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+            {
+                string128 silencer_section;
+                _GetItem(str, i, silencer_section);
+                m_silencers.push_back(silencer_section);
+                m_highlightAddons.push_back(silencer_section);
+            }
+        }
     }
-
     if (m_eGrenadeLauncherStatus == ALife::eAddonAttachable)
     {
-        m_sGrenadeLauncherName = pSettings->r_string(section, "grenade_launcher_name");
-        m_iGrenadeLauncherX = pSettings->r_s32(section, "grenade_launcher_x");
-        m_iGrenadeLauncherY = pSettings->r_s32(section, "grenade_launcher_y");
+        if (pSettings->line_exist(section, "grenade_launcher_name"))
+        {
+            str = pSettings->r_string(section, "grenade_launcher_name");
+            for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+            {
+                string128 glauncher_section;
+                _GetItem(str, i, glauncher_section);
+                m_glaunchers.push_back(glauncher_section);
+                m_highlightAddons.push_back(glauncher_section);
+            }
+        }
+    }
+    if (m_eLaserStatus == ALife::eAddonAttachable)
+    {
+        if (pSettings->line_exist(section, "laser_name"))
+        {
+            str = pSettings->r_string(section, "laser_name");
+            for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+            {
+                string128 laser_section;
+                _GetItem(str, i, laser_section);
+                m_lasers.push_back(laser_section);
+                m_highlightAddons.push_back(laser_section);
+            }
+        }
+    }
+    if (m_eFlashlightStatus == ALife::eAddonAttachable)
+    {
+        if (pSettings->line_exist(section, "flashlight_name"))
+        {
+            str = pSettings->r_string(section, "flashlight_name");
+            for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+            {
+                string128 flashlight_section;
+                _GetItem(str, i, flashlight_section);
+                m_flashlights.push_back(flashlight_section);
+                m_highlightAddons.push_back(flashlight_section);
+            }
+        }
+    }
+    if (m_eStockStatus == ALife::eAddonAttachable)
+    {
+        if (pSettings->line_exist(section, "stock_name"))
+        {
+            str = pSettings->r_string(section, "stock_name");
+            for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+            {
+                string128 stock_section;
+                _GetItem(str, i, stock_section);
+                m_stocks.push_back(stock_section);
+                m_highlightAddons.push_back(stock_section);
+            }
+        }
+    }
+    if (m_eExtenderStatus == ALife::eAddonAttachable)
+    {
+        if (pSettings->line_exist(section, "extender_name"))
+        {
+            str = pSettings->r_string(section, "extender_name");
+            for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+            {
+                string128 extender_section;
+                _GetItem(str, i, extender_section);
+                m_extenders.push_back(extender_section);
+                m_highlightAddons.push_back(extender_section);
+            }
+        }
+    }
+    if (m_eForendStatus == ALife::eAddonAttachable)
+    {
+        if (pSettings->line_exist(section, "forend_name"))
+        {
+            str = pSettings->r_string(section, "forend_name");
+            for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+            {
+                string128 forend_section;
+                _GetItem(str, i, forend_section);
+                m_forends.push_back(forend_section);
+                m_highlightAddons.push_back(forend_section);
+            }
+        }
     }
 
     // Кости мировой модели оружия
@@ -409,10 +460,13 @@ void CWeapon::Load(LPCSTR section)
     }
     else
         m_sWpn_scope_bones.push_back(wpn_scope_def_bone);
+
     m_sWpn_silencer_bone = READ_IF_EXISTS(pSettings, r_string, section, "silencer_bone", wpn_silencer_def_bone);
     m_sWpn_launcher_bone = READ_IF_EXISTS(pSettings, r_string, section, "launcher_bone", wpn_launcher_def_bone_shoc);
     m_sWpn_laser_bone = READ_IF_EXISTS(pSettings, r_string, section, "laser_ray_bones", "");
     m_sWpn_flashlight_bone = READ_IF_EXISTS(pSettings, r_string, section, "torch_cone_bones", "");
+    m_sWpn_magazine_bone = READ_IF_EXISTS(pSettings, r_string, section, "magazine_bone", "");
+    m_sWpn_stock_bone = READ_IF_EXISTS(pSettings, r_string, section, "stock_bone", "");
 
     if (pSettings->line_exist(section, "hidden_bones"))
     {
@@ -448,10 +502,13 @@ void CWeapon::Load(LPCSTR section)
     }
     else
         m_sHud_wpn_scope_bones = m_sWpn_scope_bones;
+
     m_sHud_wpn_silencer_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "silencer_bone", m_sWpn_silencer_bone);
     m_sHud_wpn_launcher_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "launcher_bone", m_sWpn_launcher_bone);
     m_sHud_wpn_laser_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "laser_ray_bones", m_sWpn_laser_bone);
     m_sHud_wpn_flashlight_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "torch_cone_bones", m_sWpn_flashlight_bone);
+    m_sHud_wpn_magazine_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "magazine_bone", m_sWpn_magazine_bone);
+    m_sHud_wpn_stock_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "stock_bone", m_sWpn_stock_bone);
 
     if (pSettings->line_exist(hud_sect, "hidden_bones"))
     {
@@ -470,22 +527,13 @@ void CWeapon::Load(LPCSTR section)
     else
         hud_hidden_bones = hidden_bones;
 
-    //Можно и из конфига прицела читать и наоборот! Пока так.
-    m_fSecondVPZoomFactor = 0.0f;
-    m_fZoomHudFov = 0.0f;
-    m_fSecondVPHudFov = 0.0f;
-    m_fScopeInertionFactor = m_fControlInertionFactor;
-
     InitAddons();
 
-    m_bHideCrosshairInZoom = true;
-    if (pSettings->line_exist(hud_sect, "zoom_hide_crosshair"))
-        m_bHideCrosshairInZoom = !!pSettings->r_bool(hud_sect, "zoom_hide_crosshair");
+    m_bHideCrosshairInZoom = READ_IF_EXISTS(pSettings, r_bool, hud_sect, "zoom_hide_crosshair", true);
 
-    m_bZoomInertionAllow =
-        READ_IF_EXISTS(pSettings, r_bool, hud_sect, "allow_zoom_inertion", IS_OGSR_GA ? true : READ_IF_EXISTS(pSettings, r_bool, "features", "default_allow_zoom_inertion", true));
-    m_bScopeZoomInertionAllow = READ_IF_EXISTS(pSettings, r_bool, hud_sect, "allow_scope_zoom_inertion",
-                                               IS_OGSR_GA ? true : READ_IF_EXISTS(pSettings, r_bool, "features", "default_allow_scope_zoom_inertion", true));
+    m_bZoomInertionAllow = READ_IF_EXISTS(pSettings, r_bool, hud_sect, "allow_zoom_inertion", READ_IF_EXISTS(pSettings, r_bool, "features", "default_allow_zoom_inertion", true));
+    m_bScopeZoomInertionAllow =
+        READ_IF_EXISTS(pSettings, r_bool, hud_sect, "allow_scope_zoom_inertion", READ_IF_EXISTS(pSettings, r_bool, "features", "default_allow_scope_zoom_inertion", true));
 
     //////////////////////////////////////////////////////////
 
@@ -515,87 +563,6 @@ void CWeapon::Load(LPCSTR section)
         }
     }
 
-    if (!laser_light_render && pSettings->line_exist(section, "laser_light_section"))
-    {
-        has_laser = true;
-
-        laserdot_attach_bone = READ_IF_EXISTS(pSettings, r_string, section, "laserdot_attach_bone", "");
-        laserdot_attach_offset =
-            Fvector{READ_IF_EXISTS(pSettings, r_float, section, "laserdot_attach_offset_x", 0.0f), READ_IF_EXISTS(pSettings, r_float, section, "laserdot_attach_offset_y", 0.0f),
-                    READ_IF_EXISTS(pSettings, r_float, section, "laserdot_attach_offset_z", 0.0f)};
-        laserdot_world_attach_offset = Fvector{READ_IF_EXISTS(pSettings, r_float, section, "laserdot_world_attach_offset_x", 0.0f),
-                                               READ_IF_EXISTS(pSettings, r_float, section, "laserdot_world_attach_offset_y", 0.0f),
-                                               READ_IF_EXISTS(pSettings, r_float, section, "laserdot_world_attach_offset_z", 0.0f)};
-
-        const bool b_r2 = psDeviceFlags.test(rsR2) || psDeviceFlags.test(rsR3) || psDeviceFlags.test(rsR4);
-
-        const char* m_light_section = pSettings->r_string(section, "laser_light_section");
-
-        laser_lanim = LALib.FindItem(READ_IF_EXISTS(pSettings, r_string, m_light_section, "color_animator", ""));
-
-        laser_light_render = ::Render->light_create();
-        laser_light_render->set_type(IRender_Light::SPOT);
-        laser_light_render->set_shadow(true);
-
-        const Fcolor clr = READ_IF_EXISTS(pSettings, r_fcolor, m_light_section, b_r2 ? "color_r2" : "color", (Fcolor{1.0f, 0.0f, 0.0f, 1.0f}));
-        laser_fBrightness = clr.intensity();
-        laser_light_render->set_color(clr);
-        const float range = READ_IF_EXISTS(pSettings, r_float, m_light_section, b_r2 ? "range_r2" : "range", 100.f);
-        laser_light_render->set_range(range);
-        laser_light_render->set_cone(deg2rad(READ_IF_EXISTS(pSettings, r_float, m_light_section, "spot_angle", 1.f)));
-        laser_light_render->set_texture(READ_IF_EXISTS(pSettings, r_string, m_light_section, "spot_texture", nullptr));
-    }
-
-    if (!flashlight_render && pSettings->line_exist(section, "flashlight_section"))
-    {
-        has_flashlight = true;
-
-        flashlight_attach_bone = pSettings->r_string(section, "torch_light_bone");
-        flashlight_attach_offset = Fvector{pSettings->r_float(section, "torch_attach_offset_x"), pSettings->r_float(section, "torch_attach_offset_y"),
-                                           pSettings->r_float(section, "torch_attach_offset_z")};
-        flashlight_omni_attach_offset = Fvector{pSettings->r_float(section, "torch_omni_attach_offset_x"), pSettings->r_float(section, "torch_omni_attach_offset_y"),
-                                                pSettings->r_float(section, "torch_omni_attach_offset_z")};
-        flashlight_world_attach_offset = Fvector{pSettings->r_float(section, "torch_world_attach_offset_x"), pSettings->r_float(section, "torch_world_attach_offset_y"),
-                                                 pSettings->r_float(section, "torch_world_attach_offset_z")};
-        flashlight_omni_world_attach_offset =
-            Fvector{pSettings->r_float(section, "torch_omni_world_attach_offset_x"), pSettings->r_float(section, "torch_omni_world_attach_offset_y"),
-                    pSettings->r_float(section, "torch_omni_world_attach_offset_z")};
-
-        const bool b_r2 = psDeviceFlags.test(rsR2) || psDeviceFlags.test(rsR3) || psDeviceFlags.test(rsR4);
-
-        const char* m_light_section = pSettings->r_string(section, "flashlight_section");
-
-        flashlight_lanim = LALib.FindItem(READ_IF_EXISTS(pSettings, r_string, m_light_section, "color_animator", ""));
-
-        flashlight_render = ::Render->light_create();
-        flashlight_render->set_type(IRender_Light::SPOT);
-        flashlight_render->set_shadow(true);
-
-        const Fcolor clr = READ_IF_EXISTS(pSettings, r_fcolor, m_light_section, b_r2 ? "color_r2" : "color", (Fcolor{0.6f, 0.55f, 0.55f, 1.0f}));
-        flashlight_fBrightness = clr.intensity();
-        flashlight_render->set_color(clr);
-        const float range = READ_IF_EXISTS(pSettings, r_float, m_light_section, b_r2 ? "range_r2" : "range", 50.f);
-        flashlight_render->set_range(range);
-        flashlight_render->set_cone(deg2rad(READ_IF_EXISTS(pSettings, r_float, m_light_section, "spot_angle", 60.f)));
-        flashlight_render->set_texture(READ_IF_EXISTS(pSettings, r_string, m_light_section, "spot_texture", nullptr));
-
-        flashlight_omni = ::Render->light_create();
-        flashlight_omni->set_type(
-            (IRender_Light::LT)(READ_IF_EXISTS(pSettings, r_u8, m_light_section, "omni_type",
-                                               2))); // KRodin: вообще omni это обычно поинт, но поинт светит во все стороны от себя, поэтому тут спот используется по умолчанию.
-        flashlight_omni->set_shadow(false);
-
-        const Fcolor oclr = READ_IF_EXISTS(pSettings, r_fcolor, m_light_section, b_r2 ? "omni_color_r2" : "omni_color", (Fcolor{1.0f, 1.0f, 1.0f, 0.0f}));
-        flashlight_omni->set_color(oclr);
-        const float orange = READ_IF_EXISTS(pSettings, r_float, m_light_section, b_r2 ? "omni_range_r2" : "omni_range", 0.25f);
-        flashlight_omni->set_range(orange);
-
-        flashlight_glow = ::Render->glow_create();
-        flashlight_glow->set_texture(READ_IF_EXISTS(pSettings, r_string, m_light_section, "glow_texture", "glow\\glow_torch_r2"));
-        flashlight_glow->set_color(clr);
-        flashlight_glow->set_radius(READ_IF_EXISTS(pSettings, r_float, m_light_section, "glow_radius", 0.3f));
-    }
-
     dof_transition_time = READ_IF_EXISTS(pSettings, r_float, section, "dof_transition_time", 0.6f);
     dof_params_zoom = (READ_IF_EXISTS(pSettings, r_fvector4, section, "dof_zoom_params", (Fvector4{0, 0, 0, 1.6}))); //(Fvector4{0.1, 0.4, 0, 1.6})
     dof_params_reload = (READ_IF_EXISTS(pSettings, r_fvector4, section, "dof_reload_params", (Fvector4{0, 0, 1, 0})));
@@ -620,15 +587,72 @@ void CWeapon::LoadFireParams(LPCSTR section, LPCSTR prefix)
 BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
 {
     BOOL bResult = inherited::net_Spawn(DC);
+    CSE_Abstract* e = (CSE_Abstract*)(DC);
+    CSE_ALifeItemWeapon* E = smart_cast<CSE_ALifeItemWeapon*>(e);
 
-    auto E = smart_cast<CSE_ALifeItemWeapon*>(DC);
-
-    // iAmmoCurrent					= E->a_current;
     iAmmoElapsed = E->a_elapsed;
     m_flagsAddOnState = E->m_addon_flags.get();
     m_ammoType = E->ammo_type;
     SetState(E->wpn_state);
     SetNextState(E->wpn_state);
+
+    bMisfire = E->bMisfire;
+    // addons check
+    if (AddonAttachable(eScope) && IsAddonAttached(eScope) && E->m_cur_scope >= m_scopes.size())
+    {
+        Msg("! [%s]: %s: wrong scope current [%u/%u]", __FUNCTION__, cName().c_str(), E->m_cur_scope, m_scopes.size() - 1);
+        E->m_cur_scope = 0;
+    }
+    m_cur_scope = E->m_cur_scope;
+
+    if (AddonAttachable(eSilencer) && IsAddonAttached(eSilencer) && E->m_cur_silencer >= m_silencers.size())
+    {
+        Msg("! [%s]: %s: wrong silencer current [%u/%u]", __FUNCTION__, cName().c_str(), E->m_cur_silencer, m_silencers.size() - 1);
+        E->m_cur_silencer = 0;
+    }
+    m_cur_silencer = E->m_cur_silencer;
+
+    if (AddonAttachable(eLauncher) && IsAddonAttached(eLauncher) && E->m_cur_glauncher >= m_glaunchers.size())
+    {
+        Msg("! [%s]: %s: wrong grenade launcher current [%u/%u]", __FUNCTION__, cName().c_str(), E->m_cur_glauncher, m_glaunchers.size() - 1);
+        E->m_cur_glauncher = 0;
+    }
+    m_cur_glauncher = E->m_cur_glauncher;
+
+    if (AddonAttachable(eLaser) && IsAddonAttached(eLaser) && E->m_cur_laser >= m_lasers.size())
+    {
+        Msg("! [%s]: %s: wrong laser current [%u/%u]", __FUNCTION__, cName().c_str(), E->m_cur_laser, m_lasers.size() - 1);
+        E->m_cur_laser = 0;
+    }
+    m_cur_laser = E->m_cur_laser;
+
+    if (AddonAttachable(eFlashlight) && IsAddonAttached(eFlashlight) && E->m_cur_flashlight >= m_flashlights.size())
+    {
+        Msg("! [%s]: %s: wrong flashlight current [%u/%u]", __FUNCTION__, cName().c_str(), E->m_cur_flashlight, m_flashlights.size() - 1);
+        E->m_cur_flashlight = 0;
+    }
+    m_cur_flashlight = E->m_cur_flashlight;
+
+    if (AddonAttachable(eStock) && IsAddonAttached(eStock) && E->m_cur_stock >= m_stocks.size())
+    {
+        Msg("! [%s]: %s: wrong stock current [%u/%u]", __FUNCTION__, cName().c_str(), E->m_cur_stock, m_stocks.size() - 1);
+        E->m_cur_stock = 0;
+    }
+    m_cur_stock = E->m_cur_stock;
+
+    if (AddonAttachable(eExtender) && IsAddonAttached(eExtender) && E->m_cur_extender >= m_extenders.size())
+    {
+        Msg("! [%s]: %s: wrong extender current [%u/%u]", __FUNCTION__, cName().c_str(), E->m_cur_extender, m_extenders.size() - 1);
+        E->m_cur_extender = 0;
+    }
+    m_cur_extender = E->m_cur_extender;
+
+    if (AddonAttachable(eForend) && IsAddonAttached(eForend) && E->m_cur_forend >= m_forends.size())
+    {
+        Msg("! [%s]: %s: wrong forend current [%u/%u]", __FUNCTION__, cName().c_str(), E->m_cur_forend, m_forends.size() - 1);
+        E->m_cur_forend = 0;
+    }
+    m_cur_forend = E->m_cur_forend;
 
     if (m_ammoType >= m_ammoTypes.size())
     {
@@ -642,13 +666,13 @@ BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
         }
     }
 
-    m_DefaultCartridge.Load(*m_ammoTypes[m_ammoType], u8(m_ammoType));
+    m_DefaultCartridge.Load(m_ammoTypes[m_ammoType].c_str(), u8(m_ammoType));
     if (iAmmoElapsed)
     {
         // нож автоматически заряжается двумя патронами, хотя
         // размер магазина у него 0. Что бы зря не ругаться, проверим
         // что в конфиге размер магазина не нулевой.
-        if (iMagazineSize && iAmmoElapsed > (iMagazineSize + 1))
+        if (iMagazineSize && iAmmoElapsed > iMagazineSize && !AddonAttachable(eMagazine))
         {
             Msg("! [%s]: %s: wrong iAmmoElapsed[%u/%u]", __FUNCTION__, cName().c_str(), iAmmoElapsed, iMagazineSize);
             iAmmoElapsed = iMagazineSize;
@@ -664,6 +688,12 @@ BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
             m_magazine.push_back(m_DefaultCartridge);
     }
 
+    m_bZoomMode = E->m_bZoom;
+    if (m_bZoomMode)
+        OnZoomIn();
+    else
+        OnZoomOut();
+
     UpdateAddonsVisibility();
     InitAddons();
 
@@ -676,7 +706,7 @@ void CWeapon::net_Destroy()
 {
     inherited::net_Destroy();
 
-    //удалить объекты партиклов
+    // удалить объекты партиклов
     StopFlameParticles();
     StopFlameParticles2();
     StopLight();
@@ -696,9 +726,6 @@ void CWeapon::net_Export(CSE_Abstract* E)
 {
     inherited::net_Export(E);
 
-    CSE_ALifeInventoryItem* itm = smart_cast<CSE_ALifeInventoryItem*>(E);
-    itm->m_fCondition = m_fCondition;
-
     CSE_ALifeItemWeapon* wpn = smart_cast<CSE_ALifeItemWeapon*>(E);
     wpn->wpn_flags = IsUpdating() ? 1 : 0;
     wpn->a_elapsed = u16(iAmmoElapsed);
@@ -706,31 +733,21 @@ void CWeapon::net_Export(CSE_Abstract* E)
     wpn->ammo_type = (u8)m_ammoType;
     wpn->wpn_state = (u8)GetState();
     wpn->m_bZoom = (u8)m_bZoomMode;
+    //
+    wpn->bMisfire = bMisfire;
+    wpn->m_cur_scope = m_cur_scope;
+    wpn->m_cur_silencer = m_cur_silencer;
+    wpn->m_cur_glauncher = m_cur_glauncher;
+    wpn->m_cur_laser = m_cur_laser;
+    wpn->m_cur_flashlight = m_cur_flashlight;
+    wpn->m_cur_stock = m_cur_stock;
+    wpn->m_cur_extender = m_cur_extender;
+    wpn->m_cur_forend = m_cur_forend;
 }
 
-void CWeapon::save(NET_Packet& output_packet)
-{
-    inherited::save(output_packet);
-    save_data(iAmmoElapsed, output_packet);
-    save_data(m_flagsAddOnState, output_packet);
-    save_data(m_ammoType, output_packet);
-    save_data(m_bZoomMode, output_packet);
-}
+void CWeapon::save(NET_Packet& output_packet) { inherited::save(output_packet); }
 
-void CWeapon::load(IReader& input_packet)
-{
-    inherited::load(input_packet);
-    load_data(iAmmoElapsed, input_packet);
-    load_data(m_flagsAddOnState, input_packet);
-    UpdateAddonsVisibility();
-    load_data(m_ammoType, input_packet);
-    load_data(m_bZoomMode, input_packet);
-
-    if (m_bZoomMode)
-        OnZoomIn();
-    else
-        OnZoomOut();
-}
+void CWeapon::load(IReader& input_packet) { inherited::load(input_packet); }
 
 void CWeapon::OnEvent(NET_Packet& P, u16 type)
 {
@@ -740,11 +757,12 @@ void CWeapon::OnEvent(NET_Packet& P, u16 type)
         u8 state;
         P.r_u8(state);
         P.r_u8(m_sub_state);
-        u8 NextAmmo = P.r_u8();
-        if (NextAmmo == u8(-1))
-            m_set_next_ammoType_on_reload = u32(-1);
-        else
-            m_set_next_ammoType_on_reload = u8(NextAmmo);
+        //не знаю чи дуже потрібен код нижче, але через нього постіно скидається тип наступних набоїв для перезарядки
+        //u8 NextAmmo = P.r_u8();
+        //if (NextAmmo == u8(-1))
+        //    m_set_next_ammoType_on_reload = u32(-1);
+        //else
+        //    m_set_next_ammoType_on_reload = u8(NextAmmo);
 
         OnStateSwitch(u32(state), GetState());
     }
@@ -768,7 +786,7 @@ void CWeapon::OnH_B_Independent(bool just_before_destroy)
 
     inherited::OnH_B_Independent(just_before_destroy);
 
-    //завершить принудительно все процессы что шли
+    // завершить принудительно все процессы что шли
     FireEnd();
     SetPending(FALSE);
     SwitchState(eIdle);
@@ -776,6 +794,8 @@ void CWeapon::OnH_B_Independent(bool just_before_destroy)
     m_strapped_mode = false;
     OnZoomOut();
     m_fZoomRotationFactor = 0.f;
+    dof_reload_effect = 0.f;
+    shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
     UpdateXForm();
 }
 
@@ -795,7 +815,7 @@ void CWeapon::OnH_A_Chield()
 void CWeapon::OnActiveItem()
 {
     inherited::OnActiveItem();
-    //если мы занружаемся и оружие было в руках
+    // если мы занружаемся и оружие было в руках
     SetState(eIdle);
     SetNextState(eIdle);
 }
@@ -808,31 +828,12 @@ void CWeapon::OnHiddenItem()
     m_set_next_ammoType_on_reload = u32(-1);
 }
 
-bool CWeapon::NeedBlendAnm()
-{
-    /*if (GetState() == eIdle && Actor()->is_safemode())
-        return true;*/
-
-    /*if (IsZoomed() && psDeviceFlags2.test(rsAimSway))
-        return true;*/
-
-    return inherited::NeedBlendAnm();
-}
-
 void CWeapon::OnH_B_Chield()
 {
     inherited::OnH_B_Chield();
 
     OnZoomOut();
     m_set_next_ammoType_on_reload = u32(-1);
-}
-
-void CWeapon::OnBeforeDrop()
-{
-    if (auto io = smart_cast<CActor*>(H_Parent()); io && this == io->inventory().ActiveItem())
-        shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
-
-    inherited::OnBeforeDrop();
 }
 
 u8 CWeapon::idle_state()
@@ -857,16 +858,16 @@ void CWeapon::UpdateCL()
 
     UpdateHUDAddonsVisibility();
 
-    //подсветка от выстрела
+    // подсветка от выстрела
     UpdateLight();
 
-    //нарисовать партиклы
+    // нарисовать партиклы
     UpdateFlameParticles();
     UpdateFlameParticles2();
 
     VERIFY(smart_cast<IKinematics*>(Visual()));
 
-    auto pActor = smart_cast<CActor*>(H_Parent());
+    bool actor = ParentIsActor();
     if (GetState() == eIdle)
     {
         auto state = idle_state();
@@ -878,195 +879,73 @@ void CWeapon::UpdateCL()
                 SwitchState(eIdle);
             }
         }
-
-        if (pActor)
-        {
-            if (psActorFlags.test(AF_DOF_ZOOM_NEW))
-            {
-                if (m_bZoomMode && dof_zoom_effect < 1.f && !UseScopeTexture())
-                    UpdateDof(dof_zoom_effect, dof_params_zoom, false);
-                else if (dof_zoom_effect > 0.f && !m_bZoomMode)
-                    UpdateDof(dof_zoom_effect, dof_params_zoom, true);
-            }
-
-            if (psActorFlags.test(AF_DOF_RELOAD) && dof_reload_effect > 0.f) 
-                UpdateDof(dof_reload_effect, dof_params_reload, true);
-        }
-    }
-    else if (GetState() == eReload)
-    {
-        if (pActor && psActorFlags.test(AF_DOF_RELOAD) && dof_reload_effect < 1.f)
-            UpdateDof(dof_reload_effect, dof_params_reload, false);
-
-        m_idle_state = eIdle;
     }
     else
     {
-        if (pActor)
-        {
-            if (psActorFlags.test(AF_DOF_RELOAD) && dof_reload_effect > 0.f)
-                UpdateDof(dof_reload_effect, dof_params_reload, true);
-
-            if (psActorFlags.test(AF_DOF_ZOOM_NEW) && dof_zoom_effect > 0.f)
-                UpdateDof(dof_zoom_effect, dof_params_zoom, true);
-        }
-
         m_idle_state = eIdle;
     }
 
-    UpdateLaser();
-    UpdateFlashlight();
+    if (actor)
+    {
+        bool b_shoots = ((GetState() == eFire) || (GetState() == eFire2));
+        if (GetHUDmode())
+            Actor()->TryToBlockSprint(b_shoots);
+
+        if (Actor()->conditions().IsCantWalk() && IsZoomed())
+            OnZoomOut();
+
+        UpdateDofAim();
+        UpdateDofReload();
+    }
 }
 
-void CWeapon::UpdateDof(float& type, Fvector4 params_type, bool desire)
+void CWeapon::UpdateDofReload()
 {
-    if (desire)
-        type -= Device.fTimeDelta / dof_transition_time;
+    if (!psActorFlags.test(AF_DOF_RELOAD))
+        return;
+    if (GetState() == eReload)
+        dof_reload_effect += Device.fTimeDelta / dof_transition_time;
     else
-        type += Device.fTimeDelta / dof_transition_time;
-
-    shader_exports.set_dof_params(params_type.x * type, params_type.y * type, params_type.z * type, params_type.w * type);
-    clamp(type, 0.f, 1.f);
+        dof_reload_effect -= Device.fTimeDelta / dof_transition_time;
+    clamp(dof_reload_effect, 0.f, 1.f);
+    bool b_process = GetState() == eReload && dof_reload_effect <= 1.f || GetState() != eReload && dof_reload_effect > 0.f;
+    if (!b_process)
+        return;
+    Msg("%s for %s: state is Reload [%s], dof_reload_effect [%.4f]", __FUNCTION__, cName().c_str(), GetState() == eReload ? "true" : "false", dof_reload_effect);
+    shader_exports.set_dof_params(
+        dof_params_reload.x * dof_reload_effect, 
+        dof_params_reload.y * dof_reload_effect, 
+        dof_params_reload.z * dof_reload_effect,
+        dof_params_reload.w * dof_reload_effect);
 }
 
-void CWeapon::UpdateLaser()
-{
-    if (laser_light_render)
+void CWeapon::UpdateDofAim() 
+{ 
+    if (!psActorFlags.test(AF_DOF_ZOOM_NEW))
+        return;
+    if (GetState() != eIdle)
+        return;
+    if (IsZoomed() && UseScopeTexture() && !m_bForceScopeDOF)
     {
-        auto io = smart_cast<CInventoryOwner*>(H_Parent());
-        if (!laser_light_render->get_active() && IsLaserOn() && (!H_Parent() || (io && this == io->inventory().ActiveItem())))
-        {
-            laser_light_render->set_active(true);
-            UpdateAddonsVisibility();
-        }
-        else if (laser_light_render->get_active() && (!IsLaserOn() || !(!H_Parent() || (io && this == io->inventory().ActiveItem()))))
-        {
-            laser_light_render->set_active(false);
-            UpdateAddonsVisibility();
-        }
-
-        if (laser_light_render->get_active())
-        {
-            laser_pos = get_LastFP();
-            Fvector laser_dir = get_LastFD();
-
-            if (GetHUDmode())
-            {
-                if (laserdot_attach_bone.size())
-                {
-                    GetBoneOffsetPosDir(laserdot_attach_bone, laser_pos, laser_dir, laserdot_attach_offset);
-                    CorrectDirFromWorldToHud(laser_dir);
-                }
-            }
-            else
-            {
-                XFORM().transform_tiny(laser_pos, laserdot_world_attach_offset);
-            }
-
-            Fmatrix laserXForm;
-            laserXForm.identity();
-            laserXForm.k.set(laser_dir);
-            Fvector::generate_orthonormal_basis_normalized(laserXForm.k, laserXForm.j, laserXForm.i);
-
-            laser_light_render->set_position(laser_pos);
-            laser_light_render->set_rotation(laserXForm.k, laserXForm.i);
-
-            // calc color animator
-            if (laser_lanim)
-            {
-                int frame;
-                const u32 clr = laser_lanim->CalculateBGR(Device.fTimeGlobal, frame);
-
-                Fcolor fclr{(float)color_get_B(clr), (float)color_get_G(clr), (float)color_get_R(clr), 1.f};
-                fclr.mul_rgb(laser_fBrightness / 255.f);
-                laser_light_render->set_color(fclr);
-            }
-        }
+        shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
+        return;
     }
-}
-
-void CWeapon::UpdateFlashlight()
-{
-    if (flashlight_render)
-    {
-        auto io = smart_cast<CInventoryOwner*>(H_Parent());
-        if (!flashlight_render->get_active() && IsFlashlightOn() && (!H_Parent() || (io && this == io->inventory().ActiveItem())))
-        {
-            flashlight_render->set_active(true);
-            flashlight_omni->set_active(true);
-            flashlight_glow->set_active(true);
-            UpdateAddonsVisibility();
-        }
-        else if (flashlight_render->get_active() && (!IsFlashlightOn() || !(!H_Parent() || (io && this == io->inventory().ActiveItem()))))
-        {
-            flashlight_render->set_active(false);
-            flashlight_omni->set_active(false);
-            flashlight_glow->set_active(false);
-            UpdateAddonsVisibility();
-        }
-
-        if (flashlight_render->get_active())
-        {
-            Fvector flashlight_pos_omni, flashlight_dir, flashlight_dir_omni;
-
-            if (GetHUDmode())
-            {
-                GetBoneOffsetPosDir(flashlight_attach_bone, flashlight_pos, flashlight_dir, flashlight_attach_offset);
-                CorrectDirFromWorldToHud(flashlight_dir);
-
-                GetBoneOffsetPosDir(flashlight_attach_bone, flashlight_pos_omni, flashlight_dir_omni, flashlight_omni_attach_offset);
-                CorrectDirFromWorldToHud(flashlight_dir_omni);
-            }
-            else
-            {
-                flashlight_dir = get_LastFD();
-                XFORM().transform_tiny(flashlight_pos, flashlight_world_attach_offset);
-
-                flashlight_dir_omni = get_LastFD();
-                XFORM().transform_tiny(flashlight_pos_omni, flashlight_omni_world_attach_offset);
-            }
-
-            Fmatrix flashlightXForm;
-            flashlightXForm.identity();
-            flashlightXForm.k.set(flashlight_dir);
-            Fvector::generate_orthonormal_basis_normalized(flashlightXForm.k, flashlightXForm.j, flashlightXForm.i);
-            flashlight_render->set_position(flashlight_pos);
-            flashlight_render->set_rotation(flashlightXForm.k, flashlightXForm.i);
-
-            flashlight_glow->set_position(flashlight_pos);
-            flashlight_glow->set_direction(flashlightXForm.k);
-
-            Fmatrix flashlightomniXForm;
-            flashlightomniXForm.identity();
-            flashlightomniXForm.k.set(flashlight_dir_omni);
-            Fvector::generate_orthonormal_basis_normalized(flashlightomniXForm.k, flashlightomniXForm.j, flashlightomniXForm.i);
-            flashlight_omni->set_position(flashlight_pos_omni);
-            flashlight_omni->set_rotation(flashlightomniXForm.k, flashlightomniXForm.i);
-
-            // calc color animator
-            if (flashlight_lanim)
-            {
-                int frame;
-                const u32 clr = flashlight_lanim->CalculateBGR(Device.fTimeGlobal, frame);
-
-                Fcolor fclr{(float)color_get_B(clr), (float)color_get_G(clr), (float)color_get_R(clr), 1.f};
-                fclr.mul_rgb(flashlight_fBrightness / 255.f);
-                flashlight_render->set_color(fclr);
-                flashlight_omni->set_color(fclr);
-                flashlight_glow->set_color(fclr);
-            }
-        }
-    }
+    float rotation{m_fZoomRotationFactor};
+    shader_exports.set_dof_params(
+        dof_params_zoom.x * rotation, 
+        dof_params_zoom.y * rotation, 
+        dof_params_zoom.z * rotation, 
+        dof_params_zoom.w * rotation);
 }
 
 void CWeapon::renderable_Render()
 {
     UpdateXForm();
 
-    //нарисовать подсветку
+    // нарисовать подсветку
     RenderLight();
 
-    //если мы в режиме снайперки, то сам HUD рисовать не надо
+    // если мы в режиме снайперки, то сам HUD рисовать не надо
     if (IsZoomed() && !IsRotatingToZoom() && ZoomTexture())
         RenderHud(FALSE);
     else
@@ -1090,6 +969,7 @@ void CWeapon::SetDefaults()
     SetPending(FALSE);
 
     m_flags.set(FUsingCondition, TRUE);
+    bMisfire = false;
     m_flagsAddOnState = 0;
     m_bZoomMode = false;
 }
@@ -1109,7 +989,7 @@ bool CWeapon::Action(s32 cmd, u32 flags)
     switch (cmd)
     {
     case kWPN_FIRE: {
-        //если оружие чем-то занято, то ничего не делать
+        // если оружие чем-то занято, то ничего не делать
         {
             if (flags & CMD_START)
             {
@@ -1128,128 +1008,104 @@ bool CWeapon::Action(s32 cmd, u32 flags)
             return false;
         }
 
-        if (Core.Features.test(xrCore::Feature::lock_reload_in_sprint) && ParentIsActor() && g_actor->get_state() & mcSprint)
-            return true;
-
         if (flags & CMD_START)
         {
-            u32 l_newType = m_ammoType;
-            bool b1, b2;
-            do
+            u32 next_ammo_type = GetNextAmmoType();
+            if (next_ammo_type != u32(-1) && TryToGetAmmo(next_ammo_type))
             {
-                l_newType = (l_newType + 1) % m_ammoTypes.size();
-                b1 = l_newType != m_ammoType;
-                b2 = unlimited_ammo() ? false : (!m_pCurrentInventory->GetAmmo(*m_ammoTypes[l_newType], ParentIsActor()));
-            } while (b1 && b2);
-
-            if (l_newType != m_ammoType)
-            {
-                m_set_next_ammoType_on_reload = l_newType;
-
-                Reload();
+                m_set_next_ammoType_on_reload = next_ammo_type;
+                LPCSTR ammo_sect = pSettings->r_string(m_ammoTypes[m_set_next_ammoType_on_reload].c_str(), "inv_name_short");
+                string1024 str;
+                sprintf(str, "%s: %s", CStringTable().translate("st_next_ammo_type").c_str(), CStringTable().translate(ammo_sect).c_str());
+                HUD().GetUI()->AddInfoMessage("item_usage", str, false);
             }
         }
     }
         return true;
-
     case kWPN_ZOOM: {
         if (IsZoomEnabled())
         {
-            if (flags & CMD_START && !IsPending())
+            auto pActor = smart_cast<const CActor*>(H_Parent());
+            auto pNightVis = pActor->GetNightVisionDevice();
+            if (pNightVis && pNightVis->IsPowerOn())
             {
-                if (psActorFlags.is(AF_WPN_AIM_TOGGLE) && IsZoomed())
+                HUD().GetUI()->AddInfoMessage("actor_state", "cant_aim");
+                return false;
+            }
+
+            if (!pActor->conditions().IsCantWalk())
+            {
+                if (flags & CMD_START && !IsPending())
+                {
+                    if (!psActorFlags.is(AF_HOLD_TO_AIM) && IsZoomed())
+                        OnZoomOut();
+                    else
+                        OnZoomIn();
+                }
+                else if (IsZoomed() && psActorFlags.is(AF_HOLD_TO_AIM))
                 {
                     OnZoomOut();
                 }
-                else
-                    OnZoomIn();
+                return true;
             }
-            else if (IsZoomed() && !psActorFlags.is(AF_WPN_AIM_TOGGLE))
-            {
-                OnZoomOut();
-            }
+            else
+                HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
+        }
+        else
+            return false;
+    }
+    case kWPN_ZOOM_INC:
+    case kWPN_ZOOM_DEC: {
+        if (IsZoomEnabled() && IsZoomed() && m_bScopeDynamicZoom && IsAddonAttached(eScope) && (flags & CMD_START))
+        {
+            // если в режиме ПГ - не будем давать использовать динамический зум
+            if (IsGrenadeMode() || IsSecondScopeMode())
+                return false;
+            ZoomChange(cmd == kWPN_ZOOM_INC);
             return true;
         }
         else
             return false;
     }
-
-    case kWPN_ZOOM_INC:
-    case kWPN_ZOOM_DEC: {
-        if (IsZoomEnabled() && IsZoomed() && m_bScopeDynamicZoom && IsScopeAttached() && (flags & CMD_START))
+    case kWPN_FUNC: {
+        if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
         {
-            // если в режиме ПГ - не будем давать использовать динамический зум
-            if (IsGrenadeMode())
-                return false;
-
-            ZoomChange(cmd == kWPN_ZOOM_INC);
-
-            return true;
+            if (HasScopeSecond() && (flags & CMD_START))
+            {
+                m_bScopeSecondMode = !m_bScopeSecondMode;
+                if (IsZoomed())
+                    OnZoomOut(true);
+                return true;
+            }
         }
-        else
-            return false;
     }
     }
     return false;
 }
 
-void CWeapon::GetZoomData(const float scope_factor, float& delta, float& min_zoom_factor)
-{
-    float def_fov = Core.Features.test(xrCore::Feature::ogse_wpn_zoom_system) ? 1.f : g_fov;
-    float delta_factor_total = def_fov - scope_factor;
-    VERIFY(delta_factor_total > 0);
-    min_zoom_factor = def_fov - delta_factor_total * m_fMinZoomK;
-    delta = (delta_factor_total * (1 - m_fMinZoomK)) / m_fZoomStepCount;
-}
-
 void CWeapon::ZoomChange(bool inc)
 {
-    bool wasChanged = false;
-
+    bool wasChanged{};
+    auto GetZoomStepDelta = [](float scope_factor, float max_scope_factor, u32 step_count) {
+        float total_zoom_delta = max_scope_factor - scope_factor;
+        return total_zoom_delta / step_count;
+    };
     if (SecondVPEnabled())
     {
-        float delta, min_zoom_factor;
-        GetZoomData(m_fSecondVPZoomFactor, delta, min_zoom_factor);
-
         const float currentZoomFactor = m_fRTZoomFactor;
-
-        if (Core.Features.test(xrCore::Feature::ogse_wpn_zoom_system))
-        {
-            m_fRTZoomFactor += delta * (inc ? 1 : -1);
-            clamp(m_fRTZoomFactor, min_zoom_factor, m_fSecondVPZoomFactor);
-        }
-        else
-        {
-            m_fRTZoomFactor += delta * (inc ? 1 : -1);
-            clamp(m_fRTZoomFactor, m_fSecondVPZoomFactor, min_zoom_factor);
-        }
-
+        m_fZoomFactor += GetZoomStepDelta(m_fSecondVPZoomFactor, m_fMaxScopeZoomFactor, m_uZoomStepCount) * (inc ? 1 : -1); // delta;
+        clamp(m_fSecondVPZoomFactor, m_fScopeZoomFactor, m_fMaxScopeZoomFactor);
         wasChanged = !fsimilar(currentZoomFactor, m_fRTZoomFactor);
     }
     else
     {
-        float delta, min_zoom_factor;
-        GetZoomData(m_fScopeZoomFactor, delta, min_zoom_factor);
-
         const float currentZoomFactor = m_fZoomFactor;
-
-        if (Core.Features.test(xrCore::Feature::ogse_wpn_zoom_system))
-        {
-            m_fZoomFactor += delta * (inc ? 1 : -1);
-            clamp(m_fZoomFactor, min_zoom_factor, m_fScopeZoomFactor);
-        }
-        else
-        {
-            m_fZoomFactor -= delta * (inc ? 1 : -1);
-            clamp(m_fZoomFactor, m_fScopeZoomFactor, min_zoom_factor);
-        }
-
+        m_fZoomFactor += GetZoomStepDelta(m_fScopeZoomFactor, m_fMaxScopeZoomFactor, m_uZoomStepCount) * (inc ? 1 : -1); // delta;
+        clamp(m_fZoomFactor, m_fScopeZoomFactor, m_fMaxScopeZoomFactor);
         wasChanged = !fsimilar(currentZoomFactor, m_fZoomFactor);
-
         if (H_Parent() && !IsRotatingToZoom() && !SecondVPEnabled())
             m_fRTZoomFactor = m_fZoomFactor; // store current
     }
-
     if (wasChanged)
     {
         OnZoomChanged();
@@ -1265,9 +1121,9 @@ void CWeapon::SpawnAmmo(u32 boxCurr, LPCSTR ammoSect, u32 ParentID)
         ammoSect = m_ammoTypes.front().c_str();
 
     CSE_Abstract* D = F_entity_Create(ammoSect);
-
     if (auto l_pA = smart_cast<CSE_ALifeItemAmmo*>(D))
     {
+        R_ASSERT(l_pA);
         l_pA->m_boxSize = (u16)pSettings->r_s32(ammoSect, "box_size");
         D->s_name = ammoSect;
         D->set_name_replace("");
@@ -1287,17 +1143,28 @@ void CWeapon::SpawnAmmo(u32 boxCurr, LPCSTR ammoSect, u32 ParentID)
         if (boxCurr == 0xffffffff)
             boxCurr = l_pA->m_boxSize;
 
-        while (boxCurr)
+        if (ParentIsActor() && m_pCurrentInventory->ActiveItem() == this)
+            l_pA->m_bNeedFindPlace = true;
+
+        NET_Packet P;
+        if (boxCurr > 0)
         {
-            l_pA->a_elapsed = (u16)(boxCurr > l_pA->m_boxSize ? l_pA->m_boxSize : boxCurr);
-            NET_Packet P;
+            while (boxCurr)
+            {
+                l_pA->a_elapsed = (u16)(boxCurr > l_pA->m_boxSize ? l_pA->m_boxSize : boxCurr);
+                D->Spawn_Write(P, TRUE);
+                Level().Send(P, net_flags(TRUE));
+
+                if (boxCurr > l_pA->m_boxSize)
+                    boxCurr -= l_pA->m_boxSize;
+                else
+                    boxCurr = 0;
+            }
+        }
+        else
+        {
             D->Spawn_Write(P, TRUE);
             Level().Send(P, net_flags(TRUE));
-
-            if (boxCurr > l_pA->m_boxSize)
-                boxCurr -= l_pA->m_boxSize;
-            else
-                boxCurr = 0;
         }
     };
     F_entity_Destroy(D);
@@ -1309,9 +1176,13 @@ int CWeapon::GetAmmoCurrent(bool use_item_to_spawn) const
     if (!m_pCurrentInventory)
         return l_count;
 
-    //чтоб не делать лишних пересчетов
+    // чтоб не делать лишних пересчетов
     if (m_pCurrentInventory->ModifyFrame() <= m_dwAmmoCurrentCalcFrame)
-        return l_count + iAmmoCurrent;
+        if (!ParentIsActor()) // очень некрасивый костыль!
+            return l_count + iAmmoCurrent;
+
+    //	Msg("[%s] get ammo current [%d]:[%s] weapon [%s] - before types cycle", m_pCurrentInventory->GetOwner()->Name(), l_count + iAmmoCurrent, *m_ammoTypes[m_ammoType],
+    //this->Name_script());
 
     m_dwAmmoCurrentCalcFrame = Device.dwFrame;
     iAmmoCurrent = 0;
@@ -1327,6 +1198,8 @@ int CWeapon::GetAmmoCurrent(bool use_item_to_spawn) const
             continue;
 
         iAmmoCurrent += inventory_owner().ammo_in_box_to_spawn();
+
+        // Msg("[%s] get ammo current [%d]:[%s] weapon [%s] ", m_pCurrentInventory->GetOwner()->Name(), l_count + iAmmoCurrent, m_ammoTypes[i].c_str(), Name_script());
     }
     return l_count + iAmmoCurrent;
 }
@@ -1351,7 +1224,7 @@ int CWeapon::GetAmmoCount_forType(shared_str const& ammo_type, u32 max) const
 
     m_pCurrentInventory->IterateAmmo(false, callback);
     if (max == 0 || res < max)
-        if (!smart_cast<const CActor*>(H_Parent()) || !psActorFlags.test(AF_AMMO_ON_BELT))
+        if (ParentIsActor())
             m_pCurrentInventory->IterateAmmo(true, callback);
 
     return res;
@@ -1359,18 +1232,30 @@ int CWeapon::GetAmmoCount_forType(shared_str const& ammo_type, u32 max) const
 
 float CWeapon::GetConditionMisfireProbability() const
 {
-    if (GetCondition() > 0.95f)
-        return 0.0f;
+    float mis{};
 
-    float mis = misfireProbability + powf(1.f - GetCondition(), 3.f) * misfireConditionK;
+    // вероятность осечки от патрона
+    if (!m_magazine.empty())
+    {
+        const auto& l_cartridge = m_magazine.back();
+        mis = l_cartridge.m_misfireProbability;
+    }
+    // вероятность осечки от состояния оружия
+    if (GetCondition() < 0.95f)
+        mis += (misfireProbability + powf(1.f - GetCondition(), 3.f) * misfireConditionK);
+
     clamp(mis, 0.0f, 0.99f);
     return mis;
 }
 
 BOOL CWeapon::CheckForMisfire()
 {
-    if (!smart_cast<CActor*>(H_Parent())) // KRodin: НПС не нужны осечки.
-        return FALSE;
+    if (Core.Features.test(xrCore::Feature::npc_simplified_shooting))
+    {
+        CActor* actor = smart_cast<CActor*>(H_Parent());
+        if (!actor)
+            return FALSE;
+    }
 
     float rnd = ::Random.randF(0.f, 1.f);
     float mp = GetConditionMisfireProbability();
@@ -1378,7 +1263,8 @@ BOOL CWeapon::CheckForMisfire()
     {
         FireEnd();
 
-        SwitchMisfire(true);
+        bMisfire = true;
+        SwitchState(eMisfire);
 
         return TRUE;
     }
@@ -1388,69 +1274,54 @@ BOOL CWeapon::CheckForMisfire()
     }
 }
 
-void CWeapon::Reload() { OnZoomOut(); }
-
-void CWeapon::DeviceSwitch() { OnZoomOut(); }
-
-bool CWeapon::IsGrenadeLauncherAttached() const
-{
-    return (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher)) ||
-        CSE_ALifeItemWeapon::eAddonPermanent == m_eGrenadeLauncherStatus;
-}
-
-bool CWeapon::IsScopeAttached() const
-{
-    return (CSE_ALifeItemWeapon::eAddonAttachable == m_eScopeStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope)) ||
-        CSE_ALifeItemWeapon::eAddonPermanent == m_eScopeStatus;
-}
-
-bool CWeapon::IsSilencerAttached() const
-{
-    return (CSE_ALifeItemWeapon::eAddonAttachable == m_eSilencerStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer)) ||
-        CSE_ALifeItemWeapon::eAddonPermanent == m_eSilencerStatus;
-}
-
-bool CWeapon::GrenadeLauncherAttachable() const { return (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus); }
-bool CWeapon::ScopeAttachable() const { return (CSE_ALifeItemWeapon::eAddonAttachable == m_eScopeStatus); }
-bool CWeapon::SilencerAttachable() const { return (CSE_ALifeItemWeapon::eAddonAttachable == m_eSilencerStatus); }
-
 void CWeapon::UpdateHUDAddonsVisibility()
 {
     if (!GetHUDmode())
         return;
 
-    if (ScopeAttachable())
-        HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, IsScopeAttached());
+    auto pWeaponVisual = smart_cast<IKinematics*>(Visual());
+
+    if (AddonAttachable(eScope))
+        HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, IsAddonAttached(eScope));
 
     if (m_eScopeStatus == ALife::eAddonDisabled)
         HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, FALSE, TRUE);
     else if (m_eScopeStatus == ALife::eAddonPermanent)
         HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, TRUE, TRUE);
 
-    if (SilencerAttachable())
-        HudItemData()->set_bone_visible(m_sHud_wpn_silencer_bone, IsSilencerAttached());
+    if (pWeaponVisual->LL_BoneID(m_sHud_wpn_silencer_bone) != BI_NONE)
+    {
+        if (AddonAttachable(eSilencer))
+        {
+            bool b_show_on_model = READ_IF_EXISTS(pSettings, r_bool, GetAddonName(eSilencer), "show_on_model", true);
+            HudItemData()->set_bone_visible(m_sHud_wpn_silencer_bone, IsAddonAttached(eSilencer) && b_show_on_model);
+        }
 
-    if (m_eSilencerStatus == ALife::eAddonDisabled)
-        HudItemData()->set_bone_visible(m_sHud_wpn_silencer_bone, FALSE, TRUE);
-    else if (m_eSilencerStatus == ALife::eAddonPermanent)
-        HudItemData()->set_bone_visible(m_sHud_wpn_silencer_bone, TRUE, TRUE);
+        if (m_eSilencerStatus == ALife::eAddonDisabled)
+            HudItemData()->set_bone_visible(m_sHud_wpn_silencer_bone, FALSE, TRUE);
+        else if (m_eSilencerStatus == ALife::eAddonPermanent)
+            HudItemData()->set_bone_visible(m_sHud_wpn_silencer_bone, TRUE, TRUE);
+    }
 
     if (!HudItemData()->has_bone(m_sHud_wpn_launcher_bone) && HudItemData()->has_bone(wpn_launcher_def_bone_cop))
         m_sHud_wpn_launcher_bone = wpn_launcher_def_bone_cop;
 
-    if (GrenadeLauncherAttachable())
-        HudItemData()->set_bone_visible(m_sHud_wpn_launcher_bone, IsGrenadeLauncherAttached());
+    if (AddonAttachable(eLauncher))
+        HudItemData()->set_bone_visible(m_sHud_wpn_launcher_bone, IsAddonAttached(eLauncher));
 
     if (m_eGrenadeLauncherStatus == ALife::eAddonDisabled)
         HudItemData()->set_bone_visible(m_sHud_wpn_launcher_bone, FALSE, TRUE);
     else if (m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
         HudItemData()->set_bone_visible(m_sHud_wpn_launcher_bone, TRUE, TRUE);
 
-    if (m_sHud_wpn_laser_bone.size() && has_laser)
+    if (m_sHud_wpn_laser_bone.size() && IsAddonAttached(eLaser))
         HudItemData()->set_bone_visible(m_sHud_wpn_laser_bone, IsLaserOn(), TRUE);
 
-    if (m_sHud_wpn_flashlight_bone.size() && has_flashlight)
+    if (m_sHud_wpn_flashlight_bone.size() && IsAddonAttached(eFlashlight))
         HudItemData()->set_bone_visible(m_sHud_wpn_flashlight_bone, IsFlashlightOn(), TRUE);
+
+    if (m_sHud_wpn_stock_bone.size() && AddonAttachable(eStock))
+        HudItemData()->set_bone_visible(m_sHud_wpn_stock_bone, IsAddonAttached(eStock));
 
     for (const shared_str& bone_name : hud_hidden_bones)
         HudItemData()->set_bone_visible(bone_name, FALSE, TRUE);
@@ -1472,18 +1343,9 @@ void CWeapon::UpdateAddonsVisibility()
     {
         bone_id = pWeaponVisual->LL_BoneID(sbone);
 
-        if (ScopeAttachable())
+        if (AddonAttachable(eScope))
         {
-            if (IsScopeAttached())
-            {
-                if (!pWeaponVisual->LL_GetBoneVisible(bone_id))
-                    pWeaponVisual->LL_SetBoneVisible(bone_id, TRUE, TRUE);
-            }
-            else
-            {
-                if (pWeaponVisual->LL_GetBoneVisible(bone_id))
-                    pWeaponVisual->LL_SetBoneVisible(bone_id, FALSE, TRUE);
-            }
+            pWeaponVisual->LL_SetBoneVisible(bone_id, IsAddonAttached(eScope), TRUE);
         }
 
         if (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonDisabled && bone_id != BI_NONE && pWeaponVisual->LL_GetBoneVisible(bone_id))
@@ -1495,18 +1357,10 @@ void CWeapon::UpdateAddonsVisibility()
 
     bone_id = pWeaponVisual->LL_BoneID(m_sWpn_silencer_bone);
 
-    if (SilencerAttachable())
+    if (AddonAttachable(eSilencer) && (bone_id != BI_NONE))
     {
-        if (IsSilencerAttached())
-        {
-            if (!pWeaponVisual->LL_GetBoneVisible(bone_id))
-                pWeaponVisual->LL_SetBoneVisible(bone_id, TRUE, TRUE);
-        }
-        else
-        {
-            if (pWeaponVisual->LL_GetBoneVisible(bone_id))
-                pWeaponVisual->LL_SetBoneVisible(bone_id, FALSE, TRUE);
-        }
+        bool b_show_on_model = READ_IF_EXISTS(pSettings, r_bool, GetAddonName(eSilencer), "show_on_model", true);
+        pWeaponVisual->LL_SetBoneVisible(bone_id, IsAddonAttached(eSilencer) && b_show_on_model, TRUE);
     }
 
     if (m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonDisabled && bone_id != BI_NONE && pWeaponVisual->LL_GetBoneVisible(bone_id))
@@ -1518,18 +1372,9 @@ void CWeapon::UpdateAddonsVisibility()
 
     bone_id = pWeaponVisual->LL_BoneID(m_sWpn_launcher_bone);
 
-    if (GrenadeLauncherAttachable())
+    if (AddonAttachable(eLauncher))
     {
-        if (IsGrenadeLauncherAttached())
-        {
-            if (!pWeaponVisual->LL_GetBoneVisible(bone_id))
-                pWeaponVisual->LL_SetBoneVisible(bone_id, TRUE, TRUE);
-        }
-        else
-        {
-            if (pWeaponVisual->LL_GetBoneVisible(bone_id))
-                pWeaponVisual->LL_SetBoneVisible(bone_id, FALSE, TRUE);
-        }
+        pWeaponVisual->LL_SetBoneVisible(bone_id, IsAddonAttached(eLauncher), TRUE);
     }
 
     if (m_eGrenadeLauncherStatus == CSE_ALifeItemWeapon::eAddonDisabled && bone_id != BI_NONE && pWeaponVisual->LL_GetBoneVisible(bone_id))
@@ -1539,34 +1384,30 @@ void CWeapon::UpdateAddonsVisibility()
 
     ///////////////////////////////////////////////////////////////////
 
-    if (m_sWpn_laser_bone.size() && has_laser)
+    if (m_sWpn_laser_bone.size() && IsAddonAttached(eLaser))
     {
         bone_id = pWeaponVisual->LL_BoneID(m_sWpn_laser_bone);
-
         if (bone_id != BI_NONE)
         {
-            const bool laser_on = IsLaserOn();
-            if (pWeaponVisual->LL_GetBoneVisible(bone_id) && !laser_on)
-                pWeaponVisual->LL_SetBoneVisible(bone_id, FALSE, TRUE);
-            else if (!pWeaponVisual->LL_GetBoneVisible(bone_id) && laser_on)
-                pWeaponVisual->LL_SetBoneVisible(bone_id, TRUE, TRUE);
+            pWeaponVisual->LL_SetBoneVisible(bone_id, IsLaserOn(), TRUE);
         }
     }
 
     ///////////////////////////////////////////////////////////////////
 
-    if (m_sWpn_flashlight_bone.size() && has_flashlight)
+    if (m_sWpn_flashlight_bone.size() && IsAddonAttached(eFlashlight))
     {
         bone_id = pWeaponVisual->LL_BoneID(m_sWpn_flashlight_bone);
-
         if (bone_id != BI_NONE)
         {
-            const bool flashlight_on = IsFlashlightOn();
-            if (pWeaponVisual->LL_GetBoneVisible(bone_id) && !flashlight_on)
-                pWeaponVisual->LL_SetBoneVisible(bone_id, FALSE, TRUE);
-            else if (!pWeaponVisual->LL_GetBoneVisible(bone_id) && flashlight_on)
-                pWeaponVisual->LL_SetBoneVisible(bone_id, TRUE, TRUE);
+            pWeaponVisual->LL_SetBoneVisible(bone_id, IsFlashlightOn(), TRUE);
         }
+    }
+
+    if (m_sWpn_stock_bone.size() && AddonAttachable(eStock))
+    {
+        bone_id = pWeaponVisual->LL_BoneID(m_sWpn_stock_bone);
+        pWeaponVisual->LL_SetBoneVisible(bone_id, IsAddonAttached(eStock), false);
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -1592,81 +1433,82 @@ bool CWeapon::Activate(bool now)
     return inherited::Activate(now);
 }
 
-void CWeapon::InitAddons() {}
-
 float CWeapon::CurrentZoomFactor()
 {
+    float res{1.f};
     if (SecondVPEnabled())
-        return Core.Features.test(xrCore::Feature::ogse_wpn_zoom_system) ? 1.0f : m_fIronSightZoomFactor; // no change to main fov zoom when use second vp
-    else if (IsScopeAttached())
-        return m_fScopeZoomFactor;
+        return res;
+    if (IsAddonAttached(eScope))
+    {
+        if (m_bScopeDynamicZoom && !IsSecondScopeMode())
+        {
+            clamp(m_fRTZoomFactor, m_fScopeZoomFactor, m_fMaxScopeZoomFactor);
+            res = m_fRTZoomFactor;
+            //			Msg("m_fRTZoomFactor res = [%.2f]", res);
+        }
+        else
+        {
+            res = IsSecondScopeMode() ? m_fScopeZoomFactorSecond : m_fScopeZoomFactor;
+            //			Msg("m_fScopeZoomFactor res = [%.2f]", res);
+        }
+    }
     else
-        return m_fIronSightZoomFactor;
+    {
+        res = m_fIronSightZoomFactor;
+        //		Msg("m_fIronSightZoomFactor res = [%.2f]", res);
+    }
+    return res;
 }
+
+bool CWeapon::HasScopeSecond() const { return IsAddonAttached(eScope) && !IsGrenadeMode() && m_bHasScopeSecond; }
+
+bool CWeapon::IsSecondScopeMode() const { return IsAddonAttached(eScope) && !IsGrenadeMode() && m_bScopeSecondMode; }
 
 void CWeapon::OnZoomIn()
 {
     m_bZoomMode = true;
-
-    // если в режиме ПГ - не будем давать включать динамический зум
-    if (m_bScopeDynamicZoom && !IsGrenadeMode() && !SecondVPEnabled())
-        m_fZoomFactor = m_fRTZoomFactor;
-    else
-        m_fZoomFactor = CurrentZoomFactor();
-
-    if (IsScopeAttached() && !IsGrenadeMode())
+    m_fZoomFactor = CurrentZoomFactor();
+    if (IsAddonAttached(eScope) && !IsGrenadeMode())
     {
         if (!m_bScopeZoomInertionAllow)
             AllowHudInertion(FALSE);
     }
     else if (!m_bZoomInertionAllow)
         AllowHudInertion(FALSE);
-
     if (GetHUDmode())
         GamePersistent().SetPickableEffectorDOF(true);
-
-    if (smart_cast<CActor*>(H_Parent()))
-        g_actor->callback(GameObject::eOnActorWeaponZoomIn)(lua_game_object());
-
-    g_player_hud->updateMovementLayerState();
+    if (auto pActor = smart_cast<CActor*>(H_Parent()))
+        pActor->callback(GameObject::eOnActorWeaponZoomIn)(lua_game_object());
 }
 
-void CWeapon::OnZoomOut()
+void CWeapon::OnZoomOut(bool rezoom)
 {
-    m_fZoomFactor = Core.Features.test(xrCore::Feature::ogse_wpn_zoom_system) ? 1.f : g_fov;
-
+    m_fZoomFactor = 1.f;
     if (m_bZoomMode)
     {
-        SprintType = false;
         m_bZoomMode = false;
-
-        if (smart_cast<CActor*>(H_Parent()))
+        if (auto pActor = smart_cast<CActor*>(H_Parent()))
         {
-            g_actor->callback(GameObject::eOnActorWeaponZoomOut)(lua_game_object());
+            pActor->callback(GameObject::eOnActorWeaponZoomOut)(lua_game_object());
         }
     }
-
     AllowHudInertion(TRUE);
-
     if (GetHUDmode())
         GamePersistent().SetPickableEffectorDOF(false);
-
     ResetSubStateTime();
-
-    g_player_hud->updateMovementLayerState();
 }
 
 bool CWeapon::UseScopeTexture()
 {
-    return !SecondVPEnabled() && m_UIScope; // только если есть текстура прицела - для простого создания коллиматоров
+    return !SecondVPEnabled() && (IsSecondScopeMode() ? m_UIScopeSecond : m_UIScope); // только если есть текстура прицела - для простого создания коллиматоров
 }
 
 CUIStaticItem* CWeapon::ZoomTexture()
 {
     if (UseScopeTexture())
-        return m_UIScope;
+        return IsSecondScopeMode() ? m_UIScopeSecond : m_UIScope;
     else
-        return NULL;
+        return nullptr;
 }
 
 void CWeapon::SwitchState(u32 S)
@@ -1680,6 +1522,8 @@ void CWeapon::SwitchState(u32 S)
         CHudItem::object().u_EventGen(P, GE_WPN_STATE_CHANGE, CHudItem::object().ID());
         P.w_u8(u8(S));
         P.w_u8(u8(m_sub_state));
+        P.w_u8(u8(m_ammoType & 0xff));
+        P.w_u8(u8(iAmmoElapsed & 0xff));
         P.w_u8(u8(m_set_next_ammoType_on_reload & 0xff));
         CHudItem::object().u_EventSend(P, net_flags(TRUE, TRUE, FALSE, TRUE));
     }
@@ -1713,8 +1557,8 @@ void CWeapon::reload(LPCSTR section)
 
     if (m_eScopeStatus == ALife::eAddonAttachable)
     {
-        m_addon_holder_range_modifier = READ_IF_EXISTS(pSettings, r_float, m_sScopeName, "holder_range_modifier", m_holder_range_modifier);
-        m_addon_holder_fov_modifier = READ_IF_EXISTS(pSettings, r_float, m_sScopeName, "holder_fov_modifier", m_holder_fov_modifier);
+        m_addon_holder_range_modifier = READ_IF_EXISTS(pSettings, r_float, GetAddonName(eScope), "holder_range_modifier", m_holder_range_modifier);
+        m_addon_holder_fov_modifier = READ_IF_EXISTS(pSettings, r_float, GetAddonName(eScope), "holder_fov_modifier", m_holder_fov_modifier);
     }
     else
     {
@@ -1750,20 +1594,7 @@ void CWeapon::reload(LPCSTR section)
     m_ef_weapon_type = READ_IF_EXISTS(pSettings, r_u32, section, "ef_weapon_type", u32(-1));
 }
 
-void CWeapon::create_physic_shell()
-{
-    // xrKrodin: Временный? "фикс" для оружия из ганслингера, валяющегося на земле. По непонятным причинам (много костей или хз от чего ещё) в некоторых случаях при рассчетах
-    // физики происходят краши в ode которые исправить невозможно.
-    if (IS_OGSR_GA)
-    {
-        auto vis = smart_cast<IKinematics*>(Visual());
-        auto& rootBoneData = vis->LL_GetData(vis->LL_GetBoneRoot());
-        m_pPhysicsShell = P_build_SimpleShell(this, rootBoneData.mass, false);
-        m_pPhysicsShell->SetMaterial(rootBoneData.game_mtl_idx);
-    }
-    else
-        CPhysicsShellHolder::create_physic_shell();
-}
+void CWeapon::create_physic_shell() { CPhysicsShellHolder::create_physic_shell(); }
 
 void CWeapon::activate_physic_shell() { CPhysicsShellHolder::activate_physic_shell(); }
 
@@ -1782,11 +1613,9 @@ CInventoryItem* CWeapon::can_kill(CInventory* inventory) const
     if (GetAmmoElapsed() || m_ammoTypes.empty())
         return (const_cast<CWeapon*>(this));
 
-    TIItemContainer::iterator I = inventory->m_all.begin();
-    TIItemContainer::iterator E = inventory->m_all.end();
-    for (; I != E; ++I)
+    for (const auto& item : inventory->m_all)
     {
-        CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(*I);
+        CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(item);
         if (!inventory_item)
             continue;
 
@@ -1821,15 +1650,18 @@ const CInventoryItem* CWeapon::can_kill(const xr_vector<const CGameObject*>& ite
 
 bool CWeapon::ready_to_kill() const { return (!IsMisfire() && ((GetState() == eIdle) || (GetState() == eFire) || (GetState() == eFire2)) && GetAmmoElapsed()); }
 
+bool CWeapon::IsAiming() const { return ((IsZoomed() && m_fZoomRotationFactor <= 1.f) || (!IsZoomed() && m_fZoomRotationFactor > 0.f)); }
+
 // Получить индекс текущих координат худа
 u8 CWeapon::GetCurrentHudOffsetIdx() const
 {
-    const bool b_aiming = ((IsZoomed() && m_fZoomRotationFactor <= 1.f) || (!IsZoomed() && m_fZoomRotationFactor > 0.f));
-
-    if (b_aiming)
+    if (IsAiming())
     {
-        const bool has_gl = GrenadeLauncherAttachable() && IsGrenadeLauncherAttached();
-        const bool has_scope = ScopeAttachable() && IsScopeAttached();
+        const bool has_gl = AddonAttachable(eLauncher) && IsAddonAttached(eLauncher);
+        const bool has_scope = AddonAttachable(eScope) && IsAddonAttached(eScope);
+
+        if (IsSecondScopeMode())
+            return hud_item_measures::m_hands_offset_type_aim_second;
 
         if (IsGrenadeMode())
         {
@@ -1896,7 +1728,7 @@ bool CWeapon::IsNecessaryItem(const shared_str& item_sect) { return (std::find(m
 
 void CWeapon::modify_holder_params(float& range, float& fov) const
 {
-    if (!IsScopeAttached())
+    if (!IsAddonAttached(eScope))
     {
         inherited::modify_holder_params(range, fov);
         return;
@@ -1914,13 +1746,20 @@ void CWeapon::OnDrawUI()
             ZoomTexture()->SetPos(0, 0);
             ZoomTexture()->SetRect(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
             ZoomTexture()->Render();
-
-            //			m_UILens.Draw();
+            if (m_bRangeMeter && !IsSecondScopeMode())
+            {
+                CGameFont* F = HUD().Font().pFontGraffiti19Russian;
+                F->SetAligment(CGameFont::alCenter);
+                F->OutSetI(m_vRangeMeterOffset.x, m_vRangeMeterOffset.y);
+                float range = HUD().GetCurrentRayQuery().range;
+                F->SetColor(m_uRangeMeterColor);
+                F->OutNext("%4.1f %s", range, CStringTable().translate("st_m").c_str());
+            }
         }
     }
 }
 
-bool CWeapon::IsHudModeNow() { return (HudItemData() != nullptr); }
+bool CWeapon::IsHudModeNow() { return (HudItemData()); }
 
 bool CWeapon::unlimited_ammo()
 {
@@ -1938,7 +1777,7 @@ LPCSTR CWeapon::GetCurrentAmmo_ShortName()
     return *(l_cartridge.m_InvShortName);
 }
 
-float CWeapon::GetMagazineWeight(const decltype(CWeapon::m_magazine)& mag) const
+float CWeapon::GetAmmoInMagazineWeight(const decltype(CWeapon::m_magazine)& mag) const
 {
     float res = 0;
     const char* last_type = nullptr;
@@ -1958,30 +1797,25 @@ float CWeapon::GetMagazineWeight(const decltype(CWeapon::m_magazine)& mag) const
 
 float CWeapon::Weight() const
 {
-    float res = CInventoryItemObject::Weight();
-    if (GrenadeLauncherAttachable() && IsGrenadeLauncherAttached())
-        res += pSettings->r_float(GetGrenadeLauncherName(), "inv_weight");
-    if (ScopeAttachable() && IsScopeAttached())
-        res += pSettings->r_float(GetScopeName(), "inv_weight");
-    if (SilencerAttachable() && IsSilencerAttached())
-        res += pSettings->r_float(GetSilencerName(), "inv_weight");
-    res += GetMagazineWeight(m_magazine);
-
+    float res = inherited::Weight();
+    for (u32 i = 0; i < eMagazine; i++)
+    {
+        if (AddonAttachable(i) && IsAddonAttached(i))
+            res += pSettings->r_float(GetAddonName(i), "inv_weight");
+    }
+    res += GetAmmoInMagazineWeight(m_magazine);
     return res;
 }
 
 u32 CWeapon::Cost() const
 {
-    u32 res = m_cost;
-
-    if (Core.Features.test(xrCore::Feature::wpn_cost_include_addons))
+    u32 res = inherited::Cost();
+    if (!Core.Features.test(xrCore::Feature::wpn_cost_include_addons))
+        return res;
+    for (u32 i = 0; i < eMagazine; i++)
     {
-        if (GrenadeLauncherAttachable() && IsGrenadeLauncherAttached())
-            res += pSettings->r_u32(GetGrenadeLauncherName(), "cost");
-        if (ScopeAttachable() && IsScopeAttached())
-            res += pSettings->r_u32(GetScopeName(), "cost");
-        if (SilencerAttachable() && IsSilencerAttached())
-            res += pSettings->r_u32(GetSilencerName(), "cost");
+        if (AddonAttachable(i) && IsAddonAttached(i))
+            res += pSettings->r_float(GetAddonName(i), "cost");
     }
     return res;
 }
@@ -1996,8 +1830,9 @@ void CWeapon::Hide(bool now)
     }
     else
         SwitchState(eHiding);
-
     OnZoomOut();
+
+    shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
 }
 
 void CWeapon::Show(bool now)
@@ -2011,35 +1846,21 @@ void CWeapon::Show(bool now)
     }
     else
         SwitchState(eShowing);
+
+    shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
 }
 
 bool CWeapon::show_crosshair() { return psActorFlags.test(AF_CROSSHAIR_DBG) || !(IsZoomed() && ZoomHideCrosshair()); }
 
-bool CWeapon::show_indicators() { return !(IsZoomed() && (ZoomTexture() || !m_bScopeShowIndicators)); }
+bool CWeapon::show_indicators() { return !(IsZoomed() && !IsRotatingToZoom() && (ZoomTexture() || !m_bScopeShowIndicators)); }
 
-float CWeapon::GetConditionToShow() const
-{
-    return (GetCondition()); // powf(GetCondition(),4.0f));
-}
+bool CWeapon::ParentMayHaveAimBullet() { return ParentIsActor(); }
 
-BOOL CWeapon::ParentMayHaveAimBullet()
+bool CWeapon::ParentIsActor() const
 {
-    CObject* O = H_Parent();
-    if (!O)
-        return FALSE;
-    CEntityAlive* EA = smart_cast<CEntityAlive*>(O);
-    return EA->cast_actor() != 0;
-}
-
-BOOL CWeapon::ParentIsActor()
-{
-    CObject* O = H_Parent();
-    if (!O)
-        return FALSE;
-    CEntityAlive* EA = smart_cast<CEntityAlive*>(O);
-    if (!EA)
-        return FALSE;
-    return EA->cast_actor() != 0;
+    if (!H_Parent())
+        return false;
+    return smart_cast<const CActor*>(H_Parent());
 }
 
 const float& CWeapon::hit_probability() const
@@ -2056,15 +1877,11 @@ void CWeapon::UpdateSecondVP()
     CActor* pActor = smart_cast<CActor*>(H_Parent());
     if (!pActor)
         return;
-
     CInventoryOwner* inv_owner = pActor->cast_inventory_owner();
-
     bool b_is_active_item = inv_owner && (inv_owner->m_inventory->ActiveItem() == this);
     R_ASSERT(b_is_active_item); // Эта функция должна вызываться только для оружия в руках нашего игрока
-
     bool bCond_1 = m_fZoomRotationFactor > 0.05f; // Мы должны целиться
     bool bCond_3 = pActor->cam_Active() == pActor->cam_FirstEye(); // Мы должны быть от 1-го лица
-
     Device.m_SecondViewport.SetSVPActive(bCond_1 && bCond_3 && SecondVPEnabled());
 }
 
@@ -2073,18 +1890,16 @@ bool CWeapon::SecondVPEnabled() const
     bool bCond_2 = m_fSecondVPZoomFactor > 0.0f; // В конфиге должен быть прописан фактор зума (scope_lense_fov_factor) больше чем 0
     bool bCond_4 = !IsGrenadeMode(); // Мы не должны быть в режиме подствольника
     bool bcond_6 = psActorFlags.test(AF_3D_SCOPES);
-
     return bCond_2 && bCond_4 && bcond_6;
 }
 
 // Чувствительность мышкии с оружием в руках во время прицеливания
-float CWeapon::GetControlInertionFactor() const
+float CWeapon::GetControlInertionFactor()
 {
     float fInertionFactor = inherited::GetControlInertionFactor();
-
-    if (IsZoomed() && SecondVPEnabled() && !IsRotatingToZoom())
+    if (IsZoomed() && !IsRotatingToZoom())
     {
-        if (m_bScopeDynamicZoom)
+        if (SecondVPEnabled() && m_bScopeDynamicZoom)
         {
             const float delta_factor_total = 1 - m_fSecondVPZoomFactor;
             float min_zoom_factor = 1 + delta_factor_total * m_fMinZoomK;
@@ -2092,9 +1907,8 @@ float CWeapon::GetControlInertionFactor() const
             return (m_fScopeInertionFactor - fInertionFactor) * k + fInertionFactor;
         }
         else
-            return m_fScopeInertionFactor;
+            return (fInertionFactor + fInertionFactor * m_fAimControlInertionK);
     }
-
     return fInertionFactor;
 }
 
@@ -2108,10 +1922,10 @@ float CWeapon::GetSecondVPFov() const
     return atanf(tanf(g_fov * (0.5f * PI / 180)) / fov_factor) / (0.5f * PI / 180);
 }
 
+// Получить HUD FOV от текущего оружия игрока
 float CWeapon::GetHudFov()
 {
     const float last_nw_hf = inherited::GetHudFov();
-
     if (m_fZoomRotationFactor > 0.0f)
     {
         if (SecondVPEnabled() && m_fSecondVPHudFov > 0.0f)
@@ -2120,14 +1934,13 @@ float CWeapon::GetHudFov()
             const float fDiff = last_nw_hf - m_fSecondVPHudFov;
             return m_fSecondVPHudFov + (fDiff * (1 - m_fZoomRotationFactor));
         }
-        if ((m_eScopeStatus == CSE_ALifeItemWeapon::eAddonDisabled || IsScopeAttached()) && !IsGrenadeMode() && m_fZoomHudFov > 0.0f)
+        if ((m_eScopeStatus == CSE_ALifeItemWeapon::eAddonDisabled || IsAddonAttached(eScope)) && !IsGrenadeMode() && m_fZoomHudFov > 0.0f)
         {
             // В процессе зума
             const float fDiff = last_nw_hf - m_fZoomHudFov;
             return m_fZoomHudFov + (fDiff * (1 - m_fZoomRotationFactor));
         }
     }
-
     return last_nw_hf;
 }
 
@@ -2148,7 +1961,7 @@ void CWeapon::SaveAttachableParams()
     sprintf_s(buff, "%f,%f,%f", m_Offset.c.x, m_Offset.c.y, m_Offset.c.z);
     pHudCfg.w_string(sect_name, "position", buff);
 
-    Fvector ypr;
+    Fvector ypr{};
     m_Offset.getHPB(ypr.x, ypr.y, ypr.z);
     ypr.mul(180.f / PI);
     sprintf_s(buff, "%f,%f,%f", ypr.x, ypr.y, ypr.z);
@@ -2168,3 +1981,155 @@ void CWeapon::SaveAttachableParams()
 }
 
 void CWeapon::ParseCurrentItem(CGameFont* F) { F->OutNext("WEAPON IN STRAPPED MODE: [%d]", m_strapped_mode); }
+
+u32 CWeapon::GetNextAmmoType()
+{
+    u32 l_newType = m_set_next_ammoType_on_reload;
+    for (;;)
+    {
+        if (++l_newType >= m_ammoTypes.size())
+        {
+            for (l_newType = 0; l_newType < m_ammoTypes.size(); ++l_newType)
+                if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), ParentIsActor(), AddonAttachable(eMagazine) && !IsSingleReloading()))
+                    break;
+            break;
+        }
+        if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), ParentIsActor(), AddonAttachable(eMagazine) && !IsSingleReloading()))
+            break;
+    }
+    if (l_newType != m_set_next_ammoType_on_reload && l_newType < m_ammoTypes.size())
+        return l_newType;
+    else
+        return u32(-1);
+}
+
+bool CWeapon::IsAddonAttached(u32 addon) const
+{
+    switch (addon)
+    {
+    case eSilencer:
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eSilencerStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer)) ||
+            CSE_ALifeItemWeapon::eAddonPermanent == m_eSilencerStatus;
+    case eScope:
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eScopeStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope)) ||
+            CSE_ALifeItemWeapon::eAddonPermanent == m_eScopeStatus;
+    case eLauncher:
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher)) ||
+            CSE_ALifeItemWeapon::eAddonPermanent == m_eGrenadeLauncherStatus;
+    case eLaser:
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eLaserStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonLaser)) ||
+            CSE_ALifeItemWeapon::eAddonPermanent == m_eLaserStatus;
+    case eFlashlight:
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eFlashlightStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight)) ||
+            CSE_ALifeItemWeapon::eAddonPermanent == m_eFlashlightStatus;
+    case eStock:
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eStockStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock)) ||
+            CSE_ALifeItemWeapon::eAddonPermanent == m_eStockStatus;
+    case eExtender:
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender)) ||
+            CSE_ALifeItemWeapon::eAddonPermanent == m_eExtenderStatus;
+    case eForend:
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eForendStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend)) ||
+            CSE_ALifeItemWeapon::eAddonPermanent == m_eForendStatus;
+    case eMagazine: return false;
+    default: return false;
+    }
+}
+
+bool CWeapon::AddonAttachable(u32 addon, bool to_show) const
+{
+    switch (addon)
+    {
+    case eSilencer: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eSilencerStatus);
+    case eScope: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eScopeStatus);
+    case eLauncher: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus);
+    case eLaser: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eLaserStatus);
+    case eFlashlight: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eFlashlightStatus);
+    case eStock: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eStockStatus);
+    case eExtender: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus);
+    case eForend: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eForendStatus);
+    case eMagazine: return false;
+    default: return false;
+    }
+}
+
+shared_str CWeapon::GetAddonName(u32 addon, bool to_show) const
+{
+    switch (addon)
+    {
+    case eSilencer: return m_silencers[m_cur_silencer];
+    case eScope: return m_scopes[m_cur_scope];
+    case eLauncher: return m_glaunchers[m_cur_glauncher];
+    case eLaser: return m_lasers[m_cur_laser];
+    case eFlashlight: return m_flashlights[m_cur_flashlight];
+    case eStock: return m_stocks[m_cur_stock];
+    case eExtender: return m_extenders[m_cur_extender];
+    case eForend: return m_forends[m_cur_forend];
+    case eMagazine: return m_ammoTypes[m_LastLoadedMagType];
+    default: return nullptr;
+    }
+}
+
+Fvector2 CWeapon::GetAddonOffset(u32 addon)
+{
+    LPCSTR addon_prefix[] = {
+        "silencer", "scope", "grenade_launcher", "laser", "flashlight", "stock", "extender", "forend", "magazine",
+    };
+
+    float offset_x{}, offset_y{};
+    string1024 res_sect{};
+    shared_str weapon_sect{cNameSect()}, addon_sect{GetAddonName(addon, true)};
+    // x coordinate
+    sprintf(res_sect, "%s_x", addon_prefix[addon]);
+    offset_x = READ_IF_EXISTS(pSettings, r_s32, weapon_sect, res_sect, 0);
+    sprintf(res_sect, "%s_x", addon_sect.c_str());
+    if (pSettings->line_exist(weapon_sect, res_sect))
+        offset_x = pSettings->r_s32(weapon_sect, res_sect);
+    // y coordinate
+    sprintf(res_sect, "%s_y", addon_prefix[addon]);
+    offset_y = READ_IF_EXISTS(pSettings, r_s32, weapon_sect, res_sect, 0);
+    sprintf(res_sect, "%s_y", addon_sect.c_str());
+    if (pSettings->line_exist(weapon_sect, res_sect))
+        offset_y = pSettings->r_s32(weapon_sect, res_sect);
+
+    Fvector2 offset{offset_x, offset_y};
+
+    return offset;
+}
+
+float CWeapon::GetHitPowerForActor() const { return fvHitPower[g_SingleGameDifficulty]; }
+
+bool CWeapon::IsDirectReload(CWeaponAmmo* ammo)
+{
+    auto _it = std::find(m_ammoTypes.begin(), m_ammoTypes.end(), ammo->cNameSect());
+    if (_it == m_ammoTypes.end())
+        return false;
+
+    m_bDirectReload = true;
+    m_pAmmo = ammo;
+
+    auto i = std::distance(m_ammoTypes.begin(), _it);
+    if (TryToGetAmmo(i) && CanBeReloaded())
+    {
+        m_ammoType = i;
+        m_set_next_ammoType_on_reload = u32(-1);
+        Reload();
+    }
+    else
+        m_bDirectReload = false;
+
+    return m_bDirectReload;
+}
+
+bool CWeapon::CanBeReloaded()
+{
+    return (iAmmoElapsed < iMagazineSize || IsMisfire() || AddonAttachable(eMagazine) || m_pAmmo && m_pAmmo->cNameSect() != m_magazine.back().m_ammoSect);
+}
+
+float CWeapon::GetCondDecPerShotToShow() const
+{
+    float silencer_dec_k = IsAddonAttached(eSilencer) && AddonAttachable(eSilencer) ? conditionDecreasePerShotSilencer : 0.f;
+    return (conditionDecreasePerShot + conditionDecreasePerShot * silencer_dec_k);
+}
+
+const shared_str CWeapon::GetMagazineIconSect(bool to_show) const { return READ_IF_EXISTS(pSettings, r_string, GetAddonName(eMagazine, to_show), "mag_icon_sect", nullptr); }

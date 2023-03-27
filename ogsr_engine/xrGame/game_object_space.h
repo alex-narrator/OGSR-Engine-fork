@@ -61,6 +61,7 @@ enum ECallbackType
     eOnItemToBelt,
     eOnItemToRuck,
     eOnItemToSlot,
+    eOnItemToVest,
     eOnBeforeUseItem,
     entity_alive_before_hit,
 

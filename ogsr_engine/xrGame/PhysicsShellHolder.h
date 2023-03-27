@@ -42,7 +42,7 @@ public:
 public:
     typedef CGameObject inherited;
 
-    CPhysicsShell* m_pPhysicsShell;
+    CPhysicsShell* m_pPhysicsShell{};
 
     CPhysicsShellHolder();
 

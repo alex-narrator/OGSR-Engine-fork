@@ -280,7 +280,7 @@ void CScriptGameObject::UnloadMagazine(bool spawn_ammo, bool unload_gl)
     if (unload_gl)
     {
         auto WpnMagazWgl = smart_cast<CWeaponMagazinedWGrenade*>(weapon_magazined);
-        if (WpnMagazWgl && WpnMagazWgl->IsGrenadeLauncherAttached())
+        if (WpnMagazWgl && WpnMagazWgl->IsAddonAttached(eLauncher))
         {
             WpnMagazWgl->PerformSwitchGL();
             WpnMagazWgl->UnloadMagazine(spawn_ammo);
@@ -965,68 +965,68 @@ void CScriptGameObject::SetActorMaxWeight(float max_weight)
     pActor->inventory().SetMaxWeight(max_weight);
 }
 // получить и задать максимальный вес при котором можно ходить
-float CScriptGameObject::GetActorMaxWalkWeight() const
-{
-    CActor* pActor = smart_cast<CActor*>(&object());
-    if (!pActor)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot access class member GetActorMaxWalkWeight!");
-        return (false);
-    }
-    return (pActor->conditions().m_MaxWalkWeight);
-}
-void CScriptGameObject::SetActorMaxWalkWeight(float max_walk_weight)
-{
-    CActor* pActor = smart_cast<CActor*>(&object());
-    if (!pActor)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot access class member SetActorMaxWalkWeight!");
-        return;
-    }
-    pActor->conditions().m_MaxWalkWeight = max_walk_weight;
-}
+//float CScriptGameObject::GetActorMaxWalkWeight() const
+//{
+//    CActor* pActor = smart_cast<CActor*>(&object());
+//    if (!pActor)
+//    {
+//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot access class member GetActorMaxWalkWeight!");
+//        return (false);
+//    }
+//    return (pActor->conditions().m_MaxWalkWeight);
+//}
+//void CScriptGameObject::SetActorMaxWalkWeight(float max_walk_weight)
+//{
+//    CActor* pActor = smart_cast<CActor*>(&object());
+//    if (!pActor)
+//    {
+//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot access class member SetActorMaxWalkWeight!");
+//        return;
+//    }
+//    pActor->conditions().m_MaxWalkWeight = max_walk_weight;
+//}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // получить и задать доп. вес для костюма
-float CScriptGameObject::GetAdditionalMaxWeight() const
-{
-    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
-    if (!outfit)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CCustomOutfit : cannot access class member GetAdditionalMaxWeight!");
-        return (false);
-    }
-    return (outfit->m_additional_weight2);
-}
-float CScriptGameObject::GetAdditionalMaxWalkWeight() const
-{
-    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
-    if (!outfit)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CCustomOutfit : cannot access class member GetAdditionalMaxWalkWeight!");
-        return (false);
-    }
-    return (outfit->m_additional_weight);
-}
-void CScriptGameObject::SetAdditionalMaxWeight(float add_max_weight)
-{
-    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
-    if (!outfit)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CCustomOutfit : cannot access class member SetAdditionalMaxWeight!");
-        return;
-    }
-    outfit->m_additional_weight2 = add_max_weight;
-}
-void CScriptGameObject::SetAdditionalMaxWalkWeight(float add_max_walk_weight)
-{
-    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
-    if (!outfit)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CCustomOutfit : cannot access class member SetAdditionalMaxWalkWeight!");
-        return;
-    }
-    outfit->m_additional_weight = add_max_walk_weight;
-}
+//float CScriptGameObject::GetAdditionalMaxWeight() const
+//{
+//    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
+//    if (!outfit)
+//    {
+//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CCustomOutfit : cannot access class member GetAdditionalMaxWeight!");
+//        return (false);
+//    }
+//    return (outfit->m_additional_weight2);
+//}
+//float CScriptGameObject::GetAdditionalMaxWalkWeight() const
+//{
+//    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
+//    if (!outfit)
+//    {
+//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CCustomOutfit : cannot access class member GetAdditionalMaxWalkWeight!");
+//        return (false);
+//    }
+//    return (outfit->m_additional_weight);
+//}
+//void CScriptGameObject::SetAdditionalMaxWeight(float add_max_weight)
+//{
+//    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
+//    if (!outfit)
+//    {
+//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CCustomOutfit : cannot access class member SetAdditionalMaxWeight!");
+//        return;
+//    }
+//    outfit->m_additional_weight2 = add_max_weight;
+//}
+//void CScriptGameObject::SetAdditionalMaxWalkWeight(float add_max_walk_weight)
+//{
+//    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
+//    if (!outfit)
+//    {
+//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CCustomOutfit : cannot access class member SetAdditionalMaxWalkWeight!");
+//        return;
+//    }
+//    outfit->m_additional_weight = add_max_walk_weight;
+//}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // получить суммарный вес инвентаря
@@ -1253,19 +1253,19 @@ void CScriptGameObject::InvalidateInventory()
     inventory_owner->inventory().InvalidateState();
 }
 // functions for CInventoryItem class
-Flags16 CScriptGameObject::GetIIFlags()
+Flags32 CScriptGameObject::GetIIFlags()
 {
     CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
     if (!inventory_item)
     {
         ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryItem : cannot access class member GetIIFlags!");
-        return Flags16();
+        return Flags32();
     }
 
     return inventory_item->m_flags;
 }
 
-void CScriptGameObject::SetIIFlags(Flags16 flags)
+void CScriptGameObject::SetIIFlags(Flags32 flags)
 {
     CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
     if (!inventory_item)

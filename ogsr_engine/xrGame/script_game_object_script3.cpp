@@ -261,12 +261,12 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         // инвентарь
         .def("get_actor_max_weight", &CScriptGameObject::GetActorMaxWeight)
         .def("set_actor_max_weight", &CScriptGameObject::SetActorMaxWeight)
-        .def("get_actor_max_walk_weight", &CScriptGameObject::GetActorMaxWalkWeight)
-        .def("set_actor_max_walk_weight", &CScriptGameObject::SetActorMaxWalkWeight)
-        .def("get_additional_max_weight", &CScriptGameObject::GetAdditionalMaxWeight)
-        .def("set_additional_max_weight", &CScriptGameObject::SetAdditionalMaxWeight)
-        .def("get_additional_max_walk_weight", &CScriptGameObject::GetAdditionalMaxWalkWeight)
-        .def("set_additional_max_walk_weight", &CScriptGameObject::SetAdditionalMaxWalkWeight)
+        //.def("get_actor_max_walk_weight", &CScriptGameObject::GetActorMaxWalkWeight)
+        //.def("set_actor_max_walk_weight", &CScriptGameObject::SetActorMaxWalkWeight)
+        //.def("get_additional_max_weight", &CScriptGameObject::GetAdditionalMaxWeight)
+        //.def("set_additional_max_weight", &CScriptGameObject::SetAdditionalMaxWeight)
+        //.def("get_additional_max_walk_weight", &CScriptGameObject::GetAdditionalMaxWalkWeight)
+        //.def("set_additional_max_walk_weight", &CScriptGameObject::SetAdditionalMaxWalkWeight)
         .def("get_total_weight", &CScriptGameObject::GetTotalWeight)
         .def("weight", &CScriptGameObject::Weight)
         /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
@@ -354,9 +354,9 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("set_camera_fov", &CScriptGameObject::SetCamFOV)
 
         .def("set_max_weight", &CScriptGameObject::SetMaxWeight)
-        .def("set_max_walk_weight", &CScriptGameObject::SetMaxWalkWeight)
+        //.def("set_max_walk_weight", &CScriptGameObject::SetMaxWalkWeight)
         .def("get_max_weight", &CScriptGameObject::GetMaxWeight)
-        .def("get_max_walk_weight", &CScriptGameObject::GetMaxWalkWeight)
+        //.def("get_max_walk_weight", &CScriptGameObject::GetMaxWalkWeight)
         .def("get_inventory_weight", &CScriptGameObject::GetInventoryWeight)
         .def("calculate_item_price", &CScriptGameObject::CalcItemPrice)
 
@@ -372,7 +372,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("get_bone_id", &CScriptGameObject::GetBoneID)
 
         .def("get_binoc_zoom_factor", &CScriptGameObject::GetBinocZoomFactor)
-        .def("set_binoc_zoom_factor", &CScriptGameObject::SetBinocZoomFactor)
         .def("get_zoom_factor", &CScriptGameObject::GetZoomFactor)
         .def("get_addon_flags", &CScriptGameObject::GetAddonFlags)
         .def("set_addon_flags", &CScriptGameObject::SetAddonFlags)
@@ -398,11 +397,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 
         // для CEatableItem
         .def("zero_effects", &CScriptGameObject::ZeroEffects)
-        .def("set_radiation_influence", &CScriptGameObject::SetRadiationInfluence)
-        // для актора - иммунитеты
-        .def("set_additional_radiation_protection", &CScriptGameObject::SetDrugRadProtection)
-        .def("set_additional_telepatic_protection", &CScriptGameObject::SetDrugPsyProtection)
-
         // KD
 
         // by Real Wolf 11.07.2014

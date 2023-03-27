@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<w>
+    <armor_params x="0" y="0" width="194" height="1">
+	
+		<armor_header width="194" height="20" complex_mode="1">
+			<text font="letterica16" x="0" y="0">st_armor_header</text>
+		</armor_header>
+	
+		<static_armor_head width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_head>
+		
+		<static_armor_jav width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_jav>
+
+		<static_armor_neck width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_neck>
+
+		<static_armor_clavicle width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_clavicle>
+
+		<static_armor_spine2 width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_spine2>
+
+		<static_armor_spine1 width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_spine1>
+
+		<static_armor_spine width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_spine>
+
+		<static_armor_pelvis width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_pelvis>
+
+		<static_armor_upperarm width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_upperarm>
+
+		<static_armor_forearm width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_forearm>
+
+		<static_armor_hand width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_hand>
+
+		<static_armor_thigh width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_thigh>
+
+		<static_armor_calf width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_calf>
+
+		<static_armor_foot width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_foot>	
+
+		<static_armor_toe width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_toe>	
+
+		<static_armor_hit_fraction width="194" height="20" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0"/>
+		</static_armor_hit_fraction>		
+				
+	</armor_params>
+</w>

@@ -318,7 +318,7 @@ bool is_snipper(u16 weaponID)
         return false;
 
     CWeapon* WM = smart_cast<CWeapon*>(O);
-    return WM && WM->IsZoomed() && WM->IsScopeAttached();
+    return WM && WM->IsZoomed() && WM->IsAddonAttached(eScope);
 }
 
 // 5.	Снайперка в голову.

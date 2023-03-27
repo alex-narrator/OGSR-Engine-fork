@@ -16,7 +16,7 @@
 #include "game_cl_base.h"
 #include "Level.h"
 
-#define PICKUP_INFO_COLOR 0xFFDDDDDD
+constexpr auto PICKUP_INFO_COLOR = 0xFFDDDDDD;
 // AAAAAA
 
 void CActor::feel_touch_new(CObject* O) {}
@@ -53,7 +53,7 @@ BOOL CActor::feel_touch_on_contact(CObject* O)
     if (!custom_zone)
         return (TRUE);
 
-    Fsphere sphere;
+    Fsphere sphere{};
     sphere.P = Position();
     sphere.R = EPS_L;
     if (custom_zone->inside(sphere))
@@ -103,7 +103,7 @@ BOOL CActor::CanPickItem(const CFrustum& frustum, const Fvector& from, CObject* 
         return FALSE;
 
     BOOL bOverlaped = FALSE;
-    Fvector dir, to;
+    Fvector dir{}, to{};
     item->Center(to);
     float range = dir.sub(to, from).magnitude();
     if (range > 0.25f)
@@ -128,7 +128,7 @@ void CActor::PickupModeUpdate()
     //. ????? GetNearest ?????
     feel_touch_update(Position(), /*inventory().GetTakeDist()*/ m_fPickupInfoRadius);
 
-    CFrustum frustum;
+    CFrustum frustum{};
     frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
     //. slow (ray-query test)
     for (xr_vector<CObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); it++)
@@ -159,12 +159,13 @@ void CActor::PickupModeUpdate_COD()
             Game().SendPickUpEvent(ID(), pNearestItem->object().ID());
             PickupModeOff();
             pNearestItem = nullptr;
+            TryPlayAnimItemTake();
         }
         HUD().GetUI()->UIMainIngameWnd->SetPickUpItem(pNearestItem);
         return;
     }
 
-    CFrustum frustum;
+    CFrustum frustum{};
     frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     //---------------------------------------------------------------------------
@@ -195,7 +196,7 @@ void CActor::PickupModeUpdate_COD()
         if (pMissile && !pMissile->Useful())
             continue;
 
-        Fvector A, B, tmp;
+        Fvector A{}, B{}, tmp{};
         pIItem->object().Center(A);
         if (A.distance_to_sqr(Position()) > 4)
             continue;
@@ -215,7 +216,7 @@ void CActor::PickupModeUpdate_COD()
 
     if (pNearestItem)
     {
-        CFrustum frustum;
+        CFrustum frustum{};
         frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
         if (!CanPickItem(frustum, Device.vCameraPosition, &pNearestItem->object()))
             pNearestItem = NULL;
@@ -233,8 +234,9 @@ void CActor::PickupModeUpdate_COD()
         {
             //подбирание объекта
             Game().SendPickUpEvent(ID(), pNearestItem->object().ID());
-            PickupModeOff();
+            //PickupModeOff();
             pNearestItem = nullptr;
+            TryPlayAnimItemTake();
         }
     }
 
@@ -251,10 +253,10 @@ void CActor::PickupInfoDraw(CObject* object)
     if (!item)
         return;
 
-    Fmatrix res;
+    Fmatrix res{};
     res.mul(Device.mFullTransform, object->XFORM());
     Fvector4 v_res;
-    Fvector shift;
+    Fvector shift{};
 
     draw_str = item->Name /*Complex*/ ();
     shift.set(0, 0, 0);

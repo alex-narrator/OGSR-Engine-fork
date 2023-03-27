@@ -9,6 +9,61 @@ class CLevel;
 #include "Hit.h"
 #include "Level.h"
 
+enum eInfluenceParams
+{
+    // instant
+    eHealthInfluence,
+    ePowerInfluence,
+    eMaxPowerInfluence,
+    eSatietyInfluence,
+    eRadiationInfluence,
+    ePsyHealthInfluence,
+    eAlcoholInfluence,
+    eWoundsHealInfluence,
+
+    eInfluenceMax,
+};
+
+enum eBoostParams
+{
+    // boost
+    eHealthBoost,
+    ePowerBoost,
+    eMaxPowerBoost,
+    eSatietyBoost,
+    eRadiationBoost,
+    ePsyHealthBoost,
+    eAlcoholBoost,
+    eWoundsHealBoost,
+
+    eRestoreBoostMax,
+
+    eAdditionalSprintBoost = eRestoreBoostMax,
+    eAdditionalJumpBoost,
+    eAdditionalWeightBoost,
+
+    eHitTypeProtectionBoosterIndex,
+
+    eBurnImmunityBoost = eHitTypeProtectionBoosterIndex,
+    eShockImmunityBoost,
+    eStrikeImmunityBoost,
+    eWoundImmunityBoost,
+    eRadiationImmunityBoost,
+    eTelepaticImmunityBoost,
+    eChemicalBurnImmunityBoost,
+    eExplosionImmunitBoost,
+    eFireWoundImmunityBoost,
+
+    eBoostMax,
+};
+
+struct SBooster
+{
+    eBoostParams m_BoostType{};
+    float f_BoostValue{};
+    float f_BoostTime{};
+};
+
 class CEntityCondition;
 class CEntityConditionSimple
 {
@@ -17,7 +72,7 @@ class CEntityConditionSimple
 
 public:
     CEntityConditionSimple();
-    virtual ~CEntityConditionSimple();
+    virtual ~CEntityConditionSimple(){};
 
     IC float GetHealth() const { return m_fHealth; }
     IC float GetMaxHealth() const { return m_fHealthMax; }
@@ -49,7 +104,6 @@ public:
     IC float GetEntityMorale() const { return m_fEntityMorale; }
     virtual float GetAlcohol() { return 0.f; }
     virtual float GetSatiety() { return 0.f; }
-    virtual float GetThirst() { return 0.f; }
 
     IC float GetHealthLost() const { return m_fHealthLost; }
 
@@ -59,7 +113,7 @@ public:
     void ChangePsyHealth(float value);
     virtual void ChangeSatiety(float value){};
     virtual void ChangeAlcohol(float value){};
-    virtual void ChangeThirst(float value){};
+    void ChangeMaxPower(float value);
 
     IC void SetMaxPower(float val)
     {
@@ -73,7 +127,7 @@ public:
     void ChangeEntityMorale(float value);
 
     virtual CWound* ConditionHit(SHit* pHDS);
-    //обновления состояния с течением времени
+    // обновления состояния с течением времени
     virtual void UpdateCondition();
     void UpdateWounds();
     void UpdateConditionTime();
@@ -81,8 +135,8 @@ public:
 
     virtual void UpdatePower();
 
-    //скорость потери крови из всех открытых ран
-    float BleedingSpeed();
+    // скорость потери крови из всех открытых ран
+    virtual float BleedingSpeed();
 
     CObject* GetWhoHitLastTime() { return m_pWho; }
     u16 GetWhoHitLastTimeID() { return m_iWhoID; }
@@ -95,41 +149,42 @@ public:
     void ClearWounds();
 
 protected:
-    void UpdateHealth();
-    void UpdateSatiety(float k = 1.0f);
-    void UpdateRadiation(float k = 1.0f);
-    void UpdatePsyHealth(float k = 1.0f);
+    virtual void UpdateHealth();
+    virtual void UpdateRadiation();
+    virtual void UpdatePsyHealth();
+    virtual void UpdateSatiety(){};
+    virtual void UpdateAlcohol(){};
 
     void UpdateEntityMorale();
 
-    //изменение силы хита в зависимости от надетого костюма
+    // изменение силы хита в зависимости от надетого костюма
     //(только для InventoryOwner)
-    float HitOutfitEffect(float hit_power, ALife::EHitType hit_type, s16 element, float AP);
-    //изменение потери сил в зависимости от надетого костюма
+    float HitOutfitEffect(SHit*);
+    // изменение потери сил в зависимости от надетого костюма
     float HitPowerEffect(float power_loss);
 
-    //для подсчета состояния открытых ран,
-    //запоминается кость куда был нанесен хит
-    //и скорость потери крови из раны
+    // для подсчета состояния открытых ран,
+    // запоминается кость куда был нанесен хит
+    // и скорость потери крови из раны
     DEFINE_VECTOR(CWound*, WOUND_VECTOR, WOUND_VECTOR_IT);
     WOUND_VECTOR m_WoundVector;
-    //очистка массива ран
+    // очистка массива ран
 
-    //все величины от 0 до 1
-    float m_fPower; //сила
-    float m_fRadiation; //доза радиактивного облучения
-    float m_fPsyHealth; //здоровье
+    // все величины от 0 до 1
+    float m_fPower; // сила
+    float m_fRadiation; // доза радиактивного облучения
+    float m_fPsyHealth; // здоровье
 
-    float m_fEntityMorale; //мораль
+    float m_fEntityMorale; // мораль
 
-    //максимальные величины
+    // максимальные величины
     float m_fPowerMax;
     float m_fRadiationMax;
     float m_fPsyHealthMax;
 
     float m_fEntityMoraleMax;
 
-    //величины изменения параметров на каждом обновлении
+    // величины изменения параметров на каждом обновлении
     float m_fDeltaHealth;
     float m_fDeltaPower;
     float m_fDeltaRadiation;
@@ -156,21 +211,21 @@ protected:
     float m_fMinWoundSize;
     bool m_bIsBleeding;
 
-    //части хита, затрачиваемые на уменьшение здоровья и силы
+    // части хита, затрачиваемые на уменьшение здоровья и силы
     float m_fHealthHitPart[ALife::eHitTypeMax]{};
     float m_fPowerHitPart;
 
-    //потеря здоровья от последнего хита
+    // потеря здоровья от последнего хита
     float m_fHealthLost;
 
-    //для отслеживания времени
+    // для отслеживания времени
     u64 m_iLastTimeCalled;
     float m_fDeltaTime{};
-    //кто нанес последний хит
+    // кто нанес последний хит
     CObject* m_pWho;
     u16 m_iWhoID;
 
-    //для передачи параметров из DamageManager
+    // для передачи параметров из DamageManager
     float m_fHitBoneScale;
     float m_fWoundBoneScale;
 
@@ -191,4 +246,34 @@ public:
     static void script_register(lua_State* L);
     virtual float GetParamByName(LPCSTR name);
     IC SConditionChangeV& GetChangeValues() { return m_change_v; }
+
+    virtual float GetWoundIncarnation() { return m_change_v.m_fV_WoundIncarnation; };
+    virtual float GetHealthRestore() { return m_change_v.m_fV_HealthRestore; };
+    virtual float GetRadiationRestore() { return m_change_v.m_fV_Radiation; };
+    virtual float GetPsyHealthRestore() { return m_change_v.m_fV_PsyHealth; };
+    virtual float GetPowerRestore() { return 1.f; };
+    virtual float GetMaxPowerRestore() { return 1.f; };
+    virtual float GetSatietyRestore() { return 1.f; };
+    virtual float GetAlcoholRestore() { return 1.f; };
+
+    // застосувати зміни параметрів сутності у абсолюдних значеннях
+    virtual void ApplyInfluence(int, float);
+    virtual void ApplyBooster(SBooster&);
+
+    virtual void UpdateBoosters();
+
+    virtual float GetBoostedParams(int);
+    virtual float GetBoostedHitTypeProtection(int);
+    virtual void BoostParameters(const SBooster&);
+    virtual void DisableBoostParameters(const SBooster&);
+
+    virtual void ClearAllBoosters();
+    // застосувати зміни параметрів сутності у відносних значеннях
+    virtual void ApplyRestoreBoost(int, float);
+
+    typedef xr_map<eBoostParams, SBooster> BOOSTER_MAP;
+
+protected:
+    BOOSTER_MAP m_boosters;
+    svector<float, eBoostMax> m_BoostParams;
 };

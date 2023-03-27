@@ -23,11 +23,8 @@ public:
 
     virtual void OnH_B_Independent(bool just_before_destroy);
 
-    virtual void save(NET_Packet& output_packet);
-    virtual void load(IReader& input_packet);
-
     virtual bool Attach(PIItem pIItem, bool b_send_event);
-    virtual bool Detach(const char* item_section_name, bool b_spawn_item);
+    virtual bool Detach(const char* item_section_name, bool b_spawn_item, float item_condition = 1.f);
     virtual bool CanAttach(PIItem pIItem);
     virtual bool CanDetach(const char* item_section_name);
     virtual void InitAddons();
@@ -49,14 +46,14 @@ public:
     virtual void UpdateSounds();
     virtual void StopHUDSounds();
 
-    //переключение в режим подствольника
+    // переключение в режим подствольника
     virtual bool SwitchMode();
     void PerformSwitchGL();
     void OnAnimationEnd(u32 state);
 
     virtual bool IsNecessaryItem(const shared_str& item_sect);
 
-    //виртуальные функции для проигрывания анимации HUD
+    // виртуальные функции для проигрывания анимации HUD
     virtual void PlayAnimShow();
     virtual void PlayAnimHide();
     virtual void PlayAnimReload();
@@ -67,13 +64,14 @@ public:
     HUD_SOUND sndShotG;
     HUD_SOUND sndReloadG;
     HUD_SOUND sndSwitch;
+    HUD_SOUND sndShutterG;
 
-    //дополнительные параметры патронов
-    //для подствольника
+    // дополнительные параметры патронов
+    // для подствольника
     CWeaponAmmo* m_pAmmo2{};
     shared_str m_ammoSect2;
     xr_vector<shared_str> m_ammoTypes2;
-    u32 m_ammoType2;
+    u32 m_ammoType2{};
     int iMagazineSize2{};
     xr_vector<CCartridge> m_magazine2;
     bool m_bGrenadeMode{};
@@ -84,18 +82,31 @@ public:
 
     virtual void UpdateGrenadeVisibility(bool visibility);
 
-    //название косточки для гранаты подствольника в HUD
+    // название косточки для гранаты подствольника в HUD
     shared_str grenade_bone_name;
 
-    int GetAmmoElapsed2() const override { return iAmmoElapsed2; }
-    bool IsGrenadeMode() const override { return m_bGrenadeMode; }
+    int GetAmmoElapsed2() const { return iAmmoElapsed2; }
     virtual float Weight() const;
 
-    bool IsPartlyReloading() const override
-    {
-        if (m_bGrenadeMode)
-            return m_set_next_ammoType_on_reload == u32(-1) && iAmmoElapsed2 > 0 && !IsMisfire();
-        else
-            return inherited::IsPartlyReloading();
-    }
+    virtual bool IsGrenadeMode() const { return m_bGrenadeMode; };
+    // получаем износ при выстреле из подствольника
+    virtual float GetWeaponDeterioration() const;
+    // считаем что в режиме подствольника стрельба только одиночными
+    virtual bool HasFireModes() { return m_bHasDifferentFireModes && !IsGrenadeMode(); };
+    // передёргивание затвора
+    virtual void PlayAnimShutter() override;
+    virtual void PlayAnimShutterMisfire() override;
+    virtual void PlayAnimOnItemTake() override;
+    virtual void PlayAnimCheckout() override;
+    virtual void PlayAnimCheckGear() override;
+    virtual void PlayAnimKick() override;
+    // оружие использует отъёмный магазин
+    virtual bool AddonAttachable(u32, bool = false) const;
+    virtual bool AmmoType2IsMagazine(u32 type) const;
+    virtual shared_str GetAddonName(u32, bool = false) const;
+    virtual LPCSTR GetMagazineEmptySect(bool = false) const;
+    virtual bool IsDirectReload(CWeaponAmmo*);
+    virtual void SetQueueSize(int size);
+    virtual void UnloadWeaponFull();
+    virtual bool IsOpened() const { return IsGrenadeMode() ? !GetAmmoElapsed2() : inherited::IsOpened(); };
 };

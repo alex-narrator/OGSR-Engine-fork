@@ -78,11 +78,11 @@ void CUI::UIOnFrame()
 #include "huditem.h"
 bool CUI::Render()
 {
-    if (GameIndicatorsShown())
-    {
-        if (pUIGame)
-            pUIGame->Render();
-    }
+    //if (GameIndicatorsShown())
+    //{
+    //    if (pUIGame)
+    //        pUIGame->Render();
+    //}
 
     CEntity* pEntity = smart_cast<CEntity*>(Level().CurrentEntity());
     if (pEntity)
@@ -93,6 +93,8 @@ bool CUI::Render()
             PIItem item = pActor->inventory().ActiveItem();
             if (item && pActor->HUDview() && smart_cast<CHudItem*>(item))
                 (smart_cast<CHudItem*>(item))->OnDrawUI();
+
+            pActor->DrawHUDMasks();
         }
 
         if (GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW | HUD_DRAW_RT))
@@ -114,6 +116,13 @@ bool CUI::Render()
     }
     else
         m_pMessagesWnd->Draw();
+
+    if (GameIndicatorsShown())
+    {
+        // викликати після UIMainIngameWnd->Draw() щоб інфомеседжи та статик активного завдання малювалися поверх худових масок броні/пнб
+        if (pUIGame)
+            pUIGame->Render();
+    }
 
     DoRenderDialogs();
 
@@ -210,13 +219,17 @@ bool CUI::IR_OnMouseMove(int dx, int dy)
     return false;
 }
 
-SDrawStaticStruct* CUI::AddInfoMessage(LPCSTR message)
+#include "string_table.h"
+SDrawStaticStruct* CUI::AddInfoMessage(LPCSTR message_static, LPCSTR message_text, bool translate)
 {
-    SDrawStaticStruct* ss = pUIGame->GetCustomStatic(message);
+    SDrawStaticStruct* ss = pUIGame->GetCustomStatic(message_static);
     if (!ss)
     {
-        ss = pUIGame->AddCustomStatic(message, true);
+        ss = pUIGame->AddCustomStatic(message_static, true);
     }
+
+    ss->wnd()->SetText(translate ? CStringTable().translate(message_text).c_str() : message_text);
+
     return ss;
 }
 

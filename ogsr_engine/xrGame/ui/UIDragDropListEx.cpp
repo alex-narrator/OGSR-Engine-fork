@@ -80,6 +80,10 @@ void CUIDragDropListEx::SetHighlightAllCells(bool b) { m_flags.set(flHighlightAl
 
 bool CUIDragDropListEx::GetHighlightAllCells() { return !!m_flags.test(flHighlightAllCells); }
 
+void CUIDragDropListEx::SetLineUpInColumns(bool b) { m_flags.set(flLineUpInColumns, b); }
+
+bool CUIDragDropListEx::GetLineUpInColumns() { return !!m_flags.test(flLineUpInColumns); }
+
 void CUIDragDropListEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 
 void CUIDragDropListEx::Init(float x, float y, float w, float h)
@@ -601,15 +605,25 @@ CUICellItem* CUICellContainer::RemoveItem(CUICellItem* itm, bool force_root)
 
 Ivector2 CUICellContainer::FindFreeCell(const Ivector2& _size)
 {
-    Ivector2 tmp;
+    Ivector2 tmp{};
     Ivector2 size = _size;
     if (m_pParentDragDropList->GetVerticalPlacement())
         std::swap(size.x, size.y);
 
-    for (tmp.y = 0; tmp.y <= m_cellsCapacity.y - size.y; ++tmp.y)
+	if (m_pParentDragDropList->GetLineUpInColumns())
+    {
         for (tmp.x = 0; tmp.x <= m_cellsCapacity.x - size.x; ++tmp.x)
-            if (IsRoomFree(tmp, _size))
-                return tmp;
+            for (tmp.y = 0; tmp.y <= m_cellsCapacity.y - size.y; ++tmp.y)
+                if (IsRoomFree(tmp, _size))
+                    return tmp;
+    }
+    else
+    {
+        for (tmp.y = 0; tmp.y <= m_cellsCapacity.y - size.y; ++tmp.y)
+            for (tmp.x = 0; tmp.x <= m_cellsCapacity.x - size.x; ++tmp.x)
+                if (IsRoomFree(tmp, _size))
+                    return tmp;
+    }
 
     if (m_pParentDragDropList->IsAutoGrow())
     {

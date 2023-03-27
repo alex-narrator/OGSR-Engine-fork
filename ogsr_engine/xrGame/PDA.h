@@ -32,13 +32,6 @@ public:
     u16 GetOriginalOwnerID() const { return m_idOriginalOwner; }
     CInventoryOwner* GetOriginalOwner() const;
 
-    void TurnOn();
-    void TurnOff();
-
-    bool IsActive() const { return IsOn(); }
-    bool IsOn() const { return !m_bTurnedOff; }
-    bool IsOff() const { return m_bTurnedOff; }
-
     xr_map<u16, CPda*> ActivePDAContacts();
     CPda* GetPdaFromOwner(CObject* owner);
     u32 ActiveContactsNum() const { return m_active_contacts.size(); }
@@ -55,11 +48,9 @@ private:
     float m_fRadius;
     bool m_changed;
 
-    u16 m_idOriginalOwner;
-    shared_str m_SpecificChracterOwner;
+    u16 m_idOriginalOwner{u16(-1)};
+    shared_str m_SpecificChracterOwner{};
     xr_string m_sFullName;
-
-    bool m_bTurnedOff;
 
     const char* m_joystick_bone{};
     u16 joystick{BI_NONE};
@@ -73,11 +64,15 @@ public:
     bool Is3DPDA() const { return this_is_3d_pda; }
     virtual void OnStateSwitch(u32 S, u32 oldState) override;
     virtual void OnAnimationEnd(u32 state) override;
+    virtual void OnMoveToSlot(EItemPlace prevPlace) override;
     virtual void OnMoveToRuck(EItemPlace prevPlace) override;
     virtual void UpdateCL() override;
     virtual void UpdateXForm() override;
     virtual void OnActiveItem() override;
     virtual void OnHiddenItem() override;
+
+    virtual void Switch(bool);
+    virtual bool IsPowerOn() const { return m_bTurnedOn; };
 
     bool m_bZoomed{};
     float m_thumb_rot[2]{};
@@ -85,4 +80,5 @@ public:
 protected:
     u8 GetCurrentHudOffsetIdx() const override { return (m_bZoomed || m_fZoomRotationFactor != 0.f) ? 1 : 0; }
     bool IsZoomed() const override { return m_bZoomed; }
+    bool m_bTurnedOn;
 };

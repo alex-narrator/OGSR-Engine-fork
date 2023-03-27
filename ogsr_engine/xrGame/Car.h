@@ -380,6 +380,8 @@ private:
 
     Fvector m_camera_position;
 
+    bool m_b_weapon_allowed{};
+
 public:
     IC CCameraBase* get_active_camera() { return active_camera; };
 
@@ -518,7 +520,7 @@ private:
     bool DoorHit(float P, s16 element, ALife::EHitType hit_type);
 
 public:
-    virtual bool allowWeapon() const { return false; }; //	{return true;};
+    virtual bool allowWeapon() const { return m_b_weapon_allowed; }; //	{return true;};
     virtual bool HUDView() const;
     virtual Fvector ExitPosition() { return m_exit_position; }
     virtual Fvector ExitVelocity();

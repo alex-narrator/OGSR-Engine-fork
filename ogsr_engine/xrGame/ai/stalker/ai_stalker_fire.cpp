@@ -208,16 +208,17 @@ void CAI_Stalker::Hit(SHit* pHDS)
     HDS.power *= m_fRankImmunity;
     if (m_boneHitProtection && HDS.hit_type == ALife::eHitTypeFireWound)
     {
-#ifdef APPLY_ARMOR_PIERCING_TO_NPC
-        float BoneArmour = m_boneHitProtection->getBoneArmour(HDS.bone()) * (1 - pHDS->ap);
-#else
         float BoneArmour = m_boneHitProtection->getBoneArmour(HDS.bone());
-#endif // APPLY_ARMOR_PIERCING_TO_NPC
-        float NewHitPower = HDS.damage() - BoneArmour;
-        if (NewHitPower < HDS.power * m_boneHitProtection->m_fHitFrac)
-            HDS.power = HDS.power * m_boneHitProtection->m_fHitFrac;
-        else
-            HDS.power = NewHitPower;
+
+        Msg("%s %s take hit power [%.4f], hitted bone [name %s][idx %d], bone armor [%.4f], hit AP [%.4f], visual name [%s], protection_sect [%s]", __FUNCTION__, Name(), HDS.power,
+            smart_cast<IKinematics*>(Visual())->LL_BoneName_dbg(pHDS->boneID), pHDS->boneID, BoneArmour, pHDS->ap, Visual()->getDebugName().c_str(),
+            smart_cast<IKinematics*>(Visual())->LL_UserData()->r_string("bone_protection", "bones_protection_sect"));
+
+        if (pHDS->ap < BoneArmour)
+        { // броню не пробито, хіт тільки від умовного удару в броню
+            HDS.power *= m_boneHitProtection->m_fHitFrac;
+            Msg("%s %s armor is not pierced, result hit power [%.4f]", __FUNCTION__, Name(), HDS.power);
+        }
 
         if (wounded())
             HDS.power = 1000.f;
@@ -252,7 +253,7 @@ void CAI_Stalker::Hit(SHit* pHDS)
             bool became_critically_wounded = update_critical_wounded(HDS.boneID, HDS.power);
             if (!became_critically_wounded && animation().script_animations().empty() && (pHDS->bone() != BI_NONE))
             {
-                Fvector D;
+                Fvector D{};
                 float yaw, pitch;
                 D.getHP(yaw, pitch);
 

@@ -295,9 +295,17 @@ void CAI_Stalker::Die(CObject* who)
 
     sound().set_sound_mask(0);
     if (is_special_killer(who))
+    {
         sound().play(eStalkerSoundDieInAnomaly);
-    else
+    }
+    else if (!b_disable_death_sound)
+    {
         sound().play(eStalkerSoundDie);
+    }
+    else
+    {
+        sound().remove_active_sounds(u32(-1));
+    }
 
     m_hammer_is_clutched = m_clutched_hammer_enabled && !CObjectHandler::planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped) && !::Random.randI(0, 2);
 

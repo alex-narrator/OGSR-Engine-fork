@@ -43,10 +43,10 @@ void CRadioactiveZone::Affect(SZoneObjectInfo* O)
             Msg("%s %s", *GO->cName(), pow);
 #endif
 
-        Fvector dir;
+        Fvector dir{};
         dir.set(0, 0, 0);
 
-        Fvector position_in_bone_space;
+        Fvector position_in_bone_space{};
         float power = Power(GO->Position().distance_to(pos));
         float impulse = 0.f;
         if (power > EPS)
@@ -61,18 +61,18 @@ void CRadioactiveZone::Affect(SZoneObjectInfo* O)
 
 void CRadioactiveZone::feel_touch_new(CObject* O) { inherited::feel_touch_new(O); }
 
-#include "actor.h"
-BOOL CRadioactiveZone::feel_touch_contact(CObject* O)
-{
-    CActor* A = smart_cast<CActor*>(O);
-    if (A)
-    {
-        if (!((CCF_Shape*)CFORM())->Contact(O))
-            return FALSE;
-        return A->feel_touch_on_contact(this);
-    }
-    else
-        return FALSE;
-}
+//#include "actor.h"
+//BOOL CRadioactiveZone::feel_touch_contact(CObject* O)
+//{
+//    CActor* A = smart_cast<CActor*>(O);
+//    if (A)
+//    {
+//        if (!((CCF_Shape*)CFORM())->Contact(O))
+//            return FALSE;
+//        return A->feel_touch_on_contact(this);
+//    }
+//    else
+//        return FALSE;
+//}
 
 void CRadioactiveZone::UpdateWorkload(u32 dt) { inherited::UpdateWorkload(dt); }

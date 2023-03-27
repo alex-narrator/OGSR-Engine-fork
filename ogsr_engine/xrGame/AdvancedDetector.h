@@ -16,4 +16,7 @@ protected:
     virtual void UpdateAf() override;
     virtual void CreateUI() override;
     CUIArtefactDetectorAdv& ui();
+
+    virtual void UpdateZones() override;
+    virtual void DisableUIDetection() override;
 };

@@ -16,6 +16,8 @@
 
 #include "ui/UIMap.h"
 #include "ui/UIXmlInit.h"
+
+#include "ui/UIInventoryUtilities.h"
 //////////////////////////////////////////////////////////////////////////
 
 CUIZoneMap::CUIZoneMap() {}
@@ -39,6 +41,15 @@ void CUIZoneMap::Init()
 
     xml_init.InitStatic(uiXml, "minimap:center", 0, &m_center);
 
+    xml_init.InitStatic(uiXml, "minimap:background:no_power", 0, &m_NoPower);
+    m_background.AttachChild(&m_NoPower);
+    m_NoPower.SetVisible(false);
+
+    xml_init.InitStatic(uiXml, "minimap:background:current_time", 0, &m_CurrentTime);
+    m_background.AttachChild(&m_CurrentTime);
+    xml_init.InitStatic(uiXml, "minimap:background:current_power", 0, &m_CurrentPower);
+    m_background.AttachChild(&m_CurrentPower);
+
     m_activeMap = xr_new<CUIMiniMap>();
     m_clipFrame.AttachChild(m_activeMap);
     m_activeMap->SetAutoDelete(true);
@@ -56,8 +67,27 @@ void CUIZoneMap::Init()
 
 void CUIZoneMap::Render()
 {
+    bool pda_workable = Actor()->HasPDAWorkable();
+
+    m_NoPower.SetVisible(!pda_workable);
+
+    if (!pda_workable)
+    {
+        m_background.Draw();
+        m_CurrentPower.SetVisible(false);
+        m_CurrentTime.SetText("");
+        return;
+    }
     m_clipFrame.Draw();
     m_background.Draw();
+    //
+    string16 tmp{};
+    auto act_pda = Actor()->GetPDA();
+    sprintf_s(tmp, "%.f%s", act_pda->GetPowerLevelToShow(), "%");
+    m_CurrentPower.SetText(tmp);
+    m_CurrentPower.SetVisible(pda_workable);
+    m_CurrentTime.SetText(InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
+    //
     m_compass.Draw();
 }
 
@@ -73,7 +103,7 @@ void CUIZoneMap::UpdateRadar(Fvector pos)
     m_background.Update();
     m_activeMap->SetActivePoint(pos);
 
-    if (m_activeMap->GetPointerDistance() > 0.5f)
+    if (m_activeMap->GetPointerDistance() > 0.5f && Actor()->HasPDAWorkable())
     {
         string64 str;
         sprintf_s(str, "%.1f m.", m_activeMap->GetPointerDistance());

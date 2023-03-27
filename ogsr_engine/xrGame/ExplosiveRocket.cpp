@@ -11,10 +11,6 @@
 #include "ai_object_location.h"
 #include "actor.h"
 
-CExplosiveRocket::CExplosiveRocket() {}
-
-CExplosiveRocket::~CExplosiveRocket() {}
-
 DLL_Pure* CExplosiveRocket::_construct()
 {
     CCustomRocket::_construct();

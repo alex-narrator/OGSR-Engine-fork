@@ -92,6 +92,9 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
         return true;
 
     auto bind = get_binded_action(dik);
+    if (!pActor->GetPDA() && bind != kINVENTORY)
+        return false;
+
     switch (bind)
     {
     case kINVENTORY:

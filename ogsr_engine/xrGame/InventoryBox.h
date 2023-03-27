@@ -8,9 +8,10 @@ protected:
     xr_vector<u16> m_items;
 
     void ProcessEvent(CGameObject* O, NET_Packet& P, u16 type);
+    bool b_opened{true};
 
 public:
-    bool m_in_use;
+    bool m_in_use{};
     IInventoryBox();
     void AddAvailableItems(TIItemContainer& items_container) const;
     bool IsEmpty() const;
@@ -21,7 +22,12 @@ public:
     virtual CGameObject* cast_game_object() { return NULL; };
     virtual CInventoryItem* cast_inventory_item() { return NULL; }
     virtual CGameObject& object() = 0;
-    virtual bool IsOpened() const { return true; }
+    virtual bool IsOpened() const { return b_opened; }
+    virtual void SetOpened(bool opened) { b_opened = opened; }
+
+    virtual bool CanTakeItem(CInventoryItem*) const;
+
+    virtual xr_vector<u16> GetItems() const { return m_items; };
 };
 
 template <class Based>
@@ -42,7 +48,6 @@ public:
         inherited::net_Spawn(DC);
         inherited::setVisible(TRUE);
         inherited::setEnabled(TRUE);
-        inherited::set_tip_text("inventory_box_use");
         return TRUE;
     }
 
@@ -52,5 +57,11 @@ public:
 class CInventoryBox : public CCustomInventoryBox<CGameObject> // CBasicInventoryBox
 {
 public:
-    CInventoryBox() {}
+    CInventoryBox(){};
+
+    virtual void shedule_Update(u32 dt);
+
+protected:
+    void UpdateDropTasks();
+    void UpdateDropItem(PIItem pIItem);
 };

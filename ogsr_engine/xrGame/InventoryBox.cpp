@@ -2,16 +2,16 @@
 #include "InventoryBox.h"
 #include "level.h"
 #include "actor.h"
+#include "HUDManager.h"
+#include "UIGameSP.h"
 #include "game_object_space.h"
 
 #include "script_callback_ex.h"
 #include "script_game_object.h"
 
-IInventoryBox::IInventoryBox() : m_items()
-{
-    m_in_use = false;
-    m_items.clear();
-}
+#include "inventory_item.h"
+
+IInventoryBox::IInventoryBox() : m_items() { m_items.clear(); }
 
 void IInventoryBox::ProcessEvent(CGameObject* O, NET_Packet& P, u16 type)
 {
@@ -57,8 +57,11 @@ void IInventoryBox::ProcessEvent(CGameObject* O, NET_Packet& P, u16 type)
 
         if (!itm)
             return;
-
+        /*Msg("~ [%s: REJECT] object [%s] with id [%u] parent [%s]", __FUNCTION__, itm->cName().c_str(), id, itm->H_Parent()->cName().c_str());*/
         itm->H_SetParent(NULL, dont_create_shell);
+
+        if (Actor() && HUD().GetUI() && HUD().GetUI()->UIGame())
+            HUD().GetUI()->UIGame()->ReInitShownUI();
 
         if (auto obj = smart_cast<CGameObject*>(itm))
         {
@@ -74,19 +77,17 @@ void IInventoryBox::ProcessEvent(CGameObject* O, NET_Packet& P, u16 type)
     };
 }
 
-#include "inventory_item.h"
 void IInventoryBox::AddAvailableItems(TIItemContainer& items_container) const
 {
-    xr_vector<u16>::const_iterator it = m_items.begin();
-    xr_vector<u16>::const_iterator it_e = m_items.end();
-
-    for (; it != it_e; ++it)
+    for (const auto& item_id : m_items)
     {
-        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(*it));
+        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
         VERIFY(itm);
         items_container.push_back(itm);
     }
 }
+
+bool IInventoryBox::CanTakeItem(CInventoryItem* inventory_item) const { return true; }
 
 CScriptGameObject* IInventoryBox::GetObjectByName(LPCSTR name)
 {
@@ -127,3 +128,31 @@ CScriptGameObject* IInventoryBox::GetObjectByIndex(u32 id)
 u32 IInventoryBox::GetSize() const { return m_items.size(); }
 
 bool IInventoryBox::IsEmpty() const { return m_items.empty(); }
+
+void CInventoryBox::shedule_Update(u32 dt)
+{
+    CGameObject::shedule_Update(dt);
+    UpdateDropTasks();
+}
+
+void CInventoryBox::UpdateDropTasks()
+{
+    for (const auto& item : m_items)
+    {
+        PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(item));
+        VERIFY(itm);
+        UpdateDropItem(itm);
+    }
+}
+
+void CInventoryBox::UpdateDropItem(PIItem pIItem)
+{
+    if (pIItem->GetDropManual())
+    {
+        pIItem->SetDropManual(FALSE);
+        NET_Packet P;
+        pIItem->object().u_EventGen(P, GE_OWNERSHIP_REJECT, pIItem->object().H_Parent()->ID());
+        P.w_u16(u16(pIItem->object().ID()));
+        pIItem->object().u_EventSend(P);
+    } // dropManual
+}

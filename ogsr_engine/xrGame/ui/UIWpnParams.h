@@ -5,10 +5,7 @@
 
 class CUIXml;
 
-#include "../script_export_space.h"
-
-struct SLuaWpnParams;
-class CPhysicsShellHolder;
+class CInventoryItem;
 
 class CUIWpnParams : public CUIWindow
 {
@@ -16,18 +13,13 @@ public:
     CUIWpnParams();
     virtual ~CUIWpnParams();
 
-    void InitFromXml(CUIXml& xml_doc);
-    void SetInfo(CPhysicsShellHolder& obj /*const shared_str& wpn_section*/);
-    bool Check(CPhysicsShellHolder& obj /*const shared_str& wpn_section*/);
+    void Init();
+    void Reinit();
+    void SetInfo(CInventoryItem* obj);
+    bool Check(CInventoryItem* obj);
 
 protected:
-    CUIProgressBar m_progressAccuracy;
-    CUIProgressBar m_progressHandling;
-    CUIProgressBar m_progressDamage;
-    CUIProgressBar m_progressRPM;
-
-    CUIStatic m_textAccuracy;
-    CUIStatic m_textHandling;
-    CUIStatic m_textDamage;
-    CUIStatic m_textRPM;
+    //
+    CUIStatic m_CapInfo; // метеринський статик листа інформації про зброю
+    CUIStatic* SetStaticParams(CUIXml&, const char*, float);
 };

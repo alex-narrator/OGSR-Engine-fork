@@ -60,13 +60,13 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .property("morale", &CScriptGameObject::GetMorale, &CScriptGameObject::SetMorale)
         // KD
         .property("alcohol", &CScriptGameObject::GetAlcohol, &CScriptGameObject::SetAlcohol)
-        .property("thirst", &CScriptGameObject::GetThirst, &CScriptGameObject::SetThirst)
+//        .property("thirst", &CScriptGameObject::GetThirst, &CScriptGameObject::SetThirst)
         .property("max_power", &CScriptGameObject::GetMaxPower, &CScriptGameObject::SetMaxPower)
 
         // Actor State
         //.property("jump_speed",				&CScriptGameObject::GetActorJumpSpeed,	&CScriptGameObject::SetActorJumpSpeed)
         //.property("walk_accel",				&CScriptGameObject::GetActorWalkAccel,	&CScriptGameObject::SetActorWalkAccel)
-        .property("exo_factor", &CScriptGameObject::GetActorExoFactor, &CScriptGameObject::SetActorExoFactor)
+        //.property("exo_factor", &CScriptGameObject::GetActorExoFactor, &CScriptGameObject::SetActorExoFactor)
 
         // Other
         .def("get_bleeding", &CScriptGameObject::GetBleeding)

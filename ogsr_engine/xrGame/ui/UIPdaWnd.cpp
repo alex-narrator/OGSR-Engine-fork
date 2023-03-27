@@ -101,6 +101,17 @@ void CUIPdaWnd::Init()
     UIMainPdaFrame->AttachChild(UITimerBackground);
     xml_init.InitFrameLine(uiXml, "timer_frame_line", 0, UITimerBackground);
 
+    // Power level background
+    m_currentPower = xr_new<CUIStatic>();
+    m_currentPower->SetAutoDelete(true);
+    UIMainPdaFrame->AttachChild(m_currentPower);
+    xml_init.InitStatic(uiXml, "power_level", 0, m_currentPower);
+    // No power background
+    m_NoPower = xr_new<CUIStatic>();
+    m_NoPower->SetAutoDelete(true);
+    UIMainPdaFrame->AttachChild(m_NoPower);
+    xml_init.InitStatic(uiXml, "no_power", 0, m_NoPower);
+
     // Oкно карты
     UIMapWnd = xr_new<CUIMapWnd>();
     UIMapWnd->Init("pda_map.xml", "map_wnd");
@@ -232,8 +243,7 @@ void CUIPdaWnd::MouseMovement(float x, float y)
 
 void CUIPdaWnd::Show()
 {
-    if (Core.Features.test(xrCore::Feature::more_hide_weapon))
-        Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);
+    Actor()->SetWeaponHideState(INV_STATE_PDA, true);
 
     InventoryUtilities::SendInfoToActor("ui_pda");
 
@@ -247,8 +257,7 @@ void CUIPdaWnd::Hide()
     InventoryUtilities::SendInfoToActor("ui_pda_hide");
     HUD().GetUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, false);
 
-    if (Core.Features.test(xrCore::Feature::more_hide_weapon))
-        Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, false);
+    Actor()->SetWeaponHideState(INV_STATE_PDA, false);
 }
 
 void CUIPdaWnd::UpdateDateTime()
@@ -335,8 +344,25 @@ void CUIPdaWnd::Draw()
         return;
     last_frame = Device.dwFrame;
 
-    inherited::Draw();
+	inherited::Draw();
+    /*DrawUpdatedSections								();*/
+
+    bool pda_workable = Actor()->HasPDAWorkable();
+    for (const auto& child_wnd : UIMainPdaFrame->GetChildWndList())
+    {
+        child_wnd->SetVisible(pda_workable);
+    }
+    m_NoPower->SetVisible(!pda_workable);
+    if (!pda_workable)
+        return;
+
     DrawUpdatedSections();
+
+    string16 tmp{};
+    auto act_pda = Actor()->GetPDA();
+    sprintf_s(tmp, "%.f%s", act_pda->GetPowerLevelToShow(), "%");
+    m_currentPower->SetText(tmp);
+    m_currentPower->SetVisible(pda_workable);
 }
 
 void CUIPdaWnd::PdaContentsChanged(pda_section::part type, bool flash)

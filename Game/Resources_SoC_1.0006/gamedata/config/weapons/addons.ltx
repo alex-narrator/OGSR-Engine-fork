@@ -1,0 +1,451 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;	WEAPON ADDON
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[wpn_addon_scope]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\addons\scope" ; option for Level Editor
+class			= WP_SCOPE
+cform           = skeleton
+visual          = weapons\upgrade\wpn_scope.ogf
+$prefetch 		= 32
+description		= enc_weapons1_wpn-addon-scope
+cost			= 200
+
+holder_range_modifier	= 1.2
+holder_fov_modifier		= 0.3
+
+inv_name		= wpn-addon-scope
+inv_name_short	= wpn-addon-scope
+inv_weight		= .2
+
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x			= 18
+inv_grid_y			= 2
+scope_texture			= wpn\crosshairs\anomaly\wpn_crosshair_pso1
+scope_texture_broken 	= wpn\crosshairs\anomaly\wpn_crosshair_pso1_broken
+scope_zoom_factor	= 1, 6, 5; формат запису: мінімільний зум, максимальний зум, кількість кроків наближення
+
+range_meter = true
+range_meter_offset = -0.1, 0.2
+;range_meter_color = 255, 255, 255, 255 ;RGBA
+
+;required_tools = multitool
+
+scope_second 				= true
+
+;snd_zoomin					= weapons\binoculars_zoomin
+;snd_zoomout					= weapons\binoculars_zoomout
+;snd_zoom_change				= weapons\pistol_empty
+
+;vision_present				= true
+;vis_frame_speed				= 4				; скорость, с которой наводится рамка на цель
+;vis_frame_color				= 0.7,0.7,0.7,1.0	; цвет рамки RGBA (A) Не учитывается
+;found_snd					= detectors\DA-2_beep1
+
+;night_vision				= on
+;night_vision_effector		= effector_nightvision; postprocess_night
+
+;snd_night_vision_on			= weapons\nv_start
+;snd_night_vision_off		= weapons\nv_off
+;snd_night_vision_idle		= weapons\nv_loop
+;snd_night_vision_broken		= weapons\nv_off
+
+[wpn_addon_scope_susat]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\addons\scope_susat" ; option for Level Editor
+class			= WP_SCOPE
+cform           = skeleton
+visual          = weapons\upgrade\wpn_scope_susat.ogf
+description		= enc_weapons1_wpn-addon-scope-susat
+
+;$prefetch 		= 64
+
+cost			= 200
+
+holder_range_modifier	= 1.3
+holder_fov_modifier		= 0.3
+
+inv_name		= wpn-addon-scope-susat
+inv_name_short	= wpn-addon-scope-susat
+inv_weight		= .2
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 19
+inv_grid_y			= 1
+scope_texture			= wpn\crosshairs\anomaly\wpn_crosshair_susat
+scope_texture_broken	= wpn\crosshairs\anomaly\wpn_crosshair_susat_broken
+scope_zoom_factor	= 4		;SUSAT 2X
+
+scope_second = true
+
+[wpn_addon_scope_pgo_7v]:wpn_addon_scope
+description		= enc_weapons1_wpn_addon_scope_pgo_7v
+inv_name		= wpn_addon_scope_pgo_7v
+inv_name_short	= wpn_addon_scope_pgo_7v
+inv_weight		= .2
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 25
+inv_grid_y         = 1
+scope_texture			= wpn\crosshairs\anomaly\wpn_crosshair_rpg
+scope_zoom_factor = 2.7
+
+[wpn_addon_silencer]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\addons\silencer" ; option for Level Editor
+class			= W_SILENC
+cform           = skeleton
+visual          = weapons\upgrade\wpn_silencer.ogf
+description		= enc_weapons1_wpn-addon-silencer
+$prefetch 		= 32
+
+cost					 = 100;150
+inv_name		= wpn-addon-silencer
+inv_name_short	= wpn-addon-silencer
+inv_weight		= .1
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 18
+inv_grid_y			= 1
+
+condition_shot_dec = 0.1 ;износ глушителя за выстрел
+
+bullet_hit_power_k	= 0.1
+bullet_speed_k	 	= 0.1
+fire_dispersion_base_k = 0
+cam_dispersion_k	= 0
+condition_shot_dec_silencer = 1.5 ;коефіцієнт зношування зброї підчас вогню з встановленим глушником (0,1 = +10%)
+
+[wpn_addon_silencer_svu]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\addons\silencer" ; option for Level Editor
+class			= W_SILENC
+cform           = skeleton
+visual          = weapons\upgrade\wpn_silencer.ogf
+description		= enc_weapons1_wpn-addon-silencer
+$prefetch 		= 32
+
+cost					 = 100;150
+inv_name		= wpn-addon-silencer_long
+inv_name_short	= wpn-addon-silencer_long
+inv_weight		= .1
+
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 24
+inv_grid_y         = 0
+
+condition_shot_dec = 0.01 ;износ глушителя за выстрел
+
+bullet_hit_power_k	= 0.1
+bullet_speed_k	 	= 0.1
+fire_dispersion_base_k = 0
+cam_dispersion_k	= 0
+condition_shot_dec_silencer = 0.5 ;коефіцієнт зношування зброї підчас вогню з встановленим глушником (0,1 = +10%)
+
+silencer_flame_particles 	= weapons\generic_weapon01
+
+[wpn_addon_choke]:wpn_addon_silencer
+description		= wpn_addon_choke_descr
+inv_name		= wpn-addon-choke
+inv_name_short	= wpn-addon-choke_short
+
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 29
+inv_grid_y         = 0
+
+bullet_hit_power_k		= 0.1
+bullet_speed_k 			= 0.1
+fire_dispersion_base_k 	= -0.5
+cam_dispersion_k 		= 0
+condition_shot_dec 		= 0.001
+condition_shot_dec_silencer = 2 ;коефіцієнт зношування зброї підчас вогню з встановленим глушником (0,1 = +10%)
+
+show_on_model = false
+
+[wpn_addon_muzzle_break_ak74]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\addons\silencer" ; option for Level Editor
+class			= W_SILENC
+cform           = skeleton
+visual          = weapons\upgrade\wpn_silencer.ogf
+description		= muzzle_break_ak74
+$prefetch 		= 32
+
+description		= descr_muzzle_break_ak74
+inv_name		= muzzle_break_ak74
+inv_name_short	= muzzle_break_ak74_short
+
+inv_weight		= 0.1
+cost = 100
+
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 20
+inv_grid_y         = 0
+
+;fire_dispersion_base_k = -0.5
+cam_dispersion_k	= -0.2
+
+show_on_model = false
+
+[wpn_addon_muzzle_break_lr300]:wpn_addon_muzzle_break_ak74
+description		= descr_muzzle_break_lr300
+description		= muzzle_break_lr300
+inv_name		= muzzle_break_lr300
+inv_name_short	= muzzle_break_lr300_short
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 21
+inv_grid_y         = 0
+
+[wpn_addon_grenade_launcher]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\addons\grenade_launcher" ; option for Level Editor
+class			= W_GLAUNC
+cform           = skeleton
+visual          = weapons\upgrade\wpn_grenade_launcher.ogf
+description		= enc_weapons1_wpn-addon-grenade-launcher
+$prefetch 		= 32
+
+cost					 = 250
+inv_name		= wpn-addon-grenade-launcher
+inv_name_short	= wpn-addon-grenade-launcher
+inv_weight		= 1.3
+
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x			= 18
+inv_grid_y			= 0
+grenade_vel			= 76
+condition_shot_dec_gl = 0.01
+
+
+[wpn_addon_grenade_launcher_m203]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\addons\grenade_launcher_m203" ; option for Level Editor
+class			= W_GLAUNC
+cform           = skeleton
+visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
+description		= enc_weapons1_wpn-addon-grenade-launcher-m203
+$prefetch 		= 32
+
+cost					 = 250
+inv_name		= wpn-addon-grenade-launcher-m203
+inv_name_short	= wpn-addon-grenade-launcher-m203
+inv_weight		= 1.36
+
+inv_grid_width		= 2
+inv_grid_height		= 1
+inv_grid_x			= 17
+inv_grid_y			= 3
+grenade_vel			= 71
+
+[wpn_addon_laser_red]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\addons\silencer" ; option for Level Editor
+class			= W_LASER
+cform           = skeleton
+visual          = weapons\upgrade\wpn_silencer.ogf
+description		= enc_weapons1_wpn-addon-silencer
+$prefetch 		= 32
+
+cost					 = 100;150
+inv_name		= wpn-addon-laser_red
+inv_name_short	= wpn-addon-laser_red
+inv_weight		= .1
+
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 32
+inv_grid_y         = 0
+
+snd_laser_switch	= weapons\pistol_empty
+
+laser_light_section = red_laser_definition
+
+[wpn_addon_laser_green]:wpn_addon_laser_red
+
+inv_name		= wpn-addon-laser_green
+inv_name_short	= wpn-addon-laser_green
+
+laser_light_section = green_laser_definition
+
+[wpn_addon_flashlight]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\addons\silencer" ; option for Level Editor
+class			= W_FLASHL
+cform           = skeleton
+visual          = weapons\upgrade\wpn_silencer.ogf
+description		= enc_weapons1_wpn-addon-silencer
+$prefetch 		= 32
+
+cost					 = 100;150
+inv_name		= wpn-addon-flashlight
+inv_name_short	= wpn-addon-flashlight
+inv_weight		= .1
+
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 31
+inv_grid_y         = 0
+
+snd_flashlight_switch	= weapons\pistol_empty
+
+flashlight_section = flashlight_definition
+
+[flashlight_definition]
+;DIRECT		= 0,
+;POINT		= 1,
+;SPOT		= 2,
+;OMNIPART	= 3,
+;REFLECTED	= 4,
+omni_type = 2 ;KRodin: вообще omni это обычно поинт, но поинт светит во все стороны от себя, поэтому тут спот используется.
+
+range           = 50	                            ; дальность в метрах
+range_r2        = 50	                            ; дальность в метрах (для динамического освещения)
+color           = 1.0,1.0,1.0,0.6					; цвет, из 4 компонентов <r,g,b,a> значением от 0 до 3.
+color_r2        = 1.0,1.1,1.2,1.2					; цвет, из 4 компонентов <r,g,b,a> значением от 0 до 3. (для динамического освещения)
+omni_range      = 0.25								; дистанция освещения от фонариков неписей в метрах.
+omni_range_r2   = 0.25								; дистанция освещения от фонариков неписей в метрах. (для динамического освещения)
+omni_color      = 1.0,1.0,1.0,0.3					; цвет фонариков неписей, из 4 компонентов <r,g,b,a> значением от 0 до 3.
+omni_color_r2   = 1.0,1.1,1.2,0.2					; цвет фонариков неписей, из 4 компонентов <r,g,b,a> значением от 0 до 3. (для динамического освещения)
+color_animator  = empty								; цвет аниматора (empty - аниматор не используется). //light_torch_01
+;spot_texture    = internal\internal_light_torch_tactical_r2 ; текстура яркой точки (только для динамического освещения).
+spot_angle      = 60	                            ; угол разлета света (определяет размер пятна)		; угол освещения в градусах.
+glow_texture    = glow\glow_torch_r2			    ; текстура свечения фонарика, когда он направлен в глаза (обязательный параметр).
+glow_radius     = 0.3								; радиус свечения в метрах.
+
+[red_laser_definition]
+range           = 100	                            ; дальность в метрах
+range_r2        = 100	                            ; дальность в метрах (для динамического освещения)
+color           = 3.0f, 0.0f, 0.0f, 1.0f			; цвет, из 4 компонентов <r,g,b,a> значением от 0 до 3.
+color_r2        = 3.0f, 0.0f, 0.0f, 1.0f			; цвет, из 4 компонентов <r,g,b,a> значением от 0 до 3. (для динамического освещения)
+color_animator  = ;battery_low								; цвет аниматора (empty - аниматор не используется). //light_torch_01
+;spot_texture    = internal\internal_light_torch_r3	; текстура яркой точки (только для динамического освещения).
+spot_angle      = 0.3	                            ; угол разлета света (определяет размер пятна)		; угол освещения в градусах.
+
+[green_laser_definition]:red_laser_definition
+color           = 0.0f, 0.0f, 3.0f, 1.0f			; цвет, из 4 компонентов <r,g,b,a> значением от 0 до 3.
+color_r2        = 0.0f, 0.0f, 3.0f, 1.0f			; цвет, из 4 компонентов <r,g,b,a> значением от 0 до 3. (для динамического освещения)
+
+[wpn_addon_stock_ak74]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\addons\grenade_launcher_m203" ; option for Level Editor
+class			= W_STOCK
+cform           = skeleton
+visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
+description		= descr_stock_ak74
+$prefetch 		= 32
+
+cost					 = 250
+inv_name		= stock_ak74
+inv_name_short	= stock_ak74_short
+inv_weight		= 0.5
+
+inv_grid_width     = 2
+inv_grid_height    = 1
+inv_grid_x         = 20
+inv_grid_y         = 3
+
+cam_dispersion_k	= -0.3
+zoom_rotate_time_k 	= -0.1
+aim_inertion_k 		= -0.5
+;aim_control_inertion_k = -0.5
+
+[wpn_addon_stock_lr300]:wpn_addon_stock_ak74
+description		= descr_stock_lr300
+inv_name		= stock_lr300
+inv_name_short	= stock_lr300_short
+inv_grid_width     = 2
+inv_grid_height    = 1
+inv_grid_x         = 22
+inv_grid_y         = 4
+
+[wpn_addon_extender_2]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\addons\silencer" ; option for Level Editor
+class			= W_EXTNDR
+cform           = skeleton
+visual          = weapons\upgrade\wpn_silencer.ogf
+description		= extender_2
+$prefetch 		= 32
+
+cost			= 250
+inv_name		= extender_2
+inv_name_short	= extender_2_short
+inv_weight		= 0.5
+
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 31
+inv_grid_y         = 0
+
+ammo_mag_size = 2
+
+[wpn_addon_extender_4]:wpn_addon_extender_2
+cost			= 550
+description		= extender_4
+inv_name		= extender_4
+inv_name_short	= extender_4_short
+inv_weight		= 0.5
+
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 30
+inv_grid_y         = 0
+
+
+ammo_mag_size = 4
+
+[wpn_addon_forend_ak74]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn			= "weapons\addons\grenade_launcher_m203" ; option for Level Editor
+class			= W_FOREND
+cform           = skeleton
+visual          = weapons\upgrade\wpn_grenade_launcher_m203.ogf
+description		= descr_forend_ak74
+$prefetch 		= 32
+
+cost			= 250
+inv_name		= forend_ak74
+inv_name_short	= forend_ak74_short
+inv_weight		= 0.5
+
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 26
+inv_grid_y         = 1
+
+grenade_launcher_allowed 	= true
+laser_allowed 				= false
+flashlight_allowed 			= false
+
+;cam_dispersion_k	= -0.3
+;aim_inertion_k 		= -0.5
+;aim_control_inertion_k = -0.5
+
+[wpn_addon_forend_lr300]:wpn_addon_forend_ak74
+description		= descr_forend_lr300
+inv_name		= forend_lr300
+inv_name_short	= forend_lr300_short
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 27
+inv_grid_y         = 1

@@ -1,0 +1,933 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_kg">
+		<text>кг</text>
+	</string>
+	<string id="st_l">
+		<text>л</text>
+	</string>
+	<string id="st_rad">
+		<text>мР/год</text>
+	</string>
+	<string id="ui_st_money_regional">
+		<text>грн</text>
+	</string>
+	<string id="st_m">
+		<text>м</text>
+	</string>	
+	<string id="st_rpm_units">
+		<text>пос./хв</text>
+	</string>
+	<string id="st_bullet_speed_units">
+		<text>м/с</text>
+	</string>	
+	<string id="st_resource_units">
+		<text>пострілів</text>
+	</string>	
+	<string id="st_resource_on_hit_units">
+		<text>ударів</text>
+	</string>	
+	<string id="st_detach">
+		<text>зняти</text>
+	</string>
+	<string id="st_attach">
+		<text>встановити на</text>
+	</string>	
+	<string id="st_repair">
+		<text>відремонтувати</text>
+	</string>		
+	<string id="st_dispersion_units">
+		<text>MOA</text>
+	</string>
+	
+	<string id="st_explosion_hit">
+		<text>Ушкодження вибухом:</text>
+	</string>	
+	<string id="st_explosion_radius">
+		<text>Радіус вибуху:</text>
+	</string>	
+	<string id="st_frags_hit">
+		<text>Ушкодження уламками:</text>
+	</string>	
+	<string id="st_frags_radius">
+		<text>Радіус розльоту уламків:</text>
+	</string>	
+	<string id="st_frags_count">
+		<text>Кількість уламків:</text>
+	</string>
+	<string id="st_safe_dist">
+		<text>Дистанція зведення:</text>
+	</string>	
+	<string id="st_destroy_time">
+		<text>Затримка вибуху/зведення:</text>
+	</string>	
+	
+	<string id="st_plates">
+		<text>Сумісні плити:</text>
+	</string>	
+	
+	
+	<string id="ui_st_pda_account_unavailable">
+		<text>[рахунок недоступний]</text>
+	</string>
+	
+	<string id="ui_inv_psy_health">
+		<text>Псі-здоров'я</text>
+	</string>
+	<string id="ui_inv_alcohol">
+		<text>Сп'яніння</text>
+	</string>
+	<string id="ui_inv_sprint">
+		<text>Швидкість бігу</text>
+	</string>
+	<string id="ui_inv_jump">
+		<text>Висота стрибка</text>
+	</string>
+	<string id="ui_inv_volume">
+		<text>Обсяг</text>
+	</string>
+	
+	<string id="st_quick_slot_empty">
+		<text>Кишеня порожня</text>
+	</string>
+	<string id="ui_quick_slot_use_str_0">
+		<text>[$$ACTION_USE_QUICK_SLOT_0$$]</text>
+	</string>
+	<string id="ui_quick_slot_use_str_1">
+		<text>[$$ACTION_USE_QUICK_SLOT_1$$]</text>
+	</string>
+	<string id="ui_quick_slot_use_str_2">
+		<text>[$$ACTION_USE_QUICK_SLOT_2$$]</text>
+	</string>
+	<string id="ui_quick_slot_use_str_3">
+		<text>[$$ACTION_USE_QUICK_SLOT_3$$]</text>
+	</string>
+
+	<string id="ui_use_slot_0">
+		<text>[$$ACTION_WPN_1$$]</text>
+	</string>
+	<string id="ui_use_slot_1">
+		<text>[$$ACTION_WPN_2$$]</text>
+	</string>
+	<string id="ui_use_slot_2">
+		<text>[$$ACTION_WPN_3$$]</text>
+	</string>
+	<string id="ui_use_slot_3">
+		<text>[$$ACTION_WPN_4$$]</text>
+	</string>
+	<string id="ui_use_slot_4">
+		<text>[$$ACTION_WPN_5$$]</text>
+	</string>	
+	<string id="ui_use_slot_10">
+		<text>[$$ACTION_WPN_7$$]</text>
+	</string>
+	<string id="ui_use_slot_11">
+		<text>[$$ACTION_WPN_8$$]</text>
+	</string>
+	<string id="ui_use_slot_12">
+		<text>[$$ACTION_USE_QUICK_SLOT_0$$]</text>
+	</string>
+	<string id="ui_use_slot_13">
+		<text>[$$ACTION_USE_QUICK_SLOT_1$$]</text>
+	</string>
+	<string id="ui_use_slot_14">
+		<text>[$$ACTION_USE_QUICK_SLOT_2$$]</text>
+	</string>	
+	<string id="ui_use_slot_15">
+		<text>[$$ACTION_USE_QUICK_SLOT_3$$]</text>
+	</string>
+	
+	<string id="kb_kick">
+		<text>Удар</text>
+	</string>
+	<string id="kb_additional_action">
+		<text>Додаткова дія</text>
+	</string>
+	<string id="kb_weapon7">
+		<text>Артефакт</text>
+	</string>	
+	<string id="kb_weapon8">
+		<text>Детектор</text>
+	</string>
+	<string id="kb_use_quick_slot_0">
+		<text>Кишеня 1</text>
+	</string>
+	<string id="kb_use_quick_slot_1">
+		<text>Кишеня 2</text>
+	</string>
+	<string id="kb_use_quick_slot_2">
+		<text>Кишеня 3</text>
+	</string>
+	<string id="kb_use_quick_slot_3">
+		<text>Кишеня 4</text>
+	</string>
+	<string id="kb_check_active_item">
+		<text>Перевірити предмет у руках</text>
+	</string>
+	<string id="kb_check_gear">
+		<text>Перевірити спорядження</text>
+	</string>
+	<string id="kb_check_devices">
+		<text>Перевірити прилади</text>
+	</string>
+	<string id="kb_ext_1">
+		<text>Автоприцілювання</text>
+	</string>
+	<string id="kb_quick_throw_grenade">
+		<text>Швидкий кидок гранати</text>
+	</string>
+	<string id="kb_quick_knife_stab">
+		<text>Швидкий удар ножем</text>
+	</string>
+	<string id="kb_laser_on">
+		<text>ЛЦВ</text>
+	</string>
+	<string id="kb_flashlight">
+		<text>Збройовий ліхтар</text>
+	</string>
+	<string id="kb_drop_backpack">
+		<text>Скинути рюкзак</text>
+	</string>	
+	
+	<string id="st_not_enough_money_to_trade">
+		<text>бракує грошей</text>
+	</string>
+	<string id="st_not_enough_money_to_barter">
+		<text>бракує товарів</text>
+	</string>
+	<string id="ui_st_barter">
+		<text>Бартер [T]</text>
+	</string>
+	
+	<string id="ui_inv_organize">
+		<text>Упорядкувати речі [E]</text>
+	</string>
+	
+	<string id="ui_inv_show_all_inv">
+		<text>показати все</text>
+	</string>
+	
+<!-- опции видео -->	
+	<string id="video_settings_name_detail_scale">
+		<text>Висота трави - r__detail_scale</text>
+	</string>
+	<string id="video_settings_desc_detail_scale">
+		<text>Ця опція регулює висоту трави (а також розмір відмальованого на асфальті листя та інших элементів дітейлу).</text>
+	</string>
+	<string id="video_settings_name_cam_height_speed">
+		<text>Швидкість зміни висоти камери - cam_height_speed</text>
+	</string>
+	<string id="video_settings_desc_cam_height_speed">
+		<text>Ця опція регулює швидкість опускання/піднімання камери підчас присідань/підйомів. \nПоточний запас сил також впливає на цю швидкість.</text>
+	</string>
+	<string id="video_settings_name_cam_lookout_speed">
+		<text>Швидкість руху камери підчас визирання - cam_lookout_speed</text>
+	</string>
+	<string id="video_settings_desc_cam_lookout_speed">
+		<text>Ця опція регулює швидкість руху камери та положення визирання та назад. \nПоточний запас сил також впливає на цю швидкість.</text>
+	</string>
+	
+<!-- опциї геймплею -->		
+	<string id="gameplay_settings_name_autopause">
+		<text>Пауза після завантаження збереження - keypress_on_start</text>
+	</string>
+	<string id="gameplay_settings_desc_autopause">
+		<text>Автопауза після завантаження гри - "Натисніть будь-яку клавішу щоб перейти до гри"</text>
+	</string>
+	<string id="gameplay_settings_name_tips">
+		<text>Розпізнавання NPC - hud_info</text>
+	</string>
+	<string id="gameplay_settings_desc_tips">
+		<text>Підказка з ім'ям при наведенні прицілу на NPC та розфарбовування прицілу при наведеннні на монстрів</text>
+	</string>
+	<string id="gameplay_settings_name_crosshair">
+		<text>Відображувати приціл - hud_crosshair</text>
+	</string>
+	<string id="gameplay_settings_desc_crosshair">
+		<text>Відображувати перехрестя прицілу</text>
+	</string>
+	<string id="gameplay_settings_name_dyn_crosshair">
+		<text>Динамічний приціл - cl_dynamiccrosshair</text>
+	</string>
+	<string id="gameplay_settings_desc_dyn_crosshair">
+		<text>Розмір перехрестя прицілу буде змінюватись відповідно до поточного розкиду зброї</text>
+	</string>
+	<string id="gameplay_settings_name_crosshair_hard">
+		<text>Реалістичний приціл - hud_crosshair_hard</text>
+	</string>
+	<string id="gameplay_settings_desc_crosshair_hard">
+		<text>Якщо опцію увімкнено, то кулі будуть вилітати зі ствола зброї, а не з центру екрана. \nВідповідно перехрестя прицілу буде вказувати на поточну точку влучання, а не на центр.</text>
+	</string>
+	<string id="gameplay_settings_name_ambient">
+		<text>Грати музикальний ембієнт - g_music_tracks</text>
+	</string>
+	<string id="gameplay_settings_desc_ambient">
+		<text>Вмикає програвання фонової музики на локаціях (якщо така описана у файлах конфігурації). \nДля застосування опції після зміни треба перезайти на локацію.</text>
+	</string>
+	<string id="gameplay_settings_name_difficulty">
+		<text>Складність - g_game_difficulty</text>
+	</string>
+	<string id="gameplay_settings_desc_difficulty">
+		<text>Вибір рівня складності гри</text>
+	</string>
+	
+	<string id="gameplay_settings_name_game_save_mode">
+		<text>Режим збереження гри - g_save_mode</text>
+	</string>
+	<string id="gameplay_settings_desc_game_save_mode">
+		<text>Вибір режиму збереження гри гри. 
+		\n
+		\nБез обмежень - збереження з оригінальної гри. 
+		\n
+		\nБез ворогів поряд - дозволяє зберегти гру тільки коли у певному радусі від гравця немає ворожих сутностей, як то сталкерів, монстрів, гелікоптерів. 
+		Радіус визначається парметром safe_radius з секції features, за замовчуванням - 50 метрів.
+		\n
+		\nУ безпечних місцях - зберегти гру можна тільки якщо гравець знаходиться у безпечному місці, при цьому на екрані відображається іконка будиночку. 
+		Технічно "безпечне місце" визначається наявністю у актора інфопорції "safehouse"</text>
+	</string>
+	
+<!-- опции управления -->	
+	<string id="controls_settings_name_mousesens">
+		<text>Чутливість миші - mouse_sens</text>
+	</string>
+	<string id="controls_settings_desc_mousesens">
+		<text>Налаштування чутливості миші</text>
+	</string>
+	<string id="controls_settings_name_mouseinvert">
+		<text>Інвертувати мишу - mouse_invert</text>
+	</string>
+	<string id="controls_settings_desc_mouseinvert">
+		<text>Інверсія введеня з миші</text>
+	</string>
+	<string id="controls_settings_name_missile_force_grow_speed">
+		<text>Швидкість зростання сили кидка - missile_force_grow_speed</text>
+	</string>
+	<string id="controls_settings_desc_missile_force_grow_speed">
+		<text>Регулює швидкість, з якою зростає сила кидка болта/гранати при утримуванні клавіші [$$ACTION_WPN_ZOOM$$]</text>
+	</string>
+	<string id="controls_settings_name_hold_to_aim">
+		<text>Утримувати клавішу [$$ACTION_WPN_ZOOM$$] для прицілювання - g_hold_to_aim</text>
+	</string>
+	<string id="controls_settings_desc_hold_to_aim">
+		<text>Якщо опцію увімкнено, то для прицілювання потрібно буде утримувати клавішу [$$ACTION_WPN_ZOOM$$], як у оригінальній грі.</text>
+	</string>
+	<string id="controls_settings_name_input_exclusive">
+		<text>Ексклюзивний режим введення - input_exclusive_mode</text>
+	</string>
+	<string id="controls_settings_desc_input_exclusive">
+		<text>Вмикання цієї опції блокує роботу мультимедійних клавіш клавіатури. \nВимикання може викликати проблеми через недозахоплення керування та на багатомоніторних конфігураціях.</text>
+	</string>
+	
+	<string id="video_settings_name_r2_visor_refl">
+		<text>Відображення по краях скла шолома - r2_visor_refl</text>
+	</string>
+	<string id="video_settings_desc_r2_visor_refl">
+		<text>Вмикає ефект віддзеркалень по краях шолома, якщо вдягнуто шолом/костюм з UI-маскою</text>
+	</string>	
+	
+	<string id="video_settings_name_terrain_parallax">
+		<text>Ефект паралаксу на терейні - r_terrain_parallax</text>
+	</string>
+	<string id="video_settings_desc_terrain_parallax">
+		<text>Вмикає ефект паралаксу на терейні. Щоб ефект був якісним потрібні якісні бамп-текстури терейну.  \nДля застосування потрібен перезапуск гри</text>
+	</string>	
+	
+	<string id="video_settings_name_bloodmarks_on_dynamics">
+		<text>Бладмарки на динамічних об'ектах та ГГ - g_bloodmarks_on_dynamics</text>
+	</string>
+	<string id="video_settings_desc_bloodmarks_on_dynamics">
+		<text>Вмикає відображення плям крові на динамічних об'єктах (уламки ящиків та інше) а також на самій моделі головного героя.
+		У деяких випадках може суттєво зменшити FPS</text>
+	</string>	
+	
+	<string id="gameplay_settings_name_crosshair_dist">
+		<text>Дистанція до цілі - hud_crosshair_dist</text>
+	</string>
+	<string id="gameplay_settings_desc_crosshair_dist">
+		<text>Відображувати дистанцію до цілі, на яку направлено перехрестя прицілу</text>
+	</string>		
+	
+	<string id="gameplay_settings_name_build_crosshair">
+		<text>Круглий курсор - hud_crosshair_build</text>
+	</string>
+	<string id="gameplay_settings_desc_build_crosshair">
+		<text>Круглий курсор (як у білдах гри) замість перехрестя прицілу.</text>
+	</string>	
+
+	<string id="controls_settings_name_switch_slot">
+		<text>Перемикання між слотами коліщатком миші - g_mouse_wheel_switch_slot</text>
+	</string>
+	<string id="controls_settings_desc_switch_slot">
+		<text>Обертання коліщатка миші буде послідовно активувати слоти. При цьому буде недоступне перемикання коліщатком режиму вогню зброї.</text>
+	</string>	
+	
+	<string id="video_settings_name_cam_inert">
+	<text>Инерція камери - cam_inert</text>
+	</string>
+	<string id="video_settings_name_detail_density">
+		<text>Щільність трави - r__detail_density</text>
+	</string>
+	<string id="video_settings_name_detail_distance">
+		<text>Дальність відображення трави - r__detail_radius</text>
+	</string>
+	<string id="video_settings_name_r2_sun">
+		<text>Тінь від сонця - r2_sun</text>
+	</string>
+	<string id="video_settings_name_npc_torch">
+		<text>Об'ємне світло ліхтариків NPC - ai_use_torch_dynamic_lights</text>
+	</string>
+	<string id="video_settings_name_vsync">
+		<text>Вертикальна синхронізація - rs_v_sync</text>
+	</string>
+	<string id="video_settings_name_aa">
+		<text>Тип згладжування - r_aa_mode</text>
+	</string>
+	<string id="video_settings_name_sun_shafts">
+		<text>Тип сонячних променів - r_sunshafts_mode</text>
+	</string>
+	<string id="video_settings_name_r2_actor_shadow">
+		<text>Тінь головного героя - r2_actor_shadow</text>
+	</string>	
+	<string id="video_settings_name_ssao">
+		<text>Глобальне освітлення - r2_ssao</text>
+	</string>
+	<string id="video_settings_name_r2_steep_parallax">
+		<text>Покращений рельєф поверхонь - r2_steep_parallax</text>
+	</string>
+	<string id="video_settings_name_dof_reload">
+		<text>Ефект глибині різкості при перезаряджанні зброї - r2_dof_reload</text>
+	</string>
+	<string id="video_settings_name_dof_zoom">
+		<text>Ефект глибині різкості при прицілюванні - g_dof_zoom</text>
+	</string>
+	<string id="video_settings_name_r2_rain_drops">
+		<text>Краплі на склі шолома - r2_rain_drops</text>
+	</string>
+	<string id="video_settings_name_r3_dynamic_wet_surfaces">
+		<text>Намокання поверхонь - r3_dynamic_wet_surfaces</text>
+	</string>
+	<string id="video_settings_name_r_sslr_enable">
+		<text>Віддзеркалення - r2_reflections</text>
+	</string>
+	<string id="video_settings_name_tessellation">
+		<text>Теселяція - r4_enable_tessellation</text>
+	</string>
+	<string id="video_settings_name_r__smap_size">
+		<text>Роздільна здатність карти тіней - r__smap_size</text>
+	</string>
+	<string id="video_settings_name_mt_texload">
+		<text>Багатопоточне завантаження текстур - r_mt_texload</text>
+	</string>
+	<string id="video_settings_name_fov">
+		<text>Кут огляду - fov</text>
+	</string>
+	<string id="video_settings_name_hud_fov">
+		<text>Кут огляду ГГ - hud_fov</text>
+	</string>
+	<string id="video_settings_name_3d_scopes_fps_factor">
+		<text>FPS у 3D прицілах - g_3d_scopes_fps_factor</text>
+	</string>
+
+	<string id="video_settings_desc_cam_inert">
+		<text>Ця опція регулює ступінь інерції точки огляду гравця. Чим вона вище, тим сильніше буде розгойдуватись точка огляду підчас ходьби та бігу, при ударах, а також сильнішим буде ефект "ведення" прицілу коли вичерпано запас витривалості. 
+		\nУВАГА! Не всім подобається такий ефект, більш того, подекуди він може викликати нудоту, тож якщо ви не певні у своєму виборі - краще виставте значення на 0.</text>
+	</string>
+	<string id="video_settings_desc_detail_density">
+		<text>Ця опція регулює наскільки щільно один до одного малюються кущики трави. Чим далі вправо повзунок, тим юлижче одне до одного малюються элементи трави і гусітша вона буде. 
+		\nУВАГА! Надмірна щільність трави призводить до великих просадок FPS. Регулюйте параметр поступово з невеликим кроком, кожного разу перевіряючи результат у грі.</text>
+	</string>
+	<string id="video_settings_desc_detail_distance">
+		<text>Опція регулює максимальну відстань на якій ще малюється трава. Чим далі повзунок, тим далі край межі малювання трави. Регулювання у діапазоні від 48 (стандартна дальність) до 240 метрів. 
+		\nУВАГА! Навантаження на відеокарту збіьшується у геометричній прогресії зі збільшенням радіусу малювання. Більш-менш прйнятні значення знаходяться у межах 150-200 метрів (середина шкали).</text>
+	</string>
+	<string id="video_settings_desc_r2_sun">
+		<text>Це налаштування вмикає тіні, що об'єкти відкидають від сонячного світла. На слабких ПК вимикання опції може дативідчутний приріст FPS.</text>
+	</string>
+	<string id="video_settings_desc_npc_torch">
+		<text>Це налаштування дозволяє опрацьовувати об'ємне світло ліхтариків NPC. а слабких ПК вимикання опції може дативідчутний приріст FPS вночі, у таборах з великою кількістю NPC.</text>
+	</string>
+	<string id="video_settings_desc_vsync">
+		<text>Це налаштування вмикає вертикальну синхронізацію, тобто синхронізує частоту кадрів з частотою оновлення монітору. Дозволяє усунути ефект горизонтального розриву кадру при різких рухах мишею, але може дещо знизити продуктивність.</text>
+	</string>
+	<string id="video_settings_desc_aa">
+		<text>Ця опція перемикає тип згладжування. Доступним є SMAA (Subpixel Morphological AntiAliasing).</text>
+	</string>
+	<string id="video_settings_desc_sun_shafts">
+		<text>Визначення типу сонячних променів. Оберіть за смаком.</text>
+	</string>
+	<string id="video_settings_desc_ssao">
+		<text>Увімкнення режиу глобального освітлення. Ця опція виконує розрахунок областей, що додатково затінюються геометрією моделей, роблячі освітлення більш наближеним до реального. 
+		На моделях з'являються напівтіні та затемнення від елементів спорядження, одягу, деталей машин, та інших невеликих частин геометрії.</text>
+	</string>
+	<string id="video_settings_desc_r2_steep_parallax">
+		<text>Ця опція регулює ефект покращеної рельєфності поверхонь з використанням алгоритму Steep parallax mapping. 
+		Цей алгоритм використовує для розрахунку рельєфності трасування промені у просторі карти висот, що дає більш реалістичний та якісний ефект.</text>
+	</string>
+	<string id="video_settings_desc_dof_reload">
+		<text>Увімкнення ефекту глибини поля зору - фокусування очей на зброї підчас перезаряджання.</text>
+	</string>
+	<string id="video_settings_desc_dof_zoom">
+		<text>Увімкнення ефекту глибини поля зору - розмивання країв екрану підчас прицілювання.</text>
+	</string>
+	<string id="video_settings_desc_r2_rain_drops">
+		<text>Ця опція вмикає появу крапель на склі масок шоломів та костюмів підчас дощу.</text>
+	</string>
+	<string id="video_settings_desc_r3_dynamic_wet_surfaces">
+		<text>Увімкнення намокання поверхонь підчас дощу.</text>
+	</string>
+	<string id="video_settings_desc_r_sslr_enable">
+		<text>Увімкнення віддзеркалень на воді та мокрих поверхнях (якщо увімкнене намокання).</text>
+	</string>
+	<string id="video_settings_desc_tessellation">
+		<text>Технологія що дозволяє збільшити деталізацію 3D-моделей шляхом розбиття багатокутників у полігоні на визначену кількість пов'язаних багатокутників.</text>
+	</string>
+	<string id="video_settings_desc_r__smap_size">
+		<text>Чим вища роздільна здатність карти тіней - тим більш чіткі тініть будь вдалині (більш ніж ~15-20 метрів від ГГ - за межею ближнього каскаду тіней). 
+		\nЩоб запобігти помітному погіршенню якості тіней на цій межі - рекомендовано встановити роздільну здатність не менш ніж 4096x4096. 
+		\nОпція суттєво впливає на продуктивність.</text>
+	</string>
+	<string id="video_settings_desc_mt_texload">
+		<text>Вмикає одночасне завантаження текстур декількома потоками. Може дещо скоротити час завантаження збереження при наявності SSD.</text>
+	</string>
+	<string id="video_settings_desc_fov">
+		<text>Має сенс збільшувати кут огляду для широких моніторів та в залежності від індивідуальних вподобань. Для більш точного налаштування використовуйте відповідну консольну команду.</text>
+	</string>
+	<string id="video_settings_desc_hud_fov">
+		<text>Кут огляду гравця. 
+		\nЯкщо значення, наприклад 0.45 і меньше (меньш ніж середина повзунка), то зброя буде ближче, якщо значення 0.65 та більше (більш ніж середина повзунка), то зброя у руках в грі буде здаватися більш віддаленою. 
+		\nМає сенс індивідуально налаштовувати для широких мониторів та в залежності від FOV.</text>
+	</string>
+	<string id="video_settings_desc_3d_scopes_fps_factor">
+		<text>Налаштування регулює який за чергою кадр будет відрендерено у 3D прицілі. За замовчуванням - кожен другий. Якщо його збільшити - FPS у грі збільшиться, але буде знижено FPS у 3D прицілі.</text>
+	</string>	
+	
+	<string id="game_object_throw_drop">
+	    <text>Відкинути [$$ACTION_USE$$]\n Відпустити [$$ACTION_ADDITIONAL_ACTION$$]+[$$ACTION_USE$$]</text>
+    </string>
+	<string id="hands_not_free">
+	    <text>Руки зайняті</text>
+    </string>
+	<string id="no_place_available">
+	    <text>Немає місця</text>
+    </string>
+	
+	<string id="gun_not_jammed">
+		<text>Затримку усунено</text>
+	</string>
+	
+	<string id="st_next_ammo_type">
+		<text>Зарядити</text>
+	</string>
+	<string id="st_load_ammo_type">
+		<text>зарядити</text>
+	</string>
+	
+	<string id="st_damage">
+		<text>Пошкодження:</text>
+	</string>
+	<string id="st_bullet_speed">
+		<text>Дульна швидкість:</text>
+	</string>	
+	<string id="st_fire_distance">
+		<text>Ефективна дистанція:</text>
+	</string>
+	<string id="st_rpm">
+		<text>Швидкострільність:</text>
+	</string>
+	<string id="st_dispersion">
+		<text>Розкид:</text>
+	</string>	
+	<string id="st_bulkiness">
+		<text>Громіздкість:</text>
+	</string>
+	<string id="st_recoil">
+		<text>Віддача:</text>
+	</string>
+	<string id="st_aim_time">
+		<text>Час вкладання:</text>
+	</string>	
+	<string id="st_aiming_controllability">
+		<text>Керованість у прицілюванні:</text>
+	</string>	
+	<string id="st_ammo_mag_size">
+		<text>Обсяг магазину:</text>
+	</string>		
+	<string id="st_weapon_dec">
+		<text>Зношування зброї:</text>
+	</string>
+	<string id="st_resource">
+		<text>Ресурс:</text>
+	</string>
+	<string id="st_ap">
+		<text>Бронебійність:</text>
+	</string>
+	<string id="st_buck_count">
+		<text>Кількість шротин:</text>
+	</string>
+	
+	<string id="st_grenade_launcher_allowed">
+		<text>Кріплення гранатомету:</text>
+	</string>
+	<string id="st_laser_allowed">
+		<text>Кріплення ЛЦВ:</text>
+	</string>
+	<string id="st_flashlight_allowed">
+		<text>Кріплення ліхтаря:</text>
+	</string>	
+	
+	<string id="st_compatible_ammo">
+		<text>набої:</text>
+	</string>
+	<string id="st_compatible_magazine">
+		<text>магазини:</text>
+	</string>
+	<string id="st_compatible_addon">
+		<text>обвіси:</text>
+	</string>
+	<string id="st_current_ammo_type">
+		<text>Заряджено:</text>
+	</string>
+	<string id="st_not_loaded">
+		<text>[не заряджено]</text>
+	</string>
+	<string id="st_current_scope">
+		<text>Оптика:</text>
+	</string>
+	<string id="st_inbuild_helmet">
+		<text>Вбудований шолом</text>
+	</string>
+	<string id="st_cells_available">
+		<text>Місткість підсумків:</text>
+	</string>
+	<string id="st_installed_plate">
+		<text>Бронеплита:</text>
+	</string>	
+	<string id="st_scope_zoom">
+		<text>кратність</text>
+	</string>
+	<string id="st_scope_night_vision">
+		<text>нічне бачення</text>
+	</string>
+	<string id="st_scope_vision_present">
+		<text>захоплення цілі</text>
+	</string>
+	<string id="st_scope_range_meter">
+		<text>далекомір</text>
+	</string>	
+	<string id="st_yes">
+		<text>так</text>
+	</string>
+	<string id="st_no">
+		<text>ні</text>
+	</string>
+	<string id="ui_inv_portions_count">
+		<text>Порцій</text>
+	</string>
+	<string id="ui_inv_max_power">
+		<text>Макс. витривалість</text>
+	</string>
+	<string id="st_power_level">
+		<text>Заряд батареї</text>
+	</string>	
+	<string id="st_charge">
+		<text>зарядити</text>
+	</string>
+	<string id="st_power_ttl">
+		<text>Час роботи</text>
+	</string>	
+	<string id="st_time_hour">
+		<text>год.</text>
+	</string>
+	<string id="st_time_minute">
+		<text>хв.</text>
+	</string>
+	<string id="st_time_second">
+		<text>сек.</text>
+	</string>	
+	
+	<string id="st_influence_header">
+		<text>миттєвий ефект:</text>
+	</string>
+	<string id="st_boost_header">
+		<text>тимчасовий ефект:</text>
+	</string>
+	<string id="ui_inv_boost_time">
+		<text>тривалість</text>
+	</string>	
+
+	<string id="st_disassemble">
+		<text>розібрати</text>
+	</string>
+	<string id="st_detail_parts">
+		<text>складові при розбиранні:</text>
+	</string>
+	<string id="st_required_tools">
+		<text>інструмент для розбирання/ремонту:</text>
+	</string>
+	<string id="st_repair_items">
+		<text>матеріали для ремонту:</text>
+	</string>
+
+	<string id="st_repair_condition_gain">
+		<text>відновлює стану:</text>
+	</string>
+	<string id="st_repair_condition_threshold">
+		<text>мінімальний стан:</text>
+	</string>
+	<string id="st_repair_count">
+		<text>кількість використань:</text>
+	</string>	
+	
+	<string id="ui_inv_move_all_from_ruck">
+		<text>Викласти все з рюкзака</text>
+	</string>
+	<string id="st_volume">
+		<text>обсяг</text>
+	</string>
+	
+	<string id="st_pda_change_spot_hint">
+		<text>Змінити текст мітки</text>
+	</string>
+	<string id="st_pda_delete_spot">
+		<text>Видалити мітку</text>
+	</string>
+
+	<string id="st_move">
+		<text>перенести</text>
+	</string>
+	<string id="st_move_all">
+		<text>перенести усе</text>
+	</string>
+
+	<string id="st_move_to_slot_0">
+		<text>у ножни</text>
+	</string>
+	<string id="st_move_to_slot_1">
+		<text>на плече</text>
+	</string>
+	<string id="st_attach_addon_to_item_in_slot_1">
+		<text>встановити %s на %s на плечі</text>
+	</string>
+	<string id="st_move_to_slot_2">
+		<text>за спину</text>
+	</string>
+	<string id="st_attach_addon_to_item_in_slot_2">
+		<text>встановити %s на %s за спиною</text>
+	</string>
+	<string id="st_move_to_slot_3">
+		<text>у підсумок</text>
+	</string>
+	<string id="st_move_to_slot_4">
+		<text>у кобуру</text>
+	</string>
+	<string id="st_attach_addon_to_item_in_slot_4">
+		<text>встановити %s на %s у кобурі</text>
+	</string>
+	<string id="st_attach_addon_to_item_in_slot_18">
+		<text>встановити %s у %s</text>
+	</string>	
+
+	<string id="st_move_to_slot_7">
+		<text>екіпірувати</text>
+	</string>
+	<string id="st_move_to_slot_8">
+		<text>екіпірувати</text>
+	</string>
+	<string id="st_move_to_slot_9">
+		<text>на голову</text>
+	</string>
+	<string id="st_move_to_slot_10">
+		<text>у підсумок</text>
+	</string>
+	<string id="st_move_to_slot_11">
+		<text>надягнути</text>
+	</string>
+	
+	<string id="st_attach_addon_to_item_in_slot_12">
+		<text>встановити %s на %s у кишені 1</text>
+	</string>
+	<string id="st_attach_addon_to_item_in_slot_13">
+		<text>встановити %s на %s у кишені 2</text>
+	</string>	
+	<string id="st_attach_addon_to_item_in_slot_14">
+		<text>встановити %s на %s у кишені 3</text>
+	</string>		
+	<string id="st_attach_addon_to_item_in_slot_15">
+		<text>встановити %s на %s у кишені 4</text>
+	</string>	
+	
+	<string id="st_move_to_slot_16">
+		<text>надягнути</text>
+	</string>	
+	<string id="st_move_to_slot_17">
+		<text>надягнути</text>
+	</string>	
+	<string id="st_move_to_slot_18">
+		<text>надягнути</text>
+	</string>		
+	
+	<string id="st_to_quick_slot">
+		<text>до кишені</text>
+	</string>
+	<string id="st_move_to_vest">
+		<text>до розгрузки</text>
+	</string>
+	
+	<string id="kb_cam_1">
+		<text>Вид від першої особи</text>
+	</string>
+	<string id="kb_cam_2">
+		<text>Вид від третьої особи</text>
+	</string>
+	<string id="kb_cam_3">
+		<text>Вид від третьої особи (вільна камера)</text>
+	</string>
+
+	<string id="inventory_item_use_or_drag">
+		<text>Підняти [$$ACTION_USE$$] \n перетягнути [SHIFT+$$ACTION_USE$$]</text>
+	</string>
+	<string id="game_object_drag">
+		<text>Перетягнути [$$ACTION_ADDITIONAL_ACTION$$]+[$$ACTION_USE$$]</text>
+	</string>
+
+	<string id="st_press_any_key">
+		<text>Натисніть будь-яку клавішу щоб перейти до гри</text>
+	</string>
+	
+	<string id="ui_st_no_power">
+		<text>battery low</text>
+	</string>
+	
+	<string id="ui_st_donate">
+		<text>Подарувати [D]</text>
+	</string>
+	
+	<string id="st_armor_header">
+		<text>Бронезахист:</text>
+	</string>	
+	
+	<string id="st_armor_class">
+		<text>клас</text>
+	</string>
+	
+	<string id="st_armor_head">
+		<text>Голова</text>
+	</string>
+	<string id="st_armor_jav">
+		<text>Щелепа</text>
+	</string>
+	<string id="st_armor_neck">
+		<text>Шия</text>
+	</string>
+	<string id="st_armor_clavicle">
+		<text>Ключиці</text>
+	</string>
+	<string id="st_armor_spine2">
+		<text>Груди верх</text>
+	</string>
+	<string id="st_armor_spine1">
+		<text>Груди низ</text>
+	</string>
+	<string id="st_armor_spine">
+		<text>Живіт</text>
+	</string>
+	<string id="st_armor_pelvis">
+		<text>Таз</text>
+	</string>
+	<string id="st_armor_upperarm">
+		<text>Плечі</text>
+	</string>
+	<string id="st_armor_forearm">
+		<text>Передпліччя</text>
+	</string>
+	<string id="st_armor_hand">
+		<text>Долоні</text>
+	</string>
+	<string id="st_armor_thigh">
+		<text>Стегна</text>
+	</string>
+	<string id="st_armor_calf">
+		<text>Литки</text>
+	</string>
+	<string id="st_armor_foot">
+		<text>Стопи</text>
+	</string>
+	<string id="st_armor_toe">
+		<text>Пальці ніг</text>
+	</string>	
+	<string id="st_armor_hit_fraction">
+		<text>Заброньова травма</text>
+	</string>		
+	
+	<string id="st_mag_full">
+		<text>••••</text>
+	</string>	
+	<string id="st_mag_empty">
+		<text>°°°°</text>
+	</string>	
+	<string id="st_mag_quarter_empty">
+		<text>•••°</text>
+	</string>	
+	<string id="st_mag_quarter_full">
+		<text>•°°°</text>
+	</string>	
+	<string id="st_mag_half_full">
+		<text>••°°</text>
+	</string>		
+	
+	<string id="st_gl_firemode">
+		<text>ПГ</text>
+	</string>	
+	
+	<string id="st_power_consumption">
+		<text>Енергоспоживання</text>
+	</string>	
+	<string id="st_power_consumption_units">
+		<text>мА</text>
+	</string>	
+	<string id="st_power_capacity">
+		<text>Ємність АКБ</text>
+	</string>	
+	<string id="st_power_capacity_units">
+		<text>мА*год</text>
+	</string>	
+	
+	<string id="st_safehouse">
+		<text>Безпечна зона</text>
+	</string>
+	<string id="st_safehouse_in">
+		<text>Ви знаходитесь у безпечній зоні. \nТут можна зберегти гру.</text>
+	</string>	
+	<string id="st_safehouse_out">
+		<text>Ви вийшли з безпечної зони. \nЗбереження гри неможливе.</text>
+	</string>	
+	
+	<string id="inventory_container_use_or_take">
+		<text>Обшукати [$$ACTION_USE$$] \nПідібрати [$$ACTION_ADDITIONAL_ACTION$$]+[$$ACTION_USE$$]</text>
+	</string>
+	
+	<string id="st_backpack_dropped">
+		<text>Рюкзак скинуто</text>
+	</string>
+	<string id="st_quick_drop">
+		<text>Система швидкого скидання</text>
+	</string>
+	<string id="st_containment">
+		<text>Вміст:</text>
+	</string>
+	
+	<string id="st_exo_factor">
+		<text>Посилення</text>
+	</string>
+	<string id="st_power_loss">
+		<text>Втрата сил</text>
+	</string>	
+	
+	<string id="st_power_descr">
+		<text>Батарея костюму:</text>
+	</string>	
+	
+	<string id="st_detect_radius">
+		<text>Радіус визначення:</text>
+	</string>		
+</string_table>

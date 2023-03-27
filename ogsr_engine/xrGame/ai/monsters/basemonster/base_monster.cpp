@@ -380,6 +380,8 @@ void CBaseMonster::Die(CObject* who)
 
     if (m_controlled)
         m_controlled->on_die();
+
+    TrySpawnInventoryItem();
 }
 
 // void CBaseMonster::Hit(float P,Fvector &dir,CObject*who,s16 element,Fvector p_in_object_space,float impulse, ALife::EHitType hit_type)
@@ -731,7 +733,7 @@ CParticlesObject* CBaseMonster::PlayParticles(const shared_str& name, const Fvec
     CParticlesObject* ps = CParticlesObject::Create(name.c_str(), auto_remove);
 
     // вычислить позицию и направленность партикла
-    Fmatrix matrix;
+    Fmatrix matrix{};
 
     matrix.identity();
     matrix.k.set(dir);
@@ -983,7 +985,7 @@ float CBaseMonster::get_screen_space_coverage_diagonal()
 {
     Fbox b = Visual()->getVisData().box;
 
-    Fmatrix xform;
+    Fmatrix xform{};
     xform.mul(Device.mFullTransform, XFORM());
     Fvector2 mn = {flt_max, flt_max}, mx = {flt_min, flt_min};
 
@@ -1003,4 +1005,44 @@ float CBaseMonster::get_screen_space_coverage_diagonal()
 
     float const average_diagonal = _sqrt(width * height);
     return average_diagonal;
+}
+
+void CBaseMonster::TrySpawnInventoryItem()
+{
+    if (!m_item_section)
+        return;
+
+    if (m_item_section && m_item_section[0])
+    {
+        string128 item;
+        int count = _GetItemCount(m_item_section);
+        for (int i = 0; i < count; i += 2)
+        {
+            _GetItem(m_item_section, i, item);
+            float spawn_prob = m_spawn_probability;
+            if (i + 1 < count)
+            {
+                string128 tmp;
+                spawn_prob = atof(_GetItem(m_item_section, i + 1, tmp));
+            }
+            float probability = Random.randF();
+            if (probability < spawn_prob || fsimilar(spawn_prob, 1.f))
+            {
+                CSE_Abstract* object = Level().spawn_item(item, Position(), ai_location().level_vertex_id(), ID(), true);
+                CSE_ALifeObject* alife_object = smart_cast<CSE_ALifeObject*>(object);
+                if (alife_object)
+                    alife_object->m_flags.set(CSE_ALifeObject::flCanSave, TRUE);
+
+                {
+                    NET_Packet P;
+                    object->Spawn_Write(P, TRUE);
+                    Level().Send(P, net_flags(TRUE));
+                    F_entity_Destroy(object);
+                }
+                // Msg("~ TrySpawnInventoryItem - Monster [%s] spawn monster part [%s] with probability [%.4f] | spawn prob [%.4f]", cName().c_str(), item, probability,
+                // spawn_prob);
+                break;
+            }
+        }
+    }
 }

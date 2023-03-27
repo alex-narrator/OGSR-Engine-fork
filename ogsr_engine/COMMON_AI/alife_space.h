@@ -139,6 +139,14 @@ enum EWeaponAddonStatus
     eAddonAttachable = 2 //можно присоединять
 };
 
+// статус джерела живлення
+enum EPowerSourceStatus
+{
+    ePowerSourceDisabled = 0, // без джерела живлення
+    ePowerSourcePermanent = 1, // незнімне джерело
+    ePowerSourceAttachable = 2 // від'ємне джерело
+};
+
 IC EHitType g_tfString2HitType(LPCSTR caHitType)
 {
     if (!stricmp(caHitType, "burn"))

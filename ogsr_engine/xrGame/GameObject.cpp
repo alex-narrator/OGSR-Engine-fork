@@ -486,9 +486,11 @@ void CGameObject::spawn_supplies()
 
     LPCSTR N, V;
     float p;
-    bool bScope = false;
-    bool bSilencer = false;
-    bool bLauncher = false;
+    bool bScope{}, bSilencer{}, bLauncher{}, bLaser{}, bFlashlight{}, bStock{}, bExtender{}, bForend{};
+
+    u32 cur_scope{}, cur_silencer{}, cur_launcher{}, cur_laser{}, cur_flashlight{}, cur_stock{}, cur_extender{}, cur_forend{},
+
+        cur_ammo_type{};
 
     for (u32 k = 0, j; spawn_ini()->r_line("spawn", k, &N, &V); k++)
     {
@@ -515,6 +517,31 @@ void CGameObject::spawn_supplies()
             bScope = (NULL != strstr(V, "scope"));
             bSilencer = (NULL != strstr(V, "silencer"));
             bLauncher = (NULL != strstr(V, "launcher"));
+            bLaser = (NULL != strstr(V, "laser"));
+            bFlashlight = (NULL != strstr(V, "flashlight"));
+            bStock = (NULL != strstr(V, "stock"));
+            bExtender = (NULL != strstr(V, "extender"));
+            bForend = (NULL != strstr(V, "forend"));
+            // preloaded ammo type
+            if (NULL != strstr(V, "ammo="))
+                cur_ammo_type = (u32)atof(strstr(V, "ammo=") + 5);
+            // custom multi-addon to install
+            if (NULL != strstr(V, "scope="))
+                cur_scope = (u32)atof(strstr(V, "scope=") + 6);
+            if (NULL != strstr(V, "silencer="))
+                cur_silencer = (u32)atof(strstr(V, "silencer=") + 9);
+            if (NULL != strstr(V, "launcher="))
+                cur_launcher = (u32)atof(strstr(V, "launcher=") + 9);
+            if (NULL != strstr(V, "laser="))
+                cur_laser = (u32)atof(strstr(V, "laser=") + 6);
+            if (NULL != strstr(V, "flashlight="))
+                cur_flashlight = (u32)atof(strstr(V, "flashlight=") + 11);
+            if (NULL != strstr(V, "stock="))
+                cur_stock = (u32)atof(strstr(V, "stock=") + 6);
+            if (NULL != strstr(V, "extender="))
+                cur_extender = (u32)atof(strstr(V, "extender=") + 9);
+            if (NULL != strstr(V, "forend="))
+                cur_forend = (u32)atof(strstr(V, "forend=") + 7);
         }
         for (u32 i = 0; i < j; ++i)
             if (::Random.randF(1.f) < p)
@@ -528,12 +555,48 @@ void CGameObject::spawn_supplies()
                 CSE_ALifeItemWeapon* W = smart_cast<CSE_ALifeItemWeapon*>(A);
                 if (W)
                 {
+                    W->ammo_type = cur_ammo_type;
+
                     if (W->m_scope_status == CSE_ALifeItemWeapon::eAddonAttachable)
+                    {
                         W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonScope, bScope);
+                        W->m_cur_scope = cur_scope;
+                    }
                     if (W->m_silencer_status == CSE_ALifeItemWeapon::eAddonAttachable)
+                    {
                         W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonSilencer, bSilencer);
+                        W->m_cur_silencer = cur_silencer;
+                    }
                     if (W->m_grenade_launcher_status == CSE_ALifeItemWeapon::eAddonAttachable)
+                    {
                         W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, bLauncher);
+                        W->m_cur_glauncher = cur_launcher;
+                    }
+                    if (W->m_laser_status == CSE_ALifeItemWeapon::eAddonAttachable)
+                    {
+                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonLaser, bLaser);
+                        W->m_cur_laser = cur_laser;
+                    }
+                    if (W->m_flashlight_status == CSE_ALifeItemWeapon::eAddonAttachable)
+                    {
+                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonFlashlight, bFlashlight);
+                        W->m_cur_flashlight = cur_flashlight;
+                    }
+                    if (W->m_stock_status == CSE_ALifeItemWeapon::eAddonAttachable)
+                    {
+                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonStock, bStock);
+                        W->m_cur_stock = cur_stock;
+                    }
+                    if (W->m_extender_status == CSE_ALifeItemWeapon::eAddonAttachable)
+                    {
+                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonExtender, bExtender);
+                        W->m_cur_extender = cur_extender;
+                    }
+                    if (W->m_forend_status == CSE_ALifeItemWeapon::eAddonAttachable)
+                    {
+                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonForend, bForend);
+                        W->m_cur_forend = cur_forend;
+                    }
                 }
 
                 NET_Packet P;
@@ -1105,3 +1168,37 @@ void CGameObject::FeelTouchAddonsRelcase(CObject* O)
         });
     }
 }
+
+#include "entity_alive.h"
+#include "InventoryOwner.h"
+#include "CharacterPhysicsSupport.h"
+#include "PHMovementControl.h"
+float CGameObject::GetTotalMass(CObject* object, float k) const
+{
+    float mass_f = 0.f;
+
+    CEntityAlive* EA = smart_cast<CEntityAlive*>(object);
+    if (EA)
+    {
+        if (EA->character_physics_support())
+            mass_f = EA->character_physics_support()->movement()->GetMass();
+        else
+            mass_f = EA->GetMass();
+    }
+    else
+    {
+        CPhysicsShellHolder* sh = smart_cast<CPhysicsShellHolder*>(object);
+        if (sh)
+            mass_f = sh->GetMass() * k; // физмасса таскаемых объектов окружения великовата для прямого учёта в нагруженность актора
+
+        PIItem itm = smart_cast<PIItem>(object);
+        if (itm)
+            mass_f = itm->Weight();
+    }
+
+    CInventoryOwner* io = smart_cast<CInventoryOwner*>(object);
+    if (io)
+        mass_f += io->GetCarryWeight();
+
+    return mass_f;
+};

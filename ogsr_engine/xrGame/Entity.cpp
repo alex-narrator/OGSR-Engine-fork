@@ -19,8 +19,8 @@
 #include "ai_space.h"
 #include "memory_space.h"
 
-#define BODY_REMOVE_TIME 600000
-#define FORGET_KILLER_TIME 180
+constexpr auto BODY_REMOVE_TIME = 600000;
+constexpr auto FORGET_KILLER_TIME = 180;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -108,7 +108,7 @@ void CEntity::Hit(SHit* pHDS)
     VERIFY(pHDS->dir.magnitude() > EPS);
 
     // convert impulse into local coordinate system
-    Fmatrix mInvXForm;
+    Fmatrix mInvXForm{};
     mInvXForm.invert(XFORM());
     mInvXForm.transform_dir(vLocalDir, pHDS->dir);
     vLocalDir.invert();
@@ -128,6 +128,12 @@ void CEntity::Hit(SHit* pHDS)
     if (Local() && !g_Alive() && !AlreadyDie() && (m_killer_id == ALife::_OBJECT_ID(-1)))
     {
         KillEntity(pHDS->whoID);
+        auto pK = smart_cast<IKinematics*>(Visual());
+        if (pHDS->bone() == pK->LL_BoneID("bip01_neck") || is_bone_head(*pK, pHDS->bone()) || is_backstab(*pK, pHDS))
+        {
+            b_disable_death_sound = true;
+            // Msg("%s disable death sound for %s", __FUNCTION__, cName().c_str());
+        }
     }
     // must be last!!! @slipch
     inherited::Hit(pHDS);
@@ -361,4 +367,59 @@ void CEntity::ChangeTeam(int team, int squad, int group)
     // add to new team
     Level().seniority_holder().team(g_Team()).squad(g_Squad()).group(g_Group()).register_member(this);
     on_after_change_team();
+}
+
+bool CEntity::find_in_parents(const u16 bone_to_find, const u16 from_bone, IKinematics& ca) const
+{
+    const u16 root = ca.LL_GetBoneRoot();
+    for (u16 bi = from_bone; bi != root && bi != BI_NONE;)
+    {
+        const CBoneData& bd = ca.LL_GetData(bi);
+        if (bi == bone_to_find)
+            return true;
+        bi = bd.GetParentID();
+    }
+    return false;
+}
+
+bool CEntity::is_bone_head(IKinematics& K, u16 bone) const
+{
+    return (bone != BI_NONE) && /*K.LL_BoneID("bip01_neck") == bone ||*/
+        find_in_parents(K.LL_BoneID("bip01_head"), bone, K);
+}
+
+bool CEntity::is_backstab_bone(IKinematics& K, u16 bone)
+{
+    return (bone != BI_NONE) &&
+        (bone == K.LL_BoneID("bip01_head") || bone == K.LL_BoneID("bip01_neck") || bone == K.LL_BoneID("bip01_spine") || bone == K.LL_BoneID("bip01_spine1") ||
+         bone == K.LL_BoneID("bip01_spine2") || bone == K.LL_BoneID("bip01_l_clavicle") || bone == K.LL_BoneID("bip01_r_clavicle"));
+}
+
+bool CEntity::is_backstab(IKinematics& K, SHit* pHDS)
+{
+    bool b_stab_hit = pHDS->type() == ALife::eHitTypeWound || pHDS->type() == ALife::eHitTypeWound_2;
+    if (b_stab_hit && is_backstab_bone(K, pHDS->bone()) && is_from_behind(pHDS->direction()))
+    {
+        return true;
+    }
+    return false;
+    ;
+}
+
+bool CEntity::is_from_behind(const Fvector& direction) const
+{
+    // convert impulse into local coordinate system
+    Fmatrix mInvXForm{};
+    mInvXForm.invert(XFORM());
+    Fvector vLocalDir;
+    mInvXForm.transform_dir(vLocalDir, direction);
+    vLocalDir.invert();
+    Fvector a = {0, 0, 1};
+    float res = a.dotproduct(vLocalDir);
+    if (res < -0.707)
+    {
+        Msg("%s for entity %s", __FUNCTION__, cName().c_str());
+        return true;
+    }
+    return false;
 }

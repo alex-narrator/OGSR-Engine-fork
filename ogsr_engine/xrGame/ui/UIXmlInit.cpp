@@ -517,6 +517,10 @@ bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, const char* path, int index
     tmp = xml_doc.ReadAttribInt(path, index, "highlight_all_cells", 0);
     pWnd->SetHighlightAllCells(tmp != 0);
 
+    // вишиковувати іконки у драгдроп лістах зверху вниз по колонкам
+    tmp = xml_doc.ReadAttribInt(path, index, "line_up_in_columns", 0);
+    pWnd->SetLineUpInColumns(tmp != 0);
+
     pWnd->back_color = GetColor(xml_doc, path, index, 0xFFFFFFFF);
 
     if (xr_strlen(path))
@@ -1095,15 +1099,21 @@ bool CUIXmlInit::InitAnimatedStatic(CUIXml& xml_doc, const char* path, int index
 bool CUIXmlInit::InitTexture(CUIXml& xml_doc, const char* path, int index, IUIMultiTextureOwner* pWnd)
 {
     string256 buf;
-    shared_str texture;
+    shared_str texture, shader;
 
     strconcat(sizeof(buf), buf, path, ":texture");
     if (xml_doc.NavigateToNode(buf))
+    {
         texture = xml_doc.Read(buf, index, NULL);
+        shader = xml_doc.ReadAttrib(buf, index, "shader", NULL);
+    }
 
     if (!!texture)
     {
-        pWnd->InitTexture(*texture);
+        if (!!shader)
+            smart_cast<IUISingleTextureOwner*>(pWnd)->InitTextureEx(texture.c_str(), shader.c_str());
+        else
+            pWnd->InitTexture(texture.c_str());
         return true;
     }
 

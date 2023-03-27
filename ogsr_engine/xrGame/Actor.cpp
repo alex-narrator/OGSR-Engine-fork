@@ -22,6 +22,11 @@
 #include "SleepEffector.h"
 #include "character_info.h"
 #include "CustomOutfit.h"
+#include "Helmet.h"
+#include "Warbelt.h"
+#include "Vest.h"
+#include "Torch.h"
+#include "NightVisionDevice.h"
 #include "actorcondition.h"
 #include "UIGameCustom.h"
 
@@ -53,7 +58,7 @@
 #include "material_manager.h"
 #include "IColisiondamageInfo.h"
 #include "ui/UIMainIngameWnd.h"
-#include "ui/UIArtefactPanel.h"
+#include "ui/UIPanels.h"
 #include "map_manager.h"
 #include "GameTaskManager.h"
 #include "actor_memory.h"
@@ -64,6 +69,7 @@
 #include "location_manager.h"
 #include "PHCapture.h"
 #include "CustomDetector.h"
+#include "InventoryContainer.h"
 
 // Tip for action for object we're looking at
 constexpr const char* m_sCarCharacterUseAction = "car_character_use";
@@ -73,6 +79,10 @@ constexpr const char* m_sDeadCharacterUseOrDragAction = "dead_character_use_or_d
 constexpr const char* m_sInventoryItemUseAction = "inventory_item_use";
 constexpr const char* m_sInventoryItemUseOrDragAction = "inventory_item_use_or_drag";
 constexpr const char* m_sGameObjectDragAction = "game_object_drag";
+
+constexpr const char* m_sInventoryContainerUseOrTakeAction = "inventory_container_use_or_take"; // обшукати/підібрати контейнер
+constexpr const char* m_sInventoryBoxUseAction = "inventory_box_use"; // обшукати скриньку
+constexpr const char* m_sGameObjectThrowDropAction = "game_object_throw_drop"; // Відкинути/відпустити предмет
 
 const u32 patch_frames = 50;
 const float respawn_delay = 1.f;
@@ -89,7 +99,7 @@ static Fvector vFootExt;
 
 Flags32 psActorFlags = {AF_3D_SCOPES | AF_KEYPRESS_ON_START | AF_CAM_COLLISION | AF_AI_VOLUMETRIC_LIGHTS | AF_DOF_RELOAD};
 
-static bool updated;
+static bool updated{};
 
 CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
 {
@@ -117,38 +127,7 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
     cameras[eacFreeLook] = xr_new<CCameraLook>(this);
     cameras[eacFreeLook]->Load("actor_free_cam");
 
-    cam_active = eacFirstEye;
-    fPrevCamPos = 0.0f;
-    vPrevCamDir.set(0.f, 0.f, 1.f);
-    fCurAVelocity = 0.0f;
-    // эффекторы
-    pCamBobbing = 0;
-    m_pSleepEffector = NULL;
-    m_pSleepEffectorPP = NULL;
-
-    r_torso.yaw = 0;
-    r_torso.pitch = 0;
-    r_torso.roll = 0;
-    r_torso_tgt_roll = 0;
-    r_model_yaw = 0;
-    r_model_yaw_delta = 0;
-    r_model_yaw_dest = 0;
-
-    b_DropActivated = 0;
-    f_DropPower = 0.f;
-
-    m_fRunFactor = 2.f;
-    m_fCrouchFactor = 0.2f;
-    m_fClimbFactor = 1.f;
-    m_fCamHeightFactor = 0.87f;
-
     m_fFallTime = s_fFallTime;
-    m_bAnimTorsoPlayed = false;
-
-    m_pPhysicsShell = NULL;
-
-    m_holder = NULL;
-    m_holderID = u16(-1);
 
 #ifdef DEBUG
     Device.seqRender.Add(this, REG_PRIORITY_LOW);
@@ -156,50 +135,15 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
 
     //разрешить использование пояса в inventory
     inventory().SetBeltUseful(true);
-
-    m_pPersonWeLookingAt = NULL;
-    m_pVehicleWeLookingAt = NULL;
-    m_pObjectWeLookingAt = NULL;
-    m_bPickupMode = false;
-
-    pStatGraph = NULL;
-
-    m_pActorEffector = NULL;
-
-    m_bZoomAimingMode = false;
-
-    m_sDefaultObjAction = nullptr;
-
-    m_fSprintFactor = 4.f;
-
-    m_pUsableObject = NULL;
+    inventory().SetVestUseful(true);
 
     m_anims = xr_new<SActorMotions>();
     m_vehicle_anims = xr_new<SActorVehicleAnims>();
-    m_entity_condition = NULL;
-    m_iLastHitterID = u16(-1);
-    m_iLastHittingWeaponID = u16(-1);
-    m_game_task_manager = NULL;
-    m_statistic_manager = NULL;
     //-----------------------------------------------------------------------------------
     m_memory = xr_new<CActorMemory>(this);
-    m_bOutBorder = false;
-    hit_probability = 1.f;
-    m_feel_touch_characters = 0;
     //-----------------------------------------------------------------------------------
 
     m_location_manager = xr_new<CLocationManager>(this);
-
-    m_fDrugPsyProtectionCoeff = 1.f;
-    m_fDrugRadProtectionCoeff = 1.f;
-
-    m_loaded_ph_box_id = 0;
-    updated = false;
-
-    // Alex ADD: for smooth crouch fix
-    CurrentHeight = 0.f;
-
-    hit_slowmo = 0.f;
 }
 
 CActor::~CActor()
@@ -277,7 +221,7 @@ void CActor::Load(LPCSTR section)
 
     // m_PhysicMovementControl: General
     // m_PhysicMovementControl->SetParent		(this);
-    Fbox bb;
+    Fbox bb{};
     Fvector vBOX_center, vBOX_size;
     // m_PhysicMovementControl: BOX
     vBOX_center = pSettings->r_fvector3(section, "ph_box2_center");
@@ -355,8 +299,6 @@ void CActor::Load(LPCSTR section)
     m_fRun_StrafeFactor = READ_IF_EXISTS(pSettings, r_float, section, "run_strafe_coef", 1.0f);
 
     m_hit_slowmo_jump = READ_IF_EXISTS(pSettings, r_bool, section, "hit_slowmo_jump", false);
-
-    m_fExoFactor = 1.0f;
 
     m_fCamHeightFactor = pSettings->r_float(section, "camera_height_factor");
     character_physics_support()->movement()->SetJumpUpVelocity(m_fJumpSpeed);
@@ -450,6 +392,24 @@ void CActor::Load(LPCSTR section)
     CurrentHeight = CameraHeight();
 
     m_news_to_show = READ_IF_EXISTS(pSettings, r_u32, section, "news_to_show", NEWS_TO_SHOW);
+
+    if (pSettings->section_exist("actor_groggy"))
+    {
+        LPCSTR concussion_sect = "actor_groggy";
+        m_fGroggyTreshold = pSettings->r_float(concussion_sect, "treshold");
+        sndGroggy.create(pSettings->r_string(concussion_sect, "snd"), st_Effect, sg_SourceType);
+        m_GroggyEffector = pSettings->r_string(concussion_sect, "effector");
+    }
+
+    m_fThrowImpulse = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "throw_impulse", 5.0f);
+    m_fKickImpulse = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "kick_impulse", 250.f);
+    m_fKickPower = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "kick_power", .1f);
+    m_fHoldingDistance = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "holding_distance", .5f); // расстояние перед актором на котором находится удерживаемый предмет
+    clamp(m_fHoldingDistance, 0.0f, inventory().GetTakeDist());
+
+    m_uActiveItemInfoTTL = READ_IF_EXISTS(pSettings, r_u32, section, "active_item_info_ttl", 0);
+    m_uGearInfoTTL = READ_IF_EXISTS(pSettings, r_u32, section, "gear_info_ttl", 0);
+    dof_params_inventory = READ_IF_EXISTS(pSettings, r_fvector4, "features", "dof_inventory_params", (Fvector4{}));
 }
 
 void CActor::PHHit(SHit& H) { m_pPhysics_support->in_Hit(H, !g_Alive()); }
@@ -488,12 +448,6 @@ void CActor::Hit(SHit* pHDS)
     bool bPlaySound = true;
     if (!g_Alive())
         bPlaySound = false;
-
-    if (HDS.hit_type == ALife::eHitTypeRadiation)
-        HDS.power *= m_fDrugRadProtectionCoeff;
-
-    if (HDS.hit_type == ALife::eHitTypeTelepatic)
-        HDS.power *= m_fDrugPsyProtectionCoeff;
 
     if (!sndHit[HDS.hit_type].empty() && (ALife::eHitTypeTelepatic != HDS.hit_type))
     {
@@ -540,49 +494,36 @@ void CActor::Hit(SHit* pHDS)
             mstate_wishful &= ~mcSprint;
     }
 
-    HitMark(HDS.damage(), HDS.dir, HDS.who, HDS.bone(), HDS.p_in_bone_space, HDS.impulse, HDS.hit_type);
+	HitMark(&HDS);
 
-    float hit_power = HitArtefactsOnBelt(HDS.damage(), HDS.hit_type);
-
-    if (GodMode())
-    {
-        HDS.power = 0.0f;
-        //				inherited::Hit(0.f,dir,who,element,position_in_bone_space,impulse, hit_type);
-        inherited::Hit(&HDS);
-        return;
-    }
-    else
-    {
-        // inherited::Hit		(hit_power,dir,who,element,position_in_bone_space, impulse, hit_type);
-        HDS.power = hit_power;
-        inherited::Hit(&HDS);
-    }
+    HDS.power *= GodMode() ? 0.f : (1.f - GetArtefactsProtection(pHDS->hit_type));
+    inherited::Hit(&HDS);
 }
 
-void CActor::HitMark(float P, Fvector dir, CObject* who, s16 element, Fvector position_in_bone_space, float impulse, ALife::EHitType hit_type)
+void CActor::HitMark(SHit* pHDS)
 {
     // hit marker
-    if ((hit_type == ALife::eHitTypeFireWound || hit_type == ALife::eHitTypeWound_2) && g_Alive() && Local() && /*(this!=who) && */ (Level().CurrentEntity() == this))
+    if ((pHDS->type() == ALife::eHitTypeFireWound || pHDS->type() == ALife::eHitTypeWound_2) && g_Alive() && Local() && (Level().CurrentEntity() == this))
     {
-        HUD().Hit(0, P, dir);
+        HUD().Hit(0, pHDS->damage(), pHDS->direction());
 
         {
             CEffectorCam* ce = Cameras().GetCamEffector((ECamEffectorType)effFireHit);
             if (!ce)
             {
                 int id = -1;
-                Fvector cam_pos, cam_dir, cam_norm;
+                Fvector cam_pos, cam_dir, cam_norm, hit_dir{pHDS->direction()};
                 cam_Active()->Get(cam_pos, cam_dir, cam_norm);
                 cam_dir.normalize_safe();
-                dir.normalize_safe();
+                hit_dir.normalize_safe();
 
-                float ang_diff = angle_difference(cam_dir.getH(), dir.getH());
-                Fvector cp;
-                cp.crossproduct(cam_dir, dir);
+                float ang_diff = angle_difference(cam_dir.getH(), hit_dir.getH());
+                Fvector cp{};
+                cp.crossproduct(cam_dir, hit_dir);
                 bool bUp = (cp.y > 0.0f);
 
-                Fvector cross;
-                cross.crossproduct(cam_dir, dir);
+                Fvector cross{};
+                cross.crossproduct(cam_dir, hit_dir);
                 VERIFY(ang_diff >= 0.0f && ang_diff <= PI);
 
                 float _s1 = PI_DIV_8;
@@ -617,7 +558,7 @@ void CActor::HitMark(float P, Fvector dir, CObject* who, s16 element, Fvector po
 
                 string64 sect_name;
                 sprintf_s(sect_name, "effector_fire_hit_%d", id);
-                AddEffector(this, effFireHit, sect_name, P / 100.0f);
+                AddEffector(this, effFireHit, sect_name, pHDS->damage() / 100.0f);
             }
         }
     }
@@ -631,7 +572,7 @@ void CActor::HitSignal(float perc, Fvector& vLocalDir, CObject* who, s16 element
         if (character_physics_support()->movement()->Environment() == CPHMovementControl::peOnGround ||
             character_physics_support()->movement()->Environment() == CPHMovementControl::peAtWall)
         {
-            Fvector zeroV;
+            Fvector zeroV{};
             zeroV.set(0, 0, 0);
             character_physics_support()->movement()->SetVelocity(zeroV);
         }
@@ -661,35 +602,37 @@ void CActor::Die(CObject* who)
 {
     inherited::Die(who);
 
+ 	const auto& slots = inventory().m_slots;
+
+    for (u32 slot_idx = 0; slot_idx < slots.size(); ++slot_idx)
     {
-        xr_vector<CInventorySlot>::iterator I = inventory().m_slots.begin();
-        xr_vector<CInventorySlot>::iterator E = inventory().m_slots.end();
+        auto& item = slots[slot_idx].m_pIItem;
 
-        for (u32 slot_idx = 0; I != E; ++I, ++slot_idx)
+        if (slot_idx == inventory().GetActiveSlot())
         {
-            if (slot_idx == inventory().GetActiveSlot())
+            if (item)
             {
-                if ((*I).m_pIItem)
-                {
-                    (*I).m_pIItem->SetDropManual(TRUE);
-                }
-                continue;
+                item->SetDropManual(TRUE);
             }
-            else
-            {
-                CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>((*I).m_pIItem);
-                if (pOutfit)
-                    continue;
-            };
-            if ((*I).m_pIItem)
-                inventory().Ruck((*I).m_pIItem);
-        };
+            continue;
+        }
+        else
+        {
+            if (item == GetOutfit())
+                continue;
+            if (item == GetHelmet())
+                continue;
+            if (item == GetBackpack())
+                continue;
+        }
 
-        ///!!! чистка пояса
-        TIItemContainer& l_blist = inventory().m_belt;
-        while (!l_blist.empty())
-            inventory().Ruck(l_blist.front());
-    }
+        if (item)
+            inventory().Ruck(item);
+    };
+
+    ///!!! чистка пояса
+    inventory().DropBeltToRuck(true);
+    inventory().DropVestToRuck(true);
 
     cam_Set(eacFreeLook);
     mstate_wishful &= ~mcAnyMove;
@@ -721,7 +664,7 @@ void CActor::SwitchOutBorder(bool new_border_state)
 void CActor::g_Physics(Fvector& _accel, float jump, float dt)
 {
     // Correct accel
-    Fvector accel;
+    Fvector accel{};
     accel.set(_accel);
     hit_slowmo -= dt;
     if (hit_slowmo < 0)
@@ -778,15 +721,13 @@ float g_fov = 67.5f; // 75.0f - SWM
 
 float CActor::currentFOV()
 {
+    float current_fov = g_fov;
     const auto pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
 
     if (eacFirstEye == cam_active && pWeapon && pWeapon->IsZoomed() && (!pWeapon->ZoomTexture() || (!pWeapon->IsRotatingToZoom() && pWeapon->ZoomTexture())))
-        if (Core.Features.test(xrCore::Feature::ogse_wpn_zoom_system))
-            return atanf(tanf(g_fov * (0.5f * PI / 180)) / pWeapon->GetZoomFactor()) / (0.5f * PI / 180);
-        else
-            return pWeapon->GetZoomFactor() * 0.75f;
-    else
-        return g_fov;
+        current_fov /= pWeapon->GetZoomFactor();
+
+    return current_fov;
 }
 
 void CActor::UpdateCL()
@@ -834,12 +775,9 @@ void CActor::UpdateCL()
     {
         if (pWeapon->IsZoomed())
         {
-            float full_fire_disp = pWeapon->GetFireDispersion(true);
-
             CEffectorZoomInertion* S = smart_cast<CEffectorZoomInertion*>(Cameras().GetCamEffector(eCEZoom));
             if (S)
-                S->SetParams(full_fire_disp);
-
+                S->SetParams(pWeapon->GetControlInertionFactor());
             m_bZoomAimingMode = true;
         }
 
@@ -922,6 +860,34 @@ void CActor::UpdateCL()
             wpn_cond = wpn->GetCondition();
         shader_exports.set_actor_params(Fvector{this->conditions().GetHealth(), outfit_cond, wpn_cond});
     }
+
+    if (!sndGroggy._feedback())
+    {
+        RemoveEffector(this, effGroggy);
+    }
+
+    if (!m_uActiveItemInfoTTL)
+    {
+        m_bShowActiveItemInfo = true;
+    }
+    else if (m_bShowActiveItemInfo)
+    {
+        if (Device.dwTimeGlobal > m_uActiveItemInfoStartTime + m_uActiveItemInfoTTL)
+        {
+            m_bShowActiveItemInfo = false;
+        }
+    }
+    if (!m_uGearInfoTTL)
+    {
+        m_bShowGearInfo = true;
+    }
+    else if (m_bShowGearInfo)
+    {
+        if (Device.dwTimeGlobal > m_uGearInfoStartTime + m_uGearInfoTTL)
+        {
+            m_bShowGearInfo = false;
+        }
+    }
 }
 
 constexpr u32 TASKS_UPDATE_TIME = 1u;
@@ -964,8 +930,6 @@ void CActor::shedule_Update(u32 DT)
     }
 
     //обновление инвентаря
-    if (!updated)
-        inventory().RestoreBeltOrder();
     UpdateInventoryOwner(DT);
 
     static u32 tasks_update_time = 0;
@@ -1035,16 +999,10 @@ void CActor::shedule_Update(u32 DT)
 
         {
             //-----------------------------------------------------
-            mstate_wishful &= ~mcAccel;
             mstate_wishful &= ~mcLStrafe;
             mstate_wishful &= ~mcRStrafe;
-            mstate_wishful &= ~mcLLookout;
-            mstate_wishful &= ~mcRLookout;
             mstate_wishful &= ~mcFwd;
             mstate_wishful &= ~mcBack;
-            extern bool g_bAutoClearCrouch;
-            if (g_bAutoClearCrouch)
-                mstate_wishful &= ~mcCrouch;
             //-----------------------------------------------------
         }
     }
@@ -1096,7 +1054,7 @@ void CActor::shedule_Update(u32 DT)
         float bs = conditions().BleedingSpeed();
         if (bs > 0.6f)
         {
-            Fvector snd_pos;
+            Fvector snd_pos{};
             snd_pos.set(0, ACTOR_HEIGHT, 0);
             if (!m_BloodSnd._feedback())
                 m_BloodSnd.play_at_pos(this, snd_pos, sm_Looped | sm_2D);
@@ -1134,11 +1092,17 @@ void CActor::shedule_Update(u32 DT)
         auto pEntityAlive = smart_cast<CEntityAlive*>(RQ.O);
         auto ph_shell_holder = smart_cast<CPhysicsShellHolder*>(RQ.O);
 
+        auto capture = character_physics_support()->movement()->PHCapture();
+
         bool b_allow_drag = ph_shell_holder && ph_shell_holder->ActorCanCapture();
 
-        if (HUD().GetUI()->MainInputReceiver() || m_holder || character_physics_support()->movement()->PHCapture())
+        if (HUD().GetUI()->MainInputReceiver() || m_holder || !IsFreeHands())
         {
             m_sDefaultObjAction = nullptr;
+        }
+        else if (capture && capture->taget_object())
+        { // щось у руках
+            m_sDefaultObjAction = m_sGameObjectThrowDropAction;
         }
         else if (m_pUsableObject && m_pUsableObject->tip_text())
         {
@@ -1157,6 +1121,13 @@ void CActor::shedule_Update(u32 DT)
                 else
                     m_sDefaultObjAction = m_sDeadCharacterUseAction;
             }
+        }
+        else if (m_pInvBoxWeLookingAt)
+        {
+            if (smart_cast<CInventoryContainer*>(m_pInvBoxWeLookingAt))
+                m_sDefaultObjAction = m_sInventoryContainerUseOrTakeAction;
+            else
+                m_sDefaultObjAction = m_sInventoryBoxUseAction;
         }
         else if (m_pVehicleWeLookingAt)
         {
@@ -1180,19 +1151,19 @@ void CActor::shedule_Update(u32 DT)
     }
     else
     {
-        inventory().m_pTarget = NULL;
-        m_pPersonWeLookingAt = NULL;
+        inventory().m_pTarget = nullptr;
+        m_pPersonWeLookingAt = nullptr;
         m_sDefaultObjAction = nullptr;
-        m_pUsableObject = NULL;
-        m_pObjectWeLookingAt = NULL;
-        m_pVehicleWeLookingAt = NULL;
-        m_pInvBoxWeLookingAt = NULL;
+        m_pUsableObject = nullptr;
+        m_pObjectWeLookingAt = nullptr;
+        m_pVehicleWeLookingAt = nullptr;
+        m_pInvBoxWeLookingAt = nullptr;
     }
 
     //	UpdateSleep									();
 
-    //для свойст артефактов, находящихся на поясе
-    UpdateArtefactsOnBelt();
+	// для усіх предметів що впливають на параметри актора
+    UpdateItemsBoost();
     if (!m_holder)
         m_pPhysics_support->in_shedule_Update(DT);
 
@@ -1284,11 +1255,11 @@ void CActor::RenderText(LPCSTR Text, Fvector dpos, float* pdup, u32 color)
         return;
 
     CBoneInstance& BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(u16(m_head));
-    Fmatrix M;
+    Fmatrix M{};
     smart_cast<IKinematics*>(Visual())->CalculateBones();
     M.mul(XFORM(), BI.mTransform);
     //------------------------------------------------
-    Fvector v0, v1;
+    Fvector v0{}, v1{};
     v0.set(M.c);
     v1.set(M.c);
     Fvector T = Device.vCameraTop;
@@ -1385,7 +1356,7 @@ void CActor::OnItemDrop(CInventoryItem* inventory_item)
     CInventoryOwner::OnItemDrop(inventory_item);
 
     if (inventory_item->m_eItemPlace == eItemPlaceBelt)
-        UpdateArtefactPanel();
+        UpdateUIPanels(inventory_item->m_eItemPlace);
 }
 
 void CActor::OnItemDropUpdate()
@@ -1403,194 +1374,49 @@ void CActor::OnItemDropUpdate()
 void CActor::OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
     CInventoryOwner::OnItemRuck(inventory_item, previous_place);
-
-    if (previous_place == eItemPlaceBelt)
-        UpdateArtefactPanel();
+    UpdateUIPanels(previous_place);
 }
 void CActor::OnItemBelt(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
     CInventoryOwner::OnItemBelt(inventory_item, previous_place);
-
-    UpdateArtefactPanel();
+    UpdateUIPanels(previous_place);
 }
-
+void CActor::OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place)
+{
+    CInventoryOwner::OnItemVest(inventory_item, previous_place);
+    UpdateUIPanels(previous_place);
+}
 void CActor::OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
     CInventoryOwner::OnItemSlot(inventory_item, previous_place);
-
-    if (previous_place == eItemPlaceBelt)
-        UpdateArtefactPanel();
+    UpdateUIPanels(previous_place);
 }
 
-void CActor::UpdateArtefactPanel()
+void CActor::UpdateUIPanels(int place)
 {
-    if (Level().CurrentViewEntity() && Level().CurrentViewEntity() == this) //Оно надо вообще без мультиплеера?
-        HUD().GetUI()->UIMainIngameWnd->m_artefactPanel->InitIcons(inventory().m_belt);
-}
-
-void CActor::ApplyArtefactEffects(ActorRestoreParams& r, CArtefact* artefact)
-{
-    float k = (Core.Features.test(xrCore::Feature::af_zero_condition) && fis_zero(artefact->GetCondition())) ? 0.f : 1.f;
-
-    r.BleedingRestoreSpeed += artefact->m_fBleedingRestoreSpeed * k;
-    r.HealthRestoreSpeed += artefact->m_fHealthRestoreSpeed * k;
-    r.PowerRestoreSpeed += artefact->m_fPowerRestoreSpeed * k;
-
-    if (Core.Features.test(xrCore::Feature::af_satiety))
-        r.SatietyRestoreSpeed += artefact->m_fSatietyRestoreSpeed * k;
-
-    if (Core.Features.test(xrCore::Feature::actor_thirst))
-        r.ThirstRestoreSpeed += artefact->m_fThirstRestoreSpeed * k;
-
-    if (Core.Features.test(xrCore::Feature::af_psy_health))
+    auto main_wnd = HUD().GetUI()->UIMainIngameWnd;
+    switch (place)
     {
-        if (Core.Features.test(xrCore::Feature::objects_radioactive))
-        {
-            if (artefact->PsyHealthRestoreSpeed() > 0)
-                r.PsyHealthRestoreSpeed += artefact->PsyHealthRestoreSpeed() * k;
-        }
-        else
-        {
-            r.PsyHealthRestoreSpeed += artefact->PsyHealthRestoreSpeed() * k;
-        }
-    }
-    if (Core.Features.test(xrCore::Feature::objects_radioactive))
-    {
-        if (artefact->RadiationRestoreSpeed() < 0)
-            r.RadiationRestoreSpeed += artefact->RadiationRestoreSpeed() * k;
-    }
-    else
-    {
-        if (artefact->RadiationRestoreSpeed() > 0 && Core.Features.test(xrCore::Feature::af_radiation_immunity_mod))
-        {
-            float new_rs = HitArtefactsOnBelt(artefact->RadiationRestoreSpeed(), ALife::eHitTypeRadiation, true);
-            if (new_rs > artefact->RadiationRestoreSpeed())
-                r.RadiationRestoreSpeed += new_rs * k;
-            else
-                r.RadiationRestoreSpeed += artefact->RadiationRestoreSpeed() * k;
-        }
-        else
-            r.RadiationRestoreSpeed += artefact->RadiationRestoreSpeed() * k;
+    case eItemPlaceUndefined:
+        main_wnd->m_slotPanel->Update();
+        main_wnd->m_beltPanel->Update();
+        main_wnd->m_vestPanel->Update();
+        break;
+    case eItemPlaceSlot: main_wnd->m_slotPanel->Update(); break;
+    case eItemPlaceBelt: main_wnd->m_beltPanel->Update(); break;
+    case eItemPlaceVest: main_wnd->m_vestPanel->Update(); break;
     }
 }
 
-ActorRestoreParams CActor::ActiveArtefactsOnBelt()
-{
-    ActorRestoreParams r;
+constexpr auto ITEMS_BOOST_TIME = 0.100f;
 
-    Memory.mem_fill(&r, 0, sizeof(r));
-
-    for (TIItemContainer::iterator it = inventory().m_belt.begin(); inventory().m_belt.end() != it; ++it)
-    {
-        CArtefact* artefact = smart_cast<CArtefact*>(*it);
-        if (artefact)
-        {
-            ApplyArtefactEffects(r, artefact);
-        }
-    }
-
-    if (Core.Features.test(xrCore::Feature::objects_radioactive))
-    {
-        auto& map_all = inventory().m_all;
-        for (TIItemContainer::iterator it = map_all.begin(); map_all.end() != it; ++it)
-        {
-            CInventoryItem* obj = smart_cast<CInventoryItem*>(*it);
-
-            float k = (Core.Features.test(xrCore::Feature::af_zero_condition) && fis_zero(obj->GetCondition())) ? 0.f : 1.f;
-
-            if (Core.Features.test(xrCore::Feature::af_psy_health))
-            {
-                // только уменьшение пси здоровоья
-                if (obj->PsyHealthRestoreSpeed() < 0)
-                {
-                    r.PsyHealthRestoreSpeed += obj->PsyHealthRestoreSpeed() * k;
-                }
-            }
-            // только увеличение радиации
-            if (obj->RadiationRestoreSpeed() > 0)
-            {
-                if (Core.Features.test(xrCore::Feature::af_radiation_immunity_mod))
-                {
-                    float new_rs = HitArtefactsOnBelt(obj->RadiationRestoreSpeed(), ALife::eHitTypeRadiation, true);
-                    if (new_rs > obj->RadiationRestoreSpeed())
-                        r.RadiationRestoreSpeed += new_rs * k;
-                    else
-                        r.RadiationRestoreSpeed += obj->RadiationRestoreSpeed() * k;
-                }
-                else
-                    r.RadiationRestoreSpeed += obj->RadiationRestoreSpeed() * k;
-            }
-        }
-    }
-
-    if (Core.Features.test(xrCore::Feature::outfit_af))
-    {
-        PIItem helm = inventory().m_slots[HELMET_SLOT].m_pIItem;
-        if (helm)
-        {
-            CArtefact* helmet = smart_cast<CArtefact*>(helm);
-            if (helmet)
-            {
-                ApplyArtefactEffects(r, helmet);
-            }
-        }
-
-        PIItem outfit_item = inventory().m_slots[OUTFIT_SLOT].m_pIItem;
-        if (outfit_item)
-        {
-            CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(outfit_item);
-            if (outfit)
-            {
-                float k = (Core.Features.test(xrCore::Feature::af_zero_condition) && fis_zero(outfit->GetCondition())) ? 0.f : 1.f;
-
-                r.BleedingRestoreSpeed += outfit->m_fBleedingRestoreSpeed * k;
-                r.HealthRestoreSpeed += outfit->m_fHealthRestoreSpeed * k;
-                r.PowerRestoreSpeed += outfit->m_fPowerRestoreSpeed * k;
-
-                if (Core.Features.test(xrCore::Feature::af_satiety))
-                    r.SatietyRestoreSpeed += outfit->m_fSatietyRestoreSpeed * k;
-
-                if (Core.Features.test(xrCore::Feature::actor_thirst))
-                    r.ThirstRestoreSpeed += outfit->m_fThirstRestoreSpeed * k;
-
-                if (Core.Features.test(xrCore::Feature::af_psy_health))
-                {
-                    if (Core.Features.test(xrCore::Feature::objects_radioactive))
-                    {
-                        if (outfit->PsyHealthRestoreSpeed() > 0)
-                            r.PsyHealthRestoreSpeed += outfit->PsyHealthRestoreSpeed() * k;
-                    }
-                    else
-                    {
-                        r.PsyHealthRestoreSpeed += outfit->PsyHealthRestoreSpeed() * k;
-                    }
-                }
-
-                if (Core.Features.test(xrCore::Feature::objects_radioactive))
-                {
-                    if (outfit->RadiationRestoreSpeed() < 0)
-                        r.RadiationRestoreSpeed += outfit->RadiationRestoreSpeed() * k;
-                }
-                else
-                {
-                    r.RadiationRestoreSpeed += outfit->RadiationRestoreSpeed() * k;
-                }
-            }
-        }
-    }
-
-    return r;
-}
-
-#define ARTEFACTS_UPDATE_TIME 0.100f
-
-void CActor::UpdateArtefactsOnBelt()
+void CActor::UpdateItemsBoost()
 {
     static float update_time = 0;
 
     float f_update_time = 0;
 
-    if (update_time < ARTEFACTS_UPDATE_TIME)
+    if (update_time < ITEMS_BOOST_TIME)
     {
         update_time += conditions().fdelta_time();
         return;
@@ -1601,66 +1427,88 @@ void CActor::UpdateArtefactsOnBelt()
         update_time = 0.0f;
     }
 
-    auto effects = ActiveArtefactsOnBelt();
+    auto cond = &conditions();
 
-    if (!fis_zero(effects.BleedingRestoreSpeed))
-        conditions().ChangeBleeding(effects.BleedingRestoreSpeed * f_update_time);
+    // проходимо по усім рестор_параметрам для актора
+    for (int i = 0; i < eRestoreBoostMax; ++i)
+    {
+        // nullifying values
+        m_ActorItemBoostedParam[i] = 0.f;
 
-    if (!fis_zero(effects.HealthRestoreSpeed))
-        conditions().ChangeHealth(effects.HealthRestoreSpeed * f_update_time);
-
-    if (!fis_zero(effects.PowerRestoreSpeed))
-        conditions().ChangePower(effects.PowerRestoreSpeed * f_update_time);
-
-    if (!fis_zero(effects.SatietyRestoreSpeed))
-        conditions().ChangeSatiety(effects.SatietyRestoreSpeed * f_update_time);
-
-    if (!fis_zero(effects.ThirstRestoreSpeed))
-        conditions().ChangeThirst(effects.ThirstRestoreSpeed * f_update_time);
-
-    if (!fis_zero(effects.PsyHealthRestoreSpeed))
-        conditions().ChangePsyHealth(effects.PsyHealthRestoreSpeed * f_update_time);
-
-    if (!fis_zero(effects.RadiationRestoreSpeed))
-        conditions().ChangeRadiation(effects.RadiationRestoreSpeed * f_update_time);
+        if (i == eRadiationBoost)
+        {
+            // OBJECTS_RADIOACTIVE - new version
+            for (const auto& item : inventory().m_all)
+            {
+                float radiation_restore_speed = item->GetItemEffect(i);
+                if (item != inventory().ActiveItem())
+                { // що взяте в руки те випромінює на повну
+                    if (GetOutfit()) // костюм захищає від радіації речей
+                        radiation_restore_speed *= (1.f - GetOutfit()->GetHitTypeProtection(ALife::eHitTypeRadiation));
+                    if (GetVest() && inventory().InRuck(item)) // бронежилет захищає від радіації речей у рюкзаку
+                        radiation_restore_speed *= (1.f - GetVest()->GetHitTypeProtection(ALife::eHitTypeRadiation));
+                    if (GetBackpack() && inventory().InRuck(item)) // рюкзак захищає від радіації речей у рюкзаку
+                        radiation_restore_speed *= (1.f - GetBackpack()->GetHitTypeProtection(ALife::eHitTypeRadiation));
+                    if (GetHelmet() && inventory().InRuck(item)) // шолом захищає від радіації речей у рюкзаку
+                        radiation_restore_speed *= (1.f - GetHelmet()->GetHitTypeProtection(ALife::eHitTypeRadiation));
+                }
+                m_ActorItemBoostedParam[i] += radiation_restore_speed;
+            }
+        }
+        else
+        {
+            // artefacts
+            m_ActorItemBoostedParam[i] += GetTotalArtefactsEffect(i);
+            // outfit
+            auto outfit = GetOutfit();
+            if (outfit && !fis_zero(outfit->GetCondition()))
+            {
+                m_ActorItemBoostedParam[i] += outfit->GetItemEffect(i);
+            }
+            // vest
+            auto vest = GetVest();
+            if (vest && !fis_zero(vest->GetCondition()))
+            {
+                m_ActorItemBoostedParam[i] += vest->GetItemEffect(i);
+            }
+            // helmet
+            auto helmet = GetHelmet();
+            if (helmet && !fis_zero(helmet->GetCondition()))
+            {
+                m_ActorItemBoostedParam[i] += helmet->GetItemEffect(i);
+            }
+            // backpack
+            auto backpack = GetBackpack();
+            if (backpack && !fis_zero(backpack->GetCondition()))
+            {
+                m_ActorItemBoostedParam[i] += backpack->GetItemEffect(i);
+            }
+        }
+        // apllying boost on actor *_restore conditions
+        cond->ApplyRestoreBoost(i, m_ActorItemBoostedParam[i] * f_update_time);
+    }
 
     callback(GameObject::eUpdateArtefactsOnBelt)(f_update_time);
 }
 
-float CActor::HitArtefactsOnBelt(float hit_power, ALife::EHitType hit_type, bool belt_only)
+float CActor::GetArtefactsProtection(int hit_type)
 {
-    float res_hit_power_k = 1.0f;
-    float _af_count = 0.0f;
-    for (TIItemContainer::iterator it = inventory().m_belt.begin(); inventory().m_belt.end() != it; ++it)
+    float res{};
+    auto placement = inventory().GetActiveArtefactPlace();
+    for (const auto& item : placement)
     {
-        CArtefact* artefact = smart_cast<CArtefact*>(*it);
-        if (artefact)
+        auto artefact = smart_cast<CArtefact*>(item);
+        if (artefact && !fis_zero(artefact->GetHitTypeProtection(hit_type)) && !fis_zero(artefact->GetCondition()))
         {
-            if (!Core.Features.test(xrCore::Feature::af_zero_condition) || !fis_zero(artefact->GetCondition()))
-            {
-                res_hit_power_k += artefact->m_ArtefactHitImmunities.AffectHit(1.0f, hit_type);
-                _af_count += 1.0f;
-            }
+            res += artefact->GetHitTypeProtection(hit_type);
+        }
+        auto container = smart_cast<CInventoryContainer*>(item);
+        if (container)
+        {
+            res += container->GetContainmentArtefactProtection(hit_type);
         }
     }
-    // учет иммунитета от шлема
-    PIItem helm = inventory().m_slots[HELMET_SLOT].m_pIItem;
-    if (helm && !belt_only)
-    {
-        CArtefact* helmet = smart_cast<CArtefact*>(helm);
-        if (helmet)
-        {
-            if (!Core.Features.test(xrCore::Feature::af_zero_condition) || !fis_zero(helmet->GetCondition()))
-            {
-                res_hit_power_k += helmet->m_ArtefactHitImmunities.AffectHit(1.0f, hit_type);
-                _af_count += 1.0f;
-            }
-        }
-    }
-
-    res_hit_power_k -= _af_count;
-
-    return res_hit_power_k > 0 ? res_hit_power_k * hit_power : 0;
+    return res;
 }
 
 void CActor::SetZoomRndSeed(s32 Seed)
@@ -1719,20 +1567,11 @@ void CActor::UpdateMotionIcon(u32 mstate_rl)
         }
         else if (mstate_rl & mcSprint)
             motion_icon.ShowState(CUIMotionIcon::stSprint);
-        else if (mstate_rl & mcAnyMove && isActorAccelerated(mstate_rl, IsZoomAimingMode()))
+        else if (!isActorAccelerated(mstate_rl, IsZoomAimingMode()))
             motion_icon.ShowState(CUIMotionIcon::stRun);
         else
             motion_icon.ShowState(CUIMotionIcon::stNormal);
     }
-
-    /*
-                            stNormal, --
-                            stCrouch, --
-                            stCreep,  --
-                            stClimb,  --
-                            stRun,    --
-                            stSprint, --
-    */
 }
 
 CPHDestroyable* CActor::ph_destroyable() { return smart_cast<CPHDestroyable*>(character_physics_support()); }
@@ -1793,30 +1632,30 @@ CVisualMemoryManager* CActor::visual_memory() const { return (&memory().visual()
 
 float CActor::GetCarryWeight() const
 {
-    float add = 0;
+    float res{CInventoryOwner::GetCarryWeight()};
     CPHCapture* capture = character_physics_support()->movement()->PHCapture();
     if (capture && capture->taget_object())
-    {
-        CPhysicsShellHolder* obj = capture->taget_object();
-        CInventoryOwner* io = smart_cast<CInventoryOwner*>(obj);
-        if (io)
-            add += io->GetCarryWeight();
-
-        add += READ_IF_EXISTS(pSettings, r_float, *obj->cNameSect(), "ph_mass", 0) * 0.1f;
-    }
-
-    return CInventoryOwner::GetCarryWeight() + add;
+        res += GetTotalMass(capture->taget_object(), 0.1f);
+    return res;
 }
 
 float CActor::GetMass() { return g_Alive() ? character_physics_support()->movement()->GetMass() : m_pPhysicsShell ? m_pPhysicsShell->getMass() : 0; }
 
 bool CActor::is_on_ground() { return (character_physics_support()->movement()->Environment() != CPHMovementControl::peInAir); }
 
-CCustomOutfit* CActor::GetOutfit() const
-{
-    PIItem _of = inventory().m_slots[OUTFIT_SLOT].m_pIItem;
-    return _of ? smart_cast<CCustomOutfit*>(_of) : NULL;
-}
+CCustomOutfit* CActor::GetOutfit() const { return smart_cast<CCustomOutfit*>(inventory().ItemFromSlot(OUTFIT_SLOT)); }
+
+CWarbelt* CActor::GetWarbelt() const { return smart_cast<CWarbelt*>(inventory().ItemFromSlot(WARBELT_SLOT)); }
+
+CInventoryContainer* CActor::GetBackpack() const { return smart_cast<CInventoryContainer*>(inventory().ItemFromSlot(BACKPACK_SLOT)); }
+
+CHelmet* CActor::GetHelmet() const { return smart_cast<CHelmet*>(inventory().ItemFromSlot(HELMET_SLOT)); }
+
+CVest* CActor::GetVest() const { return smart_cast<CVest*>(inventory().ItemFromSlot(VEST_SLOT)); }
+
+CTorch* CActor::GetTorch() const { return smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT)); }
+
+CNightVisionDevice* CActor::GetNightVisionDevice() const { return smart_cast<CNightVisionDevice*>(inventory().ItemFromSlot(TORCH_SLOT)); }
 
 void CActor::block_action(EGameActions cmd)
 {
@@ -1835,15 +1674,15 @@ void CActor::unblock_action(EGameActions cmd)
     }
 }
 
-bool CActor::is_actor_normal() { return mstate_real & (mcAnyAction | mcLookout | mcCrouch | mcClimb | mcSprint) ? false : true; }
+bool CActor::is_actor_normal() const { return mstate_real & (mcAnyAction | mcLookout | mcCrouch | mcClimb | mcSprint) ? false : true; }
 
-bool CActor::is_actor_crouch() { return mstate_real & (mcAnyAction | mcAccel | mcClimb | mcSprint) ? false : mstate_real & mcCrouch ? true : false; }
+bool CActor::is_actor_crouch() const { return mstate_real & (mcAnyAction | mcAccel | mcClimb | mcSprint) ? false : mstate_real & mcCrouch ? true : false; }
 
-bool CActor::is_actor_creep() { return mstate_real & (mcAnyAction | mcClimb | mcSprint) ? false : (mstate_real & mcCrouch && mstate_real & mcAccel) ? true : false; }
+bool CActor::is_actor_creep() const { return mstate_real & (mcAnyAction | mcClimb | mcSprint) ? false : (mstate_real & mcCrouch && mstate_real & mcAccel) ? true : false; }
 
-bool CActor::is_actor_climb() { return mstate_real & (mcAnyAction | mcCrouch | mcSprint) ? false : mstate_real & mcClimb ? true : false; }
+bool CActor::is_actor_climb() const { return mstate_real & (mcAnyAction | mcCrouch | mcSprint) ? false : mstate_real & mcClimb ? true : false; }
 
-bool CActor::is_actor_walking()
+bool CActor::is_actor_walking() const
 {
     bool run = false;
     if (mstate_real & mcAccel)
@@ -1853,7 +1692,7 @@ bool CActor::is_actor_walking()
     return ((mstate_real & (mcJump | mcFall | mcLanding | mcLanding2 | mcCrouch | mcClimb | mcSprint)) || run) ? false : mstate_real & mcAnyMove ? true : false;
 }
 
-bool CActor::is_actor_running()
+bool CActor::is_actor_running() const
 {
     bool run = false;
     if (mstate_real & mcAccel)
@@ -1863,26 +1702,29 @@ bool CActor::is_actor_running()
     return mstate_real & (mcJump | mcFall | mcLanding | mcLanding2 | mcLookout | mcCrouch | mcClimb | mcSprint) ? false : (mstate_real & mcAnyMove && run) ? true : false;
 }
 
-bool CActor::is_actor_sprinting()
+bool CActor::is_actor_sprinting() const
 {
     return mstate_real & (mcJump | mcFall | mcLanding | mcLanding2 | mcLookout | mcCrouch | mcAccel | mcClimb | mcLStrafe | mcRStrafe) ? false :
         (mstate_real & mcFwd && mstate_real & mcSprint)                                                                                ? true :
                                                                                                                                          false;
 }
 
-bool CActor::is_actor_crouching()
+bool CActor::is_actor_crouching() const
 {
     return mstate_real & (mcJump | mcFall | mcLanding | mcLanding2 | mcAccel | mcClimb) ? false : (mstate_real & mcAnyMove && mstate_real & mcCrouch) ? true : false;
 }
 
-bool CActor::is_actor_creeping()
+bool CActor::is_actor_creeping() const
 {
     return mstate_real & (mcJump | mcFall | mcLanding | mcLanding2 | mcClimb) ? false : (mstate_real & mcAnyMove && mstate_real & mcCrouch && mstate_real & mcAccel) ? true : false;
 }
 
-bool CActor::is_actor_climbing() { return mstate_real & (mcJump | mcFall | mcLanding | mcLanding2) ? false : (mstate_real & mcAnyMove && mstate_real & mcClimb) ? true : false; }
+bool CActor::is_actor_climbing() const
+{
+    return mstate_real & (mcJump | mcFall | mcLanding | mcLanding2) ? false : (mstate_real & mcAnyMove && mstate_real & mcClimb) ? true : false;
+}
 
-bool CActor::is_actor_moving() { return mstate_real & mcAnyAction ? true : false; }
+bool CActor::is_actor_moving() const { return mstate_real & mcAnyAction ? true : false; }
 
 void CActor::RepackAmmo()
 {
@@ -1929,14 +1771,16 @@ void CActor::RepackAmmo()
                             cnt = 0;
                         }
                     }
-                    else
+                    else if (!ammo->IsBoxReloadableEmpty())
                     {
+                        if (ammo->IsBoxReloadable()) // spawn empty box
+                            ammo->SpawnAmmo(0, ammo->m_EmptySect.c_str());
                         ammo->DestroyObject();
                     }
                 }
             }
         }
-        //чистим массив от обработанных пачек
+        // чистим массив от обработанных пачек
         _ammo.erase(std::remove_if(_ammo.begin(), _ammo.end(), [asect](CWeaponAmmo* a) { return a->cNameSect() == asect; }), _ammo.end());
     }
 }
@@ -1946,7 +1790,272 @@ bool CActor::unlimited_ammo() { return !!psActorFlags.test(AF_UNLIMITEDAMMO); }
 bool CActor::IsDetectorActive() const
 {
     if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)))
-        return det->IsWorking();
-
+        return det->IsPowerOn() && det->GetHUDmode();
     return false;
+}
+
+float CActor::GetZoomEffectorK()
+{
+    float k{};
+    if (IsHardHold())
+        return k;
+    k = 1.f + (conditions().GetZoomEffectorKoef() * (1.f - conditions().GetPower()));
+    if (is_actor_crouch())
+        k *= 0.5f;
+    if (auto weapon = smart_cast<CWeapon*>(inventory().ActiveItem()))
+        k /= weapon->GetZoomFactor();
+    return k;
+}
+
+void CActor::TryToBlockSprint(bool block)
+{
+    if (block && mstate_wishful & mcSprint)
+        mstate_wishful &= ~mcSprint;
+}
+
+bool CActor::IsHitToBackPack(SHit* pHDS) const
+{
+    if (pHDS->type() == ALife::eHitTypeRadiation)
+    {
+        //		Msg("! RADIATION HITTED FOR BACKPACK");
+        return true;
+    }
+    bool calculate_direction{true};
+    // якщо хіт вогнепальний або поріз то має значення кістка попадання
+    if (pHDS->type() == ALife::eHitTypeFireWound || pHDS->type() == ALife::eHitTypeWound || pHDS->type() == ALife::eHitTypeWound_2)
+    {
+        calculate_direction = (pHDS->bone() == m_spine || pHDS->bone() == m_spine1 || pHDS->bone() == m_spine2);
+    }
+    if (calculate_direction && is_from_behind(pHDS->direction()))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool CActor::IsHitToHead(SHit* pHDS) const
+{
+    if (pHDS->type() == ALife::eHitTypeRadiation)
+        return true;
+    auto pK = smart_cast<IKinematics*>(Visual());
+    return is_bone_head(*pK, pHDS->bone());
+}
+
+bool CActor::IsHitToVest(SHit* pHDS) const
+{
+    switch (pHDS->type())
+    {
+    case ALife::eHitTypeFireWound:
+    case ALife::eHitTypeWound:
+    case ALife::eHitTypeWound_2: {
+        // вважаємо що зношувати бронік треба тільки тоді як хіт потрапляє у броню
+        return GetVest() && GetVest()->IsBoneArmored(pHDS->bone());
+    }
+    break;
+    default: return true;
+    }
+}
+
+#include "SimpleDetectorSHOC.h"
+bool CActor::HasDetectorWorkable()
+{
+    auto item_in_det_slot = inventory().ItemFromSlot(DETECTOR_SLOT);
+    return (smart_cast<CCustomDetector*>(item_in_det_slot) || smart_cast<CSimpleDetectorSHOC*>(item_in_det_slot)) && item_in_det_slot->IsPowerOn() &&
+        !fis_zero(item_in_det_slot->GetCondition());
+}
+#include "PDA.h"
+bool CActor::HasPDAWorkable() { return GetPDA() && GetPDA()->IsPowerOn() && !fis_zero(GetPDA()->GetCondition()); }
+
+float CActor::GetItemBoostedParams(int type) { return m_ActorItemBoostedParam[type]; }
+
+float CActor::GetTotalArtefactsEffect(int i)
+{
+    float res{};
+    auto placement = inventory().GetActiveArtefactPlace();
+    for (const auto& item : placement)
+    {
+        auto artefact = smart_cast<CArtefact*>(item);
+        if (artefact && !fis_zero(artefact->GetCondition()))
+        {
+            res += artefact->GetItemEffect(i);
+        }
+        auto container = smart_cast<CInventoryContainer*>(item);
+        if (container)
+        {
+            res += container->GetContainmentArtefactEffect(i);
+        }
+    }
+    return res;
+}
+
+void CActor::DrawHUDMasks()
+{
+    if (!g_Alive() || eacFirstEye != cam_active)
+        return;
+    auto pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
+    if (pWeapon && pWeapon->IsZoomed() && !pWeapon->show_indicators())
+        return;
+    if (GetNightVisionDevice())
+        GetNightVisionDevice()->DrawHUDMask();
+    if (GetOutfit())
+        GetOutfit()->DrawHUDMask();
+    if (GetHelmet())
+        GetHelmet()->DrawHUDMask();
+}
+#include "../xr_3da/XR_IOConsole.h"
+void CActor::UpdateVisorEfects()
+{
+    bool has_visor = GetOutfit() && GetOutfit()->HasVisor() || GetHelmet() && GetHelmet()->HasVisor();
+    bool b_enable_effect = eacFirstEye == cam_active && g_Alive() && has_visor;
+    string128 _buff{};
+    sprintf(_buff, "r2_rain_drops_control %d", b_enable_effect);
+    Console->Execute(_buff);
+    sprintf(_buff, "r2_visor_refl_control %d", b_enable_effect);
+    Console->Execute(_buff);
+}
+
+void CActor::TryPlayAnimItemTake()
+{
+    if (!inventory().ActiveItem())
+        return;
+    const auto hud_item = smart_cast<CHudItem*>(inventory().ActiveItem());
+    if (!hud_item || !hud_item->GetHUDmode())
+        return;
+    if (hud_item->IsZoomed())
+        hud_item->OnZoomOut();
+    hud_item->PlayAnimOnItemTake();
+}
+
+bool CActor::HasRequiredTool(PIItem item)
+{
+    if (item->m_required_tools.empty())
+        return true;
+    for (const auto& item_sect : item->m_required_tools)
+    {
+        if (inventory().GetItemFromInventory(item_sect.c_str()))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CActor::HasRequiredTool(const shared_str& sect)
+{
+    if (!pSettings->line_exist(sect, "required_tools"))
+    {
+        //		Msg("%s line not exist",__FUNCTION__);
+        return true;
+    }
+    LPCSTR str = pSettings->r_string(sect, "required_tools");
+    for (int i = 0; i < _GetItemCount(str); ++i)
+    {
+        string128 tool_section;
+        _GetItem(str, i, tool_section);
+        if (inventory().GetItemFromInventory(tool_section))
+        {
+            //			Msg("%s has required tool %s for item %s", __FUNCTION__, tool_section, sect.c_str());
+            return true;
+        }
+    }
+    return false;
+}
+
+void CActor::TryGroggyEffect(SHit* pHDS)
+{
+    if (GodMode() || fis_zero(m_fGroggyTreshold) || pHDS->damage() < m_fGroggyTreshold || !IsHitToHead(pHDS))
+        return;
+
+    // groggy effect
+    if (this == Level().CurrentControlEntity())
+    {
+        switch (pHDS->type())
+        {
+        case ALife::eHitTypeFireWound:
+        case ALife::eHitTypeStrike:
+        case ALife::eHitTypePhysicStrike: {
+            CEffectorCam* ce = Actor()->Cameras().GetCamEffector((ECamEffectorType)effGroggy);
+            if (!ce && !!m_GroggyEffector)
+            {
+                AddEffector(this, effGroggy, "effector_groggy", pHDS->damage());
+            }
+            Fvector point = Position();
+            point.y += CameraHeight();
+            sndGroggy.play_at_pos(this, point);
+        }
+        break;
+        default: break;
+        }
+    }
+}
+
+bool CActor::SaveGameAllowed()
+{
+    switch (g_eSaveGameMode)
+    {
+    case eSaveGameDefault: {
+        return true;
+    }
+    break;
+    case eSaveGameEnemyCheck: {
+        float safe_radius = READ_IF_EXISTS(pSettings, r_float, "features", "safe_radius", 50.f);
+        feel_touch_update(Position(), safe_radius);
+        for (const auto object : feel_touch)
+        {
+            auto entity = smart_cast<CEntity*>(object);
+            if (!entity)
+                continue;
+            if (entity && entity->CheckEnemyStatus(this))
+                return false;
+        }
+        return true;
+    }
+    break;
+    case eSaveGameSafehouseCheck: {
+        return InSafeHouse();
+    }
+    break;
+    default: NODEFAULT;
+    }
+}
+
+bool CActor::InSafeHouse() { return HasInfo("safehouse"); }
+
+float CActor::GetExoFactor() const
+{
+    float res{1.f};
+    if (GetOutfit())
+        res = GetOutfit()->GetExoFactor();
+    return res;
+}
+
+bool CActor::IsFreeHands() const
+{
+    const auto active_hud_item = smart_cast<CHudItem*>(inventory().ActiveItem());
+    if (active_hud_item && active_hud_item->IsPending())
+        return false;
+    return true;
+}
+
+void CActor::TryInventoryCrouch(bool enable)
+{
+    if (!Core.Features.test(xrCore::Feature::inventory_crouch))
+        return;
+
+    if (enable)
+    {
+        bool b_skip_state = (mstate_wishful & mcCrouch) || (mstate_wishful & mcCrouchAccel) || (mstate_wishful & mcClimb);
+        saved_state = b_skip_state ? (u32)-1 : mstate_wishful;
+        if (!b_skip_state)
+            set_state_wishful(mcCrouch);
+    }
+    else if (saved_state != (u32)-1)
+        set_state_wishful(saved_state);
+
+}
+
+void CActor::EnableInventoryDOF(bool enable) 
+{ 
+    Fvector4 dof_param{enable ? dof_params_inventory : Fvector4{}}; 
+    shader_exports.set_dof_params(dof_param.x, dof_param.y, dof_param.z, dof_param.w);
 }

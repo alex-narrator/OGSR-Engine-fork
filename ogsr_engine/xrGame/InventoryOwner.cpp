@@ -29,23 +29,16 @@
 #include "alife_object_registry.h"
 
 #include "CustomOutfit.h"
+#include "EntityCondition.h"
+#include "InventoryContainer.h"
 
 CInventoryOwner::CInventoryOwner()
 {
-    m_pTrade = NULL;
-    m_trade_parameters = 0;
-
     m_inventory = xr_new<CInventory>();
     m_pCharacterInfo = xr_new<CCharacterInfo>();
-
+    m_known_info_registry = xr_new<CInfoPortionWrapper>();
     EnableTalk();
     EnableTrade();
-
-    m_known_info_registry = xr_new<CInfoPortionWrapper>();
-    m_tmp_active_slot_num = NO_ACTIVE_SLOT;
-    m_need_osoznanie_mode = FALSE;
-
-    m_tmp_next_item_slot = NO_ACTIVE_SLOT;
 }
 
 DLL_Pure* CInventoryOwner::_construct()
@@ -71,14 +64,7 @@ void CInventoryOwner::Load(LPCSTR section)
     if (pSettings->line_exist(section, "inv_max_weight"))
         m_inventory->SetMaxWeight(pSettings->r_float(section, "inv_max_weight"));
 
-    if (pSettings->line_exist(section, "need_osoznanie_mode"))
-    {
-        m_need_osoznanie_mode = pSettings->r_bool(section, "need_osoznanie_mode");
-    }
-    else
-    {
-        m_need_osoznanie_mode = FALSE;
-    }
+	m_need_osoznanie_mode = READ_IF_EXISTS(pSettings, r_bool, section, "need_osoznanie_mode", false);
 }
 
 void CInventoryOwner::reload(LPCSTR section)
@@ -305,14 +291,36 @@ float CInventoryOwner::GetCarryWeight() const { return inventory().TotalWeight()
 //максимальный переносимы вес
 float CInventoryOwner::MaxCarryWeight() const
 {
-    float ret = inventory().GetMaxWeight();
+    float res = inventory().GetMaxWeight();
 
-    const CCustomOutfit* outfit = GetOutfit();
-    if (outfit)
-        ret += outfit->m_additional_weight2;
+    const auto EA = smart_cast<const CEntityAlive*>(this);
+    res += (res * EA->conditions().GetBoostedParams(eAdditionalWeightBoost));
 
-    ret += ArtefactsAddWeight(false);
-    return ret;
+    auto outfit = GetOutfit();
+    if (outfit && !fis_zero(outfit->GetCondition()))
+        res += outfit->GetItemEffect(CInventoryItem::eAdditionalWeight);
+
+    auto backpack = GetBackpack();
+    if (backpack && !fis_zero(backpack->GetCondition()))
+        res += backpack->GetItemEffect(CInventoryItem::eAdditionalWeight);
+
+    if (inventory().OwnerIsActor())
+    {
+        auto placement = inventory().GetActiveArtefactPlace();
+        for (const auto& item : placement)
+        {
+            auto artefact = smart_cast<CArtefact*>(item);
+            if (artefact && !fis_zero(artefact->GetCondition()))
+                res += artefact->GetItemEffect(CInventoryItem::eAdditionalWeight);
+            auto container = smart_cast<CInventoryContainer*>(item);
+            if (container)
+            {
+                res += container->GetContainmentArtefactEffect(CInventoryItem::eAdditionalWeight);
+            }
+        }
+    }
+
+    return res;
 }
 
 void CInventoryOwner::spawn_supplies()
@@ -440,6 +448,13 @@ void CInventoryOwner::OnItemSlot(CInventoryItem* inventory_item, EItemPlace prev
     object->callback(GameObject::eOnItemToSlot)(inventory_item->object().lua_game_object());
     attach(inventory_item);
 }
+void CInventoryOwner::OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place)
+{
+    CGameObject* object = smart_cast<CGameObject*>(this);
+    VERIFY(object);
+    object->callback(GameObject::eOnItemToVest)(inventory_item->object().lua_game_object());
+}
+
 
 CInventoryItem* CInventoryOwner::GetCurrentOutfit() const { return inventory().m_slots[OUTFIT_SLOT].m_pIItem; }
 
@@ -531,19 +546,6 @@ float CInventoryOwner::missile_throw_force()
 }
 
 bool CInventoryOwner::use_throw_randomness() { return (true); }
-
-float CInventoryOwner::ArtefactsAddWeight(bool first) const
-{
-    float add_weight = 0.f;
-    for (const auto& it : inventory().m_belt)
-    {
-        CArtefact* artefact = smart_cast<CArtefact*>(it);
-
-        if (artefact && (!Core.Features.test(xrCore::Feature::af_zero_condition) || !fis_zero(artefact->GetCondition())))
-            add_weight += first ? artefact->m_additional_weight : artefact->m_additional_weight2;
-    }
-    return add_weight;
-}
 
 void CInventoryOwner::SetNextItemSlot(u32 slot) { m_tmp_next_item_slot = slot; }
 

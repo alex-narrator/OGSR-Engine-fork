@@ -25,28 +25,16 @@ CUIMMShniaga::CUIMMShniaga()
     m_magnifier = xr_new<CUIStatic>();
     m_shniaga->AttachChild(m_magnifier);
     m_magnifier->SetPPMode();
-    m_gratings[0] = xr_new<CUIStatic>();
-    m_shniaga->AttachChild(m_gratings[0]);
-    m_gratings[1] = xr_new<CUIStatic>();
-    m_shniaga->AttachChild(m_gratings[1]);
     m_anims[0] = xr_new<CUIStatic>();
     m_shniaga->AttachChild(m_anims[0]);
     m_anims[1] = xr_new<CUIStatic>();
     m_shniaga->AttachChild(m_anims[1]);
-
-    m_mag_pos = 0;
-
-    m_selected = NULL;
-
-    m_start_time = 0;
-    m_origin = 0;
-    m_destination = 0;
-    m_run_time = 0;
+    m_gratings[0] = xr_new<CUIStatic>();
+    m_shniaga->AttachChild(m_gratings[0]);
+    m_gratings[1] = xr_new<CUIStatic>();
+    m_shniaga->AttachChild(m_gratings[1]);
 
     m_flags.zero();
-
-    m_selected_btn = -1;
-    m_page = -1;
 }
 
 CUIMMShniaga::~CUIMMShniaga()
@@ -112,18 +100,17 @@ void CUIMMShniaga::Init(CUIXml& xml_doc, LPCSTR path)
 
     m_wheel_size[0] = m_anims[0]->GetWndSize();
 
-    m_wheel_size[1].set(m_wheel_size[0]);
-    m_wheel_size[1].x /= 1.33f;
+    // m_wheel_size[1].set(m_wheel_size[0]);
+    // m_wheel_size[1].x	/= 1.33f;
 }
 
 void CUIMMShniaga::OnDeviceReset()
 {
-    if (UI()->is_widescreen())
-    {
-        m_anims[0]->SetWndSize(m_wheel_size[1]);
-        m_anims[1]->SetWndSize(m_wheel_size[1]);
-    }
-    else
+    // if(UI()->is_widescreen())
+    //{
+    //	m_anims[0]->SetWndSize(m_wheel_size[1]);
+    //	m_anims[1]->SetWndSize(m_wheel_size[1]);
+    // }else
     {
         m_anims[0]->SetWndSize(m_wheel_size[0]);
         m_anims[1]->SetWndSize(m_wheel_size[0]);

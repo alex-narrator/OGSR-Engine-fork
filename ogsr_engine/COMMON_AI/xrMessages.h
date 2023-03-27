@@ -48,7 +48,6 @@ enum
     GE_RESPAWN,
     GE_OWNERSHIP_TAKE, // DUAL: Client request for ownership of an item
     GE_OWNERSHIP_REJECT, // DUAL: Client request ownership rejection
-    GE_TRANSFER_AMMO, // DUAL: Take ammo out of weapon for our weapon
     GE_HIT, //
     GE_DIE, //
     GE_ASSIGN_KILLER, //
@@ -68,11 +67,7 @@ enum
     GE_WPN_AMMO_ADD,
     GE_WPN_STATE_CHANGE,
 
-    GE_ADDON_ATTACH,
-    GE_ADDON_DETACH,
-
     GE_GRENADE_EXPLODE,
-    GE_INV_ACTION, // a action beign taken on inventory
 
     GE_ZONE_STATE_CHANGE,
 
@@ -80,16 +75,7 @@ enum
 
     GE_CHANGE_VISUAL,
 
-    GEG_PLAYER_ACTIVATE_SLOT,
-    GEG_PLAYER_ITEM2SLOT,
-    GEG_PLAYER_ITEM2BELT,
-    GEG_PLAYER_ITEM2RUCK,
-    GEG_PLAYER_ITEM_EAT,
     GEG_PLAYER_ITEM_SELL,
-    GEG_PLAYER_ACTIVATEARTEFACT,
-
-    GEG_PLAYER_ATTACH_HOLDER,
-    GEG_PLAYER_DETACH_HOLDER,
     
     //-------------------------------------
     GE_KILL_SOMEONE,

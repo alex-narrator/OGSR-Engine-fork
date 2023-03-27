@@ -39,6 +39,8 @@ protected:
     CUIStatic* UIMainPdaFrame;
     CUIStatic* m_updatedSectionImage;
     CUIStatic* m_oldSectionImage;
+    CUIStatic* m_currentPower;
+    CUIStatic* m_NoPower;
 
     // Текущий активный диалог
     CUIWindow* m_pActiveDialog;

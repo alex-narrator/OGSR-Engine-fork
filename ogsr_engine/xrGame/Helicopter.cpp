@@ -484,3 +484,13 @@ void CHelicopter::net_Relcase(CObject* O)
     CExplosive::net_Relcase(O);
     inherited::net_Relcase(O);
 }
+
+bool CHelicopter::CheckEnemyStatus(CEntityAlive* tgt)
+{
+    CObject* O = tgt->dcast_CObject();
+    if (O && isOnAttack() && m_enemy.destEnemyID == O->ID() && isObjectVisible(O))
+    {
+        Msg("%s: %s is enemy for %s", __FUNCTION__, cName().c_str(), tgt->cName().c_str());
+    }
+    return (O && isOnAttack() && m_enemy.destEnemyID == O->ID() && isObjectVisible(O));
+}

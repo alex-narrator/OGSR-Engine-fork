@@ -12,7 +12,7 @@
 #include "actorcondition.h"
 #include "ActorEffector.h"
 
-ZONE_INFO_SHOC::ZONE_INFO_SHOC() { pParticle = NULL; }
+ZONE_INFO_SHOC::ZONE_INFO_SHOC() {}
 
 ZONE_INFO_SHOC::~ZONE_INFO_SHOC()
 {
@@ -20,18 +20,13 @@ ZONE_INFO_SHOC::~ZONE_INFO_SHOC()
         CParticlesObject::Destroy(pParticle);
 }
 
-CCustomDetectorSHOC::CCustomDetectorSHOC(void)
-{
-    m_bWorking = false;
-    radiation_snd_time = 0;
-}
+CCustomDetectorSHOC::CCustomDetectorSHOC(void) {}
 
 CCustomDetectorSHOC::~CCustomDetectorSHOC(void)
 {
     ZONE_TYPE_MAP_IT it;
     for (it = m_ZoneTypeMap.begin(); m_ZoneTypeMap.end() != it; ++it)
         HUD_SOUND::DestroySound(it->second.detect_snds);
-    //		it->second.detect_snd.destroy();
 
     m_ZoneInfoMap.clear();
 }
@@ -56,7 +51,7 @@ void CCustomDetectorSHOC::Load(LPCSTR section)
     u32 i = 1;
     string256 temp;
 
-    //загрузить звуки для обозначения различных типов зон
+    // загрузить звуки для обозначения различных типов зон
     do
     {
         sprintf_s(temp, "zone_class_%d", i);
@@ -98,7 +93,7 @@ void CCustomDetectorSHOC::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
 
-    if (!IsWorking())
+    if (!IsPowerOn())
         return;
     if (!H_Parent())
         return;
@@ -107,8 +102,7 @@ void CCustomDetectorSHOC::shedule_Update(u32 dt)
 
     if (H_Parent() && H_Parent() == Level().CurrentViewEntity())
     {
-        Fvector P;
-        P.set(H_Parent()->Position());
+        Fvector P{H_Parent()->Position()};
         feel_touch_update(P, m_fRadius);
         UpdateNightVisionMode();
     }
@@ -121,7 +115,6 @@ void CCustomDetectorSHOC::StopAllSounds()
     {
         ZONE_TYPE_SHOC& zone_type = (*it).second;
         HUD_SOUND::StopSound(zone_type.detect_snds);
-        //		zone_type.detect_snd.stop();
     }
 }
 
@@ -129,22 +122,20 @@ void CCustomDetectorSHOC::UpdateCL()
 {
     inherited::UpdateCL();
 
-    if (!IsWorking())
+    if (!IsPowerOn())
         return;
-
     if (!H_Parent())
         return;
 
     if (!m_pCurrentActor)
         return;
 
-    ZONE_INFO_MAP_IT it;
-    for (it = m_ZoneInfoMap.begin(); m_ZoneInfoMap.end() != it; ++it)
+    for (auto& item : m_ZoneInfoMap)
     {
-        CCustomZone* pZone = it->first;
-        ZONE_INFO_SHOC& zone_info = it->second;
+        CCustomZone* pZone = item.first;
+        ZONE_INFO_SHOC& zone_info = item.second;
 
-        //такой тип зон не обнаруживается
+        // такой тип зон не обнаруживается
         if (m_ZoneTypeMap.find(pZone->CLS_ID) == m_ZoneTypeMap.end() || !pZone->VisibleByDetector())
             continue;
 
@@ -168,17 +159,16 @@ void CCustomDetectorSHOC::UpdateCL()
             continue;
 
         CSpaceRestrictor* pSR = smart_cast<CSpaceRestrictor*>(pZone);
-        float dist_to_zone = pSR->distance_to(H_Parent()->Position()); // H_Parent()->Position().distance_to(pZone->Position()) - 0.8f*pZone->Radius();
+        float dist_to_zone = pSR->distance_to(H_Parent()->Position());
         if (dist_to_zone > zone_type.m_fRadius)
             continue;
-
         if (dist_to_zone < 0)
             dist_to_zone = 0;
 
         float fRelPow = 1.f - dist_to_zone / zone_type.m_fRadius;
         clamp(fRelPow, 0.f, 1.f);
 
-        //определить текущую частоту срабатывания сигнала
+        // определить текущую частоту срабатывания сигнала
         zone_info.cur_freq = zone_type.min_freq + (zone_type.max_freq - zone_type.min_freq) * fRelPow * fRelPow * fRelPow * fRelPow;
 
         float current_snd_time = 1000.f * 1.f / zone_info.cur_freq;
@@ -243,31 +233,28 @@ u32 CCustomDetectorSHOC::ef_detector_type() const { return (m_ef_detector_type);
 void CCustomDetectorSHOC::OnMoveToRuck(EItemPlace prevPlace)
 {
     inherited::OnMoveToRuck(prevPlace);
-    TurnOff();
+    Switch(false);
 }
 
-void CCustomDetectorSHOC::OnMoveToSlot()
+void CCustomDetectorSHOC::OnMoveToSlot(EItemPlace prevPlace)
 {
-    inherited::OnMoveToSlot();
-    TurnOn();
+    inherited::OnMoveToSlot(prevPlace);
+    Switch(true);
 }
 
-void CCustomDetectorSHOC::OnMoveToBelt()
+void CCustomDetectorSHOC::OnMoveToBelt(EItemPlace prevPlace)
 {
-    inherited::OnMoveToBelt();
-    TurnOn();
+    inherited::OnMoveToBelt(prevPlace);
+    Switch(true);
 }
 
-void CCustomDetectorSHOC::TurnOn()
+void CCustomDetectorSHOC::Switch(bool turn_on)
 {
-    m_bWorking = true;
-    UpdateMapLocations();
-    UpdateNightVisionMode();
-}
+    if (turn_on && fis_zero(GetPowerLevel()))
+        return;
+    inherited::Switch(turn_on);
 
-void CCustomDetectorSHOC::TurnOff()
-{
-    m_bWorking = false;
+    m_bWorking = turn_on;
     UpdateMapLocations();
     UpdateNightVisionMode();
 }
@@ -281,7 +268,6 @@ void CCustomDetectorSHOC::AddRemoveMapSpot(CCustomZone* pZone, bool bAdd)
         return;
 
     ZONE_TYPE_SHOC& zone_type = m_ZoneTypeMap[pZone->CLS_ID];
-
     if (xr_strlen(zone_type.zone_map_location))
     {
         if (bAdd && pZone->IsEnabled())
@@ -289,7 +275,7 @@ void CCustomDetectorSHOC::AddRemoveMapSpot(CCustomZone* pZone, bool bAdd)
             if (!Level().MapManager().HasMapLocation(*zone_type.zone_map_location, pZone->ID()))
                 Level().MapManager().AddMapLocation(*zone_type.zone_map_location, pZone->ID());
         }
-        else 
+        else
         {
             if (Level().MapManager().HasMapLocation(*zone_type.zone_map_location, pZone->ID()))
                 Level().MapManager().RemoveMapLocation(*zone_type.zone_map_location, pZone->ID());
@@ -301,33 +287,27 @@ void CCustomDetectorSHOC::UpdateMapLocations() // called on turn on/off only
 {
     ZONE_INFO_MAP_IT it;
     for (it = m_ZoneInfoMap.begin(); it != m_ZoneInfoMap.end(); ++it)
-        AddRemoveMapSpot(it->first, IsWorking());
+        AddRemoveMapSpot(it->first, IsPowerOn());
 }
 
 #include "clsid_game.h"
-
 void CCustomDetectorSHOC::UpdateNightVisionMode()
 {
     bool bNightVision = Actor()->Cameras().GetPPEffector(EEffectorPPType(effNightvision)) != NULL;
 
-    bool bOn = bNightVision && m_pCurrentActor && m_pCurrentActor == Level().CurrentViewEntity() && IsWorking() && m_nightvision_particle.size();
+    bool bOn = bNightVision && m_pCurrentActor && m_pCurrentActor == Level().CurrentViewEntity() && IsPowerOn() && m_nightvision_particle.size();
 
-    ZONE_INFO_MAP_IT it;
-    for (it = m_ZoneInfoMap.begin(); m_ZoneInfoMap.end() != it; ++it)
+    for (auto& item : m_ZoneInfoMap)
     {
-        CCustomZone* pZone = it->first;
-        ZONE_INFO_SHOC& zone_info = it->second;
+        CCustomZone* pZone = item.first;
+        ZONE_INFO_SHOC& zone_info = item.second;
 
         if (bOn && pZone->IsEnabled())
         {
-            Fvector zero_vector;
-            zero_vector.set(0.f, 0.f, 0.f);
-
             if (!zone_info.pParticle)
-                zone_info.pParticle = CParticlesObject::Create(*m_nightvision_particle, FALSE);
+                zone_info.pParticle = CParticlesObject::Create(m_nightvision_particle.c_str(), FALSE);
 
-            zone_info.pParticle->UpdateParent(pZone->XFORM(), zero_vector);
-
+            zone_info.pParticle->UpdateParent(pZone->XFORM(), Fvector{});
             if (!zone_info.pParticle->IsPlaying())
                 zone_info.pParticle->Play();
         }
@@ -348,7 +328,6 @@ void CCustomDetectorSHOC::update_actor_radiation()
         return;
     if (m_ZoneTypeMap.find(CLSID_Z_RADIO) == m_ZoneTypeMap.end())
         return;
-
     ZONE_TYPE_SHOC& zone_type = m_ZoneTypeMap[CLSID_Z_RADIO];
 
     float fRelPow = m_pCurrentActor->conditions().GetRadiation();

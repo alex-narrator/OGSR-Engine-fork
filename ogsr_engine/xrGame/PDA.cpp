@@ -30,9 +30,7 @@ CPda::CPda()
     SetSlot(PDA_SLOT);
     m_flags.set(Fruck, TRUE);
 
-    m_idOriginalOwner = u16(-1);
-    m_SpecificChracterOwner = nullptr;
-    TurnOff();
+    Switch(false);
 }
 
 BOOL CPda::net_Spawn(CSE_Abstract* DC)
@@ -53,7 +51,7 @@ void CPda::net_Destroy()
     else
         CInventoryItemObject::net_Destroy();
 
-    TurnOff();
+    Switch(false);
     feel_touch.clear();
 }
 
@@ -91,12 +89,12 @@ void CPda::shedule_Update(u32 dt)
         return;
     Position().set(H_Parent()->Position());
 
-    if (IsOn() && Level().CurrentEntity() && Level().CurrentEntity()->ID() == H_Parent()->ID())
+    if (IsPowerOn() && Level().CurrentEntity() && Level().CurrentEntity()->ID() == H_Parent()->ID())
     {
         CEntityAlive* EA = smart_cast<CEntityAlive*>(H_Parent());
         if (!EA || !EA->g_Alive())
         {
-            TurnOff();
+            Switch(false);
             return;
         }
 
@@ -184,12 +182,12 @@ BOOL CPda::feel_touch_contact(CObject* O)
 
 void CPda::OnH_A_Chield()
 {
-    VERIFY(IsOff());
+    VERIFY(!IsPowerOn());
 
     //включить PDA только если оно находится у первого владельца
     if (H_Parent()->ID() == m_idOriginalOwner)
     {
-        TurnOn();
+        Switch(true);
         if (m_sFullName.empty())
         {
             m_sFullName.assign(inherited::Name());
@@ -211,7 +209,7 @@ void CPda::OnH_B_Independent(bool just_before_destroy)
         CInventoryItemObject::OnH_B_Independent(just_before_destroy);
 
     //выключить
-    TurnOff();
+    Switch(false);
 
     if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
         return;
@@ -284,18 +282,6 @@ LPCSTR CPda::Name()
 }
 
 CPda* CPda::GetPdaFromOwner(CObject* owner) { return smart_cast<CInventoryOwner*>(owner)->GetPDA(); }
-
-void CPda::TurnOn()
-{
-    m_bTurnedOff = false;
-    m_changed = true;
-}
-
-void CPda::TurnOff()
-{
-    m_bTurnedOff = true;
-    m_active_contacts.clear();
-}
 
 void CPda::net_Relcase(CObject* O)
 {
@@ -466,6 +452,7 @@ void CPda::JoystickCallback(CBoneInstance* B)
 void CPda::OnMoveToRuck(EItemPlace prevPlace)
 {
     inherited::OnMoveToRuck(prevPlace);
+    Switch(false);
 
     if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
         return;
@@ -482,6 +469,12 @@ void CPda::OnMoveToRuck(EItemPlace prevPlace)
 
     StopCurrentAnimWithoutCallback();
     SetPending(FALSE);
+}
+
+void CPda::OnMoveToSlot(EItemPlace prevPlace)
+{
+    inherited::OnMoveToSlot(prevPlace);
+    Switch(true);
 }
 
 void CPda::UpdateCL()
@@ -533,4 +526,17 @@ CPda::~CPda()
     HUD_SOUND::DestroySound(sndHide);
     HUD_SOUND::DestroySound(sndBtnPress);
     HUD_SOUND::DestroySound(sndBtnRelease);
+}
+
+void CPda::Switch(bool turn_on)
+{
+    if (turn_on && fis_zero(GetPowerLevel()))
+        return;
+    inherited::Switch(turn_on);
+
+    m_bTurnedOn = turn_on;
+    if (turn_on)
+        m_changed = true;
+    else
+        m_active_contacts.clear();
 }

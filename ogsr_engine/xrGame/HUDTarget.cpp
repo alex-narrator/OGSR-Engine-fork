@@ -213,7 +213,8 @@ void CHUDTarget::Render()
         clamp(fuzzyShowInfo, 0.f, 1.f);
     }
 
-    if (auto Wpn = smart_cast<CWeapon*>(Actor->inventory().ActiveItem()); Wpn && (Wpn->IsLaserOn() || Wpn->GetState() == CHUDState::EHudStates::eReload))
+    if (auto Wpn = smart_cast<CWeapon*>(Actor->inventory().ActiveItem());
+        Wpn && (Wpn->IsLaserOn() || Wpn->GetState() == CHUDState::EHudStates::eReload) && !psActorFlags.test(AF_CROSSHAIR_DBG))
         return;
 
     if (const u32 State = Actor->get_state() & mcSprint)

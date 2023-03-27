@@ -5,9 +5,6 @@
 #include "hudmanager.h"
 #include "weapon.h"
 #include "artifact.h"
-#include "scope.h"
-#include "silencer.h"
-#include "grenadelauncher.h"
 #include "inventory.h"
 #include "level.h"
 #include "xr_level_controller.h"
@@ -44,10 +41,6 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
             Msg("! Error: No object to take/buy [%d]", id);
             break;
         }
-
-        CFoodItem* pFood = smart_cast<CFoodItem*>(O);
-        if (pFood)
-            pFood->m_eItemPlace = eItemPlaceRuck;
 
         CGameObject* _GO = smart_cast<CGameObject*>(O);
 
@@ -109,89 +102,6 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
 
         if (Level().CurrentViewEntity() == this && HUD().GetUI() && HUD().GetUI()->UIGame())
             HUD().GetUI()->UIGame()->ReInitShownUI();
-    }
-    break;
-    case GE_INV_ACTION: {
-        s32 cmd;
-        P.r_s32(cmd);
-        u32 flags;
-        P.r_u32(flags);
-        s32 ZoomRndSeed = P.r_s32();
-        s32 ShotRndSeed = P.r_s32();
-
-        if (flags & CMD_START)
-        {
-            if (cmd == kWPN_ZOOM)
-                SetZoomRndSeed(ZoomRndSeed);
-            if (cmd == kWPN_FIRE)
-                SetShotRndSeed(ShotRndSeed);
-            IR_OnKeyboardPress(cmd);
-        }
-        else
-            IR_OnKeyboardRelease(cmd);
-    }
-    break;
-    case GEG_PLAYER_ITEM2SLOT:
-    case GEG_PLAYER_ITEM2BELT:
-    case GEG_PLAYER_ITEM2RUCK:
-    case GEG_PLAYER_ITEM_EAT:
-    case GEG_PLAYER_ACTIVATEARTEFACT: {
-        P.r_u16(id);
-        CObject* O = Level().Objects.net_Find(id);
-        if (!O)
-            break;
-        if (O->getDestroy())
-        {
-#ifdef DEBUG
-            Msg("! something to destroyed object - %s[%d]0x%X", *O->cName(), id, smart_cast<CInventoryItem*>(O));
-#endif
-            break;
-        }
-        switch (type)
-        {
-        case GEG_PLAYER_ITEM2SLOT: inventory().Slot(smart_cast<CInventoryItem*>(O)); break;
-        case GEG_PLAYER_ITEM2BELT: inventory().Belt(smart_cast<CInventoryItem*>(O)); break;
-        case GEG_PLAYER_ITEM2RUCK: inventory().Ruck(smart_cast<CInventoryItem*>(O)); break;
-        case GEG_PLAYER_ITEM_EAT: inventory().Eat(smart_cast<CInventoryItem*>(O)); break;
-        case GEG_PLAYER_ACTIVATEARTEFACT: {
-            CArtefact* pArtefact = smart_cast<CArtefact*>(O);
-            pArtefact->ActivateArtefact();
-        }
-        break;
-        }
-    }
-    break;
-    case GEG_PLAYER_ACTIVATE_SLOT: {
-        u32 slot_id;
-        P.r_u32(slot_id);
-
-        inventory().Activate(slot_id);
-    }
-    break;
-
-    case GEG_PLAYER_ATTACH_HOLDER: {
-        u32 id = P.r_u32();
-        CObject* O = Level().Objects.net_Find(id);
-        if (!O)
-        {
-            Msg("! Error: No object to attach holder [%d]", id);
-            break;
-        }
-        VERIFY(m_holder == NULL);
-        CHolderCustom* holder = smart_cast<CHolderCustom*>(O);
-        if (!holder->Engaged())
-            use_Holder(holder);
-    }
-    break;
-    case GEG_PLAYER_DETACH_HOLDER: {
-        if (!m_holder)
-            break;
-#ifdef DEBUG
-        u32 id =
-#endif
-            P.r_u32();
-        VERIFY(id == smart_cast<CGameObject*>(m_holder)->ID());
-        use_Holder(NULL);
     }
     break;
     }

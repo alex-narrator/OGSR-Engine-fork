@@ -14,11 +14,11 @@
 
 #include "level_bullet_manager.h"
 
-#define FLAME_TIME 0.05f
+constexpr auto FLAME_TIME = 0.05f;
 
 float _nrand(float sigma)
 {
-#define ONE_OVER_SIGMA_EXP (1.0f / 0.7975f)
+constexpr auto ONE_OVER_SIGMA_EXP = (1.0f / 0.7975f);
 
     if (sigma == 0)
         return 0;
@@ -40,7 +40,7 @@ void random_dir(Fvector& tgt_dir, const Fvector& src_dir, float dispersion)
     float alpha = clampr(_nrand(sigma), -dispersion, dispersion);
     float theta = Random.randF(0, PI);
     float r = tan(alpha);
-    Fvector U, V, T;
+    Fvector U{}, V{}, T{};
     Fvector::generate_orthonormal_basis(src_dir, U, V);
     U.mul(r * _sin(theta));
     V.mul(r * _cos(theta));
@@ -48,7 +48,11 @@ void random_dir(Fvector& tgt_dir, const Fvector& src_dir, float dispersion)
     tgt_dir.add(src_dir, T).normalize();
 }
 
-float CWeapon::GetWeaponDeterioration() { return conditionDecreasePerShot; };
+float CWeapon::GetWeaponDeterioration() const
+{
+    float silencer_dec_k = IsAddonAttached(eSilencer) && AddonAttachable(eSilencer) ? conditionDecreasePerShotSilencer : 0.f;
+    return (conditionDecreasePerShot + conditionDecreasePerShot * silencer_dec_k);
+};
 
 void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
 {
@@ -66,14 +70,9 @@ void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
     //повысить изношенность оружия с учетом влияния конкретного патрона
     //	float Deterioration = GetWeaponDeterioration();
     //	Msg("Deterioration = %f", Deterioration);
-    if (Core.Features.test(xrCore::Feature::npc_simplified_shooting))
-    {
-        CActor* actor = smart_cast<CActor*>(H_Parent());
-        if (actor)
-            ChangeCondition(-GetWeaponDeterioration() * l_cartridge.m_impair);
-    }
-    else
-        ChangeCondition(-GetWeaponDeterioration() * l_cartridge.m_impair);
+    float deterioration = GetWeaponDeterioration() + (GetWeaponDeterioration() * l_cartridge.m_impair);
+    if (!Core.Features.test(xrCore::Feature::npc_simplified_shooting) || smart_cast<CActor*>(H_Parent()))
+        ChangeCondition(-deterioration);
 
     float fire_disp = GetFireDispersion(true);
 

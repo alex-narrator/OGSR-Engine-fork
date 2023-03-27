@@ -5,7 +5,7 @@
 #include "../xr_3da/xr_input.h"
 #include "HudManager.h"
 #include "HudItem.h"
-#include "Weapon.h"
+#include "WeaponMagazined.h"
 #include <array>
 
 enum HUD_ADJUST_MODE : int
@@ -82,7 +82,7 @@ static void tune_remap(const Ivector& in_values, Ivector& out_values)
 
 static void calc_cam_diff_pos(const Fmatrix& item_transform, const Fvector& diff, Fvector& res)
 {
-    Fmatrix cam_m;
+    Fmatrix cam_m{};
     cam_m.i.set(Device.vCameraRight);
     cam_m.j.set(Device.vCameraTop);
     cam_m.k.set(Device.vCameraDirection);
@@ -91,7 +91,7 @@ static void calc_cam_diff_pos(const Fmatrix& item_transform, const Fvector& diff
     Fvector res1;
     cam_m.transform_dir(res1, diff);
 
-    Fmatrix item_transform_i;
+    Fmatrix item_transform_i{};
     item_transform_i.invert(item_transform);
     item_transform_i.transform_dir(res, res1);
 }
@@ -165,12 +165,12 @@ void attachable_hud_item::tune(const Ivector& values)
             m_measures.m_shell_point_offset.add(diff);
         else if (g_bHudAdjustMode == LASETDOT_POS)
         {
-            if (auto Wpn = smart_cast<CWeapon*>(m_parent_hud_item))
+            if (auto Wpn = smart_cast<CWeaponMagazined*>(m_parent_hud_item))
                 Wpn->laserdot_attach_offset.add(diff);
         }
         else if (g_bHudAdjustMode == FLASHLIGHT_POS)
         {
-            if (auto Wpn = smart_cast<CWeapon*>(m_parent_hud_item))
+            if (auto Wpn = smart_cast<CWeaponMagazined*>(m_parent_hud_item))
                 Wpn->flashlight_attach_offset.add(diff);
         }
 
@@ -181,7 +181,7 @@ void attachable_hud_item::tune(const Ivector& values)
             Msg("fire_point = %f,%f,%f", m_measures.m_fire_point_offset.x, m_measures.m_fire_point_offset.y, m_measures.m_fire_point_offset.z);
             Msg("fire_point2 = %f,%f,%f", m_measures.m_fire_point2_offset.x, m_measures.m_fire_point2_offset.y, m_measures.m_fire_point2_offset.z);
             Msg("shell_point = %f,%f,%f", m_measures.m_shell_point_offset.x, m_measures.m_shell_point_offset.y, m_measures.m_shell_point_offset.z);
-            if (auto Wpn = smart_cast<CWeapon*>(m_parent_hud_item))
+            if (auto Wpn = smart_cast<CWeaponMagazined*>(m_parent_hud_item))
             {
                 Msg("laserdot_attach_offset = %f,%f,%f", Wpn->laserdot_attach_offset.x, Wpn->laserdot_attach_offset.y, Wpn->laserdot_attach_offset.z);
                 Msg("torch_attach_offset = %f,%f,%f", Wpn->flashlight_attach_offset.x, Wpn->flashlight_attach_offset.y, Wpn->flashlight_attach_offset.z);
@@ -218,12 +218,12 @@ void attachable_hud_item::debug_draw_firedeps()
         }
         else if (g_bHudAdjustMode == LASETDOT_POS)
         {
-            if (auto Wpn = smart_cast<CWeapon*>(m_parent_hud_item))
+            if (auto Wpn = smart_cast<CWeaponMagazined*>(m_parent_hud_item))
                 render.draw_aabb(Wpn->laser_pos, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(125, 0, 0));
         }
         else if (g_bHudAdjustMode == FLASHLIGHT_POS)
         {
-            if (auto Wpn = smart_cast<CWeapon*>(m_parent_hud_item))
+            if (auto Wpn = smart_cast<CWeaponMagazined*>(m_parent_hud_item))
                 render.draw_aabb(Wpn->flashlight_pos, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(0, 56, 125));
         }
     }
@@ -291,6 +291,14 @@ void player_hud::tune(const Ivector& _values)
                 Msg("[%s]", m_attached_items[g_bHudAdjustItemIdx]->m_sect_name.c_str());
                 Msg("aim_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
                 Msg("aim_hud_offset_rot%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+                Log("####################################");
+            }
+            else if (idx == hud_item_measures::m_hands_offset_type_aim_second)
+            {
+                Log("####################################");
+                Msg("[%s]", m_attached_items[g_bHudAdjustItemIdx]->m_sect_name.c_str());
+                Msg("aim_second_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+                Msg("aim_second_hud_offset_rot%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
                 Log("####################################");
             }
             else if (idx == hud_item_measures::m_hands_offset_type_gl)

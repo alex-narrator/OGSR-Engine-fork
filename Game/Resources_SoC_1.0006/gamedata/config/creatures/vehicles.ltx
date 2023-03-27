@@ -1,0 +1,30 @@
+[vehicle_niva] 
+GroupControlSection = spawn_group
+$spawn 					= "vehicles\niva"
+class 					= SCRPTCAR
+cform 					= skeleton
+visual 					= physics\vehicles\niva\veh_niva_u_01.ogf 
+actor_visual 			= physics\vehicles\niva\veh_niva_u_01.ogf 
+ef_equipment_type 		= 3
+ph_mass 				= 100000
+script_binding 			= bind_physic_object.init 
+;weapon_allowed 			= false
+
+[vehicle_uaz]
+GroupControlSection   	= spawn_group
+$spawn                	= "vehicles\vehicle_uaz"
+class                 	= SCRPTCAR
+cform                 	= skeleton
+visual                	= physics\vehicles\uaz\veh_uaz_u_01.ogf
+actor_visual          	= physics\vehicles\uaz\veh_uaz_u_01.ogf
+ef_equipment_type     	= 3
+ph_mass               	= 99000
+script_binding        	= bind_physic_object.init
+ 
+ph_skeleton_airr_lin_factor    = 2.0
+ph_skeleton_airr_ang_factor    = 0.0
+ph_skeleton_hinger_factor1     = 1.0
+ph_skeleton_ddelay             = 15.0
+ph_skel_fatal_impulse_factor   = 12.0
+ph_skel_shot_up_factor         = 0.25
+ph_after_death_velocity_factor = 0.75

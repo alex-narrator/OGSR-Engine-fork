@@ -2,8 +2,8 @@
 #include "WeaponKnife.h"
 #include "Entity.h"
 #include "Actor.h"
-#include "torch.h"
-#include "inventory.h"
+#include "Inventory.h"
+#include "ActorCondition.h"
 #include "level.h"
 #include "xr_level_controller.h"
 #include "../xr_3da/gamemtllib.h"
@@ -12,23 +12,21 @@
 #include "game_cl_single.h"
 #include "game_object_space.h"
 #include "Level_Bullet_Manager.h"
-#include "../xr_3da/x_ray.h"
+#include "HUDManager.h"
 
-#define KNIFE_MATERIAL_NAME "objects\\knife"
+constexpr auto KNIFE_MATERIAL_NAME = "objects\\knife";
 
 CWeaponKnife::CWeaponKnife() : CWeapon("KNIFE")
 {
-    m_attackStart = false;
-    m_attackMotionMarksAvailable = false;
     SetState(eHidden);
     SetNextState(eHidden);
-    knife_material_idx = (u16)-1;
 }
 
 CWeaponKnife::~CWeaponKnife()
 {
     HUD_SOUND::DestroySound(m_sndShot);
-    HUD_SOUND::DestroySound(sndItemOn);
+    HUD_SOUND::DestroySound(m_sndShow);
+    HUD_SOUND::DestroySound(m_sndHide);
 }
 
 void CWeaponKnife::Load(LPCSTR section)
@@ -40,10 +38,14 @@ void CWeaponKnife::Load(LPCSTR section)
 
     HUD_SOUND::LoadSound(section, "snd_shoot", m_sndShot, ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING));
 
-    if (pSettings->line_exist(section, "snd_item_on"))
-        HUD_SOUND::LoadSound(section, "snd_item_on", sndItemOn);
+    if (pSettings->line_exist(section, "snd_draw"))
+        HUD_SOUND::LoadSound(section, "snd_draw", m_sndShow);
+    if (pSettings->line_exist(section, "snd_holster"))
+        HUD_SOUND::LoadSound(section, "snd_holster", m_sndHide);
 
     knife_material_idx = GMLib.GetMaterialIdx(KNIFE_MATERIAL_NAME);
+
+    m_fMinConditionHitPart = READ_IF_EXISTS(pSettings, r_float, section, "min_condition_hit_part", 1.0f);
 }
 
 void CWeaponKnife::OnStateSwitch(u32 S, u32 oldState)
@@ -60,24 +62,6 @@ void CWeaponKnife::OnStateSwitch(u32 S, u32 oldState)
         switch2_Attacking(S);
     }
     break;
-    case eDeviceSwitch: {
-        SetPending(TRUE);
-        PlayAnimDeviceSwitch();
-    }
-    break;
-    }
-}
-
-void CWeaponKnife::PlayAnimDeviceSwitch()
-{
-    PlaySound(sndItemOn, Position());
-
-    if (AnimationExist("anm_headlamp_on"))
-        PlayHUDMotion("anm_headlamp_on", true, GetState());
-    else
-    {
-        DeviceUpdate();
-        SwitchState(eIdle);
     }
 }
 
@@ -130,11 +114,11 @@ void CWeaponKnife::KnifeStrike(u32 state, const Fvector& pos, const Fvector& dir
     {
         CCartridge cartridge;
         cartridge.m_buckShot = 1;
-        cartridge.m_impair = 1;
-        cartridge.m_kDisp = 1;
-        cartridge.m_kHit = 1;
-        cartridge.m_kImpulse = 1;
-        cartridge.m_kPierce = 1;
+        cartridge.m_impair = 0.f;
+        cartridge.m_kDisp = 0.f;
+        cartridge.m_kHit = 0.f;
+        cartridge.m_kImpulse = 0.f;
+        cartridge.m_kPierce = 0.f;
         cartridge.m_flags.set(CCartridge::cfTracer, FALSE);
         cartridge.m_flags.set(CCartridge::cfRicochet, FALSE);
         cartridge.fWallmarkSize = fWallmarkSize;
@@ -149,8 +133,16 @@ void CWeaponKnife::KnifeStrike(u32 state, const Fvector& pos, const Fvector& dir
 
         PlaySound(m_sndShot, pos);
 
-        if (ParentIsActor() && !fis_zero(conditionDecreasePerShotOnHit) && GetCondition() < 0.95f)
-            cur_fHit = cur_fHit * (GetCondition() / 0.95f);
+        if (ParentIsActor())
+        {
+            float condition_k{1.f};
+            if (!fis_zero(conditionDecreasePerShotOnHit))
+                condition_k = m_fMinConditionHitPart + (1 - m_fMinConditionHitPart) * GetCondition();
+            cur_fHit *= (condition_k * Actor()->conditions().GetPower());
+            if (fis_zero(GetCondition()))
+                m_eHitType = m_eHitType_ZeroCondition;
+        }
+
         SBullet& bullet =
             Level().BulletManager().AddBullet(pos, dir, m_fStartBulletSpeed, cur_fHit, cur_fHitImpulse, H_Parent()->ID(), ID(), cur_eHitType, fireDistance, cartridge, send_hit);
         if (ParentIsActor())
@@ -164,7 +156,7 @@ void CWeaponKnife::OnMotionMark(u32 state, const motion_marks& M)
 
     if (H_Parent())
     {
-        Fvector p1, d;
+        Fvector p1{}, d{};
         p1.set(get_LastFP());
         d.set(get_LastFD());
         smart_cast<CEntity*>(H_Parent())->g_fireParams(this, p1, d);
@@ -174,6 +166,7 @@ void CWeaponKnife::OnMotionMark(u32 state, const motion_marks& M)
 
 void CWeaponKnife::OnAnimationEnd(u32 state)
 {
+    inherited::OnAnimationEnd(state);
     switch (state)
     {
     case eHiding: SwitchState(eHidden); break;
@@ -188,7 +181,7 @@ void CWeaponKnife::OnAnimationEnd(u32 state)
             else // eFire2
                 time = PlayHUDMotion({"anim_shoot2_end", "anm_attack2_end"}, false, state);
 
-            Fvector p1, d;
+            Fvector p1{}, d{};
             p1.set(get_LastFP());
             d.set(get_LastFD());
 
@@ -199,6 +192,13 @@ void CWeaponKnife::OnAnimationEnd(u32 state)
 
             if (time != 0 && !m_attackMotionMarksAvailable)
                 KnifeStrike(state, p1, d);
+
+            if (ParentIsActor() && m_bIsQuickStab)
+            {
+                auto& inv = Actor()->inventory();
+                inv.Activate(inv.GetPrevActiveSlot(), eGeneral, true, true);
+                m_bIsQuickStab = false;
+            }
         }
         if (time == 0)
         {
@@ -207,9 +207,16 @@ void CWeaponKnife::OnAnimationEnd(u32 state)
     }
     break;
     case eShowing:
-    case eDeviceSwitch:
-    case eIdle: SwitchState(eIdle); break;
-    default: inherited::OnAnimationEnd(state);
+        SwitchState(eIdle);
+        if (m_bIsQuickStab)
+        {
+            FireStart();
+        }
+        break;
+    case eIdle:
+        SwitchState(eIdle);
+        break;
+        break;
     }
 }
 
@@ -241,35 +248,59 @@ void CWeaponKnife::switch2_Hiding()
     FireEnd();
     VERIFY(GetState() == eHiding);
     PlayHUDMotion({"anim_hide", "anm_hide"}, true, GetState());
+    PlaySound(m_sndHide, Position());
+    SetPending(TRUE);
 }
 
 void CWeaponKnife::switch2_Hidden()
 {
     signal_HideComplete();
     SetPending(FALSE);
+    m_bIsQuickStab = false;
 }
 
 void CWeaponKnife::switch2_Showing()
 {
     VERIFY(GetState() == eShowing);
     PlayHUDMotion({"anim_draw", "anm_show"}, false, GetState());
+    PlaySound(m_sndShow, Position());
+    SetPending(TRUE);
 }
 
 void CWeaponKnife::FireStart()
 {
-    inherited::FireStart();
-    SwitchState(eFire);
+    if (!ParentIsActor() || (ParentIsActor() && !Actor()->conditions().IsCantWalk()))
+    {
+        inherited::FireStart();
+        SwitchState(eFire);
+    }
+    //
+    if (ParentIsActor() && !GodMode())
+    {
+        if (!Actor()->conditions().IsCantWalk())
+            Actor()->conditions().ConditionJump(Weight() * 0.1f);
+        else
+            HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
+    }
+    //
 }
 
 void CWeaponKnife::Fire2Start()
 {
-    inherited::Fire2Start();
-    SwitchState(eFire2);
-
-    if (ParentIsActor())
+    if (!ParentIsActor() || (ParentIsActor() && !Actor()->conditions().IsCantWalk()))
     {
-        Actor()->set_state_wishful(Actor()->get_state_wishful() & (~mcSprint));
+        inherited::Fire2Start();
+        SwitchState(eFire2);
     }
+
+    if (ParentIsActor() && !GodMode())
+    {
+        if (!Actor()->conditions().IsCantWalk())
+            Actor()->conditions().ConditionJump(Weight() * 0.1f);
+        else
+            HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
+    }
+    //
 }
 
 bool CWeaponKnife::Action(s32 cmd, u32 flags)
@@ -279,58 +310,13 @@ bool CWeaponKnife::Action(s32 cmd, u32 flags)
     switch (cmd)
     {
     case kWPN_ZOOM:
-        if (flags & CMD_START)
-            Fire2Start();
+        if (flags & CMD_START && !IsPending())
+            Fire2Start(); //! IsPending() добавлено чтобы Fire2Start() вызывался только по окончании атаки а не по каждому нажатию kWPN_ZOOM
         else
             Fire2End();
         return true;
-    case kTORCH: {
-        auto pActorTorch = smart_cast<CActor*>(H_Parent())->inventory().ItemFromSlot(TORCH_SLOT);
-        if ((flags & CMD_START) && pActorTorch && GetState() == eIdle)
-        {
-            HeadLampSwitch = true;
-            SwitchState(eDeviceSwitch);
-            return true;
-        }
-    }
-    break;
-    case kNIGHT_VISION: {
-        auto pActorNv = smart_cast<CActor*>(H_Parent())->inventory().ItemFromSlot(IS_OGSR_GA ? NIGHT_VISION_SLOT : TORCH_SLOT);
-        if ((flags & CMD_START) && pActorNv && GetState() == eIdle)
-        {
-            NightVisionSwitch = true;
-            SwitchState(eDeviceSwitch);
-            return true;
-        }
-    }
-    break;
     }
     return false;
-}
-
-void CWeaponKnife::DeviceUpdate()
-{
-    if (auto pA = smart_cast<CActor*>(H_Parent()))
-    {
-        if (HeadLampSwitch)
-        {
-            auto pActorTorch = smart_cast<CTorch*>(pA->inventory().ItemFromSlot(TORCH_SLOT));
-            pActorTorch->Switch();
-            HeadLampSwitch = false;
-        }
-        else if (NightVisionSwitch)
-        {
-            if (auto pActorTorch = smart_cast<CTorch*>(pA->inventory().ItemFromSlot(TORCH_SLOT)))
-                pActorTorch->SwitchNightVision();
-            NightVisionSwitch = false;
-        }
-    }
-}
-
-void CWeaponKnife::UpdateCL()
-{
-    inherited::UpdateCL();
-    TimeLockAnimation();
 }
 
 void CWeaponKnife::LoadFireParams(LPCSTR section, LPCSTR prefix)
@@ -347,33 +333,28 @@ void CWeaponKnife::LoadFireParams(LPCSTR section, LPCSTR prefix)
 
     // fHitPower_2			= pSettings->r_float	(section,strconcat(full_name, prefix, "hit_power_2"));
     s_sHitPower_2 = pSettings->r_string_wb(section, strconcat(sizeof(full_name), full_name, prefix, "hit_power_2"));
-    fvHitPower_2[egdMaster] = (float)atof(_GetItem(*s_sHitPower_2, 0, buffer)); //первый параметр - это хит для уровня игры мастер
+    fvHitPower_2[egdMaster] = (float)atof(_GetItem(*s_sHitPower_2, 0, buffer)); // первый параметр - это хит для уровня игры мастер
 
-    fvHitPower_2[egdVeteran] = fvHitPower_2[egdMaster]; //изначально параметры для других уровней
-    fvHitPower_2[egdStalker] = fvHitPower_2[egdMaster]; //сложности
-    fvHitPower_2[egdNovice] = fvHitPower_2[egdMaster]; //такие же
+    fvHitPower_2[egdVeteran] = fvHitPower_2[egdMaster]; // изначально параметры для других уровней
+    fvHitPower_2[egdStalker] = fvHitPower_2[egdMaster]; // сложности
+    fvHitPower_2[egdNovice] = fvHitPower_2[egdMaster]; // такие же
 
-    int num_game_diff_param = _GetItemCount(*s_sHitPower_2); //узнаём колличество параметров для хитов
-    if (num_game_diff_param > 1) //если задан второй параметр хита
+    int num_game_diff_param = _GetItemCount(*s_sHitPower_2); // узнаём колличество параметров для хитов
+    if (num_game_diff_param > 1) // если задан второй параметр хита
     {
-        fvHitPower_2[egdVeteran] = (float)atof(_GetItem(*s_sHitPower_2, 1, buffer)); //то вычитываем его для уровня ветерана
+        fvHitPower_2[egdVeteran] = (float)atof(_GetItem(*s_sHitPower_2, 1, buffer)); // то вычитываем его для уровня ветерана
     }
-    if (num_game_diff_param > 2) //если задан третий параметр хита
+    if (num_game_diff_param > 2) // если задан третий параметр хита
     {
-        fvHitPower_2[egdStalker] = (float)atof(_GetItem(*s_sHitPower_2, 2, buffer)); //то вычитываем его для уровня сталкера
+        fvHitPower_2[egdStalker] = (float)atof(_GetItem(*s_sHitPower_2, 2, buffer)); // то вычитываем его для уровня сталкера
     }
-    if (num_game_diff_param > 3) //если задан четвёртый параметр хита
+    if (num_game_diff_param > 3) // если задан четвёртый параметр хита
     {
-        fvHitPower_2[egdNovice] = (float)atof(_GetItem(*s_sHitPower_2, 3, buffer)); //то вычитываем его для уровня новичка
+        fvHitPower_2[egdNovice] = (float)atof(_GetItem(*s_sHitPower_2, 3, buffer)); // то вычитываем его для уровня новичка
     }
 
     fHitImpulse_2 = pSettings->r_float(section, strconcat(sizeof(full_name), full_name, prefix, "hit_impulse_2"));
     m_eHitType_2 = ALife::g_tfString2HitType(pSettings->r_string(section, "hit_type_2"));
-}
 
-void CWeaponKnife::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
-{
-    str_name = NameShort();
-    str_count = "";
-    icon_sect_name = *cNameSect();
+    m_eHitType_ZeroCondition = ALife::g_tfString2HitType(READ_IF_EXISTS(pSettings, r_string, section, "hit_type_zero_condition", "wound"));
 }

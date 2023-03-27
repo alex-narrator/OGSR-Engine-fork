@@ -46,13 +46,13 @@ public:
     virtual bool StopSprintOnFire() { return false; }
 
 protected:
-    HUD_SOUND sndCheckout;
-    ESoundTypes m_eSoundCheckout;
+    //HUD_SOUND sndCheckout;
+    //ESoundTypes m_eSoundCheckout;
     virtual size_t GetWeaponTypeForCollision() const override { return Knife_and_other; }
 
 private:
-    float m_grenade_detonation_threshold_hit;
-    bool m_thrown;
+    float m_grenade_detonation_threshold_hit{};
+    bool m_thrown{};
 
 protected:
     virtual void UpdateXForm() { CMissile::UpdateXForm(); };
@@ -68,6 +68,7 @@ public:
     using destroy_callback = fastdelegate::FastDelegate<void(CGrenade*)>;
     void set_destroy_callback(destroy_callback callback) { m_destroy_callback = callback; }
     //void DestroyCallbackClear() { m_destroy_callback.clear(); }
+    virtual void Contact(CPhysicsShellHolder* obj);
 
 private:
     destroy_callback m_destroy_callback;

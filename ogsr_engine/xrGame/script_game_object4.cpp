@@ -244,10 +244,8 @@ bool CScriptGameObject::IsInvBoxEmpty()
 #include "Artifact.h"
 #include "medkit.h"
 #include "antirad.h"
-#include "scope.h"
-#include "silencer.h"
+#include "Addons.h"
 #include "torch.h"
-#include "GrenadeLauncher.h"
 #include "searchlight.h"
 #include "WeaponAmmo.h"
 #include "grenade.h"
@@ -491,16 +489,6 @@ float CScriptGameObject::GetBinocZoomFactor()
     }
     return k->GetZoomFactor();
 }
-void CScriptGameObject::SetBinocZoomFactor(float _zoom)
-{
-    CWeaponBinoculars* k = smart_cast<CWeaponBinoculars*>(&object());
-    if (!k)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeaponBinoculars : cannot access class member SetBinocZoomFactor!");
-        return;
-    }
-    k->SetZoomFactor(_zoom);
-}
 float CScriptGameObject::GetZoomFactor()
 {
     CWeapon* k = smart_cast<CWeapon*>(&object());
@@ -559,7 +547,7 @@ bool CScriptGameObject::GrenadeLauncherAttachable()
         ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeapon : cannot access class member GrenadeLauncherAttachable!");
         return false;
     }
-    return k->GrenadeLauncherAttachable();
+    return k->AddonAttachable(eLauncher);
 }
 u32 CScriptGameObject::GetAmmoType()
 {
@@ -666,38 +654,6 @@ void CScriptGameObject::ZeroEffects()
         return;
     }
     item->ZeroAllEffects();
-}
-void CScriptGameObject::SetRadiationInfluence(float rad)
-{
-    CEatableItem* item = smart_cast<CEatableItem*>(&object());
-    if (!item)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CEatableItem : cannot access class member ZeroEffects!");
-        return;
-    }
-    item->SetRadiation(rad);
-}
-
-void CScriptGameObject::SetDrugRadProtection(float _prot)
-{
-    CActor* k = smart_cast<CActor*>(&object());
-    if (!k)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot access class member SetDrugRadProtection!");
-        return;
-    }
-    k->SetDrugRadProtection(_prot);
-}
-
-void CScriptGameObject::SetDrugPsyProtection(float _prot)
-{
-    CActor* k = smart_cast<CActor*>(&object());
-    if (!k)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot access class member SetDrugPsyProtection!");
-        return;
-    }
-    k->SetDrugPsyProtection(_prot);
 }
 
 u32 CScriptGameObject::GetHudItemState()

@@ -5,6 +5,7 @@
 #include "PHObject.h"
 #include "script_export_space.h"
 #include "patrol_path.h"
+#include "hudsound.h"
 
 struct SArtefactActivation;
 
@@ -40,6 +41,7 @@ public:
 
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
+    virtual void net_Export(CSE_Abstract* E);
 
     virtual void OnH_A_Chield();
     virtual void OnH_B_Independent(bool just_before_destroy);
@@ -62,22 +64,27 @@ protected:
     virtual void UpdateCLChild(){};
 
     u16 m_CarringBoneID;
-    shared_str m_sParticlesName;
+    shared_str m_sParticlesName{};
+
+    HUD_SOUND sndShow, sndHide, sndActivate;
 
 protected:
-    SArtefactActivation* m_activationObj;
+    SArtefactActivation* m_activationObj{};
     //////////////////////////////////////////////////////////////////////////
     //	Lights
     //////////////////////////////////////////////////////////////////////////
     //флаг, что подсветка может быть включена
     bool m_bLightsEnabled;
     //подсветка во время полета и работы двигателя
-    ref_light m_pTrailLight;
+    ref_light m_pTrailLight{};
     Fcolor m_TrailLightColor;
     float m_fTrailLightRange;
 
     SArtefactDetectorsSupport* m_detectorObj{};
     u8 m_af_rank{};
+
+    float GetTrailLightRange() { return m_fTrailLightRange * GetCondition(); };
+    bool IsLightsEnabled() { return m_bLightsEnabled && !!GetCondition(); }
 
 protected:
     virtual void UpdateLights();
@@ -92,27 +99,26 @@ public:
     virtual void PhTune(dReal step){};
 
     bool m_bCanSpawnZone;
+    //
+    float m_fRandomKMin{1.f};
+    float m_fRandomKMax{1.f};
+    float m_fRandomK{1.f};
+    float GetRandomKoef() const { return m_fRandomK; };
 
-    float m_fHealthRestoreSpeed;
-    float m_fSatietyRestoreSpeed;
-    float m_fPowerRestoreSpeed;
-    float m_fBleedingRestoreSpeed;
-    float m_fThirstRestoreSpeed;
+    virtual float GetHitTypeProtection(int) const;
+    virtual float GetItemEffect(int) const;
 
-    float m_additional_weight;
-    float m_additional_weight2;
+    virtual void UpdateConditionDecrease() override;
 
-    CHitImmunity m_ArtefactHitImmunities;
-
-public:
-    enum EAFHudStates
-    {
-        eIdle = 0,
-        eShowing,
-        eHiding,
-        eHidden,
-        eActivating,
-    };
+//public:
+//    enum EAFHudStates
+//    {
+//        eIdle = 0,
+//        eShowing,
+//        eHiding,
+//        eHidden,
+//        eActivating,
+//    };
 
 public:
     virtual void Hide(bool = false);
@@ -123,7 +129,6 @@ public:
     virtual void OnStateSwitch(u32 S, u32 oldState);
     virtual void OnAnimationEnd(u32 state);
     virtual bool IsHidden() const { return GetState() == eHidden; }
-    virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
 
     // optimization FAST/SLOW mode
 public:

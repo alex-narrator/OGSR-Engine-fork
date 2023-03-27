@@ -1,0 +1,66 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;TOOLS AND PARTS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[tool_base]:identity_immunities
+GroupControlSection		= spawn_group
+discovery_dependency	=
+$spawn					= "food and drugs\harmonica_a"
+cform                   = skeleton
+class					= II_ATTCH
+visual                  = Equipments\item_harmonica.ogf
+cost					= 35
+inv_name				= "tool_base"
+inv_name_short			= "tool_base"
+inv_weight				= 0.01
+inv_grid_width     = 1
+inv_grid_height    = 2
+inv_grid_x         = 23
+inv_grid_y         = 33
+
+[multitool]:tool_base
+inv_name				= "multitool"
+inv_name_short			= "multitool"
+inv_weight				= 0.1
+inv_grid_width     = 1
+inv_grid_height    = 2
+inv_grid_x         = 23
+inv_grid_y         = 33
+
+[service_kit_weapon]:tool_base
+inv_name				= "service_kit_weapon"
+inv_name_short			= "service_kit_weapon"
+description				= "service_kit_weapon"
+inv_weight				= 0.2
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 20
+inv_grid_y         = 26
+repair_condition_gain = 0.05
+repair_condition_threshold = 0.9
+repair_count = 10
+
+[service_kit_armor]:tool_base
+inv_name				= "service_kit_armor"
+inv_name_short			= "service_kit_armor"
+description				= "service_kit_armor"
+inv_weight				= 0.2
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 20
+inv_grid_y         = 27
+repair_condition_gain = 0.05
+repair_condition_threshold = 0.9
+repair_count = 10
+
+[weapon_parts_pistol]:tool_base
+inv_name				= "weapon_parts_pistol"
+inv_name_short			= "weapon_parts_pistol"
+inv_weight				= 0.2
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 28
+inv_grid_y         = 37
+repair_condition_gain = 0.2
+repair_condition_threshold = 0.5
+repair_count = 1
+required_tools = multitool

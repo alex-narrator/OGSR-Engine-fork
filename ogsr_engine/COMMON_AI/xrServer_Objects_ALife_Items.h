@@ -41,14 +41,29 @@ union mask_num_items
 };
 
 public:
-float m_fCondition;
+float m_fCondition{1.f};
 float m_fMass;
 u32 m_dwCost;
-s32 m_iHealthValue;
-s32 m_iFoodValue;
-float m_fDeteriorationValue;
+s32 m_iHealthValue{};
+s32 m_iFoodValue{};
+float m_fDeteriorationValue{};
 CSE_ALifeObject* m_self{};
-u32 m_last_update_time;
+u32 m_last_update_time{};
+//
+float m_fRadiationRestoreSpeed{};
+// статус джерела живлення
+enum EPowerSourceStatus
+{
+    ePowerSourceDisabled = 0, // без джерела живлення
+    ePowerSourcePermanent = 1, // незнімне джерело
+    ePowerSourceAttachable = 2 // від'ємне джерело
+};
+EPowerSourceStatus m_power_source_status{};
+u8 m_cur_power_source{};
+float m_fLastTimeCalled{};
+bool m_bIsPowerSourceAttached{true};
+float m_fPowerLevel{};
+float m_fAttachedPowerSourceCondition{1.f};
 
 CSE_ALifeInventoryItem(LPCSTR caSection);
 virtual ~CSE_ALifeInventoryItem();
@@ -72,7 +87,7 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeInventoryItem)
 #define script_type_list save_type_list(CSE_ALifeInventoryItem)
 
-    SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeItem, CSE_ALifeDynamicObjectVisual, CSE_ALifeInventoryItem) bool m_physics_disabled;
+    SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeItem, CSE_ALifeDynamicObjectVisual, CSE_ALifeInventoryItem) bool m_physics_disabled{};
 
 CSE_ALifeItem(LPCSTR caSection);
 virtual ~CSE_ALifeItem();
@@ -88,15 +103,13 @@ add_to_type_list(CSE_ALifeItem)
 #define script_type_list save_type_list(CSE_ALifeItem)
 
     SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemTorch, CSE_ALifeItem)
-    //флаги
+    // флаги
     enum EStats {
         eTorchActive = (1 << 0),
-        eNightVisionActive = (1 << 1),
-        eAttached = (1 << 2)
+        eAttached = (1 << 1)
     };
-bool m_active;
-bool m_nightvision_active;
-bool m_attached;
+bool m_active{};
+bool m_attached{};
 CSE_ALifeItemTorch(LPCSTR caSection);
 virtual ~CSE_ALifeItemTorch();
 virtual BOOL Net_Relevant();
@@ -105,8 +118,12 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemTorch)
 #define script_type_list save_type_list(CSE_ALifeItemTorch)
 
-    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemAmmo, CSE_ALifeItem) u16 a_elapsed;
+    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemAmmo, CSE_ALifeItem) 
+u16 a_elapsed;
 u16 m_boxSize;
+bool m_bNeedFindPlace{};
+EItemPlace m_eTargetPlace{};
+u8 m_target_slot{u8(-1)};
 
 CSE_ALifeItemAmmo(LPCSTR caSection);
 virtual ~CSE_ALifeItemAmmo();
@@ -132,25 +149,28 @@ enum EWeaponAddonState : u8
     eWeaponAddonScope = 1 << 0,
     eWeaponAddonGrenadeLauncher = 1 << 1,
     eWeaponAddonSilencer = 1 << 2,
-
-    eWeaponAddonLaserOn = 1 << 3,
-    eWeaponAddonFlashlightOn = 1 << 4,
-    eWeaponMisfire = 1 << 5,
-
-    // KRodin: TODO: эти пять свободных флагов можно использовать для хранения какой-то полезной информации, типа установлен ли на оружие лцу, фонарик и тп.
-    // emaxflag = 1<<7,
+    eWeaponAddonLaser = 1 << 3,
+    eWeaponAddonFlashlight = 1 << 4,
+    eWeaponAddonStock = 1 << 5,
+    eWeaponAddonExtender = 1 << 6,
+    eWeaponAddonForend = 1 << 7, // maximum
 };
 
-EWeaponAddonStatus m_scope_status;
-EWeaponAddonStatus m_silencer_status;
-EWeaponAddonStatus m_grenade_launcher_status;
+EWeaponAddonStatus m_scope_status{};
+EWeaponAddonStatus m_silencer_status{};
+EWeaponAddonStatus m_grenade_launcher_status{};
+EWeaponAddonStatus m_laser_status{};
+EWeaponAddonStatus m_flashlight_status{};
+EWeaponAddonStatus m_stock_status{};
+EWeaponAddonStatus m_extender_status{};
+EWeaponAddonStatus m_forend_status{};
 
 u32 timestamp{};
-u8 wpn_flags;
-u8 wpn_state;
-u8 ammo_type;
-u16 a_current;
-u16 a_elapsed;
+u8 wpn_flags{};
+u8 wpn_state{};
+u8 ammo_type{};
+u16 a_current{90};
+u16 a_elapsed{};
 float m_fHitPower;
 ALife::EHitType m_tHitType;
 LPCSTR m_caAmmoSections;
@@ -159,6 +179,16 @@ Flags8 m_addon_flags;
 u8 m_bZoom{};
 u32 m_ef_main_weapon_type;
 u32 m_ef_weapon_type;
+//
+bool bMisfire{};
+u8 m_cur_scope{};
+u8 m_cur_silencer{};
+u8 m_cur_glauncher{};
+u8 m_cur_laser{};
+u8 m_cur_flashlight{};
+u8 m_cur_stock{};
+u8 m_cur_extender{};
+u8 m_cur_forend{};
 
 CSE_ALifeItemWeapon(LPCSTR caSection);
 virtual ~CSE_ALifeItemWeapon();
@@ -178,7 +208,22 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemWeapon)
 #define script_type_list save_type_list(CSE_ALifeItemWeapon)
 
-    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazined, CSE_ALifeItemWeapon) u8 m_u8CurFireMode;
+    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazined, CSE_ALifeItemWeapon) 
+// флаги
+    enum EStats {
+        eMagazineAttached = (1 << 0),
+        eLaserOn = (1 << 1),
+        eFlashlightOn = (1 << 2),
+    };
+u8 m_u8CurFireMode;
+// присоединён ли магазин
+bool m_bIsMagazineAttached{true};
+bool m_bIsLaserOn{};
+bool m_bIsFlashlightOn{};
+float m_fAttachedScopeCondition{1.f};
+float m_fAttachedGrenadeLauncherCondition{1.f};
+float m_fAttachedSilencerCondition{1.f};
+xr_vector<u8> m_AmmoIDs;
 CSE_ALifeItemWeaponMagazined(LPCSTR caSection);
 virtual ~CSE_ALifeItemWeaponMagazined();
 
@@ -187,9 +232,10 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemWeaponMagazined)
 #define script_type_list save_type_list(CSE_ALifeItemWeaponMagazined)
 
-    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazinedWGL, CSE_ALifeItemWeaponMagazined) bool m_bGrenadeMode;
-u8 ammo_type2;
-u16 a_elapsed2;
+    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazinedWGL, CSE_ALifeItemWeaponMagazined) 
+bool m_bGrenadeMode{};
+u8 ammo_type2{};
+u16 a_elapsed2{};
 CSE_ALifeItemWeaponMagazinedWGL(LPCSTR caSection);
 virtual ~CSE_ALifeItemWeaponMagazinedWGL();
 
@@ -198,7 +244,7 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemWeaponMagazinedWGL)
 #define script_type_list save_type_list(CSE_ALifeItemWeaponMagazinedWGL)
 
-    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponShotGun, CSE_ALifeItemWeaponMagazined) xr_vector<u8> m_AmmoIDs;
+    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponShotGun, CSE_ALifeItemWeaponMagazined) 
 CSE_ALifeItemWeaponShotGun(LPCSTR caSection);
 virtual ~CSE_ALifeItemWeaponShotGun();
 
@@ -216,7 +262,9 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemDetector)
 #define script_type_list save_type_list(CSE_ALifeItemDetector)
 
-    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemArtefact, CSE_ALifeItem) float m_fAnomalyValue;
+    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemArtefact, CSE_ALifeItem) 
+float m_fAnomalyValue{100.f};
+float m_fRandomK{1.f};
 CSE_ALifeItemArtefact(LPCSTR caSection);
 virtual ~CSE_ALifeItemArtefact();
 virtual BOOL Net_Relevant();
@@ -224,9 +272,10 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemArtefact)
 #define script_type_list save_type_list(CSE_ALifeItemArtefact)
 
-    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemPDA, CSE_ALifeItem) u16 m_original_owner;
-shared_str m_specific_character;
-shared_str m_info_portion;
+    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemPDA, CSE_ALifeItem) 
+u16 m_original_owner{0xffff};
+shared_str m_specific_character{};
+shared_str m_info_portion{};
 
 CSE_ALifeItemPDA(LPCSTR caSection);
 virtual ~CSE_ALifeItemPDA();
@@ -235,14 +284,16 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemPDA)
 #define script_type_list save_type_list(CSE_ALifeItemPDA)
 
-    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemDocument, CSE_ALifeItem) shared_str m_wDoc;
+    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemDocument, CSE_ALifeItem) shared_str m_wDoc{};
 CSE_ALifeItemDocument(LPCSTR caSection);
 virtual ~CSE_ALifeItemDocument();
 SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemDocument)
 #define script_type_list save_type_list(CSE_ALifeItemDocument)
 
-    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemGrenade, CSE_ALifeItem) u32 m_ef_weapon_type;
+    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemGrenade, CSE_ALifeItem) 
+u32 m_ef_weapon_type;
+u32 m_dwDestroyTimeMax{}; // время до взырва гранаты
 CSE_ALifeItemGrenade(LPCSTR caSection);
 virtual ~CSE_ALifeItemGrenade();
 virtual u32 ef_weapon_type() const;
@@ -297,6 +348,46 @@ public:
 // По идее, оно и не нужно, ведь у класса CSE_InventoryContainer нету метода ::script_register()
 // add_to_type_list(CSE_InventoryContainer)
 //#define script_type_list save_type_list(CSE_InventoryContainer)
+
+SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemNightVisionDevice, CSE_ALifeItem)
+// флаги
+enum EStats
+{
+    eNightVisionActive = (1 << 0),
+    eAttached = (1 << 1)
+};
+bool m_nightvision_active{};
+bool m_attached{};
+CSE_ALifeItemNightVisionDevice(LPCSTR caSection);
+virtual ~CSE_ALifeItemNightVisionDevice();
+virtual BOOL Net_Relevant();
+SERVER_ENTITY_DECLARE_END
+add_to_type_list(CSE_ALifeItemNightVisionDevice)
+#define script_type_list save_type_list(CSE_ALifeItemNightVisionDevice)
+SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemEatable, CSE_ALifeItem) CSE_ALifeItemEatable(LPCSTR);
+virtual ~CSE_ALifeItemEatable();
+virtual BOOL Net_Relevant();
+public:
+s32 m_portions_num;
+SERVER_ENTITY_DECLARE_END
+add_to_type_list(CSE_ALifeItemEatable)
+#define script_type_list save_type_list(CSE_ALifeItemEatable)
+
+SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemVest, CSE_ALifeItem) 
+bool m_bIsPlateInstalled{};
+u8 m_cur_plate{};
+CSE_ALifeItemVest(LPCSTR caSection);
+virtual ~CSE_ALifeItemVest();
+SERVER_ENTITY_DECLARE_END
+add_to_type_list(CSE_ALifeItemVest)
+#define script_type_list save_type_list(CSE_ALifeItemVest)
+
+SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemPowerBattery, CSE_ALifeItem)
+CSE_ALifeItemPowerBattery(LPCSTR caSection);
+virtual ~CSE_ALifeItemPowerBattery();
+SERVER_ENTITY_DECLARE_END
+add_to_type_list(CSE_ALifeItemPowerBattery)
+#define script_type_list save_type_list(CSE_ALifeItemPowerBattery)
 
 #pragma warning(pop)
 

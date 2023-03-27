@@ -22,6 +22,12 @@ class CInfoPortion;
 struct GAME_NEWS_DATA;
 class CActorCondition;
 class CCustomOutfit;
+class CInventoryContainer;
+class CHelmet;
+class CWarbelt;
+class CVest;
+class CTorch;
+class CNightVisionDevice;
 class CKnownContactsRegistryWrapper;
 class CEncyclopediaRegistryWrapper;
 class CGameTaskRegistryWrapper;
@@ -167,8 +173,8 @@ public:
     u32 NewsToShow() { return m_news_to_show; };
 
 protected:
-    CGameTaskManager* m_game_task_manager;
-    CActorStatisticMgr* m_statistic_manager;
+    CGameTaskManager* m_game_task_manager{};
+    CActorStatisticMgr* m_statistic_manager{};
 
 public:
     void StartTalk(CInventoryOwner* talk_partner, bool = true) override;
@@ -198,6 +204,7 @@ public:
     virtual void OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_place);
     virtual void OnItemBelt(CInventoryItem* inventory_item, EItemPlace previous_place);
     virtual void OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place);
+    virtual void OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place);
 
     virtual void OnItemDrop(CInventoryItem* inventory_item);
     virtual void OnItemDropUpdate();
@@ -207,7 +214,7 @@ public:
     virtual void PHHit(SHit& H);
     virtual void HitSignal(float P, Fvector& vLocalDir, CObject* who, s16 element);
     void HitSector(CObject* who, CObject* weapon);
-    void HitMark(float P, Fvector dir, CObject* who, s16 element, Fvector position_in_bone_space, float impulse, ALife::EHitType hit_type);
+    void HitMark(SHit* pHDS);
 
     virtual float GetMass();
     virtual float GetCarryWeight() const;
@@ -216,17 +223,13 @@ public:
 
     virtual bool unlimited_ammo();
 
-public:
-    //свойства артефактов
-    virtual void UpdateArtefactsOnBelt();
+	virtual void UpdateItemsBoost();
 
-    virtual ActorRestoreParams ActiveArtefactsOnBelt();
-    virtual float HitArtefactsOnBelt(float, ALife::EHitType, bool = false);
+    virtual float GetArtefactsProtection(int);
 
-    virtual void UpdateArtefactPanel();
+    virtual void UpdateUIPanels(int place = eItemPlaceUndefined);
 
 protected:
-    void ApplyArtefactEffects(ActorRestoreParams&, CArtefact*);
     //звук тяжелого дыхания
     ref_sound m_HeavyBreathSnd;
     ref_sound m_BloodSnd;
@@ -243,8 +246,8 @@ protected:
     // misc properties
 protected:
     // Death
-    float hit_slowmo;
-    float hit_probability;
+    float hit_slowmo{};
+    float hit_probability{1.f};
     bool m_hit_slowmo_jump;
 
     // media
@@ -255,24 +258,28 @@ protected:
     float m_fLandingTime;
     float m_fJumpTime;
     float m_fFallTime;
-    float m_fCamHeightFactor;
+    float m_fCamHeightFactor{0.87f};
 
     // Dropping
-    BOOL b_DropActivated;
-    float f_DropPower;
+    BOOL b_DropActivated{};
+    float f_DropPower{};
 
     // random seed для Zoom mode
     s32 m_ZoomRndSeed;
     // random seed для Weapon Effector Shot
     s32 m_ShotRndSeed;
 
-    bool m_bOutBorder;
+    bool m_bOutBorder{};
     //сохраняет счетчик объектов в feel_touch, для которых необходимо обновлять размер колижена с актером
-    u32 m_feel_touch_characters;
+    u32 m_feel_touch_characters{};
     //разрешения на удаление трупа актера
     //после того как контролирующий его игрок зареспавнился заново.
     //устанавливается в game
-    u8 m_loaded_ph_box_id;
+    u8 m_loaded_ph_box_id{};
+
+    float m_fGroggyTreshold{};
+    ref_sound sndGroggy{};
+    shared_str m_GroggyEffector{};
 
 private:
     void SwitchOutBorder(bool new_border_state);
@@ -293,8 +300,8 @@ public:
     virtual bool can_attach(const CInventoryItem* inventory_item) const;
 
 protected:
-    CHolderCustom* m_holder;
-    u16 m_holderID;
+    CHolderCustom* m_holder{};
+    u16 m_holderID{u16(-1)};
     bool use_Holder(CHolderCustom* holder);
 
     bool use_Vehicle(CHolderCustom* object);
@@ -305,19 +312,19 @@ protected:
     // actor model & animations
     /////////////////////////////////////////////////////////
 protected:
-    BOOL m_bAnimTorsoPlayed;
+    BOOL m_bAnimTorsoPlayed{};
     static void AnimTorsoPlayCallBack(CBlend* B);
 
     // Rotation
-    SRotation r_torso;
-    float r_torso_tgt_roll;
+    SRotation r_torso{};
+    float r_torso_tgt_roll{};
     //положение торса без воздействия эффекта отдачи оружия
-    SRotation unaffected_r_torso;
+    SRotation unaffected_r_torso{};
 
     //ориентация модели
-    float r_model_yaw_dest;
-    float r_model_yaw; // orientation of model
-    float r_model_yaw_delta; // effect on multiple "strafe"+"something"
+    float r_model_yaw_dest{};
+    float r_model_yaw{}; // orientation of model
+    float r_model_yaw_delta{}; // effect on multiple "strafe"+"something"
 
 public:
     SActorMotions* m_anims;
@@ -380,22 +387,22 @@ protected:
 
     // Cameras
     CCameraBase* cameras[eacMaxCam];
-    EActorCameras cam_active;
-    float fPrevCamPos;
+    EActorCameras cam_active{};
+    float fPrevCamPos{};
     float current_ik_cam_shift;
-    Fvector vPrevCamDir;
-    float fCurAVelocity;
-    CEffectorBobbing* pCamBobbing;
+    Fvector vPrevCamDir{};
+    float fCurAVelocity{};
+    CEffectorBobbing* pCamBobbing{};
 
     //	void					LoadShootingEffector	(LPCSTR section);
     //	SShootingEffector*		m_pShootingEffector;
 
     void LoadSleepEffector(LPCSTR section);
-    SSleepEffector* m_pSleepEffector;
-    CSleepEffectorPP* m_pSleepEffectorPP;
+    SSleepEffector* m_pSleepEffector{};
+    CSleepEffectorPP* m_pSleepEffectorPP{};
 
     //менеджер эффекторов, есть у каждого актрера
-    CActorCameraManager* m_pActorEffector;
+    CActorCameraManager* m_pActorEffector{};
     static float f_Ladder_cam_limit;
     ////////////////////////////////////////////
     // для взаимодействия с другими персонажами
@@ -417,18 +424,18 @@ protected:
     //.	void					DestroyFollowerInternal();//hack
     //.	CActorFollowerMngr&		Followers	();
     //.	CActorFollowerMngr*		m_followers;
-    CUsableScriptObject* m_pUsableObject;
+    CUsableScriptObject* m_pUsableObject{};
     // Person we're looking at
-    CInventoryOwner* m_pPersonWeLookingAt;
-    CHolderCustom* m_pVehicleWeLookingAt;
-    CGameObject* m_pObjectWeLookingAt;
-    IInventoryBox* m_pInvBoxWeLookingAt;
+    CInventoryOwner* m_pPersonWeLookingAt{};
+    CHolderCustom* m_pVehicleWeLookingAt{};
+    CGameObject* m_pObjectWeLookingAt{};
+    IInventoryBox* m_pInvBoxWeLookingAt{};
 
     // Tip for action for object we're looking at
-    const char* m_sDefaultObjAction;
+    const char* m_sDefaultObjAction{};
 
     //режим подбирания предметов
-    bool m_bPickupMode;
+    bool m_bPickupMode{};
     //расстояние подсветки предметов
     float m_fPickupInfoRadius;
 
@@ -455,7 +462,8 @@ public:
     bool CanJump(float weight);
     bool CanMove();
     float CameraHeight();
-    float CurrentHeight;
+    // Alex ADD: for smooth crouch fix
+    float CurrentHeight{};
     bool CanSprint();
     bool CanRun();
     void StopAnyMove();
@@ -469,10 +477,9 @@ public:
 
     IC float GetJumpSpeed() const { return m_fJumpSpeed; }
     IC float GetWalkAccel() const { return m_fWalkAccel; }
-    IC float GetExoFactor() const { return m_fExoFactor; }
+    float GetExoFactor() const;
     IC void SetJumpSpeed(float _factor) { m_fJumpSpeed = _factor; }
     IC void SetWalkAccel(float _factor) { m_fWalkAccel = _factor; }
-    IC void SetExoFactor(float _factor) { m_fExoFactor = _factor; }
 
 protected:
     u32 mstate_wishful;
@@ -483,17 +490,16 @@ protected:
 
     float m_fWalkAccel;
     float m_fJumpSpeed;
-    float m_fRunFactor;
+    float m_fRunFactor{2.f};
     float m_fRunBackFactor;
     float m_fWalkBackFactor;
-    float m_fCrouchFactor;
-    float m_fClimbFactor;
-    float m_fSprintFactor;
+    float m_fCrouchFactor{0.2f};
+    float m_fClimbFactor{1.f};
+    float m_fSprintFactor{4.f};
 
     float m_fWalk_StrafeFactor;
     float m_fRun_StrafeFactor;
 
-    float m_fExoFactor;
     float m_fLookoutAngle;
     //////////////////////////////////////////////////////////////////////////
     // User input/output
@@ -523,7 +529,7 @@ public:
 
 protected:
     //если актер целится в прицел
-    bool m_bZoomAimingMode;
+    bool m_bZoomAimingMode{};
 
     //настройки аккуратности стрельбы
     //базовая дисперсия (когда игрок стоит на месте)
@@ -638,7 +644,7 @@ private:
     /////////////////////////////////////////
     // DEBUG INFO
 protected:
-    CStatGraph* pStatGraph;
+    CStatGraph* pStatGraph{};
 
     shared_str m_DefaultVisualOutfit;
 
@@ -655,9 +661,15 @@ protected:
 public:
     void SetWeaponHideState(u32 State, bool bSet, bool now = false);
     virtual CCustomOutfit* GetOutfit() const;
+    virtual CWarbelt* GetWarbelt() const;
+    virtual CInventoryContainer* GetBackpack() const;
+    virtual CHelmet* GetHelmet() const;
+    virtual CVest* GetVest() const;
+    virtual CTorch* GetTorch() const;
+    virtual CNightVisionDevice* GetNightVisionDevice() const;
 
 private:
-    CActorCondition* m_entity_condition;
+    CActorCondition* m_entity_condition{};
 
 protected:
     virtual CEntityConditionSimple* create_entity_condition(CEntityConditionSimple* ec);
@@ -670,8 +682,8 @@ public:
     virtual bool use_center_to_aim() const;
 
 protected:
-    u16 m_iLastHitterID;
-    u16 m_iLastHittingWeaponID;
+    u16 m_iLastHitterID{u16(-1)};
+    u16 m_iLastHittingWeaponID{u16(-1)};
     s16 m_s16LastHittedElement;
     Fvector m_vLastHitDir;
     Fvector m_vLastHitPos;
@@ -750,30 +762,86 @@ public:
     void unblock_action(EGameActions cmd);
     // Real Wolf. End. 14.10.2014
 
-    bool is_actor_normal();
-    bool is_actor_crouch();
-    bool is_actor_creep();
-    bool is_actor_climb();
-    bool is_actor_walking();
-    bool is_actor_running();
-    bool is_actor_sprinting();
-    bool is_actor_crouching();
-    bool is_actor_creeping();
-    bool is_actor_climbing();
-    bool is_actor_moving();
+    bool is_actor_normal() const;
+    bool is_actor_crouch() const;
+    bool is_actor_creep() const;
+    bool is_actor_climb() const;
+    bool is_actor_walking() const;
+    bool is_actor_running() const;
+    bool is_actor_sprinting() const;
+    bool is_actor_crouching() const;
+    bool is_actor_creeping() const;
+    bool is_actor_climbing() const;
+    bool is_actor_moving() const;
 
     void RepackAmmo();
 
     bool IsDetectorActive() const;
 
-private:
-    // иммунитеты от препаратов, применяемые для ослабления хита
-    float m_fDrugPsyProtectionCoeff;
-    float m_fDrugRadProtectionCoeff;
+	float m_fThrowImpulse; // сила с которой актор отбрасывает предмет
+    float m_fKickImpulse; // імпульс копняка
+    float m_fKickPower; // сила копняка
+    float m_fHoldingDistance; // расстояние перед актором на котором находится удерживаемый предмет
+    void ActorThrow();
+    void ActorKick();
+    void ActorQuickThrowGrenade();
+    void ActorQuickKnifeStab();
+    // множитель для управления интенсивностью эффектора качания в прицеливании
+    float GetZoomEffectorK();
+    void SetHardHold(bool val) { m_bIsHardHold = val; };
+    bool IsHardHold() const { return m_bIsHardHold || is_actor_creep(); };
+
+    void TryToBlockSprint(bool block);
+    // визначаємо чи треба передати хіт до рюкзака та його вмісту
+    virtual bool IsHitToBackPack(SHit* pHDS) const;
+    virtual bool IsHitToHead(SHit* pHDS) const;
+    virtual bool IsHitToVest(SHit* pHDS) const;
+
+    bool HasDetectorWorkable();
+    bool HasPDAWorkable();
+
+    bool IsRuckAmmoPlacement() { return m_bRuckAmmoPlacement; };
+    void SetRuckAmmoPlacement(bool set_ruck) { m_bRuckAmmoPlacement = set_ruck; };
+
+    void DrawHUDMasks();
+    void UpdateVisorEfects();
+
+    void TryPlayAnimItemTake();
+    void ActorCheckout();
+    void ActorCheckGear();
+
+    bool m_bShowActiveItemInfo{};
+    bool m_bShowGearInfo{};
+
+    virtual bool HasRequiredTool(PIItem);
+    virtual bool HasRequiredTool(const shared_str&);
+
+protected:
+    bool m_bIsHardHold{};
+    bool m_bRuckAmmoPlacement{};
+
+    u32 m_uActiveItemInfoTTL{};
+    u32 m_uGearInfoTTL{};
+    u32 m_uActiveItemInfoStartTime{};
+    u32 m_uGearInfoStartTime{};
+    u32 saved_state{(u32)-1};
+    Fvector4 dof_params_inventory{};
 
 public:
-    IC void SetDrugRadProtection(float _prot) { m_fDrugRadProtectionCoeff = _prot; };
-    IC void SetDrugPsyProtection(float _prot) { m_fDrugPsyProtectionCoeff = _prot; };
+    float GetItemBoostedParams(int);
+    float GetTotalArtefactsEffect(int);
+
+    virtual void TryGroggyEffect(SHit* pHDS);
+
+    bool SaveGameAllowed();
+    bool InSafeHouse();
+
+    bool IsFreeHands() const;
+    void TryInventoryCrouch(bool);
+    void EnableInventoryDOF(bool);
+
+protected:
+    svector<float, eRestoreBoostMax> m_ActorItemBoostedParam;
 };
 
 extern bool isActorAccelerated(u32 mstate, bool ZoomMode);

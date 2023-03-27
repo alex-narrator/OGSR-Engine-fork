@@ -369,19 +369,55 @@ void CUICellItem::ColorizeItems(std::initializer_list<CUIDragDropListEx*> args)
 
     xr_vector<shared_str> ColorizeSects;
 
-    auto WpnScanner = [&ColorizeSects](CWeaponMagazined* Wpn) {
+    auto Scanner = [&ColorizeSects](CInventoryItem* inventoryitem) {
         ColorizeSects.clear();
 
-        std::copy(Wpn->m_ammoTypes.begin(), Wpn->m_ammoTypes.end(), std::back_inserter(ColorizeSects));
-        if (auto WpnGl = smart_cast<CWeaponMagazinedWGrenade*>(Wpn); WpnGl && WpnGl->IsGrenadeLauncherAttached())
-            std::copy(WpnGl->m_ammoTypes2.begin(), WpnGl->m_ammoTypes2.end(), std::back_inserter(ColorizeSects));
-        if (Wpn->SilencerAttachable())
-            ColorizeSects.push_back(Wpn->GetSilencerName());
-        if (Wpn->ScopeAttachable())
-            ColorizeSects.push_back(Wpn->GetScopeName());
-        if (Wpn->GrenadeLauncherAttachable())
-            ColorizeSects.push_back(Wpn->GetGrenadeLauncherName());
-        std::copy(Wpn->m_highlightAddons.begin(), Wpn->m_highlightAddons.end(), std::back_inserter(ColorizeSects));
+        auto Wpn = smart_cast<CWeaponMagazined*>(inventoryitem);
+        auto Ammo = smart_cast<CWeaponAmmo*>(inventoryitem);
+        auto Vest = smart_cast<CVest*>(inventoryitem);
+        bool need_battery = inventoryitem->IsPowerConsumer() && inventoryitem->IsPowerSourceAttachable();
+        bool need_tool = !inventoryitem->m_required_tools.empty();
+        bool can_be_repaired = !inventoryitem->m_repair_items.empty();
+
+        bool b_colorize = (Wpn || Ammo || Vest || need_battery || need_tool || can_be_repaired);
+        if (!b_colorize)
+            return;
+
+        if (Wpn)
+        {
+            std::copy(Wpn->m_ammoTypes.begin(), Wpn->m_ammoTypes.end(), std::back_inserter(ColorizeSects));
+            if (auto WpnGl = smart_cast<CWeaponMagazinedWGrenade*>(Wpn); WpnGl && WpnGl->IsAddonAttached(eLauncher))
+                std::copy(WpnGl->m_ammoTypes2.begin(), WpnGl->m_ammoTypes2.end(), std::back_inserter(ColorizeSects));
+            for (u32 i = 0; i < eMagazine; i++)
+            {
+                if (Wpn->AddonAttachable(i))
+                    ColorizeSects.push_back(Wpn->GetAddonName(i));
+            }
+            std::copy(Wpn->m_highlightAddons.begin(), Wpn->m_highlightAddons.end(), std::back_inserter(ColorizeSects));
+        }
+        if (Ammo)
+        {
+            if (Ammo->IsBoxReloadableEmpty())
+                std::copy(Ammo->m_ammoTypes.begin(), Ammo->m_ammoTypes.end(), std::back_inserter(ColorizeSects));
+            if (Ammo->IsBoxReloadable())
+                ColorizeSects.push_back(Ammo->m_ammoSect);
+        }
+        if (Vest)
+        {
+            std::copy(Vest->m_plates.begin(), Vest->m_plates.end(), std::back_inserter(ColorizeSects));
+        }
+        if (need_battery)
+        {
+            std::copy(inventoryitem->m_power_sources.begin(), inventoryitem->m_power_sources.end(), std::back_inserter(ColorizeSects));
+        }
+        if (need_tool)
+        {
+            std::copy(inventoryitem->m_required_tools.begin(), inventoryitem->m_required_tools.end(), std::back_inserter(ColorizeSects));
+        }
+        if (can_be_repaired)
+        {
+            std::copy(inventoryitem->m_repair_items.begin(), inventoryitem->m_repair_items.end(), std::back_inserter(ColorizeSects));
+        }
     };
 
     auto ColorizeAmmoAddons = [&] {
@@ -414,32 +450,31 @@ void CUICellItem::ColorizeItems(std::initializer_list<CUIDragDropListEx*> args)
                 auto invitem = reinterpret_cast<CInventoryItem*>(CellItem->m_pData);
                 if (invitem)
                 {
-                    if (auto Wpn = smart_cast<CWeaponMagazined*>(invitem))
+                    Scanner(invitem);
+                    if (std::find(ColorizeSects.begin(), ColorizeSects.end(), Sect) != ColorizeSects.end())
                     {
-                        WpnScanner(Wpn);
-                        if (std::find(ColorizeSects.begin(), ColorizeSects.end(), Sect) != ColorizeSects.end())
-                        {
-                            CellItem->m_select_armament = true;
-                            if (colorize_ammo)
-                                ProcessColorize(CellItem, Color);
-                        }
+                        CellItem->m_select_armament = true;
+                        if (colorize_ammo)
+                            ProcessColorize(CellItem, Color);
                     }
                 }
             }
         }
     };
 
-    //Подкраска выбранного предмета
+    // Подкраска выбранного предмета
     if (colorize_ammo && this->m_select_armament)
         ProcessColorize(this, Color);
 
-    if (auto Wpn = smart_cast<CWeaponMagazined*>(inventoryitem))
-    {
-        WpnScanner(Wpn);
-        ColorizeAmmoAddons();
-    }
-    else
-    { //Надо подумать, какое условие тут сделать. Аддоны например, могут быть не именно аддонами, а фейк-предметами, например. Лушчше наверно вообще без каких-либо условий.
-        ColorizeWeapons(inventoryitem->object().cNameSect());
-    }
+    // if (auto Wpn = smart_cast<CWeaponMagazined*>(inventoryitem)) {
+    //  WpnScanner(Wpn);
+    //  ColorizeAmmoAddons();
+    //}
+    // else { //Надо подумать, какое условие тут сделать. Аддоны например, могут быть не именно аддонами, а фейк-предметами, например. Лушчше наверно вообще без каких-либо условий.
+    // ColorizeWeapons(inventoryitem->object().cNameSect());
+    //}
+
+    Scanner(inventoryitem);
+    ColorizeAmmoAddons();
+    ColorizeWeapons(inventoryitem->object().cNameSect());
 }

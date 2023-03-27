@@ -4,13 +4,13 @@
 #include "hudsound.h"
 
 class CCustomZone;
-//описание типа зоны
+// описание типа зоны
 struct ZONE_TYPE_SHOC
 {
-    //интервал частот отыгрывания звука
+    // интервал частот отыгрывания звука
     float min_freq;
     float max_freq;
-    //звук реакции детектора на конкретную зону
+    // звук реакции детектора на конкретную зону
     //	ref_sound	detect_snd;
     HUD_SOUND detect_snds;
 
@@ -18,14 +18,14 @@ struct ZONE_TYPE_SHOC
     float m_fRadius;
 };
 
-//описание зоны, обнаруженной детектором
+// описание зоны, обнаруженной детектором
 struct ZONE_INFO_SHOC
 {
-    u32 snd_time;
-    //текущая частота работы датчика
-    float cur_freq;
+    u32 snd_time{};
+    // текущая частота работы датчика
+    float cur_freq{};
     // particle for night-vision mode
-    CParticlesObject* pParticle;
+    CParticlesObject* pParticle{};
 
     ZONE_INFO_SHOC();
     ~ZONE_INFO_SHOC();
@@ -54,13 +54,12 @@ public:
     virtual void feel_touch_delete(CObject* O);
     virtual BOOL feel_touch_contact(CObject* O);
 
-    void TurnOn();
-    void TurnOff();
-    bool IsWorking() { return m_bWorking; }
+    virtual bool IsPowerOn() const { return m_bWorking; }
+    virtual void Switch(bool);
 
-    virtual void OnMoveToSlot() override;
+    virtual void OnMoveToSlot(EItemPlace prevPlace) override;
     virtual void OnMoveToRuck(EItemPlace prevPlace) override;
-    virtual void OnMoveToBelt() override;
+    virtual void OnMoveToBelt(EItemPlace prevPlace) override;
 
 protected:
     void StopAllSounds();
@@ -68,30 +67,30 @@ protected:
     void AddRemoveMapSpot(CCustomZone* pZone, bool bAdd);
     void UpdateNightVisionMode();
 
-    bool m_bWorking;
+    bool m_bWorking{};
 
-    float m_fRadius;
+    float m_fRadius{};
 
-    //если хозяин текущий актер
-    CActor* m_pCurrentActor;
-    CInventoryOwner* m_pCurrentInvOwner;
+    // если хозяин текущий актер
+    CActor* m_pCurrentActor{};
+    CInventoryOwner* m_pCurrentInvOwner{};
 
-    //информация об онаруживаемых зонах
+    // информация об онаруживаемых зонах
     DEFINE_MAP(CLASS_ID, ZONE_TYPE_SHOC, ZONE_TYPE_MAP, ZONE_TYPE_MAP_IT);
     ZONE_TYPE_MAP m_ZoneTypeMap;
 
-    //список обнаруженных зон и информация о них
+    // список обнаруженных зон и информация о них
     DEFINE_MAP(CCustomZone*, ZONE_INFO_SHOC, ZONE_INFO_MAP, ZONE_INFO_MAP_IT);
     ZONE_INFO_MAP m_ZoneInfoMap;
 
-    shared_str m_nightvision_particle;
+    shared_str m_nightvision_particle{};
 
-    bool m_detect_actor_radiation;
-    u32 radiation_snd_time;
+    bool m_detect_actor_radiation{};
+    u32 radiation_snd_time{};
     void update_actor_radiation();
 
 protected:
-    u32 m_ef_detector_type;
+    u32 m_ef_detector_type{};
 
 public:
     virtual u32 ef_detector_type() const;

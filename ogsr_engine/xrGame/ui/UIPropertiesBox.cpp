@@ -5,10 +5,10 @@
 #include "UIListBoxItem.h"
 #include "UIXmlInit.h"
 
-#define OFFSET_X (5)
-#define OFFSET_Y (5)
-#define FRAME_BORDER_WIDTH 20
-#define FRAME_BORDER_HEIGHT 22
+constexpr auto OFFSET_X = 5;
+constexpr auto OFFSET_Y = 5;
+constexpr auto FRAME_BORDER_WIDTH = 20;
+constexpr auto FRAME_BORDER_HEIGHT = 22;
 
 #define ITEM_HEIGHT (GetFont()->CurrentHeight() + 2.0f)
 
@@ -65,7 +65,7 @@ void CUIPropertiesBox::RemoveAll() { m_UIListWnd.Clear(); }
 
 void CUIPropertiesBox::Show(const Frect& parent_rect, const Fvector2& point)
 {
-    Fvector2 prop_pos;
+    Fvector2 prop_pos{};
     Fvector2 prop_size = GetWndSize();
 
     if (point.x - prop_size.x > parent_rect.x1 && point.y + prop_size.y < parent_rect.y2)
@@ -139,6 +139,7 @@ void CUIPropertiesBox::Draw() { inherited::Draw(); }
 
 bool CUIPropertiesBox::OnKeyboard(int dik, EUIMessages keyboard_action)
 {
-    Hide();
+    if (dik != get_action_dik(kADDITIONAL_ACTION))
+        Hide();
     return true;
 }

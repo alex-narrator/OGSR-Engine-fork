@@ -60,8 +60,12 @@ protected:
     void PerformTrade();
     void UpdatePrices();
     void ColorizeItem(CUICellItem* itm, bool canTrade, bool highlighted);
-    bool MoveItem(CUICellItem* itm);
-    void MoveItems(CUICellItem* itm);
+    void MoveItems(CUICellItem* itm, bool b_all);
+    void DropItems(bool b_all); // выбросить предмет/стак предметов
+    void EatItem();
+    void PerformDonation();
+    void DisassembleItem(bool);
+    void DetachAddon(const char* addon_name, bool);
 
     enum EListType
     {
@@ -79,7 +83,7 @@ protected:
 
     bool CanMoveToOther(PIItem, bool);
 
-    //указатели игрока и того с кем торгуем
+    // указатели игрока и того с кем торгуем
     CInventory* m_pInv;
     CInventory* m_pOthersInv;
     CInventoryOwner* m_pInvOwner;
@@ -108,4 +112,18 @@ protected:
     bool OnItemRButtonClick(CUICellItem* itm);
 
     void BindDragDropListEvents(CUIDragDropListEx* lst);
+
+    enum eInventorySndAction
+    {
+        eInvSndOpen = 0,
+        eInvProperties,
+        eInvDropItem,
+        eInvMoveItem,
+        eInvDetachAddon,
+        eInvSndMax
+    };
+
+    ref_sound sounds[eInvSndMax];
+    void PlaySnd(eInventorySndAction a);
+    bool m_bShowAllInv{};
 };

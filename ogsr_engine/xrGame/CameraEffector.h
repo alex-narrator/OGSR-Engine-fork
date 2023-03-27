@@ -4,7 +4,7 @@
 #include "..\xr_3da\effector.h"
 #include "..\xr_3da\effectorPP.h"
 
-#define eStartEffectorID 50
+constexpr auto eStartEffectorID = 50;
 
 #define effHit (eStartEffectorID + 1)
 #define effAlcohol (eStartEffectorID + 2)
@@ -16,7 +16,10 @@
 #define effControllerAura2 (eStartEffectorID + 8)
 #define effBigMonsterHit (eStartEffectorID + 9)
 
-#define effPoltergeistTeleDetectStartEffect 2048
+#define effNightvisionScope (eStartEffectorID + 10)
+#define effGroggy (eStartEffectorID + 11)
+
+constexpr auto effPoltergeistTeleDetectStartEffect = 2048;
 // warning: ~50 constants after effPoltergeistTeleDetectStartEffect are reserved for poltergeists
 
 #define eCEFall ((ECamEffectorType)(cefNext + 1))

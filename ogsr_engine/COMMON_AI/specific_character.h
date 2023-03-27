@@ -78,11 +78,19 @@ struct SSpecificCharacterData : CSharedResource
 #ifdef XRGAME_EXPORTS
     struct SMoneyDef
     {
-        u32 min_money;
-        u32 max_money;
-        bool inf_money;
+        u32 min_money{};
+        u32 max_money{};
+        u32 barter_money{100000};
+        bool inf_money{};
     };
     SMoneyDef money_def{};
+
+    struct SDonationDef
+    {
+        float goodwill_k{0.001f};
+        bool can_take{true};
+    };
+    SDonationDef donation_def{};
 #endif
 };
 
@@ -131,6 +139,7 @@ public:
     shared_str Bio() const;
     const CHARACTER_COMMUNITY& Community() const;
     SSpecificCharacterData::SMoneyDef& MoneyDef() { return data()->money_def; }
+    SSpecificCharacterData::SDonationDef& DonationDef() { return data()->donation_def; }
 #endif
 
     CHARACTER_RANK_VALUE Rank() const;

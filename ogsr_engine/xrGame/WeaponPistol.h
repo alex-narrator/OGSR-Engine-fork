@@ -11,17 +11,17 @@ public:
 
     virtual void Load(LPCSTR section);
 
-    virtual void switch2_Reload();
+    // virtual void	switch2_Reload	();
 
     // virtual void	OnShot			();
     virtual void OnAnimationEnd(u32 state);
     virtual void net_Destroy();
     virtual void OnH_B_Chield();
 
-    virtual void OnDrawUI();
-    virtual void net_Relcase(CObject* object);
+    // virtual void	OnDrawUI();
+    // virtual void	net_Relcase(CObject *object);
 
-    //анимации
+    // анимации
     virtual void PlayAnimShow() override;
     // virtual void	PlayAnimBore	() override;
     virtual void PlayAnimIdleSprint() override;
@@ -35,7 +35,13 @@ public:
     virtual void PlayAnimReload() override;
     virtual void PlayAnimShoot() override;
 
+    virtual void PlayAnimOnItemTake() override;
+    virtual void PlayAnimCheckout() override;
+    virtual void PlayAnimKick() override;
+
     virtual void UpdateSounds();
+
+    virtual bool IsOpened() const { return m_opened; };
 
 protected:
     virtual bool AllowFireWhileWorking() { return true; }
@@ -43,7 +49,7 @@ protected:
     HUD_SOUND sndClose;
     ESoundTypes m_eSoundClose;
 
-    bool m_opened;
+    bool m_opened{};
 
     virtual size_t GetWeaponTypeForCollision() const override { return Pistol; }
 };

@@ -29,7 +29,7 @@ enum eTraderFlags
 };
 //	float							m_fCumulativeItemMass;
 //	int								m_iCumulativeItemVolume;
-u32 m_dwMoney;
+u32 m_dwMoney{};
 float m_fMaxItemMass;
 Flags32 m_trader_flags;
 
@@ -57,7 +57,7 @@ void SetRank(CHARACTER_RANK_VALUE val);
 #endif
 
 shared_str m_sCharacterProfile;
-shared_str m_SpecificCharacter;
+shared_str m_SpecificCharacter{};
 
 //буферный вектор проверенных персонажей
 xr_vector<shared_str> m_CheckedCharacters;
@@ -114,11 +114,14 @@ add_to_type_list(CSE_ALifeTrader)
 
     SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeCustomZone, CSE_ALifeSpaceRestrictor)
 
-        ALife::EHitType m_tHitType;
-u32 m_owner_id;
-u32 m_enabled_time;
-u32 m_disabled_time;
-u32 m_start_time_shift;
+ALife::EHitType m_tHitType{ALife::eHitTypeMax};
+u32 m_owner_id{u32(-1)};
+u32 m_enabled_time{};
+u32 m_disabled_time{};
+u32 m_start_time_shift{};
+//
+f32 m_maxPower;
+u32 m_zone_ttl{u32(-1)};
 
 CSE_ALifeCustomZone(LPCSTR caSection);
 virtual ~CSE_ALifeCustomZone();
@@ -127,9 +130,9 @@ add_to_type_list(CSE_ALifeCustomZone)
 #define script_type_list save_type_list(CSE_ALifeCustomZone)
 
     SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeAnomalousZone, CSE_ALifeCustomZone) CSE_ALifeItemWeapon* m_tpCurrentBestWeapon{};
-float m_offline_interactive_radius;
+float m_offline_interactive_radius{30.f};
 u32 m_artefact_position_offset{};
-u16 m_artefact_spawn_count;
+u16 m_artefact_spawn_count{32};
 
 CSE_ALifeAnomalousZone(LPCSTR caSection);
 virtual ~CSE_ALifeAnomalousZone();
@@ -172,19 +175,20 @@ add_to_type_list(CSE_ALifeZoneVisual)
     //---------------------------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------------------------
 
-    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeCreatureAbstract, CSE_ALifeDynamicObjectVisual) u8 s_team;
-u8 s_squad;
-u8 s_group;
-float fHealth;
-float m_fMorale;
-float m_fAccuracy;
-float m_fIntelligence;
+    SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeCreatureAbstract, CSE_ALifeDynamicObjectVisual) 
+u8 s_team{};
+u8 s_squad{};
+u8 s_group{};
+float fHealth{1.f};
+float m_fMorale{100.f};
+float m_fAccuracy{25.f};
+float m_fIntelligence{25.f};
 
 u32 timestamp{}; // server(game) timestamp
-u8 flags;
-float o_model; // model yaw
-SRotation o_torso; // torso in world coords
-bool m_bDeathIsProcessed;
+u8 flags{};
+float o_model{}; // model yaw
+SRotation o_torso{}; // torso in world coords
+bool m_bDeathIsProcessed{};
 
 xr_vector<ALife::_OBJECT_ID> m_dynamic_out_restrictions;
 xr_vector<ALife::_OBJECT_ID> m_dynamic_in_restrictions;
@@ -193,8 +197,8 @@ u32 m_ef_creature_type;
 u32 m_ef_weapon_type;
 u32 m_ef_detector_type;
 
-ALife::_OBJECT_ID m_killer_id;
-ALife::_TIME_ID m_game_death_time;
+ALife::_OBJECT_ID m_killer_id{ALife::_OBJECT_ID(-1)};
+ALife::_TIME_ID m_game_death_time{};
 
 CSE_ALifeCreatureAbstract(LPCSTR caSection);
 virtual ~CSE_ALifeCreatureAbstract();
@@ -222,13 +226,14 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeCreatureAbstract)
 #define script_type_list save_type_list(CSE_ALifeCreatureAbstract)
 
-    SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeMonsterAbstract, CSE_ALifeCreatureAbstract, CSE_ALifeSchedulable) GameGraph::_GRAPH_ID m_tNextGraphID;
-GameGraph::_GRAPH_ID m_tPrevGraphID;
+    SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeMonsterAbstract, CSE_ALifeCreatureAbstract, CSE_ALifeSchedulable) 
+GameGraph::_GRAPH_ID m_tNextGraphID{m_tGraphID};
+GameGraph::_GRAPH_ID m_tPrevGraphID{m_tGraphID};
 float m_fGoingSpeed;
 float m_fCurrentLevelGoingSpeed;
-float m_fCurSpeed;
-float m_fDistanceFromPoint;
-float m_fDistanceToPoint;
+float m_fCurSpeed{};
+float m_fDistanceFromPoint{};
+float m_fDistanceToPoint{};
 GameGraph::TERRAIN_VECTOR m_tpaTerrain;
 float m_fMaxHealthValue;
 float m_fRetreatThreshold;
@@ -239,12 +244,12 @@ shared_str m_out_space_restrictors;
 shared_str m_in_space_restrictors;
 svector<float, ALife::eHitTypeMax> m_fpImmunityFactors;
 
-ALife::_OBJECT_ID m_smart_terrain_id;
+ALife::_OBJECT_ID m_smart_terrain_id{0xffff};
 
 //---------------------------------------------------------
 // bool if monster under smart terrain and currently executes task
 // if monster on the way then (m_smart_terrain_id != 0xffff) && (!m_task_reached)
-bool m_task_reached;
+bool m_task_reached{};
 //---------------------------------------------------------
 
 int m_rank;
@@ -252,7 +257,7 @@ int m_rank;
 ALife::_TIME_ID m_stay_after_death_time_interval;
 
 public:
-ALife::_OBJECT_ID m_group_id;
+ALife::_OBJECT_ID m_group_id{0xffff};
 
 public:
 CSE_ALifeMonsterAbstract(LPCSTR caSection);
@@ -307,14 +312,14 @@ add_to_type_list(CSE_ALifeMonsterAbstract)
     SERVER_ENTITY_DECLARE_BEGIN3(CSE_ALifeCreatureActor, CSE_ALifeCreatureAbstract, CSE_ALifeTraderAbstract, CSE_PHSkeleton)
 
         u16 mstate{};
-Fvector accel;
-Fvector velocity;
+Fvector accel{};
+Fvector velocity{};
 //	float							fArmor;
-float fRadiation;
+float fRadiation{};
 u8 weapon{};
 ///////////////////////////////////////////
-u16 m_u16NumItems;
-u16 m_holderID;
+u16 m_u16NumItems{};
+u16 m_holderID{u16(-1)};
 //	DEF_DEQUE		(PH_STATES, SPHNetState);
 SPHNetState m_AliveState{};
 //	PH_STATES						m_DeadStates;
@@ -362,18 +367,18 @@ add_to_type_list(CSE_ALifeCreaturePhantom)
 
     SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeMonsterZombie, CSE_ALifeMonsterAbstract)
     // Personal characteristics:
-    float fEyeFov;
-float fEyeRange;
-float fMinSpeed;
-float fMaxSpeed;
-float fAttackSpeed;
-float fMaxPursuitRadius;
-float fMaxHomeRadius;
+float fEyeFov{120.f};
+float fEyeRange{30.f};
+float fMinSpeed{1.5f};
+float fMaxSpeed{1.75f};
+float fAttackSpeed{2.f};
+float fMaxPursuitRadius{100.f};
+float fMaxHomeRadius{30.f};
 // attack
-float fHitPower;
-u16 u16HitInterval;
-float fAttackDistance;
-float fAttackAngle;
+float fHitPower{20.f};
+u16 u16HitInterval{1000};
+float fAttackDistance{1.f};
+float fAttackAngle{15.f};
 
 CSE_ALifeMonsterZombie(LPCSTR caSection); // constructor for variable initialization
 virtual ~CSE_ALifeMonsterZombie();
@@ -381,7 +386,8 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeMonsterZombie)
 #define script_type_list save_type_list(CSE_ALifeMonsterZombie)
 
-    SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeMonsterBase, CSE_ALifeMonsterAbstract, CSE_PHSkeleton) u16 m_spec_object_id;
+    SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeMonsterBase, CSE_ALifeMonsterAbstract, CSE_PHSkeleton) 
+u16 m_spec_object_id{0xffff};
 
 CSE_ALifeMonsterBase(LPCSTR caSection); // constructor for variable initialization
 virtual ~CSE_ALifeMonsterBase();
@@ -448,7 +454,8 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeHumanAbstract)
 #define script_type_list save_type_list(CSE_ALifeHumanAbstract)
 
-    SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeHumanStalker, CSE_ALifeHumanAbstract, CSE_PHSkeleton) shared_str m_start_dialog;
+    SERVER_ENTITY_DECLARE_BEGIN2(CSE_ALifeHumanStalker, CSE_ALifeHumanAbstract, CSE_PHSkeleton) 
+shared_str m_start_dialog{};
 
 CSE_ALifeHumanStalker(LPCSTR caSection);
 virtual ~CSE_ALifeHumanStalker();

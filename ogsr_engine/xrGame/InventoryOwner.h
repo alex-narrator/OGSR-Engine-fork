@@ -26,6 +26,10 @@ class CTradeParameters;
 class CPurchaseList;
 class CWeapon;
 class CCustomOutfit;
+class CHelmet;
+class CVest;
+class CInventoryContainer;
+struct SHit;
 
 class CInventoryOwner : public CAttachmentOwner
 {
@@ -96,17 +100,17 @@ public:
 protected:
     u32 m_money;
     // торговля
-    CTrade* m_pTrade;
+    CTrade* m_pTrade{};
     bool m_bTalking;
     CInventoryOwner* m_pTalkPartner;
 
     bool m_bAllowTalk;
     bool m_bAllowTrade;
 
-    u32 m_tmp_active_slot_num;
+    u32 m_tmp_active_slot_num{NO_ACTIVE_SLOT};
 
 public:
-    u32 m_tmp_next_item_slot;
+    u32 m_tmp_next_item_slot{NO_ACTIVE_SLOT};
     //////////////////////////////////////////////////////////////////////////
     // сюжетная информация
 public:
@@ -142,12 +146,20 @@ public:
 
     //возвращает текуший разброс стрельбы (в радианах) с учетом движения
     virtual float GetWeaponAccuracy() const;
-    virtual float ArtefactsAddWeight(bool = true) const;
     //максимальный переносимы вес
     virtual float GetCarryWeight() const;
     virtual float MaxCarryWeight() const;
 
-    virtual CCustomOutfit* GetOutfit() const { return NULL; };
+   	virtual void TryGroggyEffect(SHit* pHDS){};
+
+    virtual CCustomOutfit* GetOutfit() const { return nullptr; };
+    virtual CInventoryContainer* GetBackpack() const { return nullptr; };
+    virtual CHelmet* GetHelmet() const { return nullptr; };
+    virtual CVest* GetVest() const { return nullptr; };
+
+    virtual bool IsHitToBackPack(SHit* pHDS) const { return false; };
+    virtual bool IsHitToHead(SHit* pHDS) const { return false; };
+    virtual bool IsHitToVest(SHit* pHDS) const { return false; };
 
     //////////////////////////////////////////////////////////////////////////
     //игровые характеристики персонажа
@@ -159,6 +171,10 @@ public:
     }
     IC const CSpecificCharacter& SpecificCharacter() const { return CharacterInfo().m_SpecificCharacter; };
     bool InfinitiveMoney() { return CharacterInfo().m_SpecificCharacter.MoneyDef().inf_money; }
+    
+    u32 GetBarterMoney() { return CharacterInfo().m_SpecificCharacter.MoneyDef().barter_money; }
+    float GetDonateGoodwillK() { return CharacterInfo().m_SpecificCharacter.DonationDef().goodwill_k; }
+    bool CanTakeDonations() { return CharacterInfo().m_SpecificCharacter.DonationDef().can_take; }
 
     //установка группировки на клиентском и серверном объкте
     virtual void SetCommunity(CHARACTER_COMMUNITY_INDEX);
@@ -184,6 +200,7 @@ public:
     virtual void OnItemBelt(CInventoryItem* inventory_item, EItemPlace previous_place);
     virtual void OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_place);
     virtual void OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place);
+    virtual void OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place);
 
     virtual void OnItemDrop(CInventoryItem* inventory_item);
 
@@ -215,9 +232,9 @@ public:
     virtual bool use_simplified_visual() const { return (false); };
 
 private:
-    CTradeParameters* m_trade_parameters;
+    CTradeParameters* m_trade_parameters{};
     CPurchaseList* m_purchase_list;
-    BOOL m_need_osoznanie_mode;
+    BOOL m_need_osoznanie_mode{};
 
 public:
     IC CTradeParameters& trade_parameters() const;

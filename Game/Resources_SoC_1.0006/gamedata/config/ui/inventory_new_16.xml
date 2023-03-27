@@ -1,0 +1,388 @@
+<w>
+	<properties_box>
+		<texture>ui_cb_listbox</texture>
+		<list x="0" y="0" width="10" height="10" item_height="18"  always_show_scroll="0" can_select="1" bottom_indent="10" right_ident="10" left_ident="20">				
+				<font_s r="218" g="217" b="213"/>				
+				<font r="131" g="131" b="131" font="letterica16"/>
+		</list>
+	</properties_box>
+	
+	<main x="0" y="0" width="1024" height="768"/>
+	
+	<belt_slots x="127" y="80" width="771" height="172" stretch="1">
+		<texture>ui_slots_belt</texture>		
+	</belt_slots>
+	
+	<back x="8" y="243" width="1000" height="483" stretch="1">
+		<texture>ui_inventory_main</texture>
+	</back>
+
+
+    <dragdrop_bag x="20" y="42" width="316" height="400"
+            cell_width = "30" cell_height="40" rows_num="10" cols_num="10" 
+            unlimited="1" group_similar="1" condition_progress_bar="1"/>
+
+	<dragdrop_vest x="740" y="0" width="120" height="120"
+            cell_width = "30" cell_height="40" rows_num="3" cols_num="4"
+			custom_placement="1" line_up_in_columns="1"/>
+
+    <dragdrop_belt x="740" y="120" width="120" height="80"
+            cell_width = "30" cell_height="40" rows_num="2" cols_num="4"
+			custom_placement="1"/>
+
+	<dragdrop_torch x="858" y="285" width="60" height="40"
+            cell_width = "30" cell_height="40" rows_num="1" cols_num="2"
+            custom_placement="0"/>
+
+	<dragdrop_helmet x="858" y="325" width="60" height="80"
+            cell_width = "30" cell_height="40" rows_num="2" cols_num="2"
+            custom_placement="0" condition_progress_bar="1"/>			
+
+    <dragdrop_outfit x="858" y="405" width="60" height="120" 
+            cell_width = "30" cell_height="40" rows_num="3" cols_num="2" 
+            custom_placement="0" condition_progress_bar="1"/>
+			
+	<dragdrop_backpack x="918" y="405" width="60" height="80"
+            cell_width = "30" cell_height="40" rows_num="2" cols_num="2"
+            custom_placement="0" condition_progress_bar="1"/>			
+			
+	<dragdrop_pda x="828" y="405" width="30" height="40"
+            cell_width = "30" cell_height="40" rows_num="1" cols_num="1"
+            custom_placement="0"/>				
+			
+	<dragdrop_detector x="828" y="445" width="30" height="40"
+            cell_width = "30" cell_height="40" rows_num="1" cols_num="1"
+            custom_placement="0"/>		
+
+	<dragdrop_tactical_vest x="680" y="0" width="60" height="120"
+            cell_width = "30" cell_height="40" rows_num="3" cols_num="2"
+            custom_placement="0"/>
+			
+	<dragdrop_warbelt x="680" y="120" width="60" height="40"
+            cell_width = "30" cell_height="40" rows_num="1" cols_num="2"
+            custom_placement="0"/>			
+
+    <dragdrop_knife x="0" y="0" width="30" height="80"
+            cell_width = "30" cell_height="40" rows_num="2" cols_num="1"
+            custom_placement="0" vertical_placement="1" condition_progress_bar="1"/>
+
+	<dragdrop_first_weapon x="33" y="118" width="180" height="80"
+            cell_width = "30" cell_height="40" rows_num="2" cols_num="6"
+            custom_placement="0" condition_progress_bar="1" vertical_placement="0"/>
+			
+    <dragdrop_second_weapon x="300" y="118" width="180" height="80"
+            cell_width = "30" cell_height="40" rows_num="2" cols_num="6"
+            custom_placement="0" condition_progress_bar="1"/>
+
+	<dragdrop_binocular x="390" y="0" width="60" height="40"
+            cell_width = "30" cell_height="40" rows_num="1" cols_num="2"
+            custom_placement="0" condition_progress_bar="1"/>
+			
+	<dragdrop_grenade x="520" y="0" width="30" height="40"
+            cell_width = "30" cell_height="40" rows_num="1" cols_num="1"
+            custom_placement="0"/>
+			
+	<dragdrop_artefact x="560" y="0" width="30" height="40"
+            cell_width = "30" cell_height="40" rows_num="1" cols_num="1"
+            custom_placement="0"/>					
+
+	<dragdrop_quick_0 x="0" y="70" width="60" height="80"
+            cell_width = "30" cell_height="40" rows_num="2" cols_num="2"
+            custom_placement="0"/>			
+	<dragdrop_quick_1 x="130" y="70" width="60" height="80"
+            cell_width = "30" cell_height="40" rows_num="2" cols_num="2"
+            custom_placement="0"/>			
+	<dragdrop_quick_2 x="260" y="70" width="60" height="80"
+            cell_width = "30" cell_height="40" rows_num="2" cols_num="2"
+            custom_placement="0"/>			
+	<dragdrop_quick_3 x="390" y="70" width="60" height="80"
+            cell_width = "30" cell_height="40" rows_num="2" cols_num="2"
+            custom_placement="0"/>
+			
+<!-- action key statics -->
+	<knife_key_static x="0" y="0" width="0" height="0">
+		<text x="0" y="0" font="letterica16" r="231" g="153" b="22">ui_use_slot_0</text>
+	</knife_key_static>
+	<first_weapon_key_static x="0" y="0" width="0" height="0">
+		<text x="0" y="0" font="letterica16" r="231" g="153" b="22">ui_use_slot_1</text>
+	</first_weapon_key_static>
+	<second_weapon_key_static x="0" y="0" width="0" height="0">
+		<text x="0" y="0" font="letterica16" r="231" g="153" b="22">ui_use_slot_2</text>
+	</second_weapon_key_static>
+	<grenade_key_static x="0" y="0" width="0" height="0">
+		<text x="0" y="0" font="letterica16" r="231" g="153" b="22">ui_use_slot_3</text>
+	</grenade_key_static>	
+	<binocular_key_static x="0" y="0" width="0" height="0">
+		<text x="0" y="0" font="letterica16" r="231" g="153" b="22">ui_use_slot_4</text>
+	</binocular_key_static>
+	<artefact_key_static x="0" y="0" width="0" height="0">
+		<text x="0" y="0" font="letterica16" r="231" g="153" b="22">ui_use_slot_10</text>
+	</artefact_key_static>
+	<detector_key_static x="0" y="0" width="0" height="0">
+		<text x="0" y="0" font="letterica16" r="231" g="153" b="22">ui_use_slot_11</text>
+	</detector_key_static>
+	<quickslot_0_key_static x="0" y="0" width="0" height="0">
+		<text x="0" y="0" font="letterica16" r="231" g="153" b="22">ui_use_slot_12</text>
+	</quickslot_0_key_static>	
+	<quickslot_1_key_static x="0" y="0" width="0" height="0">
+		<text x="0" y="0" font="letterica16" r="231" g="153" b="22">ui_use_slot_13</text>
+	</quickslot_1_key_static>
+	<quickslot_2_key_static x="0" y="0" width="0" height="0">
+		<text x="0" y="0" font="letterica16" r="231" g="153" b="22">ui_use_slot_14</text>
+	</quickslot_2_key_static>
+	<quickslot_3_key_static x="0" y="0" width="0" height="0">
+		<text x="0" y="0" font="letterica16" r="231" g="153" b="22">ui_use_slot_15</text>
+	</quickslot_3_key_static>		
+
+	<bottom_static x="0" y="736" width="1024" height="32" stretch="1">
+		<texture>ui\ui_bottom_background</texture>
+	</bottom_static>
+	
+    <bag_static x="11" y="245" width="350" height="450" stretch="1" complex_mode="1">		
+        <text x="22" y="8" font="graffiti19" r="231" g="153" b="22"></text>
+    </bag_static>
+	
+	<weight_static x="0" y="-2" width="400" height="400" stretch="1" complex_mode="1">		
+        <text x="22" y="8" font="graffiti19" r="231" g="153" b="22"></text>
+    </weight_static>
+	
+    <money_static x="744" y="530" width="81" height="33" stretch="1">
+		<text font="graffiti19" r="238" g="153" b="26" align="c" vert_align="c"></text>
+    </money_static>
+
+   
+    <btn_sell_all x="370" y="672" width="157" height="48">
+		<texture>ui_button_main01</texture>
+		<text font="graffiti19" r="238" g="153" b="26">Sell All</text>
+    </btn_sell_all>
+
+    <descr_static x="370" y="253" width="330" height="475" stretch="1">
+        <text x="19" y="0" font="graffiti19" r="238" g="155" b="23">ui_inv_description</text>
+    </descr_static>
+    
+    <character_frame_window x="730" y="260" width="202" height="460">
+        <title x="50" y="-8" width="100" height="60" complex_mode="1">
+			<text font="graffiti19" r="231" g="153" b="22">ui_inv_personal</text>
+        </title>
+    </character_frame_window>
+    
+	<outfit_info x="740" y="550" width="260" height="180">
+		<auto_static x="130" y="0">
+			<text font="graffiti22" color="UI_orange" complex_mode="0">ui_st_params</text>
+		</auto_static>
+		
+		<scroll_view x="8" y="33" width="236" height="147" always_show_scroll="0"/>
+		
+		<static_health_restore_speed x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_health_restore_speed>
+		<static_radiation_restore_speed x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_radiation_restore_speed</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_radiation_restore_speed>
+		<static_satiety_restore_speed x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_satiety_restore_speed</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_satiety_restore_speed>
+		<static_power_restore_speed x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_power_restore_speed</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_power_restore_speed>
+		<static_max_power_restore_speed x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_power_restore_speed</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_max_power_restore_speed>
+		<static_wounds_heal_speed x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_wounds_heal_speed>
+		<static_psy_health_restore_speed x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_psy_health_restore_speed>
+		<static_alcohol_restore_speed x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_alcohol_restore_speed>
+		<static_additional_sprint x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_additional_sprint>
+		<static_additional_jump x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_additional_jump>
+		<static_additional_max_weight x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_additional_max_weight>
+		
+		<static_burn_immunity x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_burn_immunity</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_burn_immunity>
+		
+		<static_shock_immunity x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_shock_immunity</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_shock_immunity>
+		
+		<static_strike_immunity x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_strike_immunity</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_strike_immunity>
+		
+		<static_wound_immunity x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_wound_immunity>
+		
+		<static_radiation_immunity x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_radiation_immunity</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_radiation_immunity>
+		
+		<static_telepatic_immunity x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_telepatic_immunity</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_telepatic_immunity>
+		
+		<static_chemical_burn_immunity x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_chemical_burn_immunity</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_chemical_burn_immunity>
+		
+		<static_explosion_immunity x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_explosion_immunity</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_explosion_immunity>
+		
+		<static_fire_wound_immunity x="0" y="0" width="226" height="15" complex_mode="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
+			<text font="letterica16" x="20" y="0" color="ui_clr_1"/>
+		</static_fire_wound_immunity>
+		
+	</outfit_info>
+
+	<static_personal x="1" y="285" width="95" height="260"/>
+	
+
+    <rank x="732" y="272" width="56" height="65" stretch="1">
+		<texture>ui_inventory_rank</texture>
+		<pic x="10" y="17" width="34" height="40" stretch="1"/>
+    </rank>
+    
+    <progress_background x="739" y="337" width="44" height="179" stretch="1">
+		<texture>ui_scale_three</texture>
+    </progress_background>
+	
+	<progress_background_radiation x="770" y="337" width="29" height="179" stretch="1">
+		<texture>ui_scale_radiation</texture>		
+    </progress_background_radiation> 
+    
+    
+    <progress_back_rank x="770" y="337" width="29" height="179" stretch="1">
+		<texture>ui_scale_one</texture>		
+    </progress_back_rank>   
+
+
+    <progress_bar_health x="6" y="22" width="8" height="124" horz="0" min="0" max="100" pos="0">
+		<progress>
+			<texture>ui_scale_red_1</texture>
+		</progress>
+    </progress_bar_health>    
+
+    <progress_bar_psy x="19" y="22" width="8" height="124" horz="0" min="0" max="100" pos="0">
+		<progress>
+			<texture>ui_scale_blue_1</texture>
+		</progress>
+	</progress_bar_psy>
+
+    <progress_bar_satiety x="33" y="22" width="8" height="124" horz="0" min="0" max="100" pos="0">
+		<progress>
+			<texture>ui_scale_green</texture>
+		</progress>
+    </progress_bar_satiety>
+
+    <progress_bar_radiation x="16" y="22" width="8" height="124" horz="0" min="0" max="100" pos="0">
+		<progress>
+			<texture>ui_scale_yellow_1</texture>
+		</progress>
+    </progress_bar_radiation>
+
+    
+    
+    <progress_bar_rank x="15" y="20" width="8" height="142" horz="0" min="0" max="100" pos="0">
+		<progress x="0" y="0" width="10" height="142 "  stretch="1">
+			<texture>ui_scale_green</texture>
+		</progress>
+    </progress_bar_rank>
+    
+    
+    <time_static x="11" y="730" width="151" height="30" stretch="1">        
+		<texture x=0 y=0 width=190 height=36>ui\ui_dg_time</texture>
+        <text x="15" y="6" font="letterica16" r="240" g="217" b="182" a="255">ui_inv_time</text>
+	</time_static>
+	
+    <time_static_str x="96" y="6" width="80" height="30">        
+        <text font="letterica16" r="240" g="217" b="182" a="255"/>
+	</time_static_str>
+
+    <exit_button x="850" y="725" width="157" height="48" stretch="1">
+        <texture>ui_button_main02</texture>
+        <text font="graffiti19" r="238" g="153" b="26">ui_inv_exit</text>
+        <text_color>
+			<e r="240"	g="217" b="182"/>				
+			<t r="0"	g="0"	b="0"/>				
+			<d r="135"	g="123" b="116"/>
+			<h r="0"	g="0"	b="0"/>
+		</text_color>
+    </exit_button>
+	
+	<organize_button x="157" y="725" width="157" height="48" stretch="1" accel = "kE">
+        <texture>ui_button_main02</texture>
+        <text font="graffiti19" r="238" g="153" b="26">ui_inv_organize</text>
+        <text_color>
+			<e r="240"	g="217" b="182"/>				
+			<t r="0"	g="0"	b="0"/>				
+			<d r="135"	g="123" b="116"/>
+			<h r="0"	g="0"	b="0"/>
+		</text_color>
+    </organize_button>
+
+	<action_sounds>
+		<snd_open>interface\inv_open</snd_open>
+		<snd_close>interface\inv_close</snd_close>
+		<snd_item_to_slot>interface\inv_slot</snd_item_to_slot>
+		<snd_item_to_belt>interface\inv_belt</snd_item_to_belt>
+		<snd_item_to_vest>interface\inv_belt</snd_item_to_vest>
+		<snd_item_to_ruck>interface\inv_ruck</snd_item_to_ruck>
+		<snd_properties>interface\inv_properties</snd_properties>
+		<snd_drop_item>interface\inv_drop</snd_drop_item>
+		<snd_attach_addon>interface\inv_attach_addon</snd_attach_addon>
+		<snd_detach_addon>interface\inv_detach_addon</snd_detach_addon>
+		<snd_item_use>interface\inv_slot</snd_item_use>
+	</action_sounds>
+	
+	<condition_progess_bar x="3" y="1" width="29" height="4" horz="1" min="0" max="100" pos="1">
+		<background x="0" y="0" width="30" height="5">
+			<texture r="196" g="18" b="18" a="200">ui_mg_progress_efficiency_full</texture>
+		</background>
+		<progress>
+			<texture>ui_mg_progress_efficiency_full</texture>
+		</progress>
+		<min_color r="107" g="207" b="119"/>
+		<middle_color r="255" g="255" b="118"/>
+		<max_color r="107" g="207" b="119"/>
+	</condition_progess_bar>
+
+	<cell_item_text x="0" y="0" width="35" height="16" stretch="1">
+		<text x="0" y="0" width="35" height="16" font="letterica16" color="white" align="l" vert_align="t"/>
+	</cell_item_text>
+	
+	<cell_item_text_add x="0" y="0" width="0" height="14" stretch="1">
+		<text x="0" y="0" width="0" height="0" font="letterica16" color="UI_orange" align="r" vert_align="t"/>
+	</cell_item_text_add>
+
+</w>

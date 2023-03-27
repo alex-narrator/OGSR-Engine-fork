@@ -17,7 +17,7 @@
 #include "../Include/xrRender/Kinematics.h"
 #include "level.h"
 #include "CarWeapon.h"
-#include "Torch.h"
+#include "NightVisionDevice.h"
 #include "inventory.h"
 
 void CCar::OnMouseMove(int dx, int dy)
@@ -172,10 +172,10 @@ void CCar::OnKeyboardPress(int cmd)
         auto* Act = OwnerActor();
         if (Act)
         {
-            auto* pTorch = smart_cast<CTorch*>(Act->inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch)
+            auto pNV = Act->GetNightVisionDevice();
+            if (pNV)
             {
-                pTorch->SwitchNightVision();
+                pNV->Switch();
             }
         }
     }
@@ -290,7 +290,7 @@ bool CCar::isObjectVisible(CScriptGameObject* O_)
             return false;
         }
         CObject* O = &O_->object();
-        Fvector dir_to_object;
+        Fvector dir_to_object{};
         Fvector to_point;
         O->Center(to_point);
 

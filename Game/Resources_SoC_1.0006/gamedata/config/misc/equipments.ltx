@@ -1,0 +1,597 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;WARBELT;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[warbelt]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+$spawn 				= "devices\detector_simple"
+$prefetch 			= 32
+class				= EQ_WRBLT
+cform				= skeleton
+visual				= dynamics\equipments\belt_2_art.ogf
+description			= warbelt_descr
+slot				= 16
+
+belt_width 			= 4
+
+inv_name			= Warbelt
+inv_name_short		= Warbelt
+inv_weight			= 0.1
+
+inv_grid_width     = 2
+inv_grid_height    = 1
+inv_grid_x         = 20
+inv_grid_y         = 22
+
+cost				= 500	;30
+default_to_ruck		= false
+
+[warbelt_adv]:warbelt
+visual				= dynamics\equipments\belt_3_art.ogf
+inv_grid_width     = 2
+inv_grid_height    = 1
+inv_grid_width     = 2
+inv_grid_height    = 1
+inv_grid_x         = 26
+inv_grid_y         = 22
+
+[pouch]:warbelt
+description			= pouch_descr
+inv_name			= pouch
+inv_name_short		= pouch_short
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 31
+inv_grid_y         = 19
+
+belt_width 			= 2
+belt_height 		= 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;BACKPACK;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[backpack]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+class				= O_CONTNR
+cform				= skeleton
+visual				= equipments\item_rukzak.ogf
+description			= backpack_descr
+slot				= 17
+
+additional_max_weight 	= 20
+additional_max_volume 	= 20
+power_restore_speed 	= 1
+shock_protection 		= 0.1
+burn_protection 		= 0.5
+strike_protection 		= 0.5
+
+immunities_sect			= sect_backpack_immunities
+
+inv_name			= Backpack
+inv_name_short		= Backpack
+inv_weight			= 0.5
+
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 24
+inv_grid_y         = 23
+
+inv_show_condition = true
+cost				= 500	;30
+default_to_ruck		= false
+
+quick_drop 			= true
+
+position				= 0.35,0.25,0.0
+attach_angle_offset		= -1.6, -3.14, 1.6
+attach_position_offset	= 0.18, 0.00, -0.07 ;vert(+up -down)/horz (+left -right)/deep (-close to screen +far from screen)
+attach_bone_name		= bip01_spine1
+
+[sect_backpack_immunities]
+burn_immunity				= 0.03			;коэффициенты иммунитета самого костюма
+strike_immunity				= 0.01
+shock_immunity				= 0.03
+wound_immunity				= 0.015
+radiation_immunity			= 0.00
+telepatic_immunity			= 0.00
+chemical_burn_immunity		= 0.03
+explosion_immunity			= 0.03
+fire_wound_immunity			= 0.01
+
+[backpack_small]:backpack
+additional_max_weight = 10
+additional_max_volume = 10
+
+description			= backpack_small_descr
+inv_name			= Backpack_small
+inv_name_short		= Backpack_small
+
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 20
+inv_grid_y         = 23
+
+[container]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn 				= "devices\cointainer"
+class				= O_CONTNR
+cform				= skeleton
+cost        = 5000
+inv_weight			= 0.1
+script_binding      = bind_physic_object.init
+visual 			= equipments\item_rukzak.ogf
+description  = container_descr
+inv_name   = container
+inv_name_short  = container_short
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 24
+inv_grid_y         = 23
+additional_max_volume = 20
+power_restore_speed = 5
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;BATTERY;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[battery]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+class				= II_PWRBT
+cform				= skeleton
+visual				= dynamics\equipments\duracell.ogf
+description			= battery_descr
+
+inv_name			= battery
+inv_name_short		= battery
+inv_weight			= 0.1
+
+power_capacity 		= 100
+
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 24
+inv_grid_y         = 32
+cost				= 500	;30
+
+[pda_battery]:battery
+visual				= dynamics\devices\dev_power_device\dev_universalpowerdevice.ogf
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 25
+inv_grid_y         = 32
+description			= pda_battery_descr
+inv_name			= pda_battery
+inv_name_short		= pda_battery
+inv_weight			= 0.3
+
+rechargeable = true
+power_capacity = 50
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;vest;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[vest]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+$spawn 				= "devices\detector_simple"
+$prefetch 			= 32
+class				= EQ_TVEST
+cform				= skeleton
+visual				= equipments\item_datchik1.ogf
+description			= vest_descr
+slot				= 18
+
+vest_width 			= 2
+vest_height 		= 2
+
+inv_name			= Vest
+inv_name_short		= Vest
+inv_weight			= 0.1
+
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 20
+inv_grid_y         = 18
+
+cost				= 500	;30
+default_to_ruck		= false
+
+bones_koeff_protection = actor_vest_medium
+
+[vest_medium]:vest
+description			= vest_descr_medium
+inv_name			= Vest_medium
+inv_name_short		= Vest_medium
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 22
+inv_grid_y         = 18
+vest_width 			= 3
+vest_height 		= 2
+plates 				= plate_class_2,plate_class_3
+
+[vest_adv]:vest
+description			= vest_descr_adv
+inv_name			= Vest_adv
+inv_name_short		= Vest_adv
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 24
+inv_grid_y         = 18
+vest_width 			= 4
+vest_height 		= 2
+plates 				= plate_class_3
+
+[vest_heavy]:vest
+description			= vest_descr_heavy
+inv_name			= Vest_heavy
+inv_name_short		= Vest_heavy
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 26
+inv_grid_y         = 18
+vest_width 			= 4
+vest_height 		= 3
+plates 				= plate_class_3,plate_class_4
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;EQUIPMENT MODULES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[drop_pouch]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn 				= "devices\quest_items\quest_case_02"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= dynamics\equipments\pouch.ogf
+
+belt = true
+vest = true
+slot_enabled = -1
+
+description         = drop_pouch_desc
+inv_name			= drop_pouch_name
+inv_name_short		= drop_pouch_name_short
+inv_weight			= 0.1
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 29
+inv_grid_y         = 20
+cost				= 1000
+
+[scabbard]:drop_pouch
+description         = scabbard_desc
+inv_name			= scabbard_name
+inv_name_short		= scabbard_name_short
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 31
+inv_grid_y         = 20
+slot_enabled 		= 0
+
+[holster]:drop_pouch
+description         = holster_desc
+inv_name			= holster_name
+inv_name_short		= holster_name_short
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 30
+inv_grid_y         = 20
+slot_enabled 		= 4
+
+[grenade_pouch]:drop_pouch
+description         = grenade_pouch_desc
+inv_name			= grenade_pouch_name
+inv_name_short		= grenade_pouch_name_short
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 28
+inv_grid_y         = 20
+slot_enabled 		= 3
+
+[utility_pouch]:drop_pouch
+description         = utility_pouch_desc
+inv_name			= utility_pouch_name
+inv_name_short		= utility_pouch_name_short
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 31
+inv_grid_y         = 18
+slot_enabled 		= 10
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;VEST PLATES;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[plate_class_2]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn 				= "devices\quest_items\quest_case_02"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= physics\anomaly\artefact_plenka.ogf
+
+description         = plate_class_2_desc
+inv_name			= plate_class_2_name
+inv_name_short		= plate_class_2_name_short
+inv_weight			= 4
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 26
+inv_grid_y         = 31
+cost				= 4000
+
+bones_koeff_protection = actor_plate_class_2
+
+[plate_class_3]:plate_class_2
+description         = plate_class_3_desc
+inv_name			= plate_class_3_name
+inv_name_short		= plate_class_3_name_short
+cost				= 6000
+bones_koeff_protection = actor_plate_class_3
+
+[plate_class_4]:plate_class_2
+description         = plate_class_4_desc
+inv_name			= plate_class_4_name
+inv_name_short		= plate_class_4_name_short
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 26
+inv_grid_y         = 32
+cost				= 8000
+bones_koeff_protection = actor_plate_class_4
+
+;---------------------------------------------------------------------------------------------
+;		ШЛЕМЫ
+;---------------------------------------------------------------------------------------------
+
+[helmet]
+GroupControlSection	= spawn_group
+discovery_dependency =
+;$spawn 			= "outfit\helmet"
+$prefetch 		= 32
+class			= EQ_HELMT
+cform           	= skeleton
+visual          	= dynamics\outfit\scientific_outfit
+slot			= 11
+default_to_ruck		= false
+sprint_allowed		= true
+control_inertion_factor	= 1.0
+inv_name             	= st_helmet
+inv_name_short       	= st_helmet
+description				= st_helmet_descr
+inv_weight           	= 4.0
+inv_grid_width       	= 2
+inv_grid_height      	= 3
+inv_grid_x           	= 14
+inv_grid_y           	= 16
+cost			= 1000
+
+inv_show_condition = true
+
+position				= 0,0,0
+attach_angle_offset 	= 1.550, 0.043, 1.650
+attach_position_offset 	= 0.081, 0.001, 0.083
+attach_bone_name		= bip01_head
+auto_attach				= false
+
+immunities_sect 			= sect_helm_immunities
+bones_koeff_protection		= actor_helm_respirator
+
+;---------------------------------------------------------------------------------------------
+;		ПРОТИВОГАЗ
+;---------------------------------------------------------------------------------------------
+
+[helm_respirator]:helmet
+$spawn 			= "outfit\helm_respirator"
+visual          	= dynamics\outfit\helm_respirator
+control_inertion_factor	= 1.0
+inv_name             	= st_helm_respirator
+inv_name_short       	= st_helm_respirator
+description				= st_helm_respirator_descr
+
+inv_weight           	= 4.0
+
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 10
+inv_grid_y         = 27
+
+cost			= 1000
+
+immunities_sect 			= sect_helm_respirator_immunities
+bones_koeff_protection		= actor_helm_respirator
+
+telepatic_protection 		= 0.1
+radiation_protection 		= 0.3
+chemical_burn_protection 	= 0.3
+
+attach_angle_offset = 1.500, 0.043, 1.650
+attach_position_offset = 0.064, 0.001, 0.067
+
+[sect_helm_respirator_immunities]
+burn_immunity			= 0.04
+strike_immunity			= 0.0
+shock_immunity			= 0.04
+wound_immunity			= 0.0
+wound_2_immunity		= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.04
+explosion_immunity		= 0.04
+fire_wound_immunity		= 0.04
+
+;---------------------------------------------------------------------------------------------
+;		СТАЛЬНОЙ ШЛЕМ
+;---------------------------------------------------------------------------------------------
+
+[helm_hardhat]:helmet
+$spawn 			= "outfit\helm_hardhat"
+visual          	= dynamics\outfit\helm_hardhat
+control_inertion_factor	= 1.0
+inv_name             	= st_helm_hardhat
+inv_name_short       	= st_helm_hardhat
+description				= st_helm_hardhat_descr
+
+inv_weight           	= 4.0
+
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 14
+inv_grid_y         = 27
+
+
+cost			= 1200
+
+immunities_sect 			= sect_helm_hardhat_immunities
+bones_koeff_protection		= actor_helm_hardhat
+
+telepatic_protection 		= 0.1
+strike_protection 			= 0.6
+explosion_protection 		= 0.6
+wound_protection			= 0.6
+
+attach_angle_offset = 0.300, -0.057, 1.600
+attach_position_offset = -0.008, 0.012, -0.008
+
+[sect_helm_hardhat_immunities]
+burn_immunity			= 0.03
+strike_immunity			= 0.0
+shock_immunity			= 0.03
+wound_immunity			= 0.0
+wound_2_immunity		= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.03
+explosion_immunity		= 0.03
+fire_wound_immunity		= 0.025
+
+;---------------------------------------------------------------------------------------------
+;		ШЛЕМ "ЗАСЛОН"
+;---------------------------------------------------------------------------------------------
+
+[helm_protective]:helmet
+$spawn 			= "outfit\helm_protective"
+visual          	= dynamics\outfit\helm_protective
+control_inertion_factor	= 1.0
+inv_name             	= st_helm_protective
+inv_name_short       	= st_helm_protective
+description				= st_helm_protective_descr
+
+inv_weight           	= 4.0
+
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 12
+inv_grid_y         = 27
+
+cost			= 6000
+
+immunities_sect 			= sect_helm_protective_immunities
+bones_koeff_protection		= actor_helm_protective
+
+radiation_protection 		= 0.5
+chemical_burn_protection 	= 0.5
+telepatic_protection 		= 0.5
+
+attach_angle_offset = 1.550, 0.043, 1.650
+attach_position_offset = 0.047, 0.006, 0.043
+
+[sect_helm_protective_immunities]
+burn_immunity			= 0.01
+strike_immunity			= 0.0
+shock_immunity			= 0.01
+wound_immunity			= 0.0
+wound_2_immunity		= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.0
+explosion_immunity		= 0.03
+fire_wound_immunity		= 0.035
+
+;---------------------------------------------------------------------------------------------
+;		ТАКТИЧЕСКИЙ ШЛЕМ
+;---------------------------------------------------------------------------------------------
+
+[helm_tactic]:helmet
+$spawn 			= "outfit\helm_tactic"
+visual          	= dynamics\outfit\helm_tactic
+control_inertion_factor	= 1.0
+inv_name             	= st_helm_tactic
+inv_name_short       	= st_helm_tactic
+description				= st_helm_tactic_descr
+
+inv_weight           	= 4.0
+
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 16
+inv_grid_y         = 27
+
+cost			= 7000
+
+immunities_sect 	= sect_helm_tactic_immunities
+bones_koeff_protection		= actor_helm_tactic
+
+telepatic_protection 		= 0.1
+radiation_protection 		= 0.1
+chemical_burn_protection 	= 0.3
+strike_protection 			= 0.8
+explosion_protection 		= 0.8
+wound_protection			= 0.8
+
+attach_angle_offset = 0.300, -0.057, 1.600
+attach_position_offset = -0.008, 0.012, -0.008
+
+[sect_helm_tactic_immunities]
+burn_immunity			= 0.02
+strike_immunity			= 0.0
+shock_immunity			= 0.02
+wound_immunity			= 0.0
+wound_2_immunity		= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.02
+explosion_immunity		= 0.02
+fire_wound_immunity		= 0.015
+
+;---------------------------------------------------------------------------------------------
+;		ШЛЕМ "СФЕРА М12"
+;---------------------------------------------------------------------------------------------
+
+[helm_battle]:helmet
+$spawn 			= "outfit\helm_battle"
+visual          	= dynamics\outfit\helm_battle
+control_inertion_factor	= 1.0
+inv_name             	= st_helm_battle
+inv_name_short       	= st_helm_battle
+description				= st_helm_battle_descr
+
+inv_weight           	= 4.0
+
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 18
+inv_grid_y         = 27
+
+cost			= 8000
+
+immunities_sect 			= sect_helm_battle_immunities
+bones_koeff_protection		= actor_helm_battle
+
+telepatic_protection 		= 0.2
+radiation_protection 		= 0.2
+chemical_burn_protection 	= 0.5
+strike_protection 			= 0.8
+explosion_protection 		= 0.8
+wound_protection			= 0.8
+
+attach_angle_offset = 0.300, -0.057, 1.600
+attach_position_offset = -0.008, 0.012, -0.008
+
+[sect_helm_battle_immunities]
+burn_immunity			= 0.02
+strike_immunity			= 0.0
+shock_immunity			= 0.02
+wound_immunity			= 0.0
+wound_2_immunity		= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.02
+explosion_immunity		= 0.01
+fire_wound_immunity		= 0.01

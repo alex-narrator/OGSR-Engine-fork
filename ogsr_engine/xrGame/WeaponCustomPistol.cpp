@@ -10,6 +10,7 @@
 CWeaponCustomPistol::CWeaponCustomPistol(LPCSTR name) : CWeaponMagazined(name, SOUND_TYPE_WEAPON_PISTOL) {}
 
 CWeaponCustomPistol::~CWeaponCustomPistol() {}
+
 void CWeaponCustomPistol::switch2_Fire()
 {
     if (GetCurrentFireMode() == 1)
@@ -27,16 +28,10 @@ void CWeaponCustomPistol::switch2_Fire()
 
 void CWeaponCustomPistol::FireEnd()
 {
-    // if (fTime <= 0 && GetCurrentFireMode() == 1)
-    //{
-    //	m_bPending = false;
-    // }
+    if (fTime <= 0 && GetCurrentFireMode() == 1)
+    {
+        SetPending(FALSE);
+    }
 
     inherited::FireEnd();
 }
-
-void CWeaponCustomPistol::net_Relcase(CObject* object) { inherited::net_Relcase(object); }
-
-void CWeaponCustomPistol::OnDrawUI() { inherited::OnDrawUI(); }
-
-void CWeaponCustomPistol::net_Destroy() { inherited::net_Destroy(); }

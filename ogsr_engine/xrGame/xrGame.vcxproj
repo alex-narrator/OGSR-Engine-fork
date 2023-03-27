@@ -400,6 +400,7 @@
     <ClInclude Include="..\COMMON_AI\random32.h" />
     <ClInclude Include="..\COMMON_AI\server_entity_wrapper.h" />
     <ClInclude Include="..\COMMON_AI\server_entity_wrapper_inline.h" />
+    <ClInclude Include="Addons.h" />
     <ClInclude Include="AdvancedDetector.h" />
     <ClInclude Include="ai\monsters\anti_aim_ability.h" />
     <ClInclude Include="ai\monsters\group_states\group_state_attack.h" />
@@ -434,6 +435,7 @@
     <ClInclude Include="ai\monsters\states\monster_state_attack_on_run_inline.h" />
     <ClInclude Include="derived_client_classes.h" />
     <ClInclude Include="EliteDetector.h" />
+    <ClInclude Include="Helmet.h" />
     <ClInclude Include="IKFoot.h" />
     <ClInclude Include="IKFoot_inl.h" />
     <ClInclude Include="ik_calculate_data.h" />
@@ -449,8 +451,10 @@
     <ClInclude Include="mt_config.h" />
     <ClInclude Include="damage_manager.h" />
     <ClInclude Include="DamageSource.h" />
+    <ClInclude Include="NightVisionDevice.h" />
     <ClInclude Include="player_hud.h" />
     <ClInclude Include="pose_extrapolation.h" />
+    <ClInclude Include="PowerBattery.h" />
     <ClInclude Include="script_actor.h" />
     <ClInclude Include="script_game_object_impl.h" />
     <ClInclude Include="script_rq_result.h" />
@@ -465,11 +469,17 @@
     <ClInclude Include="steering_behaviour_separation.h" />
     <ClInclude Include="trajectories.h" />
     <ClInclude Include="ui\ArtefactDetectorUI.h" />
+    <ClInclude Include="ui\UIArmorParams.h" />
+    <ClInclude Include="ui\UIEatableParams.h" />
+    <ClInclude Include="ui\UIEquipParams.h" />
     <ClInclude Include="ui\UIHelper.h" />
     <ClInclude Include="ui\UIIconParams.h" />
     <ClInclude Include="ui\UILoadingScreen.h" />
+    <ClInclude Include="ui\UIPanels.h" />
     <ClInclude Include="ui\UIPdaSpot.h" />
     <ClInclude Include="ui_defs.h" />
+    <ClInclude Include="Vest.h" />
+    <ClInclude Include="Warbelt.h" />
     <ClInclude Include="wrapper_abstract.h" />
     <ClInclude Include="wrapper_abstract_inline.h" />
     <ClInclude Include="action_management_config.h" />
@@ -1273,9 +1283,6 @@
     <ClInclude Include="Missile.h" />
     <ClInclude Include="WeaponMagazined.h" />
     <ClInclude Include="WeaponMagazinedWGrenade.h" />
-    <ClInclude Include="Scope.h" />
-    <ClInclude Include="Silencer.h" />
-    <ClInclude Include="GrenadeLauncher.h" />
     <ClInclude Include="CustomRocket.h" />
     <ClInclude Include="ExplosiveRocket.h" />
     <ClInclude Include="RocketLauncher.h" />
@@ -1545,7 +1552,6 @@
     <ClInclude Include="ui\UIEncyclopediaWnd.h" />
     <ClInclude Include="ui\UINewsItemWnd.h" />
     <ClInclude Include="ui\UINewsWnd.h" />
-    <ClInclude Include="ui\UIArtefactPanel.h" />
     <ClInclude Include="ui\UICarPanel.h" />
     <ClInclude Include="ui\UIMainIngameWnd.h" />
     <ClInclude Include="ui\UIMessagesWindow.h" />
@@ -1650,6 +1656,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\COMMON_AI\random32.cpp" />
+    <ClCompile Include="Addons.cpp" />
     <ClCompile Include="AdvancedDetector.cpp" />
     <ClCompile Include="ai\monsters\anti_aim_ability.cpp" />
     <ClCompile Include="ai\monsters\monster_aura.cpp" />
@@ -1657,6 +1664,7 @@
     <ClCompile Include="action_base_script.cpp" />
     <ClCompile Include="derived_client_classes.cpp" />
     <ClCompile Include="EliteDetector.cpp" />
+    <ClCompile Include="Helmet.cpp" />
     <ClCompile Include="IKFoot.cpp" />
     <ClCompile Include="ik_calculate_data.cpp" />
     <ClCompile Include="ik_dbg_matrix.cpp" />
@@ -1664,9 +1672,11 @@
     <ClCompile Include="ik_limb_state.cpp" />
     <ClCompile Include="ik_object_shift.cpp" />
     <ClCompile Include="InventoryContainer.cpp" />
+    <ClCompile Include="NightVisionDevice.cpp" />
     <ClCompile Include="player_hud.cpp" />
     <ClCompile Include="player_hud_tune.cpp" />
     <ClCompile Include="pose_extrapolation.cpp" />
+    <ClCompile Include="PowerBattery.cpp" />
     <ClCompile Include="script_action_wrapper.cpp" />
     <ClCompile Include="action_planner_script.cpp" />
     <ClCompile Include="script_action_planner_wrapper.cpp" />
@@ -1692,10 +1702,15 @@
     <ClCompile Include="steering_behaviour.cpp" />
     <ClCompile Include="trajectories.cpp" />
     <ClCompile Include="ui\ArtefactDetectorUI.cpp" />
+    <ClCompile Include="ui\UIArmorParams.cpp" />
+    <ClCompile Include="ui\UIEatableParams.cpp" />
+    <ClCompile Include="ui\UIEquipParams.cpp" />
     <ClCompile Include="ui\UIHelper.cpp" />
     <ClCompile Include="ui\UIIconParams.cpp" />
     <ClCompile Include="ui\UILoadingScreen.cpp" />
+    <ClCompile Include="ui\UIPanels.cpp" />
     <ClCompile Include="ui\UIPdaSpot.cpp" />
+    <ClCompile Include="Vest.cpp" />
     <ClCompile Include="visual_memory_manager.cpp" />
     <ClCompile Include="visual_memory_params.cpp" />
     <ClCompile Include="vision_client.cpp" />
@@ -2087,6 +2102,7 @@
     <ClCompile Include="pp_effector_custom.cpp" />
     <ClCompile Include="pp_effector_distance.cpp" />
     <ClCompile Include="PostprocessAnimator.cpp" />
+    <ClCompile Include="Warbelt.cpp" />
     <ClCompile Include="zone_effector.cpp" />
     <ClCompile Include="EffectorShot.cpp" />
     <ClCompile Include="EffectorShotX.cpp" />
@@ -2200,9 +2216,6 @@
     <ClCompile Include="Missile.cpp" />
     <ClCompile Include="WeaponMagazined.cpp" />
     <ClCompile Include="WeaponMagazinedWGrenade.cpp" />
-    <ClCompile Include="Scope.cpp" />
-    <ClCompile Include="Silencer.cpp" />
-    <ClCompile Include="GrenadeLauncher.cpp" />
     <ClCompile Include="CustomRocket.cpp" />
     <ClCompile Include="ExplosiveRocket.cpp" />
     <ClCompile Include="RocketLauncher.cpp" />
@@ -2476,7 +2489,6 @@
     <ClCompile Include="ui\UIEncyclopediaWnd.cpp" />
     <ClCompile Include="ui\UINewsItemWnd.cpp" />
     <ClCompile Include="ui\UINewsWnd.cpp" />
-    <ClCompile Include="ui\UIArtefactPanel.cpp" />
     <ClCompile Include="ui\UICarPanel.cpp" />
     <ClCompile Include="ui\UIMainIngameWnd.cpp" />
     <ClCompile Include="ui\UIMessagesWindow.cpp" />

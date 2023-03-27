@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding="UTF-8"?>
+
+<window>
+
+	<main x=0 y=0 width=1024 height=768/>
+
+	<static_icon x="30" y="22" width="150" height="220" stretch="1">
+		<texture_offset x="-11" y="0"/>
+		<texture>ui_charinfo_left</texture>
+	</static_icon>
+	
+	<static_icon x="870" y="22" width="150" height="220" stretch="1">
+		<texture>ui_charinfo_right</texture>
+	</static_icon>
+
+	<our_bag_static x="30" y="270" width="333" height="450" stretch="1">
+		<texture width="305" height="455">ui\ui_dg_inventory_exchange_trade</texture>
+		<text x="30" y="8" font="graffiti22" r="238" g="153" b="26" complex_mode="1"/>
+	</our_bag_static>
+	
+	<our_weight_static x="0" y="-10" width="333" height="450" stretch="1">
+		<text x="30" y="18" font="graffiti22" r="238" g="153" b="26" complex_mode="1"/>
+	</our_weight_static>
+
+	<dragdrop_list_our x="29" y="35" width="296" height="410"
+			cell_width = "31" cell_height="41" rows_num="10" cols_num="9" 
+			unlimited="1" group_similar="1"/>
+
+	<others_bag_static x="675" y="270" width="333" height="455" stretch="1">
+		<texture mirror="h" width="305" height="455">ui\ui_dg_inventory_exchange_trade</texture>
+		<text x="25" y="8" font="graffiti22" r="255" g="255" b="255" a="128"></text>
+	</others_bag_static>
+	
+	<dragdrop_list_other x="29" y="35" width="296" height="410"
+			cell_width="31" cell_height="41" rows_num="10" cols_num="9" 
+			unlimited="1" group_similar="1"/>
+
+	<frame_window x="385" y="274" width="267" height="460">
+		<texture>ui_frame</texture>		
+		<_left_top_texture x="5" y="10">ui\ui_inv_info_over_lt</_left_top_texture>
+	</frame_window>
+
+	<descr_static x="5" y="184" width="260" height="270" stretch="1">
+		<texture width="258" height="271">ui\ui_inv_info_over_b</texture>
+	</descr_static>
+
+	<auto_static x="395" y="461" width="220" height="30">
+		<text font="graffiti22" r="255" g="255" b="255" a="128">ui_st_description</text>
+	</auto_static>
+
+	<top_background x=0 y=0 width=1024 height=128>
+		<texture>ui\ui_top_background</texture>
+	</top_background>
+
+	<bottom_background x=0 y=736 width=1024 height=32>
+		<texture>ui\ui_bottom_background</texture>
+	</bottom_background>
+
+    <exit_button x="850" y="725" width="157" height="48" stretch="1">
+        <texture>ui_button_main02</texture>
+        <text font="graffiti19" r="238" g="153" b="26">ui_inv_exit</text>
+        <text_color>
+			<e r="240"	g="217" b="182"/>				
+			<t r="0"	g="0"	b="0"/>				
+			<d r="135"	g="123" b="116"/>
+			<h r="0"	g="0"	b="0"/>
+		</text_color>
+    </exit_button>
+
+	<take_all_btn x="693" y="725" width="157" height="48" hR="255" hB="83" hG="179" highlight_text="1" accel = "kSPACE">
+        <texture>ui_button_main01</texture>
+        <text align="c" font="graffiti22" r="238" g="153" b="26">ui_st_take_all</text>
+        <text_color>
+			<e r="240"	g="217" b="182"/>				
+			<t r="0"	g="0"	b="0"/>				
+			<d r="135"	g="123" b="116"/>
+			<h r="0"	g="0"	b="0"/>
+		</text_color>
+	</take_all_btn>
+	
+	<organize_button x="196" y="725" width="157" height="48" stretch="1" accel = "kE">
+        <texture>ui_button_main02</texture>
+        <text font="graffiti19" r="238" g="153" b="26">ui_inv_organize</text>
+        <text_color>
+			<e r="240"	g="217" b="182"/>				
+			<t r="0"	g="0"	b="0"/>				
+			<d r="135"	g="123" b="116"/>
+			<h r="0"	g="0"	b="0"/>
+		</text_color>
+    </organize_button>
+	
+	<move_all_from_ruck_button x="39" y="725" width="157" height="48" stretch="1">
+        <texture>ui_button_main01</texture>
+        <text font="graffiti19" r="238" g="153" b="26">ui_inv_move_all_from_ruck</text>
+        <text_color>
+			<e r="240"	g="217" b="182"/>				
+			<t r="0"	g="0"	b="0"/>				
+			<d r="135"	g="123" b="116"/>
+			<h r="0"	g="0"	b="0"/>
+		</text_color>
+    </move_all_from_ruck_button>
+	
+	<show_all_inv x="135" y="278" width="110" height="15" stretch="0">
+		<text font="graffiti19" r="215" g="195" b="170">ui_inv_show_all_inv</text>
+			<text_color>
+				<e r="240"	g="217" b="182"/>				
+				<t r="238" g="153" b="26"/>				
+				<d r="240"	g="217" b="182"/>
+				<h r="238" g="153" b="26"/>
+			</text_color>
+	</show_all_inv>
+	
+	<action_sounds>
+		<snd_open>interface\inv_open</snd_open>
+		<snd_close>interface\inv_close</snd_close>
+		<snd_properties>interface\inv_properties</snd_properties>
+		<snd_drop_item>interface\inv_drop</snd_drop_item>
+		<snd_move_item>interface\inv_slot</snd_move_item>
+		<snd_detach_addon>interface\inv_detach_addon</snd_detach_addon>
+		<snd_item_use>interface\inv_slot</snd_item_use>
+		<snd_mag_load>interface\wm_load</snd_mag_load>
+		<snd_mag_unload>interface\wm_load</snd_mag_unload>
+	</action_sounds>
+
+</window>
+

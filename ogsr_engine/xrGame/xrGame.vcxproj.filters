@@ -1450,15 +1450,6 @@
     <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons">
       <UniqueIdentifier>{58ac783e-18d3-44dd-af5d-e79e48ff887e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\Scope">
-      <UniqueIdentifier>{8902b69a-d2b3-4a5f-b6aa-a836b3301d46}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\Silencer">
-      <UniqueIdentifier>{46cd5b23-68c8-4743-9e6f-047f7d27ec5f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\GrenadeLauncher">
-      <UniqueIdentifier>{3c047853-8706-43c4-b486-06092b238748}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\RocketLauncher">
       <UniqueIdentifier>{26396f3a-142a-4659-b54d-51dffd72160a}</UniqueIdentifier>
     </Filter>
@@ -4527,15 +4518,6 @@
     <ClInclude Include="WeaponMagazinedWGrenade.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Automatic</Filter>
     </ClInclude>
-    <ClInclude Include="Scope.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\Scope</Filter>
-    </ClInclude>
-    <ClInclude Include="Silencer.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\Silencer</Filter>
-    </ClInclude>
-    <ClInclude Include="GrenadeLauncher.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\GrenadeLauncher</Filter>
-    </ClInclude>
     <ClInclude Include="CustomRocket.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\RocketLauncher</Filter>
     </ClInclude>
@@ -5328,9 +5310,6 @@
     <ClInclude Include="ui\UINewsWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Diary</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIArtefactPanel.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UICarPanel.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
     </ClInclude>
@@ -6064,6 +6043,36 @@
     </ClInclude>
     <ClInclude Include="SimpleDetectorSHOC.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices\Detectors</Filter>
+    </ClInclude>
+    <ClInclude Include="Addons.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons</Filter>
+    </ClInclude>
+    <ClInclude Include="NightVisionDevice.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerBattery.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="Helmet.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClInclude>
+    <ClInclude Include="Warbelt.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClInclude>
+    <ClInclude Include="Vest.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIPanels.h">
+      <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIArmorParams.h">
+      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIEatableParams.h">
+      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIEquipParams.h">
+      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -7603,15 +7612,6 @@
     <ClCompile Include="WeaponMagazinedWGrenade.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Automatic</Filter>
     </ClCompile>
-    <ClCompile Include="Scope.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\Scope</Filter>
-    </ClCompile>
-    <ClCompile Include="Silencer.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\Silencer</Filter>
-    </ClCompile>
-    <ClCompile Include="GrenadeLauncher.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\GrenadeLauncher</Filter>
-    </ClCompile>
     <ClCompile Include="CustomRocket.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\RocketLauncher</Filter>
     </ClCompile>
@@ -8422,9 +8422,6 @@
     <ClCompile Include="ui\UINewsWnd.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Diary</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UIArtefactPanel.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UICarPanel.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
     </ClCompile>
@@ -8845,6 +8842,36 @@
     </ClCompile>
     <ClCompile Include="SimpleDetectorSHOC.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices\Detectors</Filter>
+    </ClCompile>
+    <ClCompile Include="Addons.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons</Filter>
+    </ClCompile>
+    <ClCompile Include="NightVisionDevice.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="PowerBattery.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="Helmet.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClCompile>
+    <ClCompile Include="Warbelt.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClCompile>
+    <ClCompile Include="Vest.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIPanels.cpp">
+      <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIArmorParams.cpp">
+      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIEatableParams.cpp">
+      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIEquipParams.cpp">
+      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

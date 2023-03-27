@@ -95,6 +95,12 @@ void CEatableItemObject::UpdateCL()
     CEatableItem::UpdateCL();
 }
 
+void CEatableItemObject::shedule_Update(u32 dt)
+{
+    CPhysicItem::shedule_Update(dt);
+    UpdateConditionDecrease();
+}
+
 void CEatableItemObject::OnEvent(NET_Packet& P, u16 type)
 {
     CPhysicItem::OnEvent(P, type);

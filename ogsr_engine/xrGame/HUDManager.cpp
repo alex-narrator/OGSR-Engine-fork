@@ -355,7 +355,7 @@ void CHUDManager::OnScreenRatioChanged()
     pUI->UnLoad();
     pUI->Load(pUI->UIGame());
     if (auto act = Actor())
-        act->UpdateArtefactPanel(); //Обновляем панель с артами на худе
+        act->UpdateUIPanels(); //Обновляем панель с артами на худе
 }
 
 void CHUDManager::OnDisconnected()

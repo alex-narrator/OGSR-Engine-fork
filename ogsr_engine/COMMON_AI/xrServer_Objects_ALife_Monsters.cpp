@@ -100,8 +100,8 @@ void setup_location_types(GameGraph::TERRAIN_VECTOR& m_vertex_types, CInifile* i
 
 //возможное отклонение от значения репутации
 //заданого в профиле и для конкретного персонажа
-#define REPUTATION_DELTA 10
-#define RANK_DELTA 10
+constexpr auto REPUTATION_DELTA = 10;
+constexpr auto RANK_DELTA = 10;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -114,13 +114,11 @@ CSE_ALifeTraderAbstract::CSE_ALifeTraderAbstract(LPCSTR caSection)
 {
     //	m_fCumulativeItemMass		= 0.f;
     //	m_iCumulativeItemVolume		= 0;
-    m_dwMoney = 0;
     if (pSettings->line_exist(caSection, "money"))
         m_dwMoney = pSettings->r_u32(caSection, "money");
     m_fMaxItemMass = pSettings->r_float(caSection, "max_item_mass");
 
     m_sCharacterProfile = READ_IF_EXISTS(pSettings, r_string, caSection, "character_profile", "default");
-    m_SpecificCharacter = NULL;
 
 #ifdef XRGAME_EXPORTS
     m_community_index = NO_COMMUNITY_INDEX;
@@ -545,14 +543,10 @@ bool CSE_ALifeTrader::interactive() const { return (false); }
 ////////////////////////////////////////////////////////////////////////////
 CSE_ALifeCustomZone::CSE_ALifeCustomZone(LPCSTR caSection) : CSE_ALifeSpaceRestrictor(caSection)
 {
-    m_owner_id = u32(-1);
     if (pSettings->line_exist(caSection, "hit_type"))
         m_tHitType = ALife::g_tfString2HitType(pSettings->r_string(caSection, "hit_type"));
-    else
-        m_tHitType = ALife::eHitTypeMax;
-    m_enabled_time = 0;
-    m_disabled_time = 0;
-    m_start_time_shift = 0;
+
+    m_maxPower = pSettings->r_float(caSection, "max_start_power");
 }
 
 CSE_ALifeCustomZone::~CSE_ALifeCustomZone() {}
@@ -561,8 +555,7 @@ void CSE_ALifeCustomZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited::STATE_Read(tNetPacket, size);
 
-    float tmp;
-    tNetPacket.r_float(tmp /*m_maxPower*/);
+    tNetPacket.r_float(m_maxPower);
 
     if (m_wVersion < 113)
     {
@@ -587,16 +580,23 @@ void CSE_ALifeCustomZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
     {
         tNetPacket.r_u32(m_start_time_shift);
     }
+    //
+    if (m_wVersion > 118)
+    {
+        tNetPacket.r_u32(m_zone_ttl);
+    }
 }
 
 void CSE_ALifeCustomZone::STATE_Write(NET_Packet& tNetPacket)
 {
     inherited::STATE_Write(tNetPacket);
-    tNetPacket.w_float(0.0 /*m_maxPower*/);
+    tNetPacket.w_float(m_maxPower);
     tNetPacket.w_u32(m_owner_id);
     tNetPacket.w_u32(m_enabled_time);
     tNetPacket.w_u32(m_disabled_time);
     tNetPacket.w_u32(m_start_time_shift);
+    //
+    tNetPacket.w_u32(m_zone_ttl);
 }
 
 void CSE_ALifeCustomZone::UPDATE_Read(NET_Packet& tNetPacket)
@@ -628,8 +628,6 @@ void CSE_ALifeCustomZone::UPDATE_Write(NET_Packet& tNetPacket)
 ////////////////////////////////////////////////////////////////////////////
 CSE_ALifeAnomalousZone::CSE_ALifeAnomalousZone(LPCSTR caSection) : CSE_ALifeCustomZone(caSection)
 {
-    m_offline_interactive_radius = 30.f;
-    m_artefact_spawn_count = 32;
     m_spawn_flags.set(flSpawnDestroyOnSpawn, TRUE);
 }
 
@@ -780,22 +778,9 @@ void CSE_ALifeZoneVisual::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPD
 ////////////////////////////////////////////////////////////////////////////
 CSE_ALifeCreatureAbstract::CSE_ALifeCreatureAbstract(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection)
 {
-    s_team = s_squad = s_group = 0;
-    o_model = 0.f;
-    o_torso.pitch = 0.f;
-    o_torso.yaw = 0.f;
-    o_torso.roll = 0.f;
-    fHealth = 1;
-    m_bDeathIsProcessed = false;
-    m_fAccuracy = 25.f;
-    m_fIntelligence = 25.f;
-    m_fMorale = 100.f;
     m_ef_creature_type = pSettings->r_u32(caSection, "ef_creature_type");
     m_ef_weapon_type = READ_IF_EXISTS(pSettings, r_u32, caSection, "ef_weapon_type", u32(-1));
     m_ef_detector_type = READ_IF_EXISTS(pSettings, r_u32, caSection, "ef_detector_type", u32(-1));
-    m_killer_id = ALife::_OBJECT_ID(-1);
-    m_game_death_time = 0;
-    flags = 0;
 }
 
 CSE_ALifeCreatureAbstract::~CSE_ALifeCreatureAbstract() {}
@@ -937,13 +922,6 @@ bool CSE_ALifeCreatureAbstract::can_switch_offline() const { return (inherited::
 ////////////////////////////////////////////////////////////////////////////
 CSE_ALifeMonsterAbstract::CSE_ALifeMonsterAbstract(LPCSTR caSection) : CSE_ALifeCreatureAbstract(caSection), CSE_ALifeSchedulable(caSection)
 {
-    m_group_id = 0xffff;
-    m_tNextGraphID = m_tGraphID;
-    m_tPrevGraphID = m_tGraphID;
-    m_fCurSpeed = 0.0f;
-    m_fDistanceFromPoint = 0.0f;
-    m_fDistanceToPoint = 0.0f;
-
     m_fMaxHealthValue = pSettings->r_float(caSection, "MaxHealthValue");
     if (pSettings->line_exist(caSection, "hit_power"))
     {
@@ -969,10 +947,7 @@ CSE_ALifeMonsterAbstract::CSE_ALifeMonsterAbstract(LPCSTR caSection) : CSE_ALife
             *I = READ_IF_EXISTS(pSettings, r_float, imm_section, strcat(strcpy(S, ALife::g_cafHitType2String(ALife::EHitType(I - B))), "_immunity"), 1.f);
     }
 
-    if (pSettings->line_exist(caSection, "retreat_threshold"))
-        m_fRetreatThreshold = pSettings->r_float(caSection, "retreat_threshold");
-    else
-        m_fRetreatThreshold = 0.2f;
+    m_fRetreatThreshold = READ_IF_EXISTS(pSettings, r_float, caSection, "retreat_threshold", 0.2f);
 
     m_fEyeRange = pSettings->r_float(caSection, "eye_range");
 
@@ -982,12 +957,8 @@ CSE_ALifeMonsterAbstract::CSE_ALifeMonsterAbstract(LPCSTR caSection) : CSE_ALife
     setup_location_types(m_tpaTerrain, pSettings, pSettings->r_string(caSection, "terrain"));
 
     m_tpBestDetector = this;
-
     m_brain = 0;
-    m_smart_terrain_id = 0xffff;
-    m_task_reached = false;
-
-    m_rank = (pSettings->line_exist(caSection, "rank")) ? pSettings->r_s32(caSection, "rank") : 0;
+    m_rank = READ_IF_EXISTS(pSettings, r_s32, caSection, "rank", 0);
 
 #ifdef XRGAME_EXPORTS
     m_stay_after_death_time_interval = generate_time(1, 1, 1, pSettings->r_u32("monsters_common", "stay_after_death_time_interval"), 0, 0);
@@ -1079,12 +1050,7 @@ CSE_ALifeCreatureActor::CSE_ALifeCreatureActor(LPCSTR caSection) : CSE_ALifeCrea
 {
     if (pSettings->section_exist(caSection) && pSettings->line_exist(caSection, "visual"))
         set_visual(pSettings->r_string(caSection, "visual"));
-    m_u16NumItems = 0;
     //	fArmor						= 0.f;
-    fRadiation = 0.f;
-    accel.set(0.f, 0.f, 0.f);
-    velocity.set(0.f, 0.f, 0.f);
-    m_holderID = u16(-1);
 }
 
 CSE_ALifeCreatureActor::~CSE_ALifeCreatureActor() {}
@@ -1301,19 +1267,7 @@ CSE_ALifeMonsterZombie::CSE_ALifeMonsterZombie(LPCSTR caSection) : CSE_ALifeMons
     if (pSettings->section_exist(caSection) && pSettings->line_exist(caSection, "visual"))
         set_visual(pSettings->r_string(caSection, "visual"));
     // personal charactersitics
-    fEyeFov = 120;
-    fEyeRange = 30;
     fHealth = 200;
-    fMinSpeed = 1.5;
-    fMaxSpeed = 1.75;
-    fAttackSpeed = 2.0;
-    fMaxPursuitRadius = 100;
-    fMaxHomeRadius = 30;
-    // attack
-    fHitPower = 20.0;
-    u16HitInterval = 1000;
-    fAttackDistance = 1.0f;
-    fAttackAngle = 15;
 }
 
 CSE_ALifeMonsterZombie::~CSE_ALifeMonsterZombie() {}
@@ -1368,7 +1322,6 @@ void CSE_ALifeMonsterZombie::UPDATE_Write(NET_Packet& tNetPacket) { inherited::U
 CSE_ALifeMonsterBase::CSE_ALifeMonsterBase(LPCSTR caSection) : CSE_ALifeMonsterAbstract(caSection), CSE_PHSkeleton(caSection)
 {
     set_visual(pSettings->r_string(caSection, "visual"));
-    m_spec_object_id = 0xffff;
 }
 
 CSE_ALifeMonsterBase::~CSE_ALifeMonsterBase() {}
@@ -1490,7 +1443,6 @@ void CSE_ALifeHumanAbstract::UPDATE_Read(NET_Packet& tNetPacket)
 CSE_ALifeHumanStalker::CSE_ALifeHumanStalker(LPCSTR caSection) : CSE_ALifeHumanAbstract(caSection), CSE_PHSkeleton(caSection)
 {
     m_trader_flags.set(eTraderFlagInfiniteAmmo, TRUE);
-    m_start_dialog = "";
 }
 
 CSE_ALifeHumanStalker::~CSE_ALifeHumanStalker() {}

@@ -74,7 +74,7 @@ BIND_FUNCTION10(&object(), CScriptGameObject::GetMaxPower, CEntityAlive, conditi
 BIND_FUNCTION10(&object(), CScriptGameObject::GetRadiation, CEntityAlive, conditions().GetRadiation, float, -1);
 BIND_FUNCTION10(&object(), CScriptGameObject::GetBleeding, CEntityAlive, conditions().BleedingSpeed, float, -1);
 BIND_FUNCTION10(&object(), CScriptGameObject::GetMorale, CEntityAlive, conditions().GetEntityMorale, float, -1);
-BIND_FUNCTION10(&object(), CScriptGameObject::GetThirst, CEntityAlive, conditions().GetThirst, float, -1);
+//BIND_FUNCTION10(&object(), CScriptGameObject::GetThirst, CEntityAlive, conditions().GetThirst, float, -1);
 BIND_FUNCTION01(&object(), CScriptGameObject::SetHealth, CEntityAlive, conditions().ChangeHealth, float, float);
 BIND_FUNCTION01(&object(), CScriptGameObject::SetPsyHealth, CEntityAlive, conditions().ChangePsyHealth, float, float);
 BIND_FUNCTION01(&object(), CScriptGameObject::SetPower, CEntityAlive, conditions().ChangePower, float, float);
@@ -83,7 +83,7 @@ BIND_FUNCTION01(&object(), CScriptGameObject::SetRadiation, CEntityAlive, condit
 BIND_FUNCTION01(&object(), CScriptGameObject::SetSatiety, CEntityAlive, conditions().ChangeSatiety, float, float);
 BIND_FUNCTION01(&object(), CScriptGameObject::SetAlcohol, CEntityAlive, conditions().ChangeAlcohol, float, float);
 BIND_FUNCTION01(&object(), CScriptGameObject::SetMorale, CEntityAlive, conditions().ChangeEntityMorale, float, float);
-BIND_FUNCTION01(&object(), CScriptGameObject::SetThirst, CEntityAlive, conditions().ChangeThirst, float, float);
+//BIND_FUNCTION01(&object(), CScriptGameObject::SetThirst, CEntityAlive, conditions().ChangeThirst, float, float);
 BIND_FUNCTION02(&object(), CScriptGameObject::SetScriptControl, CScriptEntity, SetScriptControl, bool, LPCSTR, bool, shared_str);
 BIND_FUNCTION10(&object(), CScriptGameObject::GetScriptControl, CScriptEntity, GetScriptControl, bool, false);
 BIND_FUNCTION10(&object(), CScriptGameObject::GetScriptControlName, CScriptEntity, GetScriptControlName, LPCSTR, "");
@@ -674,16 +674,6 @@ void CScriptGameObject::SetActorJumpSpeed(float _factor)
         return;
     }
     act->SetJumpSpeed(_factor);
-}
-void CScriptGameObject::SetActorExoFactor(float _factor)
-{
-    CActor* act = smart_cast<CActor*>(&object());
-    if (!act)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot perform SlowDownActor!");
-        return;
-    }
-    act->SetExoFactor(_factor);
 }
 
 CUIStatic* CScriptGameObject::GetCellItem() const

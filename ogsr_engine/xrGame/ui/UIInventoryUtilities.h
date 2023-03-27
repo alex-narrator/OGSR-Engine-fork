@@ -2,40 +2,48 @@
 
 #include "../inventory_item.h"
 #include "../character_info_defs.h"
+#include "UICellCustomItems.h"
 
 class CUIStatic;
+class CGameObject;
 
-//размеры сетки в текстуре инвентаря
-#define INV_GRID_WIDTH 50
-#define INV_GRID_HEIGHT 50
+// размеры сетки в текстуре инвентаря
+constexpr auto INV_GRID_WIDTH{50};
+constexpr auto INV_GRID_HEIGHT{50};
 
-//размеры сетки в текстуре иконок персонажей
-#define ICON_GRID_WIDTH 64
-#define ICON_GRID_HEIGHT 64
-//размер иконки персонажа для инвенторя и торговли
-#define CHAR_ICON_WIDTH 2
-#define CHAR_ICON_HEIGHT 2
+// размеры сетки в текстуре иконок персонажей
+constexpr auto ICON_GRID_WIDTH{64};
+constexpr auto ICON_GRID_HEIGHT{64};
+// размер иконки персонажа для инвенторя и торговли
+constexpr auto CHAR_ICON_WIDTH{2};
+constexpr auto CHAR_ICON_HEIGHT{2};
 
-//размер иконки персонажа в полный рост
-#define CHAR_ICON_FULL_WIDTH 2
-#define CHAR_ICON_FULL_HEIGHT 5
+// размер иконки персонажа в полный рост
+constexpr auto CHAR_ICON_FULL_WIDTH{2};
+constexpr auto CHAR_ICON_FULL_HEIGHT{5};
 
-#define TRADE_ICONS_SCALE (4.f / 5.f)
+constexpr auto TRADE_ICONS_SCALE{4.f / 5.f};
 
 namespace InventoryUtilities
 {
 
-//сравнивает элементы по пространству занимаемому ими в рюкзаке
-//для сортировки
+// сравнивает элементы по пространству занимаемому ими в рюкзаке
+// для сортировки
 bool GreaterRoomInRuck(PIItem item1, PIItem item2);
-//для проверки свободного места
+// для проверки свободного места
 bool FreeRoom_inBelt(TIItemContainer& item_list, PIItem item, int width, int height);
+// теж саме що й FreeRoom_inBelt тільки для предметів з іконками height > width
+bool FreeRoom_inVest(TIItemContainer& item_list, PIItem item, int width, int height);
+bool HasFreeSpace(TIItemContainer&, PIItem, int, int);
 
-//получить shader на иконки инвенторя
+// получить shader на иконки инвенторя
 ui_shader& GetEquipmentIconsShader(size_t icon_group = 0);
-//удаляем все шейдеры
+// удаляем все шейдеры
 void DestroyShaders();
 void CreateShaders();
+
+// приєднання іконок збройових адонів до зброї
+void TryAttachWpnAddonIcons(CUIStatic*, PIItem, float = 1.f);
 
 // Получить значение времени в текстовом виде
 

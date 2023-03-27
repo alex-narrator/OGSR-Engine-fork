@@ -3,20 +3,22 @@
 #include "../WeaponAmmo.h"
 #include "../UIStaticItem.h"
 #include "UIStatic.h"
-#include "xrServer_Objects_ALife.h"
 #include "../eatable_item.h"
 #include "../Level.h"
 #include "../HUDManager.h"
+#include "UIGameSP.h"
 #include "../date_time.h"
 #include "../string_table.h"
 #include "../Inventory.h"
 #include "../InventoryOwner.h"
+#include "InventoryBox.h"
 
 #include "../InfoPortion.h"
 #include "../game_base_space.h"
 #include "../actor.h"
+#include "string_table.h"
 
-#define EQUIPMENT_ICONS "ui\\ui_icon_equipment"
+constexpr auto EQUIPMENT_ICONS = "ui\\ui_icon_equipment";
 
 constexpr LPCSTR relationsLtxSection = "game_relations";
 constexpr LPCSTR ratingField = "rating_names";
@@ -54,45 +56,22 @@ bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
 
         if (r1.y == r2.y)
         {
-            auto item1ClassName = typeid(*item1).name();
-            auto item2ClassName = typeid(*item2).name();
-
-            int s = xr_strcmp(item1ClassName, item2ClassName);
-
-            if (s == 0)
+            if (!xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()))
             {
-                const CLASS_ID class1 = TEXT2CLSID(pSettings->r_string(item1->object().cNameSect(), "class"));
-                const CLASS_ID class2 = TEXT2CLSID(pSettings->r_string(item2->object().cNameSect(), "class"));
-
-                // if (!xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()))
-                if (class1 == class2)
+                const auto* ammo1 = smart_cast<CWeaponAmmo*>(item1);
+                const auto* ammo2 = smart_cast<CWeaponAmmo*>(item2);
+                if (ammo1 && ammo2)
                 {
-                    const auto* ammo1 = smart_cast<CWeaponAmmo*>(item1);
-                    const auto* ammo2 = smart_cast<CWeaponAmmo*>(item2);
-
-                    if (ammo1 && ammo2)
-                    {
-                        if (ammo1->m_boxCurr == ammo2->m_boxCurr)
-                            // return (item1->object().ID() < item2->object().ID());
-                            return xr_strcmp(item1->Name(), item2->Name()) < 0;
-
-                        return (ammo1->m_boxCurr > ammo2->m_boxCurr);
-                    }
-
-                    if (fsimilar(item1->GetCondition(), item2->GetCondition(), 0.01f))
-                        // return (item1->object().ID() < item2->object().ID());
-                        return xr_strcmp(item1->Name(), item2->Name()) < 0;
-
-                    return (item1->GetCondition() > item2->GetCondition());
+                    if (ammo1->m_boxCurr == ammo2->m_boxCurr)
+                        return (item1->object().ID() < item2->object().ID());
+                    return (ammo1->m_boxCurr > ammo2->m_boxCurr);
                 }
-                else
-                    // return xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()) < 0;
-                    return class1 < class2;
+                if (fsimilar(item1->GetCondition(), item2->GetCondition(), 0.01f))
+                    return (item1->object().ID() < item2->object().ID());
+                return (item1->GetCondition() > item2->GetCondition());
             }
             else
-            {
-                return s < 0;
-            }
+                return xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()) < 0;
         }
 
         return false;
@@ -102,7 +81,10 @@ bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
 
 bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _item, int width, int height)
 {
-    bool* ruck_room = (bool*)alloca(width * height);
+    if (!HasFreeSpace(item_list, _item, width, height))
+        return false;
+
+    bool* ruck_room = (bool*)_malloca(width * height);
 
     int i, j, k, m;
     int place_row = 0, place_col = 0;
@@ -124,13 +106,12 @@ bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _ite
 
     found_place = true;
 
-    for (xr_vector<PIItem>::iterator it = item_list.begin(); (item_list.end() != it) && found_place; ++it)
+    for (const auto& item : item_list)
     {
-        PIItem pItem = *it;
-        int iWidth = pItem->GetGridWidth();
-        int iHeight = pItem->GetGridHeight();
-        //проверить можно ли разместить элемент,
-        //проверяем последовательно каждую клеточку
+        int iWidth = item->GetGridWidth();
+        int iHeight = item->GetGridHeight();
+        // проверить можно ли разместить элемент,
+        // проверяем последовательно каждую клеточку
         found_place = false;
 
         for (i = 0; (i < height - iHeight + 1) && !found_place; ++i)
@@ -154,25 +135,127 @@ bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _ite
                     place_row = i;
                     place_col = j;
                 }
-            }
-        }
-        //разместить элемент на найденном месте
-        if (found_place)
-        {
-            for (k = 0; k < iHeight; ++k)
-            {
-                for (m = 0; m < iWidth; ++m)
+
+                // разместить элемент на найденном месте
+                if (found_place)
                 {
-                    ruck_room[(place_row + k) * width + place_col + m] = true;
+                    for (k = 0; k < iHeight; ++k)
+                    {
+                        for (m = 0; m < iWidth; ++m)
+                        {
+                            ruck_room[(place_row + k) * width + place_col + m] = true;
+                        }
+                    }
                 }
             }
         }
     }
+
     // remove
     item_list.erase(std::remove(item_list.begin(), item_list.end(), _item), item_list.end());
 
-    //для какого-то элемента места не нашлось
+    // для какого-то элемента места не нашлось
     if (!found_place)
+        return false;
+
+    return true;
+}
+
+bool InventoryUtilities::FreeRoom_inVest(TIItemContainer& item_list, PIItem _item, int width, int height)
+{
+    if (!HasFreeSpace(item_list, _item, width, height))
+        return false;
+
+    bool* ruck_room = (bool*)_malloca(width * height);
+
+    int i, j, k, m;
+    int place_row = 0, place_col = 0;
+    bool found_place;
+    bool can_place;
+
+    for (i = 0; i < width; ++i)
+        for (j = 0; j < height; ++j)
+            ruck_room[i * height + j] = false;
+
+    item_list.push_back(_item);
+    std::stable_sort(item_list.begin(), item_list.end(), [](const auto& a, const auto& b) {
+        if (a->GetGridHeight() > b->GetGridHeight())
+            return true;
+        if (a->GetGridHeight() == b->GetGridHeight())
+            return a->GetGridWidth() > b->GetGridWidth();
+        return false;
+    });
+
+    found_place = true;
+
+    for (const auto& item : item_list)
+    {
+        int iWidth = item->GetGridWidth();
+        int iHeight = item->GetGridHeight();
+        // проверить можно ли разместить элемент,
+        // проверяем последовательно каждую клеточку
+        found_place = false;
+
+        for (i = 0; (i < width - iWidth + 1) && !found_place; ++i)
+        {
+            for (j = 0; (j < height - iHeight + 1) && !found_place; ++j)
+            {
+                can_place = true;
+
+                for (k = 0; (k < iWidth) && can_place; ++k)
+                {
+                    for (m = 0; (m < iWidth) && can_place; ++m)
+                    {
+                        if (ruck_room[(i + k) * height + (j + m)])
+                            can_place = false;
+                    }
+                }
+
+                if (can_place)
+                {
+                    found_place = true;
+                    place_row = i;
+                    place_col = j;
+                }
+
+                // разместить элемент на найденном месте
+                if (found_place)
+                {
+                    for (k = 0; k < iWidth; ++k)
+                    {
+                        for (m = 0; m < iHeight; ++m)
+                        {
+                            ruck_room[(place_row + k) * height + place_col + m] = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // remove
+    item_list.erase(std::remove(item_list.begin(), item_list.end(), _item), item_list.end());
+
+    // для какого-то элемента места не нашлось
+    if (!found_place)
+        return false;
+
+    return true;
+}
+
+bool InventoryUtilities::HasFreeSpace(TIItemContainer& item_list, PIItem _item, int width, int height)
+{
+    if (_item->GetGridWidth() > width || _item->GetGridHeight() > height)
+        return false;
+
+    int list_area = width * height;
+    int item_area = _item->GetGridWidth() * _item->GetGridHeight();
+    int total_area{};
+    for (const auto& item : item_list)
+    {
+        total_area += item->GetGridWidth() * item->GetGridHeight();
+    }
+    if ((total_area + item_area) > list_area)
         return false;
 
     return true;
@@ -289,7 +372,7 @@ void InventoryUtilities::UpdateWeight(CUIStatic& wnd, bool withPrefix)
     R_ASSERT(pInvOwner);
     string128 buf{};
 
-    float total = pInvOwner->inventory().CalcTotalWeight();
+    float total = pInvOwner->GetCarryWeight();
     float max = pInvOwner->MaxCarryWeight();
 
     string16 cl{};
@@ -314,7 +397,7 @@ void InventoryUtilities::UpdateWeight(CUIStatic& wnd, bool withPrefix)
         strcpy_s(prefix, "");
     }
 
-    sprintf_s(buf, "%s%s%3.1f %s/%5.1f", prefix, cl, total, "%c[UI_orange]", max);
+    sprintf_s(buf, "%s%s%.1f%s/%.1f %s", prefix, cl, total, "%c[UI_orange]", max, CStringTable().translate("st_kg").c_str());
     wnd.SetText(buf);
     //	UIStaticWeight.ClipperOff();
 }
@@ -487,4 +570,49 @@ u32 InventoryUtilities::GetRelationColor(ALife::ERelationType relation)
 #ifdef DEBUG
     return 0xffffffff;
 #endif
+}
+
+CUIStatic* init_addon(CUIWeaponCellItem* cell_item, LPCSTR sect, float scale, int idx)
+{
+    CUIStatic* addon = xr_new<CUIStatic>();
+    addon->SetAutoDelete(true);
+
+    float scale_x = UI()->get_current_kx();
+
+    auto pos = cell_item->get_addon_offset(idx);
+    pos.x *= scale * scale_x;
+    pos.y *= scale;
+
+    CIconParams params(sect);
+    Frect rect = params.original_rect();
+    params.set_shader(addon);
+    addon->SetWndRect(pos.x, pos.y, rect.width() * scale * scale_x, rect.height() * scale);
+    addon->SetColor(color_rgba(255, 255, 255, 192));
+
+    return addon;
+}
+
+void InventoryUtilities::TryAttachWpnAddonIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
+{
+    _main_icon->DetachAll();
+    auto wpn = smart_cast<CWeapon*>(_item);
+    if (!wpn)
+        return;
+
+    auto cell_item = xr_new<CUIWeaponCellItem>(wpn);
+    CUIStatic* addon_statick{};
+
+	for (u32 i = 0; i < eMaxAddon; i++)
+    {
+        if (wpn->AddonAttachable(i) && wpn->IsAddonAttached(i) && (i != eMagazine || !!wpn->GetMagazineIconSect(true)))
+        {
+            auto addon_icon_name = wpn->GetAddonName(i).c_str();
+            if (i == eMagazine)
+                addon_icon_name = wpn->GetMagazineIconSect(true).c_str();
+            addon_statick = init_addon(cell_item, addon_icon_name, _scale, i);
+            _main_icon->AttachChild(addon_statick);
+        }
+    }
+
+    delete_data(cell_item);
 }

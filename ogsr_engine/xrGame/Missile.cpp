@@ -22,7 +22,12 @@
 #include "CalculateTriangle.h"
 #include "tri-colliderknoopc/dcTriangle.h"
 
-CUIProgressShape* g_MissileForceShape = NULL;
+#include "ActorCondition.h"
+#include "HUDManager.h"
+
+float g_fForceGrowSpeed{25.f};
+
+CUIProgressShape* g_MissileForceShape{};
 
 void create_force_progress()
 {
@@ -38,14 +43,16 @@ void create_force_progress()
 
 CMissile::CMissile(void)
 {
-    m_dwStateTime = 0;
-    m_throwMotionMarksAvailable = false;
+
 }
 
 CMissile::~CMissile(void)
 {
     HUD_SOUND::DestroySound(sndPlaying);
     HUD_SOUND::DestroySound(sndItemOn);
+
+    HUD_SOUND::DestroySound(sndShow);
+    HUD_SOUND::DestroySound(sndHide);
 }
 
 void CMissile::reinit()
@@ -65,9 +72,7 @@ void CMissile::Load(LPCSTR section)
     inherited::Load(section);
 
     m_fMinForce = pSettings->r_float(section, "force_min");
-    m_fConstForce = pSettings->r_float(section, "force_const");
     m_fMaxForce = pSettings->r_float(section, "force_max");
-    m_fForceGrowSpeed = pSettings->r_float(section, "force_grow_speed");
 
     m_dwDestroyTimeMax = pSettings->r_u32(section, "destroy_time");
 
@@ -83,10 +88,6 @@ void CMissile::Load(LPCSTR section)
         HUD_SOUND::LoadSound(section, "snd_item_on", sndItemOn);
 
     m_ef_weapon_type = READ_IF_EXISTS(pSettings, r_u32, section, "ef_weapon_type", u32(-1));
-
-    m_safe_dist_to_explode = READ_IF_EXISTS(pSettings, r_float, section, "safe_dist_to_explode", 0);
-    m_kick_on_explode = READ_IF_EXISTS(pSettings, r_bool, section, "explosion_on_kick", false);
-    m_explode_by_timer_on_safe_dist = READ_IF_EXISTS(pSettings, r_bool, section, "explode_by_timer_on_safe_dist", true);
 }
 
 BOOL CMissile::net_Spawn(CSE_Abstract* DC)
@@ -174,30 +175,30 @@ void CMissile::OnH_B_Independent(bool just_before_destroy)
 
 extern int g_bHudAdjustMode;
 
-void CMissile::DeviceUpdate()
-{
-    if (auto pA = smart_cast<CActor*>(H_Parent()))
-    {
-        if (HeadLampSwitch)
-        {
-            auto pActorTorch = smart_cast<CTorch*>(pA->inventory().ItemFromSlot(TORCH_SLOT));
-            pActorTorch->Switch();
-            HeadLampSwitch = false;
-        }
-        else if (NightVisionSwitch)
-        {
-            if (auto pActorTorch = smart_cast<CTorch*>(pA->inventory().ItemFromSlot(TORCH_SLOT)))
-                pActorTorch->SwitchNightVision();
-            NightVisionSwitch = false;
-        }
-    }
-}
+//void CMissile::DeviceUpdate()
+//{
+//    if (auto pA = smart_cast<CActor*>(H_Parent()))
+//    {
+//        if (HeadLampSwitch)
+//        {
+//            auto pActorTorch = smart_cast<CTorch*>(pA->inventory().ItemFromSlot(TORCH_SLOT));
+//            pActorTorch->Switch();
+//            HeadLampSwitch = false;
+//        }
+//        else if (NightVisionSwitch)
+//        {
+//            if (auto pActorTorch = smart_cast<CTorch*>(pA->inventory().ItemFromSlot(TORCH_SLOT)))
+//                pActorTorch->SwitchNightVision();
+//            NightVisionSwitch = false;
+//        }
+//    }
+//}
 
 void CMissile::UpdateCL()
 {
     inherited::UpdateCL();
 
-    TimeLockAnimation();
+    //TimeLockAnimation();
 
     if (!Core.Features.test(xrCore::Feature::stop_anim_playing))
     {
@@ -223,7 +224,7 @@ void CMissile::UpdateCL()
             CActor* actor = smart_cast<CActor*>(H_Parent());
             if (actor)
             {
-                m_fThrowForce += (m_fForceGrowSpeed * Device.dwTimeDelta) * .001f;
+                m_fThrowForce += (g_fForceGrowSpeed * Device.dwTimeDelta) * .001f;
                 clamp(m_fThrowForce, m_fMinForce, m_fMaxForce);
             }
         }
@@ -233,7 +234,7 @@ void CMissile::UpdateCL()
 void CMissile::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
-    if (!H_Parent() && getVisible() && m_pPhysicsShell)
+    if (!H_Parent() && getVisible() && m_pPhysicsShell && !b_impact_fuze)
     {
         if (m_dwDestroyTime <= Level().timeServer())
         {
@@ -252,6 +253,7 @@ void CMissile::State(u32 state, u32 oldState)
     case eShowing: {
         SetPending(TRUE);
         PlayHUDMotion({"anim_show", "anm_show"}, false, GetState());
+        PlaySound(sndShow, Position());
     }
     break;
     case eIdle: {
@@ -266,6 +268,7 @@ void CMissile::State(u32 state, u32 oldState)
             {
                 SetPending(TRUE);
                 PlayHUDMotion({"anim_hide", "anm_hide"}, true, GetState());
+                PlaySound(sndHide, Position());
             }
         }
     }
@@ -277,6 +280,7 @@ void CMissile::State(u32 state, u32 oldState)
         {
             setVisible(FALSE);
             setEnabled(FALSE);
+            m_bIsQuickThrow = false;
         }
         SetPending(FALSE);
     }
@@ -311,10 +315,10 @@ void CMissile::State(u32 state, u32 oldState)
         PlayHUDMotion({"anim_playing", "anm_bore"}, true, GetState());
     }
     break;
-    case eDeviceSwitch: {
-        SetPending(TRUE);
-        PlayAnimDeviceSwitch();
-    }
+    //case eDeviceSwitch: {
+    //    SetPending(TRUE);
+    //    PlayAnimDeviceSwitch();
+    //}
     break;
     }
 }
@@ -327,18 +331,18 @@ void CMissile::PlayAnimIdle()
     PlayHUDMotion({"anim_idle", "anm_idle"}, true, GetState());
 }
 
-void CMissile::PlayAnimDeviceSwitch()
-{
-    PlaySound(sndItemOn, Position());
-
-    if (AnimationExist("anm_headlamp_on"))
-        PlayHUDMotion("anm_headlamp_on", true, GetState());
-    else
-    {
-        DeviceUpdate();
-        SwitchState(eIdle);
-    }
-}
+//void CMissile::PlayAnimDeviceSwitch()
+//{
+//    PlaySound(sndItemOn, Position());
+//
+//    if (AnimationExist("anm_headlamp_on"))
+//        PlayHUDMotion("anm_headlamp_on", true, GetState());
+//    else
+//    {
+//        DeviceUpdate();
+//        SwitchState(eIdle);
+//    }
+//}
 
 void CMissile::OnStateSwitch(u32 S, u32 oldState)
 {
@@ -375,6 +379,11 @@ void CMissile::OnAnimationEnd(u32 state)
     }
     break;
     case eThrow: {
+        auto pActor = smart_cast<CActor*>(H_Parent());
+        bool b_have_no_power = pActor && pActor->conditions().IsCantWalk();
+        if (pActor && !b_have_no_power && !GodMode())
+            pActor->conditions().ConditionJump(Weight() * 0.1f);
+
         if (!m_throwMotionMarksAvailable)
             Throw();
         SwitchState(eThrowEnd);
@@ -382,7 +391,7 @@ void CMissile::OnAnimationEnd(u32 state)
     break;
     case eThrowEnd: SwitchState(eShowing); break;
     case eBore:
-    case eDeviceSwitch: SwitchState(eIdle); break;
+    //case eDeviceSwitch: SwitchState(eIdle); break;
     default: inherited::OnAnimationEnd(state);
     }
 }
@@ -436,8 +445,8 @@ void CMissile::UpdateXForm()
         Fmatrix& mR = V->LL_GetTransform(u16(boneR));
 
         // Calculate
-        Fmatrix mRes;
-        Fvector R, D, N;
+        Fmatrix mRes{};
+        Fvector R{}, D{}, N{};
         D.sub(mL.c, mR.c);
         D.normalize_safe();
         R.crossproduct(mR.j, D);
@@ -478,7 +487,7 @@ void CMissile::setup_throw_params()
     VERIFY(entity);
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(H_Parent());
     VERIFY(inventory_owner);
-    Fmatrix trans;
+    Fmatrix trans{};
     trans.identity();
     Fvector FirePos, FireDir;
     if (this == inventory_owner->inventory().ActiveItem())
@@ -521,9 +530,16 @@ void CMissile::Throw()
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(H_Parent());
     VERIFY(inventory_owner);
     if (inventory_owner->use_default_throw_force())
-        m_fake_missile->m_fThrowForce = m_constpower ? m_fConstForce : m_fThrowForce;
+    {
+        //
+        auto pActor = smart_cast<CActor*>(H_Parent());
+        float f_const_force = (m_fMinForce + m_fMaxForce * pActor->GetExoFactor()) / 2;
+        float power_k = pActor ? pActor->conditions().GetPower() : 1.f;
+        //
+        m_fake_missile->m_fThrowForce = (m_constpower ? f_const_force : m_fThrowForce) * power_k;
+    }
     else
-        m_fake_missile->m_fThrowForce = inventory_owner->missile_throw_force();
+        m_fake_missile->m_fThrowForce = inventory_owner->missile_throw_force(); 
 
     m_fThrowForce = m_fMinForce;
 
@@ -579,6 +595,14 @@ bool CMissile::Action(s32 cmd, u32 flags)
     if (inherited::Action(cmd, flags))
         return true;
 
+    auto pActor = smart_cast<CActor*>(H_Parent());
+    bool b_have_no_power = pActor && pActor->conditions().IsCantWalk();
+    if (b_have_no_power && GetState() != eReady)
+    {
+        HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
+        return false;
+    }
+
     switch (cmd)
     {
     case kWPN_FIRE: {
@@ -616,26 +640,26 @@ bool CMissile::Action(s32 cmd, u32 flags)
         return true;
     }
     break;
-    case kTORCH: {
-        auto pActorTorch = smart_cast<CActor*>(H_Parent())->inventory().ItemFromSlot(TORCH_SLOT);
-        if ((flags & CMD_START) && pActorTorch && GetState() == eIdle)
-        {
-            HeadLampSwitch = true;
-            SwitchState(eDeviceSwitch);
-        }
-        return true;
-    }
-    break;
-    case kNIGHT_VISION: {
-        auto pActorNv = smart_cast<CActor*>(H_Parent())->inventory().ItemFromSlot(IS_OGSR_GA ? NIGHT_VISION_SLOT : TORCH_SLOT);
-        if ((flags & CMD_START) && pActorNv && GetState() == eIdle)
-        {
-            NightVisionSwitch = true;
-            SwitchState(eDeviceSwitch);
-        }
-        return true;
-    }
-    break;
+    //case kTORCH: {
+    //    auto pActorTorch = smart_cast<CActor*>(H_Parent())->inventory().ItemFromSlot(TORCH_SLOT);
+    //    if ((flags & CMD_START) && pActorTorch && GetState() == eIdle)
+    //    {
+    //        HeadLampSwitch = true;
+    //        SwitchState(eDeviceSwitch);
+    //    }
+    //    return true;
+    //}
+    //break;
+    //case kNIGHT_VISION: {
+    //    auto pActorNv = smart_cast<CActor*>(H_Parent())->inventory().ItemFromSlot(IS_OGSR_GA ? NIGHT_VISION_SLOT : TORCH_SLOT);
+    //    if ((flags & CMD_START) && pActorNv && GetState() == eIdle)
+    //    {
+    //        NightVisionSwitch = true;
+    //        SwitchState(eDeviceSwitch);
+    //    }
+    //    return true;
+    //}
+    //break;
     }
     return false;
 }
@@ -648,12 +672,12 @@ void CMissile::activate_physic_shell()
         return;
     }
 
-    Fvector l_vel;
+    Fvector l_vel{};
     l_vel.set(m_throw_direction);
     l_vel.normalize_safe();
     l_vel.mul(m_fThrowForce);
 
-    Fvector a_vel;
+    Fvector a_vel{};
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(H_Root());
     if (inventory_owner && inventory_owner->use_throw_randomness())
     {
@@ -746,110 +770,31 @@ void CMissile::OnDrawUI()
 
 void CMissile::ExitContactCallback(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
 {
-    dxGeomUserData *gd1 = NULL, *gd2 = NULL;
+    dxGeomUserData *gd1{}, *gd2{};
+    SGameMtl* material{};
     if (bo1)
     {
         gd1 = retrieveGeomUserData(c.geom.g1);
         gd2 = retrieveGeomUserData(c.geom.g2);
+        material = material_2;
     }
     else
     {
         gd2 = retrieveGeomUserData(c.geom.g1);
         gd1 = retrieveGeomUserData(c.geom.g2);
+        material = material_1;
     }
     if (gd1 && gd2 && (CPhysicsShellHolder*)gd1->callback_data == gd2->ph_ref_object)
     {
         do_colide = false;
     }
-
+    else if (gd1 && material && !material->Flags.is(SGameMtl::flPassable))
     {
-        dxGeomUserData* l_pUD1 = retrieveGeomUserData(c.geom.g1);
-        dxGeomUserData* l_pUD2 = retrieveGeomUserData(c.geom.g2);
-
-        SGameMtl* material;
-        CMissile* l_this = l_pUD1 ? smart_cast<CMissile*>(l_pUD1->ph_ref_object) : NULL;
-        if (!l_this)
+        CMissile* l_this = smart_cast<CMissile*>(gd1->ph_ref_object);
+        if (l_this && !l_this->Contacted())
         {
-            l_this = l_pUD2 ? smart_cast<CMissile*>(l_pUD2->ph_ref_object) : NULL;
-            material = material_1;
+            l_this->Contact(gd2 ? smart_cast<CPhysicsShellHolder*>(gd2->ph_ref_object) : nullptr);
         }
-        else
-        {
-            material = material_2;
-        }
-
-        VERIFY(material);
-        if (material->Flags.is(SGameMtl::flPassable))
-            return;
-
-        if (!l_this || !l_this->m_kick_on_explode || l_this->has_already_contact)
-            return;
-
-        bool safe_to_explode = true;
-
-        Fvector l_pos;
-        l_pos.set(l_this->Position());
-
-        if (l_this->m_pOwner)
-        {
-            if (!l_pUD1 || !l_pUD2)
-            {
-                dGeomID g = NULL;
-                dxGeomUserData*& l_pUD = l_pUD1 ? l_pUD1 : l_pUD2;
-                if (l_pUD1)
-                    g = c.geom.g1;
-                else
-                    g = c.geom.g2;
-
-                if (l_pUD->pushing_neg)
-                {
-                    Fvector velocity;
-                    l_this->PHGetLinearVell(velocity);
-                    if (velocity.square_magnitude() > EPS)
-                    {
-                        velocity.normalize();
-                        Triangle neg_tri;
-                        CalculateTriangle(l_pUD->neg_tri, g, neg_tri);
-                        float cosinus = velocity.dotproduct(*((Fvector*)neg_tri.norm));
-                        VERIFY(_valid(neg_tri.dist));
-                        float dist = neg_tri.dist / cosinus;
-                        velocity.mul(dist * 1.1f);
-                        l_pos.sub(velocity);
-                    }
-                }
-            }
-
-            float dist = l_this->m_pOwner->Position().distance_to(l_pos);
-            if (dist < l_this->m_safe_dist_to_explode)
-            {
-                safe_to_explode = false;
-
-                if (!l_this->m_explode_by_timer_on_safe_dist)
-                {
-                    CActor* pActor = smart_cast<CActor*>(l_this->m_pOwner);
-                    if (pActor)
-                    {
-                        u32 lvid = l_this->UsedAI_Locations() ? l_this->ai_location().level_vertex_id() : ai().level_graph().vertex(l_pos);
-                        CSE_Abstract* object = Level().spawn_item(l_this->cNameSect().c_str(), l_pos, lvid, 0xffff, true);
-
-                        NET_Packet P;
-                        object->Spawn_Write(P, TRUE);
-                        Level().Send(P, net_flags(TRUE));
-                        F_entity_Destroy(object);
-                    }
-
-                    l_this->set_destroy_time(500);
-                    l_this->DestroyObject();
-                }
-            }
-        }
-
-        if (safe_to_explode)
-        {
-            l_this->set_destroy_time(5);
-        }
-
-        l_this->has_already_contact = true;
     }
 }
 
@@ -858,4 +803,11 @@ void CMissile::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_s
     str_name = NameShort();
     str_count = "";
     icon_sect_name = "";
+}
+
+void CMissile::QuickThrow()
+{
+    m_constpower = true;
+    m_throw = true;
+    SwitchState(eThrowStart);
 }

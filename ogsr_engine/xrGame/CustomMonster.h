@@ -290,7 +290,8 @@ public:
     IC void critical_wounded_state_stop();
 
 public:
-    IC bool critically_wounded();
+    //IC bool critically_wounded();
+    virtual bool critically_wounded() { return (m_critical_wound_type != u32(-1)); };
     IC const u32& critical_wound_type() const;
 
     //////////////////////////////////////////////////////////////////////////

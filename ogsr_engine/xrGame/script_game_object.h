@@ -198,7 +198,7 @@ public:
     _DECLARE_FUNCTION10(GetMaxPower, float);
     _DECLARE_FUNCTION10(GetAlcohol, float);
     _DECLARE_FUNCTION10(GetSatiety, float);
-    _DECLARE_FUNCTION10(GetThirst, float);
+//    _DECLARE_FUNCTION10(GetThirst, float);
 
     _DECLARE_FUNCTION11(SetHealth, void, float);
     _DECLARE_FUNCTION11(SetPsyHealth, void, float);
@@ -208,7 +208,7 @@ public:
     _DECLARE_FUNCTION11(SetMorale, void, float);
     _DECLARE_FUNCTION11(SetMaxPower, void, float);
     _DECLARE_FUNCTION11(SetAlcohol, void, float);
-    _DECLARE_FUNCTION11(SetThirst, void, float);
+//    _DECLARE_FUNCTION11(SetThirst, void, float);
 
     void set_fov(float new_fov);
     void set_range(float new_range);
@@ -629,12 +629,12 @@ public:
     // инвентарь
     float GetActorMaxWeight() const;
     void SetActorMaxWeight(float max_weight);
-    float GetActorMaxWalkWeight() const;
-    void SetActorMaxWalkWeight(float max_walk_weight);
-    float GetAdditionalMaxWeight() const;
-    void SetAdditionalMaxWeight(float add_max_weight);
-    float GetAdditionalMaxWalkWeight() const;
-    void SetAdditionalMaxWalkWeight(float add_max_walk_weight);
+//    float GetActorMaxWalkWeight() const;
+//    void SetActorMaxWalkWeight(float max_walk_weight);
+//    float GetAdditionalMaxWeight() const;
+//    void SetAdditionalMaxWeight(float add_max_weight);
+ //   float GetAdditionalMaxWalkWeight() const;
+//    void SetAdditionalMaxWalkWeight(float add_max_walk_weight);
     float GetTotalWeight() const;
     float Weight() const;
     /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
@@ -677,9 +677,9 @@ public:
     void SetCamFOV(float _fov);
 
     void SetMaxWeight(float _weight);
-    void SetMaxWalkWeight(float _weight);
+//    void SetMaxWalkWeight(float _weight);
     float GetMaxWeight() const;
-    float GetMaxWalkWeight() const;
+//    float GetMaxWalkWeight() const;
     float GetInventoryWeight() const;
     u32 CalcItemPrice(CScriptGameObject* item, bool b_buying) const;
 
@@ -700,7 +700,6 @@ public:
     u16 GetBoneID(LPCSTR _bone_name);
 
     float GetBinocZoomFactor();
-    void SetBinocZoomFactor(float _zoom);
     float GetZoomFactor();
 
     u8 GetAddonFlags();
@@ -723,14 +722,10 @@ public:
 
     // для CEatableItem, используются в реализации радиопротектора
     void ZeroEffects();
-    void SetRadiationInfluence(float _rad);
-    // для актора - иммунитеты
-    void SetDrugRadProtection(float _prot);
-    void SetDrugPsyProtection(float _prot);
 
     // functions for CInventoryItem class
-    void SetIIFlags(Flags16);
-    Flags16 GetIIFlags();
+    void SetIIFlags(Flags32);
+    Flags32 GetIIFlags();
     u32 GetHudItemState();
     float GetRadius();
 
@@ -783,7 +778,6 @@ public:
     float GetActorWalkAccel() const;
     void SetActorWalkAccel(float _factor);
     float GetActorExoFactor() const; // влияет на бег в экзе
-    void SetActorExoFactor(float _factor); // влияет на бег в экзе
     // KD
 
     // Real Wolf 07.07.2014.

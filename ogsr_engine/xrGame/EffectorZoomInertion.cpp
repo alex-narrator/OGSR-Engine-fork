@@ -99,7 +99,7 @@ void CEffectorZoomInertion::CalcNextPoint()
 {
     //	m_fEpsilon = 2*m_fFloatSpeed;
 
-    float half_disp_radius = m_fDispRadius / 2.f;
+    float half_disp_radius = m_fDispRadius / 2.f * Actor()->GetZoomEffectorK();
     m_vTargetPoint.x = m_Random.randF(-half_disp_radius, half_disp_radius);
     m_vTargetPoint.y = m_Random.randF(-half_disp_radius, half_disp_radius);
 
@@ -120,7 +120,7 @@ BOOL CEffectorZoomInertion::ProcessCam(SCamEffectorInfo& info)
 
     ///	if(dir.magnitude()<m_fEpsilon || m_dwTimePassed>m_dwDeltaTime)
     //	if (m_dwTimePassed>m_dwDeltaTime)
-    if (m_dwTimePassed == 0)
+    if (m_dwTimePassed == 0 || fis_zero(Actor()->GetZoomEffectorK()))
     {
         m_vLastPoint.set(m_vCurrentPoint);
         CalcNextPoint();

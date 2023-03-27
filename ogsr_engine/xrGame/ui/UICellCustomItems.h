@@ -1,6 +1,11 @@
 #pragma once
 #include "UICellItem.h"
-#include "../Weapon.h"
+#include "Weapon.h"
+#include "eatable_item.h"
+#include "Artifact.h"
+#include "Warbelt.h"
+#include "Vest.h"
+#include "InventoryContainer.h"
 
 class CUIInventoryCellItem : public CUICellItem
 {
@@ -8,6 +13,9 @@ class CUIInventoryCellItem : public CUICellItem
 
 protected:
     bool b_auto_drag_childs;
+
+    CUIStatic* m_text_add{};
+    void init_add();
 
 public:
     CUIInventoryCellItem(CInventoryItem* itm);
@@ -24,12 +32,76 @@ public:
     virtual ~CUIInventoryCellItem();
 };
 
+class CUIWarbeltCellItem : public CUIInventoryCellItem
+{
+    typedef CUIInventoryCellItem inherited;
+
+protected:
+    virtual void UpdateItemText();
+
+public:
+    CUIWarbeltCellItem(CWarbelt* itm);
+    virtual void Update();
+    CWarbelt* object() { return (CWarbelt*)m_pData; }
+};
+
+class CUIVestCellItem : public CUIInventoryCellItem
+{
+    typedef CUIInventoryCellItem inherited;
+
+protected:
+    virtual void UpdateItemText();
+
+public:
+    CUIVestCellItem(CVest* itm);
+    virtual void Update();
+    CVest* object() { return (CVest*)m_pData; }
+};
+
+class CUIContainerCellItem : public CUIInventoryCellItem
+{
+    typedef CUIInventoryCellItem inherited;
+
+protected:
+    virtual void UpdateItemText();
+
+public:
+    CUIContainerCellItem(CInventoryContainer* itm);
+    virtual void Update();
+    CInventoryContainer* object() { return (CInventoryContainer*)m_pData; }
+};
+
+class CUIEatableCellItem : public CUIInventoryCellItem
+{
+    typedef CUIInventoryCellItem inherited;
+
+protected:
+    virtual void UpdateItemText();
+
+public:
+    CUIEatableCellItem(CEatableItem* itm);
+    virtual void Update();
+    virtual bool EqualTo(CUICellItem* itm);
+    CEatableItem* object() { return (CEatableItem*)m_pData; }
+};
+
+class CUIArtefactCellItem : public CUIInventoryCellItem
+{
+    typedef CUIInventoryCellItem inherited;
+
+public:
+    CUIArtefactCellItem(CArtefact* itm);
+    virtual bool EqualTo(CUICellItem* itm);
+    CArtefact* object() { return (CArtefact*)m_pData; }
+};
+
 class CUIAmmoCellItem : public CUIInventoryCellItem
 {
     typedef CUIInventoryCellItem inherited;
 
 protected:
     virtual void UpdateItemText();
+    virtual void UpdateItemTextCustom();
 
 public:
     CUIAmmoCellItem(CWeaponAmmo* itm);
@@ -43,25 +115,25 @@ class CUIWeaponCellItem : public CUIInventoryCellItem
     typedef CUIInventoryCellItem inherited;
 
 public:
-    enum eAddonType
-    {
-        eSilencer = 0,
-        eScope,
-        eLauncher,
-        eMaxAddon
-    };
-    CUIStatic* m_addons[eMaxAddon];
+    CUIStatic* m_addons[eMaxAddon]{};
 
 protected:
-    Fvector2 m_addon_offset[eMaxAddon];
-    void CreateIcon(eAddonType, CIconParams& params);
-    void DestroyIcon(eAddonType);
-    CUIStatic* GetIcon(eAddonType);
+    virtual void UpdateItemText();
+    void CreateIcon(u32, CIconParams& params);
+    void DestroyIcon(u32);
+    CUIStatic* GetIcon(u32);
     void InitAddon(CUIStatic* s, CIconParams& params, Fvector2 offset, bool b_rotate);
-    void InitAllAddons(CUIStatic* s_silencer, CUIStatic* s_scope, CUIStatic* s_launcher, bool b_vertical);
+    void InitAllAddons(CUIStatic* s_silencer, CUIStatic* s_scope, CUIStatic* s_launcher, CUIStatic* s_laser, CUIStatic* s_flashlight, CUIStatic* s_stock, CUIStatic* s_extender,
+                       CUIStatic* s_forend, CUIStatic* s_magazine, bool b_vertical);
     bool is_scope();
     bool is_silencer();
     bool is_launcher();
+    bool is_laser();
+    bool is_flashlight();
+    bool is_stock();
+    bool is_extender();
+    bool is_forend();
+    bool is_magazine();
 
 public:
     CUIWeaponCellItem(CWeapon* itm);
@@ -72,7 +144,7 @@ public:
     CUIDragItem* CreateDragItem();
     virtual bool EqualTo(CUICellItem* itm);
     CUIStatic* get_addon_static(u32 idx) { return m_addons[idx]; }
-    Fvector2 get_addon_offset(u32 idx) { return m_addon_offset[idx]; }
+    Fvector2 get_addon_offset(u32 idx) { return object()->GetAddonOffset(idx); }
 };
 
 class CBuyItemCustomDrawCell : public ICustomDrawCell

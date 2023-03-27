@@ -7,11 +7,11 @@ enum
     AF_ALWAYSRUN = (1 << 2),
     AF_UNLIMITEDAMMO = (1 << 3),
     AF_DOF_ZOOM = (1 << 4),
-    AF_WPN_AIM_TOGGLE = (1 << 5),
+    AF_HOLD_TO_AIM = (1 << 5),
     AF_PSP = (1 << 6),
     AF_MUSIC_TRACKS = (1 << 7),
     AF_DOF_RELOAD = (1 << 8),
-    AF_AMMO_ON_BELT = (1 << 9),
+    AF_BLOODMARKS_ON_DYNAMIC = (1 << 9),
     AF_3D_SCOPES = (1 << 10),
     AF_ZONES_DBG = (1 << 11),
     AF_VERTEX_DBG = (1 << 12),
@@ -37,3 +37,11 @@ extern Flags32 psActorFlags;
 extern Flags32 psCallbackFlags;
 
 extern BOOL GodMode();
+
+enum ESaveGameMode
+{
+    eSaveGameDefault,
+    eSaveGameEnemyCheck,
+    eSaveGameSafehouseCheck,
+};
+extern ESaveGameMode g_eSaveGameMode;

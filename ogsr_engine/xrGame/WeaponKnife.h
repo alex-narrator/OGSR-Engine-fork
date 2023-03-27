@@ -10,12 +10,11 @@ private:
 
 protected:
     HUD_SOUND m_sndShot;
-    HUD_SOUND sndItemOn;
+    HUD_SOUND m_sndShow;
+    HUD_SOUND m_sndHide;
 
-    bool m_attackStart;
-    bool m_attackMotionMarksAvailable;
-
-    bool HeadLampSwitch{}, NightVisionSwitch{};
+    bool m_attackStart{};
+    bool m_attackMotionMarksAvailable{};
 
 protected:
     virtual void switch2_Idle();
@@ -28,27 +27,28 @@ protected:
     virtual void OnAnimationEnd(u32 state);
     virtual void OnStateSwitch(u32 S, u32 oldState);
 
-    virtual void DeviceUpdate() override;
-    virtual void UpdateCL() override;
-    virtual void PlayAnimDeviceSwitch() override;
-
     void state_Attacking(float dt);
 
     virtual void KnifeStrike(u32 state, const Fvector& pos, const Fvector& dir);
 
-    float fWallmarkSize;
-    u16 knife_material_idx;
+    float fWallmarkSize{};
+    u16 knife_material_idx{(u16)-1};
+
+    float m_fMinConditionHitPart{}; // минимальная доля хита при полном износе
 
 protected:
-    ALife::EHitType m_eHitType_1;
+    ALife::EHitType m_eHitType_1{};
     // float				fHitPower_1;
-    Fvector4 fvHitPower_1;
-    float fHitImpulse_1;
+    Fvector4 fvHitPower_1{};
+    float fHitImpulse_1{};
 
-    ALife::EHitType m_eHitType_2;
+    ALife::EHitType m_eHitType_2{};
     // float				fHitPower_2;
-    Fvector4 fvHitPower_2;
-    float fHitImpulse_2;
+    Fvector4 fvHitPower_2{};
+    float fHitImpulse_2{};
+
+    ALife::EHitType m_eHitType_ZeroCondition{}; // тип хита при полном износе
+protected:
     virtual void LoadFireParams(LPCSTR section, LPCSTR prefix);
 
     virtual size_t GetWeaponTypeForCollision() const override { return Knife_and_other; }
@@ -67,7 +67,7 @@ public:
 
     virtual bool Action(s32 cmd, u32 flags);
 
-    virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
+    bool m_bIsQuickStab{};
 
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };

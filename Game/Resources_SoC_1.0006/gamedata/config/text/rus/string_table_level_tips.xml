@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="bar_rostok">
+		<text>Дика територія - Росток</text>
+	</string>
+	<string id="car_character_use">
+		<text>Відкрити двері [$$ACTION_USE$$]</text>
+	</string>
+	<string id="character_use">
+		<text>Поговорити [$$ACTION_USE$$]</text>
+	</string>
+	<string id="dead_character_use_or_drag">
+		<text>Обшукати [$$ACTION_USE$$] \nТягти [$$ACTION_ADDITIONAL_ACTION$$]+[$$ACTION_USE$$]</text>
+	</string>
+	<string id="dead_character_use">
+		<text>Обшукати [$$ACTION_USE$$]</text>
+	</string>
+	<string id="general_complete_task">
+		<text>Завдання виконано:</text>
+	</string>
+	<string id="general_fail_task">
+		<text>Завдання провалено:</text>
+	</string>
+	<string id="general_help">
+		<text>Терміново потрібна аптечка, помираю!!!</text>
+	</string>
+	<string id="general_in_item">
+		<text>Отримано предмет:</text>
+	</string>
+	<string id="general_in_money">
+		<text>Отримано гроші:</text>
+	</string>
+	<string id="general_new_diary">
+		<text>Новий запис у щоденнику</text>
+	</string>
+	<string id="general_new_encyclopedy">
+		<text>Нова стаття у енциклопедії</text>
+	</string>
+	<string id="general_new_task">
+		<text>Нове завдання:</text>
+	</string>
+	<string id="general_out_item">
+		<text>Втрачено предмет:</text>
+	</string>
+	<string id="general_out_money">
+		<text>Втрачено гроші:</text>
+	</string>
+	<string id="general_update_task">
+		<text>Завдання оновлено:</text>
+	</string>
+	<string id="physic_shell_use">
+		<text>Рухати об'єкт [$$ACTION_USE$$]</text>
+	</string>
+	<string id="st_codelock">
+		<text>Кодовий замок [$$ACTION_USE$$]</text>
+	</string>
+	<string id="to_aes">
+		<text>До ЧАЭС</text>
+	</string>
+	<string id="to_agroprom">
+		<text>До Агропрому</text>
+	</string>
+	<string id="to_agroprom_underground">
+		<text>У катакомби</text>
+	</string>
+	<string id="to_bar">
+		<text>До Ростку</text>
+	</string>
+	<string id="to_darkvalley">
+		<text>До Темної Долини</text>
+	</string>
+	<string id="to_escape">
+		<text>До Кордону</text>
+	</string>
+	<string id="to_garbage">
+		<text>До Звалища</text>
+	</string>
+	<string id="to_military">
+		<text>До Військових Складів</text>
+	</string>
+	<string id="to_pripyat">
+		<text>До Прип'яті</text>
+	</string>
+	<string id="to_radar">
+		<text>До "Випалювача Мізків"</text>
+	</string>
+	<string id="to_rostok">
+		<text>До Дикої Території</text>
+	</string>
+	<string id="to_yantar">
+		<text>До Янтарю</text>
+	</string>
+	<string id="st_helmet_countdown">
+		<text>Вимкнення захисту</text>
+	</string>
+	<string id="st_psy_danger">
+		<text>Критичний рівень псі-випромінення. Негайно покиньте небезпечну зону.</text>
+	</string>
+	<string id="st_radiation_danger">
+		<text>Небезпечний рівень радіації. Необхдіний захист, щоб пройти.</text>
+	</string>
+	<string id="st_found_new_pda">
+		<text>Отримано інформацію:</text>
+	</string>
+</string_table>
