@@ -68,9 +68,10 @@ public:
     virtual bool Useful() const;
 
 protected:
-    float m_safe_dist_to_explode{};
     shared_str real_grenade_name;
+    u32 m_destroy_time{};
 
 public:
     void SetRealGrenadeName(shared_str name) { real_grenade_name = name; };
+    void SetDestroyTime(u32 delta) { m_destroy_time += delta; };
 };

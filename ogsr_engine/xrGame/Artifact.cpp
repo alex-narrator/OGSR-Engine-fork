@@ -162,6 +162,7 @@ BOOL CArtefact::net_Spawn(CSE_Abstract* DC)
 
 void CArtefact::net_Export(CSE_Abstract* E)
 {
+    inherited::net_Export(E);
     auto se_artefact = smart_cast<CSE_ALifeItemArtefact*>(E);
     se_artefact->m_fRandomK = m_fRandomK;
 };

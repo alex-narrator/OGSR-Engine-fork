@@ -23,7 +23,7 @@ void CExplosiveRocket::Load(LPCSTR section)
     inherited::Load(section);
     CInventoryItem::Load(section);
     CExplosive::Load(section);
-    m_safe_dist_to_explode = READ_IF_EXISTS(pSettings, r_float, section, "safe_dist_to_explode", 0);
+    m_destroy_time = READ_IF_EXISTS(pSettings, r_u32, section, "destroy_time", 0);
 }
 
 BOOL CExplosiveRocket::net_Spawn(CSE_Abstract* DC)
@@ -49,8 +49,8 @@ void CExplosiveRocket::Contact(const Fvector& pos, const Fvector& normal)
     {
         if (m_pOwner)
         {
-            float dist = m_pOwner->Position().distance_to(pos);
-            if (dist < m_safe_dist_to_explode)
+            Msg("%s for %s Device.fTimeGlobal %u m_destroy_time %u", __FUNCTION__, cNameSect().c_str(), Device.dwTimeGlobal, m_destroy_time);
+            if (Device.dwTimeGlobal < m_destroy_time)
             {
                 safe_to_explode = false;
                 CActor* pActor = smart_cast<CActor*>(m_pOwner);

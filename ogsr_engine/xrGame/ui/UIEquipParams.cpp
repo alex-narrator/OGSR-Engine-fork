@@ -529,16 +529,6 @@ void CUIEquipParams::SetInfo(CInventoryItem* obj)
             SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
             _h += list_item_h;
         }
-        // дистанція зведення
-        if (pSettings->line_exist(explosive_sect, "safe_dist_to_explode"))
-        {
-            _val = pSettings->r_float(explosive_sect, "safe_dist_to_explode");
-            _param_name = CStringTable().translate("st_safe_dist").c_str();
-            _sn = CStringTable().translate("st_m").c_str();
-            sprintf_s(text_to_show, "%s %.1f %s", _param_name, _val, _sn);
-            SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
-            _h += list_item_h;
-        }
     }
 
     if (auto pContainer = smart_cast<CInventoryContainer*>(obj))

@@ -72,7 +72,7 @@ void CWeaponRG6::LaunchGrenade(const Fvector& p1, const Fvector& d1)
             // E->g_fireParams (this, p1,d);
         }
 
-        Fmatrix launch_matrix;
+        Fmatrix launch_matrix{};
         launch_matrix.identity();
         launch_matrix.k.set(d);
         Fvector::generate_orthonormal_basis(launch_matrix.k, launch_matrix.j, launch_matrix.i);
@@ -92,7 +92,7 @@ void CWeaponRG6::LaunchGrenade(const Fvector& p1, const Fvector& d1)
             if (HasPick)
             {
                 //			collide::rq_result& RQ = HUD().GetCurrentRayQuery();
-                Fvector Transference;
+                Fvector Transference{};
                 // Transference.add(p1, Fvector().mul(d, RQ.range));
                 Transference.mul(d, RQ.range);
                 Fvector res[2];
@@ -125,6 +125,7 @@ void CWeaponRG6::LaunchGrenade(const Fvector& p1, const Fvector& d1)
         VERIFY(pGrenade);
         pGrenade->SetInitiator(H_Parent()->ID());
         pGrenade->SetRealGrenadeName(m_ammoTypes[m_ammoType]);
+        pGrenade->SetDestroyTime(Device.dwTimeGlobal);
 
         {
             NET_Packet P;

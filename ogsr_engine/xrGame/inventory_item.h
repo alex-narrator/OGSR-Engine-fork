@@ -169,11 +169,7 @@ public:
 
     float GetCondition() const { return m_fCondition; }
     void ChangeCondition(float fDeltaCondition);
-    virtual void SetCondition(float fNewCondition)
-    {
-        m_fCondition = fNewCondition;
-        ChangeCondition(0.0f);
-    }
+    virtual void SetCondition(float fNewCondition){m_fCondition = fNewCondition;}
 
     u8 selected_slot;
     const xr_vector<u8>& GetSlots() { return m_slots; }

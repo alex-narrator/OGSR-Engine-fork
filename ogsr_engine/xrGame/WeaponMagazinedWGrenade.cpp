@@ -431,6 +431,7 @@ void CWeaponMagazinedWGrenade::SwitchState(u32 S)
         VERIFY(pGrenade);
         pGrenade->SetInitiator(H_Parent()->ID());
         pGrenade->SetRealGrenadeName(m_ammoTypes[m_ammoType]);
+        pGrenade->SetDestroyTime(Device.dwTimeGlobal);
 
         if (Local())
         {

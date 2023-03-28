@@ -73,7 +73,7 @@ CSE_ALifeInventoryItem::~CSE_ALifeInventoryItem() {}
 
 void CSE_ALifeInventoryItem::STATE_Write(NET_Packet& tNetPacket)
 {
-    tNetPacket.w_float(m_fCondition);
+    tNetPacket.w_float_q8(m_fCondition, 0.0f, 1.0f);
     State.position = base()->o_Position;
     //
     tNetPacket.w_float(m_fPowerLevel);
@@ -83,7 +83,7 @@ void CSE_ALifeInventoryItem::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     u16 m_wVersion = base()->m_wVersion;
     if (m_wVersion > 52)
-        tNetPacket.r_float(m_fCondition);
+        tNetPacket.r_float_q8(m_fCondition, 0.0f, 1.0f);
 
     State.position = base()->o_Position;
     //
