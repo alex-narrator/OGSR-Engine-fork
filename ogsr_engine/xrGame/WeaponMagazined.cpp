@@ -2361,6 +2361,8 @@ void CWeaponMagazined::SwitchLaser(bool on)
         return;
 
     m_bIsLaserOn = on;
+    if (AnimationExist("anm_laser"))
+        PlayHUDMotion("anm_laser", true, GetState());
     PlaySound(sndLaserSwitch, get_LastFP());
 
     if (!m_bIsLaserOn)
@@ -2375,6 +2377,8 @@ void CWeaponMagazined::SwitchFlashlight(bool on)
         return;
 
     m_bIsFlashlightOn = on;
+    if (AnimationExist("anm_flashlight"))
+        PlayHUDMotion("anm_flashlight", true, GetState());
     PlaySound(sndFlashlightSwitch, get_LastFP());
 
     if (!m_bIsFlashlightOn)

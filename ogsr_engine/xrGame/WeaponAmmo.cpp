@@ -101,7 +101,6 @@ void CWeaponAmmo::Load(LPCSTR section)
     inherited::Load(section);
 
     m_boxSize = (u16)pSettings->r_s32(section, "box_size");
-    m_boxCurr = m_boxSize;
     //
     if (pSettings->line_exist(section, "ammo_types") && pSettings->line_exist(section, "mag_types"))
     {
@@ -140,6 +139,7 @@ void CWeaponAmmo::Load(LPCSTR section)
         return;
     }
     //
+    m_boxCurr = m_boxSize;
     m_ammoSect = section;
 
     if (pSettings->line_exist(section, "ammo_in_box") && pSettings->line_exist(section, "empty_box"))
