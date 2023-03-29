@@ -32,7 +32,7 @@
 #include "../../xr_3da/XR_IOConsole.h"
 #include "inventory.h"
 
-#define PDA_XML "pda.xml"
+constexpr auto PDA_XML = "pda.xml";
 u32 g_pda_info_state = 0;
 
 void RearrangeTabButtons(CUITabControl* pTab, xr_vector<Fvector2>& vec_sign_places);
@@ -488,9 +488,9 @@ void RearrangeTabButtons(CUITabControl* pTab, xr_vector<Fvector2>& vec_sign_plac
     vec_sign_places.clear();
     vec_sign_places.resize(btn_vec->size());
 
-    Fvector2 pos;
+    Fvector2 pos{};
     pos.set((*it)->GetWndPos());
-    Fvector2 sign_sz;
+    Fvector2 sign_sz{};
     sign_sz.set(9.0f + 3.0f, 11.0f);
     u32 idx = 0;
     float btn_text_len = 0.0f;
