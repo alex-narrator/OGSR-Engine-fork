@@ -13,6 +13,9 @@
 #include "EntityCondition.h"
 #include "InventoryOwner.h"
 
+#include "Actor.h"
+#include "ActorEffector.h"
+
 #include "xrServer_Objects_ALife_Items.h"
 
 CEatableItem::CEatableItem()
@@ -67,7 +70,7 @@ void CEatableItem::Load(LPCSTR section)
     m_ItemBoost[eFireWoundImmunityBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_fire_wound_protection", 0.0f);
     m_fBoostTime = READ_IF_EXISTS(pSettings, r_float, section, "boost_time", 0.f);
 
-    m_iStartPortionsNum = READ_IF_EXISTS(pSettings, r_s32, section, "eat_portions_num", 1);
+    m_iPortionsNum = m_iStartPortionsNum = READ_IF_EXISTS(pSettings, r_s32, section, "eat_portions_num", 1);
     VERIFY(m_iPortionsNum < 10000);
 
     m_fSelfRadiationInfluence = READ_IF_EXISTS(pSettings, r_float, section, "eat_radiation_self", 0.1f);
@@ -76,6 +79,9 @@ void CEatableItem::Load(LPCSTR section)
 
     if (pSettings->line_exist(section, "use_sound"))
         sndUse.create(pSettings->r_string(section, "use_sound"), st_Effect, sg_SourceType);
+
+    m_use_effector = READ_IF_EXISTS(pSettings, r_string, section, "use_effector", nullptr);
+    s_boost_effector = READ_IF_EXISTS(pSettings, r_string, section, "boost_effector", nullptr);
 }
 
 BOOL CEatableItem::net_Spawn(CSE_Abstract* DC)
@@ -147,7 +153,7 @@ void CEatableItem::UseBy(CEntityAlive* entity_alive)
 
     for (int i = 0; i < eBoostMax; ++i)
     {
-        SBooster B{(eBoostParams)i, GetItemBoost(i), GetItemBoostTime()};
+        SBooster B{(eBoostParams)i, GetItemBoost(i), GetItemBoostTime(), s_boost_effector};
         entity_alive->conditions().ApplyBooster(B);
     }
 
@@ -156,6 +162,15 @@ void CEatableItem::UseBy(CEntityAlive* entity_alive)
         if (sndUse._feedback())
             sndUse.stop();
         sndUse.play_at_pos(entity_alive, entity_alive->Position(), false);
+    }
+
+    if (!!m_use_effector)
+    {
+        if (auto actor = smart_cast<CActor*>(entity_alive))
+        {
+            RemoveEffector(actor, eCEItemUse);
+            AddEffector(actor, eCEItemUse, m_use_effector);
+        }
     }
 
     // уменьшить количество порций

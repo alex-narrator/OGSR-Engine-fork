@@ -643,6 +643,10 @@ void CActor::Die(CObject* who)
     m_HeavyBreathSnd.stop();
     m_BloodSnd.stop();
 
+    RemoveEffector(this, effGroggy);
+    RemoveEffector(this, eCEItemUse);
+    RemoveEffector(this, eCEBoostEffect);
+
     start_tutorial("game_over");
     xr_delete(m_sndShockEffector);
 }
@@ -862,7 +866,7 @@ void CActor::UpdateCL()
     }
 
     if (auto ce = Actor()->Cameras().GetCamEffector((ECamEffectorType)effGroggy))
-        if (!sndGroggy._feedback() || !g_Alive())
+        if (!sndGroggy._feedback())
             RemoveEffector(this, effGroggy);
 
     if (!m_uActiveItemInfoTTL)
@@ -1972,7 +1976,7 @@ void CActor::TryGroggyEffect(SHit* pHDS)
             CEffectorCam* ce = Actor()->Cameras().GetCamEffector((ECamEffectorType)effGroggy);
             if (!ce && !!m_GroggyEffector)
             {
-                AddEffector(this, effGroggy, "effector_groggy", pHDS->damage());
+                AddEffector(this, effGroggy, m_GroggyEffector, pHDS->damage());
             }
             Fvector point = Position();
             point.y += CameraHeight();

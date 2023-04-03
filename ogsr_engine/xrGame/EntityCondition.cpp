@@ -550,6 +550,7 @@ void CEntityCondition::save(NET_Packet& output_packet)
             output_packet.w_u8((u8)b->second.m_BoostType);
             output_packet.w_float(b->second.f_BoostValue);
             output_packet.w_float(b->second.f_BoostTime);
+            output_packet.w_stringZ(b->second.s_BoostEffector);
         }
     }
 }
@@ -586,6 +587,7 @@ void CEntityCondition::load(IReader& input_packet)
             B.m_BoostType = (eBoostParams)input_packet.r_u8();
             B.f_BoostValue = input_packet.r_float();
             B.f_BoostTime = input_packet.r_float();
+            input_packet.r_stringZ(B.s_BoostEffector);
             m_boosters[B.m_BoostType] = B;
             BoostParameters(B);
         }
@@ -740,18 +742,18 @@ void CEntityCondition::ApplyBooster(SBooster& B)
     m_boosters[B.m_BoostType] = B;
     BoostParameters(B);
 }
-// #include "ui/UIInventoryUtilities.h"
+ //#include "ui/UIInventoryUtilities.h"
 void CEntityCondition::BoostParameters(const SBooster& B)
 {
-    //	Msg("%s param %d value %.4f time %.4f at game time %s", __FUNCTION__, B.m_BoostType, B.f_BoostValue, B.f_BoostTime,
-    //InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
+    /*Msg("%s param %d value %.4f time %.4f at game time %s", __FUNCTION__, B.m_BoostType, B.f_BoostValue, B.f_BoostTime,
+    InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());*/
     m_BoostParams[B.m_BoostType] += B.f_BoostValue;
 }
 
 void CEntityCondition::DisableBoostParameters(const SBooster& B)
 {
-    //	Msg("%s param %d value %.4f time %.4f at game time %s", __FUNCTION__, B.m_BoostType, B.f_BoostValue, B.f_BoostTime,
-    //InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
+    /*Msg("%s param %d value %.4f time %.4f at game time %s", __FUNCTION__, B.m_BoostType, B.f_BoostValue, B.f_BoostTime,
+    InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());*/
     m_BoostParams[B.m_BoostType] -= B.f_BoostValue;
 }
 

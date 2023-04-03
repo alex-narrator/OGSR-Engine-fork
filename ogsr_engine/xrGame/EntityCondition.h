@@ -62,6 +62,7 @@ struct SBooster
     eBoostParams m_BoostType{};
     float f_BoostValue{};
     float f_BoostTime{};
+    shared_str s_BoostEffector{};
 };
 
 class CEntityCondition;

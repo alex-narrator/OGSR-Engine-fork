@@ -476,3 +476,17 @@ float CActorCondition::GetMaxPowerRestore() { return 1.f; }
 float CActorCondition::GetSatietyRestore() { return m_fV_Satiety * GetStress(); }
 
 float CActorCondition::GetAlcoholRestore() { return m_fV_Alcohol * GetStress(); }
+ 
+void CActorCondition::BoostParameters(const SBooster& B) 
+{ 
+    if (!!B.s_BoostEffector)
+        AddEffector(m_object, eCEBoostEffect, B.s_BoostEffector);
+    inherited::BoostParameters(B); 
+}
+
+void CActorCondition::DisableBoostParameters(const SBooster& B) 
+{ 
+    if (!!B.s_BoostEffector)
+        RemoveEffector(m_object, eCEBoostEffect);
+    inherited::DisableBoostParameters(B); 
+}

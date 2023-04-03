@@ -157,4 +157,7 @@ public:
     virtual float GetMaxPowerRestore() override;
     virtual float GetSatietyRestore() override;
     virtual float GetAlcoholRestore() override;
+
+    virtual void BoostParameters(const SBooster&) override;
+    virtual void DisableBoostParameters(const SBooster&) override;
 };

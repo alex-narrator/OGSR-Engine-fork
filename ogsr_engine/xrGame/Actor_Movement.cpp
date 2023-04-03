@@ -492,12 +492,12 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
     }
 
     // transform local dir to world dir
-    Fmatrix mOrient;
+    Fmatrix mOrient{};
     mOrient.rotateY(-r_model_yaw);
     mOrient.transform_dir(vControlAccel);
 }
 
-#define ACTOR_ANIM_SECT "actor_animation"
+constexpr auto ACTOR_ANIM_SECT = "actor_animation";
 // Alex ADD: smooth crouch fix
 float cam_LookoutSpeed = 2.f;
 
@@ -545,7 +545,7 @@ void CActor::g_Orientate(u32 mstate_rl, float dt)
     angle_lerp(r_model_yaw_delta, calc_yaw, PI_MUL_4, dt);
 
     // build matrix
-    Fmatrix mXFORM;
+    Fmatrix mXFORM{};
     mXFORM.rotateY(-(r_model_yaw + r_model_yaw_delta));
     mXFORM.c.set(Position());
     XFORM().set(mXFORM);
@@ -578,7 +578,7 @@ bool CActor::g_LadderOrient()
         return false;
     leader_norm.div(mag);
     leader_norm.invert();
-    Fmatrix M;
+    Fmatrix M{};
     M.set(Fidentity);
     M.k.set(leader_norm);
     M.j.set(0.f, 1.f, 0.f);
@@ -602,7 +602,7 @@ bool CActor::g_LadderOrient()
     ////angle_lerp(angles3.z,angles1.z,angles2.z,dt);
     // angle_lerp(angles3.x,angles1.x,angles2.x,dt);
     // XFORM().setHPB(angles3.x,angles3.y,angles3.z);
-    Fvector position;
+    Fvector position{};
     position.set(Position());
     // XFORM().rotation(q3);
     VERIFY2(_valid(M), "Invalide matrix in g_LadderOrient");

@@ -14,7 +14,7 @@ private:
     typedef CInventoryItem inherited;
 
 private:
-    CPhysicItem* m_physic_item;
+    CPhysicItem* m_physic_item{};
 
 public:
     CEatableItem();
@@ -38,8 +38,8 @@ public:
 protected:
     // количество порций еды,
     //-1 - порция одна и больше не бывает (чтоб не выводить надпись в меню)
-    int m_iPortionsNum;
-    int m_iStartPortionsNum{};
+    int m_iPortionsNum{1};
+    int m_iStartPortionsNum{1};
 
     // яка доля власної радіоактивності предмета буде передана гравцеві при вживанні
     float m_fSelfRadiationInfluence{};
@@ -49,8 +49,10 @@ protected:
 
     LPCSTR m_sUseMenuTip{};
     ref_sound sndUse;
+    shared_str m_use_effector{};
 
     float m_fBoostTime{};
+    shared_str s_boost_effector{};
 
 public:
     int GetStartPortionsNum() const { return m_iStartPortionsNum; };
