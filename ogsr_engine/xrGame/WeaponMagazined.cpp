@@ -115,54 +115,25 @@ BOOL CWeaponMagazined::net_Spawn(CSE_Abstract* DC)
 {
     BOOL bRes = inherited::net_Spawn(DC);
     const auto wpn = smart_cast<CSE_ALifeItemWeaponMagazined*>(DC);
-    m_iCurFireMode = wpn->m_u8CurFireMode;
-    if (HasFireModes() && m_iCurFireMode >= m_aFireModes.size())
+    if (HasFireModes() && wpn->m_u8CurFireMode >= m_aFireModes.size())
     {
         Msg("! [%s]: %s: wrong m_iCurFireMode[%u/%u]", __FUNCTION__, cName().c_str(), m_iCurFireMode, m_aFireModes.size() - 1);
-        m_iCurFireMode = m_aFireModes.size() - 1;
-        auto se_obj = alife_object();
-        if (se_obj)
-        {
-            auto W = smart_cast<CSE_ALifeItemWeaponMagazined*>(se_obj);
-            W->m_u8CurFireMode = m_iCurFireMode;
-        }
+        wpn->m_u8CurFireMode = m_aFireModes.size() - 1;
     }
+    m_iCurFireMode = wpn->m_u8CurFireMode;
     SetQueueSize(GetCurrentFireMode());
     // multitype ammo loading
-    for (const auto& _item : wpn->m_AmmoIDs)
+    for (u32 i = 0; i < wpn->m_AmmoIDs.size(); i++)
     {
-        // u8 LocalAmmoType = _item;
-        if (_item >= m_magazine.size())
+        u8 LocalAmmoType = wpn->m_AmmoIDs[i];
+        if (i >= m_magazine.size())
             continue;
-        CCartridge& l_cartridge = *(m_magazine.begin() + _item);
-        if (_item == l_cartridge.m_LocalAmmoType)
+        CCartridge& l_cartridge = *(m_magazine.begin() + i);
+        if (LocalAmmoType == l_cartridge.m_LocalAmmoType)
             continue;
-        l_cartridge.Load(m_ammoTypes[_item].c_str(), _item);
+        l_cartridge.Load(m_ammoTypes[LocalAmmoType].c_str(), LocalAmmoType);
     }
-    if (AddonAttachable(eMagazine))
-    {
-        m_bIsMagazineAttached = wpn->m_bIsMagazineAttached;
-        //	Msg("weapon [%s] spawned with magazine status [%s]", cName().c_str(), wpn->m_bIsMagazineAttached ? "atached" : "detached");
-        int mag_size{};
-        if (IsAddonAttached(eMagazine))
-        {
-            if (!AmmoTypeIsMagazine(m_ammoType))
-            {
-                Msg("! [%s] weapon %s detaching magazine due to incorrect ammotype %d|[%s]", __FUNCTION__, cName().c_str(), m_ammoType, m_ammoTypes[m_ammoType].c_str());
-                m_bIsMagazineAttached = false; // костиль від вильоту
-            }
-            else
-            {
-                m_LastLoadedMagType = m_ammoType;
-                mag_size = (int)pSettings->r_s32(GetAddonName(eMagazine), "box_size");
-            }
-        }
-        iMagazineSize = mag_size + HasChamber(); // учтём дополнительный патрон в патроннике
-    }
-    if (IsAddonAttached(eLaser))
-        m_bIsLaserOn = wpn->m_bIsLaserOn;
-    if (IsAddonAttached(eFlashlight))
-        m_bIsFlashlightOn = wpn->m_bIsFlashlightOn;
+
     if (IsAddonAttached(eSilencer))
         m_fAttachedSilencerCondition = wpn->m_fAttachedSilencerCondition;
     if (IsAddonAttached(eScope))
@@ -249,8 +220,6 @@ void CWeaponMagazined::Load(LPCSTR section)
         m_iCurFireMode = ModesCount - 1;
         m_iPrefferedFireMode = READ_IF_EXISTS(pSettings, r_s16, section, "preffered_fire_mode", -1);
     }
-    else
-        m_bHasDifferentFireModes = false;
 
     m_fire_zoomout_time = READ_IF_EXISTS(pSettings, r_u32, section, "fire_zoomout_time", u32(-1));
 
@@ -302,8 +271,8 @@ void CWeaponMagazined::Reload()
 bool CWeaponMagazined::TryToGetAmmo(u32 id)
 {
     if (!m_bDirectReload)
-        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[id].c_str(), ParentIsActor(), true));
-    return m_pAmmo && (!AddonAttachable(eMagazine) || AmmoTypeIsMagazine(id) || !iAmmoElapsed);
+        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[id].c_str(), ParentIsActor(), true, AddonAttachable(eMagazine)));
+    return m_pAmmo && m_pAmmo->Useful() && (!AddonAttachable(eMagazine) || m_pAmmo->IsBoxReloadable() || !iAmmoElapsed || IsGrenadeMode());
 }
 
 bool CWeaponMagazined::TryReload()
@@ -316,7 +285,7 @@ bool CWeaponMagazined::TryReload()
     }
     if (m_pCurrentInventory)
     {
-        if (TryToGetAmmo(m_ammoType) || unlimited_ammo() || (IsMisfire() && iAmmoElapsed))
+        if (TryToGetAmmo(m_ammoType) || unlimited_ammo())
         {
             SetPending(TRUE);
             SwitchState(eReload);
@@ -354,8 +323,8 @@ void CWeaponMagazined::OnMagazineEmpty()
 
 void CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
 {
-    int chamber_ammo = HasChamber() && AddonAttachable(eMagazine);
-    UnloadAmmo(iAmmoElapsed - chamber_ammo, spawn_ammo, !!GetMagazineEmptySect());
+    int chamber_ammo = HasChamber() && AddonAttachable(eMagazine) && !IsGrenadeMode();
+    UnloadAmmo(iAmmoElapsed - chamber_ammo, spawn_ammo, IsAddonAttached(eMagazine) && AddonAttachable(eMagazine) && !IsGrenadeMode());
 }
 
 void CWeaponMagazined::ReloadMagazine()
@@ -364,7 +333,7 @@ void CWeaponMagazined::ReloadMagazine()
     // устранить осечку при полной перезарядке
     if (IsMisfire() && (!HasChamber() || m_magazine.empty()))
     {
-        bMisfire = false;
+        SetMisfire(false);
         if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
         {
             HUD().GetUI()->AddInfoMessage("item_state", "gun_not_jammed");
@@ -390,15 +359,13 @@ void CWeaponMagazined::ReloadMagazine()
     if (!unlimited_ammo() && !m_bDirectReload)
     {
         // попытаться найти в инвентаре патроны текущего типа
-        m_pAmmo =
-            smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), ParentIsActor(), AddonAttachable(eMagazine) && !IsSingleReloading()));
+        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), ParentIsActor(), !IsSingleReloading(), AddonAttachable(eMagazine)));
         if (!m_pAmmo && !m_bLockType)
         {
             for (u32 i = 0; i < m_ammoTypes.size(); ++i)
             {
                 // проверить патроны всех подходящих типов
-                m_pAmmo = smart_cast<CWeaponAmmo*>(
-                    m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), ParentIsActor(), AddonAttachable(eMagazine) && !IsSingleReloading()));
+                m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[i].c_str(), ParentIsActor(), !IsSingleReloading(), AddonAttachable(eMagazine)));
                 if (m_pAmmo)
                 {
                     m_ammoType = i;
@@ -419,18 +386,20 @@ void CWeaponMagazined::ReloadMagazine()
         return;
 
     // разрядить магазин, если загружаем патронами другого типа
-    if (!m_bLockType && !m_magazine.empty() && (!m_pAmmo || m_pAmmo->cNameSect() != m_magazine.back().m_ammoSect) ||
+    if (!m_bLockType && !m_magazine.empty() && (!m_pAmmo || m_pAmmo->m_ammoSect != m_magazine.back().m_ammoSect || m_pAmmo->IsBoxReloadable()) ||
         m_magazine.empty() && AddonAttachable(eMagazine) && !unlimited_ammo()) // разрядить пустой магазин
         UnloadMagazine();
 
-    if (AddonAttachable(eMagazine) && !unlimited_ammo())
+    if (AddonAttachable(eMagazine) && !unlimited_ammo() && !IsGrenadeMode())
     {
-        bool b_attaching_magazine = AmmoTypeIsMagazine(m_ammoType);
+        bool b_attaching_magazine = m_pAmmo->IsBoxReloadable();
         int mag_size = b_attaching_magazine ? m_pAmmo->m_boxSize : 0;
 
         iMagazineSize = mag_size + HasChamber();
-        m_LastLoadedMagType = b_attaching_magazine ? m_ammoType : 0;
-        m_bIsMagazineAttached = b_attaching_magazine;
+        m_cur_magazine = b_attaching_magazine ? 
+            (u8)std::distance(m_magazines.begin(), std::find(m_magazines.begin(), m_magazines.end(), m_pAmmo->cNameSect())) : 
+            0;
+        SetMagazineAttached(b_attaching_magazine);
     }
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
@@ -454,7 +423,7 @@ void CWeaponMagazined::ReloadMagazine()
 
     // выкинуть коробку патронов, если она пустая
     if (m_pAmmo && !m_pAmmo->m_boxCurr)
-        m_pAmmo->SetDropManual(TRUE);
+        m_pAmmo->DestroyObject(); // SetDropManual(TRUE);
 
     // дозарядить оружие до полного магазина
     if (iMagazineSize > iAmmoElapsed && !AddonAttachable(eMagazine) && !unlimited_ammo())
@@ -685,14 +654,12 @@ void CWeaponMagazined::state_Misfire(float /**dt/**/)
     OnEmptyClick();
     SwitchState(eIdle);
 
-    bMisfire = true;
+    SetMisfire(true);
 
     UpdateSounds();
 }
 
 void CWeaponMagazined::state_MagEmpty(float dt) {}
-
-void CWeaponMagazined::SetDefaults() { CWeapon::SetDefaults(); }
 
 void CWeaponMagazined::OnShot()
 {
@@ -901,22 +868,22 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
     auto pStock = smart_cast<CStock*>(pIItem);
     auto pForend = smart_cast<CForend*>(pIItem);
 
-    if (pScope && m_eScopeStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) == 0 &&
+    if (pScope && m_eScopeStatus == ALife::eAddonAttachable && (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonScope) == 0 &&
         std::find(m_scopes.begin(), m_scopes.end(), pIItem->object().cNameSect()) != m_scopes.end())
         return true;
-    else if (pSilencer && m_eSilencerStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) == 0 &&
+    else if (pSilencer && m_eSilencerStatus == ALife::eAddonAttachable && (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) == 0 &&
              std::find(m_silencers.begin(), m_silencers.end(), pIItem->object().cNameSect()) != m_silencers.end())
         return true;
-    else if (pLaser && m_eLaserStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonLaser) == 0 &&
+    else if (pLaser && m_eLaserStatus == ALife::eAddonAttachable && (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonLaser) == 0 &&
              std::find(m_lasers.begin(), m_lasers.end(), pIItem->object().cNameSect()) != m_lasers.end())
         return true;
-    else if (pFlashlight && m_eFlashlightStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) == 0 &&
+    else if (pFlashlight && m_eFlashlightStatus == ALife::eAddonAttachable && (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) == 0 &&
              std::find(m_flashlights.begin(), m_flashlights.end(), pIItem->object().cNameSect()) != m_flashlights.end())
         return true;
-    else if (pStock && m_eStockStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock) == 0 &&
+    else if (pStock && m_eStockStatus == ALife::eAddonAttachable && (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonStock) == 0 &&
              std::find(m_stocks.begin(), m_stocks.end(), pIItem->object().cNameSect()) != m_stocks.end())
         return true;
-    else if (pForend && m_eForendStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend) == 0 &&
+    else if (pForend && m_eForendStatus == ALife::eAddonAttachable && (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonForend) == 0 &&
              std::find(m_forends.begin(), m_forends.end(), pIItem->object().cNameSect()) != m_forends.end())
         return true;
     else
@@ -929,22 +896,22 @@ bool CWeaponMagazined::CanDetach(const char* item_section_name)
     if (pActor && !pActor->HasRequiredTool(item_section_name))
         return false;
 
-    if (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) &&
+    if (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonScope) &&
         std::find(m_scopes.begin(), m_scopes.end(), item_section_name) != m_scopes.end())
         return true;
-    else if (m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) &&
+    else if (m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) &&
              std::find(m_silencers.begin(), m_silencers.end(), item_section_name) != m_silencers.end())
         return true;
-    else if (m_eLaserStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonLaser) &&
+    else if (m_eLaserStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonLaser) &&
              std::find(m_lasers.begin(), m_lasers.end(), item_section_name) != m_lasers.end())
         return true;
-    else if (m_eFlashlightStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) &&
+    else if (m_eFlashlightStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) &&
              std::find(m_flashlights.begin(), m_flashlights.end(), item_section_name) != m_flashlights.end())
         return true;
-    else if (m_eStockStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock) &&
+    else if (m_eStockStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonStock) &&
              std::find(m_stocks.begin(), m_stocks.end(), item_section_name) != m_stocks.end())
         return true;
-    else if (m_eForendStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend) &&
+    else if (m_eForendStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonForend) &&
              std::find(m_forends.begin(), m_forends.end(), item_section_name) != m_forends.end())
         return true;
     else
@@ -962,48 +929,48 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
     auto pStock = smart_cast<CStock*>(pIItem);
     auto pForend = smart_cast<CForend*>(pIItem);
 
-    if (pScope && m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) == 0)
+    if (pScope && m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonScope) == 0)
     {
         auto it = std::find(m_scopes.begin(), m_scopes.end(), pIItem->object().cNameSect());
         m_cur_scope = (u8)std::distance(m_scopes.begin(), it);
-        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonScope;
+        m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponAddonScope;
         result = true;
         m_fAttachedScopeCondition = pIItem->GetCondition();
     }
-    else if (pSilencer && m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) == 0)
+    else if (pSilencer && m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) == 0)
     {
         auto it = std::find(m_silencers.begin(), m_silencers.end(), pIItem->object().cNameSect());
         m_cur_silencer = (u8)std::distance(m_silencers.begin(), it);
-        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonSilencer;
+        m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponAddonSilencer;
         result = true;
         m_fAttachedSilencerCondition = pIItem->GetCondition();
     }
-    else if (pLaser && m_eLaserStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonLaser) == 0)
+    else if (pLaser && m_eLaserStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonLaser) == 0)
     {
         auto it = std::find(m_lasers.begin(), m_lasers.end(), pIItem->object().cNameSect());
         m_cur_laser = (u8)std::distance(m_lasers.begin(), it);
-        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonLaser;
+        m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponAddonLaser;
         result = true;
     }
-    else if (pFlashlight && m_eFlashlightStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) == 0)
+    else if (pFlashlight && m_eFlashlightStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) == 0)
     {
         auto it = std::find(m_flashlights.begin(), m_flashlights.end(), pIItem->object().cNameSect());
         m_cur_flashlight = (u8)std::distance(m_flashlights.begin(), it);
-        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonFlashlight;
+        m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponAddonFlashlight;
         result = true;
     }
-    else if (pStock && m_eStockStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock) == 0)
+    else if (pStock && m_eStockStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonStock) == 0)
     {
         auto it = std::find(m_stocks.begin(), m_stocks.end(), pIItem->object().cNameSect());
         m_cur_stock = (u8)std::distance(m_stocks.begin(), it);
-        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonStock;
+        m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponAddonStock;
         result = true;
     }
-    else if (pForend && m_eForendStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend) == 0)
+    else if (pForend && m_eForendStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonForend) == 0)
     {
         auto it = std::find(m_forends.begin(), m_forends.end(), pIItem->object().cNameSect());
         m_cur_forend = (u8)std::distance(m_forends.begin(), it);
-        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonForend;
+        m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponAddonForend;
         result = true;
     }
 
@@ -1029,10 +996,10 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 
 bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, float item_condition)
 {
-    if (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) &&
+    if (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonScope) &&
         std::find(m_scopes.begin(), m_scopes.end(), item_section_name) != m_scopes.end())
     {
-        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonScope;
+        m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponAddonScope;
         //
         m_cur_scope = 0;
         if (b_spawn_item)
@@ -1044,10 +1011,10 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
 
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
-    else if (m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) &&
+    else if (m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) &&
              std::find(m_silencers.begin(), m_silencers.end(), item_section_name) != m_silencers.end())
     {
-        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonSilencer;
+        m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponAddonSilencer;
         //
         m_cur_silencer = 0;
         if (b_spawn_item)
@@ -1058,11 +1025,11 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
         InitAddons();
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
-    else if (m_eLaserStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonLaser) &&
+    else if (m_eLaserStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonLaser) &&
              std::find(m_lasers.begin(), m_lasers.end(), item_section_name) != m_lasers.end())
     {
         SwitchLaser(false);
-        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonLaser;
+        m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponAddonLaser;
         //
         m_cur_laser = 0;
         //
@@ -1070,11 +1037,11 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
         InitAddons();
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
-    else if (m_eFlashlightStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) &&
+    else if (m_eFlashlightStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) &&
              std::find(m_flashlights.begin(), m_flashlights.end(), item_section_name) != m_flashlights.end())
     {
         SwitchFlashlight(false);
-        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonFlashlight;
+        m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponAddonFlashlight;
         //
         m_cur_flashlight = 0;
         //
@@ -1082,10 +1049,10 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
         InitAddons();
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
-    else if (m_eStockStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock) &&
+    else if (m_eStockStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonStock) &&
              std::find(m_stocks.begin(), m_stocks.end(), item_section_name) != m_stocks.end())
     {
-        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonStock;
+        m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponAddonStock;
         //
         m_cur_stock = 0;
         //
@@ -1093,10 +1060,10 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
         InitAddons();
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
-    else if (m_eForendStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend) &&
+    else if (m_eForendStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonForend) &&
              std::find(m_forends.begin(), m_forends.end(), item_section_name) != m_forends.end())
     {
-        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonForend;
+        m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponAddonForend;
         //
         m_cur_forend = 0;
         //
@@ -1893,9 +1860,7 @@ void CWeaponMagazined::net_Export(CSE_Abstract* E)
         CCartridge& l_cartridge = *(m_magazine.begin() + i);
         wpn->m_AmmoIDs.push_back(l_cartridge.m_LocalAmmoType);
     }
-    wpn->m_bIsMagazineAttached = m_bIsMagazineAttached;
-    wpn->m_bIsLaserOn = m_bIsLaserOn;
-    wpn->m_bIsFlashlightOn = m_bIsFlashlightOn;
+
     wpn->m_fAttachedSilencerCondition = m_fAttachedSilencerCondition;
     wpn->m_fAttachedScopeCondition = m_fAttachedScopeCondition;
     wpn->m_fAttachedGrenadeLauncherCondition = m_fAttachedGrenadeLauncherCondition;
@@ -1904,7 +1869,7 @@ void CWeaponMagazined::net_Export(CSE_Abstract* E)
 #include "ui/UIMainIngameWnd.h"
 void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
 {
-    if (IsMisfire() && smart_cast<CActor*>(H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
+    if (IsMisfire() && ParentIsActor() && (Level().CurrentViewEntity() == H_Parent()))
     {
         HUD().GetUI()->AddInfoMessage("item_state", "gun_jammed");
     }
@@ -1913,14 +1878,14 @@ void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_na
     bool b_wpn_info = CurrentHUD->IsHUDElementAllowed(eActiveItem);
     bool b_gear_info = CurrentHUD->IsHUDElementAllowed(eGear);
 
-    bool b_use_mags = AddonAttachable(eMagazine);
+    bool b_use_mags = AddonAttachable(eMagazine) && !IsGrenadeMode();
 
     const int AE = GetAmmoElapsed(), AC = b_use_mags ? GetMagazineCount() : GetAmmoCurrent();
 
     if (AE == 0 || m_magazine.empty())
         icon_sect_name = "";
     else
-        icon_sect_name = b_use_mags && IsAddonAttached(eMagazine) && (b_gear_info && !b_wpn_info) ? GetMagazineEmptySect() : m_magazine.back().m_ammoSect.c_str();
+        icon_sect_name = b_use_mags && IsAddonAttached(eMagazine) && (b_gear_info && !b_wpn_info) ? GetAddonName(eMagazine).c_str() : m_magazine.back().m_ammoSect.c_str();
 
     string256 sItemName;
     strcpy_s(sItemName, CStringTable().translate(AE > 0 ? pSettings->r_string(icon_sect_name.c_str(), "inv_name_short") : "st_not_loaded").c_str());
@@ -1950,9 +1915,6 @@ void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_na
     else if (unlimited_ammo())
         sprintf_s(sItemName, "[%s]--", sAmmoInMag);
 
-    // if(b_wpn_info && !b_show_count && smart_cast<CActor*>(H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
-    //	HUD().GetUI()->AddInfoMessage("item_usage", GetAmmoElapsedStr().c_str());
-
     str_count = sItemName;
 }
 
@@ -1972,19 +1934,23 @@ void CWeaponMagazined::net_Relcase(CObject* object)
 
 void CWeaponMagazined::UnloadAmmo(int unload_count, bool spawn_ammo, bool detach_magazine)
 {
+    shared_str ammo_in_mag_sect{};
     if (detach_magazine && !unlimited_ammo())
     {
         if (iAmmoElapsed <= (int)HasChamber() && spawn_ammo) // spawn mag empty
-            SpawnAmmo(0, GetMagazineEmptySect());
+            SpawnAmmo(0, GetAddonName(eMagazine).c_str());
+        else
+            ammo_in_mag_sect = m_magazine.front().m_ammoSect;
+
         iMagazineSize = HasChamber();
-        m_bIsMagazineAttached = false;
+        SetMagazineAttached(false);
     }
 
     xr_map<LPCSTR, u16> l_ammo;
     for (int i = 0; i < unload_count; ++i)
     {
         CCartridge& l_cartridge = m_magazine.back();
-        LPCSTR ammo_sect = detach_magazine ? m_ammoTypes[m_LastLoadedMagType].c_str() : l_cartridge.m_ammoSect.c_str();
+        LPCSTR ammo_sect = detach_magazine ? GetAddonName(eMagazine).c_str() : l_cartridge.m_ammoSect.c_str();
 
         if (!l_ammo[ammo_sect])
             l_ammo[ammo_sect] = 1;
@@ -2016,30 +1982,7 @@ void CWeaponMagazined::UnloadAmmo(int unload_count, bool spawn_ammo, bool detach
             }
         }
         if (_item.second && !unlimited_ammo())
-            SpawnAmmo(_item.second, _item.first);
-    }
-}
-
-bool CWeaponMagazined::IsAddonAttached(u32 addon) const
-{
-    switch (addon)
-    {
-    case eMagazine: return m_bIsMagazineAttached;
-    default: return inherited::IsAddonAttached(addon);
-    }
-}
-
-bool CWeaponMagazined::AddonAttachable(u32 addon, bool to_show) const
-{
-    switch (addon)
-    {
-    case eMagazine: {
-        for (u32 i = 0; i < m_ammoTypes.size(); ++i)
-            if (AmmoTypeIsMagazine(i))
-                return true;
-        return false;
-    }
-    default: return inherited::AddonAttachable(addon, to_show);
+            SpawnAmmo(_item.second, _item.first, ammo_in_mag_sect);
     }
 }
 
@@ -2097,7 +2040,7 @@ void CWeaponMagazined::ShutterAction() // передёргивание затв�
 {
     if (IsMisfire())
     {
-        bMisfire = false;
+        SetMisfire(false);
         if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
         {
             HUD().GetUI()->AddInfoMessage("item_state", "gun_not_jammed");
@@ -2196,9 +2139,9 @@ float CWeaponMagazined::GetConditionMisfireProbability() const
 {
     float mis = inherited::GetConditionMisfireProbability();
     // вероятность осечки от магазина
-    if (GetMagazineEmptySect())
+    if (AddonAttachable(eMagazine) && IsAddonAttached(eMagazine))
     {
-        float mag_missfire_prob = READ_IF_EXISTS(pSettings, r_float, GetMagazineEmptySect(), "misfire_probability_box", 0.0f);
+        float mag_missfire_prob = READ_IF_EXISTS(pSettings, r_float, GetAddonName(eMagazine), "misfire_probability_box", 0.0f);
         mis += mag_missfire_prob;
     }
     clamp(mis, 0.0f, 0.99f);
@@ -2208,10 +2151,8 @@ float CWeaponMagazined::GetConditionMisfireProbability() const
 u32 CWeaponMagazined::GetMagazineCount() const
 {
     u32 iMagazinesCount{};
-    for (int i = 0; i < m_ammoTypes.size(); ++i)
-    {
-        iMagazinesCount += Actor()->inventory().GetSameItemCount(m_ammoTypes[i].c_str(), false);
-    }
+    for (const auto& magazine_sect : m_magazines)
+        iMagazinesCount += Actor()->inventory().GetSameItemCount(magazine_sect.c_str(), false);
     return iMagazinesCount;
 }
 
@@ -2219,22 +2160,7 @@ bool CWeaponMagazined::IsSingleReloading()
 {
     if (IsPartlyReloading() || !AddonAttachable(eMagazine) || !HasChamber())
         return false;
-    bool reload_by_single_ammo = m_set_next_ammoType_on_reload == u32(-1) && TryToGetAmmo(m_ammoType) && !AmmoTypeIsMagazine(m_ammoType);
-    bool next_load_by_single_ammo = m_set_next_ammoType_on_reload != u32(-1) && TryToGetAmmo(m_set_next_ammoType_on_reload) && !AmmoTypeIsMagazine(m_set_next_ammoType_on_reload);
-    return reload_by_single_ammo || next_load_by_single_ammo;
-}
-
-bool CWeaponMagazined::AmmoTypeIsMagazine(u32 type) const
-{
-    return pSettings->line_exist(m_ammoTypes[type], "ammo_in_box") && pSettings->line_exist(m_ammoTypes[type], "empty_box");
-}
-
-LPCSTR CWeaponMagazined::GetMagazineEmptySect(bool to_show) const
-{
-    if (AddonAttachable(eMagazine) && IsAddonAttached(eMagazine))
-        return pSettings->r_string(GetAddonName(eMagazine, to_show), "empty_box");
-    else
-        return nullptr;
+    return m_pAmmo && !m_pAmmo->IsBoxReloadable();
 }
 
 float CWeaponMagazined::Weight() const
@@ -2242,8 +2168,8 @@ float CWeaponMagazined::Weight() const
     float res = inherited::Weight();
 
     // додамо вагу порожнього магазину, бо вагу набоїв розрахували раніше
-    if (GetMagazineEmptySect())
-        res += pSettings->r_float(GetMagazineEmptySect(), "inv_weight");
+    if (AddonAttachable(eMagazine) && IsAddonAttached(eMagazine))
+        res += pSettings->r_float(GetAddonName(eMagazine), "inv_weight");
 
     return res;
 }
@@ -2349,9 +2275,7 @@ LPCSTR CWeaponMagazined::GetCurrentMagazine_ShortName(bool to_show)
 {
     if (!IsAddonAttached(eMagazine))
         return ("");
-    LPCSTR mag_short_name = pSettings->r_string(GetAddonName(eMagazine, to_show), "inv_name_short");
-    if (iAmmoElapsed <= (int)HasChamber())
-        mag_short_name = pSettings->r_string(GetMagazineEmptySect(to_show), "inv_name_short");
+    LPCSTR mag_short_name = pSettings->r_string(GetAddonName(eMagazine), "inv_name_short");
     return CStringTable().translate(mag_short_name).c_str();
 }
 
@@ -2360,12 +2284,13 @@ void CWeaponMagazined::SwitchLaser(bool on)
     if (!IsAddonAttached(eLaser))
         return;
 
-    m_bIsLaserOn = on;
+    SetLaserOn(on);
+
     if (AnimationExist("anm_laser"))
         PlayHUDMotion("anm_laser", true, GetState());
     PlaySound(sndLaserSwitch, get_LastFP());
 
-    if (!m_bIsLaserOn)
+    if (!IsLaserOn())
     {
         laser_light_render->set_active(false);
     }
@@ -2376,12 +2301,13 @@ void CWeaponMagazined::SwitchFlashlight(bool on)
     if (!IsAddonAttached(eFlashlight))
         return;
 
-    m_bIsFlashlightOn = on;
+    SetFlashlightOn(on);
+
     if (AnimationExist("anm_flashlight"))
         PlayHUDMotion("anm_flashlight", true, GetState());
     PlaySound(sndFlashlightSwitch, get_LastFP());
 
-    if (!m_bIsFlashlightOn)
+    if (!IsFlashlightOn())
     {
         flashlight_render->set_active(false);
         flashlight_omni->set_active(false);
@@ -2428,9 +2354,9 @@ shared_str CWeaponMagazined::GetAmmoElapsedStr() const
 
 bool CWeaponMagazined::ShowAmmoCounter() const
 {
-    if (AddonAttachable(eMagazine) && IsAddonAttached(eMagazine))
+    if (AddonAttachable(eMagazine) && IsAddonAttached(eMagazine) && !IsGrenadeMode())
     {
-        bool res = READ_IF_EXISTS(pSettings, r_bool, GetMagazineEmptySect(), "ammo_counter", false);
+        bool res = READ_IF_EXISTS(pSettings, r_bool, GetAddonName(eMagazine), "ammo_counter", false);
         return res;
     }
     return m_bShowAmmoCounter;
@@ -2441,9 +2367,7 @@ void CWeaponMagazined::UpdateMagazineVisibility()
 {
     if (!AddonAttachable(eMagazine))
         return;
-    bool show = IsAddonAttached(eMagazine) ||
-        (m_set_next_ammoType_on_reload != u32(-1) && AmmoTypeIsMagazine(m_set_next_ammoType_on_reload) || m_pAmmo && AmmoTypeIsMagazine(m_ammoType)) &&
-            (GetState() == eReload || GetState() == eShutter);
+    bool show = IsAddonAttached(eMagazine) || GetState() == eReload && !IsSingleReloading();
     if (auto pWeaponVisual = smart_cast<IKinematics*>(Visual()))
     {
         if (m_sWpn_magazine_bone.size())

@@ -80,7 +80,7 @@ private:
     typedef CUIWindow inherited;
     CUIStatic m_static;
     CUICellItem* m_pParent;
-    Fvector2 m_pos_offset;
+    Fvector2 m_pos_offset{};
     CUIDragDropListEx* m_back_list;
 
 public:

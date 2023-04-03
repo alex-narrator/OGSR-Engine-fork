@@ -353,46 +353,28 @@ void CUIEquipParams::SetInfo(CInventoryItem* obj)
     auto pAmmo = smart_cast<CWeaponAmmo*>(obj);
     if (pAmmo)
     {
-        if (pAmmo->IsBoxReloadable() || pAmmo->IsBoxReloadableEmpty())
+        if (pAmmo->IsBoxReloadable())
         {
+            //споряджений набій
+            if (pAmmo->m_boxCurr)
+            {
+                _param_name = CStringTable().translate("st_current_ammo_type").c_str();
+                auto ammo_name = pSettings->r_string(pAmmo->m_ammoSect, "inv_name");
+                sprintf_s(text_to_show, "%s %s", _param_name, CStringTable().translate(ammo_name).c_str());
+                SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
+                _h += list_item_h;
+            }
             // сумісні набої магазинів - заголовок
             _param_name = CStringTable().translate("st_compatible_ammo").c_str();
             SetStaticParams(_uiXml, _path, _h)->SetText(_param_name);
             _h += list_item_h;
-            // сумісні набої порожніх магазинів - список
-            if (pAmmo->IsBoxReloadableEmpty())
+            // сумісні набої магазинів - список
+            for (const auto& ammo : pAmmo->m_ammoTypes)
             {
-                for (const auto& ammo : pAmmo->m_ammoTypes)
-                {
-                    auto ammo_name = pSettings->r_string(ammo, "inv_name");
-                    sprintf_s(text_to_show, "%s%s", marker_, CStringTable().translate(ammo_name).c_str());
-                    SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
-                    _h += list_item_h;
-                }
-            }
-            // сумісні набої заряджених магазинів - список
-            if (pAmmo->IsBoxReloadable())
-            {
-                xr_vector<shared_str> m_ammoTypes;
-                m_ammoTypes.clear();
-                LPCSTR _at = pSettings->r_string(pSettings->r_string(item_section, "empty_box"), "ammo_types");
-                if (_at && _at[0])
-                {
-                    string128 _ammoItem;
-                    int count = _GetItemCount(_at);
-                    for (int it = 0; it < count; ++it)
-                    {
-                        _GetItem(_at, it, _ammoItem);
-                        m_ammoTypes.push_back(_ammoItem);
-                    }
-                }
-                for (const auto& ammo : m_ammoTypes)
-                {
-                    auto ammo_name = pSettings->r_string(ammo, "inv_name");
-                    sprintf_s(text_to_show, "%s%s", marker_, CStringTable().translate(ammo_name).c_str());
-                    SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
-                    _h += list_item_h;
-                }
+                auto ammo_name = pSettings->r_string(ammo, "inv_name");
+                sprintf_s(text_to_show, "%s%s", marker_, CStringTable().translate(ammo_name).c_str());
+                SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
+                _h += list_item_h;
             }
         }
         else

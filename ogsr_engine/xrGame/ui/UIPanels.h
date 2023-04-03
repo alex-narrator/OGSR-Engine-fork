@@ -19,7 +19,7 @@ protected:
 	float						m_fScale;
 	Fvector2					m_cell_size;
 	xr_vector<CIconParams*>      m_vRects;
-	CUIStaticItem               m_si;
+	CUIStaticItem               m_st;
 	xr_vector<int>				m_count;
 	bool						m_bGroupSimilar{};
 	Fvector2					m_counter_offset;

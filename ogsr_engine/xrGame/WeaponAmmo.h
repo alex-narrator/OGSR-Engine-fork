@@ -68,14 +68,14 @@ public:
     u16 m_boxCurr{};
     bool m_tracer{};
     //
-    shared_str m_ammoSect{}, m_EmptySect{}, m_InvShortName{};
+    shared_str m_ammoSect{}, m_InvShortName{};
 
-    xr_vector<shared_str> m_ammoTypes, m_magTypes;
+    xr_vector<shared_str> m_ammoTypes{};
+    u8 m_cur_ammo_type{};
     virtual bool IsBoxReloadable() const;
-    virtual bool IsBoxReloadableEmpty() const;
     void ReloadBox(LPCSTR ammo_sect);
     void UnloadBox();
-    void SpawnAmmo(u32 boxCurr = 0xffffffff, LPCSTR ammoSect = NULL, bool = false);
+    void SpawnAmmo(u32 boxCurr = 0xffffffff, LPCSTR ammoSect = NULL);
     bool IsDirectReload(CWeaponAmmo*);
 
 public:

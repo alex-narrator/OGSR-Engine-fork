@@ -10,8 +10,10 @@
 #include "UIProgressBar.h"
 #include "UIXmlInit.h"
 #include "UIInventoryWnd.h"
-#include "../Weapon.h"
-#include "../CustomOutfit.h"
+#include "Weapon.h"
+#include "WeaponKnife.h"
+#include "WeaponBinoculars.h"
+#include "CustomOutfit.h"
 #include "UICellCustomItems.h"
 
 CUICellItem* CUICellItem::m_mouse_selected_item = nullptr;
@@ -383,7 +385,7 @@ void CUICellItem::ColorizeItems(std::initializer_list<CUIDragDropListEx*> args)
         if (!b_colorize)
             return;
 
-        if (Wpn)
+        if (Wpn && !smart_cast<CWeaponKnife*>(Wpn) && !smart_cast<CWeaponBinoculars*>(Wpn))
         {
             std::copy(Wpn->m_ammoTypes.begin(), Wpn->m_ammoTypes.end(), std::back_inserter(ColorizeSects));
             if (auto WpnGl = smart_cast<CWeaponMagazinedWGrenade*>(Wpn); WpnGl && WpnGl->IsAddonAttached(eLauncher))
@@ -395,12 +397,9 @@ void CUICellItem::ColorizeItems(std::initializer_list<CUIDragDropListEx*> args)
             }
             std::copy(Wpn->m_highlightAddons.begin(), Wpn->m_highlightAddons.end(), std::back_inserter(ColorizeSects));
         }
-        if (Ammo)
+        if (Ammo && Ammo->IsBoxReloadable())
         {
-            if (Ammo->IsBoxReloadableEmpty())
-                std::copy(Ammo->m_ammoTypes.begin(), Ammo->m_ammoTypes.end(), std::back_inserter(ColorizeSects));
-            if (Ammo->IsBoxReloadable())
-                ColorizeSects.push_back(Ammo->m_ammoSect);
+            std::copy(Ammo->m_ammoTypes.begin(), Ammo->m_ammoTypes.end(), std::back_inserter(ColorizeSects));
         }
         if (Vest)
         {

@@ -1249,15 +1249,16 @@ void CInventory::IterateAmmo(bool bSearchRuck, std::function<bool(const PIItem)>
     }
 }
 
-PIItem CInventory::GetAmmoByLimit(const char* name, bool forActor, bool limit_max) const
+PIItem CInventory::GetAmmoByLimit(const char* name, bool forActor, bool limit_max, bool include_magazines) const
 {
     PIItem box{};
     u32 limit{};
 
     auto callback = [&](const auto pIItem) -> bool {
-        if (!xr_strcmp(pIItem->object().cNameSect(), name))
+        const auto* ammo = smart_cast<CWeaponAmmo*>(pIItem);
+        shared_str sect_to_compare = include_magazines ? ammo->m_ammoSect : ammo->cNameSect();
+        if (ammo->Useful() && !xr_strcmp(sect_to_compare, name))
         {
-            const auto* ammo = smart_cast<CWeaponAmmo*>(pIItem);
             const bool size_fits_limit = (ammo->m_boxCurr == (limit_max ? ammo->m_boxSize : 1));
             const bool update_limit = limit_max ? ammo->m_boxCurr > limit : (limit == 0 || ammo->m_boxCurr < limit);
 
@@ -1360,21 +1361,21 @@ u32 CInventory::GetSameItemCount(LPCSTR caSection, bool SearchRuck)
     TIItemContainer& l_list = SearchRuck ? m_ruck : m_belt;
     for (const auto& item : l_list)
     {
-        if (item && !xr_strcmp(item->object().cNameSect(), caSection))
+        if (item && item->Useful() && !xr_strcmp(item->object().cNameSect(), caSection))
             ++l_dwCount;
     }
     // помимо пояса еще и в слотах поищем
     /*if (!SearchRuck)*/
     for (const auto& item : m_vest)
     {
-        if (item && !xr_strcmp(item->object().cNameSect(), caSection))
+        if (item && item->Useful() && !xr_strcmp(item->object().cNameSect(), caSection))
             ++l_dwCount;
     }
 
     for (const auto& _slot : m_slots)
     {
-        PIItem l_pIItem = _slot.m_pIItem;
-        if (l_pIItem && !xr_strcmp(l_pIItem->object().cNameSect(), caSection))
+        PIItem item = _slot.m_pIItem;
+        if (item && item->Useful() && !xr_strcmp(item->object().cNameSect(), caSection))
             ++l_dwCount;
     }
 
@@ -1394,9 +1395,11 @@ void CInventory::TryAmmoCustomPlacement(CInventoryItem* pIItem)
     if (pAmmo->m_bNeedFindPlace)
     {
         pAmmo->m_bNeedFindPlace = false; // сбрасываем флажок спавна патронов
+        if (!IsAllItemsLoaded())
+            return;
         if (!pActor->IsRuckAmmoPlacement())
         { // если включены патроны с пояса, то для боеприпасов актора, которые спавнятся при разрядке
-            if (pAmmo->IsBoxReloadableEmpty() && HasDropPouch()) // якщо пустий магазин та є сумка для скидання - кладемо до рюкзаку
+            if (pAmmo->IsBoxReloadable() && !pAmmo->m_boxCurr && HasDropPouch()) // якщо пустий магазин та є сумка для скидання - кладемо до рюкзаку
                 return;
             if (CanPutInVest(pAmmo))
             { // спробуємо до розгрузки

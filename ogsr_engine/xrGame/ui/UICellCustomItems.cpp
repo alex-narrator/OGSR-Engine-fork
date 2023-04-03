@@ -183,7 +183,7 @@ void CUIInventoryCellItem::Update()
 
 CUIAmmoCellItem::CUIAmmoCellItem(CWeaponAmmo* itm) : inherited(itm)
 {
-    if (itm->IsBoxReloadable() || itm->IsBoxReloadableEmpty())
+    if (itm->IsBoxReloadable())
     {
         init_add();
     }
@@ -204,7 +204,7 @@ bool CUIAmmoCellItem::EqualTo(CUICellItem* itm)
 void CUIAmmoCellItem::Update()
 {
     inherited::Update();
-    if (object()->IsBoxReloadable() || object()->IsBoxReloadableEmpty())
+    if (object()->IsBoxReloadable())
         UpdateItemTextCustom();
     else
         UpdateItemText();
@@ -434,7 +434,7 @@ bool CUIWeaponCellItem::is_flashlight() { return object()->AddonAttachable(eFlas
 bool CUIWeaponCellItem::is_stock() { return object()->AddonAttachable(eStock) && object()->IsAddonAttached(eStock); }
 bool CUIWeaponCellItem::is_extender() { return object()->AddonAttachable(eExtender) && object()->IsAddonAttached(eExtender); }
 bool CUIWeaponCellItem::is_forend() { return object()->AddonAttachable(eForend) && object()->IsAddonAttached(eForend); }
-bool CUIWeaponCellItem::is_magazine() { return object()->AddonAttachable(eMagazine, true) && object()->IsAddonAttached(eMagazine) && !!object()->GetMagazineIconSect(true); }
+bool CUIWeaponCellItem::is_magazine() { return object()->AddonAttachable(eMagazine) && object()->IsAddonAttached(eMagazine) && !!object()->GetMagazineIconSect(true); }
 
 void CUIWeaponCellItem::CreateIcon(u32 t, CIconParams& params)
 {
@@ -602,7 +602,7 @@ void CUIWeaponCellItem::Update()
                 DestroyIcon(eForend);
         }
     }
-    if (object()->AddonAttachable(eMagazine, true))
+    if (object()->AddonAttachable(eMagazine))
     {
         if (object()->IsAddonAttached(eMagazine) && !!object()->GetMagazineIconSect(true))
         {

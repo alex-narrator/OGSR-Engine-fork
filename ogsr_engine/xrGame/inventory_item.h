@@ -381,7 +381,6 @@ protected:
     float m_fPowerLevel{};
     float m_fPowerCapacity{};
     float m_fPowerConsumingUpdateTime;
-    float m_fAttachedPowerSourceCondition{1.f};
 
     LPCSTR m_detail_part_section{};
     LPCSTR m_sAttachMenuTip{};

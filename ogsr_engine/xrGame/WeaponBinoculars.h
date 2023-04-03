@@ -15,6 +15,7 @@ public:
     virtual bool Action(s32 cmd, u32 flags);
 
     virtual bool use_crosshair() const { return false; }
+    virtual bool CanBeReloaded() { return false; };
 
 protected:
     virtual size_t GetWeaponTypeForCollision() const override { return Binocular; }

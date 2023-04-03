@@ -70,7 +70,6 @@ protected:
     ref_light laser_light_render;
     CLAItem* laser_lanim{};
     float laser_fBrightness{1.f};
-    bool m_bIsLaserOn{};
     void UpdateLaser();
 
     // flashlight
@@ -82,7 +81,6 @@ protected:
     ref_glow flashlight_glow;
     CLAItem* flashlight_lanim{};
     float flashlight_fBrightness{1.f};
-    bool m_bIsFlashlightOn{};
     void UpdateFlashlight();
 
 protected:
@@ -126,7 +124,6 @@ public:
     virtual void Load(LPCSTR section);
     virtual CWeaponMagazined* cast_weapon_magazined() { return this; }
 
-    virtual void SetDefaults();
     virtual void FireStart();
     virtual void Reload();
 
@@ -158,8 +155,6 @@ public:
     }
     Fvector laserdot_attach_offset{}, laser_pos{};
     Fvector flashlight_attach_offset{}, flashlight_pos{};
-    virtual bool IsLaserOn() const { return m_bIsLaserOn; };
-    virtual bool IsFlashlightOn() const { return m_bIsFlashlightOn; };
 
     //////////////////////////////////////////////
     // для стрельбы очередями или одиночными
@@ -198,8 +193,6 @@ protected:
 
     // у оружия есть патронник
     bool m_bHasChamber{true};
-    // присоединён ли магазин
-    bool m_bIsMagazineAttached{true};
 
     // переменная блокирует использование
     // только разных типов патронов
@@ -281,11 +274,7 @@ public:
     virtual float GetConditionMisfireProbability() const;
 
     // оружие использует отъёмный магазин
-    // virtual bool	HasDetachableMagazine	(bool = false) const;
-    // virtual bool	IsMagazineAttached		() const;
 
-    virtual bool IsAddonAttached(u32) const;
-    virtual bool AddonAttachable(u32, bool = false) const;
     // у оружия есть патронник
     virtual bool HasChamber() const { return m_bHasChamber; };
     // разрядить кол-во патронов
@@ -294,8 +283,6 @@ public:
     u32 GetMagazineCount() const;
     //
     virtual bool IsSingleReloading();
-    virtual bool AmmoTypeIsMagazine(u32 type) const;
-    virtual LPCSTR GetMagazineEmptySect(bool = false) const;
     virtual LPCSTR GetCurrentMagazine_ShortName(bool = false);
 
     // действие передёргивания затвора

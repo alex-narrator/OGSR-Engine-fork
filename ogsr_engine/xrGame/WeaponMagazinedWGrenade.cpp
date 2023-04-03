@@ -102,13 +102,13 @@ BOOL CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC)
     SetPending(FALSE);
 
     const auto wgl = smart_cast<CSE_ALifeItemWeaponMagazinedWGL*>(DC);
-    m_bGrenadeMode = wgl->m_bGrenadeMode;
+    //m_bGrenadeMode = wgl->m_bGrenadeMode;
     m_ammoType2 = m_ammoType2 > 0 ? m_ammoType2 : wgl->ammo_type2;
     iAmmoElapsed2 = iAmmoElapsed2 > 0 ? iAmmoElapsed2 : wgl->a_elapsed2;
 
     // Msg("~~[%s][%s] net_Spawn", __FUNCTION__, Name());
 
-    if (m_bGrenadeMode) // m_bGrenadeMode enabled
+    if (IsGrenadeMode()) // m_bGrenadeMode enabled
     {
         m_fZoomFactor = CurrentZoomFactor();
 
@@ -128,11 +128,6 @@ BOOL CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC)
         m_magazine2.clear();
         while ((u32)iAmmoElapsed2 > m_magazine2.size()) //(mag_sz--)
             m_magazine2.push_back(m_DefaultCartridge2);
-
-        if (AddonAttachable(eMagazine, true) && IsAddonAttached(eMagazine))
-        {
-            m_LastLoadedMagType = m_ammoType2;
-        }
     }
     else
     {
@@ -165,7 +160,7 @@ void CWeaponMagazinedWGrenade::switch2_Idle() { inherited::switch2_Idle(); }
 void CWeaponMagazinedWGrenade::switch2_Reload()
 {
     VERIFY(GetState() == eReload);
-    if (m_bGrenadeMode)
+    if (IsGrenadeMode())
     {
         PlaySound(sndReloadG, get_LastFP2());
 
@@ -178,7 +173,7 @@ void CWeaponMagazinedWGrenade::switch2_Reload()
 
 void CWeaponMagazinedWGrenade::OnShot()
 {
-    if (m_bGrenadeMode)
+    if (IsGrenadeMode())
     {
         PlaySound(sndShotG, get_LastFP2(), true);
 
@@ -231,7 +226,7 @@ void CWeaponMagazinedWGrenade::PerformSwitchGL()
     if (IsZoomed())
         OnZoomOut(true);
 
-    m_bGrenadeMode = !m_bGrenadeMode;
+    SetGrenadeMode(!IsGrenadeMode());
 
     m_fZoomFactor = CurrentZoomFactor();
 
@@ -247,7 +242,7 @@ void CWeaponMagazinedWGrenade::PerformSwitchGL()
     iAmmoElapsed2 = (int)m_magazine2.size();
 
     SetQueueSize(GetCurrentFireMode());
-    if (m_bGrenadeMode)
+    if (IsGrenadeMode())
     {
         iMagazineSize = 1;
         sprintf_s(m_sCurFireMode, " (%s)", CStringTable().translate("st_gl_firemode").c_str());
@@ -256,9 +251,7 @@ void CWeaponMagazinedWGrenade::PerformSwitchGL()
     {
         if (AddonAttachable(eMagazine))
         {
-            int mag_size{};
-            if (IsAddonAttached(eMagazine) && AmmoTypeIsMagazine(m_ammoType))
-                mag_size = (int)pSettings->r_s32(GetAddonName(eMagazine), "box_size");
+            int mag_size{IsAddonAttached(eMagazine) ? (int)pSettings->r_s32(GetAddonName(eMagazine), "box_size") : 0};
             iMagazineSize = mag_size + HasChamber();
         }
         else
@@ -268,10 +261,10 @@ void CWeaponMagazinedWGrenade::PerformSwitchGL()
 
 bool CWeaponMagazinedWGrenade::Action(s32 cmd, u32 flags)
 {
-    if (m_bGrenadeMode && (cmd == kWPN_FIREMODE_PREV || cmd == kWPN_FIREMODE_NEXT || cmd == kWPN_ZOOM_INC || cmd == kWPN_ZOOM_DEC))
+    if (IsGrenadeMode() && (cmd == kWPN_FIREMODE_PREV || cmd == kWPN_FIREMODE_NEXT || cmd == kWPN_ZOOM_INC || cmd == kWPN_ZOOM_DEC))
         return false;
 
-    if (m_bGrenadeMode && flags & CMD_START && cmd == kWPN_FIRE && IsGrenadeLauncherBroken())
+    if (IsGrenadeMode() && flags & CMD_START && cmd == kWPN_FIRE && IsGrenadeLauncherBroken())
     {
         OnEmptyClick();
         return false;
@@ -298,7 +291,7 @@ void CWeaponMagazinedWGrenade::state_Fire(float dt)
     VERIFY(fTimeToFire > 0.f);
 
     // режим стрельбы подствольника
-    if (m_bGrenadeMode)
+    if (IsGrenadeMode())
     {
         fTime -= dt;
         Fvector p1{get_LastFP2()}, d{get_LastFD()};
@@ -359,7 +352,7 @@ void CWeaponMagazinedWGrenade::SwitchState(u32 S)
     inherited::SwitchState(S);
 
     // стрельнуть из подствольника
-    if (m_bGrenadeMode && GetState() == eIdle && S == eFire && getRocketCount())
+    if (IsGrenadeMode() && GetState() == eIdle && S == eFire && getRocketCount())
     {
         Fvector p1{get_LastFP2()}, d{get_LastFD()};
         CEntity* E = smart_cast<CEntity*>(H_Parent());
@@ -469,7 +462,7 @@ void CWeaponMagazinedWGrenade::ReloadMagazine()
     inherited::ReloadMagazine();
 
     // перезарядка подствольного гранатомета
-    if (iAmmoElapsed && !getRocketCount() && m_bGrenadeMode)
+    if (iAmmoElapsed && !getRocketCount() && IsGrenadeMode())
     {
         shared_str fake_grenade_name = pSettings->r_string(m_ammoTypes[m_ammoType], "fake_grenade_name");
 
@@ -479,7 +472,7 @@ void CWeaponMagazinedWGrenade::ReloadMagazine()
 
 bool CWeaponMagazinedWGrenade::IsDirectReload(CWeaponAmmo* ammo)
 {
-    auto _it = std::find(m_ammoTypes2.begin(), m_ammoTypes2.end(), ammo->cNameSect());
+    auto _it = std::find(m_ammoTypes2.begin(), m_ammoTypes2.end(), ammo->m_ammoSect);
     if (_it != m_ammoTypes2.end() && IsAddonAttached(eLauncher))
         PerformSwitchGL();
     return inherited::IsDirectReload(ammo);
@@ -523,7 +516,7 @@ void CWeaponMagazinedWGrenade::OnH_B_Independent(bool just_before_destroy)
     inherited::OnH_B_Independent(just_before_destroy);
 
     SetPending(FALSE);
-    if (m_bGrenadeMode)
+    if (IsGrenadeMode())
     {
         SetState(eIdle);
         SetPending(FALSE);
@@ -538,7 +531,7 @@ bool CWeaponMagazinedWGrenade::CanAttach(PIItem pIItem)
 
     auto pGrenadeLauncher = smart_cast<CGrenadeLauncher*>(pIItem);
 
-    if (pGrenadeLauncher && CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
+    if (pGrenadeLauncher && CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 == (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
         std::find(m_glaunchers.begin(), m_glaunchers.end(), pIItem->object().cNameSect()) != m_glaunchers.end())
         return true;
     else
@@ -551,7 +544,7 @@ bool CWeaponMagazinedWGrenade::CanDetach(const char* item_section_name)
     if (pActor && !pActor->HasRequiredTool(item_section_name))
         return false;
 
-    if (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
+    if (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
         std::find(m_glaunchers.begin(), m_glaunchers.end(), item_section_name) != m_glaunchers.end())
         return true;
     else
@@ -562,11 +555,11 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
 {
     auto pGrenadeLauncher = smart_cast<CGrenadeLauncher*>(pIItem);
 
-    if (pGrenadeLauncher && CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher))
+    if (pGrenadeLauncher && CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 == (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher))
     {
         auto it = std::find(m_glaunchers.begin(), m_glaunchers.end(), pIItem->object().cNameSect());
         m_cur_glauncher = (u8)std::distance(m_glaunchers.begin(), it);
-        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
+        m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
 
         m_fAttachedGrenadeLauncherCondition = pIItem->GetCondition();
 
@@ -585,19 +578,19 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
 
 bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spawn_item, float item_condition)
 {
-    if (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
+    if (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
         std::find(m_glaunchers.begin(), m_glaunchers.end(), item_section_name) != m_glaunchers.end())
     {
         // https://github.com/revolucas/CoC-Xray/pull/5/commits/9ca73da34a58ceb48713b1c67608198c6af26db2
         // Now we need to unload GL's magazine
-        if (!m_bGrenadeMode)
+        if (!IsGrenadeMode())
         {
             PerformSwitchGL();
         }
         UnloadMagazine();
         PerformSwitchGL();
 
-        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
+        m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
 
         m_cur_glauncher = 0;
         if (b_spawn_item)
@@ -625,14 +618,14 @@ void CWeaponMagazinedWGrenade::InitAddons()
 
 bool CWeaponMagazinedWGrenade::UseScopeTexture()
 {
-    if (IsAddonAttached(eLauncher) && m_bGrenadeMode)
+    if (IsAddonAttached(eLauncher) && IsGrenadeMode())
         return false;
     return inherited::UseScopeTexture();
 }
 
 float CWeaponMagazinedWGrenade::CurrentZoomFactor()
 {
-    if (IsAddonAttached(eLauncher) && m_bGrenadeMode)
+    if (IsAddonAttached(eLauncher) && IsGrenadeMode())
         return m_fIronSightZoomFactor;
     else
         return inherited::CurrentZoomFactor();
@@ -644,7 +637,7 @@ void CWeaponMagazinedWGrenade::PlayAnimShow()
     VERIFY(GetState() == eShowing);
     if (IsAddonAttached(eLauncher))
     {
-        if (!m_bGrenadeMode)
+        if (!IsGrenadeMode())
             PlayHUDMotion({"anim_draw_gl", "anm_show_w_gl"}, false, GetState());
         else
             PlayHUDMotion({"anim_draw_g", "anm_show_g"}, false, GetState());
@@ -659,7 +652,7 @@ void CWeaponMagazinedWGrenade::PlayAnimHide()
 
     if (IsAddonAttached(eLauncher))
     {
-        if (!m_bGrenadeMode)
+        if (!IsGrenadeMode())
             PlayHUDMotion({"anim_holster_gl", "anm_hide_w_gl"}, true, GetState());
         else
             PlayHUDMotion({"anim_holster_g", "anm_hide_g"}, true, GetState());
@@ -676,6 +669,13 @@ void CWeaponMagazinedWGrenade::PlayAnimReload()
     {
         if (IsPartlyReloading())
             PlayHUDMotion({"anim_reload_gl_partly", "anm_reload_w_gl_partly", "anim_reload_gl", "anm_reload_w_gl"}, true, GetState());
+        else if (IsSingleReloading())
+        {
+            if (AnimationExist("anim_reload_single_w_gl"))
+                PlayHUDMotion("anim_reload_single_w_gl", true, GetState());
+            else
+                PlayHUDMotion({"anim_draw_gl", "anm_show_w_gl"}, false, GetState());
+        }
         else
             PlayHUDMotion({"anm_reload_empty_w_gl", "anim_reload_gl", "anm_reload_w_gl"}, true, GetState());
     }
@@ -694,7 +694,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
             if (IsRotatingToZoom())
             {
                 string32 guns_aim_anm;
-                xr_strconcat(guns_aim_anm, "anm_idle_aim_start", m_bGrenadeMode ? "_g" : "_w_gl");
+                xr_strconcat(guns_aim_anm, "anm_idle_aim_start", IsGrenadeMode() ? "_g" : "_w_gl");
                 if (AnimationExist(guns_aim_anm))
                 {
                     PlayHUDMotion(guns_aim_anm, true, GetState());
@@ -706,7 +706,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
             if (const char* guns_aim_anm = GetAnimAimName())
             {
                 string64 guns_aim_anm_full;
-                xr_strconcat(guns_aim_anm_full, guns_aim_anm, m_bGrenadeMode ? "_g" : "_w_gl");
+                xr_strconcat(guns_aim_anm_full, guns_aim_anm, IsGrenadeMode() ? "_g" : "_w_gl");
                 if (AnimationExist(guns_aim_anm_full))
                 {
                     PlayHUDMotion(guns_aim_anm_full, true, GetState());
@@ -714,7 +714,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                 }
             }
 
-            if (m_bGrenadeMode)
+            if (IsGrenadeMode())
                 PlayHUDMotion({"anm_idle_aim_g", "anim_idle_g_aim", "anm_idle_g_aim"}, true, GetState());
             else
                 PlayHUDMotion({"anm_idle_aim_w_gl", "anim_idle_gl_aim", "anm_idle_w_gl_aim"}, true, GetState());
@@ -724,7 +724,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
             if (IsRotatingFromZoom())
             {
                 string32 guns_aim_anm;
-                xr_strconcat(guns_aim_anm, "anm_idle_aim_end", m_bGrenadeMode ? "_g" : "_w_gl");
+                xr_strconcat(guns_aim_anm, "anm_idle_aim_end", IsGrenadeMode() ? "_g" : "_w_gl");
                 if (AnimationExist(guns_aim_anm))
                 {
                     PlayHUDMotion(guns_aim_anm, true, GetState());
@@ -760,7 +760,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                 }
             }
 
-            if (m_bGrenadeMode)
+            if (IsGrenadeMode())
             {
                 switch (act_state)
                 {
@@ -811,7 +811,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
 void CWeaponMagazinedWGrenade::PlayAnimShoot()
 {
     VERIFY(GetState() == eFire || GetState() == eFire2);
-    if (m_bGrenadeMode)
+    if (IsGrenadeMode())
     {
         // анимация стрельбы из подствольника
         string_path guns_shoot_anm{};
@@ -838,7 +838,7 @@ void CWeaponMagazinedWGrenade::PlayAnimShoot()
 
 void CWeaponMagazinedWGrenade::PlayAnimModeSwitch()
 {
-    if (m_bGrenadeMode)
+    if (IsGrenadeMode())
         PlayHUDMotion({"anim_switch_grenade_on", "anm_switch_g"}, true, eSwitch);
     else
         PlayHUDMotion({"anim_switch_grenade_off", "anm_switch"}, true, eSwitch);
@@ -868,7 +868,6 @@ void CWeaponMagazinedWGrenade::net_Export(CSE_Abstract* E)
 {
     inherited::net_Export(E);
     CSE_ALifeItemWeaponMagazinedWGL* wgl = smart_cast<CSE_ALifeItemWeaponMagazinedWGL*>(E);
-    wgl->m_bGrenadeMode = m_bGrenadeMode;
     wgl->ammo_type2 = (u8)m_ammoType2;
     wgl->a_elapsed2 = (u16)m_magazine2.size();
 }
@@ -881,7 +880,7 @@ bool CWeaponMagazinedWGrenade::IsNecessaryItem(const shared_str& item_sect)
 
 float CWeaponMagazinedWGrenade::Weight() const { return inherited::Weight() + GetAmmoInMagazineWeight(m_magazine2); }
 
-float CWeaponMagazinedWGrenade::GetWeaponDeterioration() const { return m_bGrenadeMode ? conditionDecreasePerShotGL : inherited::GetWeaponDeterioration(); }
+float CWeaponMagazinedWGrenade::GetWeaponDeterioration() const { return IsGrenadeMode() ? conditionDecreasePerShotGL : inherited::GetWeaponDeterioration(); }
 //
 void CWeaponMagazinedWGrenade::PlayAnimShutter()
 {
@@ -963,37 +962,6 @@ void CWeaponMagazinedWGrenade::PlayAnimKick()
         AnimationExist("anm_kick_g") ? PlayHUDMotion("anm_kick_g", true, GetState()) : PlayHUDMotion({"anim_draw_g", "anm_show_g"}, true, GetState());
     else
         AnimationExist("anm_kick_w_gl") ? PlayHUDMotion("anm_kick_w_gl", true, GetState()) : PlayHUDMotion({"anim_draw_gl", "anm_show_w_gl"}, true, GetState());
-}
-
-bool CWeaponMagazinedWGrenade::AddonAttachable(u32 addon, bool to_show) const
-{
-    if (addon == eMagazine && to_show && IsGrenadeMode())
-    {
-        for (u32 i = 0; i < m_ammoTypes2.size(); ++i)
-            if (AmmoType2IsMagazine(i))
-                return true;
-    }
-    return inherited::AddonAttachable(addon, to_show);
-}
-
-bool CWeaponMagazinedWGrenade::AmmoType2IsMagazine(u32 type) const
-{
-    return pSettings->line_exist(m_ammoTypes2[type], "ammo_in_box") && pSettings->line_exist(m_ammoTypes2[type], "empty_box");
-}
-
-shared_str CWeaponMagazinedWGrenade::GetAddonName(u32 addon, bool to_show) const
-{
-    if (addon == eMagazine && to_show && IsGrenadeMode())
-        return m_ammoTypes2[m_LastLoadedMagType];
-    return inherited::GetAddonName(addon, to_show);
-}
-
-LPCSTR CWeaponMagazinedWGrenade::GetMagazineEmptySect(bool to_show) const
-{
-    if (AddonAttachable(eMagazine, to_show) && IsAddonAttached(eMagazine))
-        return pSettings->r_string(GetAddonName(eMagazine, to_show), "empty_box");
-    else
-        return inherited::GetMagazineEmptySect(to_show);
 }
 
 void CWeaponMagazinedWGrenade::UnloadWeaponFull()

@@ -400,14 +400,14 @@ bool CWeaponShotgun::HaveCartridgeInInventory(u8 cnt)
     }
     else
     {
-        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), ParentIsActor(), false));
+        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), ParentIsActor()));
 
         if (!m_pAmmo)
         {
             for (u32 i = 0; i < m_ammoTypes.size(); ++i)
             {
                 // проверить патроны всех подходящих типов
-                m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[i].c_str(), ParentIsActor(), false));
+                m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[i].c_str(), ParentIsActor()));
 
                 if (m_pAmmo)
                 {
@@ -425,7 +425,7 @@ u8 CWeaponShotgun::AddCartridge(u8 cnt)
 {
     if (IsMisfire())
     {
-        bMisfire = false;
+        SetMisfire(false);
         if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
         {
             HUD().GetUI()->AddInfoMessage("item_state", "gun_not_jammed");
@@ -484,7 +484,7 @@ bool CWeaponShotgun::CanAttach(PIItem pIItem)
         return false;
 
     auto pExtender = smart_cast<CExtender*>(pIItem);
-    if (pExtender && m_eExtenderStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
+    if (pExtender && m_eExtenderStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 == (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
         std::find(m_extenders.begin(), m_extenders.end(), pIItem->object().cNameSect()) != m_extenders.end())
         return true;
     else
@@ -497,7 +497,7 @@ bool CWeaponShotgun::CanDetach(const char* item_section_name)
     if (pActor && !pActor->HasRequiredTool(item_section_name))
         return false;
 
-    if (m_eExtenderStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
+    if (m_eExtenderStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
         std::find(m_extenders.begin(), m_extenders.end(), item_section_name) != m_extenders.end())
         return true;
     else
@@ -508,11 +508,11 @@ bool CWeaponShotgun::Attach(PIItem pIItem, bool b_send_event)
 {
     auto pExtender = smart_cast<CExtender*>(pIItem);
 
-    if (pExtender && CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender))
+    if (pExtender && CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 == (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonExtender))
     {
         auto it = std::find(m_extenders.begin(), m_extenders.end(), pIItem->object().cNameSect());
         m_cur_extender = (u8)std::distance(m_extenders.begin(), it);
-        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonExtender;
+        m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponAddonExtender;
 
         UnloadWeaponFull();
 
@@ -530,12 +530,12 @@ bool CWeaponShotgun::Attach(PIItem pIItem, bool b_send_event)
 
 bool CWeaponShotgun::Detach(const char* item_section_name, bool b_spawn_item, float item_condition)
 {
-    if (CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
+    if (CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
         std::find(m_extenders.begin(), m_extenders.end(), item_section_name) != m_extenders.end())
     {
         UnloadWeaponFull();
 
-        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonExtender;
+        m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponAddonExtender;
 
         m_cur_extender = 0;
 
@@ -555,4 +555,11 @@ void CWeaponShotgun::InitAddons()
     {
         iMagazineSize += READ_IF_EXISTS(pSettings, r_u32, GetAddonName(eExtender), "ammo_mag_size", 0);
     }
+}
+
+bool CWeaponShotgun::CanBeReloaded()
+{
+    if (m_bTriStateReload)
+        return iAmmoElapsed < iMagazineSize;
+    return inherited::CanBeReloaded();
 }

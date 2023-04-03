@@ -861,10 +861,9 @@ void CActor::UpdateCL()
         shader_exports.set_actor_params(Fvector{this->conditions().GetHealth(), outfit_cond, wpn_cond});
     }
 
-    if (!sndGroggy._feedback())
-    {
-        RemoveEffector(this, effGroggy);
-    }
+    if (auto ce = Actor()->Cameras().GetCamEffector((ECamEffectorType)effGroggy))
+        if (!sndGroggy._feedback() || !g_Alive())
+            RemoveEffector(this, effGroggy);
 
     if (!m_uActiveItemInfoTTL)
     {
@@ -1771,12 +1770,8 @@ void CActor::RepackAmmo()
                             cnt = 0;
                         }
                     }
-                    else if (!ammo->IsBoxReloadableEmpty())
-                    {
-                        if (ammo->IsBoxReloadable()) // spawn empty box
-                            ammo->SpawnAmmo(0, ammo->m_EmptySect.c_str());
+                    else if (!ammo->IsBoxReloadable())
                         ammo->DestroyObject();
-                    }
                 }
             }
         }

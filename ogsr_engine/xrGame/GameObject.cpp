@@ -486,9 +486,9 @@ void CGameObject::spawn_supplies()
 
     LPCSTR N, V;
     float p;
-    bool bScope{}, bSilencer{}, bLauncher{}, bLaser{}, bFlashlight{}, bStock{}, bExtender{}, bForend{};
+    bool bScope{}, bSilencer{}, bLauncher{}, bLaser{}, bFlashlight{}, bStock{}, bExtender{}, bForend{}, bMagazine{}, bAmmo{};
 
-    u32 cur_scope{}, cur_silencer{}, cur_launcher{}, cur_laser{}, cur_flashlight{}, cur_stock{}, cur_extender{}, cur_forend{},
+    u32 cur_scope{}, cur_silencer{}, cur_launcher{}, cur_laser{}, cur_flashlight{}, cur_stock{}, cur_extender{}, cur_forend{}, cur_magazine{},
 
         cur_ammo_type{};
 
@@ -522,6 +522,8 @@ void CGameObject::spawn_supplies()
             bStock = (NULL != strstr(V, "stock"));
             bExtender = (NULL != strstr(V, "extender"));
             bForend = (NULL != strstr(V, "forend"));
+            bMagazine = (NULL != strstr(V, "magazine"));
+            bAmmo = (NULL != strstr(V, "ammo"));
             // preloaded ammo type
             if (NULL != strstr(V, "ammo="))
                 cur_ammo_type = (u32)atof(strstr(V, "ammo=") + 5);
@@ -542,6 +544,8 @@ void CGameObject::spawn_supplies()
                 cur_extender = (u32)atof(strstr(V, "extender=") + 9);
             if (NULL != strstr(V, "forend="))
                 cur_forend = (u32)atof(strstr(V, "forend=") + 7);
+            if (NULL != strstr(V, "magazine="))
+                cur_magazine = (u32)atof(strstr(V, "magazine=") + 9);
         }
         for (u32 i = 0; i < j; ++i)
             if (::Random.randF(1.f) < p)
@@ -552,6 +556,12 @@ void CGameObject::spawn_supplies()
                 if (pSE_InventoryItem)
                     pSE_InventoryItem->m_fCondition = f_cond;
 
+                if (auto ammo = smart_cast<CSE_ALifeItemAmmo*>(A); bAmmo && ammo && !ammo->m_ammoTypes.empty())
+                {
+                    ammo->m_cur_ammo_type = cur_ammo_type;
+                    ammo->a_elapsed = ammo->m_boxSize;
+                }
+
                 CSE_ALifeItemWeapon* W = smart_cast<CSE_ALifeItemWeapon*>(A);
                 if (W)
                 {
@@ -559,43 +569,49 @@ void CGameObject::spawn_supplies()
 
                     if (W->m_scope_status == CSE_ALifeItemWeapon::eAddonAttachable)
                     {
-                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonScope, bScope);
+                        W->m_weapon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonScope, bScope);
                         W->m_cur_scope = cur_scope;
                     }
                     if (W->m_silencer_status == CSE_ALifeItemWeapon::eAddonAttachable)
                     {
-                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonSilencer, bSilencer);
+                        W->m_weapon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonSilencer, bSilencer);
                         W->m_cur_silencer = cur_silencer;
                     }
                     if (W->m_grenade_launcher_status == CSE_ALifeItemWeapon::eAddonAttachable)
                     {
-                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, bLauncher);
+                        W->m_weapon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, bLauncher);
                         W->m_cur_glauncher = cur_launcher;
                     }
                     if (W->m_laser_status == CSE_ALifeItemWeapon::eAddonAttachable)
                     {
-                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonLaser, bLaser);
+                        W->m_weapon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonLaser, bLaser);
                         W->m_cur_laser = cur_laser;
                     }
                     if (W->m_flashlight_status == CSE_ALifeItemWeapon::eAddonAttachable)
                     {
-                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonFlashlight, bFlashlight);
+                        W->m_weapon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonFlashlight, bFlashlight);
                         W->m_cur_flashlight = cur_flashlight;
                     }
                     if (W->m_stock_status == CSE_ALifeItemWeapon::eAddonAttachable)
                     {
-                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonStock, bStock);
+                        W->m_weapon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonStock, bStock);
                         W->m_cur_stock = cur_stock;
                     }
                     if (W->m_extender_status == CSE_ALifeItemWeapon::eAddonAttachable)
                     {
-                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonExtender, bExtender);
+                        W->m_weapon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonExtender, bExtender);
                         W->m_cur_extender = cur_extender;
                     }
                     if (W->m_forend_status == CSE_ALifeItemWeapon::eAddonAttachable)
                     {
-                        W->m_addon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonForend, bForend);
+                        W->m_weapon_flags.set(CSE_ALifeItemWeapon::eWeaponAddonForend, bForend);
                         W->m_cur_forend = cur_forend;
+                    }
+                    if (pSettings->line_exist(W->name(), "magazine_class"))
+                    {
+                        W->m_weapon_flags.set(CSE_ALifeItemWeapon::eWeaponMagazineAttached, true);
+                        if (bMagazine)
+                            W->m_cur_magazine = cur_magazine;
                     }
                 }
 

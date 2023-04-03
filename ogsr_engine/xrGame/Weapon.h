@@ -126,8 +126,9 @@ public:
     // Does weapon need's update?
     BOOL IsUpdating();
 
-    BOOL IsMisfire() const { return bMisfire; };
+    BOOL IsMisfire() const { return m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponMisfire; };
     BOOL CheckForMisfire();
+    void SetMisfire(bool on) { on ? m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponMisfire : m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponMisfire; }
 
     bool IsTriStateReload() const { return m_bTriStateReload; }
     EWeaponSubStates GetReloadState() const { return (EWeaponSubStates)m_sub_state; }
@@ -138,12 +139,7 @@ protected:
     u8 m_sub_state{};
     u8 m_idle_state{};
     // Weapon fires now
-    bool bWorking2;
-    // a misfire happens, you'll need to rearm weapon
-    bool bMisfire;
-
-    // последний заряженный тип магазина
-    u32 m_LastLoadedMagType{};
+    bool bWorking2{};
 
     //////////////////////////////////////////////////////////////////////////
     //  Weapon Addons
@@ -154,9 +150,9 @@ public:
     //////////////////////////////////////////
 
     virtual bool IsAddonAttached(u32) const;
-    virtual bool AddonAttachable(u32, bool = false) const;
+    virtual bool AddonAttachable(u32) const;
 
-    virtual bool IsGrenadeMode() const { return false; };
+    virtual bool IsGrenadeMode() const { return m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponGrenadeMode; };
 
     virtual bool UseScopeTexture();
 
@@ -168,12 +164,12 @@ public:
 
     // для отоброажения иконок апгрейдов в интерфейсе
     Fvector2 GetAddonOffset(u32);
-    virtual shared_str GetAddonName(u32, bool = false) const;
+    virtual shared_str GetAddonName(u32) const;
 
     const shared_str GetMagazineIconSect(bool = false) const;
 
-    u8 GetAddonsState() const { return m_flagsAddOnState; };
-    void SetAddonsState(u8 st) { m_flagsAddOnState = st; }
+    u8 GetAddonsState() const { return m_flagsWeaponState; };
+    void SetAddonsState(u8 st) { m_flagsWeaponState = st; }
 
     xr_vector<shared_str> m_sWpn_scope_bones;
     shared_str m_sWpn_silencer_bone;
@@ -195,8 +191,8 @@ private:
     xr_vector<shared_str> hud_hidden_bones;
 
 protected:
-    // состояние подключенных аддонов
-    u8 m_flagsAddOnState;
+    // стан
+    u16 m_flagsWeaponState{};
 
     // возможность подключения различных аддонов
     ALife::EWeaponAddonStatus m_eScopeStatus{};
@@ -232,7 +228,7 @@ protected:
     float m_fScopeZoomFactor{1.f};
     float m_fScopeZoomFactorSecond{1.f};
     // когда режим приближения включен
-    bool m_bZoomMode;
+    bool m_bZoomMode{};
     // коэффициент увеличения во втором вьюпорте при зуме
     float m_fSecondVPZoomFactor{};
     // прятать перекрестие в режиме прицеливания
@@ -265,6 +261,11 @@ protected:
 
     float m_fScopeInertionFactor;
     float m_fAimControlInertionK{};
+
+    void SetMagazineAttached(bool attached) { attached ? m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponMagazineAttached : m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponMagazineAttached; }
+    void SetLaserOn(bool on) { on ? m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponLaserOn : m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponLaserOn; }
+    void SetFlashlightOn(bool on) { on ? m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponFlashlightOn : m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponFlashlightOn; }
+    void SetGrenadeMode(bool on) { on ? m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponGrenadeMode : m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponGrenadeMode; }
 
 public:
     IC bool IsZoomEnabled() const { return m_bZoomEnabled; }
@@ -384,8 +385,6 @@ public:
     // Weapon fire
     //////////////////////////////////////////////////////////////////////////
 protected:
-    virtual void SetDefaults();
-
     // трассирование полета пули
     virtual void FireTrace(const Fvector& P, const Fvector& D);
     virtual float GetWeaponDeterioration() const;
@@ -500,7 +499,7 @@ public:
     int GetAmmoElapsed2() const { return 0; }
 
     virtual void OnMagazineEmpty();
-    void SpawnAmmo(u32 boxCurr = 0xffffffff, LPCSTR ammoSect = NULL, u32 ParentID = 0xffffffff);
+    void SpawnAmmo(u32 boxCurr = 0xffffffff, LPCSTR ammoSect = NULL, shared_str ammo_sect_in_mag = nullptr, u32 ParentID = 0xffffffff);
 
     //  [8/3/2005]
     virtual float Get_PDM_Base() const { return m_fPDM_disp_base; };
@@ -585,18 +584,16 @@ public:
     float GetHudFov() override;
 
     virtual void OnBulletHit();
-    bool IsPartlyReloading() { return (GetAmmoElapsed() > 0); };
+    bool IsPartlyReloading() { return iAmmoElapsed; };
 
-    virtual bool IsLaserOn() const { return false; };
-    virtual bool IsFlashlightOn() const { return false; };
+    virtual bool IsLaserOn() const { return m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponLaserOn; };
+    virtual bool IsFlashlightOn() const { return m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponFlashlightOn; };
 
     // какие патроны будут заряжены при смене типа боеприпаса
     u32 GetNextAmmoType();
-    // оружие использует отъёмный магазин
-    // virtual bool		HasDetachableMagazine	(bool = false) const { return false; };
-    // virtual bool		IsMagazineAttached		() const { return false; };
     virtual bool IsSingleReloading() { return false; };
     virtual bool CanBeReloaded();
+    virtual bool CanBeUnloaded();
     //
     IC void ReloadWeapon() { Reload(); };
     virtual bool TryToGetAmmo(u32) { return true; };
@@ -624,6 +621,11 @@ public:
 
     xr_vector<shared_str> m_forends{};
     u8 m_cur_forend{};
+
+    xr_vector<shared_str> m_magazines{};
+    u8 m_cur_magazine{};
+
+    virtual bool HasChamber() const { return false; };
 
     bool m_bCamRecoilCompensation;
 

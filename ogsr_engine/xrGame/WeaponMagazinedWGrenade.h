@@ -74,7 +74,7 @@ public:
     u32 m_ammoType2{};
     int iMagazineSize2{};
     xr_vector<CCartridge> m_magazine2;
-    bool m_bGrenadeMode{};
+//    bool m_bGrenadeMode{};
 
     CCartridge m_DefaultCartridge2;
 
@@ -88,7 +88,7 @@ public:
     int GetAmmoElapsed2() const { return iAmmoElapsed2; }
     virtual float Weight() const;
 
-    virtual bool IsGrenadeMode() const { return m_bGrenadeMode; };
+    //virtual bool IsGrenadeMode() const { return m_bGrenadeMode; };
     // получаем износ при выстреле из подствольника
     virtual float GetWeaponDeterioration() const;
     // считаем что в режиме подствольника стрельба только одиночными
@@ -100,11 +100,6 @@ public:
     virtual void PlayAnimCheckout() override;
     virtual void PlayAnimCheckGear() override;
     virtual void PlayAnimKick() override;
-    // оружие использует отъёмный магазин
-    virtual bool AddonAttachable(u32, bool = false) const;
-    virtual bool AmmoType2IsMagazine(u32 type) const;
-    virtual shared_str GetAddonName(u32, bool = false) const;
-    virtual LPCSTR GetMagazineEmptySect(bool = false) const;
     virtual bool IsDirectReload(CWeaponAmmo*);
     virtual void SetQueueSize(int size);
     virtual void UnloadWeaponFull();

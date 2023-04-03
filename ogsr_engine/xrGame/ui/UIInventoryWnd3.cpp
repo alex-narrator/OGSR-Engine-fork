@@ -133,42 +133,25 @@ void CUIInventoryWnd::ActivatePropertiesBox()
         b_show = true;
     }
 
-    if (pAmmo)
+    if (pAmmo && pAmmo->IsBoxReloadable())
     {
-        LPCSTR _ammo_sect;
-        if (pAmmo->IsBoxReloadable())
+        // reload AmmoBox
+        for (const auto& type : pAmmo->m_ammoTypes)
         {
-            // unload AmmoBox
-            sprintf(temp, "%s%s", _many, CStringTable().translate("st_unload_magazine").c_str());
-            UIPropertiesBox.AddItem(temp, NULL, INVENTORY_UNLOAD_AMMO_BOX);
-
-            b_show = true;
-            // reload AmmoBox
-            if (pAmmo->m_boxCurr < pAmmo->m_boxSize)
+            if (inv->GetAmmoByLimit(type.c_str(), true))
             {
-                _ammo_sect = pAmmo->m_ammoSect.c_str();
-                if (inv->GetAmmoByLimit(_ammo_sect, true, false))
-                {
-                    sprintf(temp, "%s%s %s", _many, CStringTable().translate("st_load_ammo_type").c_str(),
-                            CStringTable().translate(pSettings->r_string(_ammo_sect, "inv_name_short")).c_str());
-                    UIPropertiesBox.AddItem(temp, (void*)_ammo_sect, INVENTORY_RELOAD_AMMO_BOX);
-                    b_show = true;
-                }
+                sprintf(temp, "%s%s %s", _many, CStringTable().translate("st_load_ammo_type").c_str(),
+                        CStringTable().translate(pSettings->r_string(type, "inv_name_short")).c_str());
+                UIPropertiesBox.AddItem(temp, (void*)type.c_str(), INVENTORY_RELOAD_AMMO_BOX);
+                b_show = true;
             }
         }
-        else if (pAmmo->IsBoxReloadableEmpty())
+        // unload AmmoBox
+        if (pAmmo->m_boxCurr)
         {
-            for (u8 i = 0; i < pAmmo->m_ammoTypes.size(); ++i)
-            {
-                _ammo_sect = pAmmo->m_ammoTypes[i].c_str();
-                if (inv->GetAmmoByLimit(_ammo_sect, true, false))
-                {
-                    sprintf(temp, "%s%s %s", _many, CStringTable().translate("st_load_ammo_type").c_str(),
-                            CStringTable().translate(pSettings->r_string(_ammo_sect, "inv_name_short")).c_str());
-                    UIPropertiesBox.AddItem(temp, (void*)_ammo_sect, INVENTORY_RELOAD_AMMO_BOX);
-                    b_show = true;
-                }
-            }
+            sprintf(temp, "%s%s", _many, CStringTable().translate("st_unload_magazine").c_str());
+            UIPropertiesBox.AddItem(temp, NULL, INVENTORY_UNLOAD_AMMO_BOX);
+            b_show = true;
         }
     }
 
@@ -179,7 +162,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
         {
             for (u32 i = 0; i < pWeapon->m_ammoTypes.size(); ++i)
             {
-                if (pWeapon->TryToGetAmmo(i))
+                if (pWeapon->TryToGetAmmo(i) && pWeapon->CanBeReloaded())
                 {
                     auto ammo_sect = pSettings->r_string(pWeapon->m_ammoTypes[i].c_str(), "inv_name_short");
                     sprintf(temp, "%s %s", CStringTable().translate("st_load_ammo_type").c_str(), CStringTable().translate(ammo_sect).c_str());
@@ -201,10 +184,9 @@ void CUIInventoryWnd::ActivatePropertiesBox()
             }
         }
         //
-        if (smart_cast<CWeaponMagazined*>(pWeapon))
+        if (pWeapon)
         {
-            auto WpnMagazWgl = smart_cast<CWeaponMagazinedWGrenade*>(pWeapon);
-            bool b = pWeapon->GetAmmoElapsed() > 0 || WpnMagazWgl && !WpnMagazWgl->m_magazine2.empty() || smart_cast<CWeaponMagazined*>(pWeapon)->IsAddonAttached(eMagazine);
+            bool b = pWeapon->CanBeUnloaded();
 
             if (!b)
             {
@@ -212,8 +194,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
                 for (u32 i = 0; i < itm->ChildsCount(); ++i)
                 {
                     auto pWeaponChild = static_cast<CWeaponMagazined*>(itm->Child(i)->m_pData);
-                    auto WpnMagazWglChild = smart_cast<CWeaponMagazinedWGrenade*>(pWeaponChild);
-                    if (pWeaponChild->GetAmmoElapsed() > 0 || (WpnMagazWglChild && !WpnMagazWglChild->m_magazine2.empty()))
+                    if (pWeaponChild->CanBeUnloaded())
                     {
                         b = true;
                         break;
@@ -392,6 +373,7 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
                 auto ammobox = static_cast<CWeaponAmmo*>(itm->Child(i)->m_pData);
                 ammobox->UnloadBox();
             }
+            InitInventory_delayed();
         }
         break;
         case INVENTORY_REPAIR_ITEM: RepairItem((PIItem)(UIPropertiesBox.GetClickedItem()->GetData())); break;

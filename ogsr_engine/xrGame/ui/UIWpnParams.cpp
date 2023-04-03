@@ -162,7 +162,7 @@ void CUIWpnParams::SetInfo(CInventoryItem* obj)
     if (!pWeaponKnife && !pWeaponBinoc && (pWeapon->AddonAttachable(eMagazine) && pWeaponMag->IsAddonAttached(eMagazine) || pWeapon->GetAmmoElapsed() || pWeapon->IsGrenadeMode()))
     {
         _param_name = CStringTable().translate("st_current_ammo_type").c_str();
-        if (pWeapon->AddonAttachable(eMagazine, true) && pWeaponMag->IsAddonAttached(eMagazine) && pWeapon->GetAmmoElapsed())
+        if (pWeapon->AddonAttachable(eMagazine) && pWeaponMag->IsAddonAttached(eMagazine) && pWeapon->GetAmmoElapsed())
             sprintf_s(text_to_show, "%s %s, %s", _param_name, pWeapon->GetCurrentAmmo_ShortName(), pWeaponMag->GetCurrentMagazine_ShortName(true));
         else if (pWeapon->GetAmmoElapsed())
             sprintf_s(text_to_show, "%s %s", _param_name, pWeapon->GetCurrentAmmo_ShortName());
@@ -249,18 +249,10 @@ void CUIWpnParams::SetInfo(CInventoryItem* obj)
             SetStaticParams(_uiXml, _path, _h)->SetText(_param_name);
             _h += list_item_h;
             // сумісні магазини - список
-            LPCSTR empty_sect_prev = nullptr;
-            for (const auto& ammo : pWeapon->m_ammoTypes)
+            for (const auto& magazine : pWeapon->m_magazines)
             {
-                if (!pSettings->line_exist(ammo, "empty_box"))
-                    continue;
-                // для магазинів будемо відображати тільки загальний "пустий" магазин
-                auto empty_sect = pSettings->r_string(ammo, "empty_box");
-                auto ammo_name = pSettings->r_string(empty_sect, "inv_name");
-                if (empty_sect == empty_sect_prev) // та скіпнемо відображення якщо такий пустий магазин вже у переліку
-                    continue;
-                empty_sect_prev = empty_sect;
-                sprintf_s(text_to_show, "%s%s", marker_, CStringTable().translate(ammo_name).c_str());
+                auto magazine_name = pSettings->r_string(magazine, "inv_name");
+                sprintf_s(text_to_show, "%s%s", marker_, CStringTable().translate(magazine_name).c_str());
                 SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
                 _h += list_item_h;
             }

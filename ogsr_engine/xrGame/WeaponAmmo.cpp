@@ -20,11 +20,6 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     m_ammoSect = section;
     // Msg("ammo: section [%s], m_ammoSect [%s]", section, *m_ammoSect);
     //
-    if (pSettings->line_exist(section, "ammo_in_box") && pSettings->line_exist(section, "empty_box"))
-    {
-        m_ammoSect = pSettings->r_string(section, "ammo_in_box");
-    }
-    //
     m_LocalAmmoType = LocalAmmoType;
 
     m_kDist = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "k_dist", 0.f);
@@ -94,7 +89,7 @@ CWeaponAmmo::CWeaponAmmo(void)
     m_flags.set(Fbelt, TRUE);
 }
 
-CWeaponAmmo::~CWeaponAmmo(void) {}
+CWeaponAmmo::~CWeaponAmmo(void) { delete_data(m_ammoTypes); }
 
 void CWeaponAmmo::Load(LPCSTR section)
 {
@@ -102,7 +97,7 @@ void CWeaponAmmo::Load(LPCSTR section)
 
     m_boxSize = (u16)pSettings->r_s32(section, "box_size");
     //
-    if (pSettings->line_exist(section, "ammo_types") && pSettings->line_exist(section, "mag_types"))
+    if (pSettings->line_exist(section, "ammo_types"))
     {
         // load ammo types
         m_ammoTypes.clear();
@@ -117,24 +112,15 @@ void CWeaponAmmo::Load(LPCSTR section)
                 m_ammoTypes.push_back(_ammoItem);
             }
         }
-        // load mag types
-        m_magTypes.clear();
-        LPCSTR _mt = pSettings->r_string(section, "mag_types");
-        if (_mt && _mt[0])
-        {
-            string128 _magItem;
-            int count = _GetItemCount(_mt);
-            for (int it = 0; it < count; ++it)
-            {
-                _GetItem(_mt, it, _magItem);
-                m_magTypes.push_back(_magItem);
-            }
-        }
+        m_ammoSect = m_ammoTypes[m_cur_ammo_type];
+        m_InvShortName = CStringTable().translate(pSettings->r_string(m_ammoSect, "inv_name_short"));
         //
         m_misfireProbabilityBox = READ_IF_EXISTS(pSettings, r_float, section, "misfire_probability_box", 0.0f);
 
         if (pSettings->line_exist(section, "load_sound"))
             sndLoad.create(pSettings->r_string(section, "load_sound"), st_Effect, sg_SourceType);
+        if (pSettings->line_exist(section, "unload_sound"))
+            sndUnload.create(pSettings->r_string(section, "unload_sound"), st_Effect, sg_SourceType);
         //
         return;
     }
@@ -142,17 +128,6 @@ void CWeaponAmmo::Load(LPCSTR section)
     m_boxCurr = m_boxSize;
     m_ammoSect = section;
 
-    if (pSettings->line_exist(section, "ammo_in_box") && pSettings->line_exist(section, "empty_box"))
-    {
-        m_ammoSect = pSettings->r_string(section, "ammo_in_box");
-        m_EmptySect = pSettings->r_string(section, "empty_box");
-
-        if (pSettings->line_exist(section, "load_sound"))
-            sndLoad.create(pSettings->r_string(section, "load_sound"), st_Effect, sg_SourceType);
-        if (pSettings->line_exist(section, "unload_sound"))
-            sndUnload.create(pSettings->r_string(section, "unload_sound"), st_Effect, sg_SourceType);
-    }
-    //
     m_InvShortName = CStringTable().translate(pSettings->r_string(m_ammoSect, "inv_name_short"));
     //
 
@@ -188,15 +163,22 @@ BOOL CWeaponAmmo::net_Spawn(CSE_Abstract* DC)
         l_pA->a_elapsed = m_boxCurr = m_boxSize;
 
     m_bNeedFindPlace = l_pA->m_bNeedFindPlace;
-    if (!m_bNeedFindPlace && l_pA->m_eTargetPlace != eItemPlaceUndefined)
+    m_cur_ammo_type = l_pA->m_cur_ammo_type;
+    if (IsBoxReloadable())
     {
-        m_eItemPlace = l_pA->m_eTargetPlace;
-        if (m_eItemPlace == eItemPlaceSlot)
-            SetSlot(l_pA->m_target_slot);
+        m_ammoSect = m_ammoTypes[m_cur_ammo_type];
+        m_InvShortName = CStringTable().translate(pSettings->r_string(m_ammoSect, "inv_name_short"));
     }
-    l_pA->m_eTargetPlace = eItemPlaceUndefined;
 
     return bResult;
+}
+
+void CWeaponAmmo::net_Export(CSE_Abstract* E)
+{
+    inherited::net_Export(E);
+    CSE_ALifeItemAmmo* ammo = smart_cast<CSE_ALifeItemAmmo*>(E);
+    ammo->a_elapsed = m_boxCurr;
+    ammo->m_cur_ammo_type = m_cur_ammo_type;
 }
 
 void CWeaponAmmo::net_Destroy() { inherited::net_Destroy(); }
@@ -205,7 +187,7 @@ void CWeaponAmmo::OnH_B_Chield() { inherited::OnH_B_Chield(); }
 
 void CWeaponAmmo::OnH_B_Independent(bool just_before_destroy)
 {
-    if (!Useful())
+    if (!Useful() && !IsBoxReloadable())
     {
         if (Local())
         {
@@ -219,12 +201,10 @@ void CWeaponAmmo::OnH_B_Independent(bool just_before_destroy)
 bool CWeaponAmmo::Useful() const
 {
     // Если IItem еще не полностью использованый, вернуть true
-    return m_boxCurr || IsBoxReloadableEmpty();
+    return m_boxCurr/* || IsBoxReloadable()*/;
 }
 
-bool CWeaponAmmo::IsBoxReloadable() const { return !!m_EmptySect && cNameSect() != m_ammoSect; }
-
-bool CWeaponAmmo::IsBoxReloadableEmpty() const { return !m_ammoTypes.empty() && !m_magTypes.empty(); }
+bool CWeaponAmmo::IsBoxReloadable() const { return !m_ammoTypes.empty() && cNameSect() != m_ammoSect; }
 
 bool CWeaponAmmo::Get(CCartridge& cartridge)
 {
@@ -266,13 +246,6 @@ void CWeaponAmmo::UpdateCL()
     VERIFY2(_valid(renderable.xform), *cName());
 }
 
-void CWeaponAmmo::net_Export(CSE_Abstract* E)
-{
-    inherited::net_Export(E);
-    CSE_ALifeItemAmmo* ammo = smart_cast<CSE_ALifeItemAmmo*>(E);
-    ammo->a_elapsed = m_boxCurr;
-}
-
 CInventoryItem* CWeaponAmmo::can_make_killing(const CInventory* inventory) const
 {
     VERIFY(inventory);
@@ -293,15 +266,13 @@ CInventoryItem* CWeaponAmmo::can_make_killing(const CInventory* inventory) const
 float CWeaponAmmo::Weight() const
 {
     float res{inherited::Weight()};
-
     if (!m_boxCurr)
         return res;
 
     if (IsBoxReloadable())
     {
         float one_cartridge_weight = pSettings->r_float(m_ammoSect, "inv_weight") / pSettings->r_float(m_ammoSect, "box_size");
-        res = (float)m_boxCurr * one_cartridge_weight;
-        res += pSettings->r_float(m_EmptySect, "inv_weight");
+        res += ((float)m_boxCurr * one_cartridge_weight);
     }
     else
         res *= (float)m_boxCurr / (float)m_boxSize;
@@ -311,20 +282,19 @@ float CWeaponAmmo::Weight() const
 
 u32 CWeaponAmmo::Cost() const
 {
+    u32 res { inherited::Cost() };
     if (!m_boxCurr)
-        return inherited::Cost();
+        return res;
 
     if (IsBoxReloadable())
     {
         float one_cartridge_cost = pSettings->r_float(m_ammoSect, "cost") / pSettings->r_float(m_ammoSect, "box_size");
-        float res = (float)m_boxCurr * one_cartridge_cost;
-        res += pSettings->r_float(m_EmptySect, "cost");
-        return (u32)ceil(res + 0.5);
+        res += ((float)m_boxCurr * one_cartridge_cost);
+        return res;
     }
-
-    float res = (float)m_cost;
-    res *= (float)m_boxCurr / (float)m_boxSize;
-    return (u32)ceil(res + 0.5);
+    else
+        res *= (float)m_boxCurr / (float)m_boxSize;
+    return res;
 }
 
 void CWeaponAmmo::UnloadBox()
@@ -349,11 +319,10 @@ void CWeaponAmmo::UnloadBox()
 
     // spawn ammo from box
     if (m_boxCurr > 0)
+    {
         SpawnAmmo(m_boxCurr, m_ammoSect.c_str());
-    // destroy motherbox
-    DestroyObject();
-    // spawn empty box
-    SpawnAmmo(0, m_EmptySect.c_str(), smart_cast<CActor*>(H_Parent()));
+        m_boxCurr = 0;
+    }
 
     if (pSettings->line_exist(cNameSect(), "unload_sound"))
     {
@@ -368,12 +337,15 @@ void CWeaponAmmo::ReloadBox(LPCSTR ammo_sect)
     if (!m_pCurrentInventory)
         return;
 
+    if (m_boxCurr && (m_ammoSect.c_str() != ammo_sect))
+        UnloadBox();
+
     bool forActor = g_actor->m_inventory == m_pCurrentInventory;
 
     while (m_boxCurr < m_boxSize)
     {
         CCartridge l_cartridge;
-        auto m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(ammo_sect, forActor, false));
+        auto m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(ammo_sect, forActor));
 
         if (!m_pAmmo || !m_pAmmo->Get(l_cartridge))
             break;
@@ -384,12 +356,10 @@ void CWeaponAmmo::ReloadBox(LPCSTR ammo_sect)
             m_pAmmo->DestroyObject();
     }
 
-    if (IsBoxReloadableEmpty())
-    {
-        u32 type = (u32)std::distance(m_ammoTypes.begin(), std::find(m_ammoTypes.begin(), m_ammoTypes.end(), ammo_sect));
-        DestroyObject();
-        SpawnAmmo(m_boxCurr, m_magTypes[type].c_str(), smart_cast<CActor*>(H_Parent()));
-    }
+    u32 type = (u32)std::distance(m_ammoTypes.begin(), std::find(m_ammoTypes.begin(), m_ammoTypes.end(), ammo_sect));
+    m_cur_ammo_type = type;
+    m_ammoSect = m_ammoTypes[m_cur_ammo_type];
+    m_InvShortName = CStringTable().translate(pSettings->r_string(m_ammoSect, "inv_name_short"));
 
     if (pSettings->line_exist(cNameSect(), "load_sound"))
     {
@@ -401,7 +371,7 @@ void CWeaponAmmo::ReloadBox(LPCSTR ammo_sect)
 
 #include "clsid_game.h"
 #include "ai_object_location.h"
-void CWeaponAmmo::SpawnAmmo(u32 boxCurr, LPCSTR ammoSect, bool need_set_place)
+void CWeaponAmmo::SpawnAmmo(u32 boxCurr, LPCSTR ammoSect)
 {
     CSE_Abstract* D = F_entity_Create(ammoSect);
     if (auto l_pA = smart_cast<CSE_ALifeItemAmmo*>(D))
@@ -422,13 +392,6 @@ void CWeaponAmmo::SpawnAmmo(u32 boxCurr, LPCSTR ammoSect, bool need_set_place)
 
         if (boxCurr == 0xffffffff)
             boxCurr = l_pA->m_boxSize;
-
-        if (need_set_place)
-        {
-            l_pA->m_eTargetPlace = m_eItemPlace;
-            if (m_eItemPlace == eItemPlaceSlot)
-                l_pA->m_target_slot = GetSlot();
-        }
 
         NET_Packet P;
         if (boxCurr > 0)
@@ -457,20 +420,17 @@ void CWeaponAmmo::SpawnAmmo(u32 boxCurr, LPCSTR ammoSect, bool need_set_place)
 
 bool CWeaponAmmo::IsDirectReload(CWeaponAmmo* ammo_to_load)
 {
-    if (!IsBoxReloadable() && !IsBoxReloadableEmpty())
+    if (!IsBoxReloadable())
         return false;
 
     auto ammo_to_load_sect = ammo_to_load->cNameSect();
-    if (IsBoxReloadable() && (m_boxCurr == m_boxSize || ammo_to_load_sect != m_ammoSect))
+    RStringVec::iterator it = std::find(m_ammoTypes.begin(), m_ammoTypes.end(), ammo_to_load_sect);
+    if (it == m_ammoTypes.end())
         return false;
 
-    RStringVec::iterator it{};
-    if (IsBoxReloadableEmpty())
-    {
-        it = std::find(m_ammoTypes.begin(), m_ammoTypes.end(), ammo_to_load_sect);
-        if (it == m_ammoTypes.end())
-            return false;
-    }
+    if (m_boxCurr == m_boxSize || m_boxCurr && ammo_to_load_sect != m_ammoSect)
+        UnloadBox();
+
   
     while (m_boxCurr < m_boxSize)
     {
@@ -485,12 +445,8 @@ bool CWeaponAmmo::IsDirectReload(CWeaponAmmo* ammo_to_load)
             ammo_to_load->DestroyObject();
     }
 
-    if (IsBoxReloadableEmpty())
-    {
-        u32 type = (u32)std::distance(m_ammoTypes.begin(), it);
-        DestroyObject();
-        SpawnAmmo(m_boxCurr, m_magTypes[type].c_str());
-    }
+    m_cur_ammo_type = (u32)std::distance(m_ammoTypes.begin(), it);
+
 
     if (pSettings->line_exist(cNameSect(), "load_sound"))
     {

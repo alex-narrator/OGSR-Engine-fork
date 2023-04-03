@@ -405,8 +405,6 @@ bool CInventoryItem::Attach(PIItem pIItem, bool b_send_event)
         m_bIsPowerSourceAttached = true;
         // Msg("%s m_bIsPowerSourceAttached = %s for item %s", __FUNCTION__, m_bIsPowerSourceAttached ? "true" : "false", Name());
 
-        m_fAttachedPowerSourceCondition = pIItem->GetCondition();
-
         m_fPowerLevel = pIItem->m_fPowerLevel;
 
         InitPowerSource();
@@ -435,12 +433,8 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item, fl
 
         m_cur_power_source = 0;
         if (b_spawn_item)
-        {
-            item_condition = m_fAttachedPowerSourceCondition;
             power_level = m_fPowerLevel;
-        }
         m_fPowerLevel = 0.f;
-        m_fAttachedPowerSourceCondition = 1.f;
 
         InitPowerSource();
         Switch(false);
@@ -521,7 +515,6 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
                 pSE_InventoryItem->m_cur_power_source = 0;
             }
             m_cur_power_source = pSE_InventoryItem->m_cur_power_source;
-            m_fAttachedPowerSourceCondition = pSE_InventoryItem->m_fAttachedPowerSourceCondition;
             //			Msg("%s attached power source %s power level %.f item %s", __FUNCTION__, GetPowerSourceName().c_str(), m_fPowerLevel, Name());
         }
     }
@@ -546,7 +539,6 @@ void CInventoryItem::net_Export(CSE_Abstract* E)
     item->m_fPowerLevel = m_fPowerLevel;
     item->m_cur_power_source = m_cur_power_source;
     item->m_bIsPowerSourceAttached = m_bIsPowerSourceAttached;
-    item->m_fAttachedPowerSourceCondition = m_fAttachedPowerSourceCondition;
 };
 
 void CInventoryItem::save(NET_Packet& packet)
