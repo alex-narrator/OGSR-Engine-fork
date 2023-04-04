@@ -115,13 +115,6 @@ BOOL CWeaponMagazined::net_Spawn(CSE_Abstract* DC)
 {
     BOOL bRes = inherited::net_Spawn(DC);
     const auto wpn = smart_cast<CSE_ALifeItemWeaponMagazined*>(DC);
-    if (HasFireModes() && wpn->m_u8CurFireMode >= m_aFireModes.size())
-    {
-        Msg("! [%s]: %s: wrong m_iCurFireMode[%u/%u]", __FUNCTION__, cName().c_str(), m_iCurFireMode, m_aFireModes.size() - 1);
-        wpn->m_u8CurFireMode = m_aFireModes.size() - 1;
-    }
-    m_iCurFireMode = wpn->m_u8CurFireMode;
-    SetQueueSize(GetCurrentFireMode());
     // multitype ammo loading
     for (u32 i = 0; i < wpn->m_AmmoIDs.size(); i++)
     {
@@ -142,6 +135,43 @@ BOOL CWeaponMagazined::net_Spawn(CSE_Abstract* DC)
         m_fAttachedGrenadeLauncherCondition = wpn->m_fAttachedGrenadeLauncherCondition;
     //
     return bRes;
+}
+
+void CWeaponMagazined::net_Export(CSE_Abstract* E)
+{
+    inherited::net_Export(E);
+    CSE_ALifeItemWeaponMagazined* wpn = smart_cast<CSE_ALifeItemWeaponMagazined*>(E);
+    wpn->m_AmmoIDs.clear();
+    for (u8 i = 0; i < m_magazine.size(); i++)
+    {
+        CCartridge& l_cartridge = *(m_magazine.begin() + i);
+        wpn->m_AmmoIDs.push_back(l_cartridge.m_LocalAmmoType);
+    }
+
+    wpn->m_fAttachedSilencerCondition = m_fAttachedSilencerCondition;
+    wpn->m_fAttachedScopeCondition = m_fAttachedScopeCondition;
+    wpn->m_fAttachedGrenadeLauncherCondition = m_fAttachedGrenadeLauncherCondition;
+}
+
+void CWeaponMagazined::save(NET_Packet& output_packet)
+{
+    inherited::save(output_packet);
+    save_data(m_iCurFireMode, output_packet);
+    save_data(m_iShotNum, output_packet);
+    save_data(m_bScopeSecondMode, output_packet);
+    save_data(m_fRTZoomFactor, output_packet);
+    save_data(m_bNightVisionSwitchedOn, output_packet);
+}
+
+void CWeaponMagazined::load(IReader& input_packet)
+{
+    inherited::load(input_packet);
+    load_data(m_iCurFireMode, input_packet);
+    SetQueueSize(GetCurrentFireMode());
+    load_data(m_iShotNum, input_packet);
+    load_data(m_bScopeSecondMode, input_packet);
+    load_data(m_fRTZoomFactor, input_packet);
+    load_data(m_bNightVisionSwitchedOn, input_packet);
 }
 
 void CWeaponMagazined::Load(LPCSTR section)
@@ -1825,45 +1855,6 @@ float CWeaponMagazined::GetWeaponDeterioration() const
     if (!m_bHasDifferentFireModes || m_iPrefferedFireMode == -1 || u32(GetCurrentFireMode()) <= u32(m_iPrefferedFireMode))
         return inherited::GetWeaponDeterioration();
     return (inherited::GetWeaponDeterioration() * m_iShotNum);
-}
-
-void CWeaponMagazined::save(NET_Packet& output_packet)
-{
-    inherited::save(output_packet);
-    save_data(m_iQueueSize, output_packet);
-    save_data(m_iShotNum, output_packet);
-    save_data(m_bScopeSecondMode, output_packet);
-    save_data(m_fRTZoomFactor, output_packet);
-    save_data(m_bNightVisionSwitchedOn, output_packet);
-}
-
-void CWeaponMagazined::load(IReader& input_packet)
-{
-    inherited::load(input_packet);
-    load_data(m_iQueueSize, input_packet);
-    SetQueueSize(m_iQueueSize);
-    load_data(m_iShotNum, input_packet);
-    load_data(m_bScopeSecondMode, input_packet);
-    load_data(m_fRTZoomFactor, input_packet);
-    load_data(m_bNightVisionSwitchedOn, input_packet);
-}
-
-void CWeaponMagazined::net_Export(CSE_Abstract* E)
-{
-    inherited::net_Export(E);
-    CSE_ALifeItemWeaponMagazined* wpn = smart_cast<CSE_ALifeItemWeaponMagazined*>(E);
-    wpn->m_u8CurFireMode = u8(m_iCurFireMode & 0x00ff);
-    //
-    wpn->m_AmmoIDs.clear();
-    for (u8 i = 0; i < m_magazine.size(); i++)
-    {
-        CCartridge& l_cartridge = *(m_magazine.begin() + i);
-        wpn->m_AmmoIDs.push_back(l_cartridge.m_LocalAmmoType);
-    }
-
-    wpn->m_fAttachedSilencerCondition = m_fAttachedSilencerCondition;
-    wpn->m_fAttachedScopeCondition = m_fAttachedScopeCondition;
-    wpn->m_fAttachedGrenadeLauncherCondition = m_fAttachedGrenadeLauncherCondition;
 }
 
 #include "ui/UIMainIngameWnd.h"

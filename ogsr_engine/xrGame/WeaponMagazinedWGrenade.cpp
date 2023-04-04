@@ -102,11 +102,8 @@ BOOL CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC)
     SetPending(FALSE);
 
     const auto wgl = smart_cast<CSE_ALifeItemWeaponMagazinedWGL*>(DC);
-    //m_bGrenadeMode = wgl->m_bGrenadeMode;
-    m_ammoType2 = m_ammoType2 > 0 ? m_ammoType2 : wgl->ammo_type2;
-    iAmmoElapsed2 = iAmmoElapsed2 > 0 ? iAmmoElapsed2 : wgl->a_elapsed2;
-
-    // Msg("~~[%s][%s] net_Spawn", __FUNCTION__, Name());
+    m_ammoType2 = wgl->ammo_type2;
+    iAmmoElapsed2 = wgl->a_elapsed2;
 
     if (IsGrenadeMode()) // m_bGrenadeMode enabled
     {
@@ -124,10 +121,20 @@ BOOL CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC)
             m_magazine.push_back(m_DefaultCartridge);
 
         m_DefaultCartridge2.Load(m_ammoTypes2[m_ammoType2].c_str(), u8(m_ammoType2));
-        // mag_sz = m_magazine2.size();
         m_magazine2.clear();
-        while ((u32)iAmmoElapsed2 > m_magazine2.size()) //(mag_sz--)
+        while ((u32)iAmmoElapsed2 > m_magazine2.size())
             m_magazine2.push_back(m_DefaultCartridge2);
+        // multitype ammo loading for magazine2
+        for (u32 i = 0; i < wgl->m_AmmoIDs2.size(); i++)
+        {
+            u8 LocalAmmoType2 = wgl->m_AmmoIDs2[i];
+            if (i >= m_magazine2.size())
+                continue;
+            CCartridge& l_cartridge = *(m_magazine2.begin() + i);
+            if (LocalAmmoType2 == l_cartridge.m_LocalAmmoType)
+                continue;
+            l_cartridge.Load(m_ammoTypes2[LocalAmmoType2].c_str(), LocalAmmoType2);
+        }
     }
     else
     {
@@ -153,6 +160,20 @@ BOOL CWeaponMagazinedWGrenade::net_Spawn(CSE_Abstract* DC)
     }
 
     return l_res;
+}
+
+void CWeaponMagazinedWGrenade::net_Export(CSE_Abstract* E)
+{
+    inherited::net_Export(E);
+    CSE_ALifeItemWeaponMagazinedWGL* wgl = smart_cast<CSE_ALifeItemWeaponMagazinedWGL*>(E);
+    wgl->ammo_type2 = (u8)m_ammoType2;
+    wgl->a_elapsed2 = (u16)m_magazine2.size();
+    wgl->m_AmmoIDs2.clear();
+    for (u8 i = 0; i < m_magazine2.size(); i++)
+    {
+        CCartridge& l_cartridge = *(m_magazine2.begin() + i);
+        wgl->m_AmmoIDs2.push_back(l_cartridge.m_LocalAmmoType);
+    }
 }
 
 void CWeaponMagazinedWGrenade::switch2_Idle() { inherited::switch2_Idle(); }
@@ -862,14 +883,6 @@ void CWeaponMagazinedWGrenade::UpdateGrenadeVisibility(bool visibility)
         return;
 
     HudItemData()->set_bone_visible(grenade_bone_name, visibility, TRUE);
-}
-
-void CWeaponMagazinedWGrenade::net_Export(CSE_Abstract* E)
-{
-    inherited::net_Export(E);
-    CSE_ALifeItemWeaponMagazinedWGL* wgl = smart_cast<CSE_ALifeItemWeaponMagazinedWGL*>(E);
-    wgl->ammo_type2 = (u8)m_ammoType2;
-    wgl->a_elapsed2 = (u16)m_magazine2.size();
 }
 
 bool CWeaponMagazinedWGrenade::IsNecessaryItem(const shared_str& item_sect)

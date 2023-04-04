@@ -25,6 +25,7 @@
 #include "alife_registry_wrappers.h"
 #include "alife_simulator_header.h"
 #include "grenade.h"
+#include "PowerBattery.h"
 
 #ifdef DEBUG
 #include "debug_renderer.h"
@@ -366,7 +367,6 @@ void CInventoryItem::OnEvent(NET_Packet& P, u16 type)
     }
 }
 
-#include "PowerBattery.h"
 bool CInventoryItem::CanAttach(PIItem pIItem)
 {
     auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
@@ -546,9 +546,7 @@ void CInventoryItem::save(NET_Packet& packet)
     packet.w_u8((u8)m_eItemPlace);
 
     if (m_eItemPlace == eItemPlaceSlot)
-    {
         packet.w_u8((u8)GetSlot());
-    }
 
     if (object().H_Parent())
     {

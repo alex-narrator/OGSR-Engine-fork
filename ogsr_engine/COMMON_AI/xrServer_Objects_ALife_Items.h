@@ -214,7 +214,6 @@ add_to_type_list(CSE_ALifeItemWeapon)
 #define script_type_list save_type_list(CSE_ALifeItemWeapon)
 
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazined, CSE_ALifeItemWeapon) 
-u8 m_u8CurFireMode{};
 float m_fAttachedScopeCondition{1.f};
 float m_fAttachedGrenadeLauncherCondition{1.f};
 float m_fAttachedSilencerCondition{1.f};
@@ -231,6 +230,7 @@ add_to_type_list(CSE_ALifeItemWeaponMagazined)
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazinedWGL, CSE_ALifeItemWeaponMagazined) 
 u8 ammo_type2{};
 u16 a_elapsed2{};
+xr_vector<u8> m_AmmoIDs2;
 CSE_ALifeItemWeaponMagazinedWGL(LPCSTR caSection);
 virtual ~CSE_ALifeItemWeaponMagazinedWGL();
 
