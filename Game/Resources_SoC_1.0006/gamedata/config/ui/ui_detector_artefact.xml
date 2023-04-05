@@ -9,9 +9,15 @@
     <af_sign width="0.0045" height="0.005" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
     </af_sign>
-
     <palette id="af_sign" width="0.0045" height="0.005" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
+    </palette>
+	
+	<zone_sign width="0.006" height="0.006" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>
+    </zone_sign>
+    <palette id="zone_sign" width="0.006" height="0.006" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>
     </palette>
   </elite>
 
@@ -85,6 +91,9 @@
     <palette id="zone_witches_galantine_weak" width="0.004" height="0.004" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_inGame2_Detector_icon_electro_big</texture>
     </palette>
+    <palette id="zone_witches_galantine" width="0.004" height="0.004" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_inGame2_Detector_icon_electro_big</texture>
+    </palette>	
 
     <palette id="zone_mine_gravitational_strong" width="0.008" height="0.008" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>
@@ -95,6 +104,20 @@
     <palette id="zone_mine_gravitational_weak" width="0.006" height="0.006" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>
     </palette>
+	
+    <palette id="zone_mincer_weak_noart" width="0.006" height="0.006" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>
+    </palette>
+	<palette id="zone_mincer_weak" width="0.006" height="0.006" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>
+    </palette>
+    <palette id="zone_mosquito_bald_weak_noart" width="0.006" height="0.006" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>
+    </palette>	
+    <palette id="zone_mosquito_bald_weak" width="0.006" height="0.006" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>
+    </palette>	
+	
 <!--
     <palette id="zone_mine_gravitational_big" width="0.032" height="0.032" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>

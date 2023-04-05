@@ -26,8 +26,6 @@ void CAdvancedDetector::UpdateAf()
     for (auto& item : m_artefacts.m_ItemInfos)
     { // only nearest
         CArtefact* pAf = item.first;
-        if (pAf->H_Parent())
-            continue;
 
         float d = Position().distance_to(pAf->Position());
         if (d < min_dist)

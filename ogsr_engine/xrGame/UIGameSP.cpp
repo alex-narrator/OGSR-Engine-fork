@@ -55,7 +55,7 @@ void CUIGameSP::shedule_Update(u32 dt)
 void CUIGameSP::HideShownDialogs()
 {
     CUIDialogWnd* mir = MainInputReceiver();
-    if (mir && (mir == InventoryMenu || mir == PdaMenu || mir == TalkMenu || mir == UICarBodyMenu))
+    if (IsDialogsShown())
         mir->GetHolder()->StartStopMenu(mir, true);
 }
 
@@ -64,6 +64,12 @@ void CUIGameSP::SetClGame(game_cl_GameState* g)
     inherited::SetClGame(g);
     m_game = smart_cast<game_cl_Single*>(g);
     R_ASSERT(m_game);
+}
+
+bool CUIGameSP::IsDialogsShown() 
+{
+    CUIDialogWnd* mir = MainInputReceiver();
+    return mir && (mir == InventoryMenu || mir == PdaMenu || mir == TalkMenu || mir == UICarBodyMenu);
 }
 
 extern bool attach_adjust_mode_keyb(int dik);

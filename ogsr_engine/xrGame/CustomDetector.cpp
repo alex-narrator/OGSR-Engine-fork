@@ -43,7 +43,7 @@ bool CCustomDetector::CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate
     if (bres)
     {
         if (CWeapon* W = smart_cast<CWeapon*>(itm))
-            bres = bres && (W->GetState() != CHUDState::eBore) && (W->GetState() != CWeapon::eReload) && (W->GetState() != CWeapon::eSwitch) /*&& !W->IsZoomed()*/;
+            bres = bres && (W->GetState() != CHUDState::eBore) && (W->GetState() != CWeapon::eReload) && (W->GetState() != CWeapon::eSwitch);
     }
 
     return bres;
@@ -64,13 +64,13 @@ bool CCustomDetector::CheckCompatibility(CHudItem* itm)
 
 void CCustomDetector::HideDetector(bool bFastMode)
 {
-    if (GetState() == eIdle)
+    if (GetState() != eHidden || GetState() != eHiding)
         ToggleDetector(bFastMode);
 }
 
 void CCustomDetector::ShowDetector(bool bFastMode)
 {
-    if (GetState() == eHidden)
+    if (GetState() == eHidden || GetState() == eHiding)
         ToggleDetector(bFastMode);
 }
 
@@ -79,7 +79,7 @@ void CCustomDetector::ToggleDetector(bool bFastMode)
     m_bNeedActivation = false;
     m_bFastAnimMode = bFastMode;
 
-    if (GetState() == eHidden)
+    if (GetState() == eHidden || GetState() == eHiding)
     {
         auto actor = smart_cast<CActor*>(H_Parent());
         auto& inv = actor->inventory();
@@ -87,7 +87,7 @@ void CCustomDetector::ToggleDetector(bool bFastMode)
         CHudItem* itm = (iitem) ? iitem->cast_hud_item() : nullptr;
         u16 slot_to_activate = NO_ACTIVE_SLOT;
 
-        if (CheckCompatibilityInt(itm, &slot_to_activate))
+        if (CheckCompatibilityInt(itm, &slot_to_activate) && !IsUIWnd())
         {
             if (slot_to_activate != NO_ACTIVE_SLOT)
             {
@@ -98,11 +98,10 @@ void CCustomDetector::ToggleDetector(bool bFastMode)
             else
             {
                 SwitchState(eShowing);
-                // TurnDetectorInternal(true);
             }
         }
     }
-    else if (GetState() == eIdle)
+    else if (GetState() != eHidden || GetState() != eHiding)
         SwitchState(eHiding);
 }
 
@@ -151,7 +150,6 @@ void CCustomDetector::OnAnimationEnd(u32 state)
     break;
     case eHiding: {
         SwitchState(eHidden);
-        // TurnDetectorInternal(false);
         g_player_hud->detach_item(this);
     }
     break;
@@ -230,21 +228,20 @@ void CCustomDetector::UpdateVisibility()
 {
     // check visibility
     attachable_hud_item* i0 = g_player_hud->attached_item(0);
-    if (i0 && HudItemData())
+    if (GetState() == eIdle || GetState() == eShowing)
     {
         bool bClimb = ((Actor()->MovingState() & mcClimb) != 0);
-        if (bClimb)
+        if (bClimb || IsUIWnd())
         {
             HideDetector(true);
             m_bNeedActivation = true;
         }
-        else
+        else if (i0 && HudItemData())
         {
-            //auto wpn = smart_cast<CWeapon*>(i0->m_parent_hud_item);
-            if (/*wpn*/ i0->m_parent_hud_item)
+            if (i0->m_parent_hud_item)
             {
-                u32 state = /*wpn*/ i0->m_parent_hud_item->GetState();
-                if (/*wpn->IsZoomed() || */ state == eReload || state == eSwitch || smart_cast<CGrenade*>(i0->m_parent_hud_item) && state == eThrowStart)
+                u32 state = i0->m_parent_hud_item->GetState();
+                if (state == eReload || state == eSwitch || smart_cast<CGrenade*>(i0->m_parent_hud_item) && state == eThrowStart)
                 {
                     HideDetector(true);
                     m_bNeedActivation = true;
@@ -261,7 +258,7 @@ void CCustomDetector::UpdateVisibility()
             CHudItem* huditem = (i0) ? i0->m_parent_hud_item : nullptr;
             bool bChecked = !huditem || CheckCompatibilityInt(huditem, 0);
 
-            if (bChecked)
+            if (bChecked && !IsUIWnd())
                 ShowDetector(true);
         }
     }
@@ -430,6 +427,15 @@ bool CCustomDetector::IsAiming() const
     return false;
 }
 
+#include "UIGameSP.h"
+bool CCustomDetector::IsUIWnd() 
+{ 
+    auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+    if (Actor() && pGameSP)
+        return pGameSP->IsDialogsShown();
+    return false;
+}
+
 BOOL CAfList::feel_touch_contact(CObject* O)
 {
     auto pAf = smart_cast<CArtefact*>(O);
@@ -438,7 +444,7 @@ BOOL CAfList::feel_touch_contact(CObject* O)
 
     bool res = (m_TypesMap.find(O->cNameSect()) != m_TypesMap.end()) || (m_TypesMap.find("class_all") != m_TypesMap.end());
     if (res)
-        if (pAf->GetAfRank() > m_af_rank)
+        if (pAf->H_Parent() || pAf->GetAfRank() > m_af_rank)
             res = false;
 
     return res;
@@ -451,7 +457,7 @@ BOOL CZoneList::feel_touch_contact(CObject* O)
         return false;
 
     bool res = (m_TypesMap.find(O->cNameSect()) != m_TypesMap.end()) || (m_TypesMap.find("class_all") != m_TypesMap.end());
-    if (!pZone->IsEnabled())
+    if (!pZone->IsEnabled() || !pZone->VisibleByDetector())
         res = false;
 
     return res;

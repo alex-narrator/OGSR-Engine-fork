@@ -41,6 +41,7 @@ public:
     void ChangeLevel(GameGraph::_GRAPH_ID game_vert_id, u32 level_vert_id, Fvector pos, Fvector ang, Fvector pos2, Fvector ang2, bool b);
 
     virtual void HideShownDialogs();
+    virtual bool IsDialogsShown();
 
     CUIInventoryWnd* InventoryMenu;
     CUIPdaWnd* PdaMenu;

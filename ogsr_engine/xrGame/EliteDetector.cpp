@@ -6,6 +6,7 @@
 #include "ui/ArtefactDetectorUI.h"
 
 constexpr const char* AF_SIGN = "af_sign";
+constexpr const char* ZONE_SIGN = "zone_sign";
 
 CEliteDetector::CEliteDetector() { m_artefacts.m_af_rank = 3; }
 
@@ -29,9 +30,6 @@ void CEliteDetector::UpdateAf()
     for (auto& item : m_artefacts.m_ItemInfos)
     {
         auto pAf = item.first;
-        if (pAf->H_Parent())
-            continue;
-
         ui().RegisterItemToDraw(pAf->Position(), AF_SIGN);
         TryMakeArtefactVisible(pAf);
 
@@ -78,10 +76,7 @@ void CEliteDetector::UpdateZones()
     for (auto& item : m_zones.m_ItemInfos)
     { // all
         auto pZone = item.first;
-        if (!pZone->VisibleByDetector())
-            continue;
-
-        ui().RegisterItemToDraw(pZone->Position(), AF_SIGN);
+        ui().RegisterItemToDraw(pZone->Position(), ZONE_SIGN);
 
         ITEM_INFO& zone_info = item.second;
         ITEM_TYPE* item_type = zone_info.curr_ref;

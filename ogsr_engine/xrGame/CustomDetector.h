@@ -215,4 +215,6 @@ protected:
     virtual Fvector GetDirectionForCollision() override;
 
     virtual u8 GetCurrentHudOffsetIdx() const override { return IsAiming(); };
+
+    virtual bool IsUIWnd();
 };
