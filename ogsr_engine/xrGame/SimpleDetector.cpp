@@ -4,8 +4,6 @@
 #include "../xr_3da/LightAnimLibrary.h"
 #include "player_hud.h"
 
-CSimpleDetector::CSimpleDetector() { m_artefacts.m_af_rank = 1; }
-
 void CSimpleDetector::CreateUI()
 {
     R_ASSERT(!m_ui);
@@ -25,6 +23,7 @@ void CSimpleDetector::UpdateAf()
     for (auto& item : m_artefacts.m_ItemInfos)
     { // only nearest
         CArtefact* pAf = item.first;
+
         float d = Position().distance_to(pAf->Position());
         if (d < min_dist)
         {
@@ -55,7 +54,7 @@ void CSimpleDetector::UpdateAf()
         af_info.snd_time = 0;
         HUD_SOUND::PlaySound(item_type->detect_snds, Fvector{}, this, true, false);
         ui().Flash(true, fRelPow);
-        if (item_type->detect_snds.m_activeSnd)
+        if (!item_type->detect_snds.sounds.empty() && item_type->detect_snds.m_activeSnd)
             item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
     }
     else
@@ -97,7 +96,7 @@ void CSimpleDetector::UpdateZones()
             zone_info.snd_time = 0;
             HUD_SOUND::PlaySound(item_type->detect_snds, Fvector{}, this, true, false);
             ui().Flash(true, fRelPow);
-            if (item_type->detect_snds.m_activeSnd)
+            if (!item_type->detect_snds.sounds.empty() && item_type->detect_snds.m_activeSnd)
                 item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
         }
         else

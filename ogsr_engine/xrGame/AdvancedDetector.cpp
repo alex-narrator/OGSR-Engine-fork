@@ -4,8 +4,6 @@
 #include "player_hud.h"
 #include "game_object_space.h"
 
-CAdvancedDetector::CAdvancedDetector() { m_artefacts.m_af_rank = 2; }
-
 void CAdvancedDetector::CreateUI()
 {
     R_ASSERT(!m_ui);
@@ -36,9 +34,21 @@ void CAdvancedDetector::UpdateAf()
         TryMakeArtefactVisible(pAf);
     }
 
+    CArtefact* pCurrentAf = it->first;
+    // direction
+    Fvector dir_to_artefact{};
+    dir_to_artefact.sub(pCurrentAf->Position(), Device.vCameraPosition);
+    dir_to_artefact.normalize();
+    float _ang_af = dir_to_artefact.getH();
+    float _ang_cam = Device.vCameraDirection.getH();
+    float _diff = angle_difference_signed(_ang_af, _ang_cam);
+    ui().SetValue(_diff, dir_to_artefact);
+
     ITEM_INFO& af_info = it->second;
     ITEM_TYPE* item_type = af_info.curr_ref;
-    CArtefact* pCurrentAf = it->first;
+
+    if (item_type->detect_snds.sounds.empty())
+        return;
 
     float dist = min_dist;
     float fRelPow = (dist / m_fDetectRadius);
@@ -59,16 +69,6 @@ void CAdvancedDetector::UpdateAf()
     }
     else
         af_info.snd_time += Device.fTimeDelta;
-
-    // direction
-    Fvector dir_to_artefact{};
-    dir_to_artefact.sub(pCurrentAf->Position(), Device.vCameraPosition);
-    dir_to_artefact.normalize();
-    float _ang_af = dir_to_artefact.getH();
-    float _ang_cam = Device.vCameraDirection.getH();
-    float _diff = angle_difference_signed(_ang_af, _ang_cam);
-
-    ui().SetValue(_diff, dir_to_artefact);
 }
 
 void CAdvancedDetector::UpdateZones()
@@ -86,9 +86,6 @@ void CAdvancedDetector::UpdateZones()
         if (!pZone->VisibleByDetector())
             continue;
 
-        ITEM_INFO& zone_info = item.second;
-        ITEM_TYPE* item_type = zone_info.curr_ref;
-
         CSpaceRestrictor* pSR = smart_cast<CSpaceRestrictor*>(pZone);
         float dist = pSR->distance_to(Position());
         if (dist < 0.f)
@@ -100,6 +97,12 @@ void CAdvancedDetector::UpdateZones()
             min_dist = dist;
             pNearestZone = item.first;
         }
+
+        ITEM_INFO& zone_info = item.second;
+        ITEM_TYPE* item_type = zone_info.curr_ref;
+        
+        if (item_type->detect_snds.sounds.empty())
+            continue;
 
         float fRelPow = (dist / m_fDetectRadius);
         clamp(fRelPow, 0.f, 1.f);

@@ -9,7 +9,7 @@ class CEliteDetector : public CCustomDetector
     typedef CCustomDetector inherited;
 
 public:
-    CEliteDetector();
+    CEliteDetector(){};
     virtual ~CEliteDetector() = default;
     virtual void render_item_3d_ui() override;
     virtual bool render_item_3d_ui_query() override;
@@ -29,7 +29,7 @@ class CScientificDetector : public CEliteDetector
     typedef CEliteDetector inherited;
 
 public:
-    CScientificDetector();
+    CScientificDetector(){};
     virtual ~CScientificDetector();
     virtual LPCSTR ui_xml_tag() const override { return "scientific"; }
 

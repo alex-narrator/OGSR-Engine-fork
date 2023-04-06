@@ -85,10 +85,11 @@ public:
                 ITEM_TYPE item_type{};
 
                 xr_sprintf(temp, "%s_freq_%d", prefix, i);
-                item_type.freq = pSettings->r_fvector2(sect, temp);
+                item_type.freq = READ_IF_EXISTS(pSettings, r_fvector2, sect, temp, Fvector2{});
 
                 xr_sprintf(temp, "%s_sound_%d_", prefix, i);
-                HUD_SOUND::LoadSound(sect, temp, item_type.detect_snds, SOUND_TYPE_ITEM);
+                if (pSettings->line_exist(sect, temp))
+                    HUD_SOUND::LoadSound(sect, temp, item_type.detect_snds, SOUND_TYPE_ITEM);
 
                 m_TypesMap.emplace(std::move(item_sect), std::move(item_type));
 
@@ -102,10 +103,11 @@ public:
                     ITEM_TYPE item_type{};
 
                     xr_sprintf(temp, "%s_freq_all", prefix);
-                    item_type.freq = pSettings->r_fvector2(sect, temp);
+                    item_type.freq = READ_IF_EXISTS(pSettings, r_fvector2, sect, temp, Fvector2{});
 
                     xr_sprintf(temp, "%s_sound_all_", prefix);
-                    HUD_SOUND::LoadSound(sect, temp, item_type.detect_snds, SOUND_TYPE_ITEM);
+                    if (pSettings->line_exist(sect, temp))
+                        HUD_SOUND::LoadSound(sect, temp, item_type.detect_snds, SOUND_TYPE_ITEM);
 
                     m_TypesMap.emplace("class_all", std::move(item_type));
                 }
@@ -123,8 +125,8 @@ protected:
     virtual BOOL feel_touch_contact(CObject* O) override;
 
 public:
-    CAfList() : m_af_rank(0) {}
-    int m_af_rank;
+    CAfList() = default;
+    int m_af_rank{};
 };
 
 class CZoneList : public CDetectList<CCustomZone>
@@ -148,6 +150,7 @@ protected:
     bool m_bFastAnimMode{};
     bool m_bNeedActivation{};
     shared_str m_nightvision_particle{};
+    bool m_bSectionMarks{};
 
 public:
     CCustomDetector() = default;

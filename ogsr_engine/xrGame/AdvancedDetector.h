@@ -7,7 +7,7 @@ class CAdvancedDetector : public CCustomDetector
     typedef CCustomDetector inherited;
 
 public:
-    CAdvancedDetector();
+    CAdvancedDetector(){};
     virtual ~CAdvancedDetector() = default;
     virtual void on_a_hud_attach() override;
     virtual void on_b_hud_detach() override;

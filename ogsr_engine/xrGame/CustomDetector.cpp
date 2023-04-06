@@ -189,7 +189,10 @@ void CCustomDetector::Load(LPCSTR section)
     m_fAfVisRadius = READ_IF_EXISTS(pSettings, r_float, section, "af_vis_radius", 2.0f);
     m_fDecayRate = READ_IF_EXISTS(pSettings, r_float, section, "decay_rate", 0.f); // Alundaio
     m_artefacts.load(section, "af");
+    m_artefacts.m_af_rank = READ_IF_EXISTS(pSettings, r_u32, section, "af_rank", 0);
     m_zones.load(section, "zone");
+
+    m_bSectionMarks = READ_IF_EXISTS(pSettings, r_bool, section, "use_section_marks", false);
 
     m_nightvision_particle = READ_IF_EXISTS(pSettings, r_string, section, "night_vision_particle", nullptr);
     m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", 0.25f);
@@ -375,7 +378,7 @@ void CCustomDetector::UpdateNightVisionMode()
         return;
 
     auto& actor_cam = pActor->Cameras();
-    bool bNightVision = pActor && actor_cam.GetPPEffector(EEffectorPPType(effNightvision)) || actor_cam.GetPPEffector(EEffectorPPType(effNightvisionScope));
+    bool bNightVision = pActor && (actor_cam.GetPPEffector(EEffectorPPType(effNightvision)) || actor_cam.GetPPEffector(EEffectorPPType(effNightvisionScope)));
 
     bool bOn = bNightVision && pActor == Level().CurrentViewEntity() && IsPowerOn() && GetHUDmode() && // in hud mode only
         m_nightvision_particle.size();

@@ -8,8 +8,6 @@
 constexpr const char* AF_SIGN = "af_sign";
 constexpr const char* ZONE_SIGN = "zone_sign";
 
-CEliteDetector::CEliteDetector() { m_artefacts.m_af_rank = 3; }
-
 void CEliteDetector::CreateUI()
 {
     R_ASSERT(!m_ui);
@@ -30,7 +28,7 @@ void CEliteDetector::UpdateAf()
     for (auto& item : m_artefacts.m_ItemInfos)
     {
         auto pAf = item.first;
-        ui().RegisterItemToDraw(pAf->Position(), AF_SIGN);
+        ui().RegisterItemToDraw(pAf->Position(), m_bSectionMarks ? pAf->cNameSect() : AF_SIGN);
         TryMakeArtefactVisible(pAf);
 
         float d = Position().distance_to(pAf->Position());
@@ -43,6 +41,9 @@ void CEliteDetector::UpdateAf()
 
     ITEM_INFO& af_info = it->second;
     ITEM_TYPE* item_type = af_info.curr_ref;
+    
+    if (item_type->detect_snds.sounds.empty())
+        return;
 
     float dist = min_dist;
 
@@ -76,10 +77,13 @@ void CEliteDetector::UpdateZones()
     for (auto& item : m_zones.m_ItemInfos)
     { // all
         auto pZone = item.first;
-        ui().RegisterItemToDraw(pZone->Position(), ZONE_SIGN);
+        ui().RegisterItemToDraw(pZone->Position(), m_bSectionMarks ? pZone->cNameSect() : ZONE_SIGN);
 
         ITEM_INFO& zone_info = item.second;
         ITEM_TYPE* item_type = zone_info.curr_ref;
+
+        if (item_type->detect_snds.sounds.empty())
+            continue;
 
         CSpaceRestrictor* pSR = smart_cast<CSpaceRestrictor*>(pZone);
         float dist = pSR->distance_to(Position());
@@ -235,7 +239,7 @@ void CUIArtefactDetectorElite::Draw()
     m_wrk_area->GetAbsolutePos(rp);
 
     Fmatrix M{}, Mc{};
-    float h, p;
+    float h{}, p{};
     Device.vCameraDirection.getHP(h, p);
     Mc.setHPB(h, 0, 0);
     Mc.c.set(Device.vCameraPosition);
@@ -291,7 +295,6 @@ void CUIArtefactDetectorElite::RegisterItemToDraw(const Fvector& p, const shared
     m_items_to_draw.push_back(itm);
 }
 
-CScientificDetector::CScientificDetector() { m_artefacts.m_af_rank = 3; }
 CScientificDetector::~CScientificDetector() {}
 
 void CScientificDetector::UpdateWork()
@@ -301,18 +304,14 @@ void CScientificDetector::UpdateWork()
     for (auto& item : m_artefacts.m_ItemInfos)
     {
         auto pAf = item.first;
-        if (pAf->H_Parent())
-            continue;
-
-        ui().RegisterItemToDraw(pAf->Position(), pAf->cNameSect());
-
+        ui().RegisterItemToDraw(pAf->Position(), m_bSectionMarks ? pAf->cNameSect() : AF_SIGN);
         TryMakeArtefactVisible(pAf);
     }
 
     for (auto& item : m_zones.m_ItemInfos)
     {
         auto pZone = item.first;
-        ui().RegisterItemToDraw(pZone->Position(), pZone->cNameSect());
+        ui().RegisterItemToDraw(pZone->Position(), m_bSectionMarks ? pZone->cNameSect() : ZONE_SIGN);
     }
 
     m_ui->update();

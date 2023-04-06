@@ -8,7 +8,7 @@ class CSimpleDetector : public CCustomDetector
     typedef CCustomDetector inherited;
 
 public:
-    CSimpleDetector();
+    CSimpleDetector(){};
     virtual ~CSimpleDetector() = default;
 
 protected:
