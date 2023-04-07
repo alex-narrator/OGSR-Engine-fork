@@ -336,6 +336,7 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
     if (pSettings->section_exist(caSection) && pSettings->line_exist(caSection, "visual"))
         set_visual(pSettings->r_string(caSection, "visual"));
 
+    m_addon_flags.zero();
     m_weapon_flags.zero();
 
 	m_scope_status = (EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, caSection, "scope_status", 0);
@@ -356,7 +357,7 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
     {
         if (pSettings->line_exist(caSection, "scope_installed"))
         {
-            m_weapon_flags.set(eWeaponAddonScope, true);
+            m_addon_flags.set(eWeaponAddonScope, true);
             m_cur_scope = pSettings->r_u8(s_name, "scope_installed");
         }
     }
@@ -364,7 +365,7 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
     {
         if (pSettings->line_exist(caSection, "silencer_installed"))
         {
-            m_weapon_flags.set(eWeaponAddonSilencer, true);
+            m_addon_flags.set(eWeaponAddonSilencer, true);
             m_cur_silencer = pSettings->r_u8(s_name, "silencer_installed");
         }
     }
@@ -372,7 +373,7 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
     {
         if (pSettings->line_exist(caSection, "launcher_installed"))
         {
-            m_weapon_flags.set(eWeaponAddonGrenadeLauncher, true);
+            m_addon_flags.set(eWeaponAddonGrenadeLauncher, true);
             m_cur_glauncher = pSettings->r_u8(s_name, "launcher_installed");
         }
     }
@@ -380,7 +381,7 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
     {
         if (pSettings->line_exist(caSection, "laser_installed"))
         {
-            m_weapon_flags.set(eWeaponAddonLaser, true);
+            m_addon_flags.set(eWeaponAddonLaser, true);
             m_cur_laser = pSettings->r_u8(s_name, "laser_installed");
         }
     }
@@ -388,7 +389,7 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
     {
         if (pSettings->line_exist(caSection, "flashlight_installed"))
         {
-            m_weapon_flags.set(eWeaponAddonFlashlight, true);
+            m_addon_flags.set(eWeaponAddonFlashlight, true);
             m_cur_flashlight = pSettings->r_u8(s_name, "flashlight_installed");
         }
     }
@@ -396,7 +397,7 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
     {
         if (pSettings->line_exist(caSection, "stock_installed"))
         {
-            m_weapon_flags.set(eWeaponAddonStock, true);
+            m_addon_flags.set(eWeaponAddonStock, true);
             m_cur_stock = pSettings->r_u8(s_name, "stock_installed");
         }
     }
@@ -404,7 +405,7 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
     {
         if (pSettings->line_exist(caSection, "extender_installed"))
         {
-            m_weapon_flags.set(eWeaponAddonExtender, true);
+            m_addon_flags.set(eWeaponAddonExtender, true);
             m_cur_extender = pSettings->r_u8(s_name, "extender_installed");
         }
     }
@@ -412,7 +413,7 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
     {
         if (pSettings->line_exist(caSection, "forend_installed"))
         {
-            m_weapon_flags.set(eWeaponAddonForend, true);
+            m_addon_flags.set(eWeaponAddonForend, true);
             m_cur_forend = pSettings->r_u8(s_name, "forend_installed");
         }
     }
@@ -447,13 +448,14 @@ void CSE_ALifeItemWeapon::UPDATE_Read(NET_Packet& tNetPacket)
 
     tNetPacket.r_u8(wpn_flags);
     tNetPacket.r_u16(a_elapsed);
-    tNetPacket.r_u16(m_weapon_flags.flags);
+    tNetPacket.r_u8(m_addon_flags.flags);
     tNetPacket.r_u8(ammo_type);
     tNetPacket.r_u8(wpn_state);
     tNetPacket.r_u8(m_bZoom);
     //
     if (m_wVersion > 118)
     {
+        tNetPacket.r_u8(m_weapon_flags.flags);
         tNetPacket.r_u8(m_cur_scope);
         tNetPacket.r_u8(m_cur_silencer);
         tNetPacket.r_u8(m_cur_glauncher);
@@ -472,11 +474,12 @@ void CSE_ALifeItemWeapon::UPDATE_Write(NET_Packet& tNetPacket)
 
     tNetPacket.w_u8(wpn_flags);
     tNetPacket.w_u16(a_elapsed);
-    tNetPacket.w_u16(m_weapon_flags.get());
+    tNetPacket.w_u8(m_addon_flags.get());
     tNetPacket.w_u8(ammo_type);
     tNetPacket.w_u8(wpn_state);
     tNetPacket.w_u8(m_bZoom);
     //
+    tNetPacket.w_u8(m_weapon_flags.get());
     tNetPacket.w_u8(m_cur_scope);
     tNetPacket.w_u8(m_cur_silencer);
     tNetPacket.w_u8(m_cur_glauncher);
@@ -496,7 +499,7 @@ void CSE_ALifeItemWeapon::STATE_Read(NET_Packet& tNetPacket, u16 size)
     tNetPacket.r_u8(wpn_state);
 
     if (m_wVersion > 40)
-        tNetPacket.r_u16(m_weapon_flags.flags);
+        tNetPacket.r_u8(m_addon_flags.flags);
 
     if (m_wVersion > 46)
         tNetPacket.r_u8(ammo_type);
@@ -508,7 +511,7 @@ void CSE_ALifeItemWeapon::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u16(a_current);
     tNetPacket.w_u16(a_elapsed);
     tNetPacket.w_u8(wpn_state);
-    tNetPacket.w_u16(m_weapon_flags.get());
+    tNetPacket.w_u8(m_addon_flags.get());
     tNetPacket.w_u8(ammo_type);
 }
 

@@ -143,7 +143,7 @@ add_to_type_list(CSE_ALifeItemAmmo)
     };
 
 //текущее состояние аддонов
-enum EWeaponAddonState : u16
+enum EWeaponAddonState : u8
 {
     eWeaponAddonScope = 1 << 0,
     eWeaponAddonGrenadeLauncher = 1 << 1,
@@ -153,12 +153,15 @@ enum EWeaponAddonState : u16
     eWeaponAddonStock = 1 << 5,
     eWeaponAddonExtender = 1 << 6,
     eWeaponAddonForend = 1 << 7,
-    //
-    eWeaponMisfire = 1 << 8,
-    eWeaponMagazineAttached = 1 << 9,
-    eWeaponLaserOn = 1 << 10,
-    eWeaponFlashlightOn = 1 << 11,
-    eWeaponGrenadeMode = 1 << 12,
+};
+
+enum EWeaponState : u8
+{
+    eWeaponMisfire = 1 << 0,
+    eWeaponMagazineAttached = 1 << 1,
+    eWeaponLaserOn = 1 << 2,
+    eWeaponFlashlightOn = 1 << 3,
+    eWeaponGrenadeMode = 1 << 4,
 };
 
 EWeaponAddonStatus m_scope_status{};
@@ -180,7 +183,8 @@ float m_fHitPower;
 ALife::EHitType m_tHitType;
 LPCSTR m_caAmmoSections;
 u32 m_dwAmmoAvailable{};
-Flags16 m_weapon_flags;
+Flags8 m_addon_flags;
+Flags8 m_weapon_flags;
 u8 m_bZoom{};
 u32 m_ef_main_weapon_type;
 u32 m_ef_weapon_type;

@@ -405,7 +405,6 @@ void CWeapon::Load(LPCSTR section)
     {
         if (pSettings->line_exist(section, "stock_name"))
         {
-            m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponAddonStock;
             str = pSettings->r_string(section, "stock_name");
             for (int i = 0, count = _GetItemCount(str); i < count; ++i)
             {
@@ -434,7 +433,6 @@ void CWeapon::Load(LPCSTR section)
     {
         if (pSettings->line_exist(section, "forend_name"))
         {
-            m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponAddonForend;
             str = pSettings->r_string(section, "forend_name");
             for (int i = 0, count = _GetItemCount(str); i < count; ++i)
             {
@@ -608,6 +606,7 @@ BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
     CSE_ALifeItemWeapon* E = smart_cast<CSE_ALifeItemWeapon*>(e);
 
     iAmmoElapsed = E->a_elapsed;
+    m_flagsAddOnState = E->m_addon_flags.get();
     m_flagsWeaponState = E->m_weapon_flags.get();
     m_ammoType = E->ammo_type;
     SetState(E->wpn_state);
@@ -762,11 +761,12 @@ void CWeapon::net_Export(CSE_Abstract* E)
     CSE_ALifeItemWeapon* wpn = smart_cast<CSE_ALifeItemWeapon*>(E);
     wpn->wpn_flags = IsUpdating() ? 1 : 0;
     wpn->a_elapsed = u16(iAmmoElapsed);
-    wpn->m_weapon_flags.flags = m_flagsWeaponState;
+    wpn->m_addon_flags.flags = m_flagsAddOnState;
     wpn->ammo_type = (u8)m_ammoType;
     wpn->wpn_state = (u8)GetState();
     wpn->m_bZoom = (u8)m_bZoomMode;
     //
+    wpn->m_weapon_flags.flags = m_flagsWeaponState;
     wpn->m_cur_scope = m_cur_scope;
     wpn->m_cur_silencer = m_cur_silencer;
     wpn->m_cur_glauncher = m_cur_glauncher;
@@ -2030,28 +2030,28 @@ bool CWeapon::IsAddonAttached(u32 addon) const
     switch (addon)
     {
     case eSilencer:
-        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eSilencerStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonSilencer)) ||
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eSilencerStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer)) ||
             CSE_ALifeItemWeapon::eAddonPermanent == m_eSilencerStatus;
     case eScope:
-        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eScopeStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonScope)) ||
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eScopeStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope)) ||
             CSE_ALifeItemWeapon::eAddonPermanent == m_eScopeStatus;
     case eLauncher:
-        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher)) ||
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher)) ||
             CSE_ALifeItemWeapon::eAddonPermanent == m_eGrenadeLauncherStatus;
     case eLaser:
-        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eLaserStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonLaser)) ||
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eLaserStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonLaser)) ||
             CSE_ALifeItemWeapon::eAddonPermanent == m_eLaserStatus;
     case eFlashlight:
-        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eFlashlightStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight)) ||
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eFlashlightStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight)) ||
             CSE_ALifeItemWeapon::eAddonPermanent == m_eFlashlightStatus;
     case eStock:
-        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eStockStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonStock)) ||
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eStockStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock)) ||
             CSE_ALifeItemWeapon::eAddonPermanent == m_eStockStatus;
     case eExtender:
-        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonExtender)) ||
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender)) ||
             CSE_ALifeItemWeapon::eAddonPermanent == m_eExtenderStatus;
     case eForend:
-        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eForendStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonForend)) ||
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eForendStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend)) ||
             CSE_ALifeItemWeapon::eAddonPermanent == m_eForendStatus;
     case eMagazine: return m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponMagazineAttached;
     default: return false;

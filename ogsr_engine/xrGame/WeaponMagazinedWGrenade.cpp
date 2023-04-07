@@ -552,7 +552,7 @@ bool CWeaponMagazinedWGrenade::CanAttach(PIItem pIItem)
 
     auto pGrenadeLauncher = smart_cast<CGrenadeLauncher*>(pIItem);
 
-    if (pGrenadeLauncher && CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 == (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
+    if (pGrenadeLauncher && CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
         std::find(m_glaunchers.begin(), m_glaunchers.end(), pIItem->object().cNameSect()) != m_glaunchers.end())
         return true;
     else
@@ -565,7 +565,7 @@ bool CWeaponMagazinedWGrenade::CanDetach(const char* item_section_name)
     if (pActor && !pActor->HasRequiredTool(item_section_name))
         return false;
 
-    if (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
+    if (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
         std::find(m_glaunchers.begin(), m_glaunchers.end(), item_section_name) != m_glaunchers.end())
         return true;
     else
@@ -576,11 +576,11 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
 {
     auto pGrenadeLauncher = smart_cast<CGrenadeLauncher*>(pIItem);
 
-    if (pGrenadeLauncher && CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 == (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher))
+    if (pGrenadeLauncher && CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher))
     {
         auto it = std::find(m_glaunchers.begin(), m_glaunchers.end(), pIItem->object().cNameSect());
         m_cur_glauncher = (u8)std::distance(m_glaunchers.begin(), it);
-        m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
+        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
 
         m_fAttachedGrenadeLauncherCondition = pIItem->GetCondition();
 
@@ -599,7 +599,7 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
 
 bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spawn_item, float item_condition)
 {
-    if (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 != (m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
+    if (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
         std::find(m_glaunchers.begin(), m_glaunchers.end(), item_section_name) != m_glaunchers.end())
     {
         // https://github.com/revolucas/CoC-Xray/pull/5/commits/9ca73da34a58ceb48713b1c67608198c6af26db2
@@ -611,7 +611,7 @@ bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spaw
         UnloadMagazine();
         PerformSwitchGL();
 
-        m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
+        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
 
         m_cur_glauncher = 0;
         if (b_spawn_item)

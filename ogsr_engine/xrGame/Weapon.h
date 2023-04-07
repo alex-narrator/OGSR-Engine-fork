@@ -168,8 +168,8 @@ public:
 
     const shared_str GetMagazineIconSect(bool = false) const;
 
-    u8 GetAddonsState() const { return m_flagsWeaponState; };
-    void SetAddonsState(u8 st) { m_flagsWeaponState = st; }
+    u8 GetAddonsState() const { return m_flagsAddOnState; };
+    void SetAddonsState(u8 st) { m_flagsAddOnState = st; }
 
     xr_vector<shared_str> m_sWpn_scope_bones;
     shared_str m_sWpn_silencer_bone;
@@ -192,7 +192,8 @@ private:
 
 protected:
     // стан
-    u16 m_flagsWeaponState{};
+    u8 m_flagsAddOnState{};
+    u8 m_flagsWeaponState{};
 
     // возможность подключения различных аддонов
     ALife::EWeaponAddonStatus m_eScopeStatus{};
