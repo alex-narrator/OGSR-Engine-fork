@@ -4,9 +4,9 @@
 #include "HudSound.h"
 #include "CustomZone.h"
 #include "Artifact.h"
+#include "entity_alive.h"
 #include "ai_sounds.h"
 
-class CCustomZone;
 class CInventoryOwner;
 
 struct ITEM_TYPE
@@ -76,7 +76,7 @@ public:
         u32 i = 1;
         do
         {
-            string16 temp;
+            string128 temp{};
             xr_sprintf(temp, "%s_class_%d", prefix, i);
             if (pSettings->line_exist(sect, temp))
             {
@@ -139,6 +139,16 @@ public:
     virtual ~CZoneList();
 };
 
+class CCreatureList : public CDetectList<CEntityAlive>
+{
+protected:
+    virtual BOOL feel_touch_contact(CObject* O) override;
+
+public:
+    CCreatureList() = default;
+    virtual ~CCreatureList();
+};
+
 class CUIArtefactDetectorBase;
 
 class CCustomDetector : public CHudItemObject
@@ -192,8 +202,6 @@ public:
 
 protected:
     bool CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate);
-    // void TurnDetectorInternal(bool b);
-    // void UpdateNightVisionMode(bool b_off);
     void UpdateVisibility();
     virtual void UpdateWork();
     virtual void UpdateAf() {}
@@ -210,6 +218,7 @@ protected:
     float m_fDecayRate{}; // Alundaio
     CAfList m_artefacts;
     CZoneList m_zones;
+    CCreatureList m_creatures;
 
     HUD_SOUND sndShow, sndHide;
 

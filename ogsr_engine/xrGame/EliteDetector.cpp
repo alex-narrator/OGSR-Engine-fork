@@ -7,6 +7,7 @@
 
 constexpr const char* AF_SIGN = "af_sign";
 constexpr const char* ZONE_SIGN = "zone_sign";
+constexpr const char* CREATURE_SIGN = "creature_sign";
 
 void CEliteDetector::CreateUI()
 {
@@ -301,17 +302,10 @@ void CScientificDetector::UpdateWork()
 {
     ui().Clear();
 
-    for (auto& item : m_artefacts.m_ItemInfos)
+    for (const auto& item : m_creatures.m_ItemInfos)
     {
-        auto pAf = item.first;
-        ui().RegisterItemToDraw(pAf->Position(), m_bSectionMarks ? pAf->cNameSect() : AF_SIGN);
-        TryMakeArtefactVisible(pAf);
-    }
-
-    for (auto& item : m_zones.m_ItemInfos)
-    {
-        auto pZone = item.first;
-        ui().RegisterItemToDraw(pZone->Position(), m_bSectionMarks ? pZone->cNameSect() : ZONE_SIGN);
+        auto pCreature = item.first;
+        ui().RegisterItemToDraw(pCreature->Position(), m_bSectionMarks ? pCreature->cNameSect() : CREATURE_SIGN);
     }
 
     m_ui->update();

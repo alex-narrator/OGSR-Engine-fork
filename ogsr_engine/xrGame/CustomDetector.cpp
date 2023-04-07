@@ -169,6 +169,7 @@ CCustomDetector::~CCustomDetector()
 
     m_artefacts.destroy();
     m_zones.destroy();
+    m_creatures.destroy();
 
     Switch(false);
     xr_delete(m_ui);
@@ -188,11 +189,11 @@ void CCustomDetector::Load(LPCSTR section)
     m_fDetectRadius = READ_IF_EXISTS(pSettings, r_float, section, "detect_radius", 15.0f);
     m_fAfVisRadius = READ_IF_EXISTS(pSettings, r_float, section, "af_vis_radius", 2.0f);
     m_fDecayRate = READ_IF_EXISTS(pSettings, r_float, section, "decay_rate", 0.f); // Alundaio
+    m_bSectionMarks = READ_IF_EXISTS(pSettings, r_bool, section, "use_section_marks", false);
     m_artefacts.load(section, "af");
     m_artefacts.m_af_rank = READ_IF_EXISTS(pSettings, r_u32, section, "af_rank", 0);
     m_zones.load(section, "zone");
-
-    m_bSectionMarks = READ_IF_EXISTS(pSettings, r_bool, section, "use_section_marks", false);
+    m_creatures.load(section, "creature");
 
     m_nightvision_particle = READ_IF_EXISTS(pSettings, r_string, section, "night_vision_particle", nullptr);
     m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", 0.25f);
@@ -215,6 +216,7 @@ void CCustomDetector::shedule_Update(u32 dt)
 
     m_artefacts.feel_touch_update(P, m_fDetectRadius);
     m_zones.feel_touch_update(P, m_fDetectRadius);
+    m_creatures.feel_touch_update(P, m_fDetectRadius);
 }
 
 bool CCustomDetector::IsPowerOn() const { return m_bWorking && H_Parent() && H_Parent() == Level().CurrentViewEntity(); }
@@ -290,6 +292,7 @@ void CCustomDetector::OnH_B_Independent(bool just_before_destroy)
 
     m_artefacts.clear();
     m_zones.clear();
+    m_creatures.clear();
 
     if (GetState() != eHidden)
     {
@@ -467,6 +470,25 @@ BOOL CZoneList::feel_touch_contact(CObject* O)
 }
 
 CZoneList::~CZoneList()
+{
+    clear();
+    destroy();
+}
+
+BOOL CCreatureList::feel_touch_contact(CObject* O)
+{
+    auto pCreature = smart_cast<CEntityAlive*>(O);
+    if (!pCreature)
+        return false;
+
+    bool res = (m_TypesMap.find(O->cNameSect()) != m_TypesMap.end()) || (m_TypesMap.find("class_all") != m_TypesMap.end());
+    if (!pCreature->g_Alive() || smart_cast<CActor*>(pCreature))
+        res = false;
+
+    return res;
+}
+
+CCreatureList::~CCreatureList()
 {
     clear();
     destroy();

@@ -6,16 +6,10 @@
       </auto_static>
     </wrk_area>
 
-    <af_sign width="0.0045" height="0.005" stretch="1" alignment="c">
-      <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
-    </af_sign>
     <palette id="af_sign" width="0.0045" height="0.005" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
     </palette>
 	
-	<zone_sign width="0.006" height="0.006" stretch="1" alignment="c">
-      <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>
-    </zone_sign>
     <palette id="zone_sign" width="0.006" height="0.006" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>
     </palette>
@@ -27,6 +21,20 @@
         <texture shader="hud\p3d">ui_temp_ad3_radar_glow</texture>
       </auto_static>
     </wrk_area>
+	
+    <palette id="creature_sign" width="0.004" height="0.004" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
+    </palette>	
+	
+	<palette id="stalker" width="0.004" height="0.004" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
+    </palette>	
+	<palette id="m_trader" width="0.004" height="0.004" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
+    </palette>
+	<palette id="m_army_soldier" width="0.004" height="0.004" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
+    </palette>		
 
     <palette id="zone_mine_acidic_weak" width="0.004" height="0.004" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_inGame2_Detector_icon_acid_big</texture>
