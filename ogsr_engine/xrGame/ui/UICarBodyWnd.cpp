@@ -646,8 +646,7 @@ void CUICarBodyWnd::Update()
     }
     CheckForcedWeightUpdate();
     Actor()->EnableUIDOF(true);
-    if (Core.Features.test(xrCore::Feature::inventory_crouch) && m_pOtherGO)
-        Actor()->UpdateCameraDirection(m_pOtherGO);
+    Actor()->UpdateCameraDirection(m_pOtherGO);
     inherited::Update();
 }
 
@@ -665,7 +664,6 @@ void CUICarBodyWnd::Show()
         actor->SetWeaponHideState(INV_STATE_INV_WND, true);
         actor->SetRuckAmmoPlacement(true);
         actor->RepackAmmo();
-        actor->EnableUIDOF(true);
         actor->TryInventoryCrouch(true);
         actor->EnableInvEffector(true);
     }

@@ -490,7 +490,6 @@ void CUIInventoryWnd::Show()
         actor->SetWeaponHideState(INV_STATE_INV_WND, true);
         actor->SetRuckAmmoPlacement(true); // установим флаг перезарядки из рюкзака
         actor->RepackAmmo();
-        actor->EnableUIDOF(true);
         actor->TryInventoryCrouch(true);
         actor->EnableInvEffector(true);
     }
