@@ -466,7 +466,7 @@ void CUIInventoryWnd::Update()
 
     UIStaticTimeString.SetText(InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
     UIStaticTime.Show(Actor()->HasPDAWorkable());
-    Actor()->EnableInventoryDOF(true);
+    Actor()->EnableUIDOF(true);
 
     CUIWindow::Update();
 }
@@ -490,8 +490,9 @@ void CUIInventoryWnd::Show()
         actor->SetWeaponHideState(INV_STATE_INV_WND, true);
         actor->SetRuckAmmoPlacement(true); // установим флаг перезарядки из рюкзака
         actor->RepackAmmo();
-        actor->EnableInventoryDOF(true);
+        actor->EnableUIDOF(true);
         actor->TryInventoryCrouch(true);
+        actor->EnableInvEffector(true);
     }
 }
 
@@ -513,8 +514,9 @@ void CUIInventoryWnd::Hide()
         }
         actor->SetWeaponHideState(INV_STATE_INV_WND, false);
         actor->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
-        actor->EnableInventoryDOF(false);
+        actor->EnableUIDOF(false);
         actor->TryInventoryCrouch(false);
+        actor->EnableInvEffector(false);
     }
 
     HideSlotsHighlight();

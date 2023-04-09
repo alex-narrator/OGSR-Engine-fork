@@ -186,28 +186,6 @@ void CUITalkWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     inherited::SendMessage(pWnd, msg, pData);
 }
 
-//////////////////////////////////////////////////////////////////////////
-void UpdateCameraDirection(CGameObject* pTo)
-{
-    CCameraBase* cam = Actor()->cam_Active();
-
-    Fvector des_dir;
-    Fvector des_pt;
-    pTo->Center(des_pt);
-    des_pt.y += pTo->Radius() * 0.5f;
-
-    des_dir.sub(des_pt, cam->vPosition);
-
-    float p, h;
-    des_dir.getHP(h, p);
-
-    if (angle_difference(cam->yaw, -h) > 0.2)
-        cam->yaw = angle_inertion_var(cam->yaw, -h, 0.15f, 0.2f, PI_DIV_6, Device.fTimeDelta);
-
-    if (angle_difference(cam->pitch, -p) > 0.2)
-        cam->pitch = angle_inertion_var(cam->pitch, -p, 0.15f, 0.2f, PI_DIV_6, Device.fTimeDelta);
-}
-
 void CUITalkWnd::Update()
 {
     // остановить разговор, если нужно
@@ -231,7 +209,7 @@ void CUITalkWnd::Update()
         UpdateQuestions();
     }
     inherited::Update();
-    UpdateCameraDirection(smart_cast<CGameObject*>(m_pOthersInvOwner));
+    Actor()->UpdateCameraDirection(smart_cast<CGameObject*>(m_pOthersInvOwner));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -252,7 +230,6 @@ void CUITalkWnd::Hide()
 {
     InventoryUtilities::SendInfoToActor("ui_talk_hide");
     StopSnd();
-
     inherited::Hide();
     UITradeWnd->Hide();
     if (!m_pActor)

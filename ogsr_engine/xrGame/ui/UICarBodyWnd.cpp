@@ -284,7 +284,9 @@ void CUICarBodyWnd::Hide()
     {
         actor->SetWeaponHideState(INV_STATE_INV_WND, false);
         actor->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
-        actor->EnableInventoryDOF(false);
+        actor->EnableUIDOF(false);
+        actor->TryInventoryCrouch(false);
+        actor->EnableInvEffector(false);
     }
     m_bShowAllInv = false;
     PlaySnd(eInvSndClose);
@@ -643,7 +645,9 @@ void CUICarBodyWnd::Update()
         GetHolder()->StartStopMenu(this, true);
     }
     CheckForcedWeightUpdate();
-    Actor()->EnableInventoryDOF(true);
+    Actor()->EnableUIDOF(true);
+    if (Core.Features.test(xrCore::Feature::inventory_crouch) && m_pOtherGO)
+        Actor()->UpdateCameraDirection(m_pOtherGO);
     inherited::Update();
 }
 
@@ -661,7 +665,9 @@ void CUICarBodyWnd::Show()
         actor->SetWeaponHideState(INV_STATE_INV_WND, true);
         actor->SetRuckAmmoPlacement(true);
         actor->RepackAmmo();
-        actor->EnableInventoryDOF(true);
+        actor->EnableUIDOF(true);
+        actor->TryInventoryCrouch(true);
+        actor->EnableInvEffector(true);
     }
     PlaySnd(eInvSndOpen);
 }

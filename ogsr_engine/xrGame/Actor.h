@@ -280,6 +280,8 @@ protected:
     float m_fGroggyTreshold{};
     ref_sound sndGroggy{};
     shared_str m_GroggyEffector{};
+    shared_str m_InvEffOpen{};
+    shared_str m_InvEffClose{};
 
 private:
     void SwitchOutBorder(bool new_border_state);
@@ -376,6 +378,7 @@ public:
     IC CCameraBase* cam_FirstEye() { return cameras[eacFirstEye]; }
     IC EActorCameras active_cam() { return cam_active; } // KD: need to know which cam active outside actor methods
     CEffectorBobbing* GetEffectorBobbing() { return pCamBobbing; }
+    void UpdateCameraDirection(CGameObject* pTo);
 
 protected:
     void cam_Set(EActorCameras style);
@@ -825,7 +828,7 @@ protected:
     u32 m_uActiveItemInfoStartTime{};
     u32 m_uGearInfoStartTime{};
     u32 saved_state{(u32)-1};
-    Fvector4 dof_params_inventory{};
+    Fvector4 dof_params_ui{};
 
 public:
     float GetItemBoostedParams(int);
@@ -838,7 +841,8 @@ public:
 
     bool IsFreeHands() const;
     void TryInventoryCrouch(bool);
-    void EnableInventoryDOF(bool);
+    void EnableUIDOF(bool);
+    void EnableInvEffector(bool);
 
 protected:
     svector<float, eRestoreBoostMax> m_ActorItemBoostedParam;

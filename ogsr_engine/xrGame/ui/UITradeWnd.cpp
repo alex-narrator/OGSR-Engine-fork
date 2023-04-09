@@ -535,8 +535,6 @@ void CUITradeWnd::Draw()
         m_uidata->UIDealMsg->Draw();
 }
 
-extern void UpdateCameraDirection(CGameObject* pTo);
-
 void CUITradeWnd::Update()
 {
     EListType et = eNone;
@@ -557,7 +555,7 @@ void CUITradeWnd::Update()
         UpdateLists(et);
 
     inherited::Update();
-    UpdateCameraDirection(smart_cast<CGameObject*>(m_pOthersInvOwner));
+    Actor()->UpdateCameraDirection(smart_cast<CGameObject*>(m_pOthersInvOwner));
 
     if (m_uidata->UIDealMsg)
     {

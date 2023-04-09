@@ -39,3 +39,4 @@ constexpr auto effPoltergeistTeleDetectStartEffect = 2048;
 #define eCEActorMoving ((ECamEffectorType)(cefNext + 18))
 #define eCEItemUse ((ECamEffectorType)(cefNext + 19))
 #define eCEBoostEffect ((ECamEffectorType)(cefNext + 20))
+#define eCEUIWindowEffect ((ECamEffectorType)(cefNext + 21))

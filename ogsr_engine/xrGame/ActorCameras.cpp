@@ -187,7 +187,7 @@ void CActor::cam_Update(float dt, float fFOV)
 
     Fvector point = {0, CurrentHeight + current_ik_cam_shift, 0}, dangle = {0, 0, 0};
 
-    Fmatrix xform, xformR;
+    Fmatrix xform{}, xformR{};
     xform.setXYZ(0, r_torso.yaw, 0);
     xform.translate_over(XFORM().c);
 
@@ -196,7 +196,7 @@ void CActor::cam_Update(float dt, float fFOV)
     {
         if (!fis_zero(r_torso_tgt_roll))
         {
-            Fvector src_pt, tgt_pt;
+            Fvector src_pt{}, tgt_pt{};
             float radius = point.y * 0.5f;
             float alpha = r_torso_tgt_roll / 2.f;
             float dZ = ((PI_DIV_2 - ((PI + alpha) / 2)));
@@ -206,7 +206,7 @@ void CActor::cam_Update(float dt, float fFOV)
             float valid_angle = alpha;
             // xform with roll
             xformR.setXYZ(-r_torso.pitch, r_torso.yaw, -dZ);
-            Fmatrix33 mat;
+            Fmatrix33 mat{};
             mat.i = xformR.i;
             mat.j = xformR.j;
             mat.k = xformR.k;
@@ -216,7 +216,7 @@ void CActor::cam_Update(float dt, float fFOV)
             w /= 2.f;
             h /= 2.f;
             // find tris
-            Fbox box;
+            Fbox box{};
             box.invalidate();
             box.modify(src_pt);
             box.modify(tgt_pt);
@@ -224,7 +224,7 @@ void CActor::cam_Update(float dt, float fFOV)
 
             // query
             Fvector bc, bd;
-            Fbox xf;
+            Fbox xf{};
             xf.xform(box, xform);
             xf.get_CD(bc, bd);
 
@@ -426,4 +426,27 @@ void CActor::LoadSleepEffector(LPCSTR section)
     m_pSleepEffector->time = pSettings->r_float(section, "time");
     m_pSleepEffector->time_attack = pSettings->r_float(section, "time_attack");
     m_pSleepEffector->time_release = pSettings->r_float(section, "time_release");
+}
+
+//////////////////////////////////////////////////////////////////////////
+void CActor::UpdateCameraDirection(CGameObject* pTo)
+{
+    auto cam = cam_Active();
+
+    Fvector des_dir{};
+    Fvector des_pt;
+    pTo->Center(des_pt);
+    if (auto creature = smart_cast<CEntityAlive*>(pTo); creature && creature->g_Alive())
+        des_pt.y += pTo->Radius() * 0.5f;
+
+    des_dir.sub(des_pt, cam->vPosition);
+
+    float p, h;
+    des_dir.getHP(h, p);
+
+    if (angle_difference(cam->yaw, -h) > 0.2)
+        cam->yaw = angle_inertion_var(cam->yaw, -h, 0.15f, 0.2f, PI_DIV_6, Device.fTimeDelta);
+
+    if (angle_difference(cam->pitch, -p) > 0.2)
+        cam->pitch = angle_inertion_var(cam->pitch, -p, 0.15f, 0.2f, PI_DIV_6, Device.fTimeDelta);
 }

@@ -104,7 +104,6 @@ void CUITalkDialogWnd::Show()
     else
         UIToTradeButton.SetText(*CStringTable().translate("ui_st_barter")); // напишем "бартер" на кнопке, вместо "торговать"
     //
-
     ResetAll();
 }
 

@@ -409,7 +409,9 @@ void CActor::Load(LPCSTR section)
 
     m_uActiveItemInfoTTL = READ_IF_EXISTS(pSettings, r_u32, section, "active_item_info_ttl", 0);
     m_uGearInfoTTL = READ_IF_EXISTS(pSettings, r_u32, section, "gear_info_ttl", 0);
-    dof_params_inventory = READ_IF_EXISTS(pSettings, r_fvector4, "features", "dof_inventory_params", (Fvector4{}));
+    dof_params_ui = READ_IF_EXISTS(pSettings, r_fvector4, "features", "dof_ui_params", (Fvector4{}));
+    m_InvEffOpen = READ_IF_EXISTS(pSettings, r_string, section, "inv_effector_open", nullptr);
+    m_InvEffClose = READ_IF_EXISTS(pSettings, r_string, section, "inv_effector_close", nullptr);
 }
 
 void CActor::PHHit(SHit& H) { m_pPhysics_support->in_Hit(H, !g_Alive()); }
@@ -2053,8 +2055,19 @@ void CActor::TryInventoryCrouch(bool enable)
 
 }
 
-void CActor::EnableInventoryDOF(bool enable) 
+void CActor::EnableUIDOF(bool enable) 
 { 
-    Fvector4 dof_param{enable ? dof_params_inventory : Fvector4{}}; 
+    Fvector4 dof_param{enable ? dof_params_ui : Fvector4{}}; 
     shader_exports.set_dof_params(dof_param.x, dof_param.y, dof_param.z, dof_param.w);
+}
+
+void CActor::EnableInvEffector(bool open)
+{
+    RemoveEffector(this, eCEUIWindowEffect);
+    if (!g_Alive())
+        return;
+    if (open && !!m_InvEffOpen)
+        AddEffector(this, eCEUIWindowEffect, m_InvEffOpen);
+    else if (!open && !!m_InvEffClose)
+        AddEffector(this, eCEUIWindowEffect, m_InvEffClose);
 }
