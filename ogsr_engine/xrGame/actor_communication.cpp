@@ -255,9 +255,6 @@ void CActor::RunTalkDialog(CInventoryOwner* talk_partner)
 
 void CActor::StartTalk(CInventoryOwner* talk_partner, bool)
 {
-    if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)))
-        det->HideDetector(true);
-
     CInventoryOwner::StartTalk(talk_partner);
 }
 /*
