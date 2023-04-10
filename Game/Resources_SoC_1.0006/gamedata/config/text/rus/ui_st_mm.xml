@@ -242,6 +242,9 @@
 	<string id="ui_mm_dof">
 		<text>Ефект глибини поля зору</text>
 	</string>
+	<string id="ui_mm_r2_dof_ui_wnd">
+		<text>Ефект глибини поля зору для діалогових вікон</text>
+	</string>
 	<string id="ui_mm_r2_reload_dof">
 		<text>Ефект глибини поля зору при перезаряджанні</text>
 	</string>

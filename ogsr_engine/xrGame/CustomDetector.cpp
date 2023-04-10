@@ -181,6 +181,18 @@ BOOL CCustomDetector::net_Spawn(CSE_Abstract* DC)
     return inherited::net_Spawn(DC);
 }
 
+void CCustomDetector::save(NET_Packet& output_packet)
+{
+    inherited::save(output_packet);
+    save_data(GetState() == eIdle, output_packet);
+}
+
+void CCustomDetector::load(IReader& input_packet)
+{
+    inherited::load(input_packet);
+    load_data(m_bNeedActivation, input_packet);
+}
+
 void CCustomDetector::Load(LPCSTR section)
 {
     m_animation_slot = 7;

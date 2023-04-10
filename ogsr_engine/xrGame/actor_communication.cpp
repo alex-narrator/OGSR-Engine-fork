@@ -30,7 +30,6 @@
 #include "infoportion.h"
 #include "ai/monsters/basemonster/base_monster.h"
 #include "ai/trader/ai_trader.h"
-#include "CustomDetector.h"
 #include "inventory.h"
 
 void CActor::AddEncyclopediaArticle(const CInfoPortion* info_portion, bool revert) const

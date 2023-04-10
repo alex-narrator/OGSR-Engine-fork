@@ -394,6 +394,9 @@
 	<string id="video_settings_name_r2_steep_parallax">
 		<text>Покращений рельєф поверхонь - r2_steep_parallax</text>
 	</string>
+	<string id="video_settings_name_dof_ui_wnd">
+		<text>Ефект глибині різкості при відкритих діалогових вікнах - g_dof_ui_wnd</text>
+	</string>	
 	<string id="video_settings_name_dof_reload">
 		<text>Ефект глибині різкості при перезаряджанні зброї - r2_dof_reload</text>
 	</string>
@@ -463,6 +466,10 @@
 		<text>Ця опція регулює ефект покращеної рельєфності поверхонь з використанням алгоритму Steep parallax mapping. 
 		Цей алгоритм використовує для розрахунку рельєфності трасування промені у просторі карти висот, що дає більш реалістичний та якісний ефект.</text>
 	</string>
+	<string id="video_settings_desc_dof_ui_wnd">
+		<text>Увімкнення ефекту глибини поля зору - розмиття фону при відкритих вікнах інвентаря, обшуку, ділогу та ПДА.
+		\nНалаштувати інтенсивність ефекту можна параметром dof_ui_params у секції додаткових параметрів features</text>
+	</string>	
 	<string id="video_settings_desc_dof_reload">
 		<text>Увімкнення ефекту глибини поля зору - фокусування очей на зброї підчас перезаряджання.</text>
 	</string>

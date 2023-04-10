@@ -169,6 +169,9 @@ public:
     virtual BOOL net_Spawn(CSE_Abstract* DC) override;
     virtual void Load(LPCSTR section) override;
 
+    virtual void save(NET_Packet& output_packet);
+    virtual void load(IReader& input_packet);
+
     virtual void OnH_A_Chield() override;
     virtual void OnH_B_Independent(bool just_before_destroy) override;
 

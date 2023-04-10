@@ -32,9 +32,12 @@
 	<palette id="m_trader" width="0.004" height="0.004" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
     </palette>
-	<palette id="m_army_soldier" width="0.004" height="0.004" stretch="1" alignment="c">
+	<palette id="esc_soldier_respawn_1" width="0.004" height="0.004" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
     </palette>		
+	<palette id="esc_stalker_respawn_1" width="0.004" height="0.004" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
+    </palette>	
 
     <palette id="zone_mine_acidic_weak" width="0.004" height="0.004" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_inGame2_Detector_icon_acid_big</texture>

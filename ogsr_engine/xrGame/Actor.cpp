@@ -409,7 +409,7 @@ void CActor::Load(LPCSTR section)
 
     m_uActiveItemInfoTTL = READ_IF_EXISTS(pSettings, r_u32, section, "active_item_info_ttl", 0);
     m_uGearInfoTTL = READ_IF_EXISTS(pSettings, r_u32, section, "gear_info_ttl", 0);
-    dof_params_ui = READ_IF_EXISTS(pSettings, r_fvector4, "features", "dof_ui_params", (Fvector4{}));
+    dof_params_ui = READ_IF_EXISTS(pSettings, r_fvector4, "features", "dof_ui_params", (Fvector4{0, 0, 1, 0}));
     m_InvEffOpen = READ_IF_EXISTS(pSettings, r_string, section, "inv_effector_open", nullptr);
     m_InvEffClose = READ_IF_EXISTS(pSettings, r_string, section, "inv_effector_close", nullptr);
 }
@@ -2057,6 +2057,8 @@ void CActor::TryInventoryCrouch(bool enable)
 
 void CActor::EnableUIDOF(bool enable) 
 { 
+    if (!psActorFlags.test(AF_DOF_UI_WND))
+        return;
     Fvector4 dof_param{enable ? dof_params_ui : Fvector4{}}; 
     shader_exports.set_dof_params(dof_param.x, dof_param.y, dof_param.z, dof_param.w);
 }

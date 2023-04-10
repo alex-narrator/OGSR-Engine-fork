@@ -41,6 +41,7 @@ local adv_vid_opt_params = {
 	--
 	{ "npc_torch",             "check", 0, hint_colors.yellow, "video_settings_name_npc_torch", "video_settings_desc_npc_torch" },
 	--
+	{ "dof_ui_wnd",            "check", 0, hint_colors.green , "video_settings_name_dof_ui_wnd", "video_settings_desc_dof_ui_wnd" },
 	{ "dof_reload",            "check", 0, hint_colors.green , "video_settings_name_dof_reload", "video_settings_desc_dof_reload" },
 	{ "dof_zoom",              "check", 0, hint_colors.green , "video_settings_name_dof_zoom", "video_settings_desc_dof_zoom" },
 	{ "dof_zoom_param",        "track", 0, hint_colors.green , "", ""                                             },
