@@ -10,6 +10,7 @@
 #include "player_hud.h"
 #include "Weapon.h"
 #include "Grenade.h"
+#include "string_table.h"
 
 ITEM_INFO::~ITEM_INFO()
 {
@@ -166,6 +167,7 @@ CCustomDetector::~CCustomDetector()
 {
     HUD_SOUND::DestroySound(sndShow);
     HUD_SOUND::DestroySound(sndHide);
+    HUD_SOUND::DestroySound(sndSwitch);
 
     m_artefacts.destroy();
     m_zones.destroy();
@@ -184,12 +186,14 @@ BOOL CCustomDetector::net_Spawn(CSE_Abstract* DC)
 void CCustomDetector::save(NET_Packet& output_packet)
 {
     inherited::save(output_packet);
+    save_data(m_bAfMode, output_packet);
     save_data(GetState() == eIdle, output_packet);
 }
 
 void CCustomDetector::load(IReader& input_packet)
 {
     inherited::load(input_packet);
+    load_data(m_bAfMode, input_packet);
     load_data(m_bNeedActivation, input_packet);
 }
 
@@ -207,11 +211,15 @@ void CCustomDetector::Load(LPCSTR section)
     m_zones.load(section, "zone");
     m_creatures.load(section, "creature");
 
+    m_bCanSwitchModes = m_artefacts.not_empty() && m_zones.not_empty();
+
     m_nightvision_particle = READ_IF_EXISTS(pSettings, r_string, section, "night_vision_particle", nullptr);
     m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", 0.25f);
 
     HUD_SOUND::LoadSound(section, "snd_draw", sndShow, SOUND_TYPE_ITEM_TAKING);
     HUD_SOUND::LoadSound(section, "snd_holster", sndHide, SOUND_TYPE_ITEM_HIDING);
+    if (pSettings->line_exist(section, "snd_switch"))
+        HUD_SOUND::LoadSound(section, "snd_switch", sndSwitch);
 }
 
 void CCustomDetector::shedule_Update(u32 dt)
@@ -378,7 +386,7 @@ Fvector CCustomDetector::GetDirectionForCollision()
 
 void CCustomDetector::TryMakeArtefactVisible(CArtefact* artefact)
 {
-    if (artefact->CanBeInvisible())
+    if (artefact->CanBeInvisible() && (!CanSwitchModes() || IsAfMode()))
     {
         float dist = Position().distance_to(artefact->Position());
         if (dist < m_fAfVisRadius)
@@ -443,6 +451,28 @@ bool CCustomDetector::IsAiming() const
         return wpn && wpn->IsAiming();
     }
     return false;
+}
+
+void CCustomDetector::SwitchMode() 
+{
+    if (!CanSwitchModes())
+        return;
+
+    m_bAfMode = !m_bAfMode;
+
+    AnimationExist("anm_switch_mode") ? PlayHUDMotion("anm_switch_mode", true, GetState()) : PlayHUDMotion({"anm_show_fast"}, true, GetState(), false);
+    PlaySound(sndSwitch, Position());
+    ShowCurrentModeMsg();
+}
+
+void CCustomDetector::ShowCurrentModeMsg()
+{
+    if (!CanSwitchModes())
+        return;
+
+    string1024 str;
+    sprintf(str, "%s: %s", NameShort(), CStringTable().translate(m_bAfMode ? "st_af_mode" : "st_zone_mode").c_str());
+    HUD().GetUI()->AddInfoMessage("item_usage", str, false);
 }
 
 #include "UIGameSP.h"

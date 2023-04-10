@@ -204,7 +204,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
     break;
     case kWPN_8: {
         if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)))
-            det->ToggleDetector(g_player_hud->attached_item(0) != nullptr);
+            det->ToggleDetector(/*g_player_hud->attached_item(0) != nullptr*/false);
     }
     break;
     case kUSE: ActorUse(); break;
@@ -315,6 +315,11 @@ void CActor::IR_OnKeyboardPress(int cmd)
             GetBackpack()->SetDropManual(TRUE);
             HUD().GetUI()->AddInfoMessage("item_usage", "st_backpack_dropped");
         }
+    }
+    break;
+    case kWPN_FUNC: {
+        if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)); det && det->GetHUDmode())
+            det->SwitchMode();
     }
     break;
     }
@@ -876,6 +881,9 @@ void CActor::ActorQuickKnifeStab()
 
 void CActor::ActorCheckout()
 {
+    if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)); det && det->GetHUDmode())
+        det->ShowCurrentModeMsg();
+
     if (!inventory().ActiveItem() || m_bShowActiveItemInfo)
         return;
 

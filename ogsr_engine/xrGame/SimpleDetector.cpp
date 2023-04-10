@@ -53,7 +53,8 @@ void CSimpleDetector::UpdateAf()
     {
         af_info.snd_time = 0;
         HUD_SOUND::PlaySound(item_type->detect_snds, Fvector{}, this, true, false);
-        ui().Flash(true, fRelPow);
+        if (!CanSwitchModes() || IsAfMode())
+            ui().Flash(true, fRelPow);
         if (!item_type->detect_snds.sounds.empty() && item_type->detect_snds.m_activeSnd)
             item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
     }
@@ -95,7 +96,8 @@ void CSimpleDetector::UpdateZones()
         {
             zone_info.snd_time = 0;
             HUD_SOUND::PlaySound(item_type->detect_snds, Fvector{}, this, true, false);
-            ui().Flash(true, fRelPow);
+            if (!CanSwitchModes() || !IsAfMode())
+                ui().Flash(true, fRelPow);
             if (!item_type->detect_snds.sounds.empty() && item_type->detect_snds.m_activeSnd)
                 item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
         }

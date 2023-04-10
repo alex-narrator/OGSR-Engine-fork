@@ -117,6 +117,7 @@ public:
 
         } while (true);
     }
+    virtual bool not_empty() const { return !m_TypesMap.empty(); };
 };
 
 class CAfList : public CDetectList<CArtefact>
@@ -161,6 +162,8 @@ protected:
     bool m_bNeedActivation{};
     shared_str m_nightvision_particle{};
     bool m_bSectionMarks{};
+    bool m_bCanSwitchModes{};
+    bool m_bAfMode{};
 
 public:
     CCustomDetector() = default;
@@ -203,6 +206,11 @@ public:
     bool IsZoomed() const override;
     bool IsAiming() const;
 
+    virtual bool CanSwitchModes() const { return m_bCanSwitchModes; }
+    virtual void SwitchMode();
+    virtual bool IsAfMode() const { return m_bAfMode; }
+    virtual void ShowCurrentModeMsg();
+
 protected:
     bool CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate);
     void UpdateVisibility();
@@ -223,7 +231,7 @@ protected:
     CZoneList m_zones;
     CCreatureList m_creatures;
 
-    HUD_SOUND sndShow, sndHide;
+    HUD_SOUND sndShow, sndHide, sndSwitch;
 
     virtual size_t GetWeaponTypeForCollision() const override { return Detector; }
     virtual Fvector GetPositionForCollision() override;
