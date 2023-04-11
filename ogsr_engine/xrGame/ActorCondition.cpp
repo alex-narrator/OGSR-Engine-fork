@@ -72,8 +72,6 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
 
     m_fBleedingPowerDecrease = READ_IF_EXISTS(pSettings, r_float, section, "bleeding_power_dec", 0.f);
     m_fMinPowerWalkJump = READ_IF_EXISTS(pSettings, r_float, section, "min_power_walk_jump", 1.0f);
-    m_fMinHealthRadiation = READ_IF_EXISTS(pSettings, r_float, section, "min_health_radiation", 1.0f);
-    m_fMinHealthRadiationTreshold = READ_IF_EXISTS(pSettings, r_float, section, "min_health_radiation_treshold", 0.f);
     m_fAlcoholSatietyIntens = READ_IF_EXISTS(pSettings, r_float, section, "satiety_to_alcohol_effector_intensity", 1.0f);
     m_fExerciseStressFactor = READ_IF_EXISTS(pSettings, r_float, section, "exercise_stress_factor", 1.0f);
     m_fZoomEffectorK = READ_IF_EXISTS(pSettings, r_float, section, "power_to_zoom_effector_k", 10.0f);
@@ -334,7 +332,7 @@ float CActorCondition::GetRegenK() { return (1.0f - GetRadiation()) * GetSatiety
 
 float CActorCondition::GetSmoothOwerweightKoef()
 {
-    float val = 1.0f;
+    float val{1.0f};
     float power_k = m_fMinPowerWalkJump + (1.0f - m_fMinPowerWalkJump) * GetPower(); // коэф влияния выносливости
     float overweight_k = object().GetCarryWeight() > object().MaxCarryWeight() ? // считаем коэф. только если есть перегруз
         object().MaxCarryWeight() / object().GetCarryWeight() : // коэф влияния перегруза
@@ -366,12 +364,6 @@ void CActorCondition::UpdateHealth()
     VERIFY(_valid(m_fDeltaHealth));
 
     ChangeBleeding(GetWoundIncarnation() * m_fDeltaTime);
-
-    // радиация влияет на максимальное здоровье
-    if (m_fRadiation > m_fMinHealthRadiationTreshold) // защита от потенциального деления на 0 если m_fRadiationTreshold = 1
-        object().SetMaxHealth(m_fMinHealthRadiation + (1.0f - m_fMinHealthRadiation) * (1.0f - m_fRadiation) / (1.0f - m_fMinHealthRadiationTreshold));
-    else
-        object().SetMaxHealth(1.0f);
 }
 
 void CActorCondition::UpdatePower()

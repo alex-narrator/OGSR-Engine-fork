@@ -129,9 +129,6 @@ public:
     //
     float m_fMinPowerWalkJump{1.f};
     //
-    float m_fMinHealthRadiation{1.f};
-    float m_fMinHealthRadiationTreshold{};
-    //
     float m_fAlcoholSatietyIntens{1.f}; // коэфф. для рассчета интенсивности постэффекта опьянения от голода
     //
     float m_fExerciseStressFactor{1.f}; // фактор физнагрузки - множитель для коэффициента нагрузки актора при спринте и прыжке
