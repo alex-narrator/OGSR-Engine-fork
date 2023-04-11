@@ -114,7 +114,7 @@ void CCustomDetector::OnStateSwitch(u32 S, u32 oldState)
     {
     case eShowing: {
         g_player_hud->attach_item(this);
-        HUD_SOUND::PlaySound(sndShow, Fvector{}, this, !!GetHUDmode(), false, false);
+        PlaySound(sndShow, Position());
         PlayHUDMotion({m_bFastAnimMode ? "anm_show_fast" : "anm_show"}, false, GetState());
         SetPending(TRUE);
         if (!IsPowerOn())
@@ -124,7 +124,7 @@ void CCustomDetector::OnStateSwitch(u32 S, u32 oldState)
     case eHiding: {
         if (oldState != eHiding)
         {
-            HUD_SOUND::PlaySound(sndHide, Fvector{}, this, !!GetHUDmode(), false, false);
+            PlaySound(sndHide, Position());
             PlayHUDMotion({m_bFastAnimMode ? "anm_hide_fast" : "anm_hide"}, false, GetState());
             SetPending(TRUE);
         }
@@ -145,8 +145,6 @@ void CCustomDetector::OnAnimationEnd(u32 state)
     {
     case eShowing: {
         SwitchState(eIdle);
-        if (m_fDecayRate > 0.f)
-            this->SetCondition(-m_fDecayRate);
     }
     break;
     case eHiding: {
@@ -204,7 +202,6 @@ void CCustomDetector::Load(LPCSTR section)
 
     m_fDetectRadius = READ_IF_EXISTS(pSettings, r_float, section, "detect_radius", 15.0f);
     m_fAfVisRadius = READ_IF_EXISTS(pSettings, r_float, section, "af_vis_radius", 2.0f);
-    m_fDecayRate = READ_IF_EXISTS(pSettings, r_float, section, "decay_rate", 0.f); // Alundaio
     m_bSectionMarks = READ_IF_EXISTS(pSettings, r_bool, section, "use_section_marks", false);
     m_artefacts.load(section, "af");
     m_artefacts.m_af_rank = READ_IF_EXISTS(pSettings, r_u32, section, "af_rank", 0);
@@ -386,7 +383,7 @@ Fvector CCustomDetector::GetDirectionForCollision()
 
 void CCustomDetector::TryMakeArtefactVisible(CArtefact* artefact)
 {
-    if (artefact->CanBeInvisible() && (!CanSwitchModes() || IsAfMode()))
+    if (artefact->CanBeInvisible() && GetHUDmode() && (!CanSwitchModes() || IsAfMode()))
     {
         float dist = Position().distance_to(artefact->Position());
         if (dist < m_fAfVisRadius)

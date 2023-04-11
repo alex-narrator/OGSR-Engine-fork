@@ -52,7 +52,7 @@ void CSimpleDetector::UpdateAf()
     if (af_info.snd_time > af_info.cur_period)
     {
         af_info.snd_time = 0;
-        HUD_SOUND::PlaySound(item_type->detect_snds, Fvector{}, this, true, false);
+        PlaySound(item_type->detect_snds, Position());
         if (!CanSwitchModes() || IsAfMode())
             ui().Flash(true, fRelPow);
         if (!item_type->detect_snds.sounds.empty() && item_type->detect_snds.m_activeSnd)
@@ -70,7 +70,7 @@ void CSimpleDetector::UpdateZones()
     for (auto& item : m_zones.m_ItemInfos)
     { // all
         auto pZone = item.first;
-        if (!pZone->VisibleByDetector())
+        if (pZone->distance_to_center(this) > m_fDetectRadius)
             continue;
 
         ITEM_INFO& zone_info = item.second;
@@ -95,7 +95,7 @@ void CSimpleDetector::UpdateZones()
         if (zone_info.snd_time > zone_info.cur_period)
         {
             zone_info.snd_time = 0;
-            HUD_SOUND::PlaySound(item_type->detect_snds, Fvector{}, this, true, false);
+            PlaySound(item_type->detect_snds, Position());
             if (!CanSwitchModes() || !IsAfMode())
                 ui().Flash(true, fRelPow);
             if (!item_type->detect_snds.sounds.empty() && item_type->detect_snds.m_activeSnd)

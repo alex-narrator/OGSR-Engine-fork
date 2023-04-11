@@ -62,7 +62,7 @@ void CEliteDetector::UpdateAf()
     if (af_info.snd_time > af_info.cur_period)
     {
         af_info.snd_time = 0;
-        HUD_SOUND::PlaySound(item_type->detect_snds, Fvector{}, this, true, false);
+        PlaySound(item_type->detect_snds, Position());
         if (item_type->detect_snds.m_activeSnd)
             item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
     }
@@ -78,6 +78,8 @@ void CEliteDetector::UpdateZones()
     for (auto& item : m_zones.m_ItemInfos)
     { // all
         auto pZone = item.first;
+        if (pZone->distance_to_center(this) > m_fDetectRadius)
+            continue;
         ui().RegisterItemToDraw(pZone->Position(), m_bSectionMarks ? pZone->cNameSect() : ZONE_SIGN);
 
         ITEM_INFO& zone_info = item.second;
@@ -105,7 +107,7 @@ void CEliteDetector::UpdateZones()
         if (zone_info.snd_time > zone_info.cur_period)
         {
             zone_info.snd_time = 0;
-            HUD_SOUND::PlaySound(item_type->detect_snds, Fvector{}, this, true, false);
+            PlaySound(item_type->detect_snds, Position());
             if (item_type->detect_snds.m_activeSnd)
                 item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
         }
