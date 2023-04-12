@@ -15,13 +15,6 @@
 	<power_level x="855" y="580" width="0" height="0">
 		<text align="r" font="letterica18" color="white"/>
 	</power_level>
-	<power_level_low x="855" y="580" width="0" height="0" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="1" la_alpha="1">
-		<text align="r" font="letterica18" color="red"/>
-	</power_level_low>
-	<no_power x="550" y="330" width="0" height="0" light_anim="ui_slow_blinking_alpha" la_cyclic="1" la_texture="1" la_alpha="1">
-		<texture>ui_battery_low</texture>
-		<text align="r" font="graffiti40" color="red">ui_st_no_power</text>
-	</no_power>
 
 	<!-- Main buttons background -->
 	<mbbackground_frame_line x="110" y="574" width="591" height="32">

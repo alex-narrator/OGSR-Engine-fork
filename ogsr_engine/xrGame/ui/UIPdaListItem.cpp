@@ -15,7 +15,7 @@
 #include "UICharacterInfo.h"
 #include "UIStatic.h"
 
-#define PDA_CONTACT_CHAR "pda_character.xml"
+constexpr auto PDA_CONTACT_CHAR = "pda_character.xml";
 
 CUIPdaListItem::CUIPdaListItem()
 {

@@ -106,11 +106,6 @@ void CUIPdaWnd::Init()
     m_currentPower->SetAutoDelete(true);
     UIMainPdaFrame->AttachChild(m_currentPower);
     xml_init.InitStatic(uiXml, "power_level", 0, m_currentPower);
-    // No power background
-    m_NoPower = xr_new<CUIStatic>();
-    m_NoPower->SetAutoDelete(true);
-    UIMainPdaFrame->AttachChild(m_NoPower);
-    xml_init.InitStatic(uiXml, "no_power", 0, m_NoPower);
 
     // Oкно карты
     UIMapWnd = xr_new<CUIMapWnd>();
@@ -351,7 +346,6 @@ void CUIPdaWnd::Draw()
     {
         child_wnd->SetVisible(pda_workable);
     }
-    m_NoPower->SetVisible(!pda_workable);
     if (!pda_workable)
         return;
 

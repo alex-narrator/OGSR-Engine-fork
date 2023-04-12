@@ -19,8 +19,8 @@
 #include "../relation_registry.h"
 #include "../string_table.h"
 
-#define ACTOR_STATISTIC_XML "actor_statistic.xml"
-#define ACTOR_CHARACTER_XML "pda_dialog_character.xml"
+constexpr auto ACTOR_STATISTIC_XML = "actor_statistic.xml";
+constexpr auto ACTOR_CHARACTER_XML = "pda_dialog_character.xml";
 
 CUIActorInfoWnd::CUIActorInfoWnd() {}
 

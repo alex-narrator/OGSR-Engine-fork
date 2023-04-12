@@ -16,7 +16,6 @@ class CUIZoneMap
     CUIStatic m_compass;
     CUIStatic m_clipFrame;
     CUIStatic m_pointerDistanceText;
-    CUIStatic m_NoPower;
     CUIStatic m_CurrentTime;
     CUIStatic m_CurrentPower;
 

@@ -14,8 +14,8 @@
 #include "../actor.h"
 #include "../xrServer_Objects_ALife_Monsters.h"
 
-#define STALKERS_RANKING_XML "stalkers_ranking.xml"
-#define STALKERS_RANKING_CHARACTER_XML "stalkers_ranking_character.xml"
+constexpr auto STALKERS_RANKING_XML = "stalkers_ranking.xml";
+constexpr auto STALKERS_RANKING_CHARACTER_XML = "stalkers_ranking_character.xml";
 
 typedef xr_vector<u16> TOP_LIST;
 TOP_LIST g_all_statistic_humans;

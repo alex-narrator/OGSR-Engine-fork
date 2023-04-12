@@ -41,10 +41,6 @@ void CUIZoneMap::Init()
 
     xml_init.InitStatic(uiXml, "minimap:center", 0, &m_center);
 
-    xml_init.InitStatic(uiXml, "minimap:background:no_power", 0, &m_NoPower);
-    m_background.AttachChild(&m_NoPower);
-    m_NoPower.SetVisible(false);
-
     xml_init.InitStatic(uiXml, "minimap:background:current_time", 0, &m_CurrentTime);
     m_background.AttachChild(&m_CurrentTime);
     xml_init.InitStatic(uiXml, "minimap:background:current_power", 0, &m_CurrentPower);
@@ -68,8 +64,6 @@ void CUIZoneMap::Init()
 void CUIZoneMap::Render()
 {
     bool pda_workable = Actor()->HasPDAWorkable();
-
-    m_NoPower.SetVisible(!pda_workable);
 
     if (!pda_workable)
     {

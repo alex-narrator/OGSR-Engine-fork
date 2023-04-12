@@ -11,9 +11,8 @@
 #include "../actor.h"
 #include "../string_table.h"
 
-#define PDA_CONTACT_HEIGHT 70
-
-#define PDA_CONTACTS_XML "pda_contacts_new.xml"
+constexpr auto PDA_CONTACT_HEIGHT = 70;
+constexpr auto PDA_CONTACTS_XML = "pda_contacts_new.xml";
 
 CUIPdaContactsWnd::CUIPdaContactsWnd() { m_flags.zero(); }
 
