@@ -499,8 +499,6 @@ void CEntityCondition::UpdateHealth()
     ChangeBleeding(m_change_v.m_fV_WoundIncarnation * m_fDeltaTime);
 }
 
-void CEntityCondition::UpdatePower() {}
-
 void CEntityCondition::UpdatePsyHealth()
 {
     if (m_fPsyHealth > 0)

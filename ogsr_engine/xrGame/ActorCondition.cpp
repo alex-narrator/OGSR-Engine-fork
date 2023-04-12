@@ -75,7 +75,9 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     m_fAlcoholSatietyIntens = READ_IF_EXISTS(pSettings, r_float, section, "satiety_to_alcohol_effector_intensity", 1.0f);
     m_fExerciseStressFactor = READ_IF_EXISTS(pSettings, r_float, section, "exercise_stress_factor", 1.0f);
     m_fZoomEffectorK = READ_IF_EXISTS(pSettings, r_float, section, "power_to_zoom_effector_k", 10.0f);
-    m_fV_HardHoldPower = READ_IF_EXISTS(pSettings, r_float, section, "hard_hold_power_v", 0.f);
+
+    m_fV_Stamina = READ_IF_EXISTS(pSettings, r_float, section, "stamina_v", 0.f);
+    m_fV_HardHoldStamina = READ_IF_EXISTS(pSettings, r_float, section, "hard_hold_stamina_v", 0.f);
 }
 
 // вычисление параметров с ходом времени
@@ -95,16 +97,12 @@ void CActorCondition::UpdateCondition()
     float weight_k = object().GetCarryWeight() / object().MaxCarryWeight();
 
     if ((object().mstate_real & mcAnyMove))
-    {
         ConditionWalk(weight_k, isActorAccelerated(object().mstate_real, object().IsZoomAimingMode()), (object().mstate_real & mcSprint) != 0);
-    }
     else
-    {
         ConditionStand(weight_k);
-    }
 
     inherited::UpdateCondition();
-
+    UpdateStamina();
     UpdateTutorialThresholds();
 }
 
@@ -200,6 +198,7 @@ void CActorCondition::save(NET_Packet& output_packet)
     save_data(m_fAlcohol, output_packet);
     save_data(m_condition_flags, output_packet);
     save_data(m_fSatiety, output_packet);
+    save_data(m_fStamina, output_packet);
 }
 
 void CActorCondition::load(IReader& input_packet)
@@ -208,6 +207,7 @@ void CActorCondition::load(IReader& input_packet)
     load_data(m_fAlcohol, input_packet);
     load_data(m_condition_flags, input_packet);
     load_data(m_fSatiety, input_packet);
+    load_data(m_fStamina, input_packet);
 }
 
 void CActorCondition::reinit()
@@ -218,6 +218,7 @@ void CActorCondition::reinit()
     m_condition_flags.set(eCantSprint, FALSE);
     m_fSatiety = 1.f;
     m_fAlcohol = 0.f;
+    m_fStamina = 1.f;
 }
 
 void CActorCondition::ChangeAlcohol(float value) { m_fAlcohol += value; }
@@ -239,8 +240,8 @@ void CActorCondition::UpdateTutorialThresholds()
     static float _cBleeding = pSettings->r_float("tutorial_conditions_thresholds", "bleeding");
     static float _cSatiety = pSettings->r_float("tutorial_conditions_thresholds", "satiety");
     static float _cRadiation = pSettings->r_float("tutorial_conditions_thresholds", "radiation");
-    static float _cWpnCondition = pSettings->r_float("tutorial_conditions_thresholds", "weapon_jammed");
     static float _cPsyHealthThr = pSettings->r_float("tutorial_conditions_thresholds", "psy_health");
+    static float _cStaminaThr = READ_IF_EXISTS(pSettings, r_float, "tutorial_conditions_thresholds", "stamina", 0.1f);
 
     bool b = true;
     if (b && !m_condition_flags.test(eCriticalPowerReached) && GetPower() < _cPowerThr)
@@ -285,11 +286,17 @@ void CActorCondition::UpdateTutorialThresholds()
         strcpy_s(cb_name, "_G.on_actor_psy");
     }
 
-    if (b && !m_condition_flags.test(eWeaponJammedReached) && m_object->inventory().GetActiveSlot() != NO_ACTIVE_SLOT)
+    if (b && !m_condition_flags.test(eStaminaMinReached) && GetStamina() < _cStaminaThr)
     {
-        PIItem item = m_object->inventory().ItemFromSlot(m_object->inventory().GetActiveSlot());
-        CWeapon* pWeapon = smart_cast<CWeapon*>(item);
-        if (pWeapon && pWeapon->GetCondition() < _cWpnCondition)
+        m_condition_flags.set(eStaminaMinReached, TRUE);
+        b = false;
+        strcpy_s(cb_name, "_G.on_actor_stamina");
+    }
+
+    if (b && !m_condition_flags.test(eWeaponJammedReached) && m_object->inventory().ActiveItem())
+    {
+        if (auto pWeapon = smart_cast<CWeapon*>(m_object->inventory().ActiveItem()); 
+            pWeapon && pWeapon->IsMisfire())
         {
             m_condition_flags.set(eWeaponJammedReached, TRUE);
             b = false;
@@ -380,15 +387,6 @@ void CActorCondition::UpdatePower()
     float bleeding_power_dec = BleedingSpeed() * m_fBleedingPowerDecrease;
 
     m_fDeltaPower += m_fV_SatietyPower * m_fDeltaTime * GetRegenK() - bleeding_power_dec;
-
-    // задержка дыхания
-    if (object().IsHardHold() && !object().is_actor_creep() && GetPower() > m_fCantWalkPowerEnd)
-    {
-        float inertion_factor = object().inventory().ActiveItem()->GetControlInertionFactor();
-        m_fDeltaPower -= m_fDeltaTime * (m_fV_HardHoldPower / object().GetExoFactor()) * inertion_factor;
-    }
-    else
-        object().SetHardHold(false);
 }
 
 void CActorCondition::UpdatePsyHealth()
@@ -451,6 +449,21 @@ void CActorCondition::UpdateAlcohol()
                 RemoveEffector(m_object, effAlcohol);
         }
     }
+}
+
+void CActorCondition::UpdateStamina()
+{
+    m_fStamina += m_fV_Stamina * GetRegenK() * m_fDeltaTime;
+    clamp(m_fStamina, 0.0f, 1.0f);
+
+    // задержка дыхания
+    if (object().IsHardHold() && !object().is_actor_creep() && GetPower() > m_fCantWalkPowerEnd && !fis_zero(GetStamina()))
+    {
+        float inertion_factor = object().inventory().ActiveItem()->GetControlInertionFactor();
+        m_fStamina -= m_fDeltaTime * (m_fV_HardHoldStamina / object().GetExoFactor()) * inertion_factor;
+    }
+    else
+        object().SetHardHold(false);
 }
 
 float CActorCondition::BleedingSpeed() { return inherited::BleedingSpeed() * GetStress(); }

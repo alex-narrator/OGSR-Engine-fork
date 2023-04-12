@@ -13,7 +13,7 @@
 		<text>Загальна мапа</text>
 	</string>
 	<string id="gun_jammed">
-		<text>ЗАТРИМКА. \nНатисніть [$$ACTION_ADDITIONAL_ACTION$$]+[$$ACTION_WPN_RELOAD$$] для усунення</text>
+		<text>ЗАТРИМКА. Натисніть [$$ACTION_ADDITIONAL_ACTION$$]+[$$ACTION_WPN_RELOAD$$] для усунення</text>
 	</string>
 	<string id="inventory_box_use">
 		<text>Обшукати ящик [$$ACTION_USE$$]</text>

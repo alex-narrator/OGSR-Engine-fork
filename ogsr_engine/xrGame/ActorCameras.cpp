@@ -436,8 +436,7 @@ void CActor::UpdateCameraDirection(CGameObject* pTo)
     Fvector des_dir{};
     Fvector des_pt;
     pTo->Center(des_pt);
-    if (auto creature = smart_cast<CEntityAlive*>(pTo); creature && creature->g_Alive())
-        des_pt.y += pTo->Radius() * 0.5f;
+    des_pt.y += pTo->Radius() * 0.5f;        
 
     des_dir.sub(des_pt, cam->vPosition);
 

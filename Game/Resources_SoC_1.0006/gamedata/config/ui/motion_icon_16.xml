@@ -35,6 +35,12 @@
 		</progress>
 	</power_progress>
 	
+	<stamina_progress  x="24" y="100" width="43" height="3" horz="1" min="0" max="100" pos="100">
+		<progress>
+			<texture stretch="1">ui_hud_shk_armour</texture>
+		</progress>
+	</stamina_progress>
+	
 	<luminosity_progress x="79" y="34" width="8" height="71" horz="0" min="0" max="200" pos="100">
 		<progress>
 			<texture>ui_hud_shk_light</texture>

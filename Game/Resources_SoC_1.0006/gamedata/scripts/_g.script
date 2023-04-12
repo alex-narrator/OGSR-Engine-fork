@@ -1374,6 +1374,9 @@ end
 function on_actor_critical_max_power()
 end
 
+function on_actor_stamina()
+end
+
 --' Кровотечение
 function on_actor_bleeding()
 	if has_alife_info("esc_trader_newbie") then

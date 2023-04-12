@@ -27,7 +27,7 @@ public:
         eCriticalRadiationReached = (1 << 4),
         eWeaponJammedReached = (1 << 5),
         ePhyHealthMinReached = (1 << 6),
-        eCantWalkWeight = (1 << 7),
+        eStaminaMinReached = (1 << 7),
 
         eLimping = (1 << 8),
         eCantWalk = (1 << 9),
@@ -41,9 +41,10 @@ private:
     virtual void UpdateSatiety() override;
     virtual void UpdateAlcohol() override;
     virtual void UpdateHealth() override;
-    virtual void UpdatePower();
+    virtual void UpdatePower() override;
     virtual void UpdateRadiation() override;
     virtual void UpdatePsyHealth() override;
+    virtual void UpdateStamina();
 
 public:
     CActorCondition(CActor* object);
@@ -123,6 +124,9 @@ protected:
 
     float m_fLimpingHealthBegin{};
     float m_fLimpingHealthEnd{};
+    //окрема витривалість для рук у режимі жорсткого хвату зброї
+    float m_fStamina{1.f};
+    float m_fV_Stamina{};
 
 public:
     float m_fBleedingPowerDecrease{};
@@ -134,7 +138,7 @@ public:
     float m_fExerciseStressFactor{1.f}; // фактор физнагрузки - множитель для коэффициента нагрузки актора при спринте и прыжке
     //
     float m_fZoomEffectorK{};
-    float m_fV_HardHoldPower{};
+    float m_fV_HardHoldStamina{};
 
     float GetSmoothOwerweightKoef();
     // коэфф. регенерации актора - зависит от сытости и дозы облучения
@@ -157,4 +161,6 @@ public:
 
     virtual void BoostParameters(const SBooster&) override;
     virtual void DisableBoostParameters(const SBooster&) override;
+
+    virtual float GetStamina() { return m_fStamina; };
 };
