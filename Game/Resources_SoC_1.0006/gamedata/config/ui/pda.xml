@@ -30,7 +30,7 @@
 	</timer_frame_line>
                    
 	<!-- TAB CONTROL -->
-	<tab x="129" y="573" width="550" height="30">
+	<tab x="129" y="573" width="550" height="30" separator="">
 		<!-- BUTTONS -->
 		<button x="0" y="7" width="50" height="20" hint="pda_btn_quests_hint">
 			<text align="l" x="0" y="0" font="letterica18" r="255" g="255" b="255">pda_btn_quests</text>

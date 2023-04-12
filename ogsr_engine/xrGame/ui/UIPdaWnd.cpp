@@ -36,6 +36,7 @@ constexpr auto PDA_XML = "pda.xml";
 u32 g_pda_info_state = 0;
 
 void RearrangeTabButtons(CUITabControl* pTab, xr_vector<Fvector2>& vec_sign_places);
+LPCSTR tab_separator{};
 
 CUIPdaWnd::CUIPdaWnd()
 {
@@ -139,6 +140,8 @@ void CUIPdaWnd::Init()
     UIMainPdaFrame->AttachChild(UITabControl);
     xml_init.InitTabControl(uiXml, "tab", 0, UITabControl);
     UITabControl->SetMessageTarget(this);
+    // tab separator
+    tab_separator = uiXml.ReadAttrib("tab", 0, "separator", "//");
 
     m_updatedSectionImage = xr_new<CUIStatic>();
     xml_init.InitStatic(uiXml, "updated_section_static", 0, m_updatedSectionImage);
@@ -498,7 +501,7 @@ void RearrangeTabButtons(CUITabControl* pTab, xr_vector<Fvector2>& vec_sign_plac
             pTab->AttachChild(st);
             st->SetFont((*it)->GetFont());
             st->SetTextColor(color_rgba(90, 90, 90, 255));
-            st->SetText("//");
+            st->SetText(tab_separator);
             st->SetWndSize((*it)->GetWndSize());
             st->AdjustWidthToText();
             st->SetWndPos(pos);
