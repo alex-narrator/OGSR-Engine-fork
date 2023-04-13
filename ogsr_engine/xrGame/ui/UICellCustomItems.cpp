@@ -198,7 +198,8 @@ bool CUIAmmoCellItem::EqualTo(CUICellItem* itm)
     if (!ci)
         return false;
 
-    return ((object()->cNameSect() == ci->object()->cNameSect()));
+    // return ((object()->cNameSect() == ci->object()->cNameSect()));
+    return object()->m_ammoSect == ci->object()->m_ammoSect;
 }
 
 void CUIAmmoCellItem::Update()
@@ -421,6 +422,7 @@ void CUIWeaponCellItem::UpdateItemText()
     m_text_add->SetWndPos(pos);
     m_text_add->SetText(str);
     m_text_add->Show(true);
+    BringToTop(m_text_add);
 }
 
 #include "../object_broker.h"
