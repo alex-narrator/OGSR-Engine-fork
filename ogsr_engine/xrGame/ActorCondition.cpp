@@ -14,6 +14,7 @@
 #include "script_callback_ex.h"
 #include "object_broker.h"
 #include "weapon.h"
+#include "WeaponKnife.h"
 #include "PDA.h"
 #include "ai/monsters/BaseMonster/base_monster.h"
 
@@ -242,6 +243,7 @@ void CActorCondition::UpdateTutorialThresholds()
     static float _cRadiation = pSettings->r_float("tutorial_conditions_thresholds", "radiation");
     static float _cPsyHealthThr = pSettings->r_float("tutorial_conditions_thresholds", "psy_health");
     static float _cStaminaThr = READ_IF_EXISTS(pSettings, r_float, "tutorial_conditions_thresholds", "stamina", 0.1f);
+    static float _cKnifeCondThr = READ_IF_EXISTS(pSettings, r_float, "tutorial_conditions_thresholds", "knife_condition", 0.5f);
 
     bool b = true;
     if (b && !m_condition_flags.test(eCriticalPowerReached) && GetPower() < _cPowerThr)
@@ -301,6 +303,16 @@ void CActorCondition::UpdateTutorialThresholds()
             m_condition_flags.set(eWeaponJammedReached, TRUE);
             b = false;
             strcpy_s(cb_name, "_G.on_actor_weapon_jammed");
+        }
+    }
+
+    if (b && !m_condition_flags.test(eKnifeCriticalReached) && m_object->inventory().ActiveItem())
+    {
+        if (auto pKnife = smart_cast<CWeaponKnife*>(m_object->inventory().ActiveItem()); pKnife && pKnife->GetCondition() < _cKnifeCondThr)
+        {
+            m_condition_flags.set(eKnifeCriticalReached, TRUE);
+            b = false;
+            strcpy_s(cb_name, "_G.on_actor_knife_condition");
         }
     }
 

@@ -25,13 +25,15 @@ public:
         eCriticalBleedingSpeed = (1 << 2),
         eCriticalSatietyReached = (1 << 3),
         eCriticalRadiationReached = (1 << 4),
-        eWeaponJammedReached = (1 << 5),
-        ePhyHealthMinReached = (1 << 6),
-        eStaminaMinReached = (1 << 7),
+        ePhyHealthMinReached = (1 << 5),
+        eStaminaMinReached = (1 << 6),
 
-        eLimping = (1 << 8),
-        eCantWalk = (1 << 9),
-        eCantSprint = (1 << 10),
+        eWeaponJammedReached = (1 << 7),
+        eKnifeCriticalReached = (1 << 8),
+
+        eLimping = (1 << 9),
+        eCantWalk = (1 << 10),
+        eCantSprint = (1 << 11),
     };
     Flags16 m_condition_flags;
 

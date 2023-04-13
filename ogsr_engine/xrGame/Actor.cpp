@@ -648,6 +648,7 @@ void CActor::Die(CObject* who)
     RemoveEffector(this, effGroggy);
     RemoveEffector(this, eCEItemUse);
     RemoveEffector(this, eCEBoostEffect);
+    RemoveEffector(this, eCEUIWindowEffect);
 
     start_tutorial("game_over");
     xr_delete(m_sndShockEffector);
@@ -2065,8 +2066,7 @@ void CActor::EnableUIDOF(bool enable)
 
 void CActor::EnableInvEffector(bool open)
 {
-    RemoveEffector(this, eCEUIWindowEffect);
-    if (!g_Alive())
+    if (Cameras().GetCamEffector(eCEUIWindowEffect))
         return;
     if (open && !!m_InvEffOpen)
         AddEffector(this, eCEUIWindowEffect, m_InvEffOpen);
