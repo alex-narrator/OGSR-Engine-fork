@@ -18,6 +18,7 @@
 #include "clsid_game.h"
 #include "CustomOutfit.h"
 #include "Vest.h"
+#include "Warbelt.h"
 #include "HudItem.h"
 #include "Grenade.h"
 

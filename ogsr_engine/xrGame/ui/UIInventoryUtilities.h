@@ -2,7 +2,6 @@
 
 #include "../inventory_item.h"
 #include "../character_info_defs.h"
-#include "UICellCustomItems.h"
 
 class CUIStatic;
 class CGameObject;
@@ -42,8 +41,8 @@ ui_shader& GetEquipmentIconsShader(size_t icon_group = 0);
 void DestroyShaders();
 void CreateShaders();
 
-// приєднання іконок збройових адонів до зброї
-void TryAttachWpnAddonIcons(CUIStatic*, PIItem, float = 1.f);
+//приєднання додаткових іконок
+void TryAttachIcons(CUIStatic*, PIItem, float = 1.f);
 
 // Получить значение времени в текстовом виде
 

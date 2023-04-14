@@ -102,6 +102,8 @@ class CUIAmmoCellItem : public CUIInventoryCellItem
 protected:
     virtual void UpdateItemText();
     virtual void UpdateItemTextCustom();
+    CUIStatic* m_ammo_in_box{};
+    void CreateAmmoInBoxIcon();
 
 public:
     CUIAmmoCellItem(CWeaponAmmo* itm);

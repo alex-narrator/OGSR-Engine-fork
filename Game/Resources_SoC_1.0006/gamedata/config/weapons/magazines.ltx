@@ -29,11 +29,18 @@ unload_sound = interface\wm_load
 slot = 12,13,14,15
 belt = true
 vest = true
+ammo_icon_ofset = 7,6
 
 [mag_large]:mag_base
 slot = 12,13,14,15
 vest = true
 belt = false
+ammo_icon_ofset = -6,25
+
+[mag_box]:mag_base
+vest = true
+belt = true
+ammo_icon_ofset = -5,55
 
 ;;;;;;;;;;;;;;;;;;;;;;;;магазин 8 набоїв 9х18;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [clip_8_900x18]:mag_small
@@ -119,6 +126,7 @@ inv_grid_height    = 2
 inv_grid_x         = 20
 inv_grid_y         = 10
 
+ammo_icon_ofset = 5,25
 mag_icon_sect = icon_mag_30_919
 
 inv_name		= mag_30_900x19
@@ -135,6 +143,9 @@ inv_grid_width     = 1
 inv_grid_height    = 1
 inv_grid_x         = 23
 inv_grid_y         = 9
+
+ammo_icon_scale = 0.4
+ammo_icon_ofset = 0,8
 
 inv_name		= clip_7_1143x23
 inv_name_short 	= clip_7_1143x23_short
@@ -270,15 +281,13 @@ inv_weight 		= 0.2
 ammo_types 		= ammo_7.62x54_7h1, ammo_7.62x54_7h14, ammo_7.62x54_ap 
 
 ;;;;;;;;;;;;;;;;;;;;короб на 100 набоїв 7,62х54;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-[box_100_762x54]:mag_base
+[box_100_762x54]:mag_box
 visual          = weapons\magazines\box_100_762x54.ogf
 box_size 			= 100
 inv_grid_width     = 2
 inv_grid_height    = 2
 inv_grid_x         = 20
 inv_grid_y         = 14
-vest = true
-belt = true
 
 mag_icon_sect = icon_box_100_762
 

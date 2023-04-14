@@ -1,21 +1,22 @@
 #include "stdafx.h"
 #include "UIInventoryUtilities.h"
-#include "../WeaponAmmo.h"
-#include "../UIStaticItem.h"
+#include "WeaponAmmo.h"
+#include "Weapon.h"
+#include "UIStaticItem.h"
 #include "UIStatic.h"
-#include "../eatable_item.h"
-#include "../Level.h"
-#include "../HUDManager.h"
+#include "eatable_item.h"
+#include "Level.h"
+#include "HUDManager.h"
 #include "UIGameSP.h"
-#include "../date_time.h"
-#include "../string_table.h"
-#include "../Inventory.h"
-#include "../InventoryOwner.h"
+#include "date_time.h"
+#include "string_table.h"
+#include "Inventory.h"
+#include "InventoryOwner.h"
 #include "InventoryBox.h"
 
-#include "../InfoPortion.h"
-#include "../game_base_space.h"
-#include "../actor.h"
+#include "InfoPortion.h"
+#include "game_base_space.h"
+#include "actor.h"
 #include "string_table.h"
 
 constexpr auto EQUIPMENT_ICONS = "ui\\ui_icon_equipment";
@@ -572,47 +573,75 @@ u32 InventoryUtilities::GetRelationColor(ALife::ERelationType relation)
 #endif
 }
 
-CUIStatic* init_addon(CUIWeaponCellItem* cell_item, LPCSTR sect, float scale, int idx)
+void AttachWpnAddonIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
 {
-    CUIStatic* addon = xr_new<CUIStatic>();
-    addon->SetAutoDelete(true);
-
-    float scale_x = UI()->get_current_kx();
-
-    auto pos = cell_item->get_addon_offset(idx);
-    pos.x *= scale * scale_x;
-    pos.y *= scale;
-
-    CIconParams params(sect);
-    Frect rect = params.original_rect();
-    params.set_shader(addon);
-    addon->SetWndRect(pos.x, pos.y, rect.width() * scale * scale_x, rect.height() * scale);
-    addon->SetColor(color_rgba(255, 255, 255, 192));
-
-    return addon;
-}
-
-void InventoryUtilities::TryAttachWpnAddonIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
-{
-    _main_icon->DetachAll();
     auto wpn = smart_cast<CWeapon*>(_item);
-    if (!wpn)
-        return;
-
-    auto cell_item = xr_new<CUIWeaponCellItem>(wpn);
-    CUIStatic* addon_statick{};
-
 	for (u32 i = 0; i < eMaxAddon; i++)
     {
-        if (wpn->AddonAttachable(i) && wpn->IsAddonAttached(i) && (i != eMagazine || !!wpn->GetMagazineIconSect(true)))
+        if (wpn->AddonAttachable(i) && wpn->IsAddonAttached(i) && (i != eMagazine || !!wpn->GetMagazineIconSect()))
         {
-            auto addon_icon_name = wpn->GetAddonName(i).c_str();
-            if (i == eMagazine)
-                addon_icon_name = wpn->GetMagazineIconSect(true).c_str();
-            addon_statick = init_addon(cell_item, addon_icon_name, _scale, i);
-            _main_icon->AttachChild(addon_statick);
+            CUIStatic* addon = xr_new<CUIStatic>();
+            addon->SetAutoDelete(true);
+
+            shared_str addon_icon_name = (i == eMagazine) ? wpn->GetMagazineIconSect() : wpn->GetAddonName(i);
+            CIconParams params(addon_icon_name);
+            Frect rect = params.original_rect();
+            params.set_shader(addon);
+            
+            float k_x{UI()->get_current_kx()};
+
+            auto pos = wpn->GetAddonOffset(i);
+            pos.mul(_scale);
+            pos.x *= k_x;
+
+            Fvector2 size{rect.width(), rect.height()};
+            size.mul(_scale);
+            size.x *= k_x;
+
+            addon->SetWndRect(pos.x, pos.y, size.x, size.y);
+            addon->SetColor(color_rgba(255, 255, 255, 192));
+
+            _main_icon->AttachChild(addon);
         }
     }
+}
+void AttachAmmoIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
+{
+    auto ammo = smart_cast<CWeaponAmmo*>(_item);
+    CUIStatic* ammo_icon = xr_new<CUIStatic>();
+    ammo_icon->SetAutoDelete(true);
 
-    delete_data(cell_item);
+    CIconParams params(ammo->m_ammoSect);
+    Frect rect = params.original_rect();
+    params.set_shader(ammo_icon);
+
+    float k_x{UI()->get_current_kx()};
+
+    Fvector2 size{rect.width(), rect.height()};
+    size.mul(_scale * ammo->ammo_icon_scale);
+    size.x *= k_x;
+
+    Fvector2 pos{ammo->ammo_icon_ofset};
+    pos.mul(_scale);
+    pos.x *= k_x;
+
+    ammo_icon->SetWndRect(pos.x, pos.y, size.x, size.y);
+    ammo_icon->SetColor(color_rgba(255, 255, 255, 192));
+    _main_icon->AttachChild(ammo_icon);
+}
+
+void InventoryUtilities::TryAttachIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
+{
+    _main_icon->DetachAll();
+
+    if (smart_cast<CWeapon*>(_item))
+    {
+        AttachWpnAddonIcons(_main_icon, _item, _scale);
+        return;
+    }
+    if (auto ammo = smart_cast<CWeaponAmmo*>(_item); ammo && ammo->IsBoxReloadable() && ammo->Useful())
+    {
+        AttachAmmoIcon(_main_icon, _item, _scale);
+        return;
+    }
 }

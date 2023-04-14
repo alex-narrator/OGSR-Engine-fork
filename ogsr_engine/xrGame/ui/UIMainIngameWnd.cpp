@@ -707,7 +707,7 @@ void CUIMainIngameWnd::UpdatePickUpItem()
 
     UIPickUpItemIcon.SetColor(color_rgba(255, 255, 255, 192));
 
-    TryAttachWpnAddonIcons(&UIPickUpItemIcon, m_pPickUpItem, scale);
+    TryAttachIcons(&UIPickUpItemIcon, m_pPickUpItem, scale);
 
     // Real Wolf: Колбек для скриптового добавления своих иконок. 10.08.2014.
     g_actor->callback(GameObject::eUIPickUpItemShowing)(m_pPickUpItem->object().lua_game_object(), &UIPickUpItemIcon);

@@ -1392,9 +1392,8 @@ void CWeaponMagazined::LoadLaserParams(LPCSTR section)
 
     shared_str wpn_sect = cNameSect();
     laserdot_attach_bone = READ_IF_EXISTS(pSettings, r_string, wpn_sect, "laserdot_attach_bone", nullptr);
-    Fvector fvec_def{};
-    laserdot_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "laserdot_attach_offset", fvec_def);
-    laserdot_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "laserdot_world_attach_offset", fvec_def);
+    laserdot_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "laserdot_attach_offset", Fvector{});
+    laserdot_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "laserdot_world_attach_offset", Fvector{});
     laserdot_attach_aim_dist = READ_IF_EXISTS(pSettings, r_float, wpn_sect, "laserdot_attach_aim_dist", 0.5f);
 
     const bool b_r2 = psDeviceFlags.test(rsR2) || psDeviceFlags.test(rsR3) || psDeviceFlags.test(rsR4);
@@ -1427,11 +1426,10 @@ void CWeaponMagazined::LoadFlashlightParams(LPCSTR section)
 
     shared_str wpn_sect = cNameSect();
     flashlight_attach_bone = READ_IF_EXISTS(pSettings, r_string, wpn_sect, "torch_light_bone", "wpn_body");
-    Fvector fvec_def{};
-    flashlight_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "torch_attach_offset", fvec_def);
-    flashlight_omni_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "torch_omni_attach_offset", fvec_def);
-    flashlight_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "torch_world_attach_offset", fvec_def);
-    flashlight_omni_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "torch_omni_world_attach_offset", fvec_def);
+    flashlight_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "torch_attach_offset", Fvector{});
+    flashlight_omni_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "torch_omni_attach_offset", Fvector{});
+    flashlight_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "torch_world_attach_offset", Fvector{});
+    flashlight_omni_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "torch_omni_world_attach_offset", Fvector{});
     flashlight_attach_aim_dist = READ_IF_EXISTS(pSettings, r_float, wpn_sect, "torch_attach_aim_dist", 0.5f);
 
     const bool b_r2 = psDeviceFlags.test(rsR2) || psDeviceFlags.test(rsR3) || psDeviceFlags.test(rsR4);

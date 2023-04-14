@@ -166,7 +166,7 @@ public:
     Fvector2 GetAddonOffset(u32);
     virtual shared_str GetAddonName(u32) const;
 
-    const shared_str GetMagazineIconSect(bool = false) const;
+    const shared_str GetMagazineIconSect() const;
 
     u8 GetAddonsState() const { return m_flagsAddOnState; };
     void SetAddonsState(u8 st) { m_flagsAddOnState = st; }

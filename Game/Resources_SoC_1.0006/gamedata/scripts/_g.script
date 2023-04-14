@@ -1410,6 +1410,9 @@ function on_actor_weapon_jammed()
 	end
 end
 
+function on_actor_knife_condition()
+end
+
 --' не может ходить изза веса
 function on_actor_cant_walk_weight()
 	if has_alife_info("esc_trader_newbie") then

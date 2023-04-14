@@ -211,7 +211,7 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
         UIItemImage->SetWidth(_min(v_r.width(), UIItemImageSize.x));
         UIItemImage->SetHeight(_min(v_r.height(), UIItemImageSize.y));
 
-        TryAttachWpnAddonIcons(UIItemImage, pInvItem);
+        TryAttachIcons(UIItemImage, pInvItem);
     }
 }
 
