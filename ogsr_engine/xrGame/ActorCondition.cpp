@@ -373,18 +373,6 @@ float CActorCondition::GetStress()
 
 float CActorCondition::GetZoomEffectorKoef() { return m_fZoomEffectorK; };
 
-void CActorCondition::UpdateHealth()
-{
-    float bleeding_speed = BleedingSpeed() * m_fDeltaTime * m_change_v.m_fV_Bleeding;
-    m_bIsBleeding = fis_zero(bleeding_speed) ? false : true;
-    m_fDeltaHealth -= CanBeHarmed() ? bleeding_speed : 0;
-
-    m_fDeltaHealth += m_fDeltaTime * GetHealthRestore();
-    VERIFY(_valid(m_fDeltaHealth));
-
-    ChangeBleeding(GetWoundIncarnation() * m_fDeltaTime);
-}
-
 void CActorCondition::UpdatePower()
 {
     m_fPower += m_fV_Power * m_fDeltaTime;
@@ -428,14 +416,6 @@ void CActorCondition::UpdatePsyHealth()
     }
     else
         health() = 0.0f;
-}
-
-void CActorCondition::UpdateRadiation()
-{
-    if (m_fRadiation > 0.f)
-    {
-        m_fDeltaRadiation -= m_change_v.m_fV_Radiation * m_fDeltaTime;
-    }
 }
 
 void CActorCondition::UpdateAlcohol()

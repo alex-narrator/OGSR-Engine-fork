@@ -493,17 +493,17 @@ void CEntityCondition::UpdateHealth()
     float bleeding_speed = BleedingSpeed() * m_fDeltaTime * m_change_v.m_fV_Bleeding;
     m_bIsBleeding = fis_zero(bleeding_speed) ? false : true;
     m_fDeltaHealth -= CanBeHarmed() ? bleeding_speed : 0;
-    m_fDeltaHealth += m_fDeltaTime * m_change_v.m_fV_HealthRestore;
+    m_fDeltaHealth += m_fDeltaTime * GetHealthRestore();
 
     VERIFY(_valid(m_fDeltaHealth));
-    ChangeBleeding(m_change_v.m_fV_WoundIncarnation * m_fDeltaTime);
+    ChangeBleeding(GetWoundIncarnation() * m_fDeltaTime);
 }
 
 void CEntityCondition::UpdatePsyHealth()
 {
     if (m_fPsyHealth > 0)
     {
-        m_fDeltaPsyHealth += m_change_v.m_fV_PsyHealth * m_fDeltaTime;
+        m_fDeltaPsyHealth += GetPsyHealthRestore() * m_fDeltaTime;
     }
 }
 
@@ -542,13 +542,13 @@ void CEntityCondition::save(NET_Packet& output_packet)
             (*it)->save(output_packet);
 
         output_packet.w_u8((u8)m_boosters.size());
-        BOOSTER_MAP::iterator b = m_boosters.begin(), e = m_boosters.end();
-        for (; b != e; b++)
+        for (const auto& item : m_boosters)
         {
-            output_packet.w_u8((u8)b->second.m_BoostType);
-            output_packet.w_float(b->second.f_BoostValue);
-            output_packet.w_float(b->second.f_BoostTime);
-            output_packet.w_stringZ(b->second.s_BoostEffector);
+            SBooster B = item.second;
+            output_packet.w_u8(B.m_BoostType);
+            output_packet.w_float(B.f_BoostValue);
+            output_packet.w_float(B.f_BoostTime);
+            output_packet.w_stringZ(B.s_BoostEffector);
         }
     }
 }

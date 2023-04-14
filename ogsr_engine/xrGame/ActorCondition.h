@@ -42,9 +42,7 @@ private:
     void UpdateTutorialThresholds();
     virtual void UpdateSatiety() override;
     virtual void UpdateAlcohol() override;
-    virtual void UpdateHealth() override;
     virtual void UpdatePower() override;
-    virtual void UpdateRadiation() override;
     virtual void UpdatePsyHealth() override;
     virtual void UpdateStamina();
 
