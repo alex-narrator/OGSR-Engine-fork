@@ -66,6 +66,7 @@ public:
     virtual void FireStart();
 
     virtual bool Action(s32 cmd, u32 flags);
+    virtual bool CanBeUnloaded() { return false; };
 
     bool m_bIsQuickStab{};
 

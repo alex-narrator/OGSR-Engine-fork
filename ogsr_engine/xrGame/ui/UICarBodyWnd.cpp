@@ -666,6 +666,7 @@ void CUICarBodyWnd::Show()
         actor->RepackAmmo();
         actor->TryInventoryCrouch(true);
         actor->EnableInvEffector(true);
+        TryActivateKnife();
     }
     PlaySnd(eInvSndOpen);
 }
@@ -989,6 +990,21 @@ bool CUICarBodyWnd::CheckMonsterAndKnife() const
 {
     return !Core.Features.test(xrCore::Feature::knife_to_cut_parts) || !smart_cast<CBaseMonster*>(m_pOtherInventoryOwner) ||
         smart_cast<CWeaponKnife*>(m_pActorInventoryOwner->inventory().ActiveItem());
+}
+
+void CUICarBodyWnd::TryActivateKnife()
+{
+    if (CheckMonsterAndKnife())
+        return;
+    auto& inv = m_pActorInventoryOwner->inventory();
+    for (const auto& slot : inv.m_slots)
+    {
+        if (slot.m_pIItem && slot.CanBeActivated() && smart_cast<CWeaponKnife*>(slot.m_pIItem))
+        {
+            inv.Activate(slot.m_pIItem->GetSlot());
+            return;
+        }
+    }
 }
 
 void CUICarBodyWnd::TryPlayStabbing(PIItem itm, CGameObject* owner_from)
