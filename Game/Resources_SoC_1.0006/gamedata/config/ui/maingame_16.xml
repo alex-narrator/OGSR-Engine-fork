@@ -16,6 +16,11 @@
 			<texture>ui_hud_shk_health</texture>
 		</progress>
 	</progress_bar_health>
+	<progress_bar_health_max x="24" y="5" width="84" height="10" mode="back" min="0" max="100" pos="0">
+		<progress>
+			<texture>ui_mg_progress_efficiency_full</texture>
+		</progress>
+	</progress_bar_health_max>	
 
 	<static_armor x="900" y="626" width="123" height="34" stretch="1">
 		<texture>ui_hud_shkala_armor</texture>		

@@ -783,7 +783,7 @@ void CActor::UpdateCL()
         if (pWeapon->IsZoomed())
         {
             CEffectorZoomInertion* S = smart_cast<CEffectorZoomInertion*>(Cameras().GetCamEffector(eCEZoom));
-            if (S)
+            if (S && !IsHardHold())
                 S->SetParams(pWeapon->GetControlInertionFactor());
             m_bZoomAimingMode = true;
         }

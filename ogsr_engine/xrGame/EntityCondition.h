@@ -80,6 +80,12 @@ public:
     IC float& health() { return m_fHealth; }
     IC float& max_health() { return m_fHealthMax; }
 
+    void ChangeMaxHealth(float delta) 
+    { 
+        m_fHealthMax += delta;
+        clamp(m_fHealthMax, 0.f, 1.f);
+    }
+
     virtual CEntityCondition* cast_entity_condition() { return NULL; }
 };
 

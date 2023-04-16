@@ -408,11 +408,11 @@ void CUICarBodyWnd::ActivatePropertiesBox()
 
     if (pWeapon)
     {
-        if (inv->InSlot(pWeapon) && smart_cast<CWeaponMagazined*>(pWeapon))
+        if (inv->InSlot(pWeapon))
         {
             for (u32 i = 0; i < pWeapon->m_ammoTypes.size(); ++i)
             {
-                if (pWeapon->TryToGetAmmo(i) && pWeapon->CanBeReloaded())
+                if (pWeapon->CanBeReloaded() && pWeapon->TryToGetAmmo(i))
                 {
                     auto ammo_sect = pSettings->r_string(pWeapon->m_ammoTypes[i].c_str(), "inv_name_short");
                     sprintf(temp, "%s %s", CStringTable().translate("st_load_ammo_type").c_str(), CStringTable().translate(ammo_sect).c_str());

@@ -45,6 +45,8 @@ private:
     virtual void UpdatePower() override;
     virtual void UpdatePsyHealth() override;
     virtual void UpdateStamina();
+    virtual void UpdatePowerMax();
+    virtual void UpdateHealthMax();
 
 public:
     CActorCondition(CActor* object);
@@ -71,7 +73,6 @@ public:
 
     void ConditionJump(float weight);
     void ConditionWalk(float weight, bool accel, bool sprint);
-    void ConditionStand(float weight);
 
     float GetAlcohol() { return m_fAlcohol; }
     float GetPsy() { return 1.0f - GetPsyHealth(); }
@@ -95,14 +96,11 @@ protected:
     //--
     float m_fSatiety{1.f};
     float m_fV_Satiety{};
-    float m_fV_SatietyPower{};
-    float m_fV_SatietyHealth{};
     //--
     float m_fPowerLeakSpeed{};
     float m_fV_Power{};
 
     float m_fJumpPower{};
-    float m_fStandPower{};
     float m_fWalkPower{};
     float m_fJumpWeightPower{};
     float m_fWalkWeightPower{};
@@ -128,6 +126,8 @@ protected:
     float m_fStamina{1.f};
     float m_fV_Stamina{};
 
+    float m_fV_HealthMax{};
+
 public:
     float m_fBleedingPowerDecrease{};
     //
@@ -139,6 +139,8 @@ public:
     //
     float m_fZoomEffectorK{};
     float m_fV_HardHoldStamina{};
+
+    float m_fBleedingHealthMaxDecrease{};
 
     float GetSmoothOwerweightKoef();
     // коэфф. регенерации актора - зависит от сытости и дозы облучения

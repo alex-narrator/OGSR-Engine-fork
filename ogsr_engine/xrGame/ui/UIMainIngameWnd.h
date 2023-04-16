@@ -61,6 +61,7 @@ protected:
     CUIStatic UIStaticArmor;
     CUIStatic UIStaticQuickHelp;
     CUIProgressBar UIHealthBar;
+    CUIProgressBar UIMaxHealthBar;
     CUIProgressBar UIArmorBar;
     CUICarPanel UICarPanel;
     CUIMotionIcon UIMotionIcon;

@@ -34,7 +34,6 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     LPCSTR section = READ_IF_EXISTS(pSettings, r_string, entity_section, "condition_sect", entity_section);
 
     m_fJumpPower = pSettings->r_float(section, "jump_power");
-    m_fStandPower = pSettings->r_float(section, "stand_power");
     m_fWalkPower = pSettings->r_float(section, "walk_power");
     m_fJumpWeightPower = pSettings->r_float(section, "jump_weight_power");
     m_fWalkWeightPower = pSettings->r_float(section, "walk_weight_power");
@@ -65,11 +64,9 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     m_fPowerLeakSpeed = pSettings->r_float(section, "max_power_leak_speed");
 
     m_fV_Alcohol = pSettings->r_float(section, "alcohol_v");
-    m_fV_Power = READ_IF_EXISTS(pSettings, r_float, section, "power_v", 0.0f);
+    m_fV_Power = pSettings->r_float(section, "power_v");
 
     m_fV_Satiety = pSettings->r_float(section, "satiety_v");
-    m_fV_SatietyPower = pSettings->r_float(section, "satiety_power_v");
-    m_fV_SatietyHealth = pSettings->r_float(section, "satiety_health_v");
 
     m_fBleedingPowerDecrease = READ_IF_EXISTS(pSettings, r_float, section, "bleeding_power_dec", 0.f);
     m_fMinPowerWalkJump = READ_IF_EXISTS(pSettings, r_float, section, "min_power_walk_jump", 1.0f);
@@ -79,6 +76,9 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
 
     m_fV_Stamina = READ_IF_EXISTS(pSettings, r_float, section, "stamina_v", 0.f);
     m_fV_HardHoldStamina = READ_IF_EXISTS(pSettings, r_float, section, "hard_hold_stamina_v", 0.f);
+
+    m_fV_HealthMax = READ_IF_EXISTS(pSettings, r_float, section, "max_health_v", 0.f);
+    m_fBleedingHealthMaxDecrease = READ_IF_EXISTS(pSettings, r_float, section, "bleeding_max_health_dec", 0.f);
 }
 
 // вычисление параметров с ходом времени
@@ -97,13 +97,13 @@ void CActorCondition::UpdateCondition()
 
     float weight_k = object().GetCarryWeight() / object().MaxCarryWeight();
 
-    if ((object().mstate_real & mcAnyMove))
+    if (object().mstate_real & mcAnyMove)
         ConditionWalk(weight_k, isActorAccelerated(object().mstate_real, object().IsZoomAimingMode()), (object().mstate_real & mcSprint) != 0);
-    else
-        ConditionStand(weight_k);
 
     inherited::UpdateCondition();
     UpdateStamina();
+    UpdatePowerMax();
+    UpdateHealthMax();
     UpdateTutorialThresholds();
 }
 
@@ -111,7 +111,7 @@ void CActorCondition::UpdateSatiety()
 {
     if (m_fSatiety > 0)
     {
-        m_fSatiety -= m_fV_Satiety * m_fDeltaTime * GetStress();
+        m_fSatiety -= GetSatietyRestore() * m_fDeltaTime;
         clamp(m_fSatiety, 0.0f, 1.0f);
     }
 }
@@ -146,13 +146,6 @@ void CActorCondition::ConditionWalk(float weight, bool accel, bool sprint)
     power *= m_fDeltaTime * (accel ? (sprint ? m_fSprintK : m_fAccelK) : 1.f);
     power /= object().GetExoFactor();
     m_fPower -= HitPowerEffect(power);
-}
-void CActorCondition::ConditionStand(float weight)
-{
-    float power = m_fStandPower * GetRegenK();
-    power *= m_fDeltaTime;
-    power /= weight > 1.f ? weight : 1.f;
-    m_fPower += power;
 }
 
 bool CActorCondition::IsCantWalk()
@@ -200,6 +193,8 @@ void CActorCondition::save(NET_Packet& output_packet)
     save_data(m_condition_flags, output_packet);
     save_data(m_fSatiety, output_packet);
     save_data(m_fStamina, output_packet);
+    save_data(m_fPowerMax, output_packet);
+    output_packet.w_float(GetMaxHealth());
 }
 
 void CActorCondition::load(IReader& input_packet)
@@ -209,6 +204,8 @@ void CActorCondition::load(IReader& input_packet)
     load_data(m_condition_flags, input_packet);
     load_data(m_fSatiety, input_packet);
     load_data(m_fStamina, input_packet);
+    load_data(m_fPowerMax, input_packet);
+    object().SetMaxHealth(input_packet.r_float());
 }
 
 void CActorCondition::reinit()
@@ -375,18 +372,11 @@ float CActorCondition::GetZoomEffectorKoef() { return m_fZoomEffectorK; };
 
 void CActorCondition::UpdatePower()
 {
-    m_fPower += m_fV_Power * m_fDeltaTime;
+    float delta = GetPowerRestore();
+    if (m_bIsBleeding)
+        delta -= BleedingSpeed() * m_fBleedingPowerDecrease;
+    m_fPower += delta * m_fDeltaTime;
     clamp(m_fPower, 0.0f, 1.0f);
-
-    float weight{object().GetCarryWeight()}, base_w{object().MaxCarryWeight()};
-
-    float k_max_power = 1.0f + _min(weight, base_w) / base_w + _max(0.0f, (weight - base_w) / 10.0f);
-
-    ChangeMaxPower(-m_fPowerLeakSpeed * m_fDeltaTime * k_max_power); // кажется это таки "сонливость" - постоянное уменьшение максимальной выносливости
-
-    float bleeding_power_dec = BleedingSpeed() * m_fBleedingPowerDecrease;
-
-    m_fDeltaPower += m_fV_SatietyPower * m_fDeltaTime * GetRegenK() - bleeding_power_dec;
 }
 
 void CActorCondition::UpdatePsyHealth()
@@ -458,15 +448,25 @@ void CActorCondition::UpdateStamina()
         object().SetHardHold(false);
 }
 
+void CActorCondition::UpdatePowerMax() { ChangeMaxPower(-m_fPowerLeakSpeed * GetSmoothOwerweightKoef() * m_fDeltaTime); }
+
+void CActorCondition::UpdateHealthMax() 
+{ 
+    float delta = m_fV_HealthMax * GetRegenK(); 
+    if (m_bIsBleeding)
+        delta -= BleedingSpeed() * m_fBleedingHealthMaxDecrease;
+    ChangeMaxHealth(delta * m_fDeltaTime);
+}
+
 float CActorCondition::BleedingSpeed() { return inherited::BleedingSpeed() * GetStress(); }
 
 float CActorCondition::GetWoundIncarnation() { return inherited::GetWoundIncarnation() * GetRegenK(); }
 
-float CActorCondition::GetHealthRestore() { return (inherited::GetHealthRestore() + m_fV_SatietyHealth) * GetRegenK(); }
+float CActorCondition::GetHealthRestore() { return inherited::GetHealthRestore() * GetRegenK(); }
 
 float CActorCondition::GetPsyHealthRestore() { return inherited::GetPsyHealthRestore() * GetRegenK(); }
 
-float CActorCondition::GetPowerRestore() { return (m_fStandPower + m_fV_SatietyPower) * GetRegenK(); }
+float CActorCondition::GetPowerRestore() { return m_fV_Power * GetRegenK(); }
 
 float CActorCondition::GetMaxPowerRestore() { return 1.f; }
 

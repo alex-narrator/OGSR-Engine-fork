@@ -179,12 +179,13 @@ void CUIMainIngameWnd::Init()
 
     // Полоса прогресса здоровья
     UIStaticHealth.AttachChild(&UIHealthBar);
-    //.	xml_init.InitAutoStaticGroup(uiXml,"static_health", &UIStaticHealth);
     xml_init.InitProgressBar(uiXml, "progress_bar_health", 0, &UIHealthBar);
+    //максимальне здоров'я
+    UIStaticHealth.AttachChild(&UIMaxHealthBar);
+    xml_init.InitProgressBar(uiXml, "progress_bar_health_max", 0, &UIMaxHealthBar);
 
     // Полоса прогресса армора
     UIStaticArmor.AttachChild(&UIArmorBar);
-    //.	xml_init.InitAutoStaticGroup(uiXml,"static_armor", &UIStaticArmor);
     xml_init.InitProgressBar(uiXml, "progress_bar_armor", 0, &UIArmorBar);
 
     // Подсказки, которые возникают при наведении прицела на объект
@@ -363,6 +364,7 @@ void CUIMainIngameWnd::Update()
         }
 
         UIHealthBar.SetProgressPos(m_pActor->GetfHealth() * 100.0f);
+        UIMaxHealthBar.SetProgressPos((1.f - m_pActor->GetMaxHealth()) * 100.0f);
         // Armor bar
         auto pOutfit = m_pActor->GetOutfit();
         UIArmorBar.Show(pOutfit);

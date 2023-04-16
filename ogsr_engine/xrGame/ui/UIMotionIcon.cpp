@@ -27,6 +27,9 @@ void CUIMotionIcon::Init()
     AttachChild(&m_power_progress);
     xml_init.InitProgressBar(uiXml, "power_progress", 0, &m_power_progress);
 
+    AttachChild(&m_max_power_progress);
+    xml_init.InitProgressBar(uiXml, "max_power_progress", 0, &m_max_power_progress);
+
     AttachChild(&m_stamina_progress);
     xml_init.InitProgressBar(uiXml, "stamina_progress", 0, &m_stamina_progress);
 
@@ -81,6 +84,7 @@ void CUIMotionIcon::ShowState(EState state)
 }
 
 void CUIMotionIcon::SetPower(float Pos) { m_power_progress.SetProgressPos(Pos); }
+void CUIMotionIcon::SetMaxPower(float Pos) { m_max_power_progress.SetProgressPos(Pos); }
 void CUIMotionIcon::SetStamina(float Pos) { m_stamina_progress.SetProgressPos(Pos); }
 
 void CUIMotionIcon::SetNoise(float Pos)
@@ -104,6 +108,7 @@ void CUIMotionIcon::Update()
 
     SetNoise((s16)(0xffff & iFloor(m_pActor->m_snd_noise * 100.0f)));
     SetPower(m_pActor->conditions().GetPower() * 100.0f);
+    SetMaxPower((1.f - m_pActor->conditions().GetMaxPower()) * 100.0f);
     SetStamina(m_pActor->conditions().GetStamina() * 100.0f);
     //
     if (!Core.Features.test(xrCore::Feature::use_luminocity))

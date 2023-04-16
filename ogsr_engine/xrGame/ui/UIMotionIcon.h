@@ -20,6 +20,7 @@ private:
     EState m_curren_state{stLast};
     CUIStatic m_states[stLast];
     CUIProgressBar m_power_progress;
+    CUIProgressBar m_max_power_progress;
     CUIProgressBar m_stamina_progress;
     CUIProgressBar m_luminosity_progress;
     CUIProgressBar m_noise_progress;
@@ -42,6 +43,7 @@ public:
     void Init();
     void ShowState(EState state);
     void SetPower(float Pos);
+    void SetMaxPower(float Pos);
     void SetStamina(float Pos);
     void SetNoise(float Pos);
     void SetLuminosity(float Pos);

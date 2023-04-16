@@ -34,10 +34,15 @@
 			<texture>ui_hud_shk_stamina</texture>
 		</progress>
 	</power_progress>
+	<max_power_progress  x="24" y="94" width="43" height="7" mode="back" min="0" max="100" pos="0">
+		<progress>
+			<texture>ui_hud_shk_armour</texture>
+		</progress>
+	</max_power_progress>	
 	
 	<stamina_progress  x="24" y="100" width="43" height="3" horz="1" min="0" max="100" pos="100">
 		<progress>
-			<texture stretch="1">ui_hud_shk_armour</texture>
+			<texture>ui_hud_shk_armour</texture>
 		</progress>
 	</stamina_progress>
 	

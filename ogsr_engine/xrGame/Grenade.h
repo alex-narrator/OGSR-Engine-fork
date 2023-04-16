@@ -48,6 +48,7 @@ public:
 protected:
     //HUD_SOUND sndCheckout;
     //ESoundTypes m_eSoundCheckout;
+    HUD_SOUND sndThrow;
     virtual size_t GetWeaponTypeForCollision() const override { return Knife_and_other; }
 
 private:
