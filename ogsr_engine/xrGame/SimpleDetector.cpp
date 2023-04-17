@@ -70,8 +70,6 @@ void CSimpleDetector::UpdateZones()
     for (auto& item : m_zones.m_ItemInfos)
     { // all
         auto pZone = item.first;
-        if (pZone->distance_to_center(this) > m_fDetectRadius)
-            continue;
 
         ITEM_INFO& zone_info = item.second;
         ITEM_TYPE* item_type = zone_info.curr_ref;

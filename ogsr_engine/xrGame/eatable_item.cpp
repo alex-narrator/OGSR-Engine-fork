@@ -143,8 +143,6 @@ void CEatableItem::UseBy(CEntityAlive* entity_alive)
 {
     CInventoryOwner* IO = smart_cast<CInventoryOwner*>(entity_alive);
     R_ASSERT(IO);
-    // R_ASSERT		(m_pCurrentInventory==IO->m_inventory);
-    // R_ASSERT		(object().H_Parent()->ID()==entity_alive->ID());
 
     for (int i = 0; i < eInfluenceMax; ++i)
     {

@@ -1739,7 +1739,7 @@ void CActor::RepackAmmo()
     for (PIItem& _pIItem : inventory().m_ruck)
     {
         CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(_pIItem);
-        if (pAmmo && pAmmo->m_boxCurr < pAmmo->m_boxSize)
+        if (pAmmo && !pAmmo->IsBoxReloadable() && pAmmo->m_boxCurr < pAmmo->m_boxSize)
             _ammo.push_back(pAmmo);
     }
     while (!_ammo.empty())
@@ -1777,7 +1777,7 @@ void CActor::RepackAmmo()
                             cnt = 0;
                         }
                     }
-                    else if (!ammo->IsBoxReloadable())
+                    else
                         ammo->DestroyObject();
                 }
             }

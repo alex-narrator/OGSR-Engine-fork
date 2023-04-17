@@ -282,7 +282,7 @@ void CUICarBodyWnd::Hide()
 
     if (const auto& actor = Actor())
     {
-        actor->SetWeaponHideState(INV_STATE_INV_WND, false);
+        //actor->SetWeaponHideState(INV_STATE_INV_WND, false);
         actor->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
         actor->EnableUIDOF(false);
         actor->TryInventoryCrouch(false);
@@ -661,7 +661,7 @@ void CUICarBodyWnd::Show()
     {
         if (auto act_item = smart_cast<CHudItem*>(actor->inventory().ActiveItem()); act_item && act_item->IsZoomed())
             act_item->OnZoomOut();
-        actor->SetWeaponHideState(INV_STATE_INV_WND, true);
+        //actor->SetWeaponHideState(INV_STATE_INV_WND, true);
         actor->SetRuckAmmoPlacement(true);
         actor->RepackAmmo();
         actor->TryInventoryCrouch(true);

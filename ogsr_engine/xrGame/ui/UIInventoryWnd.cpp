@@ -487,7 +487,7 @@ void CUIInventoryWnd::Show()
     {
         if (auto act_item = smart_cast<CHudItem*>(actor->inventory().ActiveItem()); act_item && act_item->IsZoomed())
             act_item->OnZoomOut();
-        actor->SetWeaponHideState(INV_STATE_INV_WND, true);
+        //actor->SetWeaponHideState(INV_STATE_INV_WND, true);
         actor->SetRuckAmmoPlacement(true); // установим флаг перезарядки из рюкзака
         actor->RepackAmmo();
         actor->TryInventoryCrouch(true);
@@ -511,7 +511,7 @@ void CUIInventoryWnd::Hide()
             actor->inventory().Activate(m_iCurrentActiveSlot);
             m_iCurrentActiveSlot = NO_ACTIVE_SLOT;
         }
-        actor->SetWeaponHideState(INV_STATE_INV_WND, false);
+        //actor->SetWeaponHideState(INV_STATE_INV_WND, false);
         actor->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
         actor->EnableUIDOF(false);
         actor->TryInventoryCrouch(false);

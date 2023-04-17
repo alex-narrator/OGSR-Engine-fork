@@ -2145,7 +2145,7 @@ bool CWeapon::IsDirectReload(CWeaponAmmo* ammo)
 
 bool CWeapon::CanBeReloaded()
 {
-    return (iAmmoElapsed < iMagazineSize || IsMisfire() || AddonAttachable(eMagazine) || m_pAmmo && m_pAmmo->Useful() && m_pAmmo->m_ammoSect != m_magazine.back().m_ammoSect);
+    return (iAmmoElapsed < iMagazineSize || IsMisfire() || AddonAttachable(eMagazine) || m_pAmmo && m_pAmmo->m_boxCurr && m_pAmmo->m_ammoSect != m_magazine.back().m_ammoSect);
 }
 
 bool CWeapon::CanBeUnloaded() { return GetAmmoElapsed() || GetAmmoElapsed2() || IsAddonAttached(eMagazine) && AddonAttachable(eMagazine); }

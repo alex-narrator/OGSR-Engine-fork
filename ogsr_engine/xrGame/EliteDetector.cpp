@@ -78,9 +78,9 @@ void CEliteDetector::UpdateZones()
     for (auto& item : m_zones.m_ItemInfos)
     { // all
         auto pZone = item.first;
-        if (pZone->distance_to_center(this) > m_fDetectRadius)
-            continue;
-        ui().RegisterItemToDraw(pZone->Position(), m_bSectionMarks ? pZone->cNameSect() : ZONE_SIGN);
+
+        if (pZone->distance_to_center(this) <= m_fDetectRadius)
+            ui().RegisterItemToDraw(pZone->Position(), m_bSectionMarks ? pZone->cNameSect() : ZONE_SIGN);
 
         ITEM_INFO& zone_info = item.second;
         ITEM_TYPE* item_type = zone_info.curr_ref;

@@ -93,8 +93,6 @@ void CAdvancedDetector::UpdateZones()
     for (auto& item : m_zones.m_ItemInfos)
     { // all
         auto pZone = item.first;
-        if (pZone->distance_to_center(this) > m_fDetectRadius)
-            continue;
 
         CSpaceRestrictor* pSR = smart_cast<CSpaceRestrictor*>(pZone);
         float dist = pSR->distance_to(Position());

@@ -11,6 +11,7 @@
 #include "Weapon.h"
 #include "Grenade.h"
 #include "string_table.h"
+#include "CharacterPhysicsSupport.h"
 
 ITEM_INFO::~ITEM_INFO()
 {
@@ -250,10 +251,11 @@ void CCustomDetector::UpdateVisibility()
 {
     // check visibility
     attachable_hud_item* i0 = g_player_hud->attached_item(0);
+    bool is_capture = Actor()->character_physics_support()->movement()->PHCapture();
     if (GetState() == eIdle || GetState() == eShowing)
     {
         bool bClimb = ((Actor()->MovingState() & mcClimb) != 0);
-        if (bClimb || IsUIWnd())
+        if (bClimb || IsUIWnd() || is_capture)
         {
             HideDetector(true);
             m_bNeedActivation = true;
@@ -280,7 +282,7 @@ void CCustomDetector::UpdateVisibility()
             CHudItem* huditem = (i0) ? i0->m_parent_hud_item : nullptr;
             bool bChecked = !huditem || CheckCompatibilityInt(huditem, 0);
 
-            if (bChecked && !IsUIWnd())
+            if (bChecked && !IsUIWnd() && !is_capture)
                 ShowDetector(true);
         }
     }
