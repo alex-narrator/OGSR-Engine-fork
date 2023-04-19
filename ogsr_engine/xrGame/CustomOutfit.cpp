@@ -40,8 +40,9 @@ void CCustomOutfit::Load(LPCSTR section)
 
     m_full_icon_name = pSettings->r_string(section, "full_icon_name");
 
-    m_bIsHelmetBuiltIn = !!READ_IF_EXISTS(pSettings, r_bool, section, "helmet_built_in", false);
+    m_bIsHelmetBuiltIn = READ_IF_EXISTS(pSettings, r_bool, section, "helmet_built_in", false);
 
+    m_b_has_visor = READ_IF_EXISTS(pSettings, r_bool, section, "has_visor", true);
     m_VisorTexture = READ_IF_EXISTS(pSettings, r_string, section, "visor_texture", nullptr);
 
     bulletproof_display_bone = READ_IF_EXISTS(pSettings, r_string, section, "bulletproof_display_bone", "bip01_spine");

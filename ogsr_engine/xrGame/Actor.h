@@ -28,6 +28,8 @@ class CWarbelt;
 class CVest;
 class CTorch;
 class CNightVisionDevice;
+class CCustomDetectorSHOC;
+class CCustomDetector;
 class CKnownContactsRegistryWrapper;
 class CEncyclopediaRegistryWrapper;
 class CGameTaskRegistryWrapper;
@@ -670,6 +672,9 @@ public:
     virtual CVest* GetVest() const;
     virtual CTorch* GetTorch() const;
     virtual CNightVisionDevice* GetNightVisionDevice() const;
+
+    virtual CCustomDetectorSHOC* GetDetectorSHOC() const;
+    virtual CCustomDetector* GetDetector() const;
 
 private:
     CActorCondition* m_entity_condition{};

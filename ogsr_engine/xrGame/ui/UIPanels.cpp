@@ -127,6 +127,19 @@ void CUISlotPanel::InitFromXML(CUIXml& xml, LPCSTR path, int index)
     m_fScale = xml.ReadAttribFlt(path, index, "scale");
     m_counter_offset.x = xml.ReadAttribFlt(path, index, "counter_x", 0);
     m_counter_offset.y = xml.ReadAttribFlt(path, index, "counter_y", 0);
+
+    m_slots_list.clear();
+    LPCSTR m_slots_sect = xml.ReadAttrib(path, index, "slots", nullptr);
+    if (m_slots_sect)
+    {
+        char buf[16];
+        for (int i = 0; i < _GetItemCount(m_slots_sect); ++i)
+        {
+            auto slot = atoi(_GetItem(m_slots_sect, i, buf));
+            if (slot < SLOTS_TOTAL)
+                m_slots_list.push_back(slot);
+        }
+    }
 }
 
 void CUISlotPanel::Update()
@@ -139,30 +152,18 @@ void CUISlotPanel::Update()
     auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
     auto& inv = pActor->inventory();
 
-    for (u32 i = 0; i < inv.m_slots.size(); ++i)
+    for (const auto& slot : m_slots_list)
     {
-        const auto& _itm = inv.m_slots[i].m_pIItem;
+        const auto& _itm = inv.m_slots[slot].m_pIItem;
         if (!_itm)
             continue;
 
-        switch (i)
-        {
-        case QUICK_SLOT_0:
-        case QUICK_SLOT_1:
-        case QUICK_SLOT_2:
-        case QUICK_SLOT_3: {
-            if (_itm)
-            {
-                string16 slot_key{};
-                sprintf_s(slot_key, "ui_use_slot_%d", _itm->GetSlot());
-                m_action_key.push_back(CStringTable().translate(slot_key).c_str());
-                m_vRects.push_back(&(_itm->m_icon_params));
-                auto item_sect = _itm->object().cNameSect().c_str();
-                m_count.push_back(inv.GetSameItemCount(item_sect, false));
-            }
-        }
-        default: break;
-        }
+        string16 slot_key{};
+        sprintf_s(slot_key, "ui_use_slot_%d", _itm->GetSlot());
+        m_action_key.push_back(CStringTable().translate(slot_key).c_str());
+        m_vRects.push_back(&(_itm->m_icon_params));
+        auto item_sect = _itm->object().cNameSect().c_str();
+        m_count.push_back(inv.GetSameItemCount(item_sect, false));
     }
 }
 

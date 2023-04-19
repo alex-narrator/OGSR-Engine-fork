@@ -466,11 +466,11 @@ void CCustomDetector::SwitchMode()
 
 void CCustomDetector::ShowCurrentModeMsg()
 {
-    if (!CanSwitchModes())
-        return;
-
     string1024 str;
-    sprintf(str, "%s: %s", NameShort(), CStringTable().translate(m_bAfMode ? "st_af_mode" : "st_zone_mode").c_str());
+    if (CanSwitchModes())
+        sprintf(str, "%s: %s [%.0f%s]", NameShort(), CStringTable().translate(m_bAfMode ? "st_af_mode" : "st_zone_mode").c_str(), GetPowerLevelToShow(), "%");
+    else
+        sprintf(str, "%s: [%.0f%s]", NameShort(), GetPowerLevelToShow(), "%");
     HUD().GetUI()->AddInfoMessage("item_usage", str, false);
 }
 

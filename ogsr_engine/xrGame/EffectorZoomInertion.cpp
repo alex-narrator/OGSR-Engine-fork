@@ -81,7 +81,7 @@ void CEffectorZoomInertion::SetParams(float disp)
 {
     float old_disp = m_fDispRadius;
 
-    m_fDispRadius = disp * m_fZoomAimingDispK;
+    m_fDispRadius = disp * m_fZoomAimingDispK * Actor()->GetZoomEffectorK();
     if (m_fDispRadius < m_fDispMin)
         m_fDispRadius = m_fDispMin;
 
@@ -99,7 +99,7 @@ void CEffectorZoomInertion::CalcNextPoint()
 {
     //	m_fEpsilon = 2*m_fFloatSpeed;
 
-    float half_disp_radius = m_fDispRadius / 2.f * Actor()->GetZoomEffectorK();
+    float half_disp_radius = m_fDispRadius / 2.f;
     m_vTargetPoint.x = m_Random.randF(-half_disp_radius, half_disp_radius);
     m_vTargetPoint.y = m_Random.randF(-half_disp_radius, half_disp_radius);
 
@@ -111,7 +111,7 @@ BOOL CEffectorZoomInertion::ProcessCam(SCamEffectorInfo& info)
     bool camera_moved = false;
 
     //определяем двигал ли прицелом актер
-    if (!info.d.similar(m_vOldCameraDir, m_fCameraMoveEpsilon))
+    if (!info.d.similar(m_vOldCameraDir, m_fCameraMoveEpsilon) || Actor()->IsHardHold())
         camera_moved = true;
 
     /*
@@ -120,7 +120,7 @@ BOOL CEffectorZoomInertion::ProcessCam(SCamEffectorInfo& info)
 
     ///	if(dir.magnitude()<m_fEpsilon || m_dwTimePassed>m_dwDeltaTime)
     //	if (m_dwTimePassed>m_dwDeltaTime)
-    if (m_dwTimePassed == 0 || fis_zero(Actor()->GetZoomEffectorK()))
+    if (m_dwTimePassed == 0)
     {
         m_vLastPoint.set(m_vCurrentPoint);
         CalcNextPoint();

@@ -48,6 +48,8 @@
 #include "UIColorAnimatorWrapper.h"
 #include "../game_news.h"
 
+#include "CustomDetector.h"
+
 using namespace InventoryUtilities;
 
 constexpr auto DEFAULT_MAP_SCALE = 1.f;
@@ -753,34 +755,29 @@ bool CUIMainIngameWnd::IsHUDElementAllowed(EHUDElement element)
     if (Device.Paused() || !m_pActor || m_pActor && !m_pActor->g_Alive())
         return false;
 
-    bool b_gear_info{m_pActor->m_bShowGearInfo}, b_active_item_info{m_pActor->m_bShowActiveItemInfo},
-        allow_devices_hud{b_gear_info && b_active_item_info || OnKeyboardHold(get_action_dik(kSCORES)) || m_pActor->inventory().GetActiveSlot() == BOLT_SLOT};
-
     switch (element)
     {
     case ePDA: // ПДА
     {
-        return allow_devices_hud && m_pActor->GetPDA();
+        return (m_pActor->m_bShowGearInfo && m_pActor->m_bShowActiveItemInfo || 
+            OnKeyboardHold(get_action_dik(kSCORES)) || 
+            m_pActor->inventory().GetActiveSlot() == BOLT_SLOT) &&
+            m_pActor->GetPDA();
     }
     break;
     case eDetector: // Детектор (иконка радиационного заражения)
     {
-        return allow_devices_hud && m_pActor->HasDetectorWorkable();
+        return m_pActor->HasDetectorWorkable() && (m_pActor->GetDetectorSHOC() || m_pActor->GetDetector() && m_pActor->GetDetector()->GetHUDmode());
     }
     break;
     case eActiveItem: // Информация об предмете в руках (для оружия - кол-во/тип заряженных патронов, режим огня)
     {
-        return m_pActor->inventory().ActiveItem() && b_active_item_info;
+        return m_pActor->inventory().ActiveItem() && m_pActor->m_bShowActiveItemInfo;
     }
     break;
     case eGear: // Информация о снаряжении - панель артефактов, наполнение квикслотов, общее кол-во патронов к оружию в руках
     {
-        return b_gear_info;
-    }
-    break;
-    case eArmor: // Смужка стану костюму
-    {
-        return m_pActor->GetOutfit();
+        return m_pActor->m_bShowGearInfo;
     }
     break;
     case eArmorPower: {

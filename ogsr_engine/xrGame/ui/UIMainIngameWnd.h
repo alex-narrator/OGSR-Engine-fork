@@ -39,7 +39,6 @@ enum EHUDElement
     eDetector,
     eActiveItem,
     eGear,
-    eArmor,
     eArmorPower,
 };
 

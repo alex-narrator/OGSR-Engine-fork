@@ -69,6 +69,7 @@
 #include "location_manager.h"
 #include "PHCapture.h"
 #include "CustomDetector.h"
+#include "SimpleDetectorSHOC.h"
 #include "InventoryContainer.h"
 
 // Tip for action for object we're looking at
@@ -1663,6 +1664,9 @@ CTorch* CActor::GetTorch() const { return smart_cast<CTorch*>(inventory().ItemFr
 
 CNightVisionDevice* CActor::GetNightVisionDevice() const { return smart_cast<CNightVisionDevice*>(inventory().ItemFromSlot(TORCH_SLOT)); }
 
+CCustomDetectorSHOC* CActor::GetDetectorSHOC() const { return smart_cast<CCustomDetectorSHOC*>(inventory().ItemFromSlot(DETECTOR_SLOT)); }
+CCustomDetector* CActor::GetDetector() const { return smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)); }
+
 void CActor::block_action(EGameActions cmd)
 {
     if (m_blocked_actions.find(cmd) == m_blocked_actions.end())
@@ -1791,17 +1795,14 @@ bool CActor::unlimited_ammo() { return !!psActorFlags.test(AF_UNLIMITEDAMMO); }
 
 bool CActor::IsDetectorActive() const
 {
-    if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)))
+    if (auto det = GetDetector())
         return det->IsPowerOn() && det->GetHUDmode();
     return false;
 }
 
 float CActor::GetZoomEffectorK()
 {
-    float k{};
-    if (IsHardHold())
-        return k;
-    k = 1.f + (conditions().GetZoomEffectorKoef() * (1.f - conditions().GetPower()));
+    float k = 1.f + (conditions().GetZoomEffectorKoef() * (1.f - conditions().GetPower()));
     if (is_actor_crouch())
         k *= 0.5f;
     if (auto weapon = smart_cast<CWeapon*>(inventory().ActiveItem()))
@@ -1858,12 +1859,10 @@ bool CActor::IsHitToVest(SHit* pHDS) const
     }
 }
 
-#include "SimpleDetectorSHOC.h"
 bool CActor::HasDetectorWorkable()
 {
     auto item_in_det_slot = inventory().ItemFromSlot(DETECTOR_SLOT);
-    return (smart_cast<CCustomDetector*>(item_in_det_slot) || smart_cast<CSimpleDetectorSHOC*>(item_in_det_slot)) && item_in_det_slot->IsPowerOn() &&
-        !fis_zero(item_in_det_slot->GetCondition());
+    return item_in_det_slot && item_in_det_slot->IsPowerOn() && !fis_zero(item_in_det_slot->GetCondition());
 }
 #include "PDA.h"
 bool CActor::HasPDAWorkable() { return GetPDA() && GetPDA()->IsPowerOn() && !fis_zero(GetPDA()->GetCondition()); }

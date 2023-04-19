@@ -729,9 +729,10 @@ void CEntityCondition::ApplyBooster(SBooster& B)
     BOOSTER_MAP::iterator it = m_boosters.find(B.m_BoostType);
     if (it != m_boosters.end())
     {
-        DisableBoostParameters((*it).second);
-        B.f_BoostValue += (*it).second.f_BoostValue;
-        B.f_BoostTime += (*it).second.f_BoostTime;
+        auto& _b = it->second;
+        DisableBoostParameters(_b);
+        B.f_BoostValue += _b.f_BoostValue;
+        B.f_BoostTime += _b.f_BoostTime;
     }
 
     float limit = B.m_BoostType < eHitTypeProtectionBoosterIndex ? 5.f : 1.f;
@@ -757,20 +758,17 @@ void CEntityCondition::DisableBoostParameters(const SBooster& B)
 
 void CEntityCondition::UpdateBoosters()
 {
-    for (u8 i = 0; i < eBoostMax; i++)
+    for (auto& item : m_boosters)
     {
-        BOOSTER_MAP::iterator it = m_boosters.find((eBoostParams)i);
-        if (it != m_boosters.end())
+        auto& B = item.second;
+        B.f_BoostTime -= m_fDeltaTime / 60.f; // приведення до ігрових хвилин
+        if (B.f_BoostTime <= 0.0f)
         {
-            it->second.f_BoostTime -= m_fDeltaTime / 60.f; // приведення до ігрових хвилин
-            if (it->second.f_BoostTime <= 0.0f)
-            {
-                DisableBoostParameters(it->second);
-                m_boosters.erase(it);
-            }
-            else if (it->second.m_BoostType < eRestoreBoostMax)
-                ApplyRestoreBoost(it->second.m_BoostType, it->second.f_BoostValue * m_fDeltaTime);
+            DisableBoostParameters(B);
+            m_boosters.erase(item.first);
         }
+        else
+            ApplyRestoreBoost(B.m_BoostType, B.f_BoostValue * m_fDeltaTime);
     }
 }
 
@@ -778,10 +776,8 @@ void CEntityCondition::ClearAllBoosters()
 {
     m_BoostParams.clear();
     m_BoostParams.resize(eBoostMax);
-    for (int i = 0; i < eBoostMax; ++i)
-    {
-        m_BoostParams[i] = 0.f;
-    }
+    for (auto& param : m_BoostParams)
+        param = 0.f;
 }
 
 float CEntityCondition::GetBoostedHitTypeProtection(int hit_type)
