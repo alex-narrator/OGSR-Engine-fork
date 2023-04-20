@@ -421,7 +421,7 @@ bool CUIInventoryWnd::DropItem(PIItem itm, CUIDragDropListEx* lst)
     auto ammo = itm->cast_weapon_ammo();
 
     auto wpn = smart_cast<CWeaponMagazined*>(_iitem);
-    if (wpn && ammo)
+    if (wpn && ammo && GetInventory()->InSlot(wpn))
         return wpn->IsDirectReload(ammo);
 
     auto ammo_mag = _iitem->cast_weapon_ammo();

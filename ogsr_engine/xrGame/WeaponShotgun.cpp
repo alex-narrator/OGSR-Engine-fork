@@ -316,6 +316,8 @@ void CWeaponShotgun::OnStateSwitch(u32 S, u32 oldState)
     if (m_magazine.size() >= (u32)iMagazineSize || !HaveCartridgeInInventory(1))
     {
         m_sub_state = eSubstateReloadEnd;
+        if (m_bDirectReload)
+            m_bDirectReload = false;
     };
 
     switch (m_sub_state)
@@ -394,11 +396,7 @@ bool CWeaponShotgun::HaveCartridgeInInventory(u8 cnt)
     if (!m_pCurrentInventory)
         return false;
 
-    if (m_bDirectReload)
-    {
-        m_bDirectReload = false;
-    }
-    else
+    if (!m_bDirectReload)
     {
         m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), ParentIsActor()));
 
@@ -417,7 +415,6 @@ bool CWeaponShotgun::HaveCartridgeInInventory(u8 cnt)
             }
         }
     }
-
     return m_pAmmo && m_pAmmo->m_boxCurr >= cnt;
 }
 
@@ -444,7 +441,7 @@ u8 CWeaponShotgun::AddCartridge(u8 cnt)
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
 
     if (m_DefaultCartridge.m_LocalAmmoType != m_ammoType)
-        m_DefaultCartridge.Load(*m_ammoTypes[m_ammoType], u8(m_ammoType));
+        m_DefaultCartridge.Load(m_ammoTypes[m_ammoType].c_str(), u8(m_ammoType));
 
     CCartridge l_cartridge = m_DefaultCartridge;
     while (cnt && m_magazine.size() < (u32)iMagazineSize)

@@ -102,8 +102,6 @@ protected:
 
     float m_fJumpPower{};
     float m_fWalkPower{};
-    float m_fJumpWeightPower{};
-    float m_fWalkWeightPower{};
     float m_fOverweightWalkK{};
     float m_fOverweightJumpK{};
     float m_fAccelK{};

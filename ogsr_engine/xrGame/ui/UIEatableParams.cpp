@@ -159,9 +159,11 @@ void CUIEatableParams::SetInfo(CInventoryItem* obj) {
 		auto effect_name = CStringTable().translate(effect_names[i]).c_str();
 
 		_val *= 100.0f;
+        if (i == _max_power_influence)
+            _val *= -1.f;
 		LPCSTR _sn = "%";
 		LPCSTR _color = (_val > 0) ? "%c[green]" : "%c[red]";
-		if (i == _radiation_influence)
+		if (i == _radiation_influence || i == _max_power_influence)
 			_color = (_val > 0) ? "%c[red]" : "%c[green]";
 
 		sprintf_s(text_to_show, "%s %s %+.1f %s",
@@ -199,7 +201,7 @@ void CUIEatableParams::SetInfo(CInventoryItem* obj) {
 			_val *= 100.0f;
 			_sn = "%";
 			_color = (_val > 0) ? "%c[green]" : "%c[red]";
-			if (i == _radiation_boost)
+			if (i == _radiation_boost || i == _max_power_boost)
 				_color = (_val > 0) ? "%c[red]" : "%c[green]";
 
 			sprintf_s(text_to_show, "%s %s %+.1f %s",

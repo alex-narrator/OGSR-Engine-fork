@@ -148,7 +148,7 @@ void CUIArtefactParams::SetInfo(CInventoryItem* obj)
         if (i == _item_alcohol_restore)
             _val *= -1.0f;
 
-        if (i == _item_radiation_restore || i == _item_alcohol_restore)
+        if (i == _item_radiation_restore || i == _item_alcohol_restore || i == _item_max_power_restore)
             _color = (_val > 0) ? "%c[red]" : "%c[green]";
 
         sprintf_s(_buff, "%s %s %+.1f %s", CStringTable().translate(af_item_param_names[i]).c_str(), _color, _val, _sn);

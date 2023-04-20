@@ -178,7 +178,7 @@ void CUIOutfitInfo::Update()
 
         LPCSTR _color = (_val > 0) ? "%c[green]" : "%c[red]";
 
-        if (i == _item_radiation_restore || i == _item_alcohol_restore)
+        if (i == _item_radiation_restore || i == _item_alcohol_restore || i == _item_max_power_restore)
         {
             _color = (_val > 0) ? "%c[red]" : "%c[green]";
         }

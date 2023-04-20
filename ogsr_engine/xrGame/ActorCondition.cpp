@@ -35,8 +35,6 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
 
     m_fJumpPower = pSettings->r_float(section, "jump_power");
     m_fWalkPower = pSettings->r_float(section, "walk_power");
-    m_fJumpWeightPower = pSettings->r_float(section, "jump_weight_power");
-    m_fWalkWeightPower = pSettings->r_float(section, "walk_weight_power");
     m_fOverweightWalkK = pSettings->r_float(section, "overweight_walk_k");
     m_fOverweightJumpK = pSettings->r_float(section, "overweight_jump_k");
     m_fAccelK = pSettings->r_float(section, "accel_k");
@@ -135,14 +133,14 @@ void CActorCondition::PowerHit(float power, bool apply_outfit)
 void CActorCondition::ConditionJump(float weight)
 {
     float power = m_fJumpPower;
-    power += m_fJumpWeightPower * weight * (weight > 1.f ? m_fOverweightJumpK : 1.f);
+    power += power * weight * (weight > 1.f ? m_fOverweightJumpK : 1.f);
     power /= object().GetExoFactor();
     m_fPower -= HitPowerEffect(power);
 }
 void CActorCondition::ConditionWalk(float weight, bool accel, bool sprint)
 {
     float power = m_fWalkPower;
-    power += m_fWalkWeightPower * weight * (weight > 1.f ? m_fOverweightWalkK : 1.f);
+    power += power * weight * (weight > 1.f ? m_fOverweightWalkK : 1.f);
     power *= m_fDeltaTime * (accel ? (sprint ? m_fSprintK : m_fAccelK) : 1.f);
     power /= object().GetExoFactor();
     m_fPower -= HitPowerEffect(power);
@@ -173,7 +171,7 @@ bool CActorCondition::IsCantJump(float weight)
         return false;
     }
     float power = m_fJumpPower;
-    power += m_fJumpWeightPower * weight * (weight > 1.f ? m_fOverweightJumpK : 1.f);
+    power += m_fJumpPower * weight * (weight > 1.f ? m_fOverweightJumpK : 1.f);
     return m_fPower < HitPowerEffect(power);
 }
 
@@ -448,7 +446,7 @@ void CActorCondition::UpdateStamina()
         object().SetHardHold(false);
 }
 
-void CActorCondition::UpdatePowerMax() { ChangeMaxPower(-m_fPowerLeakSpeed * GetSmoothOwerweightKoef() * m_fDeltaTime); }
+void CActorCondition::UpdatePowerMax() { ChangeMaxPower(GetMaxPowerRestore() * m_fDeltaTime); }
 
 void CActorCondition::UpdateHealthMax() 
 { 
@@ -468,7 +466,7 @@ float CActorCondition::GetPsyHealthRestore() { return inherited::GetPsyHealthRes
 
 float CActorCondition::GetPowerRestore() { return m_fV_Power * GetRegenK(); }
 
-float CActorCondition::GetMaxPowerRestore() { return 1.f; }
+float CActorCondition::GetMaxPowerRestore() { return m_fPowerLeakSpeed * GetStress(); }
 
 float CActorCondition::GetSatietyRestore() { return m_fV_Satiety * GetStress(); }
 

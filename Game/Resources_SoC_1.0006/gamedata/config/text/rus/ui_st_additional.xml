@@ -631,7 +631,7 @@
 		<text>Порцій</text>
 	</string>
 	<string id="ui_inv_max_power">
-		<text>Макс. витривалість</text>
+		<text>Втома</text>
 	</string>
 	<string id="st_power_level">
 		<text>Заряд батареї</text>

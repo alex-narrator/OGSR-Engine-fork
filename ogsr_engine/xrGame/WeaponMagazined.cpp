@@ -301,8 +301,11 @@ void CWeaponMagazined::Reload()
 bool CWeaponMagazined::TryToGetAmmo(u32 id)
 {
     if (!m_bDirectReload)
-        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[id].c_str(), ParentIsActor(), true, AddonAttachable(eMagazine)));
-    return m_pAmmo && m_pAmmo->Useful() && (!AddonAttachable(eMagazine) || m_pAmmo->IsBoxReloadable() || !iAmmoElapsed || IsGrenadeMode());
+    {
+        bool mag_weapon = AddonAttachable(eMagazine);
+        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[id].c_str(), ParentIsActor(), mag_weapon, mag_weapon));
+    }
+    return m_pAmmo && m_pAmmo->m_boxCurr && (!AddonAttachable(eMagazine) || m_pAmmo->IsBoxReloadable() || !iAmmoElapsed || IsGrenadeMode());
 }
 
 bool CWeaponMagazined::TryReload()
@@ -386,16 +389,21 @@ void CWeaponMagazined::ReloadMagazine()
         m_set_next_ammoType_on_reload = u32(-1);
     }
 
-    if (!unlimited_ammo() && !m_bDirectReload)
+    if (m_bDirectReload)
     {
+        m_bDirectReload = false;
+    }
+    else if (!unlimited_ammo())
+    {
+        bool mag_weapon = AddonAttachable(eMagazine);
         // попытаться найти в инвентаре патроны текущего типа
-        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), ParentIsActor(), !IsSingleReloading(), AddonAttachable(eMagazine)));
+        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), ParentIsActor(), mag_weapon, mag_weapon));
         if (!m_pAmmo && !m_bLockType)
         {
             for (u32 i = 0; i < m_ammoTypes.size(); ++i)
             {
                 // проверить патроны всех подходящих типов
-                m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[i].c_str(), ParentIsActor(), !IsSingleReloading(), AddonAttachable(eMagazine)));
+                m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[i].c_str(), ParentIsActor(), mag_weapon, mag_weapon));
                 if (m_pAmmo)
                 {
                     m_ammoType = i;
@@ -403,12 +411,6 @@ void CWeaponMagazined::ReloadMagazine()
                 }
             }
         }
-    }
-    else
-    {
-        m_ammoType = m_ammoType;
-        if (m_bDirectReload)
-            m_bDirectReload = false;
     }
 
     // нет патронов для перезарядки

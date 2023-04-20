@@ -1222,7 +1222,7 @@ void CInventory::IterateAmmo(bool bSearchRuck, std::function<bool(const PIItem)>
         for (const auto& item : m_ruck)
         {
             const auto* ammo = smart_cast<CWeaponAmmo*>(item);
-            if (ammo && item->Useful() && callback(item))
+            if (ammo && ammo->m_boxCurr && callback(item))
                 break;
         }
     }
@@ -1231,26 +1231,26 @@ void CInventory::IterateAmmo(bool bSearchRuck, std::function<bool(const PIItem)>
         for (const auto& item : m_vest)
         {
             const auto* ammo = smart_cast<CWeaponAmmo*>(item);
-            if (ammo && item->Useful() && callback(item))
+            if (ammo && ammo->m_boxCurr && callback(item))
                 break;
         }
         for (const auto& item : m_belt)
         {
             const auto* ammo = smart_cast<CWeaponAmmo*>(item);
-            if (ammo && item->Useful() && callback(item))
+            if (ammo && ammo->m_boxCurr && callback(item))
                 break;
         }
         for (const auto& _slot : m_slots)
         {
             const auto item = _slot.m_pIItem;
             const auto* ammo = smart_cast<CWeaponAmmo*>(item);
-            if (ammo && item->Useful() && callback(item))
+            if (ammo && ammo->m_boxCurr && callback(item))
                 break;
         }
     }
 }
 
-PIItem CInventory::GetAmmoByLimit(const char* name, bool forActor, bool limit_max, bool include_magazines) const
+PIItem CInventory::GetAmmoByLimit(const char* sect, bool forActor, bool limit_max, bool include_magazines) const
 {
     PIItem box{};
     u32 limit{};
@@ -1258,7 +1258,7 @@ PIItem CInventory::GetAmmoByLimit(const char* name, bool forActor, bool limit_ma
     auto callback = [&](const auto pIItem) -> bool {
         const auto* ammo = smart_cast<CWeaponAmmo*>(pIItem);
         shared_str sect_to_compare = include_magazines ? ammo->m_ammoSect : ammo->cNameSect();
-        if (ammo->Useful() && !xr_strcmp(sect_to_compare, name))
+        if (ammo->m_boxCurr && !xr_strcmp(sect_to_compare, sect))
         {
             const bool size_fits_limit = (ammo->m_boxCurr == (limit_max ? ammo->m_boxSize : 1));
             const bool update_limit = limit_max ? ammo->m_boxCurr > limit : (limit == 0 || ammo->m_boxCurr < limit);

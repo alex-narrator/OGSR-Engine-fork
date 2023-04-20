@@ -2007,16 +2007,17 @@ void CWeapon::ParseCurrentItem(CGameFont* F) { F->OutNext("WEAPON IN STRAPPED MO
 u32 CWeapon::GetNextAmmoType()
 {
     u32 l_newType = m_set_next_ammoType_on_reload;
+    bool mag_weapon = AddonAttachable(eMagazine);
     for (;;)
     {
         if (++l_newType >= m_ammoTypes.size())
         {
             for (l_newType = 0; l_newType < m_ammoTypes.size(); ++l_newType)
-                if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), ParentIsActor(), true, AddonAttachable(eMagazine)))
+                if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), ParentIsActor(), mag_weapon, mag_weapon))
                     break;
             break;
         }
-        if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), ParentIsActor(), true, AddonAttachable(eMagazine)))
+        if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), ParentIsActor(), mag_weapon, mag_weapon))
             break;
     }
     if (l_newType != m_set_next_ammoType_on_reload && l_newType < m_ammoTypes.size())
@@ -2130,8 +2131,10 @@ bool CWeapon::IsDirectReload(CWeaponAmmo* ammo)
     m_bDirectReload = true;
     m_pAmmo = ammo;
 
+    Msg("%s m_pAmmo %s", __FUNCTION__, m_pAmmo->cName().c_str());
+
     auto i = std::distance(m_ammoTypes.begin(), _it);
-    if (TryToGetAmmo(i) && CanBeReloaded())
+    if (CanBeReloaded() && TryToGetAmmo(i))
     {
         m_ammoType = i;
         m_set_next_ammoType_on_reload = u32(-1);
