@@ -113,9 +113,9 @@
 
 	<pick_up_item x="437" y="400" width="150" height="100"/>
 
-	<slot_panel 	x="130" y="610" width="730" height="50" cell_width="38" cell_height="50" scale="0.75" counter_y="-10" slots="0,1,2,3,4,12,13,14,15"/>
-	<vest_panel 	x="358" y="610" width="730" height="50" cell_width="38" cell_height="50" scale="0.75" group_similar="1" counter_y="-10"/>
-	<belt_panel 	x="130" y="710" width="730" height="50" cell_width="38" cell_height="50" scale="0.75" group_similar="1" counter_y="-10"/>
+	<slot_panel 	x="130" y="510" scale="0.75" counter_y="-10" slots="0,1,2,3,4,12,13,14,15"/>
+	<vest_panel 	x="358" y="610" scale="0.75" counter_y="-10" group_similar="1"/>
+	<belt_panel 	x="130" y="710" scale="0.75" counter_y="-10" group_similar="1"/>
 	
 	<new_contact_snd>detectors\contact_1</new_contact_snd>	
 	

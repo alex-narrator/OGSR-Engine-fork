@@ -969,6 +969,13 @@ void CInventoryItem::SetPowerLevel(float value)
         Switch(false);
 }
 
+float CInventoryItem::GetPowerLevelToShow() const
+{
+    float res{m_fPowerLevel / m_fPowerCapacity * 100.f};
+    clamp(res, 0.f, 100.f);
+    return res;
+}
+
 void CInventoryItem::Switch() { Switch(!IsPowerOn()); }
 
 void CInventoryItem::Switch(bool turn_on)

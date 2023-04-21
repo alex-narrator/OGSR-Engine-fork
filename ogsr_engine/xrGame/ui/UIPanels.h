@@ -4,7 +4,7 @@
 #include "UIIconParams.h"
 
 class CUIXml;
-// artefact panel
+// belt panel
 class CUIBeltPanel : public CUIWindow
 {
 public:
@@ -17,10 +17,7 @@ public:
 
 protected:
     float m_fScale;
-    Fvector2 m_cell_size;
-    xr_vector<CIconParams*> m_vRects;
-    CUIStaticItem m_st;
-    xr_vector<int> m_count;
+    CUIStatic m_st;
     bool m_bGroupSimilar{};
     Fvector2 m_counter_offset;
 };
@@ -37,15 +34,11 @@ public:
 
 protected:
     float m_fScale;
-    Fvector2 m_cell_size;
-    xr_vector<CIconParams*> m_vRects;
     CUIStatic m_st;
-    xr_vector<shared_str> m_action_key;
-    xr_vector<int> m_count;
     Fvector2 m_counter_offset;
     xr_vector<int> m_slots_list;
 };
-// vest slot panel
+// vest panel
 class CUIVestPanel : public CUIWindow
 {
 public:
@@ -58,10 +51,7 @@ public:
 
 protected:
     float m_fScale;
-    Fvector2 m_cell_size;
-    xr_vector<CIconParams*> m_vRects;
-    CUIStaticItem m_st;
-    xr_vector<int> m_count;
+    CUIStatic m_st;
     bool m_bGroupSimilar{};
     Fvector2 m_counter_offset;
 };

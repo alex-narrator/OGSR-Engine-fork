@@ -222,7 +222,7 @@ void CUIAmmoCellItem::CreateAmmoInBoxIcon()
     float k_x = UI()->get_current_kx();
 
     Frect rect = params.original_rect();
-    Fvector2 size{/*params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF*/ rect.width(), rect.height()};
+    Fvector2 size{rect.width(), rect.height()};
     size.mul(object()->ammo_icon_scale);
     size.x *= k_x;
     m_ammo_in_box->SetWndSize(size);

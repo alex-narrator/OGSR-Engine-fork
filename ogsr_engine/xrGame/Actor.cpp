@@ -1353,19 +1353,8 @@ float CActor::Radius() const
 
 bool CActor::use_bolts() const { return CInventoryOwner::use_bolts(); };
 
-void CActor::OnItemTake(CInventoryItem* inventory_item)
-{
-    CInventoryOwner::OnItemTake(inventory_item);
-}
-
-void CActor::OnItemDrop(CInventoryItem* inventory_item)
-{
-    CInventoryOwner::OnItemDrop(inventory_item);
-
-    if (inventory_item->m_eItemPlace == eItemPlaceBelt)
-        UpdateUIPanels(inventory_item->m_eItemPlace);
-}
-
+void CActor::OnItemTake(CInventoryItem* inventory_item) { CInventoryOwner::OnItemTake(inventory_item); }
+void CActor::OnItemDrop(CInventoryItem* inventory_item) { CInventoryOwner::OnItemDrop(inventory_item); }
 void CActor::OnItemDropUpdate()
 {
     CInventoryOwner::OnItemDropUpdate();
@@ -1377,43 +1366,10 @@ void CActor::OnItemDropUpdate()
         if (!(*I)->IsInvalid() && !attached(*I))
             attach(*I);
 }
-
-void CActor::OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_place)
-{
-    CInventoryOwner::OnItemRuck(inventory_item, previous_place);
-    UpdateUIPanels(previous_place);
-}
-void CActor::OnItemBelt(CInventoryItem* inventory_item, EItemPlace previous_place)
-{
-    CInventoryOwner::OnItemBelt(inventory_item, previous_place);
-    UpdateUIPanels(previous_place);
-}
-void CActor::OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place)
-{
-    CInventoryOwner::OnItemVest(inventory_item, previous_place);
-    UpdateUIPanels(previous_place);
-}
-void CActor::OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place)
-{
-    CInventoryOwner::OnItemSlot(inventory_item, previous_place);
-    UpdateUIPanels(previous_place);
-}
-
-void CActor::UpdateUIPanels(int place)
-{
-    auto main_wnd = HUD().GetUI()->UIMainIngameWnd;
-    switch (place)
-    {
-    case eItemPlaceUndefined:
-        main_wnd->m_slotPanel->Update();
-        main_wnd->m_beltPanel->Update();
-        main_wnd->m_vestPanel->Update();
-        break;
-    case eItemPlaceSlot: main_wnd->m_slotPanel->Update(); break;
-    case eItemPlaceBelt: main_wnd->m_beltPanel->Update(); break;
-    case eItemPlaceVest: main_wnd->m_vestPanel->Update(); break;
-    }
-}
+void CActor::OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemRuck(inventory_item, previous_place); }
+void CActor::OnItemBelt(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemBelt(inventory_item, previous_place); }
+void CActor::OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemVest(inventory_item, previous_place); }
+void CActor::OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemSlot(inventory_item, previous_place); }
 
 constexpr auto ITEMS_BOOST_TIME = 0.100f;
 

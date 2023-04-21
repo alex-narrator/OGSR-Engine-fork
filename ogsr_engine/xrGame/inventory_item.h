@@ -337,7 +337,7 @@ public:
     void ChangePowerLevel(float);
     void SetPowerLevel(float);
     virtual float GetPowerLevel() const { return m_fPowerLevel; };
-    virtual float GetPowerLevelToShow() const { return m_fPowerLevel / m_fPowerCapacity * 100.f; };
+    virtual float GetPowerLevelToShow() const;
     virtual float GetPowerConsumption() const { return m_fPowerConsumption; };
     virtual float GetPowerCapacity() const { return m_fPowerCapacity; };
     virtual bool CanBeCharged() const;

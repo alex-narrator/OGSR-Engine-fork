@@ -7,6 +7,8 @@
 #include "Inventory.h"
 #include "string_table.h"
 
+using namespace InventoryUtilities;
+
 void SetCounter(int count, float pos_x, float pos_y)
 {
     CUIStatic st_count;
@@ -41,19 +43,26 @@ void TryAddToShowList(TIItemContainer& list, PIItem item, bool group)
 void CUIBeltPanel::InitFromXML(CUIXml& xml, LPCSTR path, int index)
 {
     CUIXmlInit::InitWindow(xml, path, index, this);
-    m_cell_size.x = xml.ReadAttribFlt(path, index, "cell_width");
-    m_cell_size.y = xml.ReadAttribFlt(path, index, "cell_height");
     m_fScale = xml.ReadAttribFlt(path, index, "scale");
     m_bGroupSimilar = xml.ReadAttribFlt(path, index, "group_similar", 0);
     m_counter_offset.x = xml.ReadAttribFlt(path, index, "counter_x", 0);
     m_counter_offset.y = xml.ReadAttribFlt(path, index, "counter_y", 0);
 }
 
-void CUIBeltPanel::Update()
+void CUIBeltPanel::Update() {}
+
+void CUIBeltPanel::Draw()
 {
-    m_st.SetShader(InventoryUtilities::GetEquipmentIconsShader());
-    m_vRects.clear();
-    m_count.clear();
+    m_st.SetShader(GetEquipmentIconsShader());
+
+    const float iIndent = 1.0f;
+    Fvector2 pos{}, size{};
+
+    Frect rect;
+    GetAbsoluteRect(rect);
+    pos.set(rect.left, rect.top);
+
+    float k_x{UI()->get_current_kx()};
 
     auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
     auto& inv = pActor->inventory();
@@ -66,51 +75,30 @@ void CUIBeltPanel::Update()
 
     for (const auto& _itm : items_to_show)
     {
-        if (_itm)
+        auto& params = _itm->m_icon_params;
+
+        params.set_shader(&m_st);
+        const auto& r = params.original_rect();
+        size.set(r.width(), r.height());
+        size.mul(m_fScale);
+        size.x *= k_x;
+
+        m_st.SetWndRect(0, 0, size.x, size.y);
+
+        m_st.SetWndPos(pos.x, pos.y);
+
+        auto count = inv.GetSameItemCount(_itm->object().cNameSect().c_str(), false);
+        if (count > 1)
         {
-            m_vRects.push_back(&(_itm->m_icon_params));
-            auto item_sect = _itm->object().cNameSect().c_str();
-            m_count.push_back(inv.GetSameItemCount(item_sect, false));
+            float pos_x = m_counter_offset.x + pos.x;
+            float pos_y = m_counter_offset.y + (pos.y + size.y);
+            SetCounter(count, pos_x, pos_y);
         }
-    }
-}
+        pos.x = pos.x + iIndent + size.x;
 
-void CUIBeltPanel::Draw()
-{
-    const float iIndent = 1.0f;
-    float x{};
-    float y{};
-    float iHeight;
-    float iWidth;
+        TryAttachIcons(&m_st, _itm, m_fScale);
 
-    Frect rect;
-    GetAbsoluteRect(rect);
-    x = rect.left;
-    y = rect.top;
-
-    float _s = m_cell_size.x / m_cell_size.y;
-
-    for (int i = 0; i < m_vRects.size(); i++)
-    {
-        const auto& params = m_vRects[i];
-
-        params->set_shader(&m_st);
-        const auto& r = params->original_rect();
-        iHeight = m_fScale * (r.bottom - r.top);
-        iWidth = _s * m_fScale * (r.right - r.left);
-
-        m_st.SetRect(0, 0, iWidth, iHeight);
-
-        m_st.SetPos(x, y);
-        if (m_count[i] > 1 && m_bGroupSimilar)
-        {
-            float pos_x = m_counter_offset.x + x;
-            float pos_y = m_counter_offset.y + (y + iHeight);
-            SetCounter(m_count[i], pos_x, pos_y);
-        }
-        x = x + iIndent + iWidth;
-
-        m_st.Render();
+        m_st.Draw();
     }
 
     CUIWindow::Draw();
@@ -122,8 +110,6 @@ void CUIBeltPanel::Draw()
 void CUISlotPanel::InitFromXML(CUIXml& xml, LPCSTR path, int index)
 {
     CUIXmlInit::InitWindow(xml, path, index, this);
-    m_cell_size.x = xml.ReadAttribFlt(path, index, "cell_width");
-    m_cell_size.y = xml.ReadAttribFlt(path, index, "cell_height");
     m_fScale = xml.ReadAttribFlt(path, index, "scale");
     m_counter_offset.x = xml.ReadAttribFlt(path, index, "counter_x", 0);
     m_counter_offset.y = xml.ReadAttribFlt(path, index, "counter_y", 0);
@@ -142,15 +128,25 @@ void CUISlotPanel::InitFromXML(CUIXml& xml, LPCSTR path, int index)
     }
 }
 
-void CUISlotPanel::Update()
+void CUISlotPanel::Update() {}
+
+void CUISlotPanel::Draw()
 {
-    m_st.SetShader(InventoryUtilities::GetEquipmentIconsShader());
-    m_vRects.clear();
-    m_action_key.clear();
-    m_count.clear();
+    m_st.SetShader(GetEquipmentIconsShader());
+
+    const float iIndent = 1.0f;
+    Fvector2 pos{}, size{};
+
+    Frect rect;
+    GetAbsoluteRect(rect);
+    pos.set(rect.left, rect.top);
+
+    float k_x{UI()->get_current_kx()};
 
     auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
     auto& inv = pActor->inventory();
+
+    string16 slot_key{};
 
     for (const auto& slot : m_slots_list)
     {
@@ -158,51 +154,31 @@ void CUISlotPanel::Update()
         if (!_itm)
             continue;
 
-        string16 slot_key{};
-        sprintf_s(slot_key, "ui_use_slot_%d", _itm->GetSlot());
-        m_action_key.push_back(CStringTable().translate(slot_key).c_str());
-        m_vRects.push_back(&(_itm->m_icon_params));
-        auto item_sect = _itm->object().cNameSect().c_str();
-        m_count.push_back(inv.GetSameItemCount(item_sect, false));
-    }
-}
+        auto& params = _itm->m_icon_params;
 
-void CUISlotPanel::Draw()
-{
-    const float iIndent = 1.0f;
-    float x{};
-    float y{};
-    float iHeight;
-    float iWidth;
+        params.set_shader(&m_st);
+        const auto& r = params.original_rect();
+        size.set(r.width(), r.height());
+        size.mul(m_fScale);
+        size.x *= k_x;
 
-    Frect rect;
-    GetAbsoluteRect(rect);
-    x = rect.left;
-    y = rect.top;
+        m_st.SetWndRect(0, 0, size.x, size.y);
 
-    float _s = m_cell_size.x / m_cell_size.y;
+        m_st.SetWndPos(pos.x, pos.y);
 
-    for (int i = 0; i < m_vRects.size(); i++)
-    {
-        const auto& params = m_vRects[i];
-
-        params->set_shader(&m_st);
-        const auto& r = params->original_rect();
-        iHeight = m_fScale * (r.bottom - r.top);
-        iWidth = _s * m_fScale * (r.right - r.left);
-
-        m_st.SetWndRect(0, 0, iWidth, iHeight);
-
-        m_st.SetWndPos(x, y);
-        if (m_count[i] > 1)
+        auto count = inv.GetSameItemCount(_itm->object().cNameSect().c_str(), false);
+        if (count > 1)
         {
-            float pos_x = m_counter_offset.x + x;
-            float pos_y = m_counter_offset.y + (y + iHeight);
-            SetCounter(m_count[i], pos_x, pos_y);
+            float pos_x = m_counter_offset.x + pos.x;
+            float pos_y = m_counter_offset.y + (pos.y + size.y);
+            SetCounter(count, pos_x, pos_y);
         }
-        x = x + iIndent + iWidth;
+        pos.x = pos.x + iIndent + size.x;
 
-        m_st.SetText(m_action_key[i].c_str());
+        sprintf_s(slot_key, "ui_use_slot_%d", _itm->GetSlot());
+        m_st.SetText(CStringTable().translate(slot_key).c_str());
+
+        TryAttachIcons(&m_st, _itm, m_fScale);
 
         m_st.Draw();
     }
@@ -216,19 +192,26 @@ void CUISlotPanel::Draw()
 void CUIVestPanel::InitFromXML(CUIXml& xml, LPCSTR path, int index)
 {
     CUIXmlInit::InitWindow(xml, path, index, this);
-    m_cell_size.x = xml.ReadAttribFlt(path, index, "cell_width");
-    m_cell_size.y = xml.ReadAttribFlt(path, index, "cell_height");
     m_fScale = xml.ReadAttribFlt(path, index, "scale");
     m_bGroupSimilar = xml.ReadAttribFlt(path, index, "group_similar", 0);
     m_counter_offset.x = xml.ReadAttribFlt(path, index, "counter_x", 0);
     m_counter_offset.y = xml.ReadAttribFlt(path, index, "counter_y", 0);
 }
 
-void CUIVestPanel::Update()
+void CUIVestPanel::Update() {}
+
+void CUIVestPanel::Draw()
 {
     m_st.SetShader(InventoryUtilities::GetEquipmentIconsShader());
-    m_vRects.clear();
-    m_count.clear();
+
+    const float iIndent = 1.0f;
+    Fvector2 pos{}, size{};
+
+    Frect rect;
+    GetAbsoluteRect(rect);
+    pos.set(rect.left, rect.top);
+
+    float k_x{UI()->get_current_kx()};
 
     auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
     auto& inv = pActor->inventory();
@@ -241,51 +224,30 @@ void CUIVestPanel::Update()
 
     for (const auto& _itm : items_to_show)
     {
-        if (_itm)
+        auto& params = _itm->m_icon_params;
+
+        params.set_shader(&m_st);
+        const auto& r = params.original_rect();
+        size.set(r.width(), r.height());
+        size.mul(m_fScale);
+        size.x *= k_x;
+
+        m_st.SetWndRect(0, 0, size.x, size.y);
+
+        m_st.SetWndPos(pos.x, pos.y);
+
+        auto count = inv.GetSameItemCount(_itm->object().cNameSect().c_str(), false);
+        if (count > 1)
         {
-            m_vRects.push_back(&(_itm->m_icon_params));
-            auto item_sect = _itm->object().cNameSect().c_str();
-            m_count.push_back(inv.GetSameItemCount(item_sect, false));
+            float pos_x = m_counter_offset.x + pos.x;
+            float pos_y = m_counter_offset.y + (pos.y + size.y);
+            SetCounter(count, pos_x, pos_y);
         }
-    }
-}
+        pos.x = pos.x + iIndent + size.x;
 
-void CUIVestPanel::Draw()
-{
-    const float iIndent = 1.0f;
-    float x{};
-    float y{};
-    float iHeight;
-    float iWidth;
+        TryAttachIcons(&m_st, _itm, m_fScale);
 
-    Frect rect;
-    GetAbsoluteRect(rect);
-    x = rect.left;
-    y = rect.top;
-
-    float _s = m_cell_size.x / m_cell_size.y;
-
-    for (int i = 0; i < m_vRects.size(); i++)
-    {
-        const auto& params = m_vRects[i];
-
-        params->set_shader(&m_st);
-        const auto& r = params->original_rect();
-        iHeight = m_fScale * (r.bottom - r.top);
-        iWidth = _s * m_fScale * (r.right - r.left);
-
-        m_st.SetRect(0, 0, iWidth, iHeight);
-
-        m_st.SetPos(x, y);
-        if (m_count[i] > 1 && m_bGroupSimilar)
-        {
-            float pos_x = m_counter_offset.x + x;
-            float pos_y = m_counter_offset.y + (y + iHeight);
-            SetCounter(m_count[i], pos_x, pos_y);
-        }
-        x = x + iIndent + iWidth;
-
-        m_st.Render();
+        m_st.Draw();
     }
 
     CUIWindow::Draw();

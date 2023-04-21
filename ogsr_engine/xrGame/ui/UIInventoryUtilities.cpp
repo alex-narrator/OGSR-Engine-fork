@@ -616,6 +616,7 @@ void AttachAmmoIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
     params.set_shader(ammo_icon);
 
     float k_x{UI()->get_current_kx()};
+    _scale /= k_x; //без цього іконка набою буде менше ніж потрібно та зі зсувом офсету
 
     Fvector2 size{rect.width(), rect.height()};
     size.mul(_scale * ammo->ammo_icon_scale);
