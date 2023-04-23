@@ -238,5 +238,5 @@ protected:
 
     virtual u8 GetCurrentHudOffsetIdx() const override { return IsAiming(); };
 
-    virtual bool IsUIWnd();
+    virtual bool IsBlocked();
 };

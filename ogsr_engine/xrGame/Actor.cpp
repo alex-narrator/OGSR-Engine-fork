@@ -1774,11 +1774,6 @@ void CActor::TryToBlockSprint(bool block)
 
 bool CActor::IsHitToBackPack(SHit* pHDS) const
 {
-    if (pHDS->type() == ALife::eHitTypeRadiation)
-    {
-        //		Msg("! RADIATION HITTED FOR BACKPACK");
-        return true;
-    }
     bool calculate_direction{true};
     // якщо хіт вогнепальний або поріз то має значення кістка попадання
     if (pHDS->type() == ALife::eHitTypeFireWound || pHDS->type() == ALife::eHitTypeWound || pHDS->type() == ALife::eHitTypeWound_2)
@@ -1794,8 +1789,6 @@ bool CActor::IsHitToBackPack(SHit* pHDS) const
 
 bool CActor::IsHitToHead(SHit* pHDS) const
 {
-    if (pHDS->type() == ALife::eHitTypeRadiation)
-        return true;
     auto pK = smart_cast<IKinematics*>(Visual());
     return is_bone_head(*pK, pHDS->bone());
 }

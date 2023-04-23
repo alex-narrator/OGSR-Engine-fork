@@ -917,6 +917,7 @@ void CHudItem::UpdateInertion(Fmatrix& trans)
             clamp(m_fAimInertionK, -1.f, 1.f);
             _origin_offset += (_origin_offset * m_fAimInertionK);
             _tendto_speed -= (_tendto_speed * m_fAimInertionK);
+            _origin_offset *= !Actor()->IsHardHold();
         }
         else
         { // Худ в режиме "От бедра"
@@ -927,7 +928,7 @@ void CHudItem::UpdateInertion(Fmatrix& trans)
         // Фактор силы инерции
         const float power_factor = GetInertionPowerFactor();
         _tendto_speed *= power_factor;
-        _origin_offset *= power_factor * !Actor()->IsHardHold();
+        _origin_offset *= power_factor;
 
         inert_st_last_dir.mad(diff_dir, _tendto_speed * Device.fTimeDelta);
         origin.mad(diff_dir, _origin_offset);

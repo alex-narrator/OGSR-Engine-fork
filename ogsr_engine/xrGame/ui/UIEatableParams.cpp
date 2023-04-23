@@ -178,12 +178,16 @@ void CUIEatableParams::SetInfo(CInventoryItem* obj) {
 		AttachChild(_s);
 	}
 
-	if (pEatable->IsBooster()) {
-		boost_header->Show(true);
-		boost_header->SetWndPos(boost_header->GetWndPos().x, _h);
-		_h += boost_header->GetWndSize().y;
-		AttachChild(boost_header);
+	if (!pEatable->IsBooster())
+	{
+        SetHeight(_h);
+        return;
 	}
+
+	boost_header->Show(true);
+    boost_header->SetWndPos(boost_header->GetWndPos().x, _h);
+    _h += boost_header->GetWndSize().y;
+    AttachChild(boost_header);
 
 	for (u32 i = _max_influence_index; i < _max_item_index; ++i) {
 		CUIStatic* _s = m_info_items[i];

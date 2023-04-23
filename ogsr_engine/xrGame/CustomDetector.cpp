@@ -11,6 +11,7 @@
 #include "Weapon.h"
 #include "Grenade.h"
 #include "string_table.h"
+#include "UIGameSP.h"
 #include "CharacterPhysicsSupport.h"
 
 ITEM_INFO::~ITEM_INFO()
@@ -89,7 +90,7 @@ void CCustomDetector::ToggleDetector(bool bFastMode)
         CHudItem* itm = (iitem) ? iitem->cast_hud_item() : nullptr;
         u16 slot_to_activate = NO_ACTIVE_SLOT;
 
-        if (CheckCompatibilityInt(itm, &slot_to_activate) && !IsUIWnd())
+        if (CheckCompatibilityInt(itm, &slot_to_activate) && !IsBlocked())
         {
             if (slot_to_activate != NO_ACTIVE_SLOT)
             {
@@ -251,11 +252,10 @@ void CCustomDetector::UpdateVisibility()
 {
     // check visibility
     attachable_hud_item* i0 = g_player_hud->attached_item(0);
-    bool is_capture = Actor()->character_physics_support()->movement()->PHCapture();
     if (GetState() == eIdle || GetState() == eShowing)
     {
         bool bClimb = ((Actor()->MovingState() & mcClimb) != 0);
-        if (bClimb || IsUIWnd() || is_capture)
+        if (bClimb || IsBlocked())
         {
             HideDetector(true);
             m_bNeedActivation = true;
@@ -282,7 +282,7 @@ void CCustomDetector::UpdateVisibility()
             CHudItem* huditem = (i0) ? i0->m_parent_hud_item : nullptr;
             bool bChecked = !huditem || CheckCompatibilityInt(huditem, 0);
 
-            if (bChecked && !IsUIWnd() && !is_capture)
+            if (bChecked && !IsBlocked())
                 ShowDetector(true);
         }
     }
@@ -435,8 +435,7 @@ bool CCustomDetector::IsZoomed() const
     attachable_hud_item* i0 = g_player_hud->attached_item(0);
     if (i0 && HudItemData())
     {
-        auto wpn = smart_cast<CWeapon*>(i0->m_parent_hud_item);
-        return wpn && wpn->IsZoomed();
+        return i0->m_parent_hud_item->IsZoomed();
     }
     return false;
 }
@@ -474,11 +473,14 @@ void CCustomDetector::ShowCurrentModeMsg()
     HUD().GetUI()->AddInfoMessage("item_usage", str, false);
 }
 
-#include "UIGameSP.h"
-bool CCustomDetector::IsUIWnd() 
+bool CCustomDetector::IsBlocked()
 { 
-    auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (Actor() && pGameSP)
+    auto actor = smart_cast<CActor*>(H_Parent());
+    if (!actor)
+        return false;
+    if (actor->character_physics_support()->movement()->PHCapture())
+        return true;
+    if (auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame()))
         return pGameSP->IsDialogsShown();
     return false;
 }

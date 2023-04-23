@@ -277,6 +277,31 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
     auto pVest = pInvOwner->GetVest();
     auto pBackPack = pInvOwner->GetBackpack();
 
+    if (pHDS->hit_type == ALife::eHitTypeRadiation)
+    {
+        if (pHelmet)
+        {
+            new_hit_power *= (1.0f - pHelmet->GetHitTypeProtection(pHDS->type()));
+            pHelmet->Hit(pHDS);
+        }
+        if (pBackPack)
+        {
+            //new_hit_power *= (1.0f - pBackPack->GetHitTypeProtection(pHDS->type()));
+            pBackPack->Hit(pHDS);
+        }
+        if (pVest)
+        {
+            new_hit_power *= (1.0f - pVest->GetHitTypeProtection(pHDS->type()));
+            pVest->Hit(pHDS);
+        }
+        if (pOutfit)
+        {
+            new_hit_power *= (1.0f - pOutfit->GetHitTypeProtection(pHDS->type()));
+            pOutfit->Hit(pHDS);
+        }
+        return new_hit_power;
+    }
+
     if (pInvOwner->IsHitToHead(pHDS))
     {
         if (pHelmet)
@@ -322,7 +347,6 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
             pOutfit->Hit(pHDS);
         }
     }
-
     return new_hit_power;
 }
 

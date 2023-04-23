@@ -311,7 +311,7 @@ protected:
     void AllowHudInertion(BOOL B) { m_huditem_flags.set(fl_inertion_allow, B); }
     //void TimeLockAnimation();
     //virtual void DeviceUpdate(){};
-    float m_fAimInertionK;
+    float m_fAimInertionK{};
 
 private:
     shared_str world_sect;
