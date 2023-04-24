@@ -550,3 +550,19 @@ bool CInventoryOwner::use_throw_randomness() { return (true); }
 void CInventoryOwner::SetNextItemSlot(u32 slot) { m_tmp_next_item_slot = slot; }
 
 CInventoryItem* CInventoryOwner::GetCurrentTorch() const { return inventory().ItemFromSlot(TORCH_SLOT); }
+
+bool CInventoryOwner::CanPutInSlot(PIItem item, u32 slot)
+{
+    if (smart_cast<CActor*>(this))
+        return true;
+
+    switch (slot)
+    {
+    case OUTFIT_SLOT:
+    case QUICK_SLOT_0:
+    case QUICK_SLOT_1:
+    case QUICK_SLOT_2:
+    case QUICK_SLOT_3: return false;
+    default: return true;
+    }
+}

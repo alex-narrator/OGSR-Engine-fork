@@ -166,9 +166,15 @@ BOOL CWeaponAmmo::net_Spawn(CSE_Abstract* DC)
         l_pA->a_elapsed = m_boxCurr = m_boxSize;
 
     m_bNeedFindPlace = l_pA->m_bNeedFindPlace;
-    m_cur_ammo_type = l_pA->m_cur_ammo_type;
+
     if (IsBoxReloadable())
     {
+        if (l_pA->m_cur_ammo_type >= m_ammoTypes.size())
+        {
+            Msg("! [%s]: %s: wrong ammo type current [%u/%u]", __FUNCTION__, cName().c_str(), l_pA->m_cur_ammo_type, m_ammoTypes.size() - 1);
+            l_pA->m_cur_ammo_type = 0;
+        }
+        m_cur_ammo_type = l_pA->m_cur_ammo_type;
         m_ammoSect = m_ammoTypes[m_cur_ammo_type];
         m_InvShortName = CStringTable().translate(pSettings->r_string(m_ammoSect, "inv_name_short"));
     }

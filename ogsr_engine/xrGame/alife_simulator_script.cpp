@@ -198,7 +198,7 @@ CSE_Abstract* CALifeSimulator__spawn_item2(CALifeSimulator* self, LPCSTR section
 }
 
 CSE_Abstract* CALifeSimulator__spawn_ammo(CALifeSimulator* self, LPCSTR section, const Fvector& position, u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id,
-                                          ALife::_OBJECT_ID id_parent, int ammo_to_spawn)
+                                          ALife::_OBJECT_ID id_parent, int ammo_to_spawn, int ammo_type)
 {
     //	if (id_parent == ALife::_OBJECT_ID(-1))
     //		return							(self->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent));
@@ -222,6 +222,16 @@ CSE_Abstract* CALifeSimulator__spawn_ammo(CALifeSimulator* self, LPCSTR section,
         THROW(ammo->m_boxSize >= ammo_to_spawn);
         ammo->a_elapsed = (u16)ammo_to_spawn;
 
+        if (!ammo->m_ammoTypes.empty())
+        {
+            if (ammo_type >= ammo->m_ammoTypes.size())
+            {
+                Msg("! [%s]: %s: wrong ammo type current [%u/%u]", __FUNCTION__, section, ammo_type, ammo->m_ammoTypes.size() - 1);
+                ammo_type = 0;
+            }
+            ammo->m_cur_ammo_type = ammo_type;
+        }
+
         return (item);
     }
 
@@ -235,6 +245,17 @@ CSE_Abstract* CALifeSimulator__spawn_ammo(CALifeSimulator* self, LPCSTR section,
     THROW(ammo);
     THROW(ammo->m_boxSize >= ammo_to_spawn);
     ammo->a_elapsed = (u16)ammo_to_spawn;
+
+    
+    if (!ammo->m_ammoTypes.empty())
+    {
+        if (ammo_type >= ammo->m_ammoTypes.size())
+        {
+            Msg("! [%s]: %s: wrong ammo type current [%u/%u]", __FUNCTION__, section, ammo_type, ammo->m_ammoTypes.size() - 1);
+            ammo_type = 0;
+        }
+        ammo->m_cur_ammo_type = ammo_type;
+    }
 
     item->Spawn_Write(packet, FALSE);
     self->server().FreeID(item->ID, 0);

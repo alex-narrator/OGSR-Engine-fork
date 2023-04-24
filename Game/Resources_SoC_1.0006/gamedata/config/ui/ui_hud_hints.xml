@@ -1,0 +1,6 @@
+<ui_texture>
+    <file_name>ui\ui_actor_hint_wnd</file_name>
+	
+	<texture id="ui_hud_shkala_health_cop" x="781" y="143" width="140" height="17" />
+	<texture id="ui_hud_shkala_power_cop" x="781" y="165" width="140" height="13" />
+</ui_texture>

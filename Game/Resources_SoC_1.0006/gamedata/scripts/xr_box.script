@@ -205,10 +205,7 @@ function create_obligatory_items(obj, item , count)
 				--Bak--
 				local obj_itm 	= alife():create( item, position, obj:level_vertex_id(), obj:game_vertex_id() )
 				local sobj_item = alife():object( obj_itm.id )
-				local pk 		= m_netpk.get( sobj_item )
-				local data 		= pk:get()
-				data.object_flags = bit_and( data.object_flags, bit_not( 128 ) ) -- знімаємо прапорець flUsedAI_Locations щоб предмет не провалювався крізь об'єкти
-				pk:set( data )
+				alife():use_ai_locations(sobj_item, false)
 				--Bak--
 			end
 end

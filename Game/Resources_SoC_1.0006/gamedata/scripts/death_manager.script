@@ -174,7 +174,25 @@ function keep_item(npc, item)
 		item:set_condition((math.random(15)+75)/100)
         return true
     end
+	item_in_slot = npc:item_in_slot(3)
+    if item_in_slot ~= nil and
+       item_in_slot:id() == item_id
+    then
+        --item:unload_magazine()
+    --' Тут надо уменьшить кондишн оружия
+		item:set_condition((math.random(15)+75)/100)
+        return true
+    end
 	item_in_slot = npc:item_in_slot(4)
+    if item_in_slot ~= nil and
+       item_in_slot:id() == item_id
+    then
+        --item:unload_magazine()
+    --' Тут надо уменьшить кондишн оружия
+		item:set_condition((math.random(15)+75)/100)
+        return true
+    end
+	item_in_slot = npc:item_in_slot(5)
     if item_in_slot ~= nil and
        item_in_slot:id() == item_id
     then
@@ -196,7 +214,7 @@ function create_items(npc, section, number, rnd)
             npc:level_vertex_id(),  
             npc:game_vertex_id(),
             npc:id(),
-                    number)
+            number)
         end
     else
         for i=1,number do

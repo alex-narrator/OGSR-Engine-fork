@@ -4,32 +4,32 @@
 		<text font="letterica16" r="238" g="224" b="198"/>		
 	</speech_menu>
 	
-	<static_health x="900" y="660" width="123" height="34" stretch="1">
-		<texture>ui_hud_shkala_health</texture>
-		<auto_static x="5" y="10" width="14" height="18" stretch="1">
-			<texture>ui_hud_icon_health</texture>
+	<static_health x="920" y="675" width="100" height="14" stretch="1">
+		<texture>ui_hud_shkala_unitype</texture>
+		<auto_static x="-10" y="1" width="10" height="12" stretch="1">
+			<texture>ui_inv_icon_health_restore_speed</texture>
 		</auto_static>
 	</static_health>
 
-	<progress_bar_health x="24" y="5" width="84" height="10" horz="1" min="0" max="100" pos="0">
+	<progress_bar_health x="5" y="2" width="84" height="10" horz="1" min="0" max="100" pos="0">
 		<progress>
 			<texture>ui_hud_shk_health</texture>
 		</progress>
 	</progress_bar_health>
-	<progress_bar_health_max x="24" y="5" width="84" height="10" mode="back" min="0" max="100" pos="0">
+	<progress_bar_health_max x="5" y="2" width="84" height="10" mode="back" min="0" max="100" pos="0">
 		<progress>
 			<texture>ui_mg_progress_efficiency_full</texture>
 		</progress>
 	</progress_bar_health_max>	
 
-	<static_armor x="900" y="626" width="123" height="34" stretch="1">
-		<texture>ui_hud_shkala_armor</texture>		
-		<auto_static x="5" y="6" width="14" height="18" stretch="1">
-			<texture>ui_hud_icon_armour</texture>
+	<static_armor x="920" y="661" width="100" height="14" stretch="1">
+		<texture>ui_hud_shkala_unitype</texture>		
+		<auto_static x="-10" y="1" width="10" height="12" stretch="1">
+			<texture>ui_inv_icon_fire_wound_immunity</texture>
 		</auto_static>
 	</static_armor>
 
-	<progress_bar_armor x="24" y="21" width="84" height="10" horz="1" min="0" max="100" pos="0">
+	<progress_bar_armor x="5" y="2" width="84" height="10" horz="1" min="0" max="100" pos="0">
 		<progress>
 			<texture>ui_hud_shk_armour</texture>
 		</progress>

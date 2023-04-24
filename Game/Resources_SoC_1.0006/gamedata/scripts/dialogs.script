@@ -138,6 +138,75 @@ function relocate_money(victim, num, type)
 	end
 end
 
+--спеціально для видачі набоїв враховуючи магазини
+--параметри count і ammo_type необов'язкові (повна пачка та перший з переліку тип за замовчуванням)
+--можна видавати порожні пачки (для магазинів)
+-- function give_ammo_to_actor(victim, section, count, ammo_type)
+	-- local ini = system_ini()
+	-- if db.actor and victim then
+		-- local count_in_box = ini:r_u32(section, "box_size")
+		-- if count == nil then
+			-- count = count_in_box
+		-- end
+		-- if ammo_type == nil then
+			-- ammo_type = 0
+		-- end
+		-- while count > count_in_box do
+			-- alife():create_ammo(section, 
+			-- db.actor:position(), 
+			-- db.actor:level_vertex_id(), 
+			-- db.actor:game_vertex_id(), 
+			-- db.actor:id(), 
+			-- count_in_box,
+			-- ammo_type)
+			-- count = count - count_in_box
+		-- end
+		-- alife():create_ammo(section, 
+		-- db.actor:position(), 
+		-- db.actor:level_vertex_id(), 
+		-- db.actor:game_vertex_id(), 
+		-- db.actor:id(), 
+		-- count,
+		-- ammo_type)
+		-- news_manager.relocate_item(db.actor, "in", section)
+	-- end
+-- end
+
+--спеціально для видачі набоїв враховуючи магазини
+--параметри count, loaded_box, ammo_type необов'язкові (одна повна пачка та перший з переліку тип за замовчуванням)
+--count - кількість пачок
+--loaded_box - повна чи порожня пачка
+--ammo_type - тип набою у пачці (для магазинів)
+--можна видавати порожні пачки (для магазинів)
+function give_ammo_box_to_actor(victim, section, count, loaded_box, ammo_type)
+	local ini = system_ini()
+	if db.actor and victim then
+		local count_in_box = ini:r_u32(section, "box_size")
+		if count == nil then
+			count = 1
+		end
+		if loaded_box == nil then
+			loaded_box = true
+		end
+		if ammo_type == nil then
+			ammo_type = 0
+		end
+		if loaded_box == false then
+			count_in_box = 0
+		end
+		while count > 0 do
+			alife():create_ammo(section, 
+			db.actor:position(), 
+			db.actor:level_vertex_id(), 
+			db.actor:game_vertex_id(), 
+			db.actor:id(), 
+			count_in_box,
+			ammo_type)
+			count = count - 1
+		end
+		news_manager.relocate_item(db.actor, "in", section)
+	end
+end
 --'---------------------------------------------------------------------------------
 --' DIALOG ALLOWED
 --'---------------------------------------------------------------------------------

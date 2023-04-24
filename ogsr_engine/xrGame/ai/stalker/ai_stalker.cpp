@@ -1016,5 +1016,15 @@ bool CAI_Stalker::CanPutInSlot(PIItem item, u32 slot)
     if (smart_cast<CArtefact*>(item))
         return false;
 
-    return slot != OUTFIT_SLOT;
+    //return slot != OUTFIT_SLOT;
+
+    switch (slot)
+    {
+    case OUTFIT_SLOT:
+    case QUICK_SLOT_0:
+    case QUICK_SLOT_1:
+    case QUICK_SLOT_2:
+    case QUICK_SLOT_3: return false;
+    default: return true;
+    }
 }

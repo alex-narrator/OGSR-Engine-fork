@@ -72,8 +72,8 @@ LPCSTR static_names[] = {
 	"boost_max_weight",
 	//
 	"burn_boost",
+    "shock_boost",
 	"strike_boost",
-	"shock_boost",
 	"wound_boost",
 	"radiation_boost",
 	"telepatic_boost",
