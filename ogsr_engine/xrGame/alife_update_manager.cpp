@@ -23,9 +23,13 @@
 #include "profiler.h"
 #include "mt_config.h"
 
+#include "string_table.h"
+
 using namespace ALife;
 
 extern string_path g_last_saved_game;
+
+extern LPCSTR get_level_name_by_id(u32 level_id);
 
 class CSwitchPredicate
 {
@@ -176,14 +180,15 @@ bool CALifeUpdateManager::change_level(NET_Packet& net_packet)
         holder->o_Angle = graph().actor()->o_Angle;
     }
 
-    string256 autoave_name;
-    strconcat(sizeof(autoave_name), autoave_name, Core.UserName, "_", "autosave");
+    string256 autosave_name;
+    auto dest_lvl_name = get_level_name_by_id(ai().game_graph().vertex(graph().actor()->m_tGraphID)->level_id());
+    strconcat(sizeof(autosave_name), autosave_name, Core.UserName, "_", /*"autosave"*/ CStringTable().translate(dest_lvl_name).c_str());
     LPCSTR temp0 = strchr(**m_server_command_line, '/');
     VERIFY(temp0);
     string256 temp;
-    *m_server_command_line = strconcat(sizeof(temp), temp, autoave_name, temp0);
+    *m_server_command_line = strconcat(sizeof(temp), temp, autosave_name, temp0);
 
-    save(autoave_name);
+    save(autosave_name);
 
     graph().actor()->m_tGraphID = safe_graph_vertex_id;
     graph().actor()->m_tNodeID = safe_level_vertex_id;
