@@ -1203,8 +1203,24 @@ void CActor::g_PerformDrop()
 {
     b_DropActivated = FALSE;
 
-    PIItem pItem = inventory().ActiveItem();
-    if (0 == pItem)
+    PIItem pItem{};
+
+    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
+    {
+        auto huditem = g_player_hud->attached_item(1)->m_parent_hud_item;
+        if (!huditem || !huditem->GetHUDmode())
+            return;
+
+        pItem = smart_cast<CInventoryItem*>(huditem);
+        if (inventory().m_slots[pItem->GetSlot()].m_bPersistent)
+            return;
+
+        pItem->SetDropManual(TRUE);
+        return;
+    }
+
+    pItem = inventory().ActiveItem();
+    if (!pItem)
         return;
 
     u32 s = inventory().GetActiveSlot();

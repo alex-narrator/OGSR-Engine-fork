@@ -87,7 +87,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
     else if (inventory().Action(cmd, CMD_START))
         return;
 
-    	switch (cmd)
+    switch (cmd)
     {
     case kWPN_FIRE: {
     }
@@ -204,7 +204,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
     break;
     case kWPN_8: {
         if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)))
-            det->ToggleDetector(/*g_player_hud->attached_item(0) != nullptr*/false);
+            det->ToggleDetector(/*g_player_hud->attached_item(0) != nullptr*/ false);
     }
     break;
     case kUSE: ActorUse(); break;
@@ -603,10 +603,10 @@ void CActor::ActorUse()
                 TryToTalk();
                 return;
             }
-            //обыск трупа
+            // обыск трупа
             else if (!is_add_act)
             {
-                //только если находимся в режиме single
+                // только если находимся в режиме single
                 CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
                 if (pGameSP)
                     pGameSP->StartCarBody(this, m_pPersonWeLookingAt);
