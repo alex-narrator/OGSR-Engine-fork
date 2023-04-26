@@ -573,6 +573,29 @@ u32 InventoryUtilities::GetRelationColor(ALife::ERelationType relation)
 #endif
 }
 
+void AttachUpgradeIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
+{
+    CUIStatic* upgrade_icon = xr_new<CUIStatic>();
+    upgrade_icon->SetAutoDelete(true);
+
+    CIconParams params(_item->m_upgrade_icon_sect);
+    Frect rect = params.original_rect();
+    params.set_shader(upgrade_icon);
+
+    float k_x{UI()->get_current_kx()};
+
+    Fvector2 size{rect.width(), rect.height()};
+    size.mul(_scale);
+    size.x *= k_x;
+
+    Fvector2 pos{_item->m_upgrade_icon_ofset};
+    pos.mul(_scale);
+    pos.x *= k_x;
+
+    upgrade_icon->SetWndRect(pos.x, pos.y, size.x, size.y);
+    upgrade_icon->SetColor(color_rgba(255, 255, 255, 192));
+    _main_icon->AttachChild(upgrade_icon);
+}
 void AttachWpnAddonIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
 {
     auto wpn = smart_cast<CWeapon*>(_item);
@@ -616,7 +639,6 @@ void AttachAmmoIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
     params.set_shader(ammo_icon);
 
     float k_x{UI()->get_current_kx()};
-    _scale /= k_x; //без цього іконка набою буде менше ніж потрібно та зі зсувом офсету
 
     Fvector2 size{rect.width(), rect.height()};
     size.mul(_scale * ammo->ammo_icon_scale);
@@ -635,6 +657,8 @@ void InventoryUtilities::TryAttachIcons(CUIStatic* _main_icon, PIItem _item, flo
 {
     _main_icon->DetachAll();
 
+    if (!!_item->m_upgrade_icon_sect)
+        AttachUpgradeIcon(_main_icon, _item, _scale);
     if (smart_cast<CWeapon*>(_item))
     {
         AttachWpnAddonIcons(_main_icon, _item, _scale);

@@ -216,13 +216,13 @@ bool CUIScrollView::OnMouse(float x, float y, EUIMessages mouse_action)
     if (inherited::OnMouse(x, y, mouse_action))
         return true;
 
-    bool with_shift = Level().IR_GetKeyState(DIK_LSHIFT) || Level().IR_GetKeyState(DIK_RSHIFT);
+    bool scroll_fast = Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION));
 
     switch (mouse_action)
     {
     case WINDOW_MOUSE_WHEEL_UP:
         m_VScrollBar->TryScrollDec();
-        if (with_shift)
+        if (scroll_fast)
         {
             m_VScrollBar->TryScrollDec();
             m_VScrollBar->TryScrollDec();
@@ -231,7 +231,7 @@ bool CUIScrollView::OnMouse(float x, float y, EUIMessages mouse_action)
         break;
     case WINDOW_MOUSE_WHEEL_DOWN:
         m_VScrollBar->TryScrollInc();
-        if (with_shift)
+        if (scroll_fast)
         {
             m_VScrollBar->TryScrollInc();
             m_VScrollBar->TryScrollInc();

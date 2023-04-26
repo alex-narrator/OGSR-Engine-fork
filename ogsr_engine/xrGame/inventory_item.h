@@ -373,6 +373,9 @@ public:
     virtual void Drop();
     void Transfer(u16 from_id, u16 to_id);
 
+    shared_str m_upgrade_icon_sect{};
+    Fvector2 m_upgrade_icon_ofset{};
+
 protected:
     HitImmunity::HitTypeSVec m_HitTypeProtection;
 

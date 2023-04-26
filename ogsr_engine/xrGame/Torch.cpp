@@ -204,6 +204,8 @@ void CTorch::UpdateCL()
             smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones_Invalidate();
 #pragma todo("KRodin: переделать под новый рендер!")
             // light_render->set_actor_torch(true);
+            light_render->set_range(get_range_val());
+            calc_m_delta_h(get_range_val());
         }
 
         if (H_Parent()->XFORM().c.distance_to_sqr(Device.vCameraPosition) < _sqr(OPTIMIZATION_DISTANCE))
@@ -388,9 +390,9 @@ void CTorch::LoadLightDefinitions(shared_str light_sect)
 
     m_color = pUserData->r_fcolor(light_sect, b_r2 ? "color_r2" : "color");
     fBrightness = m_color.intensity();
-    float range = pUserData->r_float(light_sect, (b_r2) ? "range_r2" : "range");
+    m_fRange = pUserData->r_float(light_sect, (b_r2) ? "range_r2" : "range");
     light_render->set_color(m_color);
-    light_render->set_range(range);
+    light_render->set_range(m_fRange);
 
     if (b_r2)
     {
@@ -425,5 +427,7 @@ void CTorch::LoadLightDefinitions(shared_str light_sect)
     glow_render->set_color(m_color);
     glow_render->set_radius(pUserData->r_float(light_sect, "glow_radius"));
 
-    calc_m_delta_h(range);
+    calc_m_delta_h(m_fRange);
 }
+
+float CTorch::get_range_val() const { return m_fRange * (GetPowerLevelToShow() / 100.f); }

@@ -2131,8 +2131,6 @@ bool CWeapon::IsDirectReload(CWeaponAmmo* ammo)
     m_bDirectReload = true;
     m_pAmmo = ammo;
 
-    Msg("%s m_pAmmo %s", __FUNCTION__, m_pAmmo->cName().c_str());
-
     auto i = std::distance(m_ammoTypes.begin(), _it);
     if (CanBeReloaded() && TryToGetAmmo(i))
     {

@@ -179,6 +179,31 @@ void CUIInventoryCellItem::Update()
     inherited::Update();
     if (Core.Features.test(xrCore::Feature::show_inv_item_condition))
         UpdateConditionProgressBar();
+
+    if (!!object()->m_upgrade_icon_sect && !m_upgrade)
+        CreateUpgradeIcon();
+}
+
+void CUIInventoryCellItem::CreateUpgradeIcon()
+{
+    m_upgrade = xr_new<CUIStatic>();
+    m_upgrade->SetAutoDelete(true);
+    AttachChild(m_upgrade);
+    CIconParams params(object()->m_upgrade_icon_sect);
+    params.set_shader(m_upgrade);
+
+    Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
+    Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
+
+    Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
+    size.mul(base_scale);
+    m_upgrade->SetWndSize(size);
+
+    Fvector2 pos{object()->m_upgrade_icon_ofset};
+    pos.mul(base_scale);
+    m_upgrade->SetWndPos(pos);
+
+    m_upgrade->SetStretchTexture(true);
 }
 
 CUIAmmoCellItem::CUIAmmoCellItem(CWeaponAmmo* itm) : inherited(itm)
@@ -219,16 +244,16 @@ void CUIAmmoCellItem::CreateAmmoInBoxIcon()
     CIconParams params(object()->m_ammoSect);
     params.set_shader(m_ammo_in_box);
 
-    float k_x = UI()->get_current_kx();
+    Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
+    Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
 
-    Frect rect = params.original_rect();
-    Fvector2 size{rect.width(), rect.height()};
+    Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
+    size.mul(base_scale);
     size.mul(object()->ammo_icon_scale);
-    size.x *= k_x;
     m_ammo_in_box->SetWndSize(size);
 
     Fvector2 pos{object()->ammo_icon_ofset};
-    pos.x *= k_x;
+    pos.mul(base_scale);
     m_ammo_in_box->SetWndPos(pos);
 
     m_ammo_in_box->SetStretchTexture(true);

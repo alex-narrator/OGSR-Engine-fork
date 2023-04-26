@@ -326,13 +326,13 @@ bool CUIDragDropListEx::OnMouse(float x, float y, EUIMessages mouse_action)
 
     if (m_vScrollBar->IsShown())
     {
-        bool with_shift = Level().IR_GetKeyState(DIK_LSHIFT) || Level().IR_GetKeyState(DIK_RSHIFT);
+        bool scroll_fast = Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION));
 
         switch (mouse_action)
         {
         case WINDOW_MOUSE_WHEEL_DOWN:
             m_vScrollBar->TryScrollInc();
-            if (with_shift)
+            if (scroll_fast)
             {
                 m_vScrollBar->TryScrollInc();
                 m_vScrollBar->TryScrollInc();
@@ -342,7 +342,7 @@ bool CUIDragDropListEx::OnMouse(float x, float y, EUIMessages mouse_action)
 
         case WINDOW_MOUSE_WHEEL_UP:
             m_vScrollBar->TryScrollDec();
-            if (with_shift)
+            if (scroll_fast)
             {
                 m_vScrollBar->TryScrollDec();
                 m_vScrollBar->TryScrollDec();

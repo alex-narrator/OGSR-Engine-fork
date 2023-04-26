@@ -223,6 +223,9 @@ void CInventoryItem::Load(LPCSTR section)
     m_sDetachMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_detach_tip", "st_detach");
     m_sRepairMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_repair_tip", "st_repair");
     m_sDisassembleMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_disassemble_tip", "st_disassemble");
+
+    m_upgrade_icon_sect = READ_IF_EXISTS(pSettings, r_string, section, "upgrade_icon_sect", nullptr);
+    m_upgrade_icon_ofset = READ_IF_EXISTS(pSettings, r_fvector2, section, "upgrade_icon_ofset", Fvector2{});
 }
 
 void CInventoryItem::ChangeCondition(float fDeltaCondition)

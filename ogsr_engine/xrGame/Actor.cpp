@@ -1207,6 +1207,9 @@ void CActor::g_PerformDrop()
 
     if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
     {
+        if (!g_player_hud->attached_item(1))
+            return;
+
         auto huditem = g_player_hud->attached_item(1)->m_parent_hud_item;
         if (!huditem || !huditem->GetHUDmode())
             return;

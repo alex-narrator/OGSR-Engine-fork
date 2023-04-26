@@ -192,7 +192,7 @@ min_burn_time	= 10000		;минимальное врем€ отыгрыша партиклов (даже если рана уже
 
 [hud_cursor]
 ;все размеры в процентах от длины экрана
-cross_length		= 0.015					;длина "палочки" прицела
+cross_length		= 0.002;0.015					;длина "палочки" прицела
 min_radius			= 0.0					;минимальный радиус прицела (при нулевой дисперсии)
 max_radius			= 1.0					;максимальный радиус
 radius_lerp_speed	= 0.08					;скорость интерпол€ции положений прицела
@@ -357,10 +357,10 @@ $spawn               = "ai\graph point"
 [trade]
 ;коэффициенты изменени€ цены при торговле в зависимости от отношени€ к персонажу
 ;линейно апроксимируютс€ между значени€
-buy_price_factor_hostile	= 1		;коэффициент покупки при goodwill = -100
-buy_price_factor_friendly	= 1		;коэффициент покупки при goodwill = 100
-sell_price_factor_hostile	= 1		;коэффициент покупки при goodwill = -100
-sell_price_factor_friendly	= 1		;коэффициент покупки при goodwill = 100
+buy_price_factor_hostile	= 0.5;1		;коэффициент покупки при goodwill = -100
+buy_price_factor_friendly	= 1.5;1		;коэффициент покупки при goodwill = 100
+sell_price_factor_hostile	= 1.5;1		;коэффициент покупки при goodwill = -100
+sell_price_factor_friendly	= 0.5;1		;коэффициент покупки при goodwill = 100
 ;
 min_deficit_factor = 0.5
 max_deficit_factor = 1.5
@@ -544,13 +544,13 @@ motion_icon_health					= 0.1;,0.2,0.4,0.6,0.8
 ;motion_icon_color_default  			= 49, 194, 181, 255
 
 [tutorial_conditions_thresholds]
-max_power				= 0.75
+max_power				= 0.85
 power					= 0.1
 bleeding				= 0.4
-satiety					= 0.5
+satiety					= 0.8
 radiation				= 0.1
 weapon_jammed			= 0.9
-psy_health				= 0.5
+psy_health				= 0.8
 
 [squad_manager]
 schedule_min			=   1

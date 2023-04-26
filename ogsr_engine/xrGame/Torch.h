@@ -29,6 +29,8 @@ protected:
     Fvector m_focus;
     Fcolor m_color;
 
+    float m_fRange{};
+
 private:
     bool useVolumetric{}, useVolumetricForActor{};
 
@@ -53,6 +55,8 @@ public:
     virtual bool can_be_attached() const;
     void calc_m_delta_h(float);
     float get_range() const;
+
+    float get_range_val() const;
 
 protected:
     HUD_SOUND sndTorchOn;
