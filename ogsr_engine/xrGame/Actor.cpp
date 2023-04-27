@@ -1785,9 +1785,9 @@ float CActor::GetZoomEffectorK()
     return k;
 }
 
-void CActor::TryToBlockSprint(bool block)
+void CActor::BlockSprint()
 {
-    if (block && mstate_wishful & mcSprint)
+    if (mstate_wishful & mcSprint)
         mstate_wishful &= ~mcSprint;
 }
 

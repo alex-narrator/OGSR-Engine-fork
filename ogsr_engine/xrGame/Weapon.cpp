@@ -920,10 +920,6 @@ void CWeapon::UpdateCL()
 
     if (actor)
     {
-        bool b_shoots = ((GetState() == eFire) || (GetState() == eFire2));
-        if (GetHUDmode())
-            Actor()->TryToBlockSprint(b_shoots);
-
         if (Actor()->conditions().IsCantWalk() && IsZoomed())
             OnZoomOut();
 

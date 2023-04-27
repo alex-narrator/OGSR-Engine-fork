@@ -334,8 +334,21 @@ void CHudItem::UpdateCL()
     }
 
     AllowHudBobbing((Core.Features.test(xrCore::Feature::wpn_bobbing) && allow_bobbing && !Actor()->IsHardHold()) || Actor()->PsyAuraAffect);
-    if (GetHUDmode())
-        Actor()->TryToBlockSprint(IsPending());
+
+    if (auto actor = smart_cast<CActor*>(object().H_Parent()))
+    {
+        auto act_hud_item = smart_cast<CHudItem*>(actor->inventory().ActiveItem());
+        if (act_hud_item && act_hud_item == this)
+        {
+            switch (GetState())
+            {
+            case eThrowStart:
+            case eFire:
+            case eFire2: Actor()->BlockSprint(); break;
+            default: break;
+            }
+        }
+    }
 }
 
 void CHudItem::OnH_A_Chield() {}

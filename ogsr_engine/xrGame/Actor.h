@@ -797,7 +797,7 @@ public:
     void SetHardHold(bool val) { m_bIsHardHold = val; };
     bool IsHardHold() const { return m_bIsHardHold || is_actor_creep(); };
 
-    void TryToBlockSprint(bool block);
+    void BlockSprint();
     // визначаємо чи треба передати хіт до рюкзака та його вмісту
     virtual bool IsHitToBackPack(SHit* pHDS) const;
     virtual bool IsHitToHead(SHit* pHDS) const;
