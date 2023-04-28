@@ -344,7 +344,7 @@ void CHudItem::UpdateCL()
             {
             case eThrowStart:
             case eFire:
-            case eFire2: Actor()->BlockSprint(); break;
+            case eFire2: actor->BlockSprint(); break;
             default: break;
             }
         }

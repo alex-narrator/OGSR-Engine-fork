@@ -76,8 +76,9 @@ CTorch::~CTorch(void)
 void CTorch::Load(LPCSTR section)
 {
     inherited::Load(section);
-
+    
     m_light_descr_sect = READ_IF_EXISTS(pSettings, r_string, section, "light_definition", "torch_definition");
+    m_light_descr_sect_second = READ_IF_EXISTS(pSettings, r_string, section, "light_definition_second", nullptr);
 
     LoadLightDefinitions(m_light_descr_sect);
 
@@ -87,6 +88,8 @@ void CTorch::Load(LPCSTR section)
         HUD_SOUND::LoadSound(section, "snd_torch_on", sndTorchOn, SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_torch_off"))
         HUD_SOUND::LoadSound(section, "snd_torch_off", sndTorchOff, SOUND_TYPE_ITEM_USING);
+    if (pSettings->line_exist(section, "snd_torch_switch"))
+        HUD_SOUND::LoadSound(section, "snd_torch_switch", sndTorchSwitch, SOUND_TYPE_ITEM_USING);
 }
 
 void CTorch::Switch()
@@ -431,3 +434,31 @@ void CTorch::LoadLightDefinitions(shared_str light_sect)
 }
 
 float CTorch::get_range_val() const { return m_fRange * (GetPowerLevelToShow() / 100.f); }
+
+void CTorch::SwitchMode()
+{
+    if (!m_light_descr_sect_second)
+        return;
+
+    m_bSecondMode = !m_bSecondMode;
+
+    LoadLightDefinitions(m_bSecondMode ? m_light_descr_sect_second : m_light_descr_sect);
+
+    if (auto pA = smart_cast<CActor*>(H_Parent()))
+        HUD_SOUND::PlaySound(sndTorchSwitch, pA->Position(), pA, pA == Level().CurrentViewEntity());
+}
+
+void CTorch::save(NET_Packet& output_packet)
+{
+    inherited::save(output_packet);
+    save_data(m_bSecondMode, output_packet);
+}
+
+void CTorch::load(IReader& input_packet)
+{
+    inherited::load(input_packet);
+    bool b_saved_mode{};
+    load_data(b_saved_mode, input_packet);
+    if (b_saved_mode != m_bSecondMode)
+        SwitchMode();
+}

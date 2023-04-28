@@ -198,7 +198,12 @@ void CActor::IR_OnKeyboardPress(int cmd)
             if (!IsFreeHands())
                 HUD().GetUI()->AddInfoMessage("item_usage", "hands_not_free");
             else
-                GetTorch()->Switch();
+            {
+                if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
+                    GetTorch()->SwitchMode();
+                else 
+                    GetTorch()->Switch();
+            }
         }
     }
     break;

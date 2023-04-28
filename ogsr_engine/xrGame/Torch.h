@@ -48,6 +48,9 @@ public:
 
     virtual void UpdateCL();
 
+    virtual void save(NET_Packet& output_packet);
+    virtual void load(IReader& input_packet);
+
     virtual void Switch();
     virtual void Switch(bool);
     virtual bool IsPowerOn() const;
@@ -58,11 +61,13 @@ public:
 
     float get_range_val() const;
 
-protected:
-    HUD_SOUND sndTorchOn;
-    HUD_SOUND sndTorchOff;
+    void SwitchMode();
 
-    shared_str m_light_descr_sect{};
+protected:
+    HUD_SOUND sndTorchOn, sndTorchOff, sndTorchSwitch;
+
+    shared_str m_light_descr_sect{}, m_light_descr_sect_second{};
+    bool m_bSecondMode{};
 
     enum EStats
     {
