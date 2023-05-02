@@ -499,8 +499,11 @@ void CActor::Hit(SHit* pHDS)
 
 	HitMark(&HDS);
 
-    HDS.power *= GodMode() ? 0.f : (1.f - GetArtefactsProtection(pHDS->hit_type));
-    inherited::Hit(&HDS);
+    if (!GodMode())
+    {
+        HDS.power *= (1.f - GetArtefactsProtection(pHDS->hit_type));
+        inherited::Hit(&HDS);
+    }
 }
 
 void CActor::HitMark(SHit* pHDS)
@@ -2039,4 +2042,11 @@ void CActor::EnableInvEffector(bool open)
         AddEffector(this, eCEUIWindowEffect, m_InvEffOpen);
     else if (!open && !!m_InvEffClose)
         AddEffector(this, eCEUIWindowEffect, m_InvEffClose);
+}
+
+void CActor::SetHardHold(bool val)
+{
+    if (val && (conditions().IsCantSprint() || conditions().IsLimping()))
+        return;
+    m_bIsHardHold = val;
 }

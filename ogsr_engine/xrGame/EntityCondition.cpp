@@ -741,7 +741,7 @@ void CEntityCondition::ApplyInfluence(int type, float value)
         ChangeBleeding(value);
     }
     break;
-    default: Msg("%s unknown influence num [%d]", __FUNCTION__, type); break;
+    default: Msg("~%s unknown influence num [%d]", __FUNCTION__, type); break;
     }
 }
 
@@ -850,6 +850,6 @@ void CEntityCondition::ApplyRestoreBoost(int type, float value)
         ChangeBleeding(GetWoundIncarnation() * value);
     }
     break;
-    default: Msg("%s unknown effect num [%d]", __FUNCTION__, type); break;
+    default: Msg("~%s unknown boost effect num [%d]", __FUNCTION__, type); break;
     }
 }

@@ -9,7 +9,7 @@
     <texture id="ui_hud_frame_clock" x="190" y="137" width="157" height="67" />
     <texture id="ui_hud_frame_rank" x="349" y="0" width="60" height="65" />
     <texture id="ui_hud_frame_money" x="409" y="0" width="100" height="65" />
-    <texture id="ui_hud_stamina_full" x="349" y="65" width="125" height="125" />
+    <texture id="ui_hud_stamina_full" x="350" y="73" width="122" height="112" />
 	<texture id="ui_hud_motion_icon_back" x="375" y="73" width="72" height="110" />
 	<texture id="ui_hud_motion_icon_back_2" x="0" y="246" width="92" height="110" />
 	<texture id="ui_hud_motion_luminosity_back" x="450" y="73" width="17" height="110" />
@@ -24,12 +24,12 @@
     <texture id="ui_hud_shk_noise" x="484" y="65" width="10" height="71" />
     <texture id="ui_hud_shk_stamina" x="347" y="190" width="57" height="7" />
     <texture id="ui_hud_icon_PDA" x="619" y="40" width="48" height="29" />
-    <texture id="ui_hud_soldier_creep" x="0" y="353" width="65" height="75" />
-    <texture id="ui_hud_soldier_normal" x="0" y="428" width="65" height="75" />
-    <texture id="ui_hud_soldier_sprint" x="0" y="503" width="65" height="75" />
-    <texture id="ui_hud_soldier_climb" x="0" y="578" width="65" height="75" />
-    <texture id="ui_hud_soldier_run" x="0" y="653" width="65" height="75" />
-    <texture id="ui_hud_soldier_crouch" x="65" y="354" width="65" height="75" />
+    <texture id="ui_hud_soldier_creep" x="0" y="353" width="64" height="75" />
+    <texture id="ui_hud_soldier_normal" x="0" y="428" width="64" height="75" />
+    <texture id="ui_hud_soldier_sprint" x="0" y="503" width="64" height="75" />
+    <texture id="ui_hud_soldier_climb" x="0" y="578" width="64" height="75" />
+    <texture id="ui_hud_soldier_run" x="0" y="653" width="64" height="75" />
+    <texture id="ui_hud_soldier_crouch" x="65" y="354" width="64" height="75" />
 	<!-- altered motion icons start-->
 	<texture id="ui_hud_soldier_creep_warning" 	x="298" y="428" width="65" height="75" />
     <texture id="ui_hud_soldier_normal_warning" x="298" y="503" width="65" height="75" />
@@ -112,6 +112,10 @@
     <texture id="ui_inv_icon_fire_wound_immunity" x="152" y="741" width="19" height="19" />
 	
 	<texture id="ui_inv_icon_boost_time" x="228" y="741" width="19" height="19" />
+	
+	<texture id="ui_inv_icon_hand" x="76" y="798" width="19" height="19" />
+	<texture id="ui_inv_icon_wound_old" x="557" y="169" width="19" height="19" />
+	<texture id="ui_inv_icon_somnolence" x="228" y="779" width="19" height="19" />
 
     <texture id="ui_mg_progress_efficiency_empty" x="161" y="363" width="120" height="17" />
     <texture id="ui_mg_progress_efficiency_full" x="161" y="381" width="120" height="17" />
@@ -119,5 +123,19 @@
 	<texture id="ui_patch_back" x="421" y="239" width="603" height="51" />
     <texture id="ui_patch_progress" x="621" y="227" width="403" height="10" />
 	
-	<texture id="ui_hud_shkala_unitype" x="64" y="207" width="128" height="16" />
+	<!-- <texture id="ui_hud_shkala_unitype" x="64" y="207" width="128" height="16" /> -->
+	<texture id="ui_hud_shkala_unitype" x="69" y="209" width="109" height="13" />
+	
+	<texture id="ui_hud_stamina_simple" x="12" y="244" width="73" height="99" />
+	<texture id="ui_hud_icon_noise" x="354" y="75" width="19" height="19" />
+	<texture id="ui_hud_icon_luminosity" x="449" y="75" width="19" height="19" />
+	
+	<texture id="ui_hud_shk_health_cop" x="115" y="690" width="138" height="20" />
+	<texture id="ui_hud_shk_power_cop" x="115" y="710" width="138" height="20" />
+	<texture id="ui_hud_shk_health_cop_back" x="115" y="640" width="138" height="20" />
+	<texture id="ui_hud_shk_power_cop_back" x="115" y="660" width="138" height="20" />
+	
+	<texture id="ui_hud_shk_noise_horz" x="281" y="688" width="70" height="8" />
+	<texture id="ui_hud_shk_light_horz" x="281" y="696" width="70" height="8" />
+	
 </ui_texture>

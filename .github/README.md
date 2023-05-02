@@ -1,4 +1,4 @@
-# x-ray-OGSR-based
+# x-ray-OGSR-fork
 Редагування рушію X-Ray (S.T.A.L.K.E.R.: Shadow of Chernobyl) 
 
 на базі проекту OGSR [https://github.com/OGSR/OGSR-Engine]

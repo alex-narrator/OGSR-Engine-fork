@@ -286,6 +286,8 @@ void CWeaponMagazined::FireStart()
     else if (IsMisfire())
     {
         OnEmptyClick();
+        if (ParentIsActor() && (Level().CurrentViewEntity() == H_Parent()))
+            HUD().GetUI()->AddInfoMessage("item_state", "gun_jammed");
     }
     else if (eReload != GetState() && eMisfire != GetState())
         OnMagazineEmpty();
@@ -367,7 +369,7 @@ void CWeaponMagazined::ReloadMagazine()
     if (IsMisfire() && (!HasChamber() || m_magazine.empty()))
     {
         SetMisfire(false);
-        if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
+        if (ParentIsActor() && (Level().CurrentViewEntity() == H_Parent()))
         {
             HUD().GetUI()->AddInfoMessage("item_state", "gun_not_jammed");
         }
@@ -1861,9 +1863,7 @@ float CWeaponMagazined::GetWeaponDeterioration() const
 void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
 {
     if (IsMisfire() && ParentIsActor() && (Level().CurrentViewEntity() == H_Parent()))
-    {
         HUD().GetUI()->AddInfoMessage("item_state", "gun_jammed");
-    }
 
     auto CurrentHUD = HUD().GetUI()->UIMainIngameWnd;
     bool b_wpn_info = CurrentHUD->IsHUDElementAllowed(eActiveItem);
@@ -2029,18 +2029,18 @@ void CWeaponMagazined::PlayAnimFiremodes()
 //
 void CWeaponMagazined::ShutterAction() // передёргивание затвора
 {
+    bool b_spawn_ammo{true};
     if (IsMisfire())
     {
+        b_spawn_ammo = false;
         SetMisfire(false);
-        if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
-        {
+        if (ParentIsActor() && (Level().CurrentViewEntity() == H_Parent()))
             HUD().GetUI()->AddInfoMessage("item_state", "gun_not_jammed");
-        }
     }
 
     if (HasChamber() && !m_magazine.empty())
     {
-        UnloadAmmo(1);
+        UnloadAmmo(1, b_spawn_ammo);
         // Shell Drop
         Fvector vel;
         PHGetLinearVell(vel);
@@ -2149,9 +2149,9 @@ u32 CWeaponMagazined::GetMagazineCount() const
 
 bool CWeaponMagazined::IsSingleReloading()
 {
-    if (IsPartlyReloading() || !AddonAttachable(eMagazine) || !HasChamber())
+    if (IsPartlyReloading() || !AddonAttachable(eMagazine) || !HasChamber() || !m_pAmmo)
         return false;
-    return m_pAmmo && !m_pAmmo->IsBoxReloadable();
+    return !m_pAmmo->IsBoxReloadable();
 }
 
 float CWeaponMagazined::Weight() const

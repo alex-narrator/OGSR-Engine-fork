@@ -4,17 +4,6 @@
 #include "ParticlesObject.h"
 #include "level.h"
 #include "physicsshellholder.h"
-CMosquitoBald::CMosquitoBald(void)
-{
-    m_dwDeltaTime = 0;
-    m_fHitImpulseScale = 1.f;
-
-    m_bLastBlowoutUpdate = false;
-}
-
-CMosquitoBald::~CMosquitoBald(void) {}
-
-void CMosquitoBald::Load(LPCSTR section) { inherited::Load(section); }
 
 void CMosquitoBald::Postprocess(f32 /**val/**/) {}
 

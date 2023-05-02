@@ -9,10 +9,9 @@ private:
     typedef CCustomZone inherited;
 
 public:
-    CMosquitoBald(void);
-    virtual ~CMosquitoBald(void);
+    CMosquitoBald(void){};
+    virtual ~CMosquitoBald(void){};
 
-    virtual void Load(LPCSTR section);
     virtual void Postprocess(f32 val);
     virtual bool EnableEffector() { return true; }
 
@@ -22,7 +21,7 @@ protected:
     virtual bool BlowoutState();
     //для того чтобы blowout обновился один раз
     //после того как зона перключилась в другое состояние
-    bool m_bLastBlowoutUpdate;
+    bool m_bLastBlowoutUpdate{};
 
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };

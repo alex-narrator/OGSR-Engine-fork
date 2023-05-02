@@ -554,8 +554,8 @@ CSE_ALifeCustomZone::~CSE_ALifeCustomZone() {}
 void CSE_ALifeCustomZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited::STATE_Read(tNetPacket, size);
-
-    tNetPacket.r_float(m_maxPower);
+    float tmp;
+    tNetPacket.r_float(/*m_maxPower*/tmp);
 
     if (m_wVersion < 113)
     {
@@ -584,19 +584,21 @@ void CSE_ALifeCustomZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
     if (m_wVersion > 118)
     {
         tNetPacket.r_u32(m_zone_ttl);
+        tNetPacket.r_float(m_maxPower);
     }
 }
 
 void CSE_ALifeCustomZone::STATE_Write(NET_Packet& tNetPacket)
 {
     inherited::STATE_Write(tNetPacket);
-    tNetPacket.w_float(m_maxPower);
+    tNetPacket.w_float(/*m_maxPower*/0.f);
     tNetPacket.w_u32(m_owner_id);
     tNetPacket.w_u32(m_enabled_time);
     tNetPacket.w_u32(m_disabled_time);
     tNetPacket.w_u32(m_start_time_shift);
     //
     tNetPacket.w_u32(m_zone_ttl);
+    tNetPacket.w_float(m_maxPower);
 }
 
 void CSE_ALifeCustomZone::UPDATE_Read(NET_Packet& tNetPacket)

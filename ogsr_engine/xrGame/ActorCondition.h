@@ -26,14 +26,13 @@ public:
         eCriticalSatietyReached = (1 << 3),
         eCriticalRadiationReached = (1 << 4),
         ePhyHealthMinReached = (1 << 5),
-        eStaminaMinReached = (1 << 6),
 
-        eWeaponJammedReached = (1 << 7),
-        eKnifeCriticalReached = (1 << 8),
+        eWeaponJammedReached = (1 << 6),
+        eKnifeCriticalReached = (1 << 7),
 
-        eLimping = (1 << 9),
-        eCantWalk = (1 << 10),
-        eCantSprint = (1 << 11),
+        eLimping = (1 << 8),
+        eCantWalk = (1 << 9),
+        eCantSprint = (1 << 10),
     };
     Flags16 m_condition_flags;
 
@@ -44,9 +43,10 @@ private:
     virtual void UpdateAlcohol() override;
     virtual void UpdatePower() override;
     virtual void UpdatePsyHealth() override;
-    virtual void UpdateStamina();
     virtual void UpdatePowerMax();
     virtual void UpdateHealthMax();
+
+    void UpdateHardHold();
 
 public:
     CActorCondition(CActor* object);
@@ -120,9 +120,6 @@ protected:
 
     float m_fLimpingHealthBegin{};
     float m_fLimpingHealthEnd{};
-    //окрема витривалість для рук у режимі жорсткого хвату зброї
-    float m_fStamina{1.f};
-    float m_fV_Stamina{};
 
     float m_fV_HealthMax{};
 
@@ -133,10 +130,9 @@ public:
     //
     float m_fAlcoholSatietyIntens{1.f}; // коэфф. для рассчета интенсивности постэффекта опьянения от голода
     //
-    float m_fExerciseStressFactor{1.f}; // фактор физнагрузки - множитель для коэффициента нагрузки актора при спринте и прыжке
+    float m_fStressFactor{1.f}; // фактор физнагрузки - множитель для коэффициента нагрузки актора при спринте и прыжке
     //
     float m_fZoomEffectorK{};
-    float m_fV_HardHoldStamina{};
 
     float m_fBleedingHealthMaxDecrease{};
 
@@ -161,6 +157,4 @@ public:
 
     virtual void BoostParameters(const SBooster&) override;
     virtual void DisableBoostParameters(const SBooster&) override;
-
-    virtual float GetStamina() { return m_fStamina; };
 };

@@ -66,7 +66,7 @@ static CUIMainIngameWnd* GetMainIngameWindow()
     return nullptr;
 }
 
-static CUIStatic* warn_icon_list[12]{};
+static CUIStatic* warn_icon_list[9]{};
 
 // alpet: для возможности внешнего контроля иконок (используется в NLC6 вместо типичных индикаторов). Никак не влияет на игру для остальных модов.
 static bool external_icon_ctrl = false;
@@ -108,6 +108,7 @@ CUIMainIngameWnd::CUIMainIngameWnd()
     m_vestPanel = xr_new<CUIVestPanel>();
 
     warn_icon_list[ewiWeaponJammed] = &UIWeaponJammedIcon;
+    warn_icon_list[ewiArmor] = &UIArmorIcon;
     warn_icon_list[ewiRadiation] = &UIRadiaitionIcon;
     warn_icon_list[ewiWound] = &UIWoundIcon;
     warn_icon_list[ewiStarvation] = &UIStarvationIcon;
@@ -143,8 +144,11 @@ void CUIMainIngameWnd::Init()
     AttachChild(&UIStaticHealth);
     xml_init.InitStatic(uiXml, "static_health", 0, &UIStaticHealth);
 
-    AttachChild(&UIStaticArmor);
-    xml_init.InitStatic(uiXml, "static_armor", 0, &UIStaticArmor);
+    //AttachChild(&UIStaticArmor);
+    //xml_init.InitStatic(uiXml, "static_armor", 0, &UIStaticArmor);
+
+    AttachChild(&UIStaticPower);
+    xml_init.InitStatic(uiXml, "static_power", 0, &UIStaticPower);
 
     AttachChild(&UIWeaponBack);
     xml_init.InitStatic(uiXml, "static_weapon", 0, &UIWeaponBack);
@@ -186,9 +190,16 @@ void CUIMainIngameWnd::Init()
     UIStaticHealth.AttachChild(&UIMaxHealthBar);
     xml_init.InitProgressBar(uiXml, "progress_bar_health_max", 0, &UIMaxHealthBar);
 
+    //витривалість
+    UIStaticPower.AttachChild(&UIPowerBar);
+    xml_init.InitProgressBar(uiXml, "progress_bar_power", 0, &UIPowerBar);
+    //максимальна витривалість
+    UIStaticPower.AttachChild(&UIMaxPowerBar);
+    xml_init.InitProgressBar(uiXml, "progress_bar_power_max", 0, &UIMaxPowerBar);
+
     // Полоса прогресса армора
-    UIStaticArmor.AttachChild(&UIArmorBar);
-    xml_init.InitProgressBar(uiXml, "progress_bar_armor", 0, &UIArmorBar);
+    //UIStaticArmor.AttachChild(&UIArmorBar);
+    //xml_init.InitProgressBar(uiXml, "progress_bar_armor", 0, &UIArmorBar);
 
     // Подсказки, которые возникают при наведении прицела на объект
     AttachChild(&UIStaticQuickHelp);
@@ -196,9 +207,10 @@ void CUIMainIngameWnd::Init()
 
     uiXml.SetLocalRoot(uiXml.GetRoot());
 
-    m_UIIcons = xr_new<CUIScrollView>();
+    m_UIIcons = xr_new<CUIStatic>();
     m_UIIcons->SetAutoDelete(true);
-    xml_init.InitScrollView(uiXml, "icons_scroll_view", 0, m_UIIcons);
+    xml_init.InitStatic(uiXml, "icons_back", 0, m_UIIcons);
+    b_horz = uiXml.ReadAttrib("icons_back", 0, "horz", 0);
     AttachChild(m_UIIcons);
 
     // Загружаем иконки
@@ -210,6 +222,9 @@ void CUIMainIngameWnd::Init()
 
     xml_init.InitStatic(uiXml, "weapon_jammed_static", 0, &UIWeaponJammedIcon);
     UIWeaponJammedIcon.Show(false);
+
+    xml_init.InitStatic(uiXml, "armor_static", 0, &UIArmorIcon);
+    UIArmorIcon.Show(false);
 
     xml_init.InitStatic(uiXml, "radiation_static", 0, &UIRadiaitionIcon);
     UIRadiaitionIcon.Show(false);
@@ -227,8 +242,13 @@ void CUIMainIngameWnd::Init()
     xml_init.InitStatic(uiXml, "outfit_power_static", 0, &UIOutfitPowerStatic);
 
     constexpr const char* warningStrings[] = {
-        "jammed",     "radiation", "wounds", "starvation", "psy",
-        "invincible", // Not used
+        "jammed",
+        "armor",
+        "radiation", 
+        "wounds", 
+        "starvation", 
+        "psy",
+        "invincible",
         "safehouse",
     };
 
@@ -367,12 +387,16 @@ void CUIMainIngameWnd::Update()
 
         UIHealthBar.SetProgressPos(m_pActor->GetfHealth() * 100.0f);
         UIMaxHealthBar.SetProgressPos((1.f - m_pActor->GetMaxHealth()) * 100.0f);
+
+        UIPowerBar.SetProgressPos(m_pActor->conditions().GetPower() * 100.0f);
+        UIMaxPowerBar.SetProgressPos((1.f - m_pActor->conditions().GetMaxPower()) * 100.0f);
+
         // Armor bar
         auto pOutfit = m_pActor->GetOutfit();
-        UIArmorBar.Show(pOutfit);
-        UIStaticArmor.Show(pOutfit);
-        if (pOutfit)
-            UIArmorBar.SetProgressPos(pOutfit->GetCondition() * 100);
+        //UIArmorBar.Show(pOutfit);
+        //UIStaticArmor.Show(pOutfit);
+        //if (pOutfit)
+        //    UIArmorBar.SetProgressPos(pOutfit->GetCondition() * 100);
         // armor power
         bool show_bar = IsHUDElementAllowed(eArmorPower);
         UIOutfitPowerStatic.Show(show_bar);
@@ -398,13 +422,23 @@ void CUIMainIngameWnd::Update()
                 if (IsHUDElementAllowed(eDetector))
                     value = cond->GetRadiation();
                 break;
-            case ewiWound: value = cond->BleedingSpeed(); break;
-            case ewiWeaponJammed:
-                if (IsHUDElementAllowed(eActiveItem))
-                    value = 1 - m_pActor->inventory().ActiveItem()->GetCondition();
+            case ewiWound: 
+                value = cond->BleedingSpeed(); 
                 break;
-            case ewiStarvation: value = 1 - cond->GetSatiety(); break;
-            case ewiPsyHealth: value = 1 - cond->GetPsyHealth(); break;
+            case ewiWeaponJammed:
+                if (auto act_item = m_pActor->inventory().ActiveItem())
+                    value = 1.f - act_item->GetCondition();
+                break;
+            case ewiArmor:
+                if (auto outfit = m_pActor->GetOutfit())
+                    value = 1.f - outfit->GetCondition();
+                break;
+            case ewiStarvation: 
+                value = 1 - cond->GetSatiety(); 
+                break;
+            case ewiPsyHealth: 
+                value = 1 - cond->GetPsyHealth(); 
+                break;
             default: R_ASSERT(!"Unknown type of warning icon");
             }
 
@@ -550,13 +584,15 @@ void CUIMainIngameWnd::SetWarningIconColor(CUIStatic* s, const u32 cl)
 
     if (bOn && !bIsShown)
     {
-        m_UIIcons->AddWindow(s, false);
+        //m_UIIcons->AddWindow(s, false);
+        m_UIIcons->AttachChild(s);
         s->Show(true);
     }
 
     if (!bOn && bIsShown)
     {
-        m_UIIcons->RemoveWindow(s);
+        //m_UIIcons->RemoveWindow(s);
+        m_UIIcons->DetachChild(s);
         s->Show(false);
     }
 }
@@ -568,6 +604,7 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
     {
     case ewiAll: break;
     case ewiWeaponJammed: SetWarningIconColor(&UIWeaponJammedIcon, cl); break;
+    case ewiArmor: SetWarningIconColor(&UIArmorIcon, cl); break;
     case ewiRadiation: SetWarningIconColor(&UIRadiaitionIcon, cl); break;
     case ewiWound: SetWarningIconColor(&UIWoundIcon, cl); break;
     case ewiStarvation: SetWarningIconColor(&UIStarvationIcon, cl); break;
@@ -577,6 +614,20 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
 
     default: R_ASSERT(!"Unknown warning icon type"); break;
     }
+
+    Fvector2 pos{};
+    for (int i = ewiWeaponJammed; i < icon; ++i)
+    {
+        auto icon = warn_icon_list[i];
+        if (icon->IsShown())
+        {
+            if (b_horz)
+                pos.x += icon->GetWidth();
+            else
+                pos.y += icon->GetHeight();
+        }
+    }
+    warn_icon_list[icon]->SetWndPos(pos);
 }
 
 void CUIMainIngameWnd::TurnOffWarningIcon(EWarningIcons icon) { SetWarningIconColor(icon, 0x00ffffff); }
@@ -767,7 +818,7 @@ bool CUIMainIngameWnd::IsHUDElementAllowed(EHUDElement element)
     break;
     case eDetector: // Детектор (иконка радиационного заражения)
     {
-        return m_pActor->HasDetectorWorkable() && (m_pActor->GetDetectorSHOC() || m_pActor->GetDetector() && m_pActor->GetDetector()->GetHUDmode());
+        return m_pActor->HasDetectorWorkable();
     }
     break;
     case eActiveItem: // Информация об предмете в руках (для оружия - кол-во/тип заряженных патронов, режим огня)
@@ -780,7 +831,8 @@ bool CUIMainIngameWnd::IsHUDElementAllowed(EHUDElement element)
         return m_pActor->m_bShowGearInfo;
     }
     break;
-    case eArmorPower: {
+    case eArmorPower: 
+    {
         return m_pActor->GetOutfit() && m_pActor->GetOutfit()->IsPowerConsumer();
     }
     break;

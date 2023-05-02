@@ -4,37 +4,46 @@
 		<text font="letterica16" r="238" g="224" b="198"/>		
 	</speech_menu>
 	
-	<static_health x="920" y="675" width="100" height="14" stretch="1">
-		<texture>ui_hud_shkala_unitype</texture>
+	<static_health x="60" y="700" width="82" height="12" stretch="1">
 		<auto_static x="-10" y="1" width="10" height="12" stretch="1">
 			<texture>ui_inv_icon_health_restore_speed</texture>
 		</auto_static>
+		<auto_static x="82" y="1" width="10" height="12" stretch="1">
+			<texture>ui_inv_icon_wound_old</texture>
+		</auto_static>		
 	</static_health>
 
-	<progress_bar_health x="5" y="2" width="84" height="10" horz="1" min="0" max="100" pos="0">
+	<progress_bar_health x="0" y="-2" width="82" height="15" horz="1" min="0" max="100" pos="0">
+		<progress>
+			<texture>ui_hud_shk_health_cop</texture>
+		</progress>
+	</progress_bar_health>
+	<progress_bar_health_max x="0" y="3" width="82" height="10" mode="back" min="0" max="100" pos="0">
 		<progress>
 			<texture>ui_hud_shk_health</texture>
 		</progress>
-	</progress_bar_health>
-	<progress_bar_health_max x="5" y="2" width="84" height="10" mode="back" min="0" max="100" pos="0">
-		<progress>
-			<texture>ui_mg_progress_efficiency_full</texture>
-		</progress>
 	</progress_bar_health_max>	
 
-	<static_armor x="920" y="661" width="100" height="14" stretch="1">
-		<texture>ui_hud_shkala_unitype</texture>		
-		<auto_static x="-10" y="1" width="10" height="12" stretch="1">
-			<texture>ui_inv_icon_fire_wound_immunity</texture>
-		</auto_static>
-	</static_armor>
+	<static_power x="60" y="714" width="82" height="12" stretch="1">
+		<auto_static x="-10" y="0" width="10" height="12" stretch="1">
+			<texture>ui_inv_icon_power_restore_speed</texture>
+		</auto_static>	
+		<auto_static x="82" y="0" width="10" height="12" stretch="1">
+			<texture>ui_inv_icon_somnolence</texture>
+		</auto_static>		
+	</static_power>
 
-	<progress_bar_armor x="5" y="2" width="84" height="10" horz="1" min="0" max="100" pos="0">
+	<progress_bar_power x="0" y="-5" width="82" height="19" horz="1" min="0" max="100" pos="0">
+		<progress>
+			<texture>ui_hud_shk_power_cop</texture>
+		</progress>
+	</progress_bar_power>
+	
+	<progress_bar_power_max x="0" y="2" width="82" height="10" mode="back" min="0" max="100" pos="0">
 		<progress>
 			<texture>ui_hud_shk_armour</texture>
 		</progress>
-	</progress_bar_armor>
-	
+	</progress_bar_power_max>	
 
 	<static_weapon x="900" y="692" width="123" height="65" stretch="1">
 		<text complex_mode="0" x="45" y="0" font="letterica16" r="255" g="255" b="255" a="130"/>
@@ -60,41 +69,41 @@
 	</quick_info>
 
 
-	<icons_scroll_view  x="955" y="100" width="48" height="455" right_ident="2" always_show_scroll="0" vert_interval="18" inverse_dir="1" flip_vert="0"/>
+	<icons_back  x="50" y="730" horz="1"/>
 
-	<weapon_jammed_static x="0" y="0" width="48" height="64" stretch="1">
+	<weapon_jammed_static x="0" y="0" width="24" height="32" stretch="1">
 		<texture>ui_hud_icon_weapon</texture>
 	</weapon_jammed_static>
 
-	<radiation_static x="0" y="0" width="48" height="64" stretch="1">
+	<radiation_static x="0" y="0" width="24" height="32" stretch="1">
 		<texture>ui_hud_icon_radiation</texture>
 	</radiation_static>
 
-	<wound_static x="0" y="0" width="48" height="64" stretch="1">
+	<wound_static x="0" y="0" width="24" height="32" stretch="1">
 		<texture>ui_hud_icon_drop</texture>
 	</wound_static>
 
-	<starvation_static x="0" y="0" width="48" height="64" stretch="1">
+	<starvation_static x="0" y="0" width="24" height="32" stretch="1">
 		<texture>ui_hud_icon_eat</texture>
 	</starvation_static>
 
-	<psy_health_static x="0" y="0" width="48" height="64" stretch="1">
+	<psy_health_static x="0" y="0" width="24" height="32" stretch="1">
 		<texture>ui_hud_icon_psycho</texture>
 	</psy_health_static>
 
-	<invincible_static x="0" y="0" width="48" height="64" stretch="1">
+	<invincible_static x="0" y="0" width="24" height="32" stretch="1">
 		<texture>ui_hud_icon_goodmode</texture>
 	</invincible_static>
 	
-	<safehouse_static x="0" y="0" width="48" height="64" stretch="1">
+	<safehouse_static x="0" y="0" width="24" height="32" stretch="1">
 		<texture>ui_hud_icon_sleep</texture>
 	</safehouse_static>
 
-	<artefact_static x="0" y="0" width="48" height="64" stretch="1">
+	<artefact_static x="0" y="0" width="24" height="32" stretch="1">
 		<texture>ui_hud_icon_artefact</texture>
 	</artefact_static>
 	
-	<armor_static x="0" y="0" width="48" height="64" stretch="1">
+	<armor_static x="0" y="0" width="24" height="32" stretch="1">
 		<texture>ui_hud_icon_armor_warning</texture>
 	</armor_static>
 	<health_static x="0" y="0" width="48" height="64" stretch="1">

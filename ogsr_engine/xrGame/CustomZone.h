@@ -124,7 +124,7 @@ protected:
     //линейный коэффициент затухания в зависимости от расстояния
     float m_fAttenuation{1.f};
     //процент удара зоны, который пойдет на физический импульс
-    float m_fHitImpulseScale;
+    float m_fHitImpulseScale{1.f};
     //размер радиуса в процентах от оригинального,
     //где действует зона
     float m_fEffectiveRadius{0.75f};
@@ -180,7 +180,7 @@ protected:
 
     u32 m_dwAffectFrameNum{};
 
-    u32 m_dwDeltaTime;
+    u32 m_dwDeltaTime{};
     u32 m_dwPeriod{1100};
     //	bool					m_bZoneReady;
     //если в зоне есть не disabled объекты

@@ -69,11 +69,8 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     m_fBleedingPowerDecrease = READ_IF_EXISTS(pSettings, r_float, section, "bleeding_power_dec", 0.f);
     m_fMinPowerWalkJump = READ_IF_EXISTS(pSettings, r_float, section, "min_power_walk_jump", 1.0f);
     m_fAlcoholSatietyIntens = READ_IF_EXISTS(pSettings, r_float, section, "satiety_to_alcohol_effector_intensity", 1.0f);
-    m_fExerciseStressFactor = READ_IF_EXISTS(pSettings, r_float, section, "exercise_stress_factor", 1.0f);
+    m_fStressFactor = READ_IF_EXISTS(pSettings, r_float, section, "stress_factor", 1.0f);
     m_fZoomEffectorK = READ_IF_EXISTS(pSettings, r_float, section, "power_to_zoom_effector_k", 10.0f);
-
-    m_fV_Stamina = READ_IF_EXISTS(pSettings, r_float, section, "stamina_v", 0.f);
-    m_fV_HardHoldStamina = READ_IF_EXISTS(pSettings, r_float, section, "hard_hold_stamina_v", 0.f);
 
     m_fV_HealthMax = READ_IF_EXISTS(pSettings, r_float, section, "max_health_v", 0.f);
     m_fBleedingHealthMaxDecrease = READ_IF_EXISTS(pSettings, r_float, section, "bleeding_max_health_dec", 0.f);
@@ -99,9 +96,9 @@ void CActorCondition::UpdateCondition()
         ConditionWalk(weight_k, isActorAccelerated(object().mstate_real, object().IsZoomAimingMode()), (object().mstate_real & mcSprint) != 0);
 
     inherited::UpdateCondition();
-    UpdateStamina();
     UpdatePowerMax();
     UpdateHealthMax();
+    UpdateHardHold();
     UpdateTutorialThresholds();
 }
 
@@ -190,7 +187,6 @@ void CActorCondition::save(NET_Packet& output_packet)
     save_data(m_fAlcohol, output_packet);
     save_data(m_condition_flags, output_packet);
     save_data(m_fSatiety, output_packet);
-    save_data(m_fStamina, output_packet);
     save_data(m_fPowerMax, output_packet);
     output_packet.w_float(GetMaxHealth());
 }
@@ -201,7 +197,6 @@ void CActorCondition::load(IReader& input_packet)
     load_data(m_fAlcohol, input_packet);
     load_data(m_condition_flags, input_packet);
     load_data(m_fSatiety, input_packet);
-    load_data(m_fStamina, input_packet);
     load_data(m_fPowerMax, input_packet);
     object().SetMaxHealth(input_packet.r_float());
 }
@@ -214,7 +209,6 @@ void CActorCondition::reinit()
     m_condition_flags.set(eCantSprint, FALSE);
     m_fSatiety = 1.f;
     m_fAlcohol = 0.f;
-    m_fStamina = 1.f;
 }
 
 void CActorCondition::ChangeAlcohol(float value) { m_fAlcohol += value; }
@@ -237,7 +231,6 @@ void CActorCondition::UpdateTutorialThresholds()
     static float _cSatiety = pSettings->r_float("tutorial_conditions_thresholds", "satiety");
     static float _cRadiation = pSettings->r_float("tutorial_conditions_thresholds", "radiation");
     static float _cPsyHealthThr = pSettings->r_float("tutorial_conditions_thresholds", "psy_health");
-    static float _cStaminaThr = READ_IF_EXISTS(pSettings, r_float, "tutorial_conditions_thresholds", "stamina", 0.1f);
     static float _cKnifeCondThr = READ_IF_EXISTS(pSettings, r_float, "tutorial_conditions_thresholds", "knife_condition", 0.5f);
 
     bool b = true;
@@ -281,13 +274,6 @@ void CActorCondition::UpdateTutorialThresholds()
         m_condition_flags.set(ePhyHealthMinReached, TRUE);
         b = false;
         strcpy_s(cb_name, "_G.on_actor_psy");
-    }
-
-    if (b && !m_condition_flags.test(eStaminaMinReached) && GetStamina() < _cStaminaThr)
-    {
-        m_condition_flags.set(eStaminaMinReached, TRUE);
-        b = false;
-        strcpy_s(cb_name, "_G.on_actor_stamina");
     }
 
     if (b && !m_condition_flags.test(eWeaponJammedReached) && m_object->inventory().ActiveItem())
@@ -360,7 +346,7 @@ float CActorCondition::GetStress()
 {
     float res{1.0f};
     if (object().get_state() & (mcSprint | mcJump))
-        res *= m_fExerciseStressFactor;
+        res *= m_fStressFactor;
     if (object().GetCarryWeight() > object().MaxCarryWeight())
         res *= (object().GetCarryWeight() / object().MaxCarryWeight());
     return res;
@@ -374,7 +360,7 @@ void CActorCondition::UpdatePower()
     if (m_bIsBleeding)
         delta -= BleedingSpeed() * m_fBleedingPowerDecrease;
     m_fPower += delta * m_fDeltaTime;
-    clamp(m_fPower, 0.0f, 1.0f);
+    clamp(m_fPower, 0.0f, /*1.0f*/ GetMaxPower());
 }
 
 void CActorCondition::UpdatePsyHealth()
@@ -413,7 +399,7 @@ void CActorCondition::UpdateAlcohol()
         health() = 0.0f;
     else
     {
-        m_fAlcohol += m_fV_Alcohol * m_fDeltaTime * GetStress();
+        m_fAlcohol += GetAlcoholRestore() * m_fDeltaTime;
         clamp(m_fAlcohol, 0.0f, 1.0f);
         CEffectorCam* ce = Actor()->Cameras().GetCamEffector((ECamEffectorType)effAlcohol);
         if (!fis_zero(m_fAlcohol))
@@ -431,21 +417,6 @@ void CActorCondition::UpdateAlcohol()
     }
 }
 
-void CActorCondition::UpdateStamina()
-{
-    m_fStamina += m_fV_Stamina * GetRegenK() * m_fDeltaTime;
-    clamp(m_fStamina, 0.0f, 1.0f);
-
-    // задержка дыхания
-    if (object().IsHardHold() && !object().is_actor_creep() && GetPower() > m_fCantWalkPowerEnd && !fis_zero(GetStamina()))
-    {
-        float inertion_factor = object().inventory().ActiveItem()->GetControlInertionFactor();
-        m_fStamina -= m_fDeltaTime * (m_fV_HardHoldStamina / object().GetExoFactor()) * inertion_factor;
-    }
-    else
-        object().SetHardHold(false);
-}
-
 void CActorCondition::UpdatePowerMax() { ChangeMaxPower(GetMaxPowerRestore() * m_fDeltaTime); }
 
 void CActorCondition::UpdateHealthMax() 
@@ -454,6 +425,15 @@ void CActorCondition::UpdateHealthMax()
     if (m_bIsBleeding)
         delta -= BleedingSpeed() * m_fBleedingHealthMaxDecrease;
     ChangeMaxHealth(delta * m_fDeltaTime);
+}
+
+void CActorCondition::UpdateHardHold()
+{
+    if (!object().IsHardHold())
+        return;
+
+    if (IsCantSprint() || IsLimping())
+        object().SetHardHold(false);
 }
 
 float CActorCondition::BleedingSpeed() { return inherited::BleedingSpeed() * GetStress(); }

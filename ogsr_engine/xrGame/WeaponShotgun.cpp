@@ -423,10 +423,8 @@ u8 CWeaponShotgun::AddCartridge(u8 cnt)
     if (IsMisfire())
     {
         SetMisfire(false);
-        if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
-        {
+        if (ParentIsActor() && (Level().CurrentViewEntity() == H_Parent()))
             HUD().GetUI()->AddInfoMessage("item_state", "gun_not_jammed");
-        }
     }
 
     if (m_set_next_ammoType_on_reload != u32(-1))

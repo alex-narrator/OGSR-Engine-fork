@@ -57,11 +57,14 @@ public:
 
 protected:
     CUIStatic UIStaticHealth;
-    CUIStatic UIStaticArmor;
+    CUIStatic UIStaticPower;
+    //CUIStatic UIStaticArmor;
     CUIStatic UIStaticQuickHelp;
     CUIProgressBar UIHealthBar;
     CUIProgressBar UIMaxHealthBar;
-    CUIProgressBar UIArmorBar;
+    CUIProgressBar UIPowerBar;
+    CUIProgressBar UIMaxPowerBar;
+    //CUIProgressBar UIArmorBar;
     CUICarPanel UICarPanel;
     CUIMotionIcon UIMotionIcon;
     CUIZoneMap* UIZoneMap;
@@ -89,6 +92,7 @@ protected:
     // - голода
     // - усталости
     CUIStatic UIWeaponJammedIcon;
+    CUIStatic UIArmorIcon;
     CUIStatic UIRadiaitionIcon;
     CUIStatic UIWoundIcon;
     CUIStatic UIStarvationIcon;
@@ -96,7 +100,8 @@ protected:
     CUIStatic UIInvincibleIcon;
     CUIStatic UISafehouseIcon;
 
-    CUIScrollView* m_UIIcons{};
+    CUIStatic* m_UIIcons{};
+    bool b_horz{};
 
 public:
     CUIBeltPanel* m_beltPanel;
@@ -109,6 +114,7 @@ public:
     {
         ewiAll = 0,
         ewiWeaponJammed,
+        ewiArmor,
         ewiRadiation,
         ewiWound,
         ewiStarvation,

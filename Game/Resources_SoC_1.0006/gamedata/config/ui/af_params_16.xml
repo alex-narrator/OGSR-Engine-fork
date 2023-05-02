@@ -22,7 +22,7 @@
 		</static_power_restore_speed>
 		
 		<static_max_power_restore_speed width="194" height="20" complex_mode="1">
-			<texture>ui_inv_icon_power_restore_speed</texture>
+			<texture>ui_inv_icon_somnolence</texture>
 			<text font="letterica16" x="20" y="3"/>
 		</static_max_power_restore_speed>
 

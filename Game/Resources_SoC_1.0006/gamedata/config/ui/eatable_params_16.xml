@@ -20,7 +20,7 @@
 		</static_eat_power>
 		
 		<static_eat_max_power width="194" height="20" complex_mode="1">
-			<texture>ui_inv_icon_power_restore_speed</texture>
+			<texture>ui_inv_icon_somnolence</texture>
 			<text font="letterica16" x="20" y="3"/>
 		</static_eat_max_power>
 		
@@ -58,7 +58,7 @@
 			<text font="letterica16" x="20" y="3"/>
 		</static_boost_power>	
 		<static_boost_max_power width="194" height="20" complex_mode="1">
-			<texture>ui_inv_icon_power_restore_speed</texture>
+			<texture>ui_inv_icon_somnolence</texture>
 			<text font="letterica16" x="20" y="3"/>
 		</static_boost_max_power>
 		<static_boost_satiety width="194" height="20" complex_mode="1">
