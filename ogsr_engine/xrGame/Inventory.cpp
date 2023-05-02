@@ -1222,7 +1222,7 @@ void CInventory::IterateAmmo(bool bSearchRuck, std::function<bool(const PIItem)>
         for (const auto& item : m_ruck)
         {
             const auto* ammo = smart_cast<CWeaponAmmo*>(item);
-            if (ammo && ammo->m_boxCurr && callback(item))
+            if (ammo && callback(item))
                 break;
         }
     }
@@ -1231,20 +1231,20 @@ void CInventory::IterateAmmo(bool bSearchRuck, std::function<bool(const PIItem)>
         for (const auto& item : m_vest)
         {
             const auto* ammo = smart_cast<CWeaponAmmo*>(item);
-            if (ammo && ammo->m_boxCurr && callback(item))
+            if (ammo && callback(item))
                 break;
         }
         for (const auto& item : m_belt)
         {
             const auto* ammo = smart_cast<CWeaponAmmo*>(item);
-            if (ammo && ammo->m_boxCurr && callback(item))
+            if (ammo && callback(item))
                 break;
         }
         for (const auto& _slot : m_slots)
         {
             const auto item = _slot.m_pIItem;
             const auto* ammo = smart_cast<CWeaponAmmo*>(item);
-            if (ammo && ammo->m_boxCurr && callback(item))
+            if (ammo && callback(item))
                 break;
         }
     }
@@ -1258,7 +1258,11 @@ PIItem CInventory::GetAmmoByLimit(const char* sect, bool forActor, bool limit_ma
     auto callback = [&](const auto pIItem) -> bool {
         const auto* ammo = smart_cast<CWeaponAmmo*>(pIItem);
         shared_str sect_to_compare = include_magazines ? ammo->m_ammoSect : ammo->cNameSect();
-        if (ammo->m_boxCurr && !xr_strcmp(sect_to_compare, sect))
+
+        if (!ammo->m_boxCurr || include_magazines && !ammo->IsBoxReloadable())
+            return false;
+
+        if (!xr_strcmp(sect_to_compare, sect))
         {
             const bool size_fits_limit = (ammo->m_boxCurr == (limit_max ? ammo->m_boxSize : 1));
             const bool update_limit = limit_max ? ammo->m_boxCurr > limit : (limit == 0 || ammo->m_boxCurr < limit);
@@ -1280,6 +1284,11 @@ PIItem CInventory::GetAmmoByLimit(const char* sect, bool forActor, bool limit_ma
     bool include_ruck = !forActor || Actor()->IsRuckAmmoPlacement();
 
     IterateAmmo(include_ruck, callback);
+    if (include_magazines && !box) //шукали магазин та не знайшли
+    {
+        include_magazines = false; //шукаємо набої у пачках
+        IterateAmmo(include_ruck, callback);
+    }
 
     return box;
 }
