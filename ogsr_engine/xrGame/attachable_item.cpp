@@ -136,7 +136,19 @@ extern float adj_delta_pos, adj_delta_rot;
 
 void CAttachableItem::ParseCurrentItem(CGameFont* F) {}
 
-void CAttachableItem::SaveAttachableParams() { Msg("!![%s] It's not implemented now", __FUNCTION__); }
+void CAttachableItem::SaveAttachableParams() 
+{ 
+	Msg("!![%s] to file is not implemented now", __FUNCTION__);
+    if (!CAttachableItem::m_dbgItem)
+        return;
+    const Fvector _ang = CAttachableItem::m_dbgItem->get_angle_offset();
+    const Fvector _pos = CAttachableItem::m_dbgItem->get_pos_offset();
+    Log("####################################");
+    Msg("~~ [%s] world attach settings", CAttachableItem::m_dbgItem->object().cNameSect().c_str());
+    Msg("~~ attach_angle_offset = %3.3f, %3.3f, %3.3f", _ang.x, _ang.y, _ang.z);
+    Msg("~~ attach_position_offset = %3.3f, %3.3f, %3.3f", _pos.x, _pos.y, _pos.z);
+    Log("####################################");
+}
 
 bool attach_adjust_mode_keyb(int dik)
 {
@@ -203,6 +215,7 @@ void attach_draw_adjust_mode()
     F->OutNext("HOLD [Z]-x axis [X]-y axis [C]-z axis");
 
     F->OutNext("PageUP/PageDown - move.");
+    F->OutNext("L.SHIFT + ENTER - dump to log");
     F->OutSkip();
 
     F->OutNext("Console commands: adjust_delta_pos, adjust_delta_rot");

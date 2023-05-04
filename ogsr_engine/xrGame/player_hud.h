@@ -382,6 +382,8 @@ public:
 
     IKinematicsAnimated* Model() { return m_model; }
 
+    void DumpParamsToLog();
+
 private:
     static void Thumb0Callback(CBoneInstance* B);
     static void Thumb01Callback(CBoneInstance* B);

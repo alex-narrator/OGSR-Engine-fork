@@ -1178,3 +1178,9 @@ void CInventoryItem::Transfer(u16 from_id, u16 to_id)
     P.w_u16(object().ID());
     CGameObject::u_EventSend(P);
 }
+
+bool CInventoryItem::can_be_attached() const
+{
+    const auto actor = smart_cast<const CActor*>(object().H_Parent());
+    return actor ? IsModule() && (m_eItemPlace == eItemPlaceBelt || m_eItemPlace == eItemPlaceVest) : true;
+}

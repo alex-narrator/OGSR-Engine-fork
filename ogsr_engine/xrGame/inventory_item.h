@@ -233,6 +233,8 @@ public:
     virtual CInventoryItem* can_make_killing(const CInventory* inventory) const;
     virtual bool ready_to_kill() const;
     IC bool useful_for_NPC() const;
+
+    virtual bool can_be_attached() const override;
 #ifdef DEBUG
     virtual void OnRender();
 #endif

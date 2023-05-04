@@ -1209,10 +1209,24 @@ void CInventory::SetSlotsBlocked(u16 mask, bool bBlock, bool now)
 
 void CInventory::Iterate(bool bSearchRuck, std::function<bool(const PIItem)> callback) const
 {
-    const auto& list = bSearchRuck ? m_ruck : m_belt;
-    for (const auto& it : list)
-        if (callback(it))
-            break;
+    if (bSearchRuck)
+    {
+        for (const auto& item : m_ruck)
+            if (callback(item))
+                return;
+    }
+    else
+    {
+        for (const auto& item : m_vest)
+            if (callback(item))
+                return;
+        for (const auto& item : m_belt)
+            if (callback(item))
+                return;
+        for (const auto& _slot : m_slots)
+            if (callback(_slot.m_pIItem))
+                return;
+    }
 }
 
 void CInventory::IterateAmmo(bool bSearchRuck, std::function<bool(const PIItem)> callback) const
@@ -1220,32 +1234,22 @@ void CInventory::IterateAmmo(bool bSearchRuck, std::function<bool(const PIItem)>
     if (bSearchRuck)
     {
         for (const auto& item : m_ruck)
-        {
-            const auto* ammo = smart_cast<CWeaponAmmo*>(item);
-            if (ammo && callback(item))
-                break;
-        }
+            if (smart_cast<CWeaponAmmo*>(item) && callback(item))
+                return;
     }
     else
     {
         for (const auto& item : m_vest)
-        {
-            const auto* ammo = smart_cast<CWeaponAmmo*>(item);
-            if (ammo && callback(item))
-                break;
-        }
+            if (smart_cast<CWeaponAmmo*>(item) && callback(item))
+                return;
         for (const auto& item : m_belt)
-        {
-            const auto* ammo = smart_cast<CWeaponAmmo*>(item);
-            if (ammo && callback(item))
-                break;
-        }
+            if (smart_cast<CWeaponAmmo*>(item) && callback(item))
+                return;
         for (const auto& _slot : m_slots)
         {
             const auto item = _slot.m_pIItem;
-            const auto* ammo = smart_cast<CWeaponAmmo*>(item);
-            if (ammo && callback(item))
-                break;
+            if (smart_cast<CWeaponAmmo*>(item) && callback(item))
+                return;
         }
     }
 }
@@ -1363,6 +1367,42 @@ PIItem CInventory::GetSame(const PIItem pIItem, bool bSearchRuck) const
         }
     }
     return nullptr;
+}
+
+PIItem CInventory::GetSameEatable(const PIItem pIItem, bool bSearchRuck) const 
+{
+    PIItem item{};
+    int limit{};
+
+    const auto target_sect = pIItem->object().cNameSect();
+
+    auto callback = [&](const auto _pIItem) -> bool {
+        const auto* eatable = smart_cast<CEatableItem*>(_pIItem);
+
+        if (!eatable || _pIItem == pIItem)
+            return false;
+
+        if (!xr_strcmp(eatable->object().cNameSect(), target_sect))
+        {
+            const bool size_fits_limit = (eatable->GetPortionsNum() == 1);
+            const bool update_limit = (limit == 0 || eatable->GetPortionsNum() < limit);
+
+            if (size_fits_limit)
+            {
+                item = _pIItem;
+                return true;
+            }
+            if (update_limit)
+            {
+                item = _pIItem;
+                limit = eatable->GetPortionsNum();
+            }
+        }
+        return false;
+    };
+
+    Iterate(bSearchRuck, callback);
+    return item;
 }
 
 u32 CInventory::GetSameItemCount(LPCSTR caSection, bool SearchRuck)

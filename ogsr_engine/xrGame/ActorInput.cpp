@@ -248,7 +248,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
                 {
                     inventory().TryToHideWeapon(true, false);
                     //
-                    PIItem iitm = inventory().GetSame(itm, false);
+                    PIItem iitm = inventory().GetSameEatable(itm, false);
 
                     if (iitm)
                     {
