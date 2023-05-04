@@ -433,6 +433,7 @@ void CInventoryOwner::OnItemBelt(CInventoryItem* inventory_item, EItemPlace prev
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
     object->callback(GameObject::eOnItemToBelt)(inventory_item->object().lua_game_object());
+    attach(inventory_item);
 }
 void CInventoryOwner::OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
@@ -453,6 +454,7 @@ void CInventoryOwner::OnItemVest(CInventoryItem* inventory_item, EItemPlace prev
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
     object->callback(GameObject::eOnItemToVest)(inventory_item->object().lua_game_object());
+    attach(inventory_item);
 }
 
 
