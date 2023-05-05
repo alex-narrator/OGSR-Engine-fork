@@ -281,6 +281,13 @@ bool CAI_Stalker::non_conflicted(const CInventoryItem* item, const CWeapon* new_
 
     switch (weapon->ef_weapon_type())
     {
+    // binoculars
+    case 0: {
+        if (weapon->ef_weapon_type() != new_weapon->ef_weapon_type())
+            return (true);
+
+        break;
+    }
     // knives
     case 1: {
         if (weapon->ef_weapon_type() != new_weapon->ef_weapon_type())
@@ -327,20 +334,33 @@ bool CAI_Stalker::enough_ammo(const CWeapon* new_weapon) const
 {
     // int						ammo_box_count = 0;
 
-    TIItemContainer::const_iterator I = inventory().m_all.begin();
-    TIItemContainer::const_iterator E = inventory().m_all.end();
-    for (; I != E; ++I)
-    {
-        if (std::find(new_weapon->m_ammoTypes.begin(), new_weapon->m_ammoTypes.end(), (*I)->object().cNameSect()) == new_weapon->m_ammoTypes.end())
-            continue;
+    //TIItemContainer::const_iterator I = inventory().m_all.begin();
+    //TIItemContainer::const_iterator E = inventory().m_all.end();
+    //for (; I != E; ++I)
+    //{
+    //    if (std::find(new_weapon->m_ammoTypes.begin(), new_weapon->m_ammoTypes.end(), (*I)->object().cNameSect()) == new_weapon->m_ammoTypes.end())
+    //        continue;
 
-        //++ammo_box_count;
-        // if (ammo_box_count >= enough_ammo_box_count) //Это условие всегда истинно. Какой-то недодел лимитных патронов для неписей, видимо.
-        // KRodin: заметка: видимо эта функция отвечает за то, что чтобы непись начал использовать ствол, ему надо продать пачку патронов.
-        return (true);
-    }
+    //    //++ammo_box_count;
+    //    // if (ammo_box_count >= enough_ammo_box_count) //Это условие всегда истинно. Какой-то недодел лимитных патронов для неписей, видимо.
+    //    // KRodin: заметка: видимо эта функция отвечает за то, что чтобы непись начал использовать ствол, ему надо продать пачку патронов.
+    //    return (true);
+    //}
 
-    return (false);
+    //return (false);
+
+    //це якщо по-простому
+    return unlimited_ammo();
+
+    //а це якщо зберегти механіку оригіналу але враховуючи магазини
+    //auto& ammo_types = new_weapon->m_ammoTypes;
+    //for (const auto& item : inventory().m_all)
+    //{
+    //    if (auto ammo = smart_cast<CWeaponAmmo*>(item))
+    //        if (std::find(ammo_types.begin(), ammo_types.end(), ammo->m_ammoSect) != ammo_types.end())
+    //            return true;
+    //}
+    //return false;
 }
 
 bool CAI_Stalker::conflicted(const CInventoryItem* item, const CWeapon* new_weapon, bool new_wepon_enough_ammo, int new_weapon_rank) const
@@ -441,6 +461,7 @@ void CAI_Stalker::update_conflicted(CInventoryItem* item, const CWeapon* new_wea
 
     remove_personal_only_ammo(item);
     item->SetDropManual(TRUE);
+    //Msg("~ %s stalker [%s] dropped item [%s], new_weapon is [%s]", __FUNCTION__, Name(), item->object().Name(), new_weapon->m_name.c_str());
 }
 
 void CAI_Stalker::on_after_take(const CGameObject* object)

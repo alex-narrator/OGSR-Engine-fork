@@ -250,7 +250,7 @@ public:
     bool ready_to_detour();
     void update_best_item_info();
     virtual float GetWeaponAccuracy() const;
-    virtual bool unlimited_ammo();
+    virtual bool unlimited_ammo() const;
     virtual void spawn_supplies();
     CAgentManager& agent_manager() const;
 

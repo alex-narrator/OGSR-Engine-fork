@@ -223,7 +223,7 @@ public:
     virtual float Radius() const;
     virtual void g_PerformDrop();
 
-    virtual bool unlimited_ammo();
+    virtual bool unlimited_ammo() const;
 
 	virtual void UpdateItemsBoost();
 

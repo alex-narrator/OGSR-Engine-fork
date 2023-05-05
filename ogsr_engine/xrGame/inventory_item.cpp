@@ -872,10 +872,11 @@ void CInventoryItem::UpdateConditionDecrease()
     if (b_brake_item)
     {
         object().DestroyObject();
+        Msg("~ %s item [%s] destroyed due to full condition decrease", __FUNCTION__, object().Name_script());
         return;
     }
 
-    if (fis_zero(m_fTTLOnDecrease) || fis_zero(m_fCondition))
+    if (fis_zero(m_fTTLOnDecrease)/* || fis_zero(m_fCondition)*/)
         return;
 
     float delta_time{};

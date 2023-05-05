@@ -100,7 +100,7 @@ float CHelmet::GetPowerLoss()
 
 void CHelmet::DrawHUDMask()
 {
-    if (HasVisor())
+    if (m_UIVisor)
     {
         m_UIVisor->SetPos(0, 0);
         m_UIVisor->SetRect(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);

@@ -536,7 +536,7 @@ public:
     CCartridge m_DefaultCartridge;
     float m_fCurrentCartirdgeDisp{1.f};
 
-    bool unlimited_ammo();
+    bool unlimited_ammo() const;
     IC bool can_be_strapped() const { return m_can_be_strapped; };
 
     LPCSTR GetCurrentAmmo_ShortName();

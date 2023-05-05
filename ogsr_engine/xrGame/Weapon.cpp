@@ -1779,7 +1779,7 @@ void CWeapon::OnDrawUI()
 
 bool CWeapon::IsHudModeNow() { return (HudItemData()); }
 
-bool CWeapon::unlimited_ammo()
+bool CWeapon::unlimited_ammo() const
 {
     if (m_pCurrentInventory)
         return inventory_owner().unlimited_ammo() && m_DefaultCartridge.m_flags.test(CCartridge::cfCanBeUnlimited);

@@ -1769,7 +1769,7 @@ void CActor::RepackAmmo()
     }
 }
 
-bool CActor::unlimited_ammo() { return !!psActorFlags.test(AF_UNLIMITEDAMMO); }
+bool CActor::unlimited_ammo() const { return !!psActorFlags.test(AF_UNLIMITEDAMMO); }
 
 bool CActor::IsDetectorActive() const
 {
