@@ -77,7 +77,7 @@ IC u32 CAI_Stalker::min_queue_interval_close() const { return (m_min_queue_inter
 
 IC u32 CAI_Stalker::max_queue_interval_close() const { return (m_max_queue_interval_close); }
 
-IC bool CAI_Stalker::wounded() const { return (m_wounded); }
+//IC bool CAI_Stalker::wounded() const { return (m_wounded); }
 
 IC const CAI_Stalker::CRITICAL_WOUND_WEIGHTS& CAI_Stalker::critical_wound_weights() const
 {

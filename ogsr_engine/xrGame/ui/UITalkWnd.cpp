@@ -82,6 +82,7 @@ void CUITalkWnd::InitTalkDialog()
 
     UITalkDialogWnd->SetOsoznanieMode(m_pOthersInvOwner->NeedOsoznanieMode());
     UITalkDialogWnd->Show();
+    UITalkDialogWnd->UIToTradeButton.Show(!smart_cast<CEntityAlive*>(m_pOthersInvOwner)->wounded());
 
     UITradeWnd->Hide();
     // режим бартерной торговли

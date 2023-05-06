@@ -156,6 +156,7 @@ void CUIMainIngameWnd::Init()
     UIWeaponBack.AttachChild(&UIWeaponSignAmmo);
     xml_init.InitStatic(uiXml, "static_ammo", 0, &UIWeaponSignAmmo);
     UIWeaponSignAmmo.SetElipsis(CUIStatic::eepEnd, 2);
+    ammo_icon_scale = uiXml.ReadAttribFlt("static_ammo", 0, "icon_scale", 1.f);
 
     UIWeaponBack.AttachChild(&UIWeaponIcon);
     xml_init.InitStatic(uiXml, "static_wpn_icon", 0, &UIWeaponIcon);
@@ -339,6 +340,9 @@ void CUIMainIngameWnd::SetAmmoIcon(const shared_str& sect_name)
         x += w / 2.0f;
 
     UIWeaponIcon.SetWndPos(x, UIWeaponIcon_rect.y1);
+
+    w *= ammo_icon_scale;
+    h *= ammo_icon_scale;
 
     UIWeaponIcon.SetWidth(w);
     UIWeaponIcon.SetHeight(h);

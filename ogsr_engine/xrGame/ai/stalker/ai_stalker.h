@@ -462,7 +462,8 @@ public:
 public:
     void wounded(bool value);
     bool wounded(const CRestrictedObject* object) const;
-    IC bool wounded() const;
+    //IC bool wounded() const;
+    virtual bool wounded() const { return (m_wounded); }
 
     // throwing grenades
 private:

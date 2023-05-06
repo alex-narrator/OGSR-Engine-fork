@@ -50,7 +50,7 @@
 		<texture>ui_hud_frame_patron</texture>
 	</static_weapon>
 	
-	<static_ammo x="65" y="22" width="53" height="30">
+	<static_ammo x="65" y="22" width="53" height="30" icon_scale = "0.75">
 		<text align="c" complex_mode="0" font="graffiti22" r="238" g="155" b="23" a="255">Ammo</text>
 	</static_ammo>
 	

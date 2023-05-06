@@ -151,7 +151,8 @@ public:
     virtual bool is_relation_enemy(const CEntityAlive* tpEntityAlive) const;
 
     virtual bool CheckEnemyStatus(CEntityAlive* tgt);
-    virtual bool critically_wounded() { return false; };
+
+    virtual bool wounded() const { return false; }
 
 public:
     MONSTER_COMMUNITY* monster_community;

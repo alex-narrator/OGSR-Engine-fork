@@ -77,6 +77,7 @@ protected:
     CUIStatic UIWeaponSignAmmo;
     CUIStatic UIWeaponIcon;
     Frect UIWeaponIcon_rect{};
+    float ammo_icon_scale{};
     // заряд екзоскелету
     CUIStatic UIOutfitPowerStatic;
 
