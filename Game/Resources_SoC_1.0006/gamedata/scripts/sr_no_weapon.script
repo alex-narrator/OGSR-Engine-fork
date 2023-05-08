@@ -57,14 +57,14 @@ end
 
 function action_no_weapon:zone_enter()
 	self.state = state_inside
-	bind_stalker.hide_weapon()
+	--bind_stalker.hide_weapon()
 	
 	safe_zone_action(true)
 end
 
 function action_no_weapon:zone_leave()
 	self.state = state_outside
-	bind_stalker.restore_weapon()
+	--bind_stalker.restore_weapon()
 	
 	safe_zone_action(false)
 end
@@ -92,12 +92,12 @@ function safe_zone_action(in_zone)
 	
 	if(in_zone) then
 		actor:give_info_portion("safehouse")
-		news_text = "%c[255,160,160,160]"..game.translate_string("st_safehouse").."\\n".."%c[default]"..game.translate_string("st_safehouse_in")
+		--news_text = "%c[255,160,160,160]"..game.translate_string("st_safehouse").."\\n".."%c[default]"..game.translate_string("st_safehouse_in")
 	else
 		actor:disable_info_portion("safehouse")
-		news_text = "%c[255,160,160,160]"..game.translate_string("st_safehouse").."\\n".."%c[default]"..game.translate_string("st_safehouse_out")
+		--news_text = "%c[255,160,160,160]"..game.translate_string("st_safehouse").."\\n".."%c[default]"..game.translate_string("st_safehouse_out")
 	end
 		
-	actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(0,705,83,47), show_delay, showtime)
+	--actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(0,705,83,47), show_delay, showtime)
 end
 

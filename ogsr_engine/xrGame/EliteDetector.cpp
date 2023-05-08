@@ -29,7 +29,7 @@ void CEliteDetector::UpdateAf()
     for (auto& item : m_artefacts.m_ItemInfos)
     {
         auto pAf = item.first;
-        ui().RegisterItemToDraw(pAf->Position(), m_bSectionMarks ? pAf->cNameSect() : AF_SIGN);
+        ui().RegisterItemToDraw(pAf->Position(), m_bUniqueMarks ? pAf->cNameSect() : AF_SIGN);
         TryMakeArtefactVisible(pAf);
 
         float d = Position().distance_to(pAf->Position());
@@ -80,7 +80,10 @@ void CEliteDetector::UpdateZones()
         auto pZone = item.first;
 
         if (pZone->distance_to_center(this) <= m_fDetectRadius)
-            ui().RegisterItemToDraw(pZone->Position(), m_bSectionMarks ? pZone->cNameSect() : ZONE_SIGN);
+        {
+            const auto mark = READ_IF_EXISTS(pSettings, r_string, pZone->cNameSect(), "detector_mark", pSettings->r_string(pZone->cNameSect(), "class"));
+            ui().RegisterItemToDraw(pZone->Position(), m_bUniqueMarks ? mark : ZONE_SIGN);
+        }
 
         ITEM_INFO& zone_info = item.second;
         ITEM_TYPE* item_type = zone_info.curr_ref;
@@ -307,7 +310,8 @@ void CScientificDetector::UpdateWork()
     for (const auto& item : m_creatures.m_ItemInfos)
     {
         auto pCreature = item.first;
-        ui().RegisterItemToDraw(pCreature->Position(), m_bSectionMarks ? pCreature->cNameSect() : CREATURE_SIGN);
+        const auto mark = READ_IF_EXISTS(pSettings, r_string, pCreature->cNameSect(), "detector_mark", pSettings->r_string(pCreature->cNameSect(), "species"));
+        ui().RegisterItemToDraw(pCreature->Position(), m_bUniqueMarks ? mark : CREATURE_SIGN);
     }
 
     m_ui->update();

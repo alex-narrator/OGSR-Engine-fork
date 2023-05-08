@@ -161,7 +161,7 @@ protected:
     bool m_bFastAnimMode{};
     bool m_bNeedActivation{};
     shared_str m_nightvision_particle{};
-    bool m_bSectionMarks{};
+    bool m_bUniqueMarks{};
     bool m_bCanSwitchModes{};
     bool m_bAfMode{};
 
