@@ -23,6 +23,15 @@ void IInventoryBox::ProcessEvent(CGameObject* O, NET_Packet& P, u16 type)
         P.r_u16(id);
         CObject* itm = Level().Objects.net_Find(id);
         VERIFY(itm);
+
+        // штатно таке повинно траплятись тільки при спробі запхати предмети в лімітний контейнер стаком через карбоді
+        auto iitem = smart_cast<PIItem>(itm);
+        if (!CanTakeItem(iitem))
+        {
+            iitem->Transfer(object().ID(), m_in_use ? Actor()->ID() : u16(-1));
+            return;
+        }
+
         m_items.push_back(id);
         itm->H_SetParent(O);
         itm->setVisible(FALSE);
@@ -50,7 +59,7 @@ void IInventoryBox::ProcessEvent(CGameObject* O, NET_Packet& P, u16 type)
         if (it != m_items.end())
             m_items.erase(it);
         else
-            Msg("!![%s.GE_TRANSFER_REJECT] object with id [%u] not found! itm: [%p]", __FUNCTION__, id, itm);
+            Msg("!![%s.GE_TRANSFER_REJECT] object with id [%u] not found! itm: [%p] [%s]", __FUNCTION__, id, itm, itm->Name_script());
 
         bool just_before_destroy = !P.r_eof() && P.r_u8();
         bool dont_create_shell = (type == GE_TRADE_SELL) || (type == GE_TRANSFER_REJECT) || just_before_destroy;

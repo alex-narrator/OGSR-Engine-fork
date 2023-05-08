@@ -47,8 +47,11 @@ public:
 
     void AddUniqueItems(TIItemContainer& items_container) const;
 
+    virtual bool CanTakeItem(CInventoryItem*) const;
+
 protected:
     void UpdateDropTasks();
     void UpdateDropItem(PIItem pIItem);
     bool m_bQuickDrop{};
+    xr_vector<shared_str> m_allowed_classes{};
 };

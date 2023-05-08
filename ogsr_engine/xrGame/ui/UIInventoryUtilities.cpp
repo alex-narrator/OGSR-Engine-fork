@@ -391,7 +391,7 @@ void InventoryUtilities::UpdateWeight(CUIStatic& wnd, bool withPrefix)
 
     if (withPrefix)
     {
-        sprintf_s(prefix, "%%c[default]%s ", *CStringTable().translate("ui_inv_weight"));
+        sprintf_s(prefix, "%%c[default]%s ", CStringTable().translate("ui_inv_weight").c_str());
     }
     else
     {
@@ -404,6 +404,35 @@ void InventoryUtilities::UpdateWeight(CUIStatic& wnd, bool withPrefix)
 }
 
 //////////////////////////////////////////////////////////////////////////
+
+void InventoryUtilities::UpdateLimit(CUIStatic& wnd, CGameObject* object)
+{
+    auto box = smart_cast<IInventoryBox*>(object);
+    if (!box)
+        return;
+    string128 buf{};
+
+    int total = box->GetItems().size();
+    int max = box->GetItemsLimit();
+
+    string16 cl{};
+
+    if (total > max)
+    {
+        strcpy_s(cl, "%c[red]");
+    }
+    else
+    {
+        strcpy_s(cl, "%c[UI_orange]");
+    }
+
+    string32 prefix{};
+    sprintf_s(prefix, "%%c[default]%s ", CStringTable().translate("st_items_limit").c_str());
+
+    sprintf_s(buf, "%s%s%u%s/%u", prefix, cl, total, "%c[UI_orange]", max);
+    wnd.SetText(buf);
+    //	UIStaticWeight.ClipperOff();
+}
 
 void LoadStrings(CharInfoStrings* container, LPCSTR section, LPCSTR field)
 {

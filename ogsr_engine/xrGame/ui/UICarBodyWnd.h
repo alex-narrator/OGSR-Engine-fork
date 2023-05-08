@@ -66,6 +66,7 @@ protected:
     CUIStatic* m_pUIOthersBagWnd;
 
     CUIStatic* m_pUIOurWeightWnd;
+    CUIStatic* m_pUIOthersLimitWnd;
 
     // информация о персонажах
     CUIStatic* m_pUIOurIcon;

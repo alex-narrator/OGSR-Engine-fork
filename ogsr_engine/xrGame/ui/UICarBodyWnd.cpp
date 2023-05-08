@@ -104,6 +104,11 @@ void CUICarBodyWnd::Init()
     AttachChild(m_pUIOthersBagWnd);
     xml_init.InitStatic(uiXml, "others_bag_static", 0, m_pUIOthersBagWnd);
 
+    m_pUIOthersLimitWnd = xr_new<CUIStatic>();
+    m_pUIOthersLimitWnd->SetAutoDelete(true);
+    m_pUIOthersBagWnd->AttachChild(m_pUIOthersLimitWnd);
+    xml_init.InitStatic(uiXml, "others_limit_static", 0, m_pUIOthersLimitWnd);
+
     m_pUIOurBagList = xr_new<CUIDragDropListEx>();
     m_pUIOurBagList->SetAutoDelete(true);
     m_pUIOurBagWnd->AttachChild(m_pUIOurBagList);
@@ -203,6 +208,8 @@ void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, IInventoryBox* pInvBox)
     EnableAll();
     UpdateLists();
 
+    m_pUIOthersLimitWnd->Show(m_pOtherInventoryBox->GetItemsLimit());
+
     if (auto obj = smart_cast<CInventoryBox*>(pInvBox))
     {
         obj->callback(GameObject::eOnInvBoxOpen)();
@@ -223,6 +230,7 @@ void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryOwner* pOthers)
 
     m_pUICharacterInfoLeft->InitCharacter(our_id);
     m_pUIOthersIcon->Show(true);
+    m_pUIOthersLimitWnd->Show(false);
 
     CBaseMonster* monster = NULL;
     if (m_pOtherInventoryOwner)
@@ -466,8 +474,6 @@ void CUICarBodyWnd::ActivatePropertiesBox()
         m_pUIPropertiesBox->AddItem(pEatableItem->GetUseMenuTip(), NULL, INVENTORY_EAT_ACTION);
         b_show = true;
     }
-
-    //	bool can_move_stack = CanTakeStack(CurrentItem(), b_actor_inv ? m_pOtherGO : m_pActorGO);
 
     if (CurrentIItem()->CanBeDisassembled())
     {
@@ -908,11 +914,8 @@ bool CUICarBodyWnd::TransferItem(PIItem itm, CGameObject* owner_from, CGameObjec
 {
     if (!CanMoveToOther(itm, owner_to))
         return false;
-
     TryPlayStabbing(itm, owner_from);
-
     itm->Transfer(owner_from->ID(), owner_to->ID());
-
     return true;
 }
 
@@ -933,11 +936,8 @@ void CUICarBodyWnd::PlaySnd(eInventorySndAction a)
 
 void CUICarBodyWnd::MoveAllFromRuck()
 {
-    const auto& inv = m_pActorInventoryOwner->inventory();
-    for (const auto& item : inv.m_ruck)
-    {
+    for (const auto& item : m_pActorInventoryOwner->inventory().m_ruck)
         TransferItem(item, m_pActorGO, m_pOtherGO);
-    }
 }
 
 bool CUICarBodyWnd::CanMoveToOther(PIItem pItem, CGameObject* owner_to) const
@@ -958,7 +958,12 @@ bool CUICarBodyWnd::CanMoveToOther(PIItem pItem, CGameObject* owner_to) const
     return can_move;
 }
 
-void CUICarBodyWnd::UpdateWeight() { InventoryUtilities::UpdateWeight(*m_pUIOurWeightWnd); }
+void CUICarBodyWnd::UpdateWeight() 
+{ 
+    InventoryUtilities::UpdateWeight(*m_pUIOurWeightWnd);
+    if (m_pOtherInventoryBox)
+        InventoryUtilities::UpdateLimit(*m_pUIOthersLimitWnd, m_pOtherGO);
+}
 
 #include "InventoryContainer.h"
 void CUICarBodyWnd::CheckForcedWeightUpdate()

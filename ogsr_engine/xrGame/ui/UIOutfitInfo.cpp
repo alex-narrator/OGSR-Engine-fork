@@ -153,8 +153,10 @@ void CUIOutfitInfo::Update()
                 _val += outfit->GetHitTypeProtection(i - _hit_type_protection_index);
             if (vest)
                 _val += vest->GetHitTypeProtection(i - _hit_type_protection_index);
-            if (backpack)
-                _val += backpack->GetHitTypeProtection(i - _hit_type_protection_index);
+            // рюкзак захищає актора за досить специфічних умов (див. CActor::IsHitToBackPack)
+            // тож не будемо відображати його захисні хар-ки тут
+            //if (backpack)
+            //    _val += backpack->GetHitTypeProtection(i - _hit_type_protection_index);
             if (helmet)
                 _val += helmet->GetHitTypeProtection(i - _hit_type_protection_index);
         }

@@ -110,7 +110,7 @@ inv_grid_height    = 2
 inv_grid_x         = 20
 inv_grid_y         = 23
 
-[container]:identity_immunities
+[container_3]:identity_immunities
 GroupControlSection	= spawn_group
 discovery_dependency = 
 $spawn 				= "devices\cointainer"
@@ -119,16 +119,16 @@ cform				= skeleton
 cost        = 5000
 inv_weight			= 0.1
 script_binding      = bind_physic_object.init
-visual 			= equipments\item_rukzak.ogf
-description  = container_descr
-inv_name   = container
-inv_name_short  = container_short
+visual 			= equipments\item_merger.ogf
+description  = container_3_descr
+inv_name   = container_3_name
+inv_name_short  = container_3_name_short
 inv_grid_width     = 2
-inv_grid_height    = 2
-inv_grid_x         = 24
-inv_grid_y         = 23
-additional_max_volume = 20
-power_restore_speed = 5
+inv_grid_height    = 1
+inv_grid_x         = 8
+inv_grid_y         = 18
+items_limit = 3
+allowed_classes = ARTEFACT
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;BATTERY;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [battery]:identity_immunities

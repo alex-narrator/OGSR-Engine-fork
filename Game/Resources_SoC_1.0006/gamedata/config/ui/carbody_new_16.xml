@@ -31,6 +31,10 @@
 		<text x="25" y="8" font="graffiti22" r="255" g="255" b="255" a="128"></text>
 	</others_bag_static>
 	
+	<others_limit_static x="0" y="-10" width="333" height="450" stretch="1">
+		<text x="30" y="18" font="graffiti22" r="238" g="153" b="26" complex_mode="1"/>
+	</others_limit_static>	
+	
 	<dragdrop_list_other x="29" y="35" width="296" height="410"
 			cell_width="31" cell_height="41" rows_num="10" cols_num="9" 
 			unlimited="1" group_similar="1"/>

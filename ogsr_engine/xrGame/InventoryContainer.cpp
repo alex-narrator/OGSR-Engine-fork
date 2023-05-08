@@ -17,6 +17,17 @@ void CInventoryContainer::Load(LPCSTR section)
 {
     inherited::Load(section);
     m_bQuickDrop = READ_IF_EXISTS(pSettings, r_bool, section, "quick_drop", false);
+    m_iItemsLimit = READ_IF_EXISTS(pSettings, r_u32, section, "items_limit", 0);
+    if (pSettings->line_exist(section, "allowed_classes"))
+    {
+        LPCSTR str = pSettings->r_string(section, "allowed_classes");
+        for (int i = 0; i < _GetItemCount(str); ++i)
+        {
+            string128 item_class;
+            _GetItem(str, i, item_class);
+            m_allowed_classes.push_back(item_class);
+        }
+    }
 }
 
 u32 CInventoryContainer::Cost() const
@@ -327,4 +338,14 @@ void CInventoryContainer::AddUniqueItems(TIItemContainer& items_container) const
         if (is_unique(items_container, itm))
             items_container.push_back(itm);
     }
+}
+
+bool CInventoryContainer::CanTakeItem(CInventoryItem* inventory_item) const 
+{
+    bool res{true};
+    if (m_iItemsLimit)
+        res = (m_items.size() < m_iItemsLimit);
+    if (!m_allowed_classes.empty())
+        res = res && (std::find(m_allowed_classes.begin(), m_allowed_classes.end(), pSettings->r_string(inventory_item->object().cNameSect(), "class")) != m_allowed_classes.end());
+    return res;
 }

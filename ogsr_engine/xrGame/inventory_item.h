@@ -373,7 +373,7 @@ public:
     virtual float GetPowerLoss() { return 1.f; };
 
     virtual void Drop();
-    void Transfer(u16 from_id, u16 to_id);
+    void Transfer(u16 from_id, u16 to_id = u16(-1));
 
     shared_str m_upgrade_icon_sect{};
     Fvector2 m_upgrade_icon_ofset{};

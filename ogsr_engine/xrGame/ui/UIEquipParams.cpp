@@ -518,8 +518,15 @@ void CUIEquipParams::SetInfo(CInventoryItem* obj)
         if (pContainer->HasQuickDrop())
         {
             _param_name = CStringTable().translate("st_quick_drop").c_str();
-            _sn = CStringTable().translate("st_m").c_str();
             sprintf_s(text_to_show, "%s", _param_name);
+            SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
+            _h += list_item_h;
+        }
+        if (pContainer->GetItemsLimit())
+        {
+            _param_name = CStringTable().translate("st_items_limit").c_str();
+            _val = pContainer->GetItemsLimit();
+            sprintf_s(text_to_show, "%s: %.0f", _param_name, _val);
             SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
             _h += list_item_h;
         }

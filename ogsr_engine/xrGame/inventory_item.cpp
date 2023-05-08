@@ -1174,6 +1174,9 @@ void CInventoryItem::Transfer(u16 from_id, u16 to_id)
     P.w_u16(object().ID());
     CGameObject::u_EventSend(P);
 
+    if (to_id == u16(-1))
+        return;
+
     // другому инвентарю - взять вещь
     CGameObject::u_EventGen(P, GE_TRANSFER_TAKE, to_id);
     P.w_u16(object().ID());

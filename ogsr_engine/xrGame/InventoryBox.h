@@ -9,6 +9,7 @@ protected:
 
     void ProcessEvent(CGameObject* O, NET_Packet& P, u16 type);
     bool b_opened{true};
+    int m_iItemsLimit{};
 
 public:
     bool m_in_use{};
@@ -28,6 +29,7 @@ public:
     virtual bool CanTakeItem(CInventoryItem*) const;
 
     virtual xr_vector<u16> GetItems() const { return m_items; };
+    virtual int GetItemsLimit() const { return m_iItemsLimit; };
 };
 
 template <class Based>

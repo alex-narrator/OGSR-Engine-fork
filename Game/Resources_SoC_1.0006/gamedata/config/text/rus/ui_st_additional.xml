@@ -936,5 +936,9 @@
 	
 	<string id="st_detect_radius">
 		<text>Радіус визначення:</text>
-	</string>		
+	</string>	
+
+	<string id="st_items_limit">
+		<text>Місткість</text>
+	</string>			
 </string_table>
