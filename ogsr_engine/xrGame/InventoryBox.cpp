@@ -10,6 +10,7 @@
 #include "script_game_object.h"
 
 #include "inventory_item.h"
+#include "WeaponAmmo.h"
 
 IInventoryBox::IInventoryBox() : m_items() { m_items.clear(); }
 
@@ -137,6 +138,62 @@ CScriptGameObject* IInventoryBox::GetObjectByIndex(u32 id)
 u32 IInventoryBox::GetSize() const { return m_items.size(); }
 
 bool IInventoryBox::IsEmpty() const { return m_items.empty(); }
+
+void IInventoryBox::RepackAmmo()
+{
+    xr_vector<CWeaponAmmo*> _ammo;
+    // заполняем массив неполными пачками
+    for (const auto& item_id : m_items)
+    {
+        PIItem _pIItem = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
+        CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(_pIItem);
+        if (pAmmo && !pAmmo->IsBoxReloadable() && pAmmo->m_boxCurr < pAmmo->m_boxSize)
+            _ammo.push_back(pAmmo);
+    }
+    while (!_ammo.empty())
+    {
+        shared_str asect = _ammo[0]->cNameSect(); // текущая секция
+        u16 box_size = _ammo[0]->m_boxSize; // размер пачки
+        u32 cnt = 0;
+        u16 cart_cnt = 0;
+        // считаем кол=во патронов текущей секции
+        for (CWeaponAmmo* ammo : _ammo)
+        {
+            if (asect == ammo->cNameSect())
+            {
+                cnt = cnt + ammo->m_boxCurr;
+                cart_cnt++;
+            }
+        }
+        // если больше одной неполной пачки, то перепаковываем
+        if (cart_cnt > 1)
+        {
+            for (CWeaponAmmo* ammo : _ammo)
+            {
+                if (asect == ammo->cNameSect())
+                {
+                    if (cnt > 0)
+                    {
+                        if (cnt > box_size)
+                        {
+                            ammo->m_boxCurr = box_size;
+                            cnt = cnt - box_size;
+                        }
+                        else
+                        {
+                            ammo->m_boxCurr = (u16)cnt;
+                            cnt = 0;
+                        }
+                    }
+                    else
+                        ammo->DestroyObject();
+                }
+            }
+        }
+        // чистим массив от обработанных пачек
+        _ammo.erase(std::remove_if(_ammo.begin(), _ammo.end(), [asect](CWeaponAmmo* a) { return a->cNameSect() == asect; }), _ammo.end());
+    }
+}
 
 void CInventoryBox::shedule_Update(u32 dt)
 {

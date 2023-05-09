@@ -52,7 +52,7 @@ void CUIInventoryWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     else if (UIOrganizeButton == pWnd && BUTTON_CLICKED == msg)
     {
-        Actor()->RepackAmmo();
+        m_pInv->RepackAmmo();
         InitInventory_delayed();
     }
 

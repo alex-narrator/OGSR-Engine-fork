@@ -582,7 +582,8 @@ void CUITradeWnd::Show()
     if (const auto& actor = Actor())
     {
         actor->SetRuckAmmoPlacement(true); // установим флаг перезарядки из рюкзака
-        actor->RepackAmmo();
+        m_pInvOwner->inventory().RepackAmmo();
+        m_pOthersInvOwner->inventory().RepackAmmo();
     }
     m_uidata->UIPerformDonationButton.SetVisible(m_pOthersInvOwner->CanTakeDonations());
     PlaySnd(eInvSndOpen);

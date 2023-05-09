@@ -780,8 +780,6 @@ public:
     bool is_actor_climbing() const;
     bool is_actor_moving() const;
 
-    void RepackAmmo();
-
     bool IsDetectorActive() const;
 
 	float m_fThrowImpulse; // сила с которой актор отбрасывает предмет

@@ -48,6 +48,7 @@ public:
     bool CheckMonsterAndKnife() const;
     void TryPlayStabbing(PIItem itm, CGameObject* owner_from);
     void TryActivateKnife();
+    void RepackAmmo();
 
 protected:
     CInventoryOwner* m_pActorInventoryOwner{};

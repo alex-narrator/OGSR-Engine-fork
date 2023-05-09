@@ -209,4 +209,5 @@ public:
     bool activate_slot(u32 slot);
     bool IsAllItemsLoaded() const;
     bool OwnerIsActor() const;
+    void RepackAmmo();
 };

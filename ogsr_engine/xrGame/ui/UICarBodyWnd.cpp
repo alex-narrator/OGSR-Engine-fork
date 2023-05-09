@@ -527,7 +527,7 @@ void CUICarBodyWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         }
         else if (m_pUIOrganizeButton == pWnd)
         {
-            Actor()->RepackAmmo();
+            RepackAmmo();
             UpdateLists_delayed();
         }
         else if (m_pUIMoveAllFromRuckButton == pWnd)
@@ -669,7 +669,7 @@ void CUICarBodyWnd::Show()
             act_item->OnZoomOut();
         //actor->SetWeaponHideState(INV_STATE_INV_WND, true);
         actor->SetRuckAmmoPlacement(true);
-        actor->RepackAmmo();
+        RepackAmmo();
         actor->TryInventoryCrouch(true);
         actor->EnableInvEffector(true);
         TryActivateKnife();
@@ -1070,4 +1070,13 @@ void CUICarBodyWnd::DetachAddon(const char* addon_name, bool for_all)
     {
         pActor->inventory().Activate(NO_ACTIVE_SLOT);
     }
+}
+
+void CUICarBodyWnd::RepackAmmo()
+{ 
+    m_pActorInventoryOwner->inventory().RepackAmmo();
+    if (m_pOtherInventoryOwner)
+        m_pOtherInventoryOwner->inventory().RepackAmmo();
+    else
+        m_pOtherInventoryBox->RepackAmmo();
 }

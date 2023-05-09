@@ -30,6 +30,8 @@ public:
 
     virtual xr_vector<u16> GetItems() const { return m_items; };
     virtual int GetItemsLimit() const { return m_iItemsLimit; };
+
+    virtual void RepackAmmo();
 };
 
 template <class Based>
