@@ -1,6 +1,7 @@
 #pragma once
 #include "UICellItem.h"
 #include "Weapon.h"
+#include "WeaponRPG7.h"
 #include "eatable_item.h"
 #include "Artifact.h"
 #include "Warbelt.h"
@@ -18,7 +19,7 @@ protected:
     void init_add();
 
     CUIStatic* m_upgrade{};
-    void CreateUpgradeIcon();
+    CUIStatic* CreateUpgradeIcon();
 
 public:
     CUIInventoryCellItem(CInventoryItem* itm);
@@ -106,7 +107,7 @@ protected:
     virtual void UpdateItemText();
     virtual void UpdateItemTextCustom();
     CUIStatic* m_ammo_in_box{};
-    void CreateAmmoInBoxIcon();
+    CUIStatic* CreateAmmoInBoxIcon();
 
 public:
     CUIAmmoCellItem(CWeaponAmmo* itm);
@@ -150,6 +151,21 @@ public:
     virtual bool EqualTo(CUICellItem* itm);
     CUIStatic* get_addon_static(u32 idx) { return m_addons[idx]; }
     Fvector2 get_addon_offset(u32 idx) { return object()->GetAddonOffset(idx); }
+};
+
+class CUIWeaponRGP7CellItem : public CUIWeaponCellItem
+{
+    typedef CUIWeaponCellItem inherited;
+
+protected:
+    CUIStatic* m_grenade_loaded{};
+    CUIStatic* CreateGrenadeIcon();
+
+public:
+    CUIWeaponRGP7CellItem(CWeaponRPG7* itm);
+    virtual void Update();
+    CWeaponRPG7* object() { return (CWeaponRPG7*)m_pData; }
+    CUIDragItem* CreateDragItem();
 };
 
 class CBuyItemCustomDrawCell : public ICustomDrawCell

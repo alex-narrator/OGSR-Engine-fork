@@ -540,6 +540,7 @@ public:
     IC bool can_be_strapped() const { return m_can_be_strapped; };
 
     LPCSTR GetCurrentAmmo_ShortName();
+    LPCSTR GetCurrentAmmoNameSect();
     float GetAmmoInMagazineWeight(const decltype(m_magazine)& mag) const;
 
     bool m_bDirectReload{};

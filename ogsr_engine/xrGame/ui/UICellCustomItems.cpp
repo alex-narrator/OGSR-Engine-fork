@@ -136,13 +136,15 @@ bool CUIInventoryCellItem::OnMouse(float x, float y, EUIMessages action)
 CUIDragItem* CUIInventoryCellItem::CreateDragItem()
 {
     CUIDragItem* i = inherited::CreateDragItem();
-    CUIStatic* s = NULL;
+    if (m_upgrade)
+        i->wnd()->AttachChild(CreateUpgradeIcon());
     if (!b_auto_drag_childs)
         return i;
 
-    for (auto it = this->m_ChildWndList.begin(); it != this->m_ChildWndList.end(); ++it)
+    CUIStatic* s{};
+    for (const auto& item : m_ChildWndList)
     {
-        if (auto s_child = smart_cast<CUIStatic*>(*it))
+        if (auto s_child = smart_cast<CUIStatic*>(item))
         {
             if (Core.Features.test(xrCore::Feature::show_inv_item_condition))
                 if (s_child == m_text)
@@ -170,7 +172,6 @@ CUIDragItem* CUIInventoryCellItem::CreateDragItem()
             i->wnd()->AttachChild(s);
         }
     }
-
     return i;
 }
 
@@ -181,29 +182,33 @@ void CUIInventoryCellItem::Update()
         UpdateConditionProgressBar();
 
     if (!!object()->m_upgrade_icon_sect && !m_upgrade)
-        CreateUpgradeIcon();
+    {
+        m_upgrade = CreateUpgradeIcon();
+        AttachChild(m_upgrade);
+    }
 }
 
-void CUIInventoryCellItem::CreateUpgradeIcon()
+CUIStatic* CUIInventoryCellItem::CreateUpgradeIcon()
 {
-    m_upgrade = xr_new<CUIStatic>();
-    m_upgrade->SetAutoDelete(true);
-    AttachChild(m_upgrade);
+    auto upgrade_icon = xr_new<CUIStatic>();
+    upgrade_icon->SetAutoDelete(true);
     CIconParams params(object()->m_upgrade_icon_sect);
-    params.set_shader(m_upgrade);
+    params.set_shader(upgrade_icon);
 
     Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
     Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
 
     Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
     size.mul(base_scale);
-    m_upgrade->SetWndSize(size);
+    upgrade_icon->SetWndSize(size);
 
     Fvector2 pos{object()->m_upgrade_icon_ofset};
     pos.mul(base_scale);
-    m_upgrade->SetWndPos(pos);
+    upgrade_icon->SetWndPos(pos);
 
-    m_upgrade->SetStretchTexture(true);
+    upgrade_icon->SetStretchTexture(true);
+
+    return upgrade_icon;
 }
 
 CUIAmmoCellItem::CUIAmmoCellItem(CWeaponAmmo* itm) : inherited(itm)
@@ -236,13 +241,12 @@ void CUIAmmoCellItem::Update()
         UpdateItemText();
 }
 
-void CUIAmmoCellItem::CreateAmmoInBoxIcon()
+CUIStatic* CUIAmmoCellItem::CreateAmmoInBoxIcon()
 { 
-    m_ammo_in_box = xr_new<CUIStatic>();
-    m_ammo_in_box->SetAutoDelete(true);
-    AttachChild(m_ammo_in_box);
+    auto ammo_icon = xr_new<CUIStatic>();
+    ammo_icon->SetAutoDelete(true);
     CIconParams params(object()->m_ammoSect);
-    params.set_shader(m_ammo_in_box);
+    params.set_shader(ammo_icon);
 
     Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
     Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
@@ -250,13 +254,15 @@ void CUIAmmoCellItem::CreateAmmoInBoxIcon()
     Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
     size.mul(base_scale);
     size.mul(object()->ammo_icon_scale);
-    m_ammo_in_box->SetWndSize(size);
+    ammo_icon->SetWndSize(size);
 
     Fvector2 pos{object()->ammo_icon_ofset};
     pos.mul(base_scale);
-    m_ammo_in_box->SetWndPos(pos);
+    ammo_icon->SetWndPos(pos);
 
-    m_ammo_in_box->SetStretchTexture(true);
+    ammo_icon->SetStretchTexture(true);
+
+    return ammo_icon;
 }
 
 void CUIAmmoCellItem::UpdateItemTextCustom()
@@ -279,7 +285,10 @@ void CUIAmmoCellItem::UpdateItemTextCustom()
     if (object()->m_boxCurr)
     {
         if (!m_ammo_in_box)
-            CreateAmmoInBoxIcon();
+        {
+            m_ammo_in_box = CreateAmmoInBoxIcon();
+            AttachChild(m_ammo_in_box);
+        }
     }
     else if (m_ammo_in_box)
         DetachChild(m_ammo_in_box);
@@ -935,6 +944,51 @@ bool CUIWeaponCellItem::EqualTo(CUICellItem* itm)
     bool b_place = ((object()->m_eItemPlace == ci->object()->m_eItemPlace));
 
     return b_addons && b_place;
+}
+
+CUIWeaponRGP7CellItem::CUIWeaponRGP7CellItem(CWeaponRPG7* itm) : inherited(itm) {}
+void CUIWeaponRGP7CellItem::Update()
+{
+    inherited::Update();
+    if (object()->GetAmmoElapsed())
+    {
+        if (!m_grenade_loaded)
+        {
+            m_grenade_loaded = CreateGrenadeIcon();
+            AttachChild(m_grenade_loaded);
+        }
+    }
+    else if (m_grenade_loaded)
+        DetachChild(m_grenade_loaded);
+}
+CUIStatic* CUIWeaponRGP7CellItem::CreateGrenadeIcon()
+{
+    auto grenade_icon = xr_new<CUIStatic>();
+    grenade_icon->SetAutoDelete(true);
+    CIconParams params(object()->GetCurrentAmmoNameSect());
+    params.set_shader(grenade_icon);
+
+    Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
+    Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
+
+    Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
+    size.mul(base_scale);
+    grenade_icon->SetWndSize(size);
+
+    Fvector2 pos{object()->GetGrenadeOffset()};
+    pos.mul(base_scale);
+    grenade_icon->SetWndPos(pos);
+
+    grenade_icon->SetStretchTexture(true);
+
+    return grenade_icon;
+}
+CUIDragItem* CUIWeaponRGP7CellItem::CreateDragItem()
+{ 
+    CUIDragItem* i = inherited::CreateDragItem();
+    if (m_grenade_loaded)
+        i->wnd()->AttachChild(CreateGrenadeIcon());
+    return i;
 }
 
 CBuyItemCustomDrawCell::CBuyItemCustomDrawCell(LPCSTR str, CGameFont* pFont)

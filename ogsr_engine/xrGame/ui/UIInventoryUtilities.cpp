@@ -2,6 +2,7 @@
 #include "UIInventoryUtilities.h"
 #include "WeaponAmmo.h"
 #include "Weapon.h"
+#include "WeaponRPG7.h"
 #include "UIStaticItem.h"
 #include "UIStatic.h"
 #include "eatable_item.h"
@@ -657,6 +658,32 @@ void AttachWpnAddonIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
         }
     }
 }
+void AttachGrenadeIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
+{
+    auto rpg = smart_cast<CWeaponRPG7*>(_item);
+    if (!rpg->GetAmmoElapsed())
+        return;
+    CUIStatic* grenade_icon = xr_new<CUIStatic>();
+    grenade_icon->SetAutoDelete(true);
+
+    CIconParams params(rpg->GetCurrentAmmoNameSect());
+    Frect rect = params.original_rect();
+    params.set_shader(grenade_icon);
+
+    float k_x{UI()->get_current_kx()};
+
+    Fvector2 size{rect.width(), rect.height()};
+    size.mul(_scale);
+    size.x *= k_x;
+
+    Fvector2 pos{rpg->GetGrenadeOffset()};
+    pos.mul(_scale);
+    pos.x *= k_x;
+
+    grenade_icon->SetWndRect(pos.x, pos.y, size.x, size.y);
+    grenade_icon->SetColor(color_rgba(255, 255, 255, 192));
+    _main_icon->AttachChild(grenade_icon);
+}
 void AttachAmmoIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
 {
     auto ammo = smart_cast<CWeaponAmmo*>(_item);
@@ -691,6 +718,8 @@ void InventoryUtilities::TryAttachIcons(CUIStatic* _main_icon, PIItem _item, flo
     if (smart_cast<CWeapon*>(_item))
     {
         AttachWpnAddonIcons(_main_icon, _item, _scale);
+        if (smart_cast<CWeaponRPG7*>(_item))
+            AttachGrenadeIcon(_main_icon, _item, _scale);
         return;
     }
     if (auto ammo = smart_cast<CWeaponAmmo*>(_item); ammo && ammo->IsBoxReloadable() && ammo->Useful())

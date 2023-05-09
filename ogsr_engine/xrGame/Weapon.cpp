@@ -1792,14 +1792,21 @@ LPCSTR CWeapon::GetCurrentAmmo_ShortName()
     if (m_magazine.empty())
         return ("");
     CCartridge& l_cartridge = m_magazine.back();
-    return *(l_cartridge.m_InvShortName);
+    return l_cartridge.m_InvShortName.c_str();
+}
+
+LPCSTR CWeapon::GetCurrentAmmoNameSect()
+{
+    if (m_magazine.empty())
+        return ("");
+    CCartridge& l_cartridge = m_magazine.back();
+    return l_cartridge.m_ammoSect.c_str();
 }
 
 float CWeapon::GetAmmoInMagazineWeight(const decltype(CWeapon::m_magazine)& mag) const
 {
-    float res = 0;
-    const char* last_type = nullptr;
-    float last_ammo_weight = 0;
+    float res{}, last_ammo_weight{};
+    const char* last_type{};
     for (auto& c : mag)
     {
         // Usually ammos in mag have same type, use this fact to improve performance

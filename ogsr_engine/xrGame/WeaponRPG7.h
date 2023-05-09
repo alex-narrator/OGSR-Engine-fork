@@ -28,6 +28,8 @@ public:
     virtual void UnloadMagazine(bool spawn_ammo = true);
     virtual void PlayAnimReload();
 
+    Fvector2 GetGrenadeOffset() { return grenade_offset; };
+
 protected:
     shared_str m_sGrenadeBoneName;
     shared_str m_sHudGrenadeBoneName;
@@ -35,6 +37,8 @@ protected:
     shared_str m_sRocketSection;
 
     virtual size_t GetWeaponTypeForCollision() const override { return RPG; }
+
+    Fvector2 grenade_offset{};
 
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };

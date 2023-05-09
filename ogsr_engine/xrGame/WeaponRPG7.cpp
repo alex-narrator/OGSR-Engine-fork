@@ -19,8 +19,6 @@ void CWeaponRPG7::Load(LPCSTR section)
     inherited::Load(section);
     CRocketLauncher::Load(section);
 
-    m_fScopeZoomFactor = pSettings->r_float(section, "max_zoom_factor");
-
     m_sGrenadeBoneName = READ_IF_EXISTS(pSettings, r_string, section, "grenade_bone", grenade_def_bone_cop);
     m_sHudGrenadeBoneName = READ_IF_EXISTS(pSettings, r_string, hud_sect, "grenade_bone", grenade_def_bone_cop);
 
@@ -29,6 +27,11 @@ void CWeaponRPG7::Load(LPCSTR section)
     // РПГ никогда клинить не должен
     misfireProbability = 0.0f;
     misfireConditionK = 0.0f;
+
+    grenade_offset.set(
+        READ_IF_EXISTS(pSettings, r_float, section, "grenade_x", 0.f), 
+        READ_IF_EXISTS(pSettings, r_float, section, "grenade_y", 0.f)
+    );
 }
 
 void CWeaponRPG7::UpdateMissileVisibility()
@@ -54,7 +57,7 @@ BOOL CWeaponRPG7::net_Spawn(CSE_Abstract* DC)
     UpdateMissileVisibility();
     if (iAmmoElapsed && !getCurrentRocket())
     {
-        CRocketLauncher::SpawnRocket(*m_sRocketSection, this);
+        CRocketLauncher::SpawnRocket(m_sRocketSection.c_str(), this);
     }
 
     return l_res;
@@ -78,7 +81,7 @@ void CWeaponRPG7::ReloadMagazine()
 
     if (iAmmoElapsed && !getRocketCount())
     {
-        CRocketLauncher::SpawnRocket(*m_sRocketSection, this);
+        CRocketLauncher::SpawnRocket(m_sRocketSection.c_str(), this);
     }
 }
 void CWeaponRPG7::SwitchState(u32 S) { inherited::SwitchState(S); }
