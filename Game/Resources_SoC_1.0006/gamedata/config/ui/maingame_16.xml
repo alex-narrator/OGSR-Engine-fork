@@ -46,11 +46,11 @@
 	</progress_bar_power_max>	
 
 	<static_weapon x="900" y="692" width="123" height="65" stretch="1">
-		<text complex_mode="0" x="45" y="0" font="letterica16" r="255" g="255" b="255" a="130"/>
-		<texture>ui_hud_frame_patron</texture>
+		<text complex_mode="0" x="0" y="0" font="letterica16" r="255" g="255" b="255" a="130"/>
+		<!-- <texture>ui_hud_frame_patron</texture> -->
 	</static_weapon>
 	
-	<static_ammo x="65" y="22" width="53" height="30" icon_scale = "0.75">
+	<static_ammo x="35" y="22" width="53" height="30" icon_scale = "0.75">
 		<text align="c" complex_mode="0" font="graffiti22" r="238" g="155" b="23" a="255">Ammo</text>
 	</static_ammo>
 	
@@ -122,9 +122,8 @@
 
 	<pick_up_item x="437" y="400" width="150" height="100"/>
 
-	<slot_panel 	x="130" y="510" scale="0.75" counter_y="-10" slots="0,1,2,3,4,12,13,14,15"/>
-	<vest_panel 	x="358" y="610" scale="0.75" counter_y="-10" group_similar="1"/>
-	<belt_panel 	x="130" y="710" scale="0.75" counter_y="-10" group_similar="1"/>
+	<slot_panel 	x="330" y="620" scale="0.6" counter_y="-4" slots="0,1,2,3,4,12,13,14,15"/>
+	<belt_panel 	x="330" y="690" scale="0.6" counter_y="-4" group_similar="1"/>
 	
 	<new_contact_snd>detectors\contact_1</new_contact_snd>	
 	

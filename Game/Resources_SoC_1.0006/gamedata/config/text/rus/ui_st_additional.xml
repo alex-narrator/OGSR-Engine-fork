@@ -941,4 +941,165 @@
 	<string id="st_items_limit">
 		<text>Місткість</text>
 	</string>			
+
+<!-- описи магазинів -->	
+	<string id="clip_8_900x18">
+		<text>8-ми зарядний магазин для набоїв 9х18</text>
+	</string>
+	<string id="clip_8_900x18_short">
+		<text>Маг.8 9х18</text>
+	</string>
+	<string id="clip_8_900x18_descr">
+		<text>Стандартний магазин для пістолетів ПМ, обладнаний віконцем для контролю кількості набоїв</text>
+	</string>
+	
+	<string id="clip_12_900x18">
+		<text>12-ми зарядний магазин для набоїв 9х18</text>
+	</string>
+	<string id="clip_12_900x18_short">
+		<text>Маг.12 9х18</text>
+	</string>
+	<string id="clip_12_900x18_descr">
+		<text>Стандартний магазин для пістолетів Форт-12</text>
+	</string>
+	
+	<string id="clip_13_900x19">
+		<text>13-ти зарядний магазин для набоїв 9х19</text>
+	</string>
+	<string id="clip_13_900x19_short">
+		<text>Маг.13 9х19</text>
+	</string>
+	<string id="clip_13_900x19_descr">
+		<text>Стандартний магазин для пістолетів Browning Hi-Power</text>
+	</string>	
+	
+	<string id="clip_15_900x19">
+		<text>15-ти зарядний магазин для набоїв 9х19</text>
+	</string>
+	<string id="clip_15_900x19_short">
+		<text>Маг.15 9х19</text>
+	</string>
+	<string id="clip_15_900x19_descr">
+		<text>Стандартний магазин для пістолетів Beretta 92</text>
+	</string>	
+	
+	<string id="clip_16_900x19">
+		<text>16-ти зарядний магазин для набоїв 9х19</text>
+	</string>
+	<string id="clip_16_900x19_short">
+		<text>Маг.16 9х19</text>
+	</string>
+	<string id="clip_16_900x19_descr">
+		<text>Стандартний магазин для пістолетів Walther P99, обладнаний віконцем для контролю кількості набоїв</text>
+	</string>		
+	
+	<string id="mag_30_900x19">
+		<text>30-ти зарядний магазин для набоїв 9х19</text>
+	</string>
+	<string id="mag_30_900x19_short">
+		<text>Маг.30 9х19</text>
+	</string>
+	<string id="mag_30_900x19_descr">
+		<text>Стандартний магазин для пістолетів-кулеметів Heckler & Koch MP5</text>
+	</string>	
+	
+	<string id="clip_7_1143x23">
+		<text>7-ти зарядний магазин для набоїв .45</text>
+	</string>
+	<string id="clip_7_1143x23_short">
+		<text>Маг.7 .45</text>
+	</string>
+	<string id="clip_7_1143x23_descr">
+		<text>Стандартний магазин для пістолетів Colt 1911 та SIG Sauer P220</text>
+	</string>	
+	
+	<string id="clip_12_1143x23">
+		<text>12-ти зарядний магазин для набоїв .45</text>
+	</string>
+	<string id="clip_12_1143x23_short">
+		<text>Маг.12 .45</text>
+	</string>
+	<string id="clip_12_1143x23_descr">
+		<text>Стандартний магазин для пістолетів Heckler & Koch USP</text>
+	</string>		
+	
+	<string id="mag_30_545x39">
+		<text>30-ти зарядний магазин для набоїв 5.45</text>
+	</string>
+	<string id="mag_30_545x39_short">
+		<text>Маг.30 5.45</text>
+	</string>
+	<string id="mag_30_545x39_descr">
+		<text>Стандартний магазин для автоматів АК-74 та Абакан</text>
+	</string>
+
+	<string id="mag_45_545x39">
+		<text>45-ти зарядний магазин для набоїв 5.45</text>
+	</string>
+	<string id="mag_45_545x39_short">
+		<text>Маг.45 5.45</text>
+	</string>
+	<string id="mag_45_545x39_descr">
+		<text>Стандартний магазин для кулемету РПК-74, сумісний зі автоматами АК-74 та Абакан</text>
+	</string>	
+	
+	<string id="mag_30_556x45">
+		<text>30-ти зарядний магазин для набоїв 5.56</text>
+	</string>
+	<string id="mag_30_556x45_short">
+		<text>Маг.30 5.56</text>
+	</string>
+	<string id="mag_30_556x45_descr">
+		<text>Стандартний магазин для стрілецької зброї у калібрі 5.56х45. Завдяки відповідності стандарту STANAG сумісний з багатьма моделями зброї країн-членів NATO</text>
+	</string>	
+	
+	<string id="mag_10_900x39">
+		<text>10-ти зарядний магазин для набоїв 9х39</text>
+	</string>
+	<string id="mag_10_900x39_short">
+		<text>Маг.10 9х39</text>
+	</string>
+	<string id="mag_10_900x39_descr">
+		<text>Стандартний магазин для гвинтівок ВСС "Вінторєз". Сумісний з автоматами АС "Вал" та ОЦ-14 "Гроза"</text>
+	</string>	
+	
+	<string id="mag_20_900x39">
+		<text>10-ти зарядний магазин для набоїв 9х39</text>
+	</string>
+	<string id="mag_20_900x39_short">
+		<text>Маг.20 9х39</text>
+	</string>
+	<string id="mag_20_900x39_descr">
+		<text>Стандартний магазин для автоматів АС "Вал" та ОЦ-14 "Гроза". Сумісний з гвинтівкою ВСС "Вінторєз"</text>
+	</string>
+
+	<string id="mag_10_762x54">
+		<text>10-ти зарядний магазин для набоїв 7.62x54</text>
+	</string>
+	<string id="mag_10_762x54_short">
+		<text>Маг.10 7.62х54</text>
+	</string>
+	<string id="mag_10_762x54_descr">
+		<text>Стандартний магазин для гвинтівок СВД та СВУ</text>
+	</string>	
+
+	<string id="mag_20_762x54">
+		<text>20-ти зарядний магазин для набоїв 7.62x54</text>
+	</string>
+	<string id="mag_20_762x54_short">
+		<text>Маг.20 7.62х54</text>
+	</string>
+	<string id="mag_20_762x54_descr">
+		<text>Збільшений магазин для гвинтівок СВУ. Сумісний із гвинтівками СВД</text>
+	</string>		
+	
+	<string id="box_100_762x54">
+		<text>Короб зі стрічкою на 100 набоїв 7.62x54</text>
+	</string>
+	<string id="box_100_762x54_short">
+		<text>Короб 100 7.62х54</text>
+	</string>
+	<string id="box_100_762x54_descr">
+		<text>Короб зі стрічкою на 100 набоїв для кулеметів ПКМ.</text>
+	</string>	
 </string_table>
