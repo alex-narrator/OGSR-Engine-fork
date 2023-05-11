@@ -13,6 +13,8 @@
 #include "xrServer_Objects_ALife_Items.h"
 #include "clsid_game.h"
 
+#include "date_time.h"
+
 #ifdef XRGAME_EXPORTS
 #ifdef DEBUG
 #define PHPH_DEBUG
@@ -206,7 +208,13 @@ u32 CSE_ALifeInventoryItem::update_rate() const { return (1000); }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItem
 ////////////////////////////////////////////////////////////////////////////
-CSE_ALifeItem::CSE_ALifeItem(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection), CSE_ALifeInventoryItem(caSection) {}
+CSE_ALifeItem::CSE_ALifeItem(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection), CSE_ALifeInventoryItem(caSection) 
+{
+    u32 default_stay_after_drop_time = READ_IF_EXISTS(pSettings, r_u32, "features", "stay_after_drop_time_interval", 0);
+    u32 stay_after_drop_time = READ_IF_EXISTS(pSettings, r_u32, caSection, "stay_after_drop_time_interval", default_stay_after_drop_time);
+    if (stay_after_drop_time)
+        m_stay_after_drop_time_interval = generate_time(1, 1, 1, stay_after_drop_time, 0, 0);
+}
 
 CSE_ALifeItem::~CSE_ALifeItem() {}
 
@@ -225,6 +233,7 @@ void CSE_ALifeItem::STATE_Write(NET_Packet& tNetPacket)
 {
     inherited1::STATE_Write(tNetPacket);
     inherited2::STATE_Write(tNetPacket);
+    tNetPacket.w(&m_drop_time, sizeof(m_drop_time));
 }
 
 void CSE_ALifeItem::STATE_Read(NET_Packet& tNetPacket, u16 size)
@@ -237,6 +246,8 @@ void CSE_ALifeItem::STATE_Read(NET_Packet& tNetPacket, u16 size)
         tNetPacket.r_u8();
     }
     inherited2::STATE_Read(tNetPacket, size);
+    if (m_wVersion > 118)
+        tNetPacket.r(&m_drop_time, sizeof(m_drop_time));
 }
 
 void CSE_ALifeItem::UPDATE_Write(NET_Packet& tNetPacket)

@@ -227,7 +227,7 @@ public:
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeDynamicObject, CSE_ALifeObject)
 ALife::_TIME_ID m_tTimeID;
 u64 m_switch_counter;
-
+ALife::_TIME_ID m_stay_after_drop_time_interval{}, m_drop_time{};
 CSE_ALifeDynamicObject(LPCSTR caSection);
 virtual ~CSE_ALifeDynamicObject();
 #ifdef XRGAME_EXPORTS

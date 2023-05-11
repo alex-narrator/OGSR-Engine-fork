@@ -119,8 +119,10 @@ void CInventoryItem::Load(LPCSTR section)
     m_flags.set(FCanTrade, READ_IF_EXISTS(pSettings, r_bool, section, "can_trade", TRUE));
     m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
     m_flags.set(FAllowSprint, READ_IF_EXISTS(pSettings, r_bool, section, "sprint_allowed", TRUE));
+    //
     m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", TRUE));
     m_flags.set(Fbreakable, READ_IF_EXISTS(pSettings, r_bool, section, "breakable", FALSE));
+    m_flags.set(FIsUniqueItem, READ_IF_EXISTS(pSettings, r_bool, section, "unique_item", FALSE));
 
     //	m_fControlInertionFactor		= READ_IF_EXISTS(pSettings, r_float,section,"control_inertion_factor", 1.0f);
     m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
@@ -1187,4 +1189,12 @@ bool CInventoryItem::can_be_attached() const
 {
     const auto actor = smart_cast<const CActor*>(object().H_Parent());
     return actor ? IsModule() && (m_eItemPlace == eItemPlaceBelt || m_eItemPlace == eItemPlaceVest) : true;
+}
+
+void CInventoryItem::SetDropTime(bool b_set)
+{
+    if (IsQuestItem() || IsUniqueItem())
+        return;
+    if (auto se_itm = smart_cast<CSE_ALifeItem*>(object().alife_object()))
+        se_itm->m_drop_time = b_set ? Level().GetGameTime() : 0;
 }

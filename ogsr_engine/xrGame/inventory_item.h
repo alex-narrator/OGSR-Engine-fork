@@ -69,6 +69,7 @@ public:
         FIHiddenForInventory = (1 << 14),
         Fvest = (1 << 15),
         Fbreakable = (1 << 16),
+        FIsUniqueItem = (1 << 17),
     };
     const u32 ClrEquipped = READ_IF_EXISTS(pSettings, r_color, "dragdrop", "color_equipped", color_argb(255, 255, 225, 0));
     const u32 ClrUntradable = READ_IF_EXISTS(pSettings, r_color, "dragdrop", "color_untradable", color_argb(255, 124, 0, 0));
@@ -124,6 +125,7 @@ public:
     BOOL IsInvalid() const;
 
     BOOL IsQuestItem() const { return m_flags.test(FIsQuestItem); }
+    bool IsUniqueItem() const { return m_flags.test(FIsUniqueItem); }
 
     virtual u32 Cost() const; //{ return m_cost;	}
     virtual void SetCost(u32 cost) { m_cost = cost; }
@@ -192,6 +194,8 @@ public:
     virtual bool CanTrade() const;
     virtual bool IsNecessaryItem(CInventoryItem* item);
     virtual bool IsNecessaryItem(const shared_str& item_sect) { return false; };
+
+    virtual void SetDropTime(bool);
 
 protected:
     xr_vector<u8> m_slots;

@@ -112,6 +112,7 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
 
     pIItem->m_pCurrentInventory = this;
     pIItem->SetDropManual(FALSE);
+    pIItem->SetDropTime(false);
 
     m_all.push_back(pIItem);
 
@@ -260,10 +261,11 @@ bool CInventory::DropItem(CGameObject* pObj)
         Msg("! CInventory::Drop item not found in inventory!!!");
 
     pIItem->OnMoveOut(pIItem->m_eItemPlace);
+    pIItem->SetDropTime(true);
 
     pIItem->m_pCurrentInventory = nullptr;
 
-    m_pOwner->OnItemDrop(smart_cast<CInventoryItem*>(pObj));
+    m_pOwner->OnItemDrop(pIItem);
 
     CalcTotalWeight();
     InvalidateState();
@@ -1474,7 +1476,7 @@ void CInventory::TryAmmoCustomPlacement(CInventoryItem* pIItem)
                 }
             }
             if (!HasDropPouch()) // нікуди не вміщається та немає сумки для скидання - кидаємо на землю
-                pAmmo->SetDropManual(TRUE);
+                pAmmo->Drop();
         }
     }
 }
