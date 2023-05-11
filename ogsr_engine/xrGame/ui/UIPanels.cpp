@@ -68,10 +68,10 @@ void CUIBeltPanel::Draw()
     auto& inv = pActor->inventory();
 
     TIItemContainer items_to_show{};
-    for (const auto& itm : inv.m_belt)
-    {
+    for (const auto& itm : inv.m_vest)
         TryAddToShowList(items_to_show, itm, m_bGroupSimilar);
-    }
+    for (const auto& itm : inv.m_belt)
+        TryAddToShowList(items_to_show, itm, m_bGroupSimilar);
 
     for (const auto& _itm : items_to_show)
     {
@@ -177,73 +177,6 @@ void CUISlotPanel::Draw()
 
         sprintf_s(slot_key, "ui_use_slot_%d", _itm->GetSlot());
         m_st.SetText(CStringTable().translate(slot_key).c_str());
-
-        TryAttachIcons(&m_st, _itm, m_fScale);
-
-        m_st.Draw();
-    }
-
-    CUIWindow::Draw();
-}
-
-/////////////////////////////////////////////////
-/////////////////VEST PANEL//////////////////////
-/////////////////////////////////////////////////
-void CUIVestPanel::InitFromXML(CUIXml& xml, LPCSTR path, int index)
-{
-    CUIXmlInit::InitWindow(xml, path, index, this);
-    m_fScale = xml.ReadAttribFlt(path, index, "scale");
-    m_bGroupSimilar = xml.ReadAttribFlt(path, index, "group_similar", 0);
-    m_counter_offset.x = xml.ReadAttribFlt(path, index, "counter_x", 0);
-    m_counter_offset.y = xml.ReadAttribFlt(path, index, "counter_y", 0);
-}
-
-void CUIVestPanel::Update() {}
-
-void CUIVestPanel::Draw()
-{
-    m_st.SetShader(InventoryUtilities::GetEquipmentIconsShader());
-
-    const float iIndent = 1.0f;
-    Fvector2 pos{}, size{};
-
-    Frect rect;
-    GetAbsoluteRect(rect);
-    pos.set(rect.left, rect.top);
-
-    float k_x{UI()->get_current_kx()};
-
-    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    auto& inv = pActor->inventory();
-
-    TIItemContainer items_to_show{};
-    for (const auto& itm : inv.m_vest)
-    {
-        TryAddToShowList(items_to_show, itm, m_bGroupSimilar);
-    }
-
-    for (const auto& _itm : items_to_show)
-    {
-        auto& params = _itm->m_icon_params;
-
-        params.set_shader(&m_st);
-        const auto& r = params.original_rect();
-        size.set(r.width(), r.height());
-        size.mul(m_fScale);
-        size.x *= k_x;
-
-        m_st.SetWndRect(0, 0, size.x, size.y);
-
-        m_st.SetWndPos(pos.x, pos.y);
-
-        auto count = inv.GetSameItemCount(_itm->object().cNameSect().c_str(), false);
-        if (count > 1)
-        {
-            float pos_x = m_counter_offset.x + pos.x;
-            float pos_y = m_counter_offset.y + (pos.y + size.y);
-            SetCounter(count, pos_x, pos_y);
-        }
-        pos.x = pos.x + iIndent + size.x;
 
         TryAttachIcons(&m_st, _itm, m_fScale);
 

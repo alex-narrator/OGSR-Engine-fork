@@ -105,7 +105,6 @@ CUIMainIngameWnd::CUIMainIngameWnd()
     m_pPickUpItem = nullptr;
     m_beltPanel = xr_new<CUIBeltPanel>();
     m_slotPanel = xr_new<CUISlotPanel>();
-    m_vestPanel = xr_new<CUIVestPanel>();
 
     warn_icon_list[ewiWeaponJammed] = &UIWeaponJammedIcon;
     warn_icon_list[ewiArmor] = &UIArmorIcon;
@@ -126,7 +125,6 @@ CUIMainIngameWnd::~CUIMainIngameWnd()
     xr_delete(UIZoneMap);
     xr_delete(m_beltPanel);
     xr_delete(m_slotPanel);
-    xr_delete(m_vestPanel);
     HUD_SOUND::DestroySound(m_contactSnd);
     xr_delete(g_MissileForceShape);
 }
@@ -294,9 +292,6 @@ void CUIMainIngameWnd::Init()
 
     m_slotPanel->InitFromXML(uiXml, "slot_panel", 0);
     this->AttachChild(m_slotPanel);
-
-    m_vestPanel->InitFromXML(uiXml, "vest_panel", 0);
-    this->AttachChild(m_vestPanel);
 
     HUD_SOUND::LoadSound("maingame_ui", "snd_new_contact", m_contactSnd, SOUND_TYPE_IDLE);
 }
@@ -502,9 +497,8 @@ void CUIMainIngameWnd::Update()
     UpdatePickUpItem();
 
     bool show_panels = IsHUDElementAllowed(eGear);
-    m_beltPanel->Show(show_panels); // отрисовка панели артефактов
-    m_slotPanel->Show(show_panels); // отрисовка панели слотів
-    m_vestPanel->Show(show_panels); // отрисовка панели розгрузки
+    m_beltPanel->Show(show_panels); // панель поясу та розгрузки
+    m_slotPanel->Show(show_panels); // панель слотів
 
     UpdateFlashingIcons(); // обновляем состояние мигающих иконок
 
