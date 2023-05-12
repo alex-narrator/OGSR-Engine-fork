@@ -791,7 +791,7 @@ void CEntityCondition::UpdateBoosters()
             DisableBoostParameters(B);
             m_boosters.erase(item.first);
         }
-        else
+        else if(B.m_BoostType < eRestoreBoostMax)
             ApplyRestoreBoost(B.m_BoostType, B.f_BoostValue * m_fDeltaTime);
     }
 }
