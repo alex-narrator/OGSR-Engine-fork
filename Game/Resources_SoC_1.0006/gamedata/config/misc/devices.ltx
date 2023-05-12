@@ -441,9 +441,22 @@ af_class_11		= af_compass
 af_sound_11_		= detectors\art_beep1
 af_freq_11		= 0.05, 2
 
-zone_class_all = true
-zone_sound_all_ = detectors\DA-2_beep1
-zone_freq_all = 0.05, 2
+;zone_class_all = true
+;zone_sound_all_ = detectors\DA-2_beep1
+;zone_freq_all = 0.05, 2
+
+zone_class_1		= zone_radioactive
+zone_sound_1_		= detectors\geiger_1
+zone_sound_1_1		= detectors\geiger_2
+zone_sound_1_2		= detectors\geiger_3
+zone_sound_1_3		= detectors\geiger_4
+zone_sound_1_4		= detectors\geiger_5
+zone_sound_1_5		= detectors\geiger_6
+zone_sound_1_6		= detectors\geiger_1
+zone_sound_1_6		= detectors\geiger_1
+zone_sound_1_7		= detectors\geiger_1
+zone_freq_1 		= 0.01, 1
+zone_ui_mark_1 		= zone_radiation
 
 attach_angle_offset		= -1.303,-1.493,-1.202
 attach_position_offset	= 0.110,-0.019,0.000
@@ -635,14 +648,6 @@ af_class_26		= af_ice
 af_sound_26_		= detectors\art_beep1
 af_freq_26		= 0.05, 2
 
-af_class_all = true
-af_sound_all_ = detectors\art_beep1
-af_freq_all = 0.05, 20
-
-zone_class_all = true
-zone_sound_all_ = detectors\DA-2_beep1
-zone_freq_all = 0.05, 2
-
 
 [detector_elite_hud]:detector_base_hud
 item_position				= -0.071685,0.036188,-0.009934
@@ -691,11 +696,12 @@ ui_p			= -0.02904,0.01,0.0364
 ui_r			= 0,90,0
 
 detect_radius = 30
-use_unique_marks = true
 
 ;creature_class_all = true
 creature_class_1 = human
+creature_ui_mark_1 = human
 creature_class_2 = zombie
+creature_ui_mark_2 = human
 
 [detector_scientific_hud]:detector_base_hud
 item_position				= -0.071685,0.036188,-0.009934

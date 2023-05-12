@@ -204,7 +204,6 @@ void CCustomDetector::Load(LPCSTR section)
 
     m_fDetectRadius = READ_IF_EXISTS(pSettings, r_float, section, "detect_radius", 15.0f);
     m_fAfVisRadius = READ_IF_EXISTS(pSettings, r_float, section, "af_vis_radius", 2.0f);
-    m_bUniqueMarks = READ_IF_EXISTS(pSettings, r_bool, section, "use_unique_marks", false);
     m_artefacts.load(section, "af");
     m_artefacts.m_af_rank = READ_IF_EXISTS(pSettings, r_u32, section, "af_rank", 0);
     m_zones.load(section, "zone");
@@ -504,9 +503,7 @@ BOOL CZoneList::feel_touch_contact(CObject* O)
     if (!pZone)
         return false;
 
-    const auto mark = READ_IF_EXISTS(pSettings, r_string, pZone->cNameSect(), "detector_mark", pSettings->r_string(pZone->cNameSect(), "class"));
-
-    bool res = (m_TypesMap.find(mark) != m_TypesMap.end()) || (m_TypesMap.find("class_all") != m_TypesMap.end());
+    bool res = (m_TypesMap.find(O->cNameSect()) != m_TypesMap.end()) || (m_TypesMap.find("class_all") != m_TypesMap.end());
     if (!pZone->IsEnabled() || !pZone->VisibleByDetector())
         res = false;
 
@@ -525,13 +522,13 @@ BOOL CCreatureList::feel_touch_contact(CObject* O)
     if (!pCreature)
         return false;
 
-    const auto mark = READ_IF_EXISTS(pSettings, r_string, pCreature->cNameSect(), "detector_mark", pSettings->r_string(pCreature->cNameSect(), "species"));
+    const auto species = pSettings->r_string(pCreature->cNameSect(), "species");
 
-    bool res = (m_TypesMap.find(mark) != m_TypesMap.end()) || (m_TypesMap.find("class_all") != m_TypesMap.end());
+    bool res = (m_TypesMap.find(species) != m_TypesMap.end()) || (m_TypesMap.find("class_all") != m_TypesMap.end());
     if (!pCreature->g_Alive() || smart_cast<CActor*>(pCreature))
         res = false;
     if (!res && pCreature->g_Alive() && !smart_cast<CActor*>(pCreature))
-        Msg("~%s %s", __FUNCTION__, mark);
+        Msg("~%s %s", __FUNCTION__, species);
 
     return res;
 }

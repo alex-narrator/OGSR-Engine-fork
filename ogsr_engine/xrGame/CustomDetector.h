@@ -14,7 +14,7 @@ struct ITEM_TYPE
     Fvector2 freq; // min,max
     HUD_SOUND detect_snds;
 
-    shared_str zone_map_location;
+    shared_str ui_mark;
     shared_str nightvision_particle;
 };
 
@@ -91,6 +91,9 @@ public:
                 if (pSettings->line_exist(sect, temp))
                     HUD_SOUND::LoadSound(sect, temp, item_type.detect_snds, SOUND_TYPE_ITEM);
 
+                xr_sprintf(temp, "%s_ui_mark_%d", prefix, i);
+                item_type.ui_mark = READ_IF_EXISTS(pSettings, r_string, sect, temp, nullptr);
+
                 m_TypesMap.emplace(std::move(item_sect), std::move(item_type));
 
                 ++i;
@@ -161,7 +164,6 @@ protected:
     bool m_bFastAnimMode{};
     bool m_bNeedActivation{};
     shared_str m_nightvision_particle{};
-    bool m_bUniqueMarks{};
     bool m_bCanSwitchModes{};
     bool m_bAfMode{};
 

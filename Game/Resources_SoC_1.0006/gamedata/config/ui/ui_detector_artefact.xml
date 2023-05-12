@@ -13,6 +13,10 @@
     <palette id="zone_sign" width="0.006" height="0.006" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>
     </palette>
+	
+	<palette id="zone_radiation" width="0.006" height="0.006" stretch="1" alignment="c">
+      <texture shader="hud\p3d">ui_inGame2_Detector_icon_acid_big</texture>
+    </palette>
   </elite>
 
   <scientific x="0" y="0" width="0.0576" height="0.029">
