@@ -14,7 +14,8 @@ glow_texture    = glow\glow_torch_r2					; glow texture name     (required)
 glow_radius     = 0.3									; glow radius           <in meters>
 guide_bone      = lights_bone							; guid bone name        (required)
 volumetric_enabled 		= true
-volumetric_for_actor 	= true
+;volumetric_for_actor 	= true
+range_min_k 	= 0.3 ; when device power low light range can`t be less then range * range_min_k
 
 [torch_definition_long_range]:torch_definition
 range           = 26									; range                 <in meters>

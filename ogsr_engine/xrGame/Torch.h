@@ -29,7 +29,7 @@ protected:
     Fvector m_focus;
     Fcolor m_color;
 
-    float m_fRange{};
+    float m_fRange{}, m_fRangeMinK{};
 
 private:
     bool useVolumetric{}, useVolumetricForActor{};

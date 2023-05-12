@@ -394,6 +394,7 @@ void CTorch::LoadLightDefinitions(shared_str light_sect)
     m_color = pUserData->r_fcolor(light_sect, b_r2 ? "color_r2" : "color");
     fBrightness = m_color.intensity();
     m_fRange = pUserData->r_float(light_sect, (b_r2) ? "range_r2" : "range");
+    m_fRangeMinK = READ_IF_EXISTS(pUserData, r_float, light_sect, "range_min_k", 0.2f);
     light_render->set_color(m_color);
     light_render->set_range(m_fRange);
 
@@ -433,7 +434,12 @@ void CTorch::LoadLightDefinitions(shared_str light_sect)
     calc_m_delta_h(m_fRange);
 }
 
-float CTorch::get_range_val() const { return m_fRange * (GetPowerLevelToShow() / 100.f); }
+float CTorch::get_range_val() const 
+{ 
+    float res = m_fRange * (GetPowerLevelToShow() / 100.f);
+    clamp(res, m_fRange * m_fRangeMinK, m_fRange);
+    return res;
+}
 
 void CTorch::SwitchMode()
 {
