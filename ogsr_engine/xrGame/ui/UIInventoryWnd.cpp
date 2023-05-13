@@ -708,7 +708,7 @@ void CUIInventoryWnd::CheckForcedWeightUpdate()
     for (const auto& item : place_to_search)
     {
         auto artefact = smart_cast<CArtefact*>(item);
-        if (artefact && !fis_zero(artefact->m_fTTLOnDecrease) && !fis_zero(artefact->GetCondition()) && (!fis_zero(artefact->GetItemEffect(CInventoryItem::eAdditionalWeight))))
+        if (artefact && !fis_zero(artefact->m_fTTLOnDecrease) && !fis_zero(artefact->GetCondition()) && !fis_zero(artefact->GetItemEffect(CInventoryItem::eAdditionalWeight)))
         {
             need_update = true;
             break;

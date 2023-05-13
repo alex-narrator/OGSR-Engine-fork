@@ -52,10 +52,10 @@
 			<text font="letterica16" x="20" y="3"/>
 		</static_additional_jump>
 		
-		<static_additional_max_weight width="194" height="20" complex_mode="1">
+		<static_additional_weight width="194" height="20" complex_mode="1">
 			<texture>ui_inv_icon_additional_weight</texture>
 			<text font="letterica16" x="20" y="3"/>
-		</static_additional_max_weight>
+		</static_additional_weight>
 <!-- добавочные параметры прыжка и скорости ходьбы - END -->
 
 		<static_burn_immunity width="194" height="20" complex_mode="1">

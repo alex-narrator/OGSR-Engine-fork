@@ -33,6 +33,7 @@ protected:
         // additional
         _item_additional_sprint,
         _item_additional_jump,
+        _item_additional_weight,
 
         _hit_type_protection_index,
 

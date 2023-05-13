@@ -291,18 +291,18 @@ float CInventoryOwner::GetCarryWeight() const { return inventory().TotalWeight()
 //максимальный переносимы вес
 float CInventoryOwner::MaxCarryWeight() const
 {
-    float res = inventory().GetMaxWeight();
+    float res{inventory().GetMaxWeight()}, base_weight{inventory().GetMaxWeight()};
 
     const auto EA = smart_cast<const CEntityAlive*>(this);
-    res += (res * EA->conditions().GetBoostedParams(eAdditionalWeightBoost));
+    res += (base_weight * EA->conditions().GetBoostedParams(eAdditionalWeightBoost));
 
     auto outfit = GetOutfit();
     if (outfit && !fis_zero(outfit->GetCondition()))
-        res += outfit->GetItemEffect(CInventoryItem::eAdditionalWeight);
+        res += (base_weight * outfit->GetItemEffect(CInventoryItem::eAdditionalWeight));
 
     auto backpack = GetBackpack();
     if (backpack && !fis_zero(backpack->GetCondition()))
-        res += backpack->GetItemEffect(CInventoryItem::eAdditionalWeight);
+        res += (base_weight*backpack->GetItemEffect(CInventoryItem::eAdditionalWeight));
 
     if (inventory().OwnerIsActor())
     {
@@ -311,11 +311,11 @@ float CInventoryOwner::MaxCarryWeight() const
         {
             auto artefact = smart_cast<CArtefact*>(item);
             if (artefact && !fis_zero(artefact->GetCondition()))
-                res += artefact->GetItemEffect(CInventoryItem::eAdditionalWeight);
+                res += (base_weight*artefact->GetItemEffect(CInventoryItem::eAdditionalWeight));
             auto container = smart_cast<CInventoryContainer*>(item);
             if (container)
             {
-                res += container->GetContainmentArtefactEffect(CInventoryItem::eAdditionalWeight);
+                res += (base_weight*container->GetContainmentArtefactEffect(CInventoryItem::eAdditionalWeight));
             }
         }
     }

@@ -57,7 +57,7 @@ void CEatableItem::Load(LPCSTR section)
 
     m_ItemBoost[eAdditionalSprintBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_sprint", 0.0f);
     m_ItemBoost[eAdditionalJumpBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_jump", 0.0f);
-    m_ItemBoost[eAdditionalWeightBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_max_weight", 0.0f);
+    m_ItemBoost[eAdditionalWeightBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_weight", 0.0f);
 
     m_ItemBoost[eBurnImmunityBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_burn_protection", 0.0f);
     m_ItemBoost[eShockImmunityBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_strike_protection", 0.0f);

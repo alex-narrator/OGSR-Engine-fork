@@ -127,7 +127,7 @@
 	
 	<new_contact_snd>detectors\contact_1</new_contact_snd>	
 	
-	<outfit_power_static x="10" y="300" width="120" height="60" stretch="1">
+	<outfit_power_static x="50" y="680" width="120" height="60" stretch="1">
 		<text font="letterica16" r="238" g="224" b="198"/>	
 	</outfit_power_static>
 </w>

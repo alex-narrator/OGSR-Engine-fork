@@ -39,7 +39,7 @@ LPCSTR af_item_sect_names[] = {
     "additional_sprint",
     "additional_jump",
     //
-    "additional_max_weight",
+    "additional_weight",
     //
     "burn_immunity",
     "shock_immunity",
@@ -112,6 +112,7 @@ void CUIArtefactParams::SetInfo(CInventoryItem* obj)
     for (u32 i = 0; i < _max_item_index; ++i)
     {
         CUIStatic* _s = m_info_items[i];
+        R_ASSERT2(_s, make_string("%s static %s not described", __FUNCTION__, af_item_sect_names[i]));
 
         float _val{};
 
@@ -127,23 +128,17 @@ void CUIArtefactParams::SetInfo(CInventoryItem* obj)
         if (fis_zero(_val))
             continue;
 
-        if (i != _item_additional_weight)
-            _val *= 100.0f;
+        _val *= 100.0f;
 
-        LPCSTR _sn = "%";
+        LPCSTR _sn{"%"};
 
         if (i == _item_radiation_restore)
         {
             _val /= 100.0f;
             _sn = CStringTable().translate("st_rad").c_str();
         }
-        //
-        else if (i == _item_additional_weight)
-        {
-            _sn = CStringTable().translate("st_kg").c_str();
-        }
 
-        LPCSTR _color = (_val > 0) ? "%c[green]" : "%c[red]";
+        LPCSTR _color{(_val > 0) ? "%c[green]" : "%c[red]"};
 
         if (i == _item_alcohol_restore)
             _val *= -1.0f;

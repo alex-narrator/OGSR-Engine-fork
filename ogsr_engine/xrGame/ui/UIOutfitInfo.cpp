@@ -36,6 +36,7 @@ LPCSTR _imm_names[] = {
     //
     "additional_sprint",
     "additional_jump",
+    "additional_weight",
     //
     "burn_immunity",
     "shock_immunity",
@@ -60,6 +61,7 @@ LPCSTR _imm_st_names[] = {
     //
     "ui_inv_sprint",
     "ui_inv_jump",
+    "ui_inv_weight",
     //
     "ui_inv_burn_protection",
     "ui_inv_shock_protection",
@@ -119,15 +121,12 @@ void CUIOutfitInfo::Update()
     for (u32 i = 0; i < _max_item_index; ++i)
     {
         CUIStatic* _s = m_items[i];
+        R_ASSERT2(_s, make_string("%s static %s not described", __FUNCTION__, _imm_names[i]));
 
-        if (!_s)
-            continue;
-
-        float _val{};
+        float _val{}, _val_boost{cond.GetBoostedParams(i)};
 
         if (i < _hit_type_protection_index)
         {
-            _val += cond.GetBoostedParams(i);
             if (i < _item_additional_sprint)
             {
                 _val += Actor()->GetItemBoostedParams(i);
@@ -147,7 +146,6 @@ void CUIOutfitInfo::Update()
         }
         else
         {
-            _val += cond.GetBoostedHitTypeProtection(i - _hit_type_protection_index);
             _val += Actor()->GetArtefactsProtection(i - _hit_type_protection_index);
             if (outfit)
                 _val += outfit->GetHitTypeProtection(i - _hit_type_protection_index);
@@ -161,31 +159,46 @@ void CUIOutfitInfo::Update()
                 _val += helmet->GetHitTypeProtection(i - _hit_type_protection_index);
         }
 
-        if (fis_zero(_val))
+        if (fis_zero(_val) && fis_zero(_val_boost))
             continue;
 
-        LPCSTR _sn = "%";
+        LPCSTR _sn{"%"}, _sn_boost{"%"};
+
         _val *= 100.0f;
+        _val_boost *= 100.f;
 
         if (i == _item_radiation_restore)
         {
             _val /= 100.0f;
-            _sn = CStringTable().translate("st_rad").c_str();
+            _val_boost /= 100.f;
+            _sn = _sn_boost = CStringTable().translate("st_rad").c_str();
         }
 
         if (i == _item_alcohol_restore)
         {
             _val *= -1.0f;
+            _val_boost *= -0.1f;
         }
 
-        LPCSTR _color = (_val > 0) ? "%c[green]" : "%c[red]";
+        LPCSTR _color{(_val > 0) ? "%c[green]" : "%c[red]"};
+        LPCSTR _color_boost{(_val_boost > 0) ? "%c[green]" : "%c[red]"};
 
         if (i == _item_radiation_restore || i == _item_alcohol_restore || i == _item_max_power_restore)
         {
             _color = (_val > 0) ? "%c[red]" : "%c[green]";
+            _color_boost = (_val_boost > 0) ? "%c[red]" : "%c[green]";
         }
 
-        sprintf_s(_buff, "%s %s %+.f %s", CStringTable().translate(_imm_st_names[i]).c_str(), _color, _val, _sn);
+        auto _name{CStringTable().translate(_imm_st_names[i]).c_str()};
+        auto _val_time{cond.GetBoostedTime(i)};
+        auto _st_time{CStringTable().translate("st_time_minute").c_str()};
+
+        if (!fis_zero(_val) && !fis_zero(_val_boost))
+            sprintf_s(_buff, "%s %s%+.f%s %s%+.f%s [%.f%s]", _name, _color, _val, _sn, _color_boost, _val_boost, _sn_boost, _val_time, _st_time);
+        else if (!fis_zero(_val))
+            sprintf_s(_buff, "%s %s%+.f%s", _name, _color, _val, _sn);
+        else
+            sprintf_s(_buff, "%s %s%+.f%s [%.f%s]", _name, _color_boost, _val_boost, _sn_boost, _val_time, _st_time);
 
         _s->SetText(_buff);
 

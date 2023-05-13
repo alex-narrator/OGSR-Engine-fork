@@ -8,7 +8,8 @@
 #include "../game_object_space.h"
 #include "../script_callback_ex.h"
 #include "../script_game_object.h"
-#include "../Actor.h"
+#include "Actor.h"
+#include "Inventory.h"
 #include "UIInventoryWnd.h"
 #include "UICursor.h"
 #include "UIXmlInit.h"
@@ -389,7 +390,7 @@ void CUIContainerCellItem::UpdateItemText()
 
     string32 str;
 
-    float add_weight = object()->GetItemEffect(CInventoryItem::eAdditionalWeight);
+    float add_weight = object()->GetItemEffect(CInventoryItem::eAdditionalWeight) * Actor()->inventory().GetMaxWeight();
     auto measure_weight = CStringTable().translate("st_kg").c_str();
 
     if (!fis_zero(add_weight))

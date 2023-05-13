@@ -83,9 +83,6 @@
 	<string id="ui_inv_jump">
 		<text>Висота стрибка</text>
 	</string>
-	<string id="ui_inv_volume">
-		<text>Обсяг</text>
-	</string>
 	
 	<string id="st_quick_slot_empty">
 		<text>Кишеня порожня</text>

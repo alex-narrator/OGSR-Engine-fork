@@ -812,6 +812,14 @@ float CEntityCondition::GetBoostedHitTypeProtection(int hit_type)
 
 float CEntityCondition::GetBoostedParams(int i) { return m_BoostParams[i]; }
 
+float CEntityCondition::GetBoostedTime(int i) 
+{ 
+    BOOSTER_MAP::iterator it = m_boosters.find((eBoostParams)i);
+    if (it != m_boosters.end())
+        return it->second.f_BoostTime;
+    return 0.f;
+}
+
 void CEntityCondition::ApplyRestoreBoost(int type, float value)
 {
     if (fis_zero(value))

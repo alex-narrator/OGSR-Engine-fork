@@ -270,6 +270,7 @@ public:
     virtual void UpdateBoosters();
 
     virtual float GetBoostedParams(int);
+    virtual float GetBoostedTime(int);
     virtual float GetBoostedHitTypeProtection(int);
     virtual void BoostParameters(const SBooster&);
     virtual void DisableBoostParameters(const SBooster&);
