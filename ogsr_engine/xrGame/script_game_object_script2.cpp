@@ -83,6 +83,13 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .def("cost", &CScriptGameObject::Cost)
         .def("condition", &CScriptGameObject::GetCondition)
         .def("set_condition", &CScriptGameObject::SetCondition)
+        //
+        .def("is_power_consumer", &CScriptGameObject::IsPowerConsumer)
+        .def("is_power_source_attached", &CScriptGameObject::IsPowerSourceAttached)
+        .def("get_power_level", &CScriptGameObject::GetPowerLevel)
+        .def("set_power_level", &CScriptGameObject::SetPowerLevel)
+        .def("change_power_level", &CScriptGameObject::ChangePowerLevel)
+        //
         .def("death_time", &CScriptGameObject::DeathTime)
         //		.def("armor",						&CScriptGameObject::Armor)
         .def("max_health", &CScriptGameObject::MaxHealth)
