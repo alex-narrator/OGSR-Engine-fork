@@ -319,6 +319,8 @@ public:
 
     void IterateInventory(const luabind::functor<void>& functor, const luabind::object& object);
     void IterateBelt(const luabind::functor<void>& functor, const luabind::object& object);
+    void IterateVest(const luabind::functor<void>& functor, const luabind::object& object);
+    void IterateSlots(const luabind::functor<void>& functor, const luabind::object& object);
     void IterateRuck(const luabind::functor<void>& functor, const luabind::object& object);
     void MarkItemDropped(CScriptGameObject* item);
     bool MarkedDropped(CScriptGameObject* item);

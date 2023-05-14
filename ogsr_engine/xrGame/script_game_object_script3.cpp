@@ -245,6 +245,8 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 
         .def("iterate_inventory", &CScriptGameObject::IterateInventory)
         .def("iterate_belt", &CScriptGameObject::IterateBelt)
+        .def("iterate_vest", &CScriptGameObject::IterateVest)
+        .def("iterate_slots", &CScriptGameObject::IterateSlots)
         .def("iterate_ruck", &CScriptGameObject::IterateRuck)
         .def("mark_item_dropped", &CScriptGameObject::MarkItemDropped)
         .def("marked_dropped", &CScriptGameObject::MarkedDropped)

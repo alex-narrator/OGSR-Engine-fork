@@ -1285,7 +1285,25 @@ void CScriptGameObject::IterateBelt(const luabind::functor<void>& functor, const
         if (!it->object().getDestroy())
             functor(object, it->object().lua_game_object());
 }
-
+void CScriptGameObject::IterateVest(const luabind::functor<void>& functor, const luabind::object& object)
+{
+    auto inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
+    ASSERT_FMT(inventory_owner, "[%s]: %s not an CInventoryOwner", __FUNCTION__, this->object().Name());
+    for (const auto* it : inventory_owner->inventory().m_vest)
+        if (!it->object().getDestroy())
+            functor(object, it->object().lua_game_object());
+}
+void CScriptGameObject::IterateSlots(const luabind::functor<void>& functor, const luabind::object& object)
+{
+    auto inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
+    ASSERT_FMT(inventory_owner, "[%s]: %s not an CInventoryOwner", __FUNCTION__, this->object().Name());
+    for (const auto& it : inventory_owner->inventory().m_slots)
+    {
+        auto item = it.m_pIItem;
+        if (item && !item->object().getDestroy())
+            functor(object, item->object().lua_game_object());
+    }
+}
 void CScriptGameObject::IterateRuck(const luabind::functor<void>& functor, const luabind::object& object)
 {
     auto inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
