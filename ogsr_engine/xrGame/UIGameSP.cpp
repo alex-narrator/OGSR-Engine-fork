@@ -294,9 +294,13 @@ bool CChangeLevelWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 {
     if (keyboard_action == WINDOW_KEY_PRESSED)
     {
+        if (m_messageBox->OnKeyboard(dik, keyboard_action))
+            return true;
         if (is_binded(kQUIT, dik))
+        {
             OnCancel();
-        return true;
+            return true;
+        }
     }
     return inherited::OnKeyboard(dik, keyboard_action);
 }

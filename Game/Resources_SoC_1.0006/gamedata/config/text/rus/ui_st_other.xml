@@ -22,13 +22,13 @@
 		<text>Скасування</text>
 	</string>
 	<string id="ui_st_btn_no">
-		<text>Ні</text>
+		<text>Ні [esc]</text>
 	</string>
 	<string id="ui_st_btn_ok">
 		<text>ОК</text>
 	</string>
 	<string id="ui_st_btn_yes">
-		<text>Так</text>
+		<text>Так [enter]</text>
 	</string>
 	<string id="ui_st_cant_run_r2">
 		<text>Вы не можете запустить второй рендер на вашем компьютере</text>
@@ -103,7 +103,7 @@
 		<text>Створення нової гри</text>
 	</string>
 	<string id="st_loading_alife_simulator">
-		<text>Сервер: завантаження симуляції життя</text>
+		<text>Сервер: Завантаження симуляції життя</text>
 	</string>
 	<string id="st_server_connecting">
 		<text>Сервер: З'єднання</text>

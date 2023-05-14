@@ -26,6 +26,7 @@
 #include "script_callback_ex.h"
 #include "GamePersistent.h"
 #include "MainMenu.h"
+#include "UIGameSP.h"
 
 #ifdef DEBUG
 #include "ai/monsters/BaseMonster/base_monster.h"
@@ -146,12 +147,15 @@ void CLevel::IR_OnKeyboardPress(int key)
         return;
 
     case kQUIT: {
-        if (b_ui_exist && HUD().GetUI()->MainInputReceiver() && (MainMenu()->IsActive() || !Device.Paused()))
+        auto mir = HUD().GetUI()->MainInputReceiver();
+        auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame()); 
+        bool lc_wnd = pGameSP && pGameSP->UIChangeLevelWnd == mir;
+        if (b_ui_exist && mir && (MainMenu()->IsActive() || !Device.Paused() || lc_wnd))
         {
-            if (HUD().GetUI()->MainInputReceiver()->IR_OnKeyboardPress(key))
+            if (mir->IR_OnKeyboardPress(key))
                 return; // special case for mp and main_menu
 
-            HUD().GetUI()->StartStopMenu(HUD().GetUI()->MainInputReceiver(), true);
+            HUD().GetUI()->StartStopMenu(mir, true);
         }
         else
             Console->Execute("main_menu");
