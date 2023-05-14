@@ -40,7 +40,7 @@
 		</static_eat_psyhealth>
 		
 		<static_eat_alcohol width="194" height="20" complex_mode="1">
-			<texture>ui_inv_icon_health_restore_speed</texture>
+			<texture>ui_inv_icon_alcohol</texture>
 			<text font="letterica16" x="20" y="3"/>
 		</static_eat_alcohol>
 		
@@ -74,7 +74,7 @@
 			<text font="letterica16" x="20" y="3"/>
 		</static_boost_psyhealth>
 		<static_boost_alcohol width="194" height="20" complex_mode="1">
-			<texture>ui_inv_icon_health_restore_speed</texture>
+			<texture>ui_inv_icon_alcohol</texture>
 			<text font="letterica16" x="20" y="3"/>
 		</static_boost_alcohol>	
 		<static_boost_wounds_heal width="194" height="20" complex_mode="1">

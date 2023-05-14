@@ -44,6 +44,20 @@
 			<texture>ui_hud_shk_armour</texture>
 		</progress>
 	</progress_bar_power_max>	
+	
+	<outfit_power_static x="60" y="688" width="120" height="60" stretch="1">
+		<auto_static x="-10" y="0" width="10" height="12" stretch="1">
+			<texture>ui_inv_icon_shock_immunity</texture>
+		</auto_static>	
+		<auto_static x="83" y="0" width="10" height="12" stretch="1">
+			<texture>ui_hud_icon_armour</texture>
+		</auto_static>	
+	</outfit_power_static>
+	<progress_bar_outfit_power x="0" y="-5" width="82" height="19" horz="1" min="0" max="100" pos="0">
+		<progress>
+			<texture>ui_hud_shk_power_cop</texture>
+		</progress>
+	</progress_bar_outfit_power>	
 
 	<static_weapon x="900" y="692" width="123" height="65" stretch="1">
 		<text complex_mode="0" x="0" y="0" font="letterica16" r="255" g="255" b="255" a="130"/>
@@ -126,8 +140,4 @@
 	<belt_panel 	x="330" y="690" scale="0.6" counter_y="-4" group_similar="1"/>
 	
 	<new_contact_snd>detectors\contact_1</new_contact_snd>	
-	
-	<outfit_power_static x="50" y="680" width="120" height="60" stretch="1">
-		<text font="letterica16" r="238" g="224" b="198"/>	
-	</outfit_power_static>
 </w>

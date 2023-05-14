@@ -79,6 +79,7 @@ protected:
     float ammo_icon_scale{};
     // заряд екзоскелету
     CUIStatic UIOutfitPowerStatic;
+    CUIProgressBar UIOutfitPowerBar;
 
 public:
     CUIStatic* GetPDAOnline() { return &UIPdaOnline; };

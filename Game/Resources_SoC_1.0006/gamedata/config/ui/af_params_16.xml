@@ -37,7 +37,7 @@
 		</static_psy_health_restore_speed>
 		
 		<static_alcohol_restore_speed width="194" height="20" complex_mode="1">
-			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<texture>ui_inv_icon_alcohol</texture>
 			<text font="letterica16" x="20" y="3"/>
 		</static_alcohol_restore_speed>
 

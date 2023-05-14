@@ -239,6 +239,8 @@ void CUIMainIngameWnd::Init()
     //--
     AttachChild(&UIOutfitPowerStatic);
     xml_init.InitStatic(uiXml, "outfit_power_static", 0, &UIOutfitPowerStatic);
+    UIOutfitPowerStatic.AttachChild(&UIOutfitPowerBar);
+    xml_init.InitProgressBar(uiXml, "progress_bar_outfit_power", 0, &UIOutfitPowerBar);
 
     constexpr const char* warningStrings[] = {
         "jammed",
@@ -400,12 +402,7 @@ void CUIMainIngameWnd::Update()
         bool show_bar = IsHUDElementAllowed(eArmorPower);
         UIOutfitPowerStatic.Show(show_bar);
         if (show_bar && pOutfit)
-        {
-            auto power_descr = CStringTable().translate("st_power_descr").c_str();
-            string256 text_str;
-            sprintf_s(text_str, "%s %.0f%s", power_descr, pOutfit->GetPowerLevelToShow(), "%");
-            UIOutfitPowerStatic.SetText(text_str);
-        }
+            UIOutfitPowerBar.SetProgressPos(pOutfit->GetPowerLevelToShow());
 
         UpdateActiveItemInfo();
 

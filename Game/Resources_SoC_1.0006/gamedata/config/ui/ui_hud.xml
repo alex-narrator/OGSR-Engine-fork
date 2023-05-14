@@ -98,6 +98,7 @@
 	<texture id="ui_inv_icon_additional_weight" x="171" y="779" width="19" height="19" />
 	<texture id="ui_inv_icon_additional_sprint" x="190" y="817" width="19" height="19" />
 	<texture id="ui_inv_icon_additional_jump" x="152" y="779" width="19" height="19" />
+	<texture id="ui_inv_icon_alcohol" x="133" y="798" width="19" height="19" />
 	
 	<texture id="ui_inv_icon_hit_fraction" x="114" y="741" width="19" height="19" />
 

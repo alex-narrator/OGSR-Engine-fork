@@ -202,7 +202,7 @@
 			<text font="letterica16" x="20" y="3" color="ui_clr_1"/>
 		</static_psy_health_restore_speed>
 		<static_alcohol_restore_speed x="0" y="0" width="226" height="20" complex_mode="1">
-			<texture>ui_inv_icon_wounds_heal_speed</texture>
+			<texture>ui_inv_icon_alcohol</texture>
 			<text font="letterica16" x="20" y="3" color="ui_clr_1"/>
 		</static_alcohol_restore_speed>
 		<static_additional_sprint x="0" y="0" width="226" height="20" complex_mode="1">
