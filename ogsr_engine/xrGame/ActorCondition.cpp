@@ -131,7 +131,6 @@ void CActorCondition::ConditionJump(float weight)
 {
     float power = m_fJumpPower;
     power += power * weight * (weight > 1.f ? m_fOverweightJumpK : 1.f);
-    power /= object().GetExoFactor();
     m_fPower -= HitPowerEffect(power);
 }
 void CActorCondition::ConditionWalk(float weight, bool accel, bool sprint)
@@ -139,7 +138,6 @@ void CActorCondition::ConditionWalk(float weight, bool accel, bool sprint)
     float power = m_fWalkPower;
     power += power * weight * (weight > 1.f ? m_fOverweightWalkK : 1.f);
     power *= m_fDeltaTime * (accel ? (sprint ? m_fSprintK : m_fAccelK) : 1.f);
-    power /= object().GetExoFactor();
     m_fPower -= HitPowerEffect(power);
 }
 

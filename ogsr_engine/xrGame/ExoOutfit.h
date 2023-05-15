@@ -12,7 +12,7 @@ class CExoOutfit : public CCustomOutfit
 private:
     typedef CCustomOutfit inherited;
 
-    float m_fOwerpowerK{};
+    float m_fOverloadK{};
     float m_fExoFactor{};
 
 public:
@@ -25,4 +25,5 @@ public:
     virtual bool IsPowerOn() const;
     virtual float GetPowerConsumption() const;
     virtual float GetExoFactor() const;
+    virtual float GetPowerLoss();
 };

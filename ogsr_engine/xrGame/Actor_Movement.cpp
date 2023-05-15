@@ -174,8 +174,6 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
     mstate_old = mstate_real;
     vControlAccel.set(Fvector{});
 
-    float exo_factor = GetExoFactor();
-
     if (!(mstate_real & mcFall) && (character_physics_support()->movement()->Environment() == CPHMovementControl::peInAir))
     {
         m_fFallTime -= dt;
@@ -267,7 +265,6 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                     jump_speed += m_fJumpSpeed * backpack->GetItemEffect(CInventoryItem::eAdditionalJump);
 
                 jump_speed *= conditions().GetSmoothOwerweightKoef();
-                jump_speed *= exo_factor;
                 clamp(jump_speed, 0.0f, jump_speed);
 
                 character_physics_support()->movement()->SetJumpUpVelocity(jump_speed);
@@ -430,7 +427,6 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                 auto backpack = GetBackpack();
                 if (backpack && !fis_zero(backpack->GetCondition()))
                     sprint_k += m_fSprintFactor * backpack->GetItemEffect(CInventoryItem::eAdditionalSprint);
-                sprint_k *= exo_factor;
                 clamp(m_fSprintFactor, 0.0f, m_fSprintFactor);
 
                 if (mstate_real & mcSprint)

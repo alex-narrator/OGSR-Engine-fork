@@ -735,7 +735,10 @@ float CActor::GetLookFactor()
     PIItem pItem = inventory().ActiveItem();
 
     if (pItem)
+    {
         factor *= pItem->GetControlInertionFactor();
+        factor /= GetExoFactor();
+    }
 
     VERIFY(!fis_zero(factor));
 

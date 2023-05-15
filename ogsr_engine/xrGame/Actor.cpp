@@ -788,7 +788,7 @@ void CActor::UpdateCL()
         {
             CEffectorZoomInertion* S = smart_cast<CEffectorZoomInertion*>(Cameras().GetCamEffector(eCEZoom));
             if (S && !IsHardHold())
-                S->SetParams(pWeapon->GetControlInertionFactor());
+                S->SetParams(pWeapon->GetControlInertionFactor() / GetExoFactor());
             m_bZoomAimingMode = true;
         }
 
@@ -1938,13 +1938,7 @@ bool CActor::SaveGameAllowed()
 
 bool CActor::InSafeHouse() { return HasInfo("safehouse"); }
 
-float CActor::GetExoFactor() const
-{
-    float res{1.f};
-    if (GetOutfit())
-        res = GetOutfit()->GetExoFactor();
-    return res;
-}
+float CActor::GetExoFactor() const { return GetOutfit() ? GetOutfit()->GetExoFactor() : 1.f; }
 
 bool CActor::IsFreeHands() const
 {

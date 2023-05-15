@@ -24,7 +24,7 @@ public:
 
     virtual float GetHitTypeProtection(int) const override;
 
-    virtual void OnMoveToSlot(EItemPlace prevPlace);
+    virtual void OnMoveToSlot(EItemPlace prevPlace) override;
     virtual void OnMoveToRuck(EItemPlace prevPlace) override;
 
     virtual float GetExoFactor() const { return 1.f; };

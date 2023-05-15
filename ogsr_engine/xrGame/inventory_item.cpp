@@ -924,8 +924,7 @@ float CInventoryItem::GetItemEffect(int effect) const
 constexpr auto POWER_CONSUMING_UPDATE_TIME = 1.f;
 void CInventoryItem::UpdatePowerConsumption()
 {
-    auto pActor = smart_cast<CActor*>(object().H_Parent());
-    if (!IsPowerConsumer() || !pActor || !IsPowerOn() || fis_zero(GetCondition()))
+    if (!smart_cast<CActor*>(object().H_Parent()) || !IsPowerConsumer() || !IsPowerOn() || fis_zero(GetCondition()))
         return;
 
     float delta_time{};

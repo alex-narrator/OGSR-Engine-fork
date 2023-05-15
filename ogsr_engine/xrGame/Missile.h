@@ -95,6 +95,8 @@ protected:
     bool m_contacted{};
     bool b_impact_fuze{};
 
+    virtual float GetMaxForce() const;
+
 protected:
     //относительная точка и направление вылета гранаты
     Fvector m_vThrowPoint;

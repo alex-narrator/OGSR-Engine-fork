@@ -22,13 +22,13 @@
 		<text>Скасування</text>
 	</string>
 	<string id="ui_st_btn_no">
-		<text>Ні [esc]</text>
+		<text>Ні [Esc]</text>
 	</string>
 	<string id="ui_st_btn_ok">
 		<text>ОК</text>
 	</string>
 	<string id="ui_st_btn_yes">
-		<text>Так [enter]</text>
+		<text>Так [Enter]</text>
 	</string>
 	<string id="ui_st_cant_run_r2">
 		<text>Вы не можете запустить второй рендер на вашем компьютере</text>

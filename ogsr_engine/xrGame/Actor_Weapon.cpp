@@ -156,8 +156,6 @@ void CActor::on_weapon_shot_start(CWeapon* weapon)
     }
     R_ASSERT(effector);
 
-	bool use_recoil_compensation = pWM->m_bCamRecoilCompensation;
-
     if (pWM)
     {
         if (effector->IsSingleShot())
@@ -168,11 +166,12 @@ void CActor::on_weapon_shot_start(CWeapon* weapon)
 
     effector->SetRndSeed(GetShotRndSeed());
     effector->SetActor(this);
-    effector->Shot(weapon->camDispersion + weapon->camDispersionInc * float(weapon->ShotsFired()));
+    float exo_factor{1.f / GetExoFactor()};
+    effector->Shot(weapon->camDispersion * exo_factor + weapon->camDispersionInc * exo_factor * float(weapon->ShotsFired()));
 
     if (pWM)
     {
-        if (!use_recoil_compensation)
+        if (!pWM->m_bCamRecoilCompensation)
         {
             effector->SetActive(FALSE);
             update_camera(effector);

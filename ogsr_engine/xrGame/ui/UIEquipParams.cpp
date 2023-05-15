@@ -46,7 +46,7 @@ bool CUIEquipParams::Check(CInventoryItem* obj)
     if (smart_cast<CWeaponAmmo*>(obj) || smart_cast<CWarbelt*>(obj) || smart_cast<CVest*>(obj) || smart_cast<CCustomOutfit*>(obj) || smart_cast<CHelmet*>(obj) ||
         smart_cast<CScope*>(obj) || smart_cast<CSilencer*>(obj) || smart_cast<CStock*>(obj) || smart_cast<CExtender*>(obj) || smart_cast<CForend*>(obj) ||
         smart_cast<CInventoryContainer*>(obj) || smart_cast<CPowerBattery*>(obj) || smart_cast<CGrenade*>(obj) || smart_cast<CCustomDetector*>(obj) || 
-        obj->IsPowerConsumer() || obj->GetDetailPartSection() ||
+        obj->IsPowerConsumer() || obj->GetDetailPartSection() || !fsimilar(obj->GetPowerLoss(), 1.f) ||
         !obj->m_repair_items.empty() || !obj->m_required_tools.empty() || !fis_zero(obj->repair_condition_gain) || obj->repair_count || !fis_zero(obj->repair_condition_threshold))
     {
         return true;
@@ -96,6 +96,15 @@ void CUIEquipParams::SetInfo(CInventoryItem* obj)
         _param_name = CStringTable().translate("st_power_consumption").c_str();
         _sn = CStringTable().translate("st_power_consumption_units").c_str();
         sprintf_s(text_to_show, "%s %.0f %s", _param_name, _val, _sn);
+        SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
+        _h += list_item_h;
+    }
+
+    if (!fsimilar(obj->GetPowerLoss(), 1.f))
+    {
+        _val = obj->GetPowerLoss();
+        _param_name = CStringTable().translate("st_power_loss").c_str();
+        sprintf_s(text_to_show, "%s x%.1f", _param_name, _val);
         SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
         _h += list_item_h;
     }
@@ -331,19 +340,6 @@ void CUIEquipParams::SetInfo(CInventoryItem* obj)
         {
             auto plate_name = pSettings->r_string(plate, "inv_name");
             sprintf_s(text_to_show, "%s%s", marker_, CStringTable().translate(plate_name).c_str());
-            SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
-            _h += list_item_h;
-        }
-    }
-
-    auto pHelmet = smart_cast<CHelmet*>(obj);
-    if (pOutfit || pVest || pHelmet)
-    {
-        _val = obj->GetPowerLoss();
-        if (_val > 1.f)
-        {
-            _param_name = CStringTable().translate("st_power_loss").c_str();
-            sprintf_s(text_to_show, "%s x%.1f", _param_name, _val);
             SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
             _h += list_item_h;
         }

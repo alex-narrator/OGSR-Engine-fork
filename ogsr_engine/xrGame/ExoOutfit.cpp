@@ -14,52 +14,60 @@ void CExoOutfit::Load(LPCSTR section)
 {
     inherited::Load(section);
     m_fExoFactor = READ_IF_EXISTS(pSettings, r_float, section, "exo_factor", 1.f);
-    m_fOwerpowerK = READ_IF_EXISTS(pSettings, r_float, section, "owerpower_k", 1.f);
+    m_fOverloadK = READ_IF_EXISTS(pSettings, r_float, section, "overload_k", 1.f);
 }
 
 float CExoOutfit::GetPowerConsumption() const
 {
     float res = inherited::GetPowerConsumption();
-    float owerpower_k{1.f};
-    const auto pActor = smart_cast<const CActor*>(H_Parent());
+    float overload_k{1.f};
+    auto pActor = smart_cast<const CActor*>(H_Parent());
     if (pActor && pActor->GetOutfit() == this)
     {
         if (pActor->get_state() & mcAnyMove)
         {
             if (pActor->get_state() & (mcSprint | mcJump))
-                owerpower_k = m_fOwerpowerK;
+                overload_k = m_fOverloadK;
 
             float cur_weight{pActor->GetCarryWeight()}, max_weight{pActor->MaxCarryWeight()};
             if (cur_weight > max_weight)
-                owerpower_k *= (cur_weight / max_weight);
+                overload_k *= (cur_weight / max_weight);
         }
         else
-            owerpower_k = 0.f;
+            overload_k = 0.f;
     }
-    res *= owerpower_k;
+    res *= overload_k;
     return res;
 }
 
 float CExoOutfit::GetItemEffect(int effect) const
 {
-    float res = inherited::GetItemEffect(effect);
-    if (effect == eAdditionalWeight && IsPowerConsumer() && (!IsPowerSourceAttached() || !GetPowerLevel()))
-        res = 0.f;
-    return res;
+    switch (effect)
+    {
+    case eAdditionalJump:
+    case eAdditionalSprint:
+    case eAdditionalWeight:
+        if (!GetPowerLevel())
+            return 0.f;
+        break;
+    }
+    return inherited::GetItemEffect(effect);
 }
 
-float CExoOutfit::GetExoFactor() const
+float CExoOutfit::GetExoFactor() const { return GetPowerLevel() ? m_fExoFactor : 1.f; }
+
+float CExoOutfit::GetPowerLoss()
 {
-    float res{1.f};
-    if (!IsPowerConsumer() || GetPowerLevel())
-        res = m_fExoFactor;
+    float res = inherited::GetPowerLoss();
+    if (res < 1.f && !GetPowerLevel())
+        res = 1.0f;
     return res;
 }
 
 bool CExoOutfit::IsPowerOn() const
 {
-    const auto pActor = smart_cast<const CActor*>(H_Parent());
+    auto pActor = smart_cast<const CActor*>(H_Parent());
     if (pActor && pActor->GetOutfit() == this)
-        return IsPowerConsumer() && IsPowerSourceAttached() && GetPowerLevel();
+        return GetPowerLevel();
     return false;
 }

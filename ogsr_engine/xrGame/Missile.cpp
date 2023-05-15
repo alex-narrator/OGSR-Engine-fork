@@ -221,11 +221,10 @@ void CMissile::UpdateCL()
         }
         else
         {
-            CActor* actor = smart_cast<CActor*>(H_Parent());
-            if (actor)
+            if (auto actor = smart_cast<CActor*>(H_Parent()))
             {
-                m_fThrowForce += (g_fForceGrowSpeed * Device.dwTimeDelta) * .001f;
-                clamp(m_fThrowForce, m_fMinForce, m_fMaxForce);
+                m_fThrowForce += (g_fForceGrowSpeed * actor->GetExoFactor() * Device.dwTimeDelta) * .001f;
+                clamp(m_fThrowForce, m_fMinForce, GetMaxForce());
             }
         }
     }
@@ -533,7 +532,7 @@ void CMissile::Throw()
     {
         //
         auto pActor = smart_cast<CActor*>(H_Parent());
-        float f_const_force = (m_fMinForce + m_fMaxForce * pActor->GetExoFactor()) / 2;
+        float f_const_force = (m_fMinForce + GetMaxForce()) / 2;
         float power_k = pActor ? pActor->conditions().GetPower() : 1.f;
         //
         m_fake_missile->m_fThrowForce = (m_constpower ? f_const_force : m_fThrowForce) * power_k;
@@ -741,7 +740,7 @@ void CMissile::OnDrawUI()
         {
             if (!g_MissileForceShape)
                 create_force_progress();
-            float k = (m_fThrowForce - m_fMinForce) / (m_fMaxForce - m_fMinForce);
+            float k = (m_fThrowForce - m_fMinForce) / (GetMaxForce() - m_fMinForce);
             g_MissileForceShape->SetPos(k);
             g_MissileForceShape->Draw();
         }
@@ -790,4 +789,12 @@ void CMissile::QuickThrow()
     m_constpower = true;
     m_throw = true;
     SwitchState(eThrowStart);
+}
+
+float CMissile::GetMaxForce() const 
+{ 
+    float res = m_fMaxForce;
+    if (auto actor = smart_cast<const CActor*>(H_Parent()))
+        res *= actor->GetExoFactor();
+    return res;
 }
