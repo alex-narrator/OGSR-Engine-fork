@@ -77,6 +77,7 @@ function actor_binder:net_destroy()
 	self.object:set_callback(callback.level_border_exit, nil)
 	self.object:set_callback(callback.take_item_from_box, nil)
 	self.object:set_callback(callback.level_changer_action, nil)
+	self.object:set_callback(callback.use_object, nil)
 
 	if sr_psy_antenna.psy_antenna then
 		sr_psy_antenna.psy_antenna:destroy()
@@ -112,6 +113,7 @@ function actor_binder:reinit()
 	self.object:set_callback(callback.level_border_exit, self.level_border_exit, self)
 	self.object:set_callback(callback.take_item_from_box, self.take_item_from_box, self)
 	self.object:set_callback(callback.level_changer_action, self.level_changer_action, self)
+	self.object:set_callback(callback.use_object, self.use_object, self)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:take_item_from_box(box, item)
@@ -429,6 +431,12 @@ function actor_binder:level_changer_action( obj, wnd )
 	game.translate_string( dest_lname )..
 	"?"
   )
+end
+
+function actor_binder:use_object(obj)
+	if item_effects then
+		item_effects.use_item_effects(obj, self.object)
+	end
 end
 
 --старт префетча звуков

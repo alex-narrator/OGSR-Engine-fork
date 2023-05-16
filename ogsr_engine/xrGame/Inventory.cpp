@@ -1307,26 +1307,6 @@ bool CInventory::IsActiveSlotBlocked() const
     return true;
 }
 
-void CInventory::TryToHideWeapon(bool b_hide_state, bool b_save_prev_slot)
-{
-    if (b_hide_state)
-    {
-        if (ActiveItem() && !ActiveItem()->IsSingleHanded())
-        {
-            m_iPrevActiveSlot = b_save_prev_slot ? GetActiveSlot() : NO_ACTIVE_SLOT;
-            Activate(NO_ACTIVE_SLOT);
-        }
-    }
-    else
-    {
-        if (m_iPrevActiveSlot != NO_ACTIVE_SLOT)
-        {
-            Activate(m_iPrevActiveSlot);
-            m_iPrevActiveSlot = NO_ACTIVE_SLOT;
-        }
-    }
-}
-
 // получаем айтем из всего инвентаря или с пояса
 PIItem CInventory::GetSame(const PIItem pIItem, bool bSearchRuck) const
 {

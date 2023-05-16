@@ -77,10 +77,9 @@ void CEatableItem::Load(LPCSTR section)
 
     m_sUseMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_use_tip", "st_use");
 
-    if (pSettings->line_exist(section, "use_sound"))
-        sndUse.create(pSettings->r_string(section, "use_sound"), st_Effect, sg_SourceType);
-
-    m_use_effector = READ_IF_EXISTS(pSettings, r_string, section, "use_effector", nullptr);
+    //if (pSettings->line_exist(section, "use_sound"))
+    //    sndUse.create(pSettings->r_string(section, "use_sound"), st_Effect, sg_SourceType);
+    //m_use_effector = READ_IF_EXISTS(pSettings, r_string, section, "use_effector", nullptr);
     s_boost_effector = READ_IF_EXISTS(pSettings, r_string, section, "boost_effector", nullptr);
 }
 
@@ -155,21 +154,21 @@ void CEatableItem::UseBy(CEntityAlive* entity_alive)
         entity_alive->conditions().ApplyBooster(B);
     }
 
-    if (pSettings->line_exist(object().cNameSect(), "use_sound"))
-    {
-        if (sndUse._feedback())
-            sndUse.stop();
-        sndUse.play_at_pos(entity_alive, entity_alive->Position(), false);
-    }
+    //if (pSettings->line_exist(object().cNameSect(), "use_sound"))
+    //{
+    //    if (sndUse._feedback())
+    //        sndUse.stop();
+    //    sndUse.play_at_pos(entity_alive, entity_alive->Position(), false);
+    //}
 
-    if (!!m_use_effector)
-    {
-        if (auto actor = smart_cast<CActor*>(entity_alive))
-        {
-            RemoveEffector(actor, eCEItemUse);
-            AddEffector(actor, eCEItemUse, m_use_effector);
-        }
-    }
+    //if (!!m_use_effector)
+    //{
+    //    if (auto actor = smart_cast<CActor*>(entity_alive))
+    //    {
+    //        RemoveEffector(actor, eCEItemUse);
+    //        AddEffector(actor, eCEItemUse, m_use_effector);
+    //    }
+    //}
 
     // уменьшить количество порций
     if (m_iPortionsNum > 0)

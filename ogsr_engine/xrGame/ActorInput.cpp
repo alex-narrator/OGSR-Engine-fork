@@ -246,8 +246,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
 
                 if (itm->cast_eatable_item())
                 {
-                    inventory().TryToHideWeapon(true, false);
-                    //
                     PIItem iitm = inventory().GetSameEatable(itm, false);
 
                     if (iitm)
