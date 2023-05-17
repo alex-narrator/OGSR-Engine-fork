@@ -6,8 +6,6 @@ function read_if_exist(ltx, section, value, default)
 	end
 end
 
-local NO_ACTIVE_SLOT = 255
-
 --звуки використання предметів
 local use_sounds = {
 	--drugs
@@ -41,6 +39,22 @@ local use_effectors = {
 	["energy_drink"] 	= nil,
 }
 
+local boost_effector_id = use_effector_id + 1
+local boost_effectors = {
+	--drugs
+	["antirad"] 		= "effector_nightvision_good",
+	["medkit"] 			= nil,
+	["medkit_army"] 	= nil,
+	["medkit_scientic"] = nil,
+	["bandage"] 		= nil,
+	--foods
+	["bread"] 			= nil,
+	["kolbasa"] 		= nil,
+	["conserva"] 		= nil,
+	["vodka"] 			= nil,
+	["energy_drink"] 	= nil,
+}
+
 function use_item_effects(obj, user)
 	local sect = obj:section()
 	local is_actor_user = user:id() == db.actor:id()
@@ -50,6 +64,7 @@ function use_item_effects(obj, user)
 		xr_sound.get_safe_sound_object(snd_name,sound_object.s2d):play_at_pos(user,user:position())
 		log3("~ used item %s played sound %s for user %s", sect, snd_name, user:name())
 	end
+	--тільки для актора
 	if is_actor_user then
 		--active item action
 		local act_item = user:active_item()
@@ -57,12 +72,29 @@ function use_item_effects(obj, user)
 			--act_item:play_hud_motion("anm_show")
 			user:activate_slot(NO_ACTIVE_SLOT)
 		end
-		--effectors
+		--use effectors
 		local eff_name = use_effectors[sect]
 		if eff_name then
 			level.remove_complex_effector(use_effector_id)
 			level.add_complex_effector(eff_name, use_effector_id)
 			log3("~ used item %s played effector %s for user %s", sect, eff_name, user:name())
 		end
+	end
+end
+
+function enable_effect(booster)
+	local sect = booster.section
+	local boost_eff_name = boost_effectors[sect]
+	if boost_eff_name then
+		level.add_complex_effector(boost_eff_name, boost_effector_id)
+		log3("~ enabling booster %s, add effect %s", sect, boost_eff_name)
+	end
+end
+
+function disable_effect(booster)
+	local sect = booster.section
+	if boost_effectors[sect] then
+		level.remove_complex_effector(boost_effector_id)
+		log3("~ disabling booster %s, remove effector %s", sect, boost_effectors[sect])
 	end
 end

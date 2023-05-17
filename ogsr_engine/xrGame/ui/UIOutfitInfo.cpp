@@ -194,11 +194,11 @@ void CUIOutfitInfo::Update()
         auto _st_time{CStringTable().translate("st_time_minute").c_str()};
 
         if (!fis_zero(_val) && !fis_zero(_val_boost))
-            sprintf_s(_buff, "%s %s%+.f%s %s%+.f%s [%.f%s]", _name, _color, _val, _sn, _color_boost, _val_boost, _sn_boost, _val_time, _st_time);
+            sprintf_s(_buff, "%s %s%+.f%s %s%+.f%s [%.f %s]", _name, _color, _val, _sn, _color_boost, _val_boost, _sn_boost, _val_time, _st_time);
         else if (!fis_zero(_val))
             sprintf_s(_buff, "%s %s%+.f%s", _name, _color, _val, _sn);
         else
-            sprintf_s(_buff, "%s %s%+.f%s [%.f%s]", _name, _color_boost, _val_boost, _sn_boost, _val_time, _st_time);
+            sprintf_s(_buff, "%s %s%+.f%s [%.f %s]", _name, _color_boost, _val_boost, _sn_boost, _val_time, _st_time);
 
         _s->SetText(_buff);
 

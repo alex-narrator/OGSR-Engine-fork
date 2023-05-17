@@ -572,7 +572,7 @@ void CEntityCondition::save(NET_Packet& output_packet)
             output_packet.w_u8(B.m_BoostType);
             output_packet.w_float(B.f_BoostValue);
             output_packet.w_float(B.f_BoostTime);
-            output_packet.w_stringZ(B.s_BoostEffector);
+            output_packet.w_stringZ(B.s_BoostSection);
         }
     }
 }
@@ -609,7 +609,9 @@ void CEntityCondition::load(IReader& input_packet)
             B.m_BoostType = (eBoostParams)input_packet.r_u8();
             B.f_BoostValue = input_packet.r_float();
             B.f_BoostTime = input_packet.r_float();
-            input_packet.r_stringZ(B.s_BoostEffector);
+            shared_str _tmp;
+            input_packet.r_stringZ(_tmp);
+            B.s_BoostSection = _tmp.c_str();
             m_boosters[B.m_BoostType] = B;
             BoostParameters(B);
         }
@@ -700,7 +702,14 @@ void CEntityCondition::script_register(lua_State* L)
                   .def_readwrite("min_wound_size", &CEntityCondition::m_fMinWoundSize)
                   .def_readonly("is_bleeding", &CEntityCondition::m_bIsBleeding)
                   //.def_readwrite("health_hit_part", &CEntityCondition::m_fHealthHitPart)
-                  .def_readwrite("power_hit_part", &CEntityCondition::m_fPowerHitPart)];
+                  .def_readwrite("power_hit_part", &CEntityCondition::m_fPowerHitPart),
+
+              class_<SBooster>("SBooster")
+                  .def(constructor<>())
+                  .def_readwrite("type", &SBooster::m_BoostType)
+                  .def_readwrite("value", &SBooster::f_BoostValue)
+                  .def_readwrite("time", &SBooster::f_BoostTime)
+                  .def_readwrite("section", &SBooster::s_BoostSection)];
 }
 
 void CEntityCondition::ApplyInfluence(int type, float value)

@@ -101,6 +101,9 @@ enum ECallbackType
 
     eSelectPdaContact,
 
+    eBoosterEnable,
+    eBoosterDisable,
+
     eDummy = u32(-1),
 };
 };

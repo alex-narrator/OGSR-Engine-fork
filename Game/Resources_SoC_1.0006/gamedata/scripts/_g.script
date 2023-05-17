@@ -1460,6 +1460,8 @@ function start_game_callback()
 	dialog_manager.fill_phrase_table()	
 end
 
+NO_ACTIVE_SLOT = 255
+
 ammo_section = {}
 ammo_section["ammo_9x18_fmj"]		= true
 ammo_section["ammo_9x18_pbp"]		= true

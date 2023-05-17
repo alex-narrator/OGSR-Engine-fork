@@ -48,11 +48,8 @@ protected:
     u32 GetOnePortionCost();
 
     LPCSTR m_sUseMenuTip{};
-    //ref_sound sndUse;
-    //shared_str m_use_effector{};
 
     float m_fBoostTime{};
-    shared_str s_boost_effector{};
 
 public:
     int GetStartPortionsNum() const { return m_iStartPortionsNum; };

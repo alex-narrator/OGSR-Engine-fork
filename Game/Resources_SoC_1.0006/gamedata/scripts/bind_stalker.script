@@ -78,6 +78,8 @@ function actor_binder:net_destroy()
 	self.object:set_callback(callback.take_item_from_box, nil)
 	self.object:set_callback(callback.level_changer_action, nil)
 	self.object:set_callback(callback.use_object, nil)
+	self.object:set_callback(callback.on_booster_enable, nil)
+	self.object:set_callback(callback.on_booster_disable, nil)
 
 	if sr_psy_antenna.psy_antenna then
 		sr_psy_antenna.psy_antenna:destroy()
@@ -114,6 +116,8 @@ function actor_binder:reinit()
 	self.object:set_callback(callback.take_item_from_box, self.take_item_from_box, self)
 	self.object:set_callback(callback.level_changer_action, self.level_changer_action, self)
 	self.object:set_callback(callback.use_object, self.use_object, self)
+	self.object:set_callback(callback.on_booster_enable, self.on_booster_enable, self)
+	self.object:set_callback(callback.on_booster_disable, self.on_booster_disable, self)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:take_item_from_box(box, item)
@@ -436,6 +440,18 @@ end
 function actor_binder:use_object(obj)
 	if item_effects then
 		item_effects.use_item_effects(obj, self.object)
+	end
+end
+
+function actor_binder:on_booster_enable(booster)
+	if item_effects then
+		item_effects.enable_effect(booster)
+	end
+end
+
+function actor_binder:on_booster_disable(booster)
+	if item_effects then
+		item_effects.disable_effect(booster)
 	end
 end
 

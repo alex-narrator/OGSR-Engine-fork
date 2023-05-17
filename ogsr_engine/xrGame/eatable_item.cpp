@@ -76,11 +76,6 @@ void CEatableItem::Load(LPCSTR section)
     m_fSelfRadiationInfluence = READ_IF_EXISTS(pSettings, r_float, section, "eat_radiation_self", 0.1f);
 
     m_sUseMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_use_tip", "st_use");
-
-    //if (pSettings->line_exist(section, "use_sound"))
-    //    sndUse.create(pSettings->r_string(section, "use_sound"), st_Effect, sg_SourceType);
-    //m_use_effector = READ_IF_EXISTS(pSettings, r_string, section, "use_effector", nullptr);
-    s_boost_effector = READ_IF_EXISTS(pSettings, r_string, section, "boost_effector", nullptr);
 }
 
 BOOL CEatableItem::net_Spawn(CSE_Abstract* DC)
@@ -148,27 +143,12 @@ void CEatableItem::UseBy(CEntityAlive* entity_alive)
         entity_alive->conditions().ApplyInfluence(i, GetItemInfluence(i));
     }
 
+    const auto sect = object().cNameSect();
     for (int i = 0; i < eBoostMax; ++i)
     {
-        SBooster B{(eBoostParams)i, GetItemBoost(i), GetItemBoostTime(), s_boost_effector};
+        SBooster B{(eBoostParams)i, GetItemBoost(i), GetItemBoostTime(), sect.c_str()};
         entity_alive->conditions().ApplyBooster(B);
     }
-
-    //if (pSettings->line_exist(object().cNameSect(), "use_sound"))
-    //{
-    //    if (sndUse._feedback())
-    //        sndUse.stop();
-    //    sndUse.play_at_pos(entity_alive, entity_alive->Position(), false);
-    //}
-
-    //if (!!m_use_effector)
-    //{
-    //    if (auto actor = smart_cast<CActor*>(entity_alive))
-    //    {
-    //        RemoveEffector(actor, eCEItemUse);
-    //        AddEffector(actor, eCEItemUse, m_use_effector);
-    //    }
-    //}
 
     // уменьшить количество порций
     if (m_iPortionsNum > 0)
