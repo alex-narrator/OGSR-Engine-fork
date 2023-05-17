@@ -39,20 +39,19 @@ local use_effectors = {
 	["energy_drink"] 	= nil,
 }
 
-local boost_effector_id = use_effector_id + 1
 local boost_effectors = {
 	--drugs
-	["antirad"] 		= "effector_nightvision_good",
-	["medkit"] 			= nil,
-	["medkit_army"] 	= nil,
-	["medkit_scientic"] = nil,
-	["bandage"] 		= nil,
+	["antirad"] 		= {"effector_nightvision_good", 66650},
+	["medkit"] 			= {"effector_nightvision_bad", 66651},
+	["medkit_army"] 	= {nil, nil},
+	["medkit_scientic"] = {nil, nil},
+	["bandage"] 		= {nil, nil},
 	--foods
-	["bread"] 			= nil,
-	["kolbasa"] 		= nil,
-	["conserva"] 		= nil,
-	["vodka"] 			= nil,
-	["energy_drink"] 	= nil,
+	["bread"] 			= {nil, nil},
+	["kolbasa"] 		= {nil, nil},
+	["conserva"] 		= {nil, nil},
+	["vodka"] 			= {nil, nil},
+	["energy_drink"] 	= {nil, nil},
 }
 
 function use_item_effects(obj, user)
@@ -82,19 +81,36 @@ function use_item_effects(obj, user)
 	end
 end
 
+function get_eff_name(sect)
+	local eff_param = boost_effectors[sect]
+	if not eff_param then return nil end
+	local eff_name = eff_param[1]
+	if not eff_name then return nil end
+	return eff_name
+end
+
+function get_eff_id(sect)
+	local eff_param = boost_effectors[sect]
+	if not eff_param then return nil end
+	local eff_id = eff_param[2]
+	if not eff_id then return nil end
+	return eff_id
+end
+
 function enable_effect(booster)
 	local sect = booster.section
-	local boost_eff_name = boost_effectors[sect]
-	if boost_eff_name then
-		level.add_complex_effector(boost_eff_name, boost_effector_id)
-		log3("~ enabling booster %s, add effect %s", sect, boost_eff_name)
-	end
+	local eff_name = get_eff_name(sect)
+	if not eff_name then return end
+	local eff_id = get_eff_id(sect)
+	if not eff_id then return end
+	level.add_complex_effector(eff_name, eff_id)
+	log3("~ enable booster effect %s, id %s", eff_name, eff_id)
 end
 
 function disable_effect(booster)
 	local sect = booster.section
-	if boost_effectors[sect] then
-		level.remove_complex_effector(boost_effector_id)
-		log3("~ disabling booster %s, remove effector %s", sect, boost_effectors[sect])
-	end
+	local eff_id = get_eff_id(sect)
+	if not eff_id then return end
+	level.remove_complex_effector(eff_id)
+	log3("~ disabling booster effect %s, id %s", get_eff_name(sect), eff_id)
 end

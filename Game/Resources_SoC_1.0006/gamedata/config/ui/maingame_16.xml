@@ -136,8 +136,9 @@
 
 	<pick_up_item x="437" y="400" width="150" height="100"/>
 
-	<slot_panel 	x="330" y="620" scale="0.6" counter_y="-4" slots="0,1,2,3,4,12,13,14,15"/>
-	<belt_panel 	x="330" y="690" scale="0.6" counter_y="-4" group_similar="1"/>
+	<slot_panel 	x="330" y="620" scale="0.6" slots="0,1,2,3,4,12,13,14,15"/>
+	<belt_panel 	x="330" y="690" scale="0.6" group_similar="1"/>
+	<booster_panel 	x="330" y="10" scale="0.6" indent="8" color="UI_orange"/>
 	
 	<new_contact_snd>detectors\contact_1</new_contact_snd>	
 </w>

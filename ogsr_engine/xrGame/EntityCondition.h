@@ -280,6 +280,7 @@ public:
     virtual void ApplyRestoreBoost(int, float);
 
     typedef xr_map<eBoostParams, SBooster> BOOSTER_MAP;
+    virtual BOOSTER_MAP GetBoosters() const { return m_boosters; };
 
 protected:
     BOOSTER_MAP m_boosters;

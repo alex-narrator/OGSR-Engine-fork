@@ -22,6 +22,7 @@ class CLAItem;
 class CUIZoneMap;
 class CUIBeltPanel;
 class CUISlotPanel;
+class CUIBoosterPanel;
 class CUIScrollView;
 class CActor;
 class CWeapon;
@@ -107,6 +108,7 @@ protected:
 public:
     CUIBeltPanel* m_beltPanel;
     CUISlotPanel* m_slotPanel;
+    CUIBoosterPanel* m_boosterPanel;
 
 public:
     // Енумы соответсвующие предупреждающим иконкам
