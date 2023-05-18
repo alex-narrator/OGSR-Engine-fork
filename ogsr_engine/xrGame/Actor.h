@@ -233,6 +233,8 @@ protected:
     //звук тяжелого дыхания
     ref_sound m_HeavyBreathSnd;
     ref_sound m_BloodSnd;
+    //звук отримання хіта
+    ref_sound m_HitSnd{};
 
 protected:
     // Sleep params
