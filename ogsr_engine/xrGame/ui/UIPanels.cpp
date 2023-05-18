@@ -58,10 +58,11 @@ void CUIBeltPanel::InitFromXML(CUIXml& xml, LPCSTR path, int index)
     CUIXmlInit::InitWindow(xml, path, index, this);
     m_fScale = xml.ReadAttribFlt(path, index, "scale");
     m_fIndent = xml.ReadAttribFlt(path, index, "indent", 1.f);
-    m_bGroupSimilar = xml.ReadAttribFlt(path, index, "group_similar", 0);
-    m_counter_offset.x = xml.ReadAttribFlt(path, index, "counter_x", 0);
-    m_counter_offset.y = xml.ReadAttribFlt(path, index, "counter_y", 0);
+    m_bGroupSimilar = xml.ReadAttribInt(path, index, "group_similar");
+    m_counter_offset.x = xml.ReadAttribFlt(path, index, "counter_x");
+    m_counter_offset.y = xml.ReadAttribFlt(path, index, "counter_y");
     u_color = CUIXmlInit::GetColor(xml, path, index, color_argb(255, 255, 255, 255));
+    m_bVertical = xml.ReadAttribInt(path, index, "vertical");
 }
 
 void CUIBeltPanel::Draw()
@@ -102,11 +103,11 @@ void CUIBeltPanel::Draw()
         auto count = inv.GetSameItemCount(_itm->object().cNameSect().c_str(), false);
         if (count > 1)
         {
-            float pos_x = m_counter_offset.x + pos.x;
-            float pos_y = m_counter_offset.y + (pos.y + size.y);
+            float pos_x = m_counter_offset.x + (m_bVertical ? (pos.x + size.x) : pos.x);
+            float pos_y = m_counter_offset.y + (m_bVertical ? pos.y : (pos.y + size.y));
             SetCounter(u_color, count, pos_x, pos_y);
         }
-        pos.x = pos.x + m_fIndent + size.x;
+        m_bVertical ? pos.y = pos.y + m_fIndent + size.y : pos.x = pos.x + m_fIndent + size.x;
 
         TryAttachIcons(&m_st, _itm, m_fScale);
 
@@ -124,9 +125,10 @@ void CUISlotPanel::InitFromXML(CUIXml& xml, LPCSTR path, int index)
     CUIXmlInit::InitWindow(xml, path, index, this);
     m_fScale = xml.ReadAttribFlt(path, index, "scale");
     m_fIndent = xml.ReadAttribFlt(path, index, "indent", 1.f);
-    m_counter_offset.x = xml.ReadAttribFlt(path, index, "counter_x", 0);
-    m_counter_offset.y = xml.ReadAttribFlt(path, index, "counter_y", 0);
+    m_counter_offset.x = xml.ReadAttribFlt(path, index, "counter_x");
+    m_counter_offset.y = xml.ReadAttribFlt(path, index, "counter_y");
     u_color = CUIXmlInit::GetColor(xml, path, index, color_argb(255, 255, 255, 255));
+    m_bVertical = xml.ReadAttribInt(path, index, "vertical");
 
     m_slots_list.clear();
     LPCSTR m_slots_sect = xml.ReadAttrib(path, index, "slots", nullptr);
@@ -181,11 +183,11 @@ void CUISlotPanel::Draw()
         auto count = inv.GetSameItemCount(_itm->object().cNameSect().c_str(), false);
         if (count > 1)
         {
-            float pos_x = m_counter_offset.x + pos.x;
-            float pos_y = m_counter_offset.y + (pos.y + size.y);
+            float pos_x = m_counter_offset.x + (m_bVertical ? (pos.x + size.x) : pos.x);
+            float pos_y = m_counter_offset.y + (m_bVertical ? pos.y : (pos.y + size.y));
             SetCounter(u_color, count, pos_x, pos_y);
         }
-        pos.x = pos.x + m_fIndent + size.x;
+        m_bVertical ? pos.y = pos.y + m_fIndent + size.y : pos.x = pos.x + m_fIndent + size.x;
 
         sprintf_s(slot_key, "ui_use_slot_%d", _itm->GetSlot());
         m_st.SetText(CStringTable().translate(slot_key).c_str());
@@ -209,6 +211,7 @@ void CUIBoosterPanel::InitFromXML(CUIXml& xml, LPCSTR path, int index)
     m_timer_offset.x = xml.ReadAttribFlt(path, index, "timer_x");
     m_timer_offset.y = xml.ReadAttribFlt(path, index, "timer_y");
     u_color = CUIXmlInit::GetColor(xml, path, index, color_argb(255, 255, 255, 255));
+    m_bVertical = xml.ReadAttribInt(path, index, "vertical");
 }
 
 void CUIBoosterPanel::Draw()
@@ -222,10 +225,10 @@ void CUIBoosterPanel::Draw()
     pos.set(rect.left, rect.top);
     float k_x{UI()->get_current_kx()};
 
-    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    auto boosters = smart_cast<CActor*>(Level().CurrentViewEntity())->conditions().GetBoosters();
 
     LPCSTR _sect_to_draw{};
-    for (const auto& item : pActor->conditions().GetBoosters())
+    for (const auto& item : boosters)
     {
         auto& _b = item.second;
         auto sect = _b.s_BoostSection;
@@ -245,10 +248,10 @@ void CUIBoosterPanel::Draw()
 
         m_st.SetWndPos(pos.x, pos.y);
 
-        float pos_x = m_timer_offset.x + pos.x;
-        float pos_y = m_timer_offset.y + (pos.y + size.y);
+        float pos_x = m_timer_offset.x + (m_bVertical ? (pos.x + size.x) : pos.x);
+        float pos_y = m_timer_offset.y + (m_bVertical ? pos.y : (pos.y + size.y));
         SetTimer(u_color, _b.f_BoostTime, pos_x, pos_y);
-        pos.x = pos.x + m_fIndent + size.x;
+        m_bVertical ? pos.y = pos.y + m_fIndent + size.y : pos.x = pos.x + m_fIndent + size.x;
 
         m_st.Draw();
     }

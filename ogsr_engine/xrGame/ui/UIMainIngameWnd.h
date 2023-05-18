@@ -114,15 +114,16 @@ public:
     // Енумы соответсвующие предупреждающим иконкам
     enum EWarningIcons
     {
-        ewiAll = 0,
         ewiWeaponJammed,
         ewiArmor,
         ewiRadiation,
         ewiWound,
         ewiStarvation,
         ewiPsyHealth,
-        ewiInvincible,
+        ewiThresholdMax,
+        ewiInvincible = ewiThresholdMax,
         ewiSafehouse,
+        ewiMax,
     };
 
     // Задаем цвет соответствующей иконке

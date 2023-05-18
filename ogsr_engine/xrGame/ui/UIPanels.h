@@ -20,6 +20,7 @@ protected:
     CUIStatic m_st;
     bool m_bGroupSimilar{};
     Fvector2 m_counter_offset;
+    bool m_bVertical{};
 };
 // quick slot panel
 class CUISlotPanel : public CUIWindow
@@ -37,6 +38,7 @@ protected:
     CUIStatic m_st;
     Fvector2 m_counter_offset;
     xr_vector<int> m_slots_list;
+    bool m_bVertical{};
 };
 // active boosters panel
 class CUIBoosterPanel : public CUIWindow
@@ -53,4 +55,5 @@ protected:
     u32 u_color;
     CUIStatic m_st;
     Fvector2 m_timer_offset;
+    bool m_bVertical{};
 };

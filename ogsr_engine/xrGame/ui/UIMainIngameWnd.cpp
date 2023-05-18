@@ -66,7 +66,7 @@ static CUIMainIngameWnd* GetMainIngameWindow()
     return nullptr;
 }
 
-static CUIStatic* warn_icon_list[9]{};
+static CUIStatic* warn_icon_list[CUIMainIngameWnd::ewiMax]{};
 
 // alpet: для возможности внешнего контроля иконок (используется в NLC6 вместо типичных индикаторов). Никак не влияет на игру для остальных модов.
 static bool external_icon_ctrl = false;
@@ -251,32 +251,26 @@ void CUIMainIngameWnd::Init()
         "wounds", 
         "starvation", 
         "psy",
-        "invincible",
-        "safehouse",
+        //"invincible",
+        //"safehouse",
     };
 
     // Загружаем пороговые значения для индикаторов
-    EWarningIcons i = ewiWeaponJammed;
-    while (i <= ewiInvincible)
+    for (int i = 0; i < ewiThresholdMax; ++i)
     {
         // Читаем данные порогов для каждого индикатора
-        const char* cfgRecord = pSettings->r_string("main_ingame_indicators_thresholds", warningStrings[static_cast<int>(i) - 1]);
+        const char* cfgRecord = pSettings->r_string("main_ingame_indicators_thresholds", warningStrings[i]);
         u32 count = _GetItemCount(cfgRecord);
 
         char singleThreshold[5];
-        float f = 0;
+        float f{};
         for (u32 k = 0; k < count; ++k)
         {
             _GetItem(cfgRecord, k, singleThreshold);
             sscanf(singleThreshold, "%f", &f);
 
-            m_Thresholds[i].push_back(f);
+            m_Thresholds[(EWarningIcons)i].push_back(f);
         }
-
-        i = static_cast<EWarningIcons>(i + 1);
-
-        if (i == ewiInvincible)
-            i = static_cast<EWarningIcons>(i + 1);
     }
 
     // Flashing icons initialize
@@ -378,7 +372,7 @@ void CUIMainIngameWnd::Update()
 
     if (!(Device.dwFrame % 5))
     {
-        if (!(Device.dwFrame % 30))
+        //if (!(Device.dwFrame % 30))
         {
             if (GodMode())
                 SetWarningIconColor(ewiInvincible, 0xffffffff);
@@ -413,10 +407,11 @@ void CUIMainIngameWnd::Update()
 
         auto cond = &m_pActor->conditions();
 
-        EWarningIcons i = ewiWeaponJammed;
-        while (!external_icon_ctrl && i <= ewiInvincible)
+        //EWarningIcons i = ewiWeaponJammed;
+        //while (!external_icon_ctrl && i <= ewiInvincible)
+        for (int i = 0; i < ewiThresholdMax && !external_icon_ctrl; ++i)
         {
-            float value = 0;
+            float value{};
             switch (i)
             {
             case ewiRadiation:
@@ -443,30 +438,32 @@ void CUIMainIngameWnd::Update()
             default: R_ASSERT(!"Unknown type of warning icon");
             }
 
+            auto icon = (EWarningIcons)i;
+            auto& threshold = m_Thresholds[icon];
             // Минимальное и максимальное значения границы
-            float min = m_Thresholds[i].front();
-            float max = m_Thresholds[i].back();
+            float min = threshold.front();
+            float max = threshold.back();
 
-            if (m_Thresholds[i].size() > 1)
+            if (threshold.size() > 1)
             {
                 xr_vector<float>::reverse_iterator rit;
 
                 // Сначала проверяем на точное соответсвие
-                rit = std::find(m_Thresholds[i].rbegin(), m_Thresholds[i].rend(), value);
+                rit = std::find(threshold.rbegin(), threshold.rend(), value);
 
                 // Если его нет, то берем последнее меньшее значение ()
-                if (rit == m_Thresholds[i].rend())
-                    rit = std::find_if(m_Thresholds[i].rbegin(), m_Thresholds[i].rend(), std::bind(std::less<float>(), std::placeholders::_1, value));
+                if (rit == threshold.rend())
+                    rit = std::find_if(threshold.rbegin(), threshold.rend(), std::bind(std::less<float>(), std::placeholders::_1, value));
 
-                if (rit != m_Thresholds[i].rend())
+                if (rit != threshold.rend())
                 {
                     float v = *rit;
-                    SetWarningIconColor(i,
+                    SetWarningIconColor(icon,
                                         color_argb(0xFF, clampr<u32>(static_cast<u32>(255 * ((v - min) / (max - min) * 2)), 0, 255),
                                                    clampr<u32>(static_cast<u32>(255 * (2.0f - (v - min) / (max - min) * 2)), 0, 255), 0));
                 }
                 else
-                    TurnOffWarningIcon(i);
+                    TurnOffWarningIcon(icon);
             }
             else
             {
@@ -478,16 +475,11 @@ void CUIMainIngameWnd::Update()
                 {
                     float v = val / treshold;
                     clamp<float>(v, 0.f, 1.f);
-                    SetWarningIconColor(i, color_argb(0xFF, 255, clampr<u32>(static_cast<u32>(255 * v), 0, 255), 0));
+                    SetWarningIconColor(icon, color_argb(0xFF, 255, clampr<u32>(static_cast<u32>(255 * v), 0, 255), 0));
                 }
                 else
-                    TurnOffWarningIcon(i);
+                    TurnOffWarningIcon(icon);
             }
-
-            i = (EWarningIcons)(i + 1);
-
-            if (i == ewiInvincible)
-                i = (EWarningIcons)(i + 1);
         }
     }
 
@@ -602,7 +594,6 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
     // Задаем цвет требуемой иконки
     switch (icon)
     {
-    case ewiAll: break;
     case ewiWeaponJammed: SetWarningIconColor(&UIWeaponJammedIcon, cl); break;
     case ewiArmor: SetWarningIconColor(&UIArmorIcon, cl); break;
     case ewiRadiation: SetWarningIconColor(&UIRadiaitionIcon, cl); break;
@@ -616,7 +607,7 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
     }
 
     Fvector2 pos{};
-    for (int i = ewiWeaponJammed; i < icon; ++i)
+    for (int i = 0; i < icon; ++i)
     {
         auto icon = warn_icon_list[i];
         if (icon->IsShown())
