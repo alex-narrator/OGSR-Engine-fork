@@ -163,6 +163,7 @@ function Cwound_manager:__init(npc, storage)
 	self.npc = npc
 	self.a = storage
 	self.can_use_medkit = false
+	self.npc:disable_trade()
 end
 function Cwound_manager:update()
 	hp	= 100*self.npc.health
@@ -198,21 +199,24 @@ function Cwound_manager:unlock_medkit()
 end
 function Cwound_manager:eat_medkit()
 	local item_to_eat
+	local npc = self.npc
 	if self.can_use_medkit == true then
 	
-		item_to_eat = self.npc:object("medkit")
+		item_to_eat = npc:object("medkit")
 		if not item_to_eat then
-			item_to_eat = self.npc:object("medkit_army")
+			item_to_eat = npc:object("medkit_army")
 		end
 		if not item_to_eat then
-			item_to_eat = self.npc:object("medkit_scientic")
+			item_to_eat = npc:object("medkit_scientic")
 		end
 		
 	end
 	if item_to_eat then
-		self.npc:eat(item_to_eat)
+		npc:eat(item_to_eat)
+		npc.health = 1
+		npc:enable_trade()
 		if item_effects then
-			item_effects.use_item_effects(item_to_eat, self.npc)
+			item_effects.use_item_effects(item_to_eat, npc)
 		end
 	end
 	self.can_use_medkit = false

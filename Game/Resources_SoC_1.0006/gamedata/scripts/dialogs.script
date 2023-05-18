@@ -60,11 +60,11 @@ function actor_have_bandage(first_speaker, second_speaker)
 end
 function transfer_medkit(first_speaker, second_speaker)
 	if first_speaker:object("medkit") ~= nil then
-		dialogs.relocate_medicine_section(second_speaker, "medkit")
+		dialogs.relocate_item_section(second_speaker, "medkit", "out")
 	elseif first_speaker:object("medkit_army") ~= nil then
-		dialogs.relocate_medicine_section(second_speaker, "medkit_army")
+		dialogs.relocate_item_section(second_speaker, "medkit_army", "out")
 	else
-		dialogs.relocate_medicine_section(second_speaker, "medkit_scientic")
+		dialogs.relocate_item_section(second_speaker, "medkit_scientic", "out")
 	end
 
 	--' Тут надо анлочить аптечку для использования.
@@ -117,12 +117,6 @@ function relocate_item_section(victim, section, type)
 		end
 		news_manager.relocate_item(db.actor, type, section)
 	end
-end
-
---special for transfer medkits to NPC via "need medkit" dialog
-function relocate_medicine_section(victim, section)
-	db.actor:transfer_item(db.actor:object(section), victim)
-	victim.health = 1
 end
 
 function relocate_money(victim, num, type)
