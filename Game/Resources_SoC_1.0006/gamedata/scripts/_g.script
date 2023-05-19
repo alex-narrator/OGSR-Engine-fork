@@ -1307,6 +1307,24 @@ function IsStalker (object, class_id)
     return false
 end
 -------------------------------------------------------------------------------------------
+function IsZone (object, class_id)
+    local id = class_id or get_clsid (object)
+    if id == clsid.zone_bfuzz_s or
+       id == clsid.zone_mbald_s or
+       id == clsid.zone_galant_s or
+       id == clsid.zone_mincer_s or
+	   id == clsid.Z_AMEBA or
+	   id == clsid.Z_MBALD or
+	   id == clsid.Z_RADIO or
+	   id == clsid.Z_NOGRAV or
+	   id == clsid.Z_RUSTYH or
+	   id == clsid.Z_TORRID
+    then
+	    return true
+	end
+    return false
+end
+-------------------------------------------------------------------------------------------
 function level_object_by_sid( sid )
 	local sim = alife()
 

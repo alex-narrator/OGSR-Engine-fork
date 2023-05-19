@@ -59,6 +59,7 @@ function action_wounded:initialize ()
 		self.object:set_start_dialog(self.a.help_start_dialog)
 	end
 	self.object:wounded(true)
+	self.object:disable_trade()
 end
 function action_wounded:execute ()
     action_base.execute (self)
@@ -153,6 +154,7 @@ function action_wounded:finalize ()
     self.object:disable_talk()
     xr_sound.set_sound(self.object, nil)
     self.object:wounded(false)
+	self.object:enable_trade()
 end    
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -163,7 +165,6 @@ function Cwound_manager:__init(npc, storage)
 	self.npc = npc
 	self.a = storage
 	self.can_use_medkit = false
-	self.npc:disable_trade()
 end
 function Cwound_manager:update()
 	hp	= 100*self.npc.health
@@ -214,7 +215,6 @@ function Cwound_manager:eat_medkit()
 	if item_to_eat then
 		npc:eat(item_to_eat)
 		npc.health = 1
-		npc:enable_trade()
 		if item_effects then
 			item_effects.use_item_effects(item_to_eat, npc)
 		end

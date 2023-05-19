@@ -562,7 +562,7 @@ void CUIMainIngameWnd::ReceiveNews(GAME_NEWS_DATA* news)
 {
     VERIFY(news->texture_name.size());
     CActor* pActor = smart_cast<CActor*>(Level().CurrentEntity());
-    if (pActor->HasPDAWorkable())
+    if (pActor->HasPDAWorkable() || !pActor->g_Alive())
         HUD().GetUI()->m_pMessagesWnd->AddIconedPdaMessage(*(news->texture_name), news->tex_rect, news->SingleLineText(), news->show_time);
 }
 

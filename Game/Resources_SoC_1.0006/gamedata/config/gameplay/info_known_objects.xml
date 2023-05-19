@@ -420,7 +420,7 @@
 		<article>tr_escape_broken_car</article>
 	</info_portion>
 
-	<info_portion id="safehouse">
-	</info_portion>
+	<info_portion id="safehouse"></info_portion>
+	<info_portion id="eliminate_gunslinger_done"></info_portion>
  
 </game_information_portions>

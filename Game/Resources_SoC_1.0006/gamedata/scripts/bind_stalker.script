@@ -80,6 +80,8 @@ function actor_binder:net_destroy()
 	self.object:set_callback(callback.use_object, nil)
 	self.object:set_callback(callback.on_booster_enable, nil)
 	self.object:set_callback(callback.on_booster_disable, nil)
+	self.object:set_callback(callback.hit, nil)
+	self.object:set_callback(callback.death, nil)
 
 	if sr_psy_antenna.psy_antenna then
 		sr_psy_antenna.psy_antenna:destroy()
@@ -118,6 +120,8 @@ function actor_binder:reinit()
 	self.object:set_callback(callback.use_object, self.use_object, self)
 	self.object:set_callback(callback.on_booster_enable, self.on_booster_enable, self)
 	self.object:set_callback(callback.on_booster_disable, self.on_booster_disable, self)
+	self.object:set_callback(callback.hit, self.on_hit, self)
+	self.object:set_callback(callback.death, self.death_callback, self)
 end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:take_item_from_box(box, item)
@@ -438,6 +442,7 @@ function actor_binder:level_changer_action( obj, wnd )
 end
 
 function actor_binder:use_object(obj)
+	log3("~ use object %s", obj:section())
 	if item_effects then
 		item_effects.use_item_effects(obj, self.object)
 	end
@@ -452,6 +457,16 @@ end
 function actor_binder:on_booster_disable(booster)
 	if item_effects then
 		item_effects.disable_effect(booster)
+	end
+end
+
+function actor_binder:on_hit(victim, health_lost, direction, draftsman, bone_id)
+	--log3("on hit: victim %s health_lost %s, direction %s, draftsman %s, bone_id %s", victim:name(), health_lost, direction, draftsman:name(), bone_id)
+end
+
+function actor_binder:death_callback(victim, killer)
+	if death_news then
+		death_news.send_tip(victim, killer)
 	end
 end
 

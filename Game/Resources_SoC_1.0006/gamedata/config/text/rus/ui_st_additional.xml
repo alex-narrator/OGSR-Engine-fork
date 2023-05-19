@@ -1099,4 +1099,21 @@
 	<string id="box_100_762x54_descr">
 		<text>Короб зі стрічкою на 100 набоїв для кулеметів ПКМ.</text>
 	</string>	
+	
+	
+	<string id="st_stalker_death">
+		<text>Смерть абонента мережі</text>
+	</string>
+	<string id="st_suicide">
+		<text>яке безглузде самогубство</text>
+	</string>
+	<string id="st_victim_header">
+		<text>загиблий:</text>
+	</string>	
+	<string id="st_killer_header">
+		<text>причина смерті:</text>
+	</string>
+	<string id="st_death_reason_undefined">
+		<text>НЕВІДОМО</text>
+	</string>
 </string_table>

@@ -90,14 +90,16 @@ function safe_zone_action(in_zone)
 	local showtime = 3000
 	local show_delay = 300
 	
-	if(in_zone) then
-		actor:give_info_portion("safehouse")
-		--news_text = "%c[255,160,160,160]"..game.translate_string("st_safehouse").."\\n".."%c[default]"..game.translate_string("st_safehouse_in")
-	else
-		actor:disable_info_portion("safehouse")
-		--news_text = "%c[255,160,160,160]"..game.translate_string("st_safehouse").."\\n".."%c[default]"..game.translate_string("st_safehouse_out")
+	if in_zone and not has_alife_info("safehouse") then
+			actor:give_info_portion("safehouse")
+			news_text = "%c[255,160,160,160]"..game.translate_string("st_safehouse").."\\n".."%c[default]"..game.translate_string("st_safehouse_in")
+	elseif has_alife_info("safehouse") then
+			actor:disable_info_portion("safehouse")
+			news_text = "%c[255,160,160,160]"..game.translate_string("st_safehouse").."\\n".."%c[default]"..game.translate_string("st_safehouse_out")
 	end
 		
-	--actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(0,705,83,47), show_delay, showtime)
+	if not news_text then return end
+	
+	actor:give_game_news(news_text, "ui\\ui_iconsTotal", Frect():set(0,705,83,47), show_delay, showtime)
 end
 

@@ -10,7 +10,7 @@
 		<text>Воля</text>
 	</string>
 	<string id="arena_enemy">
-		<text>Найманець</text>
+		<text>Гладіатор арени</text>
 	</string>
 	<string id="bad">
 		<text>погано</text>
@@ -145,7 +145,7 @@
 		<text>ветеран</text>
 	</string>
 	<string id="zombied">
-		<text>зомбі</text>
+		<text>Зомбовані</text>
 	</string>
 	<string id="Btn_Cancel">
 		<text>Скасувати</text>

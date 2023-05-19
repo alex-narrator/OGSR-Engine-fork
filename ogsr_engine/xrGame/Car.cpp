@@ -1783,8 +1783,8 @@ void CCar::CarExplode()
         if (A->g_Alive() <= 0.f)
             A->character_physics_support()->movement()->DestroyCharacter();
     }
-
-    callback(GameObject::eDeath)(lua_game_object(), 0);
+    const CGameObject* who_object = smart_cast<const CGameObject*>(FatalHit().initiator());
+    callback(GameObject::eDeath)(lua_game_object(), who_object ? who_object->lua_game_object() : 0);
 
     if (CPHDestroyable::CanDestroy())
         CPHDestroyable::Destroy(ID(), "physic_destroyable_object");
