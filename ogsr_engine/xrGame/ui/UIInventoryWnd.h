@@ -93,32 +93,33 @@ protected:
 
     CUIStatic UIStaticPersonal;
 
-    CUIDragDropListEx* m_pUIBagList;
-    CUIDragDropListEx* m_pUIBeltList;
-    CUIDragDropListEx* m_pUIVestList;
+    CUIDragDropListEx* m_pUIBagList{};
+    CUIDragDropListEx* m_pUIBeltList{};
+    CUIDragDropListEx* m_pUIVestList{};
 
-    CUIOutfitDragDropList* m_pUIOutfitList;
-    CUIDragDropListEx* m_pUIHelmetList;
-    CUIDragDropListEx* m_pUIWarBeltList;
-    CUIDragDropListEx* m_pUIBackPackList;
-    CUIDragDropListEx* m_pUITacticalVestList;
+    CUIOutfitDragDropList* m_pUIOutfitList{};
+    CUIDragDropListEx* m_pUIHelmetList{};
+    CUIDragDropListEx* m_pUIGasMaskList{};
+    CUIDragDropListEx* m_pUIWarBeltList{};
+    CUIDragDropListEx* m_pUIBackPackList{};
+    CUIDragDropListEx* m_pUITacticalVestList{};
 
-    CUIDragDropListEx* m_pUIKnifeList;
-    CUIDragDropListEx* m_pUIFirstWeaponList;
-    CUIDragDropListEx* m_pUISecondWeaponList;
-    CUIDragDropListEx* m_pUIBinocularList;
+    CUIDragDropListEx* m_pUIKnifeList{};
+    CUIDragDropListEx* m_pUIFirstWeaponList{};
+    CUIDragDropListEx* m_pUISecondWeaponList{};
+    CUIDragDropListEx* m_pUIBinocularList{};
 
-    CUIDragDropListEx* m_pUIGrenadeList;
-    CUIDragDropListEx* m_pUIArtefactList;
+    CUIDragDropListEx* m_pUIGrenadeList{};
+    CUIDragDropListEx* m_pUIArtefactList{};
 
-    CUIDragDropListEx* m_pUIDetectorList;
-    CUIDragDropListEx* m_pUIOnHeadList;
-    CUIDragDropListEx* m_pUIPdaList;
+    CUIDragDropListEx* m_pUIDetectorList{};
+    CUIDragDropListEx* m_pUIOnHeadList{};
+    CUIDragDropListEx* m_pUIPdaList{};
 
-    CUIDragDropListEx* m_pUIQuickList_0;
-    CUIDragDropListEx* m_pUIQuickList_1;
-    CUIDragDropListEx* m_pUIQuickList_2;
-    CUIDragDropListEx* m_pUIQuickList_3;
+    CUIDragDropListEx* m_pUIQuickList_0{};
+    CUIDragDropListEx* m_pUIQuickList_1{};
+    CUIDragDropListEx* m_pUIQuickList_2{};
+    CUIDragDropListEx* m_pUIQuickList_3{};
 
     // alpet: для индексированного доступа
     CUIDragDropListEx* m_slots_array[SLOTS_TOTAL];

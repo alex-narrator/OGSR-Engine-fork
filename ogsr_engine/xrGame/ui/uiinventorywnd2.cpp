@@ -181,6 +181,13 @@ void CUIInventoryWnd::InitInventory()
         m_pUIHelmetList->SetItem(itm);
     }
 
+    _itm = m_pInv->m_slots[GASMASK_SLOT].m_pIItem;
+    if (_itm)
+    {
+        CUICellItem* itm = create_cell_item(_itm);
+        m_pUIGasMaskList->SetItem(itm);
+    }
+
     _itm = m_pInv->m_slots[WARBELT_SLOT].m_pIItem;
     if (_itm)
     {
@@ -527,7 +534,7 @@ bool CUIInventoryWnd::OnItemSelected(CUICellItem* itm)
 
     itm->ColorizeItems({m_pUIBagList, m_pUIBeltList, m_pUIVestList,
                         //
-                        m_pUIOutfitList, m_pUIHelmetList, m_pUIWarBeltList, m_pUIBackPackList, m_pUITacticalVestList,
+                        m_pUIOutfitList, m_pUIHelmetList, m_pUIGasMaskList, m_pUIWarBeltList, m_pUIBackPackList, m_pUITacticalVestList,
                         //
                         m_pUIKnifeList, m_pUIFirstWeaponList, m_pUISecondWeaponList, m_pUIBinocularList,
                         //
@@ -695,6 +702,7 @@ void CUIInventoryWnd::ClearAllLists()
     //
     m_pUIOutfitList->ClearAll(true);
     m_pUIHelmetList->ClearAll(true);
+    m_pUIGasMaskList->ClearAll(true);
     m_pUIWarBeltList->ClearAll(true);
     m_pUIBackPackList->ClearAll(true);
     m_pUITacticalVestList->ClearAll(true);

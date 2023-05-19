@@ -40,7 +40,7 @@ constexpr auto INVENTORY_XML = "inventory_new.xml";
 CUIInventoryWnd* g_pInvWnd = NULL;
 
 CUIInventoryWnd::CUIInventoryWnd()
-    : m_pUIBagList(nullptr), m_pUIBeltList(nullptr), m_pUIVestList(nullptr), m_pUIOutfitList(nullptr), m_pUIHelmetList(nullptr), m_pUIWarBeltList(nullptr),
+    : m_pUIBagList(nullptr), m_pUIBeltList(nullptr), m_pUIVestList(nullptr), m_pUIOutfitList(nullptr), m_pUIHelmetList(nullptr), m_pUIGasMaskList(nullptr), m_pUIWarBeltList(nullptr),
       m_pUIBackPackList(nullptr), m_pUITacticalVestList(nullptr), m_pUIKnifeList(nullptr), m_pUIFirstWeaponList(nullptr), m_pUISecondWeaponList(nullptr),
       m_pUIBinocularList(nullptr), m_pUIGrenadeList(nullptr), m_pUIArtefactList(nullptr), m_pUIDetectorList(nullptr), m_pUIOnHeadList(nullptr), m_pUIPdaList(nullptr),
       m_pUIQuickList_0(nullptr), m_pUIQuickList_1(nullptr), m_pUIQuickList_2(nullptr), m_pUIQuickList_3(nullptr)
@@ -148,6 +148,12 @@ void CUIInventoryWnd::Init()
     xml_init.InitDragDropListEx(uiXml, "dragdrop_helmet", 0, m_pUIHelmetList);
     BindDragDropListEnents(m_pUIHelmetList);
 
+    m_pUIGasMaskList = xr_new<CUIDragDropListEx>();
+    AttachChild(m_pUIGasMaskList);
+    m_pUIGasMaskList->SetAutoDelete(true);
+    xml_init.InitDragDropListEx(uiXml, "dragdrop_gasmask", 0, m_pUIGasMaskList);
+    BindDragDropListEnents(m_pUIGasMaskList);
+
     m_pUIWarBeltList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIWarBeltList);
     m_pUIWarBeltList->SetAutoDelete(true);
@@ -248,6 +254,7 @@ void CUIInventoryWnd::Init()
         m_slots_array[i] = NULL;
     m_slots_array[OUTFIT_SLOT] = m_pUIOutfitList;
     m_slots_array[HELMET_SLOT] = m_pUIHelmetList;
+    m_slots_array[GASMASK_SLOT] = m_pUIGasMaskList;
     m_slots_array[WARBELT_SLOT] = m_pUIWarBeltList;
     m_slots_array[BACKPACK_SLOT] = m_pUIBackPackList;
     m_slots_array[VEST_SLOT] = m_pUITacticalVestList;
