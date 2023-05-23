@@ -528,15 +528,9 @@ void CArtefact::UpdateConditionDecrease()
         }
     }
     if (can_be_decreased)
-    {
         inherited::UpdateConditionDecrease();
-        // Msg("! %s for artefact [%s] with parent [%s] | current condition [%.6f] | delta_time  [%.6f] | time_factor [%.6f]",
-        //	__FUNCTION__,  cName().c_str(), GetCondition(), H_Parent()->cName().c_str(), Device.fTimeDelta, Level().GetGameTimeFactor());
-    }
     else
-    {
-        m_fLastTimeCalled = Level().GetGameDayTimeSec();
-    }
+        SetLastCondDecTime(Level().GetGameTime());
     return;
 }
 

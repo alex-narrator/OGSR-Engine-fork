@@ -284,14 +284,15 @@ public:
     bool b_brake_item{};
     // проміжок часу до повного знищення
     float m_fTTLOnDecrease{};
-    float m_fLastTimeCalled{};
     virtual void UpdateConditionDecrease();
     virtual void UpdatePowerConsumption();
     virtual bool NeedForcedDescriptionUpdate() const;
+    void SetLastCondDecTime(u64);
 
     float m_fTTLOnWork{};
 
 protected:
+    ALife::_TIME_ID m_uLastConditionDecTimeCalled{};
     // партікли знищення
     shared_str m_sBreakParticles;
     // звук знищення
@@ -394,7 +395,7 @@ protected:
 
     float m_fPowerLevel{};
     float m_fPowerCapacity{};
-    float m_fPowerConsumingUpdateTime;
+    u64 m_uLastPowerConsumingUpdateTime;
 
     LPCSTR m_detail_part_section{};
     LPCSTR m_sAttachMenuTip{};

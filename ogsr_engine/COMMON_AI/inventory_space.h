@@ -57,3 +57,8 @@ extern u32 INV_STATE_BLOCK_ALL;
 extern u32 INV_STATE_INV_WND;
 extern u32 INV_STATE_BUY_MENU;
 extern u32 INV_STATE_PDA;
+
+//частота оновлення відповідних декрементів (у ігрових секундах)
+constexpr auto CONDITION_DECREASE_UPDATE_TIME = 1.f;
+constexpr auto POWER_CONSUMING_UPDATE_TIME = 1.f;
+constexpr auto FILTER_DECREASE_UPDATE_TIME = 1.f;

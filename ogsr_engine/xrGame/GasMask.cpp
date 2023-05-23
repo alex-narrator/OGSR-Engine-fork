@@ -8,7 +8,6 @@ CGasMask::CGasMask()
 { 
     SetSlot(GASMASK_SLOT); 
     m_filters.clear();
-    m_fFilterDecreaseUpdateTime = Level().GetGameDayTimeSec();
 }
 CGasMask::~CGasMask() { xr_delete(m_UIVisor); }
 
@@ -66,7 +65,7 @@ void CGasMask::OnMoveToSlot(EItemPlace prevPlace)
     {
         if (auto pActor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner()))
         {
-            m_fFilterDecreaseUpdateTime = Level().GetGameDayTimeSec();
+            m_uLastFilterDecreaseUpdateTime = Level().GetGameDayTimeSec();
             if (m_UIVisor)
                 xr_delete(m_UIVisor);
             if (!!m_VisorTexture)
@@ -159,7 +158,6 @@ bool CGasMask::Attach(PIItem pIItem, bool b_send_event)
         m_cur_filter = (u8)std::distance(m_filters.begin(), std::find(m_filters.begin(), m_filters.end(), pIItem->object().cNameSect()));
         m_bIsFilterInstalled = true;
         m_fInstalledFilterCondition = pIItem->GetCondition();
-        m_fFilterDecreaseUpdateTime = Level().GetGameDayTimeSec();
         result = true;
     }
 
@@ -223,10 +221,11 @@ void CGasMask::InitAddons()
     m_fTTLOnWork = READ_IF_EXISTS(pSettings, r_float, section, "ttl_on_work", 0.f);
     m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 1.f);
 
+    m_uLastFilterDecreaseUpdateTime = Level().GetGameTime();
+
     inherited::InitAddons();
 }
 
-constexpr auto FILTER_DECREASE_UPDATE_TIME = 1.f;
 void CGasMask::UpdateFilterDecrease()
 {
     const auto actor = smart_cast<const CActor*>(H_Parent());
@@ -243,17 +242,17 @@ void CGasMask::UpdateFilterDecrease()
     }
 
     float delta_time{};
-    float current_time{Level().GetGameDayTimeSec()};
+    auto current_time{Level().GetGameTime()};
 
-    if (current_time > m_fFilterDecreaseUpdateTime)
-        delta_time = current_time - m_fFilterDecreaseUpdateTime;
+    if (current_time > m_uLastFilterDecreaseUpdateTime)
+        delta_time = float(current_time - m_uLastFilterDecreaseUpdateTime) / 1000.f;
 
-    if (delta_time < FILTER_DECREASE_UPDATE_TIME * Level().GetGameTimeFactor())
+    if (delta_time < FILTER_DECREASE_UPDATE_TIME)
         return;
 
-    m_fFilterDecreaseUpdateTime = Level().GetGameDayTimeSec();
+    m_uLastFilterDecreaseUpdateTime = current_time;
 
-    float filter_dec = (m_fTTLOnWork / 3600.f) * // приведення до ігрових годин
+    float filter_dec = (1.f / (m_fTTLOnWork * 3600.f)) * // приведення до ігрових годин
         delta_time;
 
     if (m_bIsFilterInstalled)

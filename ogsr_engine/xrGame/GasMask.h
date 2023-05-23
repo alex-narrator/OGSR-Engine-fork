@@ -58,5 +58,5 @@ protected:
     bool m_b_has_visor{};
     bool m_bIsFilterInstalled{};
     float m_fInstalledFilterCondition{};
-    float m_fFilterDecreaseUpdateTime{};
+    u64 m_uLastFilterDecreaseUpdateTime{};
 };

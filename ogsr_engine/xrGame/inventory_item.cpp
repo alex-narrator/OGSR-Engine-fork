@@ -50,8 +50,6 @@ CInventoryItem::CInventoryItem()
     m_ItemEffect.resize(eEffectMax);
 
     m_power_sources.clear();
-
-    m_fPowerConsumingUpdateTime = Level().GetGameDayTimeSec();
 }
 
 CInventoryItem::~CInventoryItem()
@@ -506,9 +504,8 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
 
     m_fCondition = pSE_InventoryItem->m_fCondition;
     m_ItemEffect[eRadiationRestoreSpeed] = pSE_InventoryItem->m_fRadiationRestoreSpeed;
-    if (fis_zero(pSE_InventoryItem->m_fLastTimeCalled))
-        pSE_InventoryItem->m_fLastTimeCalled = Level().GetGameDayTimeSec();
-    m_fLastTimeCalled = pSE_InventoryItem->m_fLastTimeCalled;
+
+    m_uLastConditionDecTimeCalled = pSE_InventoryItem->m_uLastConditionDecTimeCalled ? pSE_InventoryItem->m_uLastConditionDecTimeCalled : Level().GetGameTime();
     
     m_fPowerLevel = pSE_InventoryItem->m_fPowerLevel;
     if (IsPowerSourceAttachable())
@@ -543,7 +540,6 @@ void CInventoryItem::net_Export(CSE_Abstract* E)
     item->m_u8NumItems = 0;
     item->m_fCondition = m_fCondition;
     item->m_fRadiationRestoreSpeed = m_ItemEffect[eRadiationRestoreSpeed];
-    item->m_fLastTimeCalled = m_fLastTimeCalled;
     item->m_fPowerLevel = m_fPowerLevel;
     item->m_cur_power_source = m_cur_power_source;
     item->m_bIsPowerSourceAttached = m_bIsPowerSourceAttached;
@@ -871,7 +867,6 @@ void CInventoryItem::TryBreakToPieces(bool play_effects)
     }
 }
 
-constexpr auto CONDITION_DECREASE_UPDATE_TIME = 1.f;
 void CInventoryItem::UpdateConditionDecrease()
 {
     if (b_brake_item)
@@ -885,16 +880,14 @@ void CInventoryItem::UpdateConditionDecrease()
         return;
 
     float delta_time{};
-    float current_time = Level().GetGameDayTimeSec();
-    if (current_time > m_fLastTimeCalled)
-        delta_time = current_time - m_fLastTimeCalled;
+    auto current_time{Level().GetGameTime()};
+    if (current_time > m_uLastConditionDecTimeCalled)
+        delta_time = float(current_time - m_uLastConditionDecTimeCalled) / 1000.f;
 
-    if (delta_time < CONDITION_DECREASE_UPDATE_TIME * Level().GetGameTimeFactor())
+    if (delta_time < CONDITION_DECREASE_UPDATE_TIME)
         return;
 
-    // Msg("delta time [%.6f] for item [%s]", delta_time, Name());
-
-    m_fLastTimeCalled = Level().GetGameDayTimeSec();
+    SetLastCondDecTime(current_time);
 
     float condition_dec = (1.f / (m_fTTLOnDecrease * 3600.f)) * // приведення до ігрових годин
         delta_time;
@@ -902,8 +895,7 @@ void CInventoryItem::UpdateConditionDecrease()
     ChangeCondition(-condition_dec);
 
     TryBreakToPieces(false);
-    // Msg("IItem [%s] change condition on [%.6f]|current condition [%.6f]|delta_time  [%.6f], current time [%.6f]", object().cName().c_str(), condition_dec, GetCondition(),
-    // delta_time, current_time);
+    //Msg("%s m_fLastTimeCalled %u for item %s", __FUNCTION__, m_uLastConditionDecTimeCalled, object().Name());
 }
 
 void CInventoryItem::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
@@ -924,22 +916,21 @@ float CInventoryItem::GetItemEffect(int effect) const
     return m_ItemEffect[effect] * condition_k;
 }
 
-constexpr auto POWER_CONSUMING_UPDATE_TIME = 1.f;
 void CInventoryItem::UpdatePowerConsumption()
 {
     if (!smart_cast<CActor*>(object().H_Parent()) || !IsPowerConsumer() || !IsPowerOn() || fis_zero(GetCondition()))
         return;
 
     float delta_time{};
-    float current_time{Level().GetGameDayTimeSec()};
+    auto current_time{Level().GetGameTime()};
 
-    if (current_time > m_fPowerConsumingUpdateTime)
-        delta_time = current_time - m_fPowerConsumingUpdateTime;
+    if (current_time > m_uLastPowerConsumingUpdateTime)
+        delta_time = float(current_time - m_uLastPowerConsumingUpdateTime) / 1000.f;
 
-    if (delta_time < POWER_CONSUMING_UPDATE_TIME * Level().GetGameTimeFactor())
+    if (delta_time < POWER_CONSUMING_UPDATE_TIME)
         return;
 
-    m_fPowerConsumingUpdateTime = Level().GetGameDayTimeSec();
+    m_uLastPowerConsumingUpdateTime = current_time;
 
     float power_dec = (GetPowerConsumption() / 3600.f) * // приведення до ігрових годин
         delta_time;
@@ -990,7 +981,7 @@ void CInventoryItem::Switch(bool turn_on)
 {
     if (!IsPowerConsumer())
         return;
-    m_fPowerConsumingUpdateTime = turn_on ? Level().GetGameDayTimeSec() : 0.f;
+    m_uLastPowerConsumingUpdateTime = Level().GetGameTime();
 }
 
 void CInventoryItem::Recharge() { SetPowerLevel(m_fPowerCapacity); }
@@ -1012,6 +1003,7 @@ void CInventoryItem::InitAddons()
 
     m_fPowerCapacity = READ_IF_EXISTS(pSettings, r_float, power_params_sect, "power_capacity", 0.f);
     clamp(m_fPowerLevel, 0.f, m_fPowerCapacity);
+    m_uLastPowerConsumingUpdateTime = Level().GetGameTime();
 }
 
 void CInventoryItem::Disassemble()
@@ -1201,4 +1193,11 @@ void CInventoryItem::SetDropTime(bool b_set)
         return;
     if (auto se_itm = smart_cast<CSE_ALifeItem*>(object().alife_object()))
         se_itm->m_drop_time = b_set ? Level().GetGameTime() : 0;
+}
+
+void CInventoryItem::SetLastCondDecTime(u64 time)
+{
+    m_uLastConditionDecTimeCalled = time;
+    if (auto se_iitm = smart_cast<CSE_ALifeInventoryItem*>(object().alife_object()))
+        se_iitm->m_uLastConditionDecTimeCalled = m_uLastConditionDecTimeCalled;
 }

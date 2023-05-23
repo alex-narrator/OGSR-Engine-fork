@@ -60,7 +60,7 @@ enum EPowerSourceStatus
 };
 EPowerSourceStatus m_power_source_status{};
 u8 m_cur_power_source{};
-float m_fLastTimeCalled{};
+u64 m_uLastConditionDecTimeCalled{};
 bool m_bIsPowerSourceAttached{true};
 float m_fPowerLevel{};
 

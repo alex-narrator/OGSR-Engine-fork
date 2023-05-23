@@ -84,6 +84,7 @@ void CSE_ALifeInventoryItem::STATE_Write(NET_Packet& tNetPacket)
     State.position = base()->o_Position;
     //
     tNetPacket.w_float(m_fPowerLevel);
+    tNetPacket.w(&m_uLastConditionDecTimeCalled, sizeof(m_uLastConditionDecTimeCalled));
 }
 
 void CSE_ALifeInventoryItem::STATE_Read(NET_Packet& tNetPacket, u16 size)
@@ -95,7 +96,10 @@ void CSE_ALifeInventoryItem::STATE_Read(NET_Packet& tNetPacket, u16 size)
     State.position = base()->o_Position;
     //
     if (m_wVersion > 118)
+    {
         tNetPacket.r_float(m_fPowerLevel);
+        tNetPacket.r(&m_uLastConditionDecTimeCalled, sizeof(m_uLastConditionDecTimeCalled));
+    }
 }
 
 static inline bool check(const u8& mask, const u8& test) { return (!!(mask & test)); }
@@ -104,7 +108,6 @@ void CSE_ALifeInventoryItem::UPDATE_Write(NET_Packet& tNetPacket)
 {
     tNetPacket.w_float_q8(m_fCondition, 0.0f, 1.0f);
     tNetPacket.w_float(m_fRadiationRestoreSpeed);
-    tNetPacket.w_float(m_fLastTimeCalled);
     tNetPacket.w_float(m_fPowerLevel);
     tNetPacket.w_u8(m_cur_power_source);
     tNetPacket.w_u8(m_bIsPowerSourceAttached ? 1 : 0);
@@ -160,7 +163,6 @@ void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
     {
         tNetPacket.r_float_q8(m_fCondition, 0.0f, 1.0f);
         tNetPacket.r_float(m_fRadiationRestoreSpeed);
-        tNetPacket.r_float(m_fLastTimeCalled);
         tNetPacket.r_float(m_fPowerLevel);
         tNetPacket.r_u8(m_cur_power_source);
         m_bIsPowerSourceAttached = !!(tNetPacket.r_u8() & 0x1);

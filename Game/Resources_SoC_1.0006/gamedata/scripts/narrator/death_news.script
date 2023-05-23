@@ -108,7 +108,7 @@ function send_tip(victim, killer)
 		end
 	end
 	
-	local news_text = "%c[red]"..tip_header.."\\n"..
+	local news_text = "%c[gray]"..tip_header.."\\n"..
 	"%c[UI_orange]"..victim_header.." ".."%c[white]"..victim_name.." "..victim_comm.."\\n"..
 	"%c[UI_orange]"..killer_header.." ".."%c[white]"..killer_type.." "..killer_info
 	
