@@ -22,7 +22,6 @@ void CHelmet::Load(LPCSTR section)
 {
     inherited::Load(section);
     m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 1.f);
-    
     m_b_has_visor = READ_IF_EXISTS(pSettings, r_bool, section, "has_visor", true);
     m_VisorTexture = READ_IF_EXISTS(pSettings, r_string, section, "visor_texture", nullptr);
     bulletproof_display_bone = READ_IF_EXISTS(pSettings, r_string, section, "bulletproof_display_bone", "bip01_head");
@@ -54,8 +53,7 @@ void CHelmet::OnMoveToSlot(EItemPlace prevPlace)
 
     if (m_pCurrentInventory)
     {
-        CActor* pActor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner());
-        if (pActor)
+        if (auto pActor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner()))
         {
             if (pSettings->line_exist(cNameSect(), "bones_koeff_protection"))
             {

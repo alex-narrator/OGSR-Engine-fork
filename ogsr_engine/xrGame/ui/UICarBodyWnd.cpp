@@ -31,6 +31,7 @@
 #include "Artifact.h"
 #include "CustomOutfit.h"
 #include "Vest.h"
+#include "GasMask.h"
 #include "WeaponKnife.h"
 #include "string_table.h"
 
@@ -356,6 +357,7 @@ void CUICarBodyWnd::ActivatePropertiesBox()
     auto pAmmo = smart_cast<CWeaponAmmo*>(CurrentIItem());
     auto pEatableItem = smart_cast<CEatableItem*>(CurrentIItem());
     auto pVest = smart_cast<CVest*>(CurrentIItem());
+    auto pGasmask = smart_cast<CGasMask*>(CurrentIItem());
 
     LPCSTR detach_tip = CurrentIItem()->GetDetachMenuTip();
 
@@ -374,6 +376,15 @@ void CUICarBodyWnd::ActivatePropertiesBox()
     if (pVest && pVest->CanDetach(pVest->GetPlateName().c_str()))
     {
         _addon_sect = pVest->GetPlateName().c_str();
+        _addon_name = pSettings->r_string(_addon_sect, "inv_name_short");
+        sprintf(temp, "%s%s %s", _many, CStringTable().translate(detach_tip).c_str(), CStringTable().translate(_addon_name).c_str());
+        m_pUIPropertiesBox->AddItem(temp, (void*)_addon_sect, INVENTORY_DETACH_ADDON);
+        b_show = true;
+    }
+
+    if (pGasmask && pGasmask->IsFilterInstalled() && pGasmask->CanDetach(pGasmask->GetFilterName().c_str()))
+    {
+        _addon_sect = pGasmask->GetFilterName().c_str();
         _addon_name = pSettings->r_string(_addon_sect, "inv_name_short");
         sprintf(temp, "%s%s %s", _many, CStringTable().translate(detach_tip).c_str(), CStringTable().translate(_addon_name).c_str());
         m_pUIPropertiesBox->AddItem(temp, (void*)_addon_sect, INVENTORY_DETACH_ADDON);

@@ -18,8 +18,6 @@
 #include "inventory.h"
 #include "Artifact.h"
 
-#include "PowerBattery.h"
-
 #include "UIInventoryUtilities.h"
 using namespace InventoryUtilities;
 

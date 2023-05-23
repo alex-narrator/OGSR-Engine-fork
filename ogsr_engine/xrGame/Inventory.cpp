@@ -66,6 +66,7 @@ CInventory::CInventory()
     m_slots[OUTFIT_SLOT].m_bVisible = false;
     m_slots[TORCH_SLOT].m_bVisible = false;
     m_slots[HELMET_SLOT].m_bVisible = false;
+    m_slots[GASMASK_SLOT].m_bVisible = false;
     m_slots[DETECTOR_SLOT].m_bVisible = false; // KRodin: это очень важно! Слот для зп-стайл детекторов должен быть НЕ активируемым!
 
     for (u32 i = 0; i < m_slots.size(); ++i)
@@ -1587,6 +1588,7 @@ bool CInventory::IsSlotAllowed(u32 slot) const
     case GRENADE_SLOT:
     case ARTEFACT_SLOT: return HasModuleForSlot(slot); break;
     case HELMET_SLOT: return (!outfit || !outfit->m_bIsHelmetBuiltIn); break;
+    case GASMASK_SLOT: return (!outfit || !outfit->m_bIsHelmetBuiltIn); break;
     }
     return true;
 }

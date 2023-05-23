@@ -133,7 +133,7 @@ allowed_classes = ARTEFACT
 [battery]:identity_immunities
 GroupControlSection	= spawn_group
 discovery_dependency =
-class				= II_PWRBT
+class				= II_ATTCH
 cform				= skeleton
 visual				= dynamics\equipments\duracell.ogf
 description			= battery_descr
@@ -163,7 +163,6 @@ inv_weight			= 0.3
 
 rechargeable = true
 power_capacity = 800
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;vest;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [vest]:identity_immunities
 GroupControlSection	= spawn_group
@@ -256,8 +255,8 @@ inv_grid_y         = 20
 cost				= 1000
 
 position				= 0,0,0
-attach_position_offset	= 0.096, 0.107, -0.138 ;vert(+up -down)/horz (+left -right)/deep (-close to screen +far from screen)
-attach_angle_offset		= -1.25, -0.107, 1.2
+attach_angle_offset 	= -1.750, 0.043, 1.100
+attach_position_offset 	= 0.096, 0.107, -0.123
 attach_bone_name		= bip01_pelvis
 
 [scabbard]:drop_pouch
@@ -342,11 +341,92 @@ inv_grid_y         = 32
 cost				= 8000
 bones_koeff_protection = actor_plate_class_4
 
+
+;---------------------------------------------------------------------------------------------
+;		ПРОТИГАЗИ
+;---------------------------------------------------------------------------------------------
+
+[gasmask_gp5]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency =
+class 					= EQ_GSMSK
+$spawn 					= "outfit\helm_respirator"
+cform           		= skeleton
+visual          		= dynamics\outfit\helm_respirator
+control_inertion_factor	= 1.0
+inv_name             	= st_helm_respirator
+inv_name_short       	= st_helm_respirator
+description				= st_helm_respirator_descr
+
+inv_weight           	= 4.0
+
+inv_grid_width     = 2
+inv_grid_height    = 2
+inv_grid_x         = 10
+inv_grid_y         = 27
+
+cost			= 1000
+
+slot			= 19
+
+inv_show_condition = true
+
+;ttl_on_work = 1
+
+position				= 0,0,0
+attach_angle_offset 	= 1.500, 0.043, 1.650
+attach_position_offset 	= 0.064, 0.001, 0.099
+attach_bone_name		= bip01_head
+auto_attach				= false
+
+immunities_sect 			= sect_helm_respirator_immunities
+
+filters = filter_gp5
+
+radiation_protection 		= 0.1
+chemical_burn_protection 	= 0.1
+
+[sect_helm_respirator_immunities]
+burn_immunity			= 0.04
+strike_immunity			= 0.0
+shock_immunity			= 0.04
+wound_immunity			= 0.0
+wound_2_immunity		= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.04
+explosion_immunity		= 0.04
+fire_wound_immunity		= 0.04
+
+[filter_gp5]:identity_immunities
+GroupControlSection	= spawn_group
+discovery_dependency = 
+$spawn 				= "devices\quest_items\quest_case_02"
+;$prefetch 			= 32
+class				= II_ATTCH
+cform				= skeleton
+visual				= physics\anomaly\artefact_plenka.ogf
+
+description         = filter_gp5_desc
+inv_name			= filter_gp5_name
+inv_name_short		= filter_gp5_name_short
+inv_weight			= 0.1
+inv_grid_width     = 1
+inv_grid_height    = 1
+inv_grid_x         = 30
+inv_grid_y         = 36
+cost				= 400
+
+ttl_on_work = 2
+
+radiation_protection 		= 0.3
+chemical_burn_protection 	= 0.3
+
 ;---------------------------------------------------------------------------------------------
 ;		ШЛЕМЫ
 ;---------------------------------------------------------------------------------------------
 
-[helmet]
+[helmet]:identity_immunities
 GroupControlSection	= spawn_group
 discovery_dependency =
 ;$spawn 			= "outfit\helmet"
@@ -378,51 +458,6 @@ auto_attach				= false
 
 immunities_sect 			= sect_helm_immunities
 bones_koeff_protection		= actor_helm_respirator
-
-;---------------------------------------------------------------------------------------------
-;		ПРОТИВОГАЗ
-;---------------------------------------------------------------------------------------------
-
-[helm_respirator]:helmet
-$spawn 			= "outfit\helm_respirator"
-visual          	= dynamics\outfit\helm_respirator
-control_inertion_factor	= 1.0
-inv_name             	= st_helm_respirator
-inv_name_short       	= st_helm_respirator
-description				= st_helm_respirator_descr
-
-inv_weight           	= 4.0
-
-inv_grid_width     = 2
-inv_grid_height    = 2
-inv_grid_x         = 10
-inv_grid_y         = 27
-
-cost			= 1000
-
-slot			= 19
-
-immunities_sect 			= sect_helm_respirator_immunities
-bones_koeff_protection		= actor_helm_respirator
-
-telepatic_protection 		= 0.1
-radiation_protection 		= 0.3
-chemical_burn_protection 	= 0.3
-
-attach_angle_offset = 1.500, 0.043, 1.650
-attach_position_offset = 0.064, 0.001, 0.067
-
-[sect_helm_respirator_immunities]
-burn_immunity			= 0.04
-strike_immunity			= 0.0
-shock_immunity			= 0.04
-wound_immunity			= 0.0
-wound_2_immunity		= 0.0
-radiation_immunity		= 0.0
-telepatic_immunity		= 0.0
-chemical_burn_immunity	= 0.04
-explosion_immunity		= 0.04
-fire_wound_immunity		= 0.04
 
 ;---------------------------------------------------------------------------------------------
 ;		СТАЛЬНОЙ ШЛЕМ

@@ -505,8 +505,7 @@ bool CWeaponShotgun::Attach(PIItem pIItem, bool b_send_event)
 
     if (pExtender && CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender))
     {
-        auto it = std::find(m_extenders.begin(), m_extenders.end(), pIItem->object().cNameSect());
-        m_cur_extender = (u8)std::distance(m_extenders.begin(), it);
+        m_cur_extender = (u8)std::distance(m_extenders.begin(), std::find(m_extenders.begin(), m_extenders.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonExtender;
 
         UnloadWeaponFull();
@@ -544,12 +543,12 @@ bool CWeaponShotgun::Detach(const char* item_section_name, bool b_spawn_item, fl
 
 void CWeaponShotgun::InitAddons()
 {
-    inherited::InitAddons();
     iMagazineSize = pSettings->r_s32(cNameSect(), "ammo_mag_size");
     if (IsAddonAttached(eExtender))
     {
         iMagazineSize += READ_IF_EXISTS(pSettings, r_u32, GetAddonName(eExtender), "ammo_mag_size", 0);
     }
+    inherited::InitAddons();
 }
 
 bool CWeaponShotgun::CanBeReloaded()

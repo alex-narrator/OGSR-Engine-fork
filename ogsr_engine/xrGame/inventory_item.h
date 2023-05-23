@@ -282,12 +282,14 @@ public:
 
     virtual void TryBreakToPieces(bool);
     bool b_brake_item{};
-    // проміжок часу до повного розряджання
+    // проміжок часу до повного знищення
     float m_fTTLOnDecrease{};
     float m_fLastTimeCalled{};
     virtual void UpdateConditionDecrease();
     virtual void UpdatePowerConsumption();
     virtual bool NeedForcedDescriptionUpdate() const;
+
+    float m_fTTLOnWork{};
 
 protected:
     // партікли знищення
@@ -333,6 +335,7 @@ public:
     xr_vector<shared_str> m_power_sources{};
 
     float m_fPowerConsumption{};
+    bool m_bRechargeable{};
 
     const shared_str GetPowerSourceName() const { return m_power_sources[m_cur_power_source]; }
 
@@ -347,7 +350,9 @@ public:
     virtual float GetPowerConsumption() const { return m_fPowerConsumption; };
     virtual float GetPowerCapacity() const { return m_fPowerCapacity; };
     virtual bool CanBeCharged() const;
-    virtual void InitPowerSource();
+    //окремо для батарейок
+    virtual bool CanBeRecharged() const;
+    virtual void InitAddons();
 
     virtual void Switch(bool);
     virtual void Switch();

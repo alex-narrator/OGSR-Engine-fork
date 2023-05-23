@@ -200,7 +200,6 @@ public:
     void ToggleDetector(bool bFastMode);
     void HideDetector(bool bFastMode);
     void ShowDetector(bool bFastMode);
-    float m_fDetectRadius{};
     virtual bool CheckCompatibility(CHudItem* itm) override;
 
     virtual u32 ef_detector_type() const override { return 1; }
@@ -212,6 +211,8 @@ public:
     virtual void SwitchMode();
     virtual bool IsAfMode() const { return m_bAfMode; }
     virtual void ShowCurrentModeMsg();
+
+    virtual float GetDetectionRadius() const { return m_fDetectRadius; };
 
 protected:
     bool CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate);
@@ -227,6 +228,7 @@ protected:
     virtual void DisableUIDetection(){};
 
     bool m_bWorking{};
+    float m_fDetectRadius{};
     float m_fAfVisRadius{};
     CAfList m_artefacts;
     CZoneList m_zones;

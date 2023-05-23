@@ -32,6 +32,10 @@ CUICellItem* create_cell_item(CInventoryItem* itm)
     if (pVest)
         return xr_new<CUIVestCellItem>(pVest);
 
+    auto pGasmask = smart_cast<CGasMask*>(itm);
+    if (pGasmask)
+        return xr_new<CUIGasMaskCellItem>(pGasmask);
+
     auto pContainer = smart_cast<CInventoryContainer*>(itm);
     if (pContainer)
         return xr_new<CUIContainerCellItem>(pContainer);

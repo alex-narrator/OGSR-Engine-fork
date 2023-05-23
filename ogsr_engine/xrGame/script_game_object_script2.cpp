@@ -86,6 +86,8 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         //
         .def("is_power_consumer", &CScriptGameObject::IsPowerConsumer)
         .def("is_power_source_attached", &CScriptGameObject::IsPowerSourceAttached)
+        .def("can_be_charged", &CScriptGameObject::CanBeCharged)
+        .def("can_be_recharged", &CScriptGameObject::CanBeRecharged)
         .def("get_power_level", &CScriptGameObject::GetPowerLevel)
         .def("set_power_level", &CScriptGameObject::SetPowerLevel)
         .def("change_power_level", &CScriptGameObject::ChangePowerLevel)

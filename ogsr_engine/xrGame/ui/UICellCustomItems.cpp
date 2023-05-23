@@ -212,6 +212,61 @@ CUIStatic* CUIInventoryCellItem::CreateUpgradeIcon()
     return upgrade_icon;
 }
 
+CUIGasMaskCellItem::CUIGasMaskCellItem(CGasMask* itm) : inherited(itm) {}
+void CUIGasMaskCellItem::Update() 
+{ 
+    inherited::Update(); 
+    if (object()->IsFilterInstalled())
+    {
+        if (!m_filter)
+        {
+            m_filter = CreateFilterIcon();
+            AttachChild(m_filter);
+        }
+    }
+    else if (m_filter)
+    {
+        DetachChild(m_filter);
+        m_filter = nullptr;
+    }
+}
+CUIStatic* CUIGasMaskCellItem::CreateFilterIcon()
+{
+    auto filter_icon = xr_new<CUIStatic>();
+    filter_icon->SetAutoDelete(true);
+    CIconParams params(object()->GetFilterName());
+    params.set_shader(filter_icon);
+
+    Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
+    Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
+
+    Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
+    size.mul(base_scale);
+    size.mul(object()->filter_icon_scale);
+    filter_icon->SetWndSize(size);
+
+    Fvector2 pos{object()->filter_icon_ofset};
+    pos.mul(base_scale);
+    filter_icon->SetWndPos(pos);
+
+    filter_icon->SetStretchTexture(true);
+
+    return filter_icon;
+}
+bool CUIGasMaskCellItem::EqualTo(CUICellItem* itm)
+{
+    if (!inherited::EqualTo(itm))
+        return false;
+
+    auto ci = smart_cast<CUIGasMaskCellItem*>(itm);
+    if (!ci)
+        return false;
+
+    return object()->IsFilterInstalled() == ci->object()->IsFilterInstalled() &&
+        object()->GetFilterName() == ci->object()->GetFilterName() &&
+        fsimilar(object()->GetInstalledFilterCondition(), ci->object()->GetInstalledFilterCondition(), 0.01f);
+}
+
 CUIAmmoCellItem::CUIAmmoCellItem(CWeaponAmmo* itm) : inherited(itm)
 {
     if (itm->IsBoxReloadable())
@@ -229,7 +284,6 @@ bool CUIAmmoCellItem::EqualTo(CUICellItem* itm)
     if (!ci)
         return false;
 
-    // return ((object()->cNameSect() == ci->object()->cNameSect()));
     return object()->m_ammoSect == ci->object()->m_ammoSect;
 }
 
@@ -292,7 +346,10 @@ void CUIAmmoCellItem::UpdateItemTextCustom()
         }
     }
     else if (m_ammo_in_box)
+    {
         DetachChild(m_ammo_in_box);
+        m_ammo_in_box = nullptr;
+    }
 }
 
 void CUIAmmoCellItem::UpdateItemText()
@@ -960,7 +1017,10 @@ void CUIWeaponRGP7CellItem::Update()
         }
     }
     else if (m_grenade_loaded)
+    {
         DetachChild(m_grenade_loaded);
+        m_grenade_loaded = nullptr;
+    }
 }
 CUIStatic* CUIWeaponRGP7CellItem::CreateGrenadeIcon()
 {

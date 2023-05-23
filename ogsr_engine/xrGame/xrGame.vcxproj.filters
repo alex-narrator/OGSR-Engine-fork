@@ -6050,9 +6050,6 @@
     <ClInclude Include="NightVisionDevice.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
     </ClInclude>
-    <ClInclude Include="PowerBattery.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
-    </ClInclude>
     <ClInclude Include="Helmet.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
@@ -6073,6 +6070,9 @@
     </ClInclude>
     <ClInclude Include="ui\UIEquipParams.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="GasMask.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -8849,9 +8849,6 @@
     <ClCompile Include="NightVisionDevice.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
     </ClCompile>
-    <ClCompile Include="PowerBattery.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
-    </ClCompile>
     <ClCompile Include="Helmet.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClCompile>
@@ -8872,6 +8869,9 @@
     </ClCompile>
     <ClCompile Include="ui\UIEquipParams.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="GasMask.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

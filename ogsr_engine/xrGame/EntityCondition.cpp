@@ -4,6 +4,7 @@
 #include "customoutfit.h"
 #include "InventoryContainer.h"
 #include "Helmet.h"
+#include "GasMask.h"
 #include "Vest.h"
 #include "inventory.h"
 #include "wound.h"
@@ -274,6 +275,7 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
 
     auto pOutfit = pInvOwner->GetOutfit();
     auto pHelmet = pInvOwner->GetHelmet();
+    auto pGasMask = pInvOwner->GetGasMask();
     auto pVest = pInvOwner->GetVest();
     auto pBackPack = pInvOwner->GetBackpack();
 
@@ -283,6 +285,11 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
         {
             new_hit_power *= (1.0f - pHelmet->GetHitTypeProtection(pHDS->type()));
             pHelmet->Hit(pHDS);
+        }
+        if (pGasMask)
+        {
+            new_hit_power *= (1.0f - pGasMask->GetHitTypeProtection(pHDS->type()));
+            pGasMask->Hit(pHDS);
         }
         if (pBackPack)
         {
@@ -311,6 +318,11 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
             else
                 new_hit_power *= (1.0f - pHelmet->GetHitTypeProtection(pHDS->type()));
             pHelmet->Hit(pHDS);
+        }
+        if (pGasMask)
+        {
+            new_hit_power *= (1.0f - pGasMask->GetHitTypeProtection(pHDS->type()));
+            pGasMask->Hit(pHDS);
         }
         else if (pOutfit && pOutfit->m_bIsHelmetBuiltIn)
         {
@@ -366,6 +378,9 @@ float CEntityCondition::HitPowerEffect(float power_loss)
 
     if (auto pHelmet = pInvOwner->GetHelmet())
         new_power_loss *= pHelmet->GetPowerLoss();
+
+    if (auto pGasMask = pInvOwner->GetGasMask())
+        new_power_loss *= pGasMask->GetPowerLoss();
 
     return new_power_loss;
 }
@@ -791,6 +806,8 @@ void CEntityCondition::DisableBoostParameters(const SBooster& B)
 
 void CEntityCondition::UpdateBoosters()
 {
+    if (!m_bTimeValid)
+        return;
     for (auto& item : m_boosters)
     {
         auto& B = item.second;

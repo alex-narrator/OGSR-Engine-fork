@@ -178,6 +178,8 @@ public:
     //
     bool IsPowerConsumer() const;
     bool IsPowerSourceAttached() const;
+    bool CanBeCharged() const;
+    bool CanBeRecharged() const;
     float GetPowerLevel() const;
     void SetPowerLevel(float val);
     void ChangePowerLevel(float val);

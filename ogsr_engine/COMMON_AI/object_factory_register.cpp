@@ -109,6 +109,7 @@
 #include "ExoOutfit.h"
 
 #include "Helmet.h"
+#include "GasMask.h"
 #include "Warbelt.h"
 #include "Vest.h"
 
@@ -138,7 +139,6 @@
 #include "pda.h"
 
 #include "NightVisionDevice.h"
-#include "PowerBattery.h"
 
 #include "searchlight.h"
 
@@ -294,9 +294,7 @@ void CObjectFactory::register_classes()
     ADD(CWarbelt, CSE_ALifeItem, CLSID_WARBELT, "obj_warbelt");
     ADD(CVest, CSE_ALifeItemVest, CLSID_VEST, "obj_vest");
     ADD(CHelmet, CSE_ALifeItem, CLSID_HELMET, "obj_helmet");
-
-    // power battery
-    ADD(CPowerBattery, CSE_ALifeItemPowerBattery, CLSID_POWER_BATTERY, "obj_power_battery");
+    ADD(CGasMask, CSE_ALifeItemGasMask, CLSID_GASMASK, "obj_gasmask");
 
     // Grenades
     ADD(CF1, CSE_ALifeItemGrenade, CLSID_GRENADE_F1, "wpn_grenade_f1");

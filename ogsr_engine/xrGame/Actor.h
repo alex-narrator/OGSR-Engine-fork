@@ -24,6 +24,7 @@ class CActorCondition;
 class CCustomOutfit;
 class CInventoryContainer;
 class CHelmet;
+class CGasMask;
 class CWarbelt;
 class CVest;
 class CTorch;
@@ -669,6 +670,7 @@ public:
     virtual CWarbelt* GetWarbelt() const;
     virtual CInventoryContainer* GetBackpack() const;
     virtual CHelmet* GetHelmet() const;
+    virtual CGasMask* GetGasMask() const;
     virtual CVest* GetVest() const;
     virtual CTorch* GetTorch() const;
     virtual CNightVisionDevice* GetNightVisionDevice() const;

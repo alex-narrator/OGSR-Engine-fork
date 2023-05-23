@@ -11,15 +11,15 @@
 
 #include "inventory_item.h"
 #include "CustomOutfit.h"
-#include "Helmet.h"
+#include "GasMask.h"
 #include "Warbelt.h"
 #include "Vest.h"
 #include "WeaponAmmo.h"
 #include "Addons.h"
-#include "PowerBattery.h"
 #include "InventoryContainer.h"
 #include "Grenade.h"
 #include "CustomDetector.h"
+#include "SimpleDetectorSHOC.h"
 
 constexpr auto equip_params = "equip_params.xml";
 
@@ -43,11 +43,14 @@ CUIStatic* CUIEquipParams::SetStaticParams(CUIXml& _xml, const char* _path, floa
 
 bool CUIEquipParams::Check(CInventoryItem* obj)
 {
-    if (smart_cast<CWeaponAmmo*>(obj) || smart_cast<CWarbelt*>(obj) || smart_cast<CVest*>(obj) || smart_cast<CCustomOutfit*>(obj) || smart_cast<CHelmet*>(obj) ||
+    if (smart_cast<CWeaponAmmo*>(obj) || 
+        smart_cast<CWarbelt*>(obj) || smart_cast<CVest*>(obj) || smart_cast<CCustomOutfit*>(obj) || smart_cast<CGasMask*>(obj) ||
         smart_cast<CScope*>(obj) || smart_cast<CSilencer*>(obj) || smart_cast<CStock*>(obj) || smart_cast<CExtender*>(obj) || smart_cast<CForend*>(obj) ||
-        smart_cast<CInventoryContainer*>(obj) || smart_cast<CPowerBattery*>(obj) || smart_cast<CGrenade*>(obj) || smart_cast<CCustomDetector*>(obj) || 
-        obj->IsPowerConsumer() || obj->GetDetailPartSection() || !fsimilar(obj->GetPowerLoss(), 1.f) ||
-        !obj->m_repair_items.empty() || !obj->m_required_tools.empty() || !fis_zero(obj->repair_condition_gain) || obj->repair_count || !fis_zero(obj->repair_condition_threshold))
+        smart_cast<CInventoryContainer*>(obj) || smart_cast<CGrenade*>(obj) || smart_cast<CCustomDetector*>(obj) || smart_cast<CCustomDetectorSHOC*>(obj) ||
+        obj->GetPowerLevel() || obj->CanBeCharged() || obj->IsPowerConsumer() || 
+        obj->GetDetailPartSection() || !fsimilar(obj->GetPowerLoss(), 1.f) || obj->m_fTTLOnWork || obj->m_fTTLOnDecrease ||
+        !obj->m_repair_items.empty() || !obj->m_required_tools.empty() || 
+        !fis_zero(obj->repair_condition_gain) || obj->repair_count || !fis_zero(obj->repair_condition_threshold))
     {
         return true;
     }
@@ -75,7 +78,7 @@ void CUIEquipParams::SetInfo(CInventoryItem* obj)
     float _h{}, _val{};
     LPCSTR _param_name{}, _sn = "%";
 
-    if (obj->IsPowerConsumer() && obj->IsPowerSourceAttached() || smart_cast<CPowerBattery*>(obj))
+    if (obj->IsPowerConsumer() && obj->IsPowerSourceAttached() || obj->CanBeCharged() || obj->GetPowerLevel())
     {
         _val = obj->GetPowerLevelToShow();
         _param_name = CStringTable().translate("st_power_level").c_str();
@@ -109,12 +112,44 @@ void CUIEquipParams::SetInfo(CInventoryItem* obj)
         _h += list_item_h;
     }
 
-    if (auto det_cop = smart_cast<CCustomDetector*>(obj))
+    auto det_cop = smart_cast<CCustomDetector*>(obj);
+    auto det_shoc = smart_cast<CSimpleDetectorSHOC*>(obj);
+    if (det_cop || det_shoc)
     {
-        _val = det_cop->m_fDetectRadius;
+        _val = det_cop ? det_cop->GetDetectionRadius() : det_shoc->GetDetectionRadius();
         _param_name = CStringTable().translate("st_detect_radius").c_str();
         _sn = CStringTable().translate("st_m").c_str();
-        sprintf_s(text_to_show, "%s %.0f %s", _param_name, _val, _sn);
+        sprintf_s(text_to_show, "%s %.f %s", _param_name, _val, _sn);
+        SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
+        _h += list_item_h;
+    }
+
+    auto pGasMask = smart_cast<CGasMask*>(obj);
+    if (pGasMask && pGasMask->IsFilterInstalled())
+    {
+        _val = pGasMask->GetInstalledFilterCondition() * 100.f;
+        _param_name = CStringTable().translate("st_installed_filter_condition").c_str();
+        sprintf_s(text_to_show, "%s %.f %s", _param_name, _val, _sn);
+        SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
+        _h += list_item_h;
+    }
+
+    if (obj->m_fTTLOnDecrease)
+    {
+        _val = obj->m_fTTLOnDecrease;
+        _param_name = CStringTable().translate("st_decrease_time").c_str();
+        _sn = CStringTable().translate("st_time_hour").c_str();
+        sprintf_s(text_to_show, "%s %.1f %s", _param_name, _val, _sn);
+        SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
+        _h += list_item_h;
+    }
+
+    if (obj->m_fTTLOnWork)
+    {
+        _val = obj->m_fTTLOnWork;
+        _param_name = CStringTable().translate("st_work_time").c_str();
+        _sn = CStringTable().translate("st_time_hour").c_str();
+        sprintf_s(text_to_show, "%s %.1f %s", _param_name, _val, _sn);
         SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
         _h += list_item_h;
     }

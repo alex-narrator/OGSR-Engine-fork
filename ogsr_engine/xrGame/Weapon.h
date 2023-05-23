@@ -160,7 +160,7 @@ public:
     void UpdateAddonsVisibility();
     void UpdateHUDAddonsVisibility();
     // инициализация свойств присоединенных аддонов
-    virtual void InitAddons(){};
+    //virtual void InitAddons(){};
 
     // для отоброажения иконок апгрейдов в интерфейсе
     Fvector2 GetAddonOffset(u32);

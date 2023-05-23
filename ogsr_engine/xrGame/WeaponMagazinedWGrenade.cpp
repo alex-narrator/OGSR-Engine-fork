@@ -578,8 +578,7 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
 
     if (pGrenadeLauncher && CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher))
     {
-        auto it = std::find(m_glaunchers.begin(), m_glaunchers.end(), pIItem->object().cNameSect());
-        m_cur_glauncher = (u8)std::distance(m_glaunchers.begin(), it);
+        m_cur_glauncher = (u8)std::distance(m_glaunchers.begin(), std::find(m_glaunchers.begin(), m_glaunchers.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
 
         m_fAttachedGrenadeLauncherCondition = pIItem->GetCondition();

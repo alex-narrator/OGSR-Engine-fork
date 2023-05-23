@@ -28,6 +28,7 @@ class CWeapon;
 class CCustomOutfit;
 class CHelmet;
 class CVest;
+class CGasMask;
 class CInventoryContainer;
 struct SHit;
 
@@ -156,6 +157,7 @@ public:
     virtual CInventoryContainer* GetBackpack() const { return nullptr; };
     virtual CHelmet* GetHelmet() const { return nullptr; };
     virtual CVest* GetVest() const { return nullptr; };
+    virtual CGasMask* GetGasMask() const { return nullptr; };
 
     virtual bool IsHitToBackPack(SHit* pHDS) const { return false; };
     virtual bool IsHitToHead(SHit* pHDS) const { return false; };

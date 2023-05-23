@@ -172,8 +172,6 @@ constexpr auto CLSID_DEVICE_PDA = MK_CLSID('D', '_', 'P', 'D', 'A', ' ', ' ', ' 
 constexpr auto CLSID_DEVICE_TORCH = MK_CLSID('D', '_', 'T', 'O', 'R', 'C', 'H', ' ');
 constexpr auto CLSID_DEVICE_AF_MERGER = MK_CLSID('D', '_', 'A', 'F', 'M', 'E', 'R', 'G');
 constexpr auto CLSID_DEVICE_NIGHT_VISION = MK_CLSID('D', '_', 'N', 'T', 'V', 'I', 'S', ' ');
-// power battery
-constexpr auto CLSID_POWER_BATTERY = MK_CLSID('I', 'I', '_', 'P', 'W', 'R', 'B', 'T');
 
 // Inventory items
 constexpr auto CLSID_IITEM_BOLT = MK_CLSID('I', 'I', '_', 'B', 'O', 'L', 'T', ' ');
@@ -210,6 +208,7 @@ constexpr auto CLSID_EQUIPMENT_EXO = MK_CLSID('E', 'Q', 'U', '_', 'E', 'X', 'O',
 constexpr auto CLSID_WARBELT = MK_CLSID('E', 'Q', '_', 'W', 'R', 'B', 'L', 'T');
 constexpr auto CLSID_VEST = MK_CLSID('E', 'Q', '_', 'T', 'V', 'E', 'S', 'T');
 constexpr auto CLSID_HELMET = MK_CLSID('E', 'Q', '_', 'H', 'E', 'L', 'M', 'T');
+constexpr auto CLSID_GASMASK = MK_CLSID('E', 'Q', '_', 'G', 'S', 'M', 'S', 'K');
 
 // Game types
 constexpr auto CLSID_SV_GAME_SINGLE = MK_CLSID('S', 'V', '_', 'S', 'I', 'N', 'G', 'L');

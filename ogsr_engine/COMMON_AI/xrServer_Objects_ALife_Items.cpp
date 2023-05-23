@@ -61,6 +61,11 @@ CSE_ALifeInventoryItem::CSE_ALifeInventoryItem(LPCSTR caSection)
         else
             m_fPowerLevel = READ_IF_EXISTS(pSettings, r_float, caSection, "power_capacity", 0.f);
     }
+    // батарейка
+    if (m_power_source_status == ALife::ePowerSourceDisabled && pSettings->line_exist(caSection, "power_capacity"))
+    {
+        m_fPowerLevel = pSettings->r_float(caSection, "power_capacity");
+    }
 }
 
 CSE_Abstract* CSE_ALifeInventoryItem::init()
@@ -1058,14 +1063,36 @@ void CSE_ALifeItemVest::UPDATE_Write(NET_Packet& tNetPacket)
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// CSE_ALifeItemPowerBattery
+// CSE_ALifeItemGasMask
 ////////////////////////////////////////////////////////////////////////////
-CSE_ALifeItemPowerBattery::CSE_ALifeItemPowerBattery(LPCSTR caSection) : CSE_ALifeItem(caSection)
+CSE_ALifeItemGasMask::CSE_ALifeItemGasMask(LPCSTR caSection) : CSE_ALifeItem(caSection)
 {
-    m_fPowerLevel = READ_IF_EXISTS(pSettings, r_float, caSection, "power_capacity", 0.f);
+    if (pSettings->line_exist(caSection, "filter_installed"))
+    {
+        m_bIsFilterInstalled = true;
+        m_cur_filter = pSettings->r_u8(s_name, "filter_installed");
+    }
 }
-CSE_ALifeItemPowerBattery::~CSE_ALifeItemPowerBattery() {}
-void CSE_ALifeItemPowerBattery::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited::STATE_Read(tNetPacket, size); }
-void CSE_ALifeItemPowerBattery::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
-void CSE_ALifeItemPowerBattery::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
-void CSE_ALifeItemPowerBattery::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
+CSE_ALifeItemGasMask::~CSE_ALifeItemGasMask() {}
+void CSE_ALifeItemGasMask::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited::STATE_Read(tNetPacket, size); }
+void CSE_ALifeItemGasMask::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
+void CSE_ALifeItemGasMask::UPDATE_Read(NET_Packet& tNetPacket)
+{
+    inherited::UPDATE_Read(tNetPacket);
+
+    if (m_wVersion > 118)
+    {
+        u8 _data = tNetPacket.r_u8();
+        m_bIsFilterInstalled = !!(_data & 0x1);
+        tNetPacket.r_u8(m_cur_filter);
+        tNetPacket.r_float_q8(m_fInstalledFilterCondition, 0.f, 1.f);
+    }
+}
+void CSE_ALifeItemGasMask::UPDATE_Write(NET_Packet& tNetPacket)
+{
+    inherited::UPDATE_Write(tNetPacket);
+
+    tNetPacket.w_u8(m_bIsFilterInstalled ? 1 : 0);
+    tNetPacket.w_u8(m_cur_filter);
+    tNetPacket.w_float_q8(m_fInstalledFilterCondition, 0.f, 1.f);
+}

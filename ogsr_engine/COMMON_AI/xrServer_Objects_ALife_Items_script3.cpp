@@ -21,9 +21,6 @@ void CSE_ALifeItemWeaponMagazinedWGL::script_register(lua_State* L)
 }
 
 void CSE_ALifeItemEatable::script_register(lua_State* L) { module(L)[luabind_class_item1(CSE_ALifeItemEatable, "cse_alife_item_eatable", CSE_ALifeItem)]; }
-
 void CSE_ALifeItemNightVisionDevice::script_register(lua_State* L){ module(L)[luabind_class_item1(CSE_ALifeItemNightVisionDevice, "cse_alife_item_night_vision_device", CSE_ALifeItem)]; }
-
 void CSE_ALifeItemVest::script_register(lua_State* L) { module(L)[luabind_class_item1(CSE_ALifeItemVest, "cse_alife_item_vest", CSE_ALifeItem)]; }
-
-void CSE_ALifeItemPowerBattery::script_register(lua_State* L) { module(L)[luabind_class_item1(CSE_ALifeItemPowerBattery, "cse_alife_item_power_battery", CSE_ALifeItem)]; }
+void CSE_ALifeItemGasMask::script_register(lua_State* L) { module(L)[luabind_class_item1(CSE_ALifeItemGasMask, "cse_alife_item_gas_mask", CSE_ALifeItem)]; }

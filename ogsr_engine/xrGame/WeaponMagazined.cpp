@@ -965,45 +965,39 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 
     if (pScope && m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) == 0)
     {
-        auto it = std::find(m_scopes.begin(), m_scopes.end(), pIItem->object().cNameSect());
-        m_cur_scope = (u8)std::distance(m_scopes.begin(), it);
+        m_cur_scope = (u8)std::distance(m_scopes.begin(), std::find(m_scopes.begin(), m_scopes.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonScope;
         result = true;
         m_fAttachedScopeCondition = pIItem->GetCondition();
     }
     else if (pSilencer && m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) == 0)
     {
-        auto it = std::find(m_silencers.begin(), m_silencers.end(), pIItem->object().cNameSect());
-        m_cur_silencer = (u8)std::distance(m_silencers.begin(), it);
+        m_cur_silencer = (u8)std::distance(m_silencers.begin(), std::find(m_silencers.begin(), m_silencers.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonSilencer;
         result = true;
         m_fAttachedSilencerCondition = pIItem->GetCondition();
     }
     else if (pLaser && m_eLaserStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonLaser) == 0)
     {
-        auto it = std::find(m_lasers.begin(), m_lasers.end(), pIItem->object().cNameSect());
-        m_cur_laser = (u8)std::distance(m_lasers.begin(), it);
+        m_cur_laser = (u8)std::distance(m_lasers.begin(), std::find(m_lasers.begin(), m_lasers.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonLaser;
         result = true;
     }
     else if (pFlashlight && m_eFlashlightStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) == 0)
     {
-        auto it = std::find(m_flashlights.begin(), m_flashlights.end(), pIItem->object().cNameSect());
-        m_cur_flashlight = (u8)std::distance(m_flashlights.begin(), it);
+        m_cur_flashlight = (u8)std::distance(m_flashlights.begin(), std::find(m_flashlights.begin(), m_flashlights.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonFlashlight;
         result = true;
     }
     else if (pStock && m_eStockStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock) == 0)
     {
-        auto it = std::find(m_stocks.begin(), m_stocks.end(), pIItem->object().cNameSect());
-        m_cur_stock = (u8)std::distance(m_stocks.begin(), it);
+        m_cur_stock = (u8)std::distance(m_stocks.begin(), std::find(m_stocks.begin(), m_stocks.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonStock;
         result = true;
     }
     else if (pForend && m_eForendStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend) == 0)
     {
-        auto it = std::find(m_forends.begin(), m_forends.end(), pIItem->object().cNameSect());
-        m_cur_forend = (u8)std::distance(m_forends.begin(), it);
+        m_cur_forend = (u8)std::distance(m_forends.begin(), std::find(m_forends.begin(), m_forends.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonForend;
         result = true;
     }

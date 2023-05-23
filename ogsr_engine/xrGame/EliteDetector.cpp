@@ -259,7 +259,7 @@ void CUIArtefactDetectorElite::Draw()
         Fvector p = item.pos;
         Fvector pt3d;
         M.transform_tiny(pt3d, p);
-        float kz = wrk_sz.y / m_parent->m_fDetectRadius;
+        float kz = wrk_sz.y / m_parent->GetDetectionRadius();
         pt3d.x *= kz;
         pt3d.z *= kz;
 

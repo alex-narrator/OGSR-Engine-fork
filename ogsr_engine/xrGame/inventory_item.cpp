@@ -25,7 +25,6 @@
 #include "alife_registry_wrappers.h"
 #include "alife_simulator_header.h"
 #include "grenade.h"
-#include "PowerBattery.h"
 
 #ifdef DEBUG
 #include "debug_renderer.h"
@@ -167,6 +166,7 @@ void CInventoryItem::Load(LPCSTR section)
     m_fRadiationAccumLimit = READ_IF_EXISTS(pSettings, r_float, section, "radiation_accum_limit", 0.f);
     //
     m_fTTLOnDecrease = READ_IF_EXISTS(pSettings, r_float, section, "ttl_on_dec", 0.f);
+    m_fTTLOnWork = READ_IF_EXISTS(pSettings, r_float, section, "ttl_on_work", 0.f);
     // hands
     eHandDependence = EHandDependence(READ_IF_EXISTS(pSettings, r_u32, section, "hand_dependence", hdNone));
     m_bIsSingleHanded = READ_IF_EXISTS(pSettings, r_bool, section, "single_handed", TRUE);
@@ -190,6 +190,14 @@ void CInventoryItem::Load(LPCSTR section)
                 }
             }
         }
+    }
+
+    m_bRechargeable = READ_IF_EXISTS(pSettings, r_bool, section, "rechargeable", false);
+    //батарейка
+    if (m_power_source_status == ALife::ePowerSourceDisabled && pSettings->line_exist(section, "power_capacity"))
+    {
+        m_fPowerCapacity = pSettings->r_float(section, "power_capacity");
+        m_fPowerLevel = m_fPowerCapacity;
     }
 
     m_uSlotEnabled = READ_IF_EXISTS(pSettings, r_u32, section, "slot_enabled", NO_ACTIVE_SLOT);
@@ -378,9 +386,7 @@ bool CInventoryItem::CanAttach(PIItem pIItem)
     if (pActor && !pActor->HasRequiredTool(pIItem))
         return false;
 
-    auto pPowerBattery = smart_cast<CPowerBattery*>(pIItem);
-
-    if (pPowerBattery && !fis_zero(pPowerBattery->GetPowerLevel()) && IsPowerSourceAttachable() && !IsPowerSourceAttached() &&
+    if (pIItem && !fis_zero(pIItem->GetPowerLevel()) && IsPowerSourceAttachable() && !IsPowerSourceAttached() &&
         std::find(m_power_sources.begin(), m_power_sources.end(), pIItem->object().cNameSect()) != m_power_sources.end())
         return true;
     else
@@ -401,18 +407,15 @@ bool CInventoryItem::CanDetach(const char* item_section_name)
 
 bool CInventoryItem::Attach(PIItem pIItem, bool b_send_event)
 {
-    auto pPowerBattery = smart_cast<CPowerBattery*>(pIItem);
-
-    if (pPowerBattery && !!pPowerBattery->GetCondition() && IsPowerSourceAttachable() && !IsPowerSourceAttached())
+    if (!!pIItem->GetCondition() && IsPowerSourceAttachable() && !IsPowerSourceAttached())
     {
-        auto it = std::find(m_power_sources.begin(), m_power_sources.end(), pIItem->object().cNameSect());
-        m_cur_power_source = (u8)std::distance(m_power_sources.begin(), it);
+        m_cur_power_source = (u8)std::distance(m_power_sources.begin(), std::find(m_power_sources.begin(), m_power_sources.end(), pIItem->object().cNameSect()));
         m_bIsPowerSourceAttached = true;
         // Msg("%s m_bIsPowerSourceAttached = %s for item %s", __FUNCTION__, m_bIsPowerSourceAttached ? "true" : "false", Name());
 
         m_fPowerLevel = pIItem->m_fPowerLevel;
 
-        InitPowerSource();
+        InitAddons();
         Switch(true);
 
         if (b_send_event)
@@ -441,7 +444,7 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item, fl
             power_level = m_fPowerLevel;
         m_fPowerLevel = 0.f;
 
-        InitPowerSource();
+        InitAddons();
         Switch(false);
     }
 
@@ -523,7 +526,7 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
             //			Msg("%s attached power source %s power level %.f item %s", __FUNCTION__, GetPowerSourceName().c_str(), m_fPowerLevel, Name());
         }
     }
-    InitPowerSource();
+    InitAddons();
 
     return TRUE;
 }
@@ -878,7 +881,7 @@ void CInventoryItem::UpdateConditionDecrease()
         return;
     }
 
-    if (fis_zero(m_fTTLOnDecrease)/* || fis_zero(m_fCondition)*/)
+    if (fis_zero(m_fTTLOnDecrease))
         return;
 
     float delta_time{};
@@ -928,7 +931,7 @@ void CInventoryItem::UpdatePowerConsumption()
         return;
 
     float delta_time{};
-    float current_time = Level().GetGameDayTimeSec();
+    float current_time{Level().GetGameDayTimeSec()};
 
     if (current_time > m_fPowerConsumingUpdateTime)
         delta_time = current_time - m_fPowerConsumingUpdateTime;
@@ -994,7 +997,9 @@ void CInventoryItem::Recharge() { SetPowerLevel(m_fPowerCapacity); }
 
 bool CInventoryItem::CanBeCharged() const { return IsPowerConsumer() && IsPowerSourceAttached() && !fis_zero(GetCondition()) && m_fPowerLevel < m_fPowerCapacity; }
 
-void CInventoryItem::InitPowerSource()
+bool CInventoryItem::CanBeRecharged() const { return m_bRechargeable && !fis_zero(GetCondition()) && m_fPowerLevel < m_fPowerCapacity; }
+
+void CInventoryItem::InitAddons()
 {
     if (!IsPowerConsumer())
         return;

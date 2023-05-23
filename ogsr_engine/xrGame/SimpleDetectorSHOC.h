@@ -61,6 +61,8 @@ public:
     virtual void OnMoveToRuck(EItemPlace prevPlace) override;
     virtual void OnMoveToBelt(EItemPlace prevPlace) override;
 
+    virtual float GetDetectionRadius() const { return m_fRadius; };
+
 protected:
     void StopAllSounds();
     void UpdateMapLocations();

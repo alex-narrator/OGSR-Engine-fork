@@ -9,6 +9,7 @@
 #include "CustomOutfit.h"
 #include "InventoryContainer.h"
 #include "Helmet.h"
+#include "GasMask.h"
 #include "Vest.h"
 #include "ActorCondition.h"
 #include "../string_table.h"
@@ -109,12 +110,14 @@ void CUIOutfitInfo::Update()
 {
     string128 _buff;
 
-    auto outfit = Actor()->GetOutfit();
-    auto backpack = Actor()->GetBackpack();
-    auto helmet = Actor()->GetHelmet();
-    auto vest = Actor()->GetVest();
+    const auto actor = Actor();
+    auto outfit = actor->GetOutfit();
+    auto backpack = actor->GetBackpack();
+    auto helmet = actor->GetHelmet();
+    auto vest = actor->GetVest();
+    auto gasmask = actor->GetGasMask();
 
-    auto& cond = Actor()->conditions();
+    auto& cond = actor->conditions();
 
     m_listWnd->Clear(false); // clear existing items and do not scroll to top
 
@@ -142,6 +145,8 @@ void CUIOutfitInfo::Update()
                     _val += backpack->GetItemEffect(i);
                 if (helmet)
                     _val += helmet->GetItemEffect(i);
+                if (gasmask)
+                    _val += gasmask->GetItemEffect(i);
             }
         }
         else
@@ -157,6 +162,8 @@ void CUIOutfitInfo::Update()
             //    _val += backpack->GetHitTypeProtection(i - _hit_type_protection_index);
             if (helmet)
                 _val += helmet->GetHitTypeProtection(i - _hit_type_protection_index);
+            if (gasmask)
+                _val += gasmask->GetHitTypeProtection(i - _hit_type_protection_index);
         }
 
         if (fis_zero(_val) && fis_zero(_val_boost))

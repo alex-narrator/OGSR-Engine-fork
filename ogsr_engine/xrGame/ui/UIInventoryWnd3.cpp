@@ -7,7 +7,6 @@
 #include "BottleItem.h"
 #include "WeaponMagazined.h"
 #include "WeaponMagazinedWGrenade.h"
-#include "PowerBattery.h"
 #include "inventory.h"
 #include "game_base.h"
 #include "game_cl_base.h"
@@ -18,6 +17,7 @@
 #include "Vest.h"
 #include "InventoryContainer.h"
 #include "Warbelt.h"
+#include "GasMask.h"
 #include "string_table.h"
 #include <regex>
 
@@ -42,6 +42,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
     auto pContainer = smart_cast<CInventoryContainer*>(CurrentIItem());
     auto pWarbelt = smart_cast<CWarbelt*>(CurrentIItem());
     auto pVest = smart_cast<CVest*>(CurrentIItem());
+    auto pGasmask = smart_cast<CGasMask*>(CurrentIItem());
     auto pWeapon = smart_cast<CWeapon*>(CurrentIItem());
     auto pAmmo = smart_cast<CWeaponAmmo*>(CurrentIItem());
 
@@ -118,6 +119,15 @@ void CUIInventoryWnd::ActivatePropertiesBox()
     if (pVest && pVest->IsPlateInstalled() && pVest->CanDetach(pVest->GetPlateName().c_str()))
     {
         _addon_sect = pVest->GetPlateName().c_str();
+        _addon_name = pSettings->r_string(_addon_sect, "inv_name_short");
+        sprintf(temp, "%s%s %s", _many, CStringTable().translate(detach_tip).c_str(), CStringTable().translate(_addon_name).c_str());
+        UIPropertiesBox.AddItem(temp, (void*)_addon_sect, INVENTORY_DETACH_ADDON);
+        b_show = true;
+    }
+
+    if (pGasmask && pGasmask->IsFilterInstalled() && pGasmask->CanDetach(pGasmask->GetFilterName().c_str()))
+    {
+        _addon_sect = pGasmask->GetFilterName().c_str();
         _addon_name = pSettings->r_string(_addon_sect, "inv_name_short");
         sprintf(temp, "%s%s %s", _many, CStringTable().translate(detach_tip).c_str(), CStringTable().translate(_addon_name).c_str());
         UIPropertiesBox.AddItem(temp, (void*)_addon_sect, INVENTORY_DETACH_ADDON);

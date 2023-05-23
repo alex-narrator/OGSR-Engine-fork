@@ -449,6 +449,26 @@ bool CScriptGameObject::IsPowerSourceAttached() const
     }
     return (inventory_item->IsPowerSourceAttached());
 }
+bool CScriptGameObject::CanBeCharged() const
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
+    if (!inventory_item)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member CanBeCharged!");
+        return (false);
+    }
+    return (inventory_item->CanBeCharged());
+}
+bool CScriptGameObject::CanBeRecharged() const
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
+    if (!inventory_item)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member CanBeRecharged!");
+        return (false);
+    }
+    return (inventory_item->CanBeRecharged());
+}
 float CScriptGameObject::GetPowerLevel() const
 {
     CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());

@@ -6,6 +6,7 @@
 #include "Artifact.h"
 #include "Warbelt.h"
 #include "Vest.h"
+#include "GasMask.h"
 #include "InventoryContainer.h"
 
 class CUIInventoryCellItem : public CUICellItem
@@ -97,6 +98,21 @@ public:
     CUIArtefactCellItem(CArtefact* itm);
     virtual bool EqualTo(CUICellItem* itm);
     CArtefact* object() { return (CArtefact*)m_pData; }
+};
+
+class CUIGasMaskCellItem : public CUIInventoryCellItem
+{
+    typedef CUIInventoryCellItem inherited;
+
+protected:
+    CUIStatic* m_filter{};
+    CUIStatic* CreateFilterIcon();
+
+public:
+    CUIGasMaskCellItem(CGasMask* itm);
+    virtual void Update();
+    CGasMask* object() { return (CGasMask*)m_pData; }
+    virtual bool EqualTo(CUICellItem* itm);
 };
 
 class CUIAmmoCellItem : public CUIInventoryCellItem

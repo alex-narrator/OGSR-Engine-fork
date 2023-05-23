@@ -25,7 +25,6 @@ public:
     virtual void OnMoveToRuck(EItemPlace prevPlace);
 
     virtual void DrawHUDMask();
-
     bool HasVisor() const { return m_b_has_visor; };
 
 private:

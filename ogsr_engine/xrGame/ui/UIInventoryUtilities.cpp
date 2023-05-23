@@ -3,6 +3,7 @@
 #include "WeaponAmmo.h"
 #include "Weapon.h"
 #include "WeaponRPG7.h"
+#include "GasMask.h"
 #include "UIStaticItem.h"
 #include "UIStatic.h"
 #include "eatable_item.h"
@@ -42,11 +43,7 @@ void InventoryUtilities::DestroyShaders() { g_EquipmentIconsShaders.clear(); }
 
 bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
 {
-    Ivector2 r1, r2;
-    r1.x = item1->GetGridWidth();
-    r1.y = item1->GetGridHeight();
-    r2.x = item2->GetGridWidth();
-    r2.y = item2->GetGridHeight();
+    Ivector2 r1{item1->GetGridWidth(), item1->GetGridHeight()}, r2{item2->GetGridWidth(), item2->GetGridHeight()};
 
     if (r1.x > r2.x)
         return true;
@@ -58,22 +55,41 @@ bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
 
         if (r1.y == r2.y)
         {
-            if (!xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()))
+            auto item1ClassName = typeid(*item1).name();
+            auto item2ClassName = typeid(*item2).name();
+
+            int s = xr_strcmp(item1ClassName, item2ClassName);
+
+            if (s == 0)
             {
-                const auto* ammo1 = smart_cast<CWeaponAmmo*>(item1);
-                const auto* ammo2 = smart_cast<CWeaponAmmo*>(item2);
-                if (ammo1 && ammo2)
+                const CLASS_ID class1 = TEXT2CLSID(pSettings->r_string(item1->object().cNameSect(), "class"));
+                const CLASS_ID class2 = TEXT2CLSID(pSettings->r_string(item2->object().cNameSect(), "class"));
+
+                if (class1 == class2)
                 {
-                    if (ammo1->m_boxCurr == ammo2->m_boxCurr)
-                        return (item1->object().ID() < item2->object().ID());
-                    return (ammo1->m_boxCurr > ammo2->m_boxCurr);
+                    const auto* ammo1 = smart_cast<CWeaponAmmo*>(item1);
+                    const auto* ammo2 = smart_cast<CWeaponAmmo*>(item2);
+
+                    if (ammo1 && ammo2)
+                    {
+                        if (ammo1->m_boxCurr == ammo2->m_boxCurr)
+                            return xr_strcmp(item1->Name(), item2->Name()) < 0;
+
+                        return (ammo1->m_boxCurr > ammo2->m_boxCurr);
+                    }
+
+                    if (fsimilar(item1->GetCondition(), item2->GetCondition(), 0.01f))
+                        return xr_strcmp(item1->Name(), item2->Name()) < 0;
+
+                    return (item1->GetCondition() > item2->GetCondition());
                 }
-                if (fsimilar(item1->GetCondition(), item2->GetCondition(), 0.01f))
-                    return (item1->object().ID() < item2->object().ID());
-                return (item1->GetCondition() > item2->GetCondition());
+                else
+                    return class1 < class2;
             }
             else
-                return xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()) < 0;
+            {
+                return s < 0;
+            }
         }
 
         return false;
@@ -708,6 +724,30 @@ void AttachAmmoIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
     ammo_icon->SetColor(color_rgba(255, 255, 255, 192));
     _main_icon->AttachChild(ammo_icon);
 }
+void AttachFilterIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
+{
+    auto gasmask = smart_cast<CGasMask*>(_item);
+    CUIStatic* filter_icon = xr_new<CUIStatic>();
+    filter_icon->SetAutoDelete(true);
+
+    CIconParams params(gasmask->GetFilterName());
+    Frect rect = params.original_rect();
+    params.set_shader(filter_icon);
+
+    float k_x{UI()->get_current_kx()};
+
+    Fvector2 size{rect.width(), rect.height()};
+    size.mul(_scale * gasmask->filter_icon_scale);
+    size.x *= k_x;
+
+    Fvector2 pos{gasmask->filter_icon_ofset};
+    pos.mul(_scale);
+    pos.x *= k_x;
+
+    filter_icon->SetWndRect(pos.x, pos.y, size.x, size.y);
+    filter_icon->SetColor(color_rgba(255, 255, 255, 192));
+    _main_icon->AttachChild(filter_icon);
+}
 
 void InventoryUtilities::TryAttachIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
 {
@@ -725,6 +765,11 @@ void InventoryUtilities::TryAttachIcons(CUIStatic* _main_icon, PIItem _item, flo
     if (auto ammo = smart_cast<CWeaponAmmo*>(_item); ammo && ammo->IsBoxReloadable() && ammo->Useful())
     {
         AttachAmmoIcon(_main_icon, _item, _scale);
+        return;
+    }
+    if (auto gasmask = smart_cast<CGasMask*>(_item); gasmask && gasmask->IsFilterInstalled())
+    {
+        AttachFilterIcon(_main_icon, _item, _scale);
         return;
     }
 }
