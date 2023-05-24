@@ -266,7 +266,7 @@ bool CInventory::DropItem(CGameObject* pObj)
 
     pIItem->m_pCurrentInventory = nullptr;
 
-    m_pOwner->OnItemDrop(pIItem);
+    m_pOwner->OnItemDrop(pIItem, pIItem->m_eItemPlace);
 
     CalcTotalWeight();
     InvalidateState();

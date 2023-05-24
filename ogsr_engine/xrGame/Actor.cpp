@@ -1370,7 +1370,7 @@ float CActor::Radius() const
 bool CActor::use_bolts() const { return CInventoryOwner::use_bolts(); };
 
 void CActor::OnItemTake(CInventoryItem* inventory_item) { CInventoryOwner::OnItemTake(inventory_item); }
-void CActor::OnItemDrop(CInventoryItem* inventory_item) { CInventoryOwner::OnItemDrop(inventory_item); }
+void CActor::OnItemDrop(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemDrop(inventory_item, previous_place); }
 void CActor::OnItemDropUpdate()
 {
     CInventoryOwner::OnItemDropUpdate();

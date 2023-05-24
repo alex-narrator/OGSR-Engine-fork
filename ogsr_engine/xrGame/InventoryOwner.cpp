@@ -417,11 +417,11 @@ void CInventoryOwner::SetReputation(CHARACTER_REPUTATION_VALUE reputation)
 
 void CInventoryOwner::ChangeReputation(CHARACTER_REPUTATION_VALUE delta) { SetReputation(Reputation() + delta); }
 
-void CInventoryOwner::OnItemDrop(CInventoryItem* inventory_item)
+void CInventoryOwner::OnItemDrop(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
-    object->callback(GameObject::eOnItemDrop)(inventory_item->object().lua_game_object());
+    object->callback(GameObject::eOnItemDrop)(inventory_item->object().lua_game_object(), previous_place);
 
     detach(inventory_item);
 }
@@ -432,28 +432,28 @@ void CInventoryOwner::OnItemBelt(CInventoryItem* inventory_item, EItemPlace prev
 {
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
-    object->callback(GameObject::eOnItemToBelt)(inventory_item->object().lua_game_object());
+    object->callback(GameObject::eOnItemToBelt)(inventory_item->object().lua_game_object(), previous_place);
     attach(inventory_item);
 }
 void CInventoryOwner::OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
-    object->callback(GameObject::eOnItemToRuck)(inventory_item->object().lua_game_object());
+    object->callback(GameObject::eOnItemToRuck)(inventory_item->object().lua_game_object(), previous_place);
     detach(inventory_item);
 }
 void CInventoryOwner::OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
-    object->callback(GameObject::eOnItemToSlot)(inventory_item->object().lua_game_object());
+    object->callback(GameObject::eOnItemToSlot)(inventory_item->object().lua_game_object(), previous_place);
     attach(inventory_item);
 }
 void CInventoryOwner::OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
-    object->callback(GameObject::eOnItemToVest)(inventory_item->object().lua_game_object());
+    object->callback(GameObject::eOnItemToVest)(inventory_item->object().lua_game_object(), previous_place);
     attach(inventory_item);
 }
 

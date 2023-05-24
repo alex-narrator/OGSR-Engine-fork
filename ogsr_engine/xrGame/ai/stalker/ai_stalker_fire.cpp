@@ -307,9 +307,9 @@ void CAI_Stalker::OnItemTake(CInventoryItem* inventory_item)
     m_sell_info_actuality = false;
 }
 
-void CAI_Stalker::OnItemDrop(CInventoryItem* inventory_item)
+void CAI_Stalker::OnItemDrop(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
-    CObjectHandler::OnItemDrop(inventory_item);
+    CObjectHandler::OnItemDrop(inventory_item, previous_place);
 
     m_item_actuality = false;
     m_sell_info_actuality = false;

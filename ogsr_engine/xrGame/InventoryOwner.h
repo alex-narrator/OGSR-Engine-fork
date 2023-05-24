@@ -204,7 +204,7 @@ public:
     virtual void OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place);
     virtual void OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place);
 
-    virtual void OnItemDrop(CInventoryItem* inventory_item);
+    virtual void OnItemDrop(CInventoryItem* inventory_item, EItemPlace previous_place);
 
     virtual void OnItemDropUpdate();
     virtual bool use_bolts() const { return (true); }

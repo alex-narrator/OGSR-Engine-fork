@@ -100,9 +100,9 @@ void CObjectHandler::OnItemTake(CInventoryItem* inventory_item)
                                                              weapon->camDispertionFrac);
 }
 
-void CObjectHandler::OnItemDrop(CInventoryItem* inventory_item)
+void CObjectHandler::OnItemDrop(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
-    inherited::OnItemDrop(inventory_item);
+    inherited::OnItemDrop(inventory_item, previous_place);
 
     m_inventory_actual = false;
 
