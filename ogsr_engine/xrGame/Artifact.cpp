@@ -17,6 +17,10 @@
 #include "actor.h"
 #include "patrol_path_storage.h"
 
+#include "game_object_space.h"
+#include "script_callback_ex.h"
+#include "script_game_object.h"
+
 constexpr auto FASTMODE_DISTANCE = (50.f); // distance to camera from sphere, when zone switches to fast update sequence;
 
 #define CHOOSE_MAX(x, inst_x, y, inst_y, z, inst_z) \
@@ -306,6 +310,7 @@ void CArtefact::ActivateArtefact()
     VERIFY(H_Parent());
     m_activationObj = xr_new<SArtefactActivation>(this, H_Parent()->ID());
     m_activationObj->Start();
+    Actor()->callback(GameObject::eUseObject)(lua_game_object());
 }
 
 void CArtefact::PhDataUpdate(dReal step)

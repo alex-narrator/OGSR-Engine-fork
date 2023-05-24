@@ -85,6 +85,7 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .def("set_condition", &CScriptGameObject::SetCondition)
         //
         .def("is_power_consumer", &CScriptGameObject::IsPowerConsumer)
+        .def("is_power_on", &CScriptGameObject::IsPowerOn)
         .def("is_power_source_attached", &CScriptGameObject::IsPowerSourceAttached)
         .def("can_be_charged", &CScriptGameObject::CanBeCharged)
         .def("can_be_recharged", &CScriptGameObject::CanBeRecharged)

@@ -177,6 +177,7 @@ public:
     void SetCondition(float val);
     //
     bool IsPowerConsumer() const;
+    bool IsPowerOn() const;
     bool IsPowerSourceAttached() const;
     bool CanBeCharged() const;
     bool CanBeRecharged() const;

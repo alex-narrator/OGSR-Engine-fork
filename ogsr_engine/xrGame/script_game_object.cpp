@@ -434,6 +434,16 @@ bool CScriptGameObject::IsPowerConsumer() const
     }
     return (inventory_item->IsPowerConsumer());
 }
+bool CScriptGameObject::IsPowerOn() const
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
+    if (!inventory_item)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member IsPowerOn!");
+        return (false);
+    }
+    return (inventory_item->IsPowerOn());
+}
 bool CScriptGameObject::IsPowerSourceAttached() const
 {
     CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());

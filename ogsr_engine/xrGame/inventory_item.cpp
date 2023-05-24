@@ -26,9 +26,17 @@
 #include "alife_simulator_header.h"
 #include "grenade.h"
 
+#include "game_object_space.h"
+#include "script_callback_ex.h"
+#include "script_game_object.h"
+
 #ifdef DEBUG
 #include "debug_renderer.h"
 #endif
+
+//час оновлення декрементів у ігрових секундах
+constexpr auto CONDITION_DECREASE_UPDATE_TIME = 1.f;
+constexpr auto POWER_CONSUMING_UPDATE_TIME = 1.f;
 
 CInventoryItem::CInventoryItem()
 {
@@ -982,6 +990,8 @@ void CInventoryItem::Switch(bool turn_on)
     if (!IsPowerConsumer())
         return;
     m_uLastPowerConsumingUpdateTime = Level().GetGameTime();
+    if (smart_cast<CActor*>(object().H_Parent()))
+        Actor()->callback(GameObject::ePowerSwitch)(object().lua_game_object());
 }
 
 void CInventoryItem::Recharge() { SetPowerLevel(m_fPowerCapacity); }

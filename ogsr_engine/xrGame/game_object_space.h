@@ -104,6 +104,8 @@ enum ECallbackType
     eBoosterEnable,
     eBoosterDisable,
 
+    ePowerSwitch,
+
     eDummy = u32(-1),
 };
 };

@@ -4,6 +4,9 @@
 #include "Inventory.h"
 #include "xrserver_objects_alife_items.h"
 
+//час оновлення декременту у ігрових секундах
+constexpr auto FILTER_DECREASE_UPDATE_TIME = 1.f;
+
 CGasMask::CGasMask() 
 { 
     SetSlot(GASMASK_SLOT); 
@@ -232,7 +235,7 @@ void CGasMask::UpdateFilterDecrease()
     if (!actor || actor->GetGasMask() != this)
         return;
 
-    if (fis_zero(m_fTTLOnWork))
+    if (fis_zero(m_fTTLOnWork) || fis_zero(GetCondition()))
         return;
 
     if (m_bIsFilterInstalled && fis_zero(m_fInstalledFilterCondition))

@@ -80,6 +80,7 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("on_key_release", int(GameObject::eOnKeyRelease)), value("on_key_hold", int(GameObject::eOnKeyHold)),
                     value("on_mouse_wheel", int(GameObject::eOnMouseWheel)), value("on_mouse_move", int(GameObject::eOnMouseMove)),
                     value("on_belt", int(GameObject::eOnItemToBelt)), value("on_ruck", int(GameObject::eOnItemToRuck)), value("on_slot", int(GameObject::eOnItemToSlot)),
+                    value("on_vest", int(GameObject::eOnItemToVest)), value("on_power_switch", int(GameObject::ePowerSwitch)),
                     value("on_before_use_item", int(GameObject::eOnBeforeUseItem)), value("entity_alive_before_hit", int(GameObject::entity_alive_before_hit)),
                     value("update_addons_visibility", int(GameObject::eOnUpdateAddonsVisibiility)),
                     value("update_hud_addons_visibility", int(GameObject::eOnUpdateHUDAddonsVisibiility)), value("on_addon_init", int(GameObject::eOnAddonInit)),
