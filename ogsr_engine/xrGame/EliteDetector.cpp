@@ -5,9 +5,7 @@
 #include "ui/UIStatic.h"
 #include "ui/ArtefactDetectorUI.h"
 
-constexpr const char* AF_SIGN = "af_sign";
-constexpr const char* ZONE_SIGN = "zone_sign";
-constexpr const char* CREATURE_SIGN = "creature_sign";
+constexpr const char* DEFAULT_SIGN = "default_sign";
 
 void CEliteDetector::CreateUI()
 {
@@ -29,8 +27,7 @@ void CEliteDetector::UpdateAf()
     for (auto& item : m_artefacts.m_ItemInfos)
     {
         auto pAf = item.first;
-        auto& ui_mark = item.second.curr_ref->ui_mark;
-        ui().RegisterItemToDraw(pAf->Position(), !!ui_mark ? ui_mark : AF_SIGN);
+        ui().RegisterItemToDraw(pAf->Position(), pAf->cNameSect());
         TryMakeArtefactVisible(pAf);
 
         float d = Position().distance_to(pAf->Position());
@@ -82,8 +79,7 @@ void CEliteDetector::UpdateZones()
 
         if (pZone->distance_to_center(this) <= m_fDetectRadius)
         {
-            auto& ui_mark = item.second.curr_ref->ui_mark;
-            ui().RegisterItemToDraw(pZone->Position(), !!ui_mark ? ui_mark : ZONE_SIGN);
+            ui().RegisterItemToDraw(pZone->Position(), pZone->cNameSect());
         }
 
         ITEM_INFO& zone_info = item.second;
@@ -195,8 +191,8 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
         else
         {
             CUIStatic* S = xr_new<CUIStatic>();
-            m_palette[AF_SIGN] = S;
-            CUIXmlInit::InitStatic(uiXml, AF_SIGN, 0, S);
+            m_palette[DEFAULT_SIGN] = S;
+            CUIXmlInit::InitStatic(uiXml, DEFAULT_SIGN, 0, S);
             S->SetAutoDelete(true);
             m_wrk_area->AttachChild(S);
             S->SetCustomDraw(true);
@@ -311,8 +307,8 @@ void CScientificDetector::UpdateWork()
     for (const auto& item : m_creatures.m_ItemInfos)
     {
         auto pCreature = item.first;
-        auto& ui_mark = item.second.curr_ref->ui_mark;
-        ui().RegisterItemToDraw(pCreature->Position(), !!ui_mark ? ui_mark : CREATURE_SIGN);
+        const auto species = pSettings->r_string(pCreature->cNameSect(), "species");
+        ui().RegisterItemToDraw(pCreature->Position(), species);
     }
 
     m_ui->update();

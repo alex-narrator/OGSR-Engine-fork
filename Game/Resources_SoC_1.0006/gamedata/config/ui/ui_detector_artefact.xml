@@ -6,12 +6,8 @@
       </auto_static>
     </wrk_area>
 
-    <palette id="af_sign" width="0.0045" height="0.005" stretch="1" alignment="c">
+    <palette id="default_sign" width="0.0045" height="0.005" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
-    </palette>
-	
-    <palette id="zone_sign" width="0.006" height="0.006" stretch="1" alignment="c">
-      <texture shader="hud\p3d">ui_inGame2_Detector_icon_gravity_big</texture>
     </palette>
 	
 	<palette id="zone_radiation" width="0.006" height="0.006" stretch="1" alignment="c">
@@ -26,7 +22,7 @@
       </auto_static>
     </wrk_area>
 	
-    <palette id="creature_sign" width="0.004" height="0.004" stretch="1" alignment="c">
+    <palette id="default_sign" width="0.004" height="0.004" stretch="1" alignment="c">
       <texture shader="hud\p3d">ui_temp_ad3_artefact</texture>
     </palette>	
 	
