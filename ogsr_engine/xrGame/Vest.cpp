@@ -65,7 +65,7 @@ float CVest::GetHitTypeProtection(int hit_type) const { return (hit_type == ALif
 float CVest::HitThruArmour(SHit* pHDS)
 {
     float hit_power = pHDS->power;
-    float BoneArmour = m_boneProtection->getBoneArmour(pHDS->boneID) * !fis_zero(GetCondition());
+    float BoneArmour = m_boneProtection->getBoneArmour(pHDS->boneID) * !fis_zero(GetCondition() * !fis_zero(m_fInstalledPlateCondition));
 
     Msg("%s %s take hit power [%.4f], hitted bone %s, bone armor [%.4f], hit AP [%.4f]", __FUNCTION__, Name(), hit_power,
         smart_cast<IKinematics*>(smart_cast<CActor*>(m_pCurrentInventory->GetOwner())->Visual())->LL_BoneName_dbg(pHDS->boneID), BoneArmour, pHDS->ap);
@@ -89,7 +89,7 @@ float CVest::GetPowerLoss()
     return m_fPowerLoss;
 };
 
-bool CVest::IsBoneArmored(u16 bone) const { return !fis_zero(m_boneProtection->getBoneArmour(bone) && !fis_zero(GetCondition())); }
+bool CVest::IsBoneArmored(u16 bone) const { return !fis_zero(m_boneProtection->getBoneArmour(bone) && !fis_zero(m_fInstalledPlateCondition) && !fis_zero(GetCondition())); }
 
 const shared_str CVest::CurrProtectSect() const { return IsPlateInstalled() ? GetPlateName() : cNameSect(); }
 
@@ -105,6 +105,8 @@ void CVest::InitAddons()
                 m_boneProtection->reload(pSettings->r_string(CurrProtectSect(), "bones_koeff_protection"), smart_cast<IKinematics*>(pActor->Visual()));
         }
     }
+    if (IsPlateInstalled())
+        m_fPowerLoss *= READ_IF_EXISTS(pSettings, r_float, GetPlateName(), "power_loss", 1.f);
     inherited::InitAddons();
 }
 
@@ -147,7 +149,7 @@ bool CVest::Attach(PIItem pIItem, bool b_send_event)
         m_cur_plate = (u8)std::distance(m_plates.begin(), std::find(m_plates.begin(), m_plates.end(), pIItem->object().cNameSect()));
         m_bIsPlateInstalled = true;
         result = true;
-        SetCondition(pIItem->GetCondition());
+        m_fInstalledPlateCondition = pIItem->GetCondition();
     }
 
     if (result)
@@ -166,13 +168,11 @@ bool CVest::Detach(const char* item_section_name, bool b_spawn_item, float item_
     if (m_bIsPlateInstalled && std::find(m_plates.begin(), m_plates.end(), item_section_name) != m_plates.end())
     {
         m_bIsPlateInstalled = false;
-        //
         m_cur_plate = 0;
-        b_spawn_item = !fis_zero(GetCondition());
+        b_spawn_item = !fis_zero(m_fInstalledPlateCondition);
         if (b_spawn_item)
-            item_condition = GetCondition();
-        SetCondition(b_spawn_item);
-        //
+            item_condition = m_fInstalledPlateCondition;
+        m_fInstalledPlateCondition = 1.f;
         InitAddons();
     }
 
@@ -185,6 +185,7 @@ BOOL CVest::net_Spawn(CSE_Abstract* DC)
     const auto sobj_vest = smart_cast<CSE_ALifeItemVest*>(DC);
     m_bIsPlateInstalled = sobj_vest->m_bIsPlateInstalled;
     m_cur_plate = sobj_vest->m_cur_plate;
+    m_fInstalledPlateCondition = sobj_vest->m_fInstalledPlateCondition;
     InitAddons();
     return bRes;
 }
@@ -214,7 +215,7 @@ float CVest::GetArmorByBone(int bone_idx)
         if (bone_params)
         {
             string128 tmp;
-            armor_class = atof(_GetItem(bone_params, 1, tmp)) * !fis_zero(GetCondition());
+            armor_class = atof(_GetItem(bone_params, 1, tmp)) * !fis_zero(GetCondition() * !fis_zero(m_fInstalledPlateCondition));
         }
     }
     return armor_class;
@@ -249,4 +250,45 @@ float CVest::Weight() const
         res += pSettings->r_float(GetPlateName(), "inv_weight");
     }
     return res;
+}
+
+void CVest::Hit(SHit* pHDS)
+{
+    inherited::Hit(pHDS);
+    auto actor = smart_cast<CActor*>(H_Parent());
+    if (actor && actor->GetVest() == this && !actor->is_from_behind(pHDS->direction()))
+        HitItemsInVest(pHDS);
+    if (IsPlateInstalled() && pHDS->type() != ALife::eHitTypeRadiation)
+    {
+        float hit_power = pHDS->damage();
+        hit_power *= m_HitTypeK[pHDS->hit_type];
+        m_fInstalledPlateCondition -= hit_power;
+    }
+}
+
+void CVest::HitItemsInVest(SHit* pHDS)
+{
+    TIItemContainer vest = m_pCurrentInventory->m_vest;
+    if (vest.empty())
+        return;
+
+    switch (pHDS->type())
+    {
+    case ALife::eHitTypeFireWound:
+    case ALife::eHitTypeWound:
+    case ALife::eHitTypeWound_2: {
+        u32 random_item = ::Random.randI(0, vest.size());
+        auto item = vest[random_item];
+        if (item)
+            item->Hit(pHDS);
+    }
+    break;
+    default: {
+        pHDS->power *= (1.0f - GetHitTypeProtection(pHDS->type()));
+        for (const auto& item : vest)
+            item->Hit(pHDS);
+    }
+    break;
+    }
+    Msg("~ %s", __FUNCTION__);
 }

@@ -495,6 +495,7 @@ void CActor::Hit(SHit* pHDS)
     {
         HDS.power *= (1.f - GetArtefactsProtection(pHDS->hit_type));
         inherited::Hit(&HDS);
+        HitToEquipment(&HDS);
     }
 }
 
@@ -1758,6 +1759,28 @@ bool CActor::IsHitToVest(SHit* pHDS) const
     }
     break;
     default: return true;
+    }
+}
+
+bool CActor::IsHitToWarbelt(SHit* pHDS) const
+{ 
+    auto pK = smart_cast<IKinematics*>(Visual()); 
+    return GetWarbelt() && pHDS->bone() == pK->LL_BoneID("bip01_pelvis");
+}
+
+void CActor::HitToEquipment(SHit* pHDS)
+{ 
+    if (!smart_cast<CCustomZone*>(pHDS->who))
+        return;
+    for (const auto& slot : inventory().m_slots)
+    {
+        auto item = slot.m_pIItem;
+        if (!item)
+            continue;
+        if (item == GetOutfit() || item == GetWarbelt() || item == GetBackpack() || item == GetHelmet() || item == GetGasMask() || item == GetVest())
+            continue;
+        item->Hit(pHDS);
+        Msg("~ %s", __FUNCTION__);
     }
 }
 

@@ -804,6 +804,7 @@ public:
     virtual bool IsHitToBackPack(SHit* pHDS) const;
     virtual bool IsHitToHead(SHit* pHDS) const;
     virtual bool IsHitToVest(SHit* pHDS) const;
+    virtual bool IsHitToWarbelt(SHit* pHDS) const;
 
     bool HasDetectorWorkable();
     bool HasPDAWorkable();
@@ -823,6 +824,7 @@ public:
 
     virtual bool HasRequiredTool(PIItem);
     virtual bool HasRequiredTool(const shared_str&);
+    void HitToEquipment(SHit* pHDS);
 
 protected:
     bool m_bIsHardHold{};

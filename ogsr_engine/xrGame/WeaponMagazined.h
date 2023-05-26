@@ -253,6 +253,7 @@ protected:
     float m_fAttachedGrenadeLauncherCondition{1.f};
     // для хранения состояния присоединённого глушителя
     float m_fAttachedSilencerCondition{1.f};
+    float m_fAttachedMagazineCondition{1.f};
     // износ самого глушителя при стрельбе
     virtual float GetSilencerDeterioration();
     virtual void DeteriorateSilencerAttachable(float);

@@ -133,6 +133,8 @@ BOOL CWeaponMagazined::net_Spawn(CSE_Abstract* DC)
         m_fAttachedScopeCondition = wpn->m_fAttachedScopeCondition;
     if (IsAddonAttached(eLauncher))
         m_fAttachedGrenadeLauncherCondition = wpn->m_fAttachedGrenadeLauncherCondition;
+    if (IsAddonAttached(eMagazine))
+        m_fAttachedMagazineCondition = wpn->m_fAttachedMagazineCondition;
     //
     return bRes;
 }
@@ -151,6 +153,7 @@ void CWeaponMagazined::net_Export(CSE_Abstract* E)
     wpn->m_fAttachedSilencerCondition = m_fAttachedSilencerCondition;
     wpn->m_fAttachedScopeCondition = m_fAttachedScopeCondition;
     wpn->m_fAttachedGrenadeLauncherCondition = m_fAttachedGrenadeLauncherCondition;
+    wpn->m_fAttachedMagazineCondition = m_fAttachedMagazineCondition;
 }
 
 void CWeaponMagazined::save(NET_Packet& output_packet)
@@ -434,6 +437,7 @@ void CWeaponMagazined::ReloadMagazine()
             (u8)std::distance(m_magazines.begin(), std::find(m_magazines.begin(), m_magazines.end(), m_pAmmo->cNameSect())) : 
             0;
         SetMagazineAttached(b_attaching_magazine);
+        m_fAttachedMagazineCondition = b_attaching_magazine ? m_pAmmo->GetCondition() : 1.f;
     }
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
@@ -1929,6 +1933,7 @@ void CWeaponMagazined::UnloadAmmo(int unload_count, bool spawn_ammo, bool detach
 
         iMagazineSize = HasChamber();
         SetMagazineAttached(false);
+        m_fAttachedMagazineCondition = 1.f;
     }
 
     xr_map<LPCSTR, u16> l_ammo;
@@ -2126,8 +2131,8 @@ float CWeaponMagazined::GetConditionMisfireProbability() const
     // вероятность осечки от магазина
     if (AddonAttachable(eMagazine) && IsAddonAttached(eMagazine))
     {
-        float mag_missfire_prob = READ_IF_EXISTS(pSettings, r_float, GetAddonName(eMagazine), "misfire_probability_box", 0.0f);
-        mis += mag_missfire_prob;
+        mis += READ_IF_EXISTS(pSettings, r_float, GetAddonName(eMagazine), "misfire_probability_box", 0.0f);
+        mis += (1.f - m_fAttachedMagazineCondition);
     }
     clamp(mis, 0.0f, 0.99f);
     return mis;

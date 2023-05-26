@@ -589,6 +589,7 @@ void CSE_ALifeItemWeaponMagazined::UPDATE_Read(NET_Packet& P)
         P.r_float_q8(m_fAttachedSilencerCondition, 0.f, 1.f);
         P.r_float_q8(m_fAttachedScopeCondition, 0.f, 1.f);
         P.r_float_q8(m_fAttachedGrenadeLauncherCondition, 0.f, 1.f);
+        P.r_float_q8(m_fAttachedMagazineCondition, 0.f, 1.f);
     }
 }
 void CSE_ALifeItemWeaponMagazined::UPDATE_Write(NET_Packet& P)
@@ -603,6 +604,7 @@ void CSE_ALifeItemWeaponMagazined::UPDATE_Write(NET_Packet& P)
     P.w_float_q8(m_fAttachedSilencerCondition, 0.f, 1.f);
     P.w_float_q8(m_fAttachedScopeCondition, 0.f, 1.f);
     P.w_float_q8(m_fAttachedGrenadeLauncherCondition, 0.f, 1.f);
+    P.w_float_q8(m_fAttachedMagazineCondition, 0.f, 1.f);
 }
 
 void CSE_ALifeItemWeaponMagazined::STATE_Read(NET_Packet& P, u16 size) { inherited::STATE_Read(P, size); }
@@ -1054,6 +1056,7 @@ void CSE_ALifeItemVest::UPDATE_Read(NET_Packet& tNetPacket)
         u8 _data = tNetPacket.r_u8();
         m_bIsPlateInstalled = !!(_data & 0x1);
         tNetPacket.r_u8(m_cur_plate);
+        tNetPacket.r_float_q8(m_fInstalledPlateCondition, 0.f, 1.f);
     }
 }
 void CSE_ALifeItemVest::UPDATE_Write(NET_Packet& tNetPacket)
@@ -1062,6 +1065,7 @@ void CSE_ALifeItemVest::UPDATE_Write(NET_Packet& tNetPacket)
 
     tNetPacket.w_u8(m_bIsPlateInstalled ? 1 : 0);
     tNetPacket.w_u8(m_cur_plate);
+    tNetPacket.w_float_q8(m_fInstalledPlateCondition, 0.f, 1.f);
 }
 
 ////////////////////////////////////////////////////////////////////////////

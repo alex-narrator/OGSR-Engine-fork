@@ -221,6 +221,7 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazined, CSE_ALifeItemWeapon)
 float m_fAttachedScopeCondition{1.f};
 float m_fAttachedGrenadeLauncherCondition{1.f};
 float m_fAttachedSilencerCondition{1.f};
+float m_fAttachedMagazineCondition{1.f};
 xr_vector<u8> m_AmmoIDs;
 //u8 m_cur_magazine{};
 CSE_ALifeItemWeaponMagazined(LPCSTR caSection);
@@ -375,6 +376,7 @@ add_to_type_list(CSE_ALifeItemEatable)
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemVest, CSE_ALifeItem) 
 bool m_bIsPlateInstalled{};
 u8 m_cur_plate{};
+float m_fInstalledPlateCondition{1.f};
 CSE_ALifeItemVest(LPCSTR caSection);
 virtual ~CSE_ALifeItemVest();
 SERVER_ENTITY_DECLARE_END

@@ -6,6 +6,7 @@
 #include "Helmet.h"
 #include "GasMask.h"
 #include "Vest.h"
+#include "Warbelt.h"
 #include "inventory.h"
 #include "wound.h"
 #include "level.h"
@@ -13,6 +14,7 @@
 #include "entity_alive.h"
 #include "../Include/xrRender/Kinematics.h"
 #include "object_broker.h"
+#include "CustomZone.h"
 
 constexpr auto MAX_HEALTH = 1.0f;
 constexpr auto MIN_HEALTH = -0.01f;
@@ -278,8 +280,9 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
     auto pGasMask = pInvOwner->GetGasMask();
     auto pVest = pInvOwner->GetVest();
     auto pBackPack = pInvOwner->GetBackpack();
+    auto pWarbelt = pInvOwner->GetWarbelt();
 
-    if (pHDS->hit_type == ALife::eHitTypeRadiation)
+    if (smart_cast<CCustomZone*>(pHDS->who))
     {
         if (pHelmet)
         {
@@ -300,6 +303,10 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
         {
             new_hit_power *= (1.0f - pVest->GetHitTypeProtection(pHDS->type()));
             pVest->Hit(pHDS);
+        }
+        if (pWarbelt)
+        {
+            pWarbelt->Hit(pHDS);
         }
         if (pOutfit)
         {
@@ -335,6 +342,8 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
     }
     else
     {
+        if (pWarbelt && pInvOwner->IsHitToWarbelt(pHDS))
+            pWarbelt->Hit(pHDS);
         if (pBackPack && pInvOwner->IsHitToBackPack(pHDS))
         {
             new_hit_power *= (1.0f - pBackPack->GetHitTypeProtection(pHDS->type()));

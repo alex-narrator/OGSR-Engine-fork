@@ -20,6 +20,8 @@ public:
 
     virtual u32 Cost() const;
     virtual float Weight() const;
+    virtual void Hit(SHit* pHDS);
+    void HitItemsInVest(SHit* pHDS);
 
     u32 GetVestWidth() const { return m_iVestWidth; }
     u32 GetVestHeight() const { return m_iVestHeight; }
@@ -57,4 +59,5 @@ private:
     float m_fPowerLoss{};
     SBoneProtections* m_boneProtection;
     bool m_bIsPlateInstalled{};
+    float m_fInstalledPlateCondition{1.f};
 };
