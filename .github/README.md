@@ -3,6 +3,8 @@
 
 на базі проекту OGSR [https://github.com/OGSR/OGSR-Engine]
 
+Рушій використовується у модифікації [https://github.com/alex-narrator/RMA_OGSR_custom]
+
 **Як зібрати рушій:**
 
 -Встановити актуальну версію Visual Studio 2022, достатньо базової конфігурації для розробки класичних додатків С++:
