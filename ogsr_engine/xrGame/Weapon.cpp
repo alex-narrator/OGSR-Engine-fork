@@ -951,7 +951,7 @@ void CWeapon::UpdateDofAim()
 { 
     if (!psActorFlags.test(AF_DOF_ZOOM_NEW))
         return;
-    if (GetState() != eIdle)
+    if (GetState() != eIdle && GetState() != eFire)
         return;
     if (IsZoomed() && UseScopeTexture() && !m_bForceScopeDOF)
     {
