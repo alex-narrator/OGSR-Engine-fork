@@ -813,7 +813,6 @@ public:
     void SetRuckAmmoPlacement(bool set_ruck) { m_bRuckAmmoPlacement = set_ruck; };
 
     void DrawHUDMasks();
-    void UpdateVisorEfects();
 
     void TryPlayAnimItemTake();
     void ActorCheckout();

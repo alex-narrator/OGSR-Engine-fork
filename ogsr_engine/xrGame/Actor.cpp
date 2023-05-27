@@ -1830,17 +1830,6 @@ void CActor::DrawHUDMasks()
     if (GetGasMask())
         GetGasMask()->DrawHUDMask();
 }
-#include "../xr_3da/XR_IOConsole.h"
-void CActor::UpdateVisorEfects()
-{
-    bool has_visor = GetOutfit() && GetOutfit()->HasVisor() || GetHelmet() && GetHelmet()->HasVisor() || GetGasMask() && GetGasMask()->HasVisor();
-    bool b_enable_effect = eacFirstEye == cam_active && g_Alive() && has_visor;
-    string128 _buff{};
-    sprintf(_buff, "r2_rain_drops_control %d", b_enable_effect);
-    Console->Execute(_buff);
-    sprintf(_buff, "r2_visor_refl_control %d", b_enable_effect);
-    Console->Execute(_buff);
-}
 
 void CActor::TryPlayAnimItemTake()
 {

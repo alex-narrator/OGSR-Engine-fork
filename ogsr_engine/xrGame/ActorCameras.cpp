@@ -31,7 +31,7 @@ void CActor::cam_Set(EActorCameras style)
     cam_active = style;
     old_cam->OnDeactivate();
     cam_Active()->OnActivate(old_cam);
-    UpdateVisorEfects();
+    //UpdateVisorEfects();
 }
 float CActor::f_Ladder_cam_limit = 1.f;
 void CActor::cam_SetLadder()

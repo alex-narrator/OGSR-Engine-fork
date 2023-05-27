@@ -101,8 +101,6 @@ void CCustomOutfit::OnMoveToSlot(EItemPlace prevPlace)
                 m_UIVisor = xr_new<CUIStaticItem>();
                 m_UIVisor->Init(m_VisorTexture.c_str(), Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
             }
-
-            pActor->UpdateVisorEfects();
         }
     }
 }
@@ -129,8 +127,6 @@ void CCustomOutfit::OnMoveToRuck(EItemPlace prevPlace)
 
             if (m_UIVisor)
                 xr_delete(m_UIVisor);
-
-            pActor->UpdateVisorEfects();
         }
     }
 }
