@@ -196,6 +196,10 @@ protected:
 
     TIItemContainer ruck_list;
     u32 m_iCurrentActiveSlot{NO_ACTIVE_SLOT};
+    
+    CUICellItem* itm_to_descr{};
+    u32 delay_time{}, delay{};
+    Fvector2 info_offset{};
 
 public:
     PIItem CurrentIItem();
@@ -205,4 +209,6 @@ public:
     void CheckForcedWeightUpdate();
     void ReinitVestList();
     void ReinitSlotList(u32);
+    void UpdateFloatingItemDescription();
+    void InitFloatingDescription(CUICellItem* itm);
 };

@@ -104,6 +104,7 @@ void InitConsole()
     CORE_FEATURE_SET(stop_anim_playing, "features");
     CORE_FEATURE_SET(use_luminocity, "features");
     CORE_FEATURE_SET(inventory_crouch, "features");
+    CORE_FEATURE_SET(floating_description_window, "features");
 }
 
 void InitInput() { pInput = xr_new<CInput>(); }

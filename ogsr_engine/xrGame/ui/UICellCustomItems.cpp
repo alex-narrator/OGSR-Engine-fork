@@ -11,6 +11,10 @@
 #include "Actor.h"
 #include "Inventory.h"
 #include "UIInventoryWnd.h"
+#include "UICarBodyWnd.h"
+#include "UITradeWnd.h"
+#include "UITalkWnd.h"
+#include "UIGameSP.h"
 #include "UICursor.h"
 #include "UIXmlInit.h"
 #include "string_table.h"
@@ -95,6 +99,13 @@ void CUIInventoryCellItem::OnFocusReceive()
         InvWnd->HideSlotsHighlight();
         InvWnd->ShowSlotsHighlight(object());
     }
+
+    if (auto InvWnd = smart_cast<CUIInventoryWnd*>(this->OwnerList()->GetTop()))
+        InvWnd->InitFloatingDescription(this);
+    if (auto CarbodyWnd = smart_cast<CUICarBodyWnd*>(this->OwnerList()->GetTop()))
+        CarbodyWnd->InitFloatingDescription(this);
+    if (auto TradeWnd = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame())->TalkMenu->GetTradeWnd())
+        TradeWnd->InitFloatingDescription(this);
 
     inherited::OnFocusReceive();
 

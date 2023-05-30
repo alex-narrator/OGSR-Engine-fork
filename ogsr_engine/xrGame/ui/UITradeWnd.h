@@ -43,6 +43,9 @@ public:
     void StartTrade();
     void StopTrade();
 
+    void UpdateFloatingItemDescription();
+    void InitFloatingDescription(CUICellItem* itm);
+
 protected:
     CUITradeInternal* m_uidata;
 
@@ -126,4 +129,8 @@ protected:
     ref_sound sounds[eInvSndMax];
     void PlaySnd(eInventorySndAction a);
     bool m_bShowAllInv{};
+
+    CUICellItem* itm_to_descr{};
+    u32 delay_time{}, delay{};
+    Fvector2 info_offset{};
 };

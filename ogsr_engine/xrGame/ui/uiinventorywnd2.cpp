@@ -30,7 +30,9 @@ void CUIInventoryWnd::SetCurrentItem(CUICellItem* itm)
     if (m_pCurrentCellItem == itm)
         return;
     m_pCurrentCellItem = itm;
-    UIItemInfo.InitItem(CurrentIItem());
+
+    if (!Core.Features.test(xrCore::Feature::floating_description_window))
+        UIItemInfo.InitItem(CurrentIItem());
 
     if (m_pCurrentCellItem)
     {

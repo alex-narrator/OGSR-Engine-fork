@@ -50,6 +50,9 @@ public:
     void TryActivateKnife();
     void RepackAmmo();
 
+    void UpdateFloatingItemDescription();
+    void InitFloatingDescription(CUICellItem* itm);
+
 protected:
     CInventoryOwner* m_pActorInventoryOwner{};
 
@@ -135,4 +138,8 @@ protected:
     bool CanMoveToOther(PIItem pItem, CGameObject* owner_to) const;
     void UpdateWeight();
     bool m_bShowAllInv{};
+
+    CUICellItem* itm_to_descr{};
+    u32 delay_time{}, delay{};
+    Fvector2 info_offset{};
 };
