@@ -217,7 +217,7 @@ void CUIWpnParams::SetInfo(CInventoryItem* obj)
     if (!pWeaponKnife && !pWeaponBinoc)
     {
         // сумісні набої - заголовок
-        _param_name = CStringTable().translate("st_compatible_ammo").c_str();
+        _param_name = CStringTable().translate("st_compatible_ammo_magazines").c_str();
         SetStaticParams(_uiXml, _path, _h)->SetText(_param_name);
         _h += list_item_h;
         // сумісні набої - список
@@ -241,14 +241,9 @@ void CUIWpnParams::SetInfo(CInventoryItem* obj)
                 _h += list_item_h;
             }
         }
-        // сумісні магазини
+        // сумісні магазини - список
         if (pWeapon->AddonAttachable(eMagazine))
         {
-            // сумісні магазини - заголовок
-            _param_name = CStringTable().translate("st_compatible_magazine").c_str();
-            SetStaticParams(_uiXml, _path, _h)->SetText(_param_name);
-            _h += list_item_h;
-            // сумісні магазини - список
             for (const auto& magazine : pWeapon->m_magazines)
             {
                 auto magazine_name = pSettings->r_string(magazine, "inv_name");
@@ -258,8 +253,13 @@ void CUIWpnParams::SetInfo(CInventoryItem* obj)
             }
         }
 
-        bool has_addon = pWeapon->AddonAttachable(eScope) || pWeapon->AddonAttachable(eSilencer) || pWeapon->AddonAttachable(eLauncher) || pWeapon->AddonAttachable(eLaser) ||
-            pWeapon->AddonAttachable(eFlashlight) || pWeapon->AddonAttachable(eStock) || pWeapon->AddonAttachable(eExtender);
+        bool has_addon{};
+        for (int i = 0; i < eMaxAddon; ++i)
+            if (pWeapon->AddonAttachable(i))
+            {
+                has_addon = true;
+                break;
+            }
 
         if (has_addon)
         {

@@ -526,8 +526,6 @@ void CUIInventoryWnd::Hide()
         actor->TryInventoryCrouch(false);
         actor->EnableInvEffector(false);
     }
-    if (Core.Features.test(xrCore::Feature::floating_description_window))
-        UIDescrWnd.Reset();
     HideSlotsHighlight();
 }
 
@@ -750,7 +748,7 @@ void CUIInventoryWnd::UpdateFloatingItemDescription()
     if (!Core.Features.test(xrCore::Feature::floating_description_window) || Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
         return;
     auto cur_time = Device.dwTimeGlobal;
-    UIDescrWnd.Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time);
+    UIDescrWnd.Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time && !UIPropertiesBox.IsShown());
     Fvector2 v_res{1024.f, 768.f};
     Fvector2 pos{GetUICursor()->GetCursorPosition()};
     pos.add(info_offset);

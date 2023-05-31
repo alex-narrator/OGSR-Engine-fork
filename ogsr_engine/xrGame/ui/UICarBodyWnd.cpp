@@ -301,8 +301,6 @@ void CUICarBodyWnd::Hide()
         actor->EnableInvEffector(false);
     }
     m_bShowAllInv = false;
-    if (Core.Features.test(xrCore::Feature::floating_description_window))
-        m_pUIDescWnd->Reset();
     PlaySnd(eInvSndClose);
 }
 
@@ -410,12 +408,15 @@ void CUICarBodyWnd::ActivatePropertiesBox()
         if (pAmmo->IsBoxReloadable())
         {
             // reload AmmoBox
+            bool is_full = pAmmo->m_boxCurr == pAmmo->m_boxSize;
             for (const auto& type : pAmmo->m_ammoTypes)
             {
                 if (inv->GetAmmoByLimit(type.c_str(), true))
                 {
-                    sprintf(temp, "%s%s %s", _many, CStringTable().translate("st_load_ammo_type").c_str(),
-                            CStringTable().translate(pSettings->r_string(type, "inv_name_short")).c_str());
+                    if (is_full && type == pAmmo->m_ammoSect)
+                        continue;
+                    auto _str = (type == pAmmo->m_ammoSect || !pAmmo->m_boxCurr) ? "st_load_ammo_type" : "st_reload_ammo_type";
+                    sprintf(temp, "%s%s %s", _many, CStringTable().translate(_str).c_str(), CStringTable().translate(pSettings->r_string(type, "inv_name_short")).c_str());
                     m_pUIPropertiesBox->AddItem(temp, (void*)type.c_str(), INVENTORY_RELOAD_AMMO_BOX);
                     b_show = true;
                 }
@@ -498,7 +499,7 @@ void CUICarBodyWnd::ActivatePropertiesBox()
         b_show = true;
     }
 
-    if (CheckMonsterAndKnife() || b_actor_inv)
+    if ((CheckMonsterAndKnife() || b_actor_inv) && !CurrentIItem()->IsQuestItem())
     {
         sprintf(temp, "%s%s", _many, CStringTable().translate("st_drop").c_str());
         m_pUIPropertiesBox->AddItem(temp, NULL, INVENTORY_DROP_ACTION);
@@ -715,6 +716,8 @@ void CUICarBodyWnd::SetCurrentItem(CUICellItem* itm)
     if (m_pCurrentCellItem == itm)
         return;
     m_pCurrentCellItem = itm;
+    if (!m_pCurrentCellItem)
+        itm_to_descr = nullptr;
     
     if (!Core.Features.test(xrCore::Feature::floating_description_window))
         m_pUIItemInfo->InitItem(CurrentIItem());
@@ -1114,7 +1117,7 @@ void CUICarBodyWnd::UpdateFloatingItemDescription()
     if (!Core.Features.test(xrCore::Feature::floating_description_window) || Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
         return;
     auto cur_time = Device.dwTimeGlobal;
-    m_pUIDescWnd->Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time);
+    m_pUIDescWnd->Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time && !m_pUIPropertiesBox->IsShown());
     Fvector2 v_res{1024.f, 768.f};
     Fvector2 pos{GetUICursor()->GetCursorPosition()};
     pos.add(info_offset);

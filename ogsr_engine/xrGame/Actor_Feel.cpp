@@ -11,7 +11,6 @@
 #include "../xr_3da/GameMtlLib.h"
 #include "ui/UIMainIngameWnd.h"
 #include "Grenade.h"
-#include "WeaponAmmo.h"
 #include "clsid_game.h"
 
 #include "game_cl_base.h"
@@ -32,9 +31,8 @@ void CActor::feel_touch_delete(CObject* O)
 BOOL CActor::feel_touch_contact(CObject* O)
 {
     CInventoryItem* item = smart_cast<CInventoryItem*>(O);
-    auto ammo = smart_cast<CWeaponAmmo*>(O);
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(O);
-    if (item && (item->Useful() || ammo && ammo->IsBoxReloadable()) && !item->object().H_Parent())
+    if (item && item->Useful() && !item->object().H_Parent())
         return TRUE;
 
     if (inventory_owner && inventory_owner != smart_cast<CInventoryOwner*>(this))
@@ -152,8 +150,7 @@ void CActor::PickupModeUpdate_COD()
 
     //подбирание объекта
     auto target = inventory().m_pTarget;
-    auto ammo = smart_cast<CWeaponAmmo*>(target);
-    if (target && (target->Useful() || ammo && ammo->IsBoxReloadable()) && m_pUsableObject && m_pUsableObject->nonscript_usable() &&
+    if (target && target->Useful() && m_pUsableObject && m_pUsableObject->nonscript_usable() &&
         !Level().m_feel_deny.is_object_denied(smart_cast<CGameObject*>(target)))
     {
         CInventoryItem* pNearestItem = inventory().m_pTarget;

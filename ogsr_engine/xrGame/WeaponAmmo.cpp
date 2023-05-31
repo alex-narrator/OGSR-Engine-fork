@@ -196,7 +196,7 @@ void CWeaponAmmo::OnH_B_Chield() { inherited::OnH_B_Chield(); }
 
 void CWeaponAmmo::OnH_B_Independent(bool just_before_destroy)
 {
-    if (!Useful() && !IsBoxReloadable())
+    if (!Useful())
     {
         if (Local())
         {
@@ -210,7 +210,7 @@ void CWeaponAmmo::OnH_B_Independent(bool just_before_destroy)
 bool CWeaponAmmo::Useful() const
 {
     // Если IItem еще не полностью использованый, вернуть true
-    return m_boxCurr/* || IsBoxReloadable()*/;
+    return m_boxCurr || IsBoxReloadable();
 }
 
 bool CWeaponAmmo::IsBoxReloadable() const { return !m_ammoTypes.empty() && cNameSect() != m_ammoSect; }

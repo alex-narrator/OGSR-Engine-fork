@@ -762,7 +762,7 @@ void InventoryUtilities::TryAttachIcons(CUIStatic* _main_icon, PIItem _item, flo
             AttachGrenadeIcon(_main_icon, _item, _scale);
         return;
     }
-    if (auto ammo = smart_cast<CWeaponAmmo*>(_item); ammo && ammo->IsBoxReloadable() && ammo->Useful())
+    if (auto ammo = smart_cast<CWeaponAmmo*>(_item); ammo && ammo->IsBoxReloadable() && ammo->m_boxCurr)
     {
         AttachAmmoIcon(_main_icon, _item, _scale);
         return;

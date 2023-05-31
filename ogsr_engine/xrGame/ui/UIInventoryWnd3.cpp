@@ -146,11 +146,15 @@ void CUIInventoryWnd::ActivatePropertiesBox()
     if (pAmmo && pAmmo->IsBoxReloadable())
     {
         // reload AmmoBox
+        bool is_full = pAmmo->m_boxCurr == pAmmo->m_boxSize;
         for (const auto& type : pAmmo->m_ammoTypes)
         {
             if (inv->GetAmmoByLimit(type.c_str(), true))
             {
-                sprintf(temp, "%s%s %s", _many, CStringTable().translate("st_load_ammo_type").c_str(),
+                if (is_full && type == pAmmo->m_ammoSect)
+                    continue;
+                auto _str = (type == pAmmo->m_ammoSect || !pAmmo->m_boxCurr) ? "st_load_ammo_type" : "st_reload_ammo_type";
+                sprintf(temp, "%s%s %s", _many, CStringTable().translate(_str).c_str(),
                         CStringTable().translate(pSettings->r_string(type, "inv_name_short")).c_str());
                 UIPropertiesBox.AddItem(temp, (void*)type.c_str(), INVENTORY_RELOAD_AMMO_BOX);
                 b_show = true;

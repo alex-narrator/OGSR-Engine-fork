@@ -433,9 +433,7 @@ void CWeaponMagazined::ReloadMagazine()
         int mag_size = b_attaching_magazine ? m_pAmmo->m_boxSize : 0;
 
         iMagazineSize = mag_size + HasChamber();
-        m_cur_magazine = b_attaching_magazine ? 
-            (u8)std::distance(m_magazines.begin(), std::find(m_magazines.begin(), m_magazines.end(), m_pAmmo->cNameSect())) : 
-            0;
+        m_cur_magazine = b_attaching_magazine ? (u8)std::distance(m_magazines.begin(), std::find(m_magazines.begin(), m_magazines.end(), m_pAmmo->cNameSect())) : 0;
         SetMagazineAttached(b_attaching_magazine);
         m_fAttachedMagazineCondition = b_attaching_magazine ? m_pAmmo->GetCondition() : 1.f;
     }

@@ -1266,7 +1266,7 @@ PIItem CInventory::GetAmmoByLimit(const char* sect, bool forActor, bool limit_ma
         const auto* ammo = smart_cast<CWeaponAmmo*>(pIItem);
         shared_str sect_to_compare = include_magazines ? ammo->m_ammoSect : ammo->cNameSect();
 
-        if (!ammo->m_boxCurr || include_magazines && !ammo->IsBoxReloadable())
+        if (!ammo->m_boxCurr/* || include_magazines && !ammo->IsBoxReloadable()*/)
             return false;
 
         if (!xr_strcmp(sect_to_compare, sect))
@@ -1464,49 +1464,29 @@ void CInventory::TryAmmoCustomPlacement(CInventoryItem* pIItem)
 
 u32 CInventory::BeltWidth() const
 {
-    if (auto pActor = smart_cast<CActor*>(m_pOwner))
-    {
-        if (auto warbelt = pActor->GetWarbelt())
-        {
-            return warbelt->GetBeltWidth();
-        }
-    }
+    if (auto warbelt = m_pOwner->GetWarbelt())
+        return warbelt->GetBeltWidth();
     return 0;
 }
 
 u32 CInventory::BeltHeight() const
 {
-    if (auto pActor = smart_cast<CActor*>(m_pOwner))
-    {
-        if (auto warbelt = pActor->GetWarbelt())
-        {
-            return warbelt->GetBeltHeight();
-        }
-    }
+    if (auto warbelt = m_pOwner->GetWarbelt())
+        return warbelt->GetBeltHeight();
     return 0;
 }
 
 u32 CInventory::VestWidth() const
 {
-    if (auto pActor = smart_cast<CActor*>(m_pOwner))
-    {
-        if (auto vest = pActor->GetVest())
-        {
-            return vest->GetVestWidth();
-        }
-    }
+    if (auto vest = m_pOwner->GetVest())
+        return vest->GetVestWidth();
     return 0;
 }
 
 u32 CInventory::VestHeight() const
 {
-    if (auto pActor = smart_cast<CActor*>(m_pOwner))
-    {
-        if (auto vest = pActor->GetVest())
-        {
-            return vest->GetVestHeight();
-        }
-    }
+    if (auto vest = m_pOwner->GetVest())
+        return vest->GetVestHeight();
     return 0;
 }
 
