@@ -99,6 +99,7 @@ public:
     virtual bool Detach(const char* item_section_name, bool b_spawn_item, float item_condition = 1.f);
     virtual bool CanAttach(PIItem);
     virtual bool CanDetach(const char*);
+    virtual void DetachAll();
 
     virtual EHandDependence HandDependence() const { return eHandDependence; };
     virtual bool IsSingleHanded() const { return m_bIsSingleHanded; };
@@ -321,13 +322,6 @@ public:
     virtual float GetItemEffect(int) const;
     virtual float GetHitTypeProtection(int) const;
 
-    xr_vector<shared_str> m_required_tools{};
-
-    xr_vector<shared_str> m_repair_items{};
-    float repair_condition_gain{};
-    float repair_condition_threshold{};
-    int repair_count{};
-
     // статус джерела живлення
     ALife::EPowerSourceStatus m_power_source_status{};
     u8 m_cur_power_source{};
@@ -361,19 +355,8 @@ public:
 
     virtual void Recharge();
 
-    LPCSTR GetDetailPartSection() const { return m_detail_part_section; }
-    virtual void Disassemble();
-    virtual bool CanBeDisassembled();
-
     LPCSTR GetAttachMenuTip() const { return m_sAttachMenuTip; };
     LPCSTR GetDetachMenuTip() const { return m_sDetachMenuTip; };
-
-    LPCSTR GetRepairMenuTip() const { return m_sRepairMenuTip; };
-    LPCSTR GetDisassembleMenuTip() const { return m_sDisassembleMenuTip; };
-
-    virtual bool CanBeRepairedBy(PIItem) const;
-    virtual void Repair(PIItem);
-    virtual void PrepairItem();
 
     virtual LPCSTR GetBoneName(int);
     virtual float GetArmorByBone(int);
@@ -397,11 +380,8 @@ protected:
     float m_fPowerCapacity{};
     u64 m_uLastPowerConsumingUpdateTime;
 
-    LPCSTR m_detail_part_section{};
     LPCSTR m_sAttachMenuTip{};
     LPCSTR m_sDetachMenuTip{};
-    LPCSTR m_sRepairMenuTip{};
-    LPCSTR m_sDisassembleMenuTip{};
 };
 
 #include "inventory_item_inline.h"

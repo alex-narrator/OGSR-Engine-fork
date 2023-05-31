@@ -492,13 +492,6 @@ void CUICarBodyWnd::ActivatePropertiesBox()
         b_show = true;
     }
 
-    if (CurrentIItem()->CanBeDisassembled())
-    {
-        sprintf(temp, "%s%s", _many, CStringTable().translate(CurrentIItem()->GetDisassembleMenuTip()).c_str());
-        m_pUIPropertiesBox->AddItem(temp, NULL, INVENTORY_DISASSEMBLE);
-        b_show = true;
-    }
-
     if ((CheckMonsterAndKnife() || b_actor_inv) && !CurrentIItem()->IsQuestItem())
     {
         sprintf(temp, "%s%s", _many, CStringTable().translate("st_drop").c_str());
@@ -617,10 +610,6 @@ void CUICarBodyWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             break;
             case INVENTORY_MOVE_ACTION: {
                 MoveItems(itm, for_all);
-            }
-            break;
-            case INVENTORY_DISASSEMBLE: {
-                DisassembleItem(for_all);
             }
             break;
             }
@@ -1050,28 +1039,6 @@ void CUICarBodyWnd::TryPlayStabbing(PIItem itm, CGameObject* owner_from)
             knife->ChangeCondition(-knife->GetCondDecPerShotOnHit() * monster->m_fSkinDensityK); // уменьшим Condition ножа износ за удар * коэф плотности кожи монстра
         }
     }
-}
-
-void CUICarBodyWnd::DisassembleItem(bool b_all)
-{
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentEntity());
-    if (!pActor)
-        return;
-    if (!CurrentIItem() || CurrentIItem()->IsQuestItem())
-        return;
-    if (b_all)
-    {
-        u32 cnt = CurrentItem()->ChildsCount();
-        for (u32 i = 0; i < cnt; ++i)
-        {
-            CUICellItem* itm = CurrentItem()->PopChild();
-            PIItem iitm = (PIItem)itm->m_pData;
-            iitm->Disassemble();
-        }
-    }
-    CurrentIItem()->Disassemble();
-    SetCurrentItem(nullptr);
-    UpdateWeight();
 }
 
 void CUICarBodyWnd::DetachAddon(const char* addon_name, bool for_all)

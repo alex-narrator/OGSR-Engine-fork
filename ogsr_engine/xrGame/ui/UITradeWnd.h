@@ -67,7 +67,6 @@ protected:
     void DropItems(bool b_all); // выбросить предмет/стак предметов
     void EatItem();
     void PerformDonation();
-    void DisassembleItem(bool);
     void DetachAddon(const char* addon_name, bool);
 
     enum EListType

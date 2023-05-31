@@ -236,24 +236,11 @@ void CUIInventoryWnd::ActivatePropertiesBox()
             UIPropertiesBox.AddItem(temp, (void*)tgt, INVENTORY_ATTACH_ADDON);
             b_show = true;
         }
-        if (tgt->CanBeRepairedBy(CurrentIItem()))
-        {
-            sprintf(temp, "%s %s", CStringTable().translate(CurrentIItem()->GetRepairMenuTip()).c_str(), tgt->NameShort());
-            UIPropertiesBox.AddItem(temp, (void*)tgt, INVENTORY_REPAIR_ITEM);
-            b_show = true;
-        }
     }
 
     if (pEatableItem)
     {
         UIPropertiesBox.AddItem(pEatableItem->GetUseMenuTip(), NULL, INVENTORY_EAT_ACTION);
-        b_show = true;
-    }
-
-    if (CurrentIItem()->CanBeDisassembled())
-    {
-        sprintf(temp, "%s%s", _many, CStringTable().translate(CurrentIItem()->GetDisassembleMenuTip()).c_str());
-        UIPropertiesBox.AddItem(temp, NULL, INVENTORY_DISASSEMBLE);
         b_show = true;
     }
 
@@ -343,10 +330,6 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
             DropCurrentItem(for_all);
         }
         break;
-        case INVENTORY_DISASSEMBLE: {
-            DisassembleItem(for_all);
-        }
-        break;
         case INVENTORY_EAT_ACTION: EatItem(CurrentIItem()); break;
         case INVENTORY_ATTACH_ADDON: AttachAddon((PIItem)(UIPropertiesBox.GetClickedItem()->GetData())); break;
         case INVENTORY_DETACH_ADDON: DetachAddon((const char*)(UIPropertiesBox.GetClickedItem()->GetData()), for_all); break;
@@ -390,7 +373,6 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
             InitInventory_delayed();
         }
         break;
-        case INVENTORY_REPAIR_ITEM: RepairItem((PIItem)(UIPropertiesBox.GetClickedItem()->GetData())); break;
         }
     }
 }
@@ -423,12 +405,6 @@ bool CUIInventoryWnd::DropItem(PIItem itm, CUIDragDropListEx* lst)
     if (_iitem->CanAttach(itm))
     {
         AttachAddon(_iitem);
-        return true;
-    }
-
-    if (_iitem->CanBeRepairedBy(itm))
-    {
-        RepairItem(_iitem);
         return true;
     }
 

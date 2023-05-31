@@ -893,10 +893,6 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
 
 bool CWeaponMagazined::CanAttach(PIItem pIItem)
 {
-    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (pActor && !pActor->HasRequiredTool(pIItem))
-        return false;
-
     auto pScope = smart_cast<CScope*>(pIItem);
     auto pSilencer = smart_cast<CSilencer*>(pIItem);
     auto pLaser = smart_cast<CLaser*>(pIItem);
@@ -928,10 +924,6 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
 
 bool CWeaponMagazined::CanDetach(const char* item_section_name)
 {
-    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (pActor && !pActor->HasRequiredTool(item_section_name))
-        return false;
-
     if (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) &&
         std::find(m_scopes.begin(), m_scopes.end(), item_section_name) != m_scopes.end())
         return true;
@@ -2320,10 +2312,10 @@ void CWeaponMagazined::UnloadAndDetachAllAddons()
     }
 }
 
-void CWeaponMagazined::PrepairItem()
+void CWeaponMagazined::DetachAll()
 {
     UnloadAndDetachAllAddons();
-    inherited::PrepairItem();
+    inherited::DetachAll();
 }
 
 shared_str CWeaponMagazined::GetAmmoElapsedStr() const

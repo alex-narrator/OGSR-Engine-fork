@@ -275,29 +275,6 @@ void CUIInventoryWnd::DropCurrentItem(bool b_all)
     m_b_need_update_stats = true;
 }
 
-void CUIInventoryWnd::DisassembleItem(bool b_all)
-{
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentEntity());
-    if (!pActor)
-        return;
-    if (!CurrentIItem() || CurrentIItem()->IsQuestItem())
-        return;
-    if (b_all)
-    {
-        u32 cnt = CurrentItem()->ChildsCount();
-        for (u32 i = 0; i < cnt; ++i)
-        {
-            CUICellItem* itm = CurrentItem()->PopChild();
-            PIItem iitm = (PIItem)itm->m_pData;
-            iitm->Disassemble();
-        }
-    }
-    CurrentIItem()->Disassemble();
-    SetCurrentItem(NULL);
-    PlaySnd(eInvDetachAddon);
-    UpdateWeight();
-}
-
 //------------------------------------------
 bool CUIInventoryWnd::ToSlot(CUICellItem* itm, u8 _slot_id, bool force_place)
 {

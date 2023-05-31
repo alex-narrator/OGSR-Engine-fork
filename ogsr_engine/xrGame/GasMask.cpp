@@ -125,10 +125,6 @@ bool CGasMask::CanAttach(PIItem pIItem)
     if (m_filters.empty() || fis_zero(pIItem->m_fTTLOnWork) || fis_zero(GetCondition()))
         return false;
 
-    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (pActor && !pActor->HasRequiredTool(pIItem))
-        return false;
-
     if (!m_bIsFilterInstalled && std::find(m_filters.begin(), m_filters.end(), pIItem->object().cNameSect()) != m_filters.end())
         return true;
     else
@@ -138,10 +134,6 @@ bool CGasMask::CanAttach(PIItem pIItem)
 bool CGasMask::CanDetach(const char* item_section_name)
 {
     if (m_filters.empty())
-        return false;
-
-    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (pActor && !pActor->HasRequiredTool(item_section_name))
         return false;
 
     if (m_bIsFilterInstalled && std::find(m_filters.begin(), m_filters.end(), item_section_name) != m_filters.end())
@@ -188,6 +180,13 @@ bool CGasMask::Detach(const char* item_section_name, bool b_spawn_item, float it
     }
 
     return inherited::Detach(item_section_name, b_spawn_item, item_condition);
+}
+
+void CGasMask::DetachAll()
+{
+    if (IsFilterInstalled())
+        Detach(GetFilterName().c_str(), true);
+    inherited::DetachAll();
 }
 
 void CGasMask::InitAddons()

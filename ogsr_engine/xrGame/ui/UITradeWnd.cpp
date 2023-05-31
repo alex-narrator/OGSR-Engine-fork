@@ -398,13 +398,6 @@ void CUITradeWnd::ActivatePropertiesBox()
             b_show = true;
         }
 
-        if (CurrentIItem()->CanBeDisassembled())
-        {
-            sprintf(temp, "%s%s", _many, CStringTable().translate(CurrentIItem()->GetDisassembleMenuTip()).c_str());
-            m_pUIPropertiesBox->AddItem(temp, NULL, INVENTORY_DISASSEMBLE);
-            b_show = true;
-        }
-
         if (!CurrentIItem()->IsQuestItem())
         {
             sprintf(temp, "%s%s", _many, CStringTable().translate("st_drop").c_str());
@@ -521,10 +514,6 @@ void CUITradeWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             break;
             case INVENTORY_MOVE_ACTION: {
                 MoveItems(itm, for_all);
-            }
-            break;
-            case INVENTORY_DISASSEMBLE: {
-                DisassembleItem(for_all);
             }
             break;
             }
@@ -1174,27 +1163,6 @@ void CUITradeWnd::PerformDonation()
         pBuyList->SetItem(itm);
     }
 
-    SetCurrentItem(nullptr);
-}
-
-void CUITradeWnd::DisassembleItem(bool b_all)
-{
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentEntity());
-    if (!pActor)
-        return;
-    if (!CurrentIItem() || CurrentIItem()->IsQuestItem())
-        return;
-    if (b_all)
-    {
-        u32 cnt = CurrentItem()->ChildsCount();
-        for (u32 i = 0; i < cnt; ++i)
-        {
-            CUICellItem* itm = CurrentItem()->PopChild();
-            PIItem iitm = (PIItem)itm->m_pData;
-            iitm->Disassemble();
-        }
-    }
-    CurrentIItem()->Disassemble();
     SetCurrentItem(nullptr);
 }
 

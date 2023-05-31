@@ -474,10 +474,6 @@ void CWeaponShotgun::StopHUDSounds()
 
 bool CWeaponShotgun::CanAttach(PIItem pIItem)
 {
-    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (pActor && !pActor->HasRequiredTool(pIItem))
-        return false;
-
     auto pExtender = smart_cast<CExtender*>(pIItem);
     if (pExtender && m_eExtenderStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
         std::find(m_extenders.begin(), m_extenders.end(), pIItem->object().cNameSect()) != m_extenders.end())
@@ -488,10 +484,6 @@ bool CWeaponShotgun::CanAttach(PIItem pIItem)
 
 bool CWeaponShotgun::CanDetach(const char* item_section_name)
 {
-    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (pActor && !pActor->HasRequiredTool(item_section_name))
-        return false;
-
     if (m_eExtenderStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
         std::find(m_extenders.begin(), m_extenders.end(), item_section_name) != m_extenders.end())
         return true;

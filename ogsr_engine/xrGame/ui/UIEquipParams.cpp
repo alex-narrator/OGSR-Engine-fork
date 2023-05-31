@@ -48,9 +48,7 @@ bool CUIEquipParams::Check(CInventoryItem* obj)
         smart_cast<CScope*>(obj) || smart_cast<CSilencer*>(obj) || smart_cast<CStock*>(obj) || smart_cast<CExtender*>(obj) || smart_cast<CForend*>(obj) ||
         smart_cast<CInventoryContainer*>(obj) || smart_cast<CGrenade*>(obj) || smart_cast<CCustomDetector*>(obj) || smart_cast<CCustomDetectorSHOC*>(obj) ||
         obj->GetPowerLevel() || obj->CanBeCharged() || obj->IsPowerConsumer() || 
-        obj->GetDetailPartSection() || !fsimilar(obj->GetPowerLoss(), 1.f) || obj->m_fTTLOnWork || obj->m_fTTLOnDecrease ||
-        !obj->m_repair_items.empty() || !obj->m_required_tools.empty() || 
-        !fis_zero(obj->repair_condition_gain) || obj->repair_count || !fis_zero(obj->repair_condition_threshold))
+        !fsimilar(obj->GetPowerLoss(), 1.f) || obj->m_fTTLOnWork || obj->m_fTTLOnDecrease)
     {
         return true;
     }
@@ -581,85 +579,6 @@ void CUIEquipParams::SetInfo(CInventoryItem* obj)
                 _h += list_item_h;
             }
         }
-    }
-
-    if (!obj->m_required_tools.empty())
-    {
-        _param_name = CStringTable().translate("st_required_tools").c_str();
-        SetStaticParams(_uiXml, _path, _h)->SetText(_param_name);
-        _h += list_item_h;
-
-        for (const auto& tool_sect : obj->m_required_tools)
-        {
-            auto tool_name = pSettings->r_string(tool_sect, "inv_name");
-            sprintf(text_to_show, "%s%s", marker_, CStringTable().translate(tool_name).c_str());
-            SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
-            _h += list_item_h;
-        }
-    }
-
-    if (obj->GetDetailPartSection())
-    {
-        _param_name = CStringTable().translate("st_detail_parts").c_str();
-        SetStaticParams(_uiXml, _path, _h)->SetText(_param_name);
-        _h += list_item_h;
-
-        string128 item_sect;
-        LPCSTR detail_part_sect = obj->GetDetailPartSection();
-        int count = _GetItemCount(detail_part_sect);
-        for (int i = 0; i < count; i += 2)
-        {
-            _GetItem(detail_part_sect, i, item_sect);
-            string128 tmp;
-            int item_count = atoi(_GetItem(detail_part_sect, i + 1, tmp));
-            auto detail_name = pSettings->r_string(item_sect, "inv_name");
-            sprintf(text_to_show, "%sx%d %s", marker_, item_count, CStringTable().translate(detail_name).c_str());
-            SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
-            _h += list_item_h;
-        }
-    }
-
-    if (!obj->m_repair_items.empty())
-    {
-        _param_name = CStringTable().translate("st_repair_items").c_str();
-        SetStaticParams(_uiXml, _path, _h)->SetText(_param_name);
-        _h += list_item_h;
-
-        for (const auto& item_sect : obj->m_repair_items)
-        {
-            auto rep_item_name = pSettings->r_string(item_sect, "inv_name");
-            sprintf_s(text_to_show, "%s%s", marker_, CStringTable().translate(rep_item_name).c_str());
-            SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
-            _h += list_item_h;
-        }
-    }
-
-    _sn = "%";
-    _val = obj->repair_condition_gain;
-    if (!fis_zero(_val))
-    {
-        _val *= 100.f;
-        _param_name = CStringTable().translate("st_repair_condition_gain").c_str();
-        sprintf_s(text_to_show, "%s %.0f%s", _param_name, _val, _sn);
-        SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
-        _h += list_item_h;
-    }
-    _val = obj->repair_condition_threshold;
-    if (!fis_zero(_val))
-    {
-        _val *= 100.f;
-        _param_name = CStringTable().translate("st_repair_condition_threshold").c_str();
-        sprintf_s(text_to_show, "%s %.0f%s", _param_name, _val, _sn);
-        SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
-        _h += list_item_h;
-    }
-    _val = obj->repair_count;
-    if (!fis_zero(_val))
-    {
-        _param_name = CStringTable().translate("st_repair_count").c_str();
-        sprintf_s(text_to_show, "%s %.0f", _param_name, _val);
-        SetStaticParams(_uiXml, _path, _h)->SetText(text_to_show);
-        _h += list_item_h;
     }
 
     SetHeight(_h);

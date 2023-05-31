@@ -821,8 +821,6 @@ public:
     bool m_bShowActiveItemInfo{};
     bool m_bShowGearInfo{};
 
-    virtual bool HasRequiredTool(PIItem);
-    virtual bool HasRequiredTool(const shared_str&);
     void HitToEquipment(SHit* pHDS);
 
 protected:

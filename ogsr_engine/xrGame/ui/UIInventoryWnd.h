@@ -178,7 +178,6 @@ protected:
 
     void DropCurrentItem(bool b_all);
     void EatItem(PIItem itm);
-    void DisassembleItem(bool b_all);
 
     bool ToSlot(CUICellItem* itm, u8 _slot_id, bool force_place);
     bool ToSlot(CUICellItem* itm, bool force_place);
@@ -188,8 +187,6 @@ protected:
 
     void AttachAddon(PIItem item_to_upgrade);
     void DetachAddon(const char* addon_name, bool);
-    void ChargeDevice(PIItem item_to_charge);
-    void RepairItem(PIItem item_to_repair);
 
     void SetCurrentItem(CUICellItem* itm);
     CUICellItem* CurrentItem();

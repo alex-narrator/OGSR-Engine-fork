@@ -380,10 +380,8 @@ void CUICellItem::ColorizeItems(std::initializer_list<CUIDragDropListEx*> args)
         auto Vest = smart_cast<CVest*>(inventoryitem);
         auto Gasmask = smart_cast<CGasMask*>(inventoryitem);
         bool need_battery = inventoryitem->IsPowerConsumer() && inventoryitem->IsPowerSourceAttachable();
-        bool need_tool = !inventoryitem->m_required_tools.empty();
-        bool can_be_repaired = !inventoryitem->m_repair_items.empty();
 
-        bool b_colorize = (Wpn || Ammo || Vest || Gasmask || need_battery || need_tool || can_be_repaired);
+        bool b_colorize = (Wpn || Ammo || Vest || Gasmask || need_battery);
         if (!b_colorize)
             return;
 
@@ -407,10 +405,6 @@ void CUICellItem::ColorizeItems(std::initializer_list<CUIDragDropListEx*> args)
             std::copy(Gasmask->m_filters.begin(), Gasmask->m_filters.end(), std::back_inserter(ColorizeSects));
         if (need_battery)
             std::copy(inventoryitem->m_power_sources.begin(), inventoryitem->m_power_sources.end(), std::back_inserter(ColorizeSects));
-        if (need_tool)
-            std::copy(inventoryitem->m_required_tools.begin(), inventoryitem->m_required_tools.end(), std::back_inserter(ColorizeSects));
-        if (can_be_repaired)
-            std::copy(inventoryitem->m_repair_items.begin(), inventoryitem->m_repair_items.end(), std::back_inserter(ColorizeSects));
     };
 
     auto ColorizeAmmoAddons = [&] {

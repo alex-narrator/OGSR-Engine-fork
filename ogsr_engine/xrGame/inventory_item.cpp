@@ -208,38 +208,6 @@ void CInventoryItem::Load(LPCSTR section)
 
     m_uSlotEnabled = READ_IF_EXISTS(pSettings, r_u32, section, "slot_enabled", NO_ACTIVE_SLOT);
 
-    m_detail_part_section = READ_IF_EXISTS(pSettings, r_string, section, "detail_parts", nullptr);
-
-    if (pSettings->line_exist(section, "required_tools"))
-    {
-        LPCSTR str = pSettings->r_string(section, "required_tools");
-        for (int i = 0; i < _GetItemCount(str); ++i)
-        {
-            string128 tool_section;
-            _GetItem(str, i, tool_section);
-            m_required_tools.push_back(tool_section);
-        }
-    }
-
-    if (pSettings->line_exist(section, "repair_items"))
-    {
-        LPCSTR str = pSettings->r_string(section, "repair_items");
-        for (int i = 0; i < _GetItemCount(str); ++i)
-        {
-            string128 repair_section;
-            _GetItem(str, i, repair_section);
-            m_repair_items.push_back(repair_section);
-        }
-    }
-    repair_condition_gain = READ_IF_EXISTS(pSettings, r_float, section, "repair_condition_gain", 0.f);
-    repair_condition_threshold = READ_IF_EXISTS(pSettings, r_float, section, "repair_condition_threshold", 0.f);
-    repair_count = READ_IF_EXISTS(pSettings, r_u32, section, "repair_count", 0);
-
-    m_sAttachMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_attach_tip", "st_attach");
-    m_sDetachMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_detach_tip", "st_detach");
-    m_sRepairMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_repair_tip", "st_repair");
-    m_sDisassembleMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_disassemble_tip", "st_disassemble");
-
     m_upgrade_icon_sect = READ_IF_EXISTS(pSettings, r_string, section, "upgrade_icon_sect", nullptr);
     m_upgrade_icon_ofset = READ_IF_EXISTS(pSettings, r_fvector2, section, "upgrade_icon_ofset", Fvector2{});
 }
@@ -388,27 +356,13 @@ void CInventoryItem::OnEvent(NET_Packet& P, u16 type)
 
 bool CInventoryItem::CanAttach(PIItem pIItem)
 {
-    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (pActor && !pActor->HasRequiredTool(pIItem))
-        return false;
-
-    if (pIItem && !fis_zero(pIItem->GetPowerLevel()) && IsPowerSourceAttachable() && !IsPowerSourceAttached() &&
-        std::find(m_power_sources.begin(), m_power_sources.end(), pIItem->object().cNameSect()) != m_power_sources.end())
-        return true;
-    else
-        return false;
+    return (pIItem && !fis_zero(pIItem->GetPowerLevel()) && IsPowerSourceAttachable() && !IsPowerSourceAttached() &&
+            std::find(m_power_sources.begin(), m_power_sources.end(), pIItem->object().cNameSect()) != m_power_sources.end());
 }
 
 bool CInventoryItem::CanDetach(const char* item_section_name)
 {
-    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (pActor && !pActor->HasRequiredTool(item_section_name))
-        return false;
-
-    if (IsPowerSourceAttachable() && IsPowerSourceAttached() && std::find(m_power_sources.begin(), m_power_sources.end(), item_section_name) != m_power_sources.end())
-        return true;
-    else
-        return false;
+    return (IsPowerSourceAttachable() && IsPowerSourceAttached() && std::find(m_power_sources.begin(), m_power_sources.end(), item_section_name) != m_power_sources.end());
 }
 
 bool CInventoryItem::Attach(PIItem pIItem, bool b_send_event)
@@ -490,6 +444,17 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item, fl
     }
 
     return true;
+}
+
+void CInventoryItem::DetachAll()
+{
+    if (m_pCurrentInventory)
+    {
+        if (!m_pCurrentInventory->InRuck(this))
+            m_pCurrentInventory->Ruck(this);
+        if (IsPowerSourceAttached() && IsPowerSourceAttachable())
+            Detach(GetPowerSourceName().c_str(), true);
+    }
 }
 
 /////////// network ///////////////////////////////
@@ -1014,77 +979,6 @@ void CInventoryItem::InitAddons()
     m_fPowerCapacity = READ_IF_EXISTS(pSettings, r_float, power_params_sect, "power_capacity", 0.f);
     clamp(m_fPowerLevel, 0.f, m_fPowerCapacity);
     m_uLastPowerConsumingUpdateTime = Level().GetGameTime();
-}
-
-void CInventoryItem::Disassemble()
-{
-    if (!m_detail_part_section)
-        return;
-
-    PrepairItem();
-
-    string128 item;
-    int count = _GetItemCount(m_detail_part_section);
-    for (int i = 0; i < count; i += 2)
-    {
-        _GetItem(m_detail_part_section, i, item);
-        string128 tmp;
-        int item_count = atoi(_GetItem(m_detail_part_section, i + 1, tmp));
-        for (int k = 0; k < item_count; ++k)
-        {
-            Detach(item, true);
-        }
-    }
-    object().DestroyObject();
-}
-
-bool CInventoryItem::CanBeDisassembled()
-{
-    if (!GetDetailPartSection() || IsQuestItem())
-        return false;
-    auto pActor = smart_cast<CActor*>(Level().CurrentEntity());
-    if (pActor && !pActor->HasRequiredTool(this))
-        return false;
-    return true;
-}
-
-bool CInventoryItem::CanBeRepairedBy(PIItem item) const
-{
-    if (m_repair_items.empty() || fis_zero(repair_condition_gain) || fsimilar(GetCondition(), 1.f, 0.01f))
-        return false;
-    auto pActor = smart_cast<CActor*>(Level().CurrentEntity());
-    if (pActor && !pActor->HasRequiredTool(item))
-        return false;
-    for (const auto& item_sect : m_repair_items)
-    {
-        if (item_sect == item->object().cNameSect() && GetCondition() >= item->repair_condition_threshold)
-            return true;
-    }
-    return false;
-}
-
-void CInventoryItem::Repair(PIItem target)
-{
-    target->PrepairItem();
-    target->ChangeCondition(repair_condition_gain);
-    if (!repair_count)
-        return;
-    float cond_lost = (float)(1 / repair_count);
-    ChangeCondition(-cond_lost);
-    if (GetCondition() <= 0.f)
-        object().DestroyObject();
-}
-
-void CInventoryItem::PrepairItem()
-{
-    auto& inv = m_pCurrentInventory;
-    if (inv)
-    {
-        if (!inv->InRuck(this))
-            inv->Ruck(this);
-        if (IsPowerSourceAttached() && IsPowerSourceAttachable())
-            Detach(GetPowerSourceName().c_str(), true);
-    }
 }
 
 LPCSTR CInventoryItem::GetBoneName(int bone_idx)

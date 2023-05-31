@@ -115,10 +115,6 @@ bool CVest::CanAttach(PIItem pIItem)
     if (m_plates.empty() || fis_zero(GetCondition()))
         return false;
 
-    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (pActor && !pActor->HasRequiredTool(pIItem))
-        return false;
-
     if (!m_bIsPlateInstalled && std::find(m_plates.begin(), m_plates.end(), pIItem->object().cNameSect()) != m_plates.end())
         return true;
     else
@@ -128,10 +124,6 @@ bool CVest::CanAttach(PIItem pIItem)
 bool CVest::CanDetach(const char* item_section_name)
 {
     if (m_plates.empty())
-        return false;
-
-    auto pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (pActor && !pActor->HasRequiredTool(item_section_name))
         return false;
 
     if (m_bIsPlateInstalled && std::find(m_plates.begin(), m_plates.end(), item_section_name) != m_plates.end())
@@ -198,11 +190,11 @@ void CVest::net_Export(CSE_Abstract* E)
     sobj_vest->m_cur_plate = m_cur_plate;
 }
 
-void CVest::PrepairItem()
+void CVest::DetachAll()
 {
     if (IsPlateInstalled())
         Detach(GetPlateName().c_str(), true);
-    inherited::PrepairItem();
+    inherited::DetachAll();
 }
 
 float CVest::GetArmorByBone(int bone_idx)

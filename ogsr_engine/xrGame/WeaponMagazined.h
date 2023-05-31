@@ -319,7 +319,7 @@ public:
     virtual void UnloadWeaponFull();
 
     virtual void UnloadAndDetachAllAddons();
-    virtual void PrepairItem();
+    virtual void DetachAll();
 
 protected:
     bool m_bNightVisionEnabled{};

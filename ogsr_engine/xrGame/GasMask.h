@@ -30,6 +30,8 @@ public:
     virtual bool CanAttach(PIItem pIItem);
     virtual bool CanDetach(const char* item_section_name);
 
+    virtual void DetachAll();
+
     virtual void DrawHUDMask();
 
     bool HasVisor() const { return m_b_has_visor; };

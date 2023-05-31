@@ -586,14 +586,6 @@ void CUIInventoryWnd::DetachAddon(const char* addon_name, bool for_all)
     }
 }
 
-void CUIInventoryWnd::RepairItem(PIItem item_to_repair)
-{
-    CurrentIItem()->Repair(item_to_repair);
-    PlaySnd(eInvAttachAddon);
-    SetCurrentItem(nullptr);
-    InitInventory_delayed();
-}
-
 void CUIInventoryWnd::BindDragDropListEnents(CUIDragDropListEx* lst)
 {
     lst->m_f_item_drop = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemDrop);

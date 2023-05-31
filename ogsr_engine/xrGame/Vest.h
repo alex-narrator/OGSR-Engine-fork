@@ -48,7 +48,7 @@ public:
     // перезавантаження параметрів балістичного захисту та власних імунітетів жилету
     virtual void InitAddons();
 
-    virtual void PrepairItem();
+    virtual void DetachAll();
 
 protected:
     u32 m_iVestWidth{};

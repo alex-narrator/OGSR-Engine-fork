@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="windows-1251" ?>
 <string_table>
+	<string id="st_rma_ver">
+		<text>+ Відновлення старого сюжету (RMA ver 1.1.5)</text>
+	</string>
 	<string id="st_kg">
 		<text>кг</text>
 	</string>
@@ -525,6 +528,9 @@
 	<string id="st_load_ammo_type">
 		<text>зарядити</text>
 	</string>
+	<string id="st_reload_ammo_type">
+		<text>перезарядити</text>
+	</string>	
 	
 	<string id="st_damage">
 		<text>Пошкодження:</text>
@@ -579,14 +585,11 @@
 		<text>Кріплення ліхтаря:</text>
 	</string>	
 	
-	<string id="st_compatible_ammo">
-		<text>набої:</text>
-	</string>
-	<string id="st_compatible_magazine">
-		<text>магазини:</text>
+	<string id="st_compatible_ammo_magazines">
+		<text>живлення:</text>
 	</string>
 	<string id="st_compatible_addon">
-		<text>обвіси:</text>
+		<text>обвіс:</text>
 	</string>
 	<string id="st_current_ammo_type">
 		<text>Заряджено:</text>
@@ -659,29 +662,6 @@
 		<text>тривалість</text>
 	</string>	
 
-	<string id="st_disassemble">
-		<text>розібрати</text>
-	</string>
-	<string id="st_detail_parts">
-		<text>складові при розбиранні:</text>
-	</string>
-	<string id="st_required_tools">
-		<text>інструмент для розбирання/ремонту:</text>
-	</string>
-	<string id="st_repair_items">
-		<text>матеріали для ремонту:</text>
-	</string>
-
-	<string id="st_repair_condition_gain">
-		<text>відновлює стану:</text>
-	</string>
-	<string id="st_repair_condition_threshold">
-		<text>мінімальний стан:</text>
-	</string>
-	<string id="st_repair_count">
-		<text>кількість використань:</text>
-	</string>	
-	
 	<string id="ui_inv_move_all_from_ruck">
 		<text>Викласти все з рюкзака</text>
 	</string>
@@ -767,6 +747,9 @@
 		<text>надягнути</text>
 	</string>	
 	<string id="st_move_to_slot_18">
+		<text>надягнути</text>
+	</string>		
+	<string id="st_move_to_slot_19">
 		<text>надягнути</text>
 	</string>		
 	
@@ -941,7 +924,7 @@
 
 <!-- описи магазинів -->	
 	<string id="clip_8_900x18">
-		<text>8-ми зарядний магазин для набоїв 9х18</text>
+		<text>8-ми зарядний магазин 9х18</text>
 	</string>
 	<string id="clip_8_900x18_short">
 		<text>Маг.8 9х18</text>
@@ -951,7 +934,7 @@
 	</string>
 	
 	<string id="clip_12_900x18">
-		<text>12-ми зарядний магазин для набоїв 9х18</text>
+		<text>12-ми зарядний магазин 9х18</text>
 	</string>
 	<string id="clip_12_900x18_short">
 		<text>Маг.12 9х18</text>
@@ -961,7 +944,7 @@
 	</string>
 	
 	<string id="clip_13_900x19">
-		<text>13-ти зарядний магазин для набоїв 9х19</text>
+		<text>13-ти зарядний магазин 9х19</text>
 	</string>
 	<string id="clip_13_900x19_short">
 		<text>Маг.13 9х19</text>
@@ -971,7 +954,7 @@
 	</string>	
 	
 	<string id="clip_15_900x19">
-		<text>15-ти зарядний магазин для набоїв 9х19</text>
+		<text>15-ти зарядний магазин 9х19</text>
 	</string>
 	<string id="clip_15_900x19_short">
 		<text>Маг.15 9х19</text>
@@ -981,7 +964,7 @@
 	</string>	
 	
 	<string id="clip_16_900x19">
-		<text>16-ти зарядний магазин для набоїв 9х19</text>
+		<text>16-ти зарядний магазин 9х19</text>
 	</string>
 	<string id="clip_16_900x19_short">
 		<text>Маг.16 9х19</text>
@@ -991,7 +974,7 @@
 	</string>		
 	
 	<string id="mag_30_900x19">
-		<text>30-ти зарядний магазин для набоїв 9х19</text>
+		<text>30-ти зарядний магазин 9х19</text>
 	</string>
 	<string id="mag_30_900x19_short">
 		<text>Маг.30 9х19</text>
@@ -1001,7 +984,7 @@
 	</string>	
 	
 	<string id="clip_7_1143x23">
-		<text>7-ти зарядний магазин для набоїв .45</text>
+		<text>7-ти зарядний магазин .45</text>
 	</string>
 	<string id="clip_7_1143x23_short">
 		<text>Маг.7 .45</text>
@@ -1011,7 +994,7 @@
 	</string>	
 	
 	<string id="clip_12_1143x23">
-		<text>12-ти зарядний магазин для набоїв .45</text>
+		<text>12-ти зарядний магазин .45</text>
 	</string>
 	<string id="clip_12_1143x23_short">
 		<text>Маг.12 .45</text>
@@ -1021,7 +1004,7 @@
 	</string>		
 	
 	<string id="mag_30_545x39">
-		<text>30-ти зарядний магазин для набоїв 5.45</text>
+		<text>30-ти зарядний магазин 5.45</text>
 	</string>
 	<string id="mag_30_545x39_short">
 		<text>Маг.30 5.45</text>
@@ -1031,7 +1014,7 @@
 	</string>
 
 	<string id="mag_45_545x39">
-		<text>45-ти зарядний магазин для набоїв 5.45</text>
+		<text>45-ти зарядний магазин 5.45</text>
 	</string>
 	<string id="mag_45_545x39_short">
 		<text>Маг.45 5.45</text>
@@ -1041,7 +1024,7 @@
 	</string>	
 	
 	<string id="mag_30_556x45">
-		<text>30-ти зарядний магазин для набоїв 5.56</text>
+		<text>30-ти зарядний магазин 5.56</text>
 	</string>
 	<string id="mag_30_556x45_short">
 		<text>Маг.30 5.56</text>
@@ -1051,7 +1034,7 @@
 	</string>	
 	
 	<string id="mag_10_900x39">
-		<text>10-ти зарядний магазин для набоїв 9х39</text>
+		<text>10-ти зарядний магазин 9х39</text>
 	</string>
 	<string id="mag_10_900x39_short">
 		<text>Маг.10 9х39</text>
@@ -1061,7 +1044,7 @@
 	</string>	
 	
 	<string id="mag_20_900x39">
-		<text>10-ти зарядний магазин для набоїв 9х39</text>
+		<text>10-ти зарядний магазин 9х39</text>
 	</string>
 	<string id="mag_20_900x39_short">
 		<text>Маг.20 9х39</text>
@@ -1071,20 +1054,20 @@
 	</string>
 
 	<string id="mag_10_762x54">
-		<text>10-ти зарядний магазин для набоїв 7.62x54</text>
+		<text>10-ти зарядний магазин 7.62x54R</text>
 	</string>
 	<string id="mag_10_762x54_short">
-		<text>Маг.10 7.62х54</text>
+		<text>Маг.10 7.62х54R</text>
 	</string>
 	<string id="mag_10_762x54_descr">
 		<text>Стандартний магазин для гвинтівок СВД та СВУ</text>
 	</string>	
 
 	<string id="mag_20_762x54">
-		<text>20-ти зарядний магазин для набоїв 7.62x54</text>
+		<text>20-ти зарядний магазин 7.62x54R</text>
 	</string>
 	<string id="mag_20_762x54_short">
-		<text>Маг.20 7.62х54</text>
+		<text>Маг.20 7.62х54R</text>
 	</string>
 	<string id="mag_20_762x54_descr">
 		<text>Збільшений магазин для гвинтівок СВУ. Сумісний із гвинтівками СВД</text>
@@ -1112,6 +1095,9 @@
 	</string>	
 	<string id="st_killer_header">
 		<text>причина смерті:</text>
+	</string>
+	<string id="st_helicopter">
+		<text>гелікоптер</text>
 	</string>
 	<string id="st_death_reason_undefined">
 		<text>НЕВІДОМО</text>
