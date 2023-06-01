@@ -423,6 +423,18 @@ void CScriptGameObject::SetCondition(float val)
     // val					-= inventory_item->GetCondition();
     inventory_item->SetCondition(val);
 }
+
+void CScriptGameObject::ChangeCondition(float val)
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
+    if (!inventory_item)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member ChangeCondition!");
+        return;
+    }
+    // val					-= inventory_item->GetCondition();
+    inventory_item->ChangeCondition(val);
+}
 //
 bool CScriptGameObject::IsPowerConsumer() const
 {

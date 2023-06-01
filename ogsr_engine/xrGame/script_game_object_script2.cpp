@@ -83,6 +83,7 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .def("cost", &CScriptGameObject::Cost)
         .def("condition", &CScriptGameObject::GetCondition)
         .def("set_condition", &CScriptGameObject::SetCondition)
+        .def("change_condition", &CScriptGameObject::ChangeCondition)
         //
         .def("is_power_consumer", &CScriptGameObject::IsPowerConsumer)
         .def("is_power_on", &CScriptGameObject::IsPowerOn)

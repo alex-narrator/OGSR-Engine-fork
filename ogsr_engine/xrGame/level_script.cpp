@@ -539,6 +539,8 @@ void add_complex_effector(LPCSTR section, int id) { AddEffector(Actor(), id, sec
 
 void remove_complex_effector(int id) { RemoveEffector(Actor(), id); }
 
+bool check_complex_effector(int id) { return CheckEffector(Actor(), id); };
+
 #include "postprocessanimator.h"
 void add_pp_effector(LPCSTR fn, int id, bool cyclic)
 {
@@ -927,7 +929,7 @@ void CLevel::script_register(lua_State* L)
             def("demo_record_get_HPB", &demo_record_get_HPB), def("demo_record_set_HPB", &demo_record_set_HPB),
             def("demo_record_set_direct_input", &demo_record_set_direct_input),
 
-            def("add_complex_effector", &add_complex_effector), def("remove_complex_effector", &remove_complex_effector),
+            def("add_complex_effector", &add_complex_effector), def("remove_complex_effector", &remove_complex_effector), def("check_complex_effector", &check_complex_effector),
 
             def("game_id", &GameID), def("set_ignore_game_state_update", &set_ignore_game_state_update),
 

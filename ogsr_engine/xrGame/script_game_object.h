@@ -175,6 +175,7 @@ public:
     u32 Cost() const;
     float GetCondition() const;
     void SetCondition(float val);
+    void ChangeCondition(float val);
     //
     bool IsPowerConsumer() const;
     bool IsPowerOn() const;

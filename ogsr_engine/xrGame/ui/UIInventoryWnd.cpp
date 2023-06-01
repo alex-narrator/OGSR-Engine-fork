@@ -499,8 +499,6 @@ void CUIInventoryWnd::Show()
         //actor->SetWeaponHideState(INV_STATE_INV_WND, true);
         actor->SetRuckAmmoPlacement(true); // установим флаг перезарядки из рюкзака
         m_pInv->RepackAmmo();
-        actor->TryInventoryCrouch(true);
-        actor->EnableInvEffector(true);
     }
 }
 
@@ -523,8 +521,6 @@ void CUIInventoryWnd::Hide()
         //actor->SetWeaponHideState(INV_STATE_INV_WND, false);
         actor->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
         actor->EnableUIDOF(false);
-        actor->TryInventoryCrouch(false);
-        actor->EnableInvEffector(false);
     }
     HideSlotsHighlight();
 }

@@ -205,7 +205,38 @@ void CScriptActor::script_register(lua_State* L)
                .def("is_actor_creeping", &CActor::is_actor_creeping)
                .def("is_actor_climbing", &CActor::is_actor_climbing)
                .def("is_actor_moving", &CActor::is_actor_moving)
+                //wishful state
+               .def("get_state_wishful", &CActor::get_state_wishful)
+               .def("set_state_wishful", &CActor::set_state_wishful)
+
                .def("IsDetectorActive", &CActor::IsDetectorActive),
+                //move commands
+              class_<enum_exporter<EMoveCommand>>("move_command")
+               .enum_("commands")[
+                   value("mcFwd", int(mcFwd)), 
+                   value("mcBack", int(mcBack)), 
+                   value("mcLStrafe", int(mcLStrafe)), 
+                   value("mcRStrafe", int(mcRStrafe)),
+                   value("mcCrouch", int(mcCrouch)), 
+                   value("mcAccel", int(mcAccel)), 
+                   value("mcTurn", int(mcTurn)), 
+                   value("mcJump", int(mcJump)), 
+                   value("mcTurn", int(mcTurn)),
+                   value("mcJump", int(mcJump)), 
+                   value("mcFall", int(mcFall)), 
+                   value("mcLanding", int(mcLanding)), 
+                   value("mcLanding2", int(mcLanding2)),
+                   value("mcClimb", int(mcClimb)), 
+                   value("mcSprint", int(mcSprint)), 
+                   value("mcLLookout", int(mcLLookout)),
+                   value("mcRLookout", int(mcRLookout)), 
+                   value("mcAnyMove", int(mcAnyMove)), 
+                   value("mcAnyAction", int(mcAnyAction)),
+                   value("mcAnyState", int(mcAnyState)),
+                   value("mcLookout", int(mcLookout)),
+                   value("mcCrouchAccel", int(mcCrouchAccel))
+               ],
+
            class_<CActorObject, bases<CActor, CEntityAlive>>("CActor") // хак с наследованием нужен для переопределения свойств. Luabind не поддерживает property getters override
 
     ];

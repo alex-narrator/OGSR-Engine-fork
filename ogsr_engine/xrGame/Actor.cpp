@@ -1913,39 +1913,12 @@ bool CActor::IsFreeHands() const
     return true;
 }
 
-void CActor::TryInventoryCrouch(bool enable)
-{
-    if (!Core.Features.test(xrCore::Feature::inventory_crouch))
-        return;
-
-    if (enable)
-    {
-        bool b_skip_state = (mstate_wishful & mcCrouch) || (mstate_wishful & mcCrouchAccel) || (mstate_wishful & mcClimb);
-        saved_state = b_skip_state ? (u32)-1 : mstate_wishful;
-        if (!b_skip_state)
-            set_state_wishful(mcCrouch);
-    }
-    else if (saved_state != (u32)-1)
-        set_state_wishful(saved_state);
-
-}
-
 void CActor::EnableUIDOF(bool enable) 
 { 
     if (!psActorFlags.test(AF_DOF_UI_WND))
         return;
     Fvector4 dof_param{enable ? dof_params_ui : Fvector4{}}; 
     shader_exports.set_dof_params(dof_param.x, dof_param.y, dof_param.z, dof_param.w);
-}
-
-void CActor::EnableInvEffector(bool open)
-{
-    if (Cameras().GetCamEffector(eCEUIWindowEffect))
-        return;
-    if (open && !!m_InvEffOpen)
-        AddEffector(this, eCEUIWindowEffect, m_InvEffOpen);
-    else if (!open && !!m_InvEffClose)
-        AddEffector(this, eCEUIWindowEffect, m_InvEffClose);
 }
 
 void CActor::SetHardHold(bool val)

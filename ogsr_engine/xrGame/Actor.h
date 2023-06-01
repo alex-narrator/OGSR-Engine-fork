@@ -844,9 +844,7 @@ public:
     bool InSafeHouse();
 
     bool IsFreeHands() const;
-    void TryInventoryCrouch(bool);
     void EnableUIDOF(bool);
-    void EnableInvEffector(bool);
 
 protected:
     svector<float, eRestoreBoostMax> m_ActorItemBoostedParam;

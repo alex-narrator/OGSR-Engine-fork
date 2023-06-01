@@ -297,8 +297,6 @@ void CUICarBodyWnd::Hide()
         //actor->SetWeaponHideState(INV_STATE_INV_WND, false);
         actor->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
         actor->EnableUIDOF(false);
-        actor->TryInventoryCrouch(false);
-        actor->EnableInvEffector(false);
     }
     m_bShowAllInv = false;
     PlaySnd(eInvSndClose);
@@ -677,8 +675,6 @@ void CUICarBodyWnd::Show()
         //actor->SetWeaponHideState(INV_STATE_INV_WND, true);
         actor->SetRuckAmmoPlacement(true);
         RepackAmmo();
-        actor->TryInventoryCrouch(true);
-        actor->EnableInvEffector(true);
         TryActivateKnife();
     }
     PlaySnd(eInvSndOpen);
