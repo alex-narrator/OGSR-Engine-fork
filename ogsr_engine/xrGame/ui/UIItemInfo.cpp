@@ -210,8 +210,14 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
         UIItemImage->GetUIStaticItem().SetRect(v_r);
         UIItemImage->SetWidth(_min(v_r.width(), UIItemImageSize.x));
         UIItemImage->SetHeight(_min(v_r.height(), UIItemImageSize.y));
+        
+        float scale_x = UIItemImageSize.x / v_r.width();
+        float scale_y = UIItemImageSize.y / v_r.height();
+        scale_x = (scale_x > 1) ? 1.0f : scale_x;
+        scale_y = (scale_y > 1) ? 1.0f : scale_y;
+        float scale = scale_x < scale_y ? scale_x : scale_y;
 
-        TryAttachIcons(UIItemImage, pInvItem);
+        TryAttachIcons(UIItemImage, pInvItem, scale);
     }
 }
 
