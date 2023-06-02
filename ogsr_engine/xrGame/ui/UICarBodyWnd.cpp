@@ -299,6 +299,8 @@ void CUICarBodyWnd::Hide()
         actor->EnableUIDOF(false);
     }
     m_bShowAllInv = false;
+    if (Core.Features.test(xrCore::Feature::floating_description_window))
+        m_pUIDescWnd->Reset();
     PlaySnd(eInvSndClose);
 }
 
@@ -655,7 +657,6 @@ void CUICarBodyWnd::Update()
         GetHolder()->StartStopMenu(this, true);
     }
     CheckForcedWeightUpdate();
-    Actor()->EnableUIDOF(true);
     Actor()->UpdateCameraDirection(m_pOtherGO);
     UpdateFloatingItemDescription();
     inherited::Update();
@@ -676,6 +677,7 @@ void CUICarBodyWnd::Show()
         actor->SetRuckAmmoPlacement(true);
         RepackAmmo();
         TryActivateKnife();
+        Actor()->EnableUIDOF(true);
     }
     PlaySnd(eInvSndOpen);
 }

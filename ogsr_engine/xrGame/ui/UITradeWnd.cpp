@@ -624,6 +624,8 @@ void CUITradeWnd::Hide()
         Actor()->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
     }
     m_bShowAllInv = false;
+    if (Core.Features.test(xrCore::Feature::floating_description_window))
+        m_uidata->UIDescWnd.Reset();
 }
 
 void CUITradeWnd::StartTrade()

@@ -274,7 +274,6 @@ void CUIPdaWnd::Update()
 {
     inherited::Update();
     UpdateDateTime();
-    Actor()->EnableUIDOF(true);
 }
 
 void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)

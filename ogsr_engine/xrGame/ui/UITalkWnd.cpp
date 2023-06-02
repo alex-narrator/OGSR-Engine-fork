@@ -211,8 +211,6 @@ void CUITalkWnd::Update()
         UpdateQuestions();
     }
     inherited::Update();
-    if (IsShown())
-        Actor()->EnableUIDOF(true);
     Actor()->UpdateCameraDirection(smart_cast<CGameObject*>(m_pOthersInvOwner));
 }
 
@@ -226,6 +224,7 @@ void CUITalkWnd::Show()
 {
     InitTalkDialog();
     inherited::Show();
+    m_pActor->EnableUIDOF(true);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -253,7 +252,7 @@ void CUITalkWnd::Hide()
         /*Msg("CUITalkWnd::Hide() NonBarterMoney = %i", u_NonBarterMoney);
         Msg("CUITalkWnd::Hide() NonBarterMoneyOther = %i", u_NonBarterMoneyOther);*/
     }
-    Actor()->EnableUIDOF(false);
+    m_pActor->EnableUIDOF(false);
     //
     m_pActor = NULL;
 }

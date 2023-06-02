@@ -828,6 +828,7 @@ void CWeapon::OnH_B_Independent(bool just_before_destroy)
     OnZoomOut();
     m_fZoomRotationFactor = 0.f;
     dof_reload_effect = 0.f;
+    dof_zoom_effect = 0.f;
     shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
     UpdateXForm();
 }
@@ -923,8 +924,11 @@ void CWeapon::UpdateCL()
         if (Actor()->conditions().IsCantWalk() && IsZoomed())
             OnZoomOut();
 
-        UpdateDofAim();
-        UpdateDofReload();
+        if (!HUD().GetUI()->MainInputReceiver() || !psActorFlags.test(AF_DOF_UI_WND))
+        {
+            UpdateDofAim();
+            UpdateDofReload();
+        }
     }
 }
 
@@ -932,14 +936,15 @@ void CWeapon::UpdateDofReload()
 {
     if (!psActorFlags.test(AF_DOF_RELOAD))
         return;
-    if (GetState() == eReload)
+    bool b_increase = GetState() == eReload;
+    if (b_increase)
         dof_reload_effect += Device.fTimeDelta / dof_transition_time;
     else
         dof_reload_effect -= Device.fTimeDelta / dof_transition_time;
-    clamp(dof_reload_effect, 0.f, 1.f);
-    bool b_process = GetState() == eReload && dof_reload_effect <= 1.f || GetState() != eReload && dof_reload_effect > 0.f;
-    if (!b_process)
+    bool b_set_dof = b_increase && dof_reload_effect <= 1.f || !b_increase && dof_reload_effect > 0.f;
+    if (!b_set_dof)
         return;
+    clamp(dof_reload_effect, 0.f, 1.f);
     shader_exports.set_dof_params(
         dof_params_reload.x * dof_reload_effect, 
         dof_params_reload.y * dof_reload_effect, 
@@ -951,19 +956,20 @@ void CWeapon::UpdateDofAim()
 { 
     if (!psActorFlags.test(AF_DOF_ZOOM_NEW))
         return;
-    if (GetState() != eIdle && GetState() != eFire)
+    bool b_increase = IsZoomed();
+    bool b_set_dof = b_increase && dof_zoom_effect <= 1.f || !b_increase && dof_zoom_effect > 0.f;
+    if (!b_set_dof)
         return;
-    if (IsZoomed() && UseScopeTexture() && !m_bForceScopeDOF)
-    {
-        shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
-        return;
-    }
-    float rotation{m_fZoomRotationFactor};
+    if (b_increase)
+        dof_zoom_effect += Device.fTimeDelta / dof_transition_time;
+    else
+        dof_zoom_effect -= Device.fTimeDelta / dof_transition_time;
+    clamp(dof_zoom_effect, 0.f, 1.f);
     shader_exports.set_dof_params(
-        dof_params_zoom.x * rotation, 
-        dof_params_zoom.y * rotation, 
-        dof_params_zoom.z * rotation, 
-        dof_params_zoom.w * rotation);
+        dof_params_zoom.x * dof_zoom_effect, 
+        dof_params_zoom.y * dof_zoom_effect, 
+        dof_params_zoom.z * dof_zoom_effect, 
+        dof_params_zoom.w * dof_zoom_effect);
 }
 
 void CWeapon::renderable_Render()
@@ -1856,8 +1862,6 @@ void CWeapon::Hide(bool now)
     else
         SwitchState(eHiding);
     OnZoomOut();
-
-    shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
 }
 
 void CWeapon::Show(bool now)
@@ -1871,8 +1875,6 @@ void CWeapon::Show(bool now)
     }
     else
         SwitchState(eShowing);
-
-    shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
 }
 
 bool CWeapon::show_crosshair() { return psActorFlags.test(AF_CROSSHAIR_DBG) || !(IsZoomed() && ZoomHideCrosshair()); }

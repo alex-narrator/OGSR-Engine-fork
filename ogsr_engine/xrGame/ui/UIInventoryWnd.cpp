@@ -474,7 +474,6 @@ void CUIInventoryWnd::Update()
 
     UIStaticTimeString.SetText(InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
     UIStaticTime.Show(Actor()->HasPDAWorkable());
-    Actor()->EnableUIDOF(true);
     UpdateFloatingItemDescription();
 
     CUIWindow::Update();
@@ -499,6 +498,7 @@ void CUIInventoryWnd::Show()
         //actor->SetWeaponHideState(INV_STATE_INV_WND, true);
         actor->SetRuckAmmoPlacement(true); // установим флаг перезарядки из рюкзака
         m_pInv->RepackAmmo();
+        Actor()->EnableUIDOF(true);
     }
 }
 
@@ -522,6 +522,8 @@ void CUIInventoryWnd::Hide()
         actor->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
         actor->EnableUIDOF(false);
     }
+    if (Core.Features.test(xrCore::Feature::floating_description_window))
+        UIDescrWnd.Reset();
     HideSlotsHighlight();
 }
 

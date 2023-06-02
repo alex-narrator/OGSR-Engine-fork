@@ -428,9 +428,8 @@ public:
     float camStepAngleHorz;
 
     float dof_transition_time{};
-    float dof_reload_effect{};
-    Fvector4 dof_params_zoom{};
-    Fvector4 dof_params_reload{};
+    float dof_reload_effect{}, dof_zoom_effect{};
+    Fvector4 dof_params_zoom{}, dof_params_reload{};
     void UpdateDofReload();
     void UpdateDofAim();
 
