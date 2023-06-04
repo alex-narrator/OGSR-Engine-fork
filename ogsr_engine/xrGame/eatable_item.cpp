@@ -153,7 +153,7 @@ void CEatableItem::UseBy(CEntityAlive* entity_alive)
     // уменьшить количество порций
     if (m_iPortionsNum > 0)
         --(m_iPortionsNum);
-    else
+    else if (m_iPortionsNum != -1)
         m_iPortionsNum = 0;
 
     // Real Wolf: Уменьшаем вес и цену после использования.
