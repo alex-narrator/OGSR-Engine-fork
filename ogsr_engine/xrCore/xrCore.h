@@ -181,7 +181,7 @@ public:
         static constexpr u64 
             equipped_untradable = 1ull << 0, 
             highlight_equipped = 1ull << 1, 
-            floating_description_window = 1ull << 2, 
+            //NOT USED = 1ull << 2, 
             //NOT USED = 1ull << 3,
             //NOT USED = 1ull << 4, 
             //NOT USED = 1ull << 5, 

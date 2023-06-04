@@ -130,6 +130,5 @@ protected:
     bool m_bShowAllInv{};
 
     CUICellItem* itm_to_descr{};
-    u32 delay_time{}, delay{};
-    Fvector2 info_offset{};
+    u32 delay_time{};
 };

@@ -1,46 +1,48 @@
 <?xml version='1.0' encoding="UTF-8"?>
 <w>
-	<auto>
-		<auto_static x="0" y="43" width="50" height="18">
-			<text  align="r" x="0" y="0" font="letterica18" r="128" g="128" b="128">st_weight</text>
-		</auto_static>
-		
-		<auto_static x="280" y="43" width="65" height="20">
-			<text  align="r" x="0" y="0" font="letterica18" r="128" g="128" b="128">st_condition</text>
-		</auto_static>
-	</auto>
+	<main_frame x="0" y="0" width="256" height="100" offset_x="20" offset_y="25" min_height="165"/>
 	
-	<static_name x="16" y="13" width="350" height="25">
-		<text align="l" x="0" y="0" font="graffiti22" r="238" g="155" b="23"complex_mode="0"/>
+	<background_frame x="0" y="0" width="256" height="0">
+		<texture>ui_inGame2_hint_wnd_main_window</texture>
+	</background_frame>
+	
+	<static_name x="10" y="10" width="235" height="20" stretch="1">
+		<text font="letterica18" r="238" g="155" b="23" complex_mode="1" align="l" vert_align="t"/>		
 	</static_name>
 
-	<static_weight x="55" y="43" width="80" height="18">
-		<text  align="l" x="0" y="0" font="letterica18" r="240" g="217" b="182"/>
-	</static_weight>
-	
-	<static_volume x="200" y="43" width="80" height="18">
-		<text  align="l" x="0" y="0" font="letterica18" r="240" g="217" b="182"/>
-	</static_volume>
+<!-- 	<auto_static x="155" y="10" width="100" height="20">
+		<text  align="l" x="0" y="0" font="letterica16" r="240" g="217" b="182" vert_align="c">st_base_cost</text>
+	</auto_static> -->
+<!-- 	<auto_static x="10" y="40" width="100" height="20">
+		<text  align="l" x="0" y="0" font="letterica16" r="240" g="217" b="182" vert_align="c">st_weight</text>
+	</auto_static> -->
+<!-- 	<auto_static x="155" y="50" width="100" height="20">
+		<text  align="l" x="0" y="0" font="letterica16" r="240" g="217" b="182" vert_align="c">st_condition</text>
+	</auto_static> -->
 
-	<static_cost x="400" y="13" width="110" height="18">
-		<text  align="l" x="0" y="0" font="graffiti22" r="240" g="215" b="185"/>
+	<static_cost x="50" y="30" width="30" height="20" stretch="1">
+		<text font="letterica16" r="238" g="155" b="23" align="l" vert_align="c"/>
 	</static_cost>
-	
-	<static_condition x="350" y="43" width="65" height="20">
-		<text  align="l" x="0" y="0" font="letterica18" r="240" g="215" b="185"/>
-	</static_condition>	
 
+	<static_weight x="10" y="30" width="30" height="20" stretch="1">
+		<text font="letterica16" r="238" g="155" b="23" align="l" vert_align="c"/>
+	</static_weight>
 
-	<descr_list x="16" y="69" width="480" height="130"  left_ident="16" always_show_scroll="0">
-		<font font="letterica16" r="240" g="217" b="182"/>
+<!-- 	<static_condition x="180" y="50" width="67" height="20" stretch="1">
+		<text font="letterica16" r="238" g="155" b="23" align="r" vert_align="c">st_condition</text>
+	</static_condition> -->
+
+	<descr_list x="10" y="70" width="235" height="130" always_show_scroll="0" left_ident="16" bottom_indent="10">
+		<text font="letterica16" r="240" g="217" b="182"/>
 	</descr_list>
-    
-    <condition_progress x="400" y="50" width="95" height="8" horz="1" min="0" max="100" pos="100">
+
+	<image_static x="10" y="10" width="0" height="0" alignment="l" stretch="1"/>		
+	
+    <condition_progress x="11" y="50" width="80" height="6" horz="1" min="0" max="100" pos="100">
 		<min_color r="255" g="0" b="0"/>
 		<max_color r="0" g="255" b="0"/>
 		<progress>
 			<texture>ui_mg_progress_efficiency_full</texture>
-		</progress>
-    </condition_progress>	
+		</progress>        
+    </condition_progress>
 </w>
-

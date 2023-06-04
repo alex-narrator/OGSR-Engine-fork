@@ -10,6 +10,7 @@ class CUIArtefactParams;
 class CUIEquipParams;
 class CUIEatableParams;
 class CUIArmorParams;
+class CUIFrameWindow;
 
 // extern const char * const 		fieldsCaptionColor;
 
@@ -29,7 +30,6 @@ public:
     CUIItemInfo();
     virtual ~CUIItemInfo();
 
-    void Init(float x, float y, float width, float height, LPCSTR xml_name);
     void Init(LPCSTR xml_name);
     void InitItem(CInventoryItem* pInvItem);
 
@@ -43,6 +43,7 @@ public:
     virtual void Draw();
     virtual void Update();
     bool m_b_force_drawing{};
+    CUIFrameWindow* UIBackground{}; 
     CUIStatic* UIName{};
     CUIStatic* UIWeight{};
     CUIStatic* UICost{};
@@ -57,4 +58,8 @@ public:
 
     Fvector2 UIItemImageSize{};
     CUIStatic* UIItemImage;
+
+    u32 show_delay{};
+    Fvector2 info_offset{};
+    float min_height{};
 };

@@ -80,10 +80,6 @@
 			group_similar="1" unlimited="1"/>
 
 
-	<descr_static x="258" y="22" width="507" height="232" stretch="1" show_x="20" show_y="25">
-		<texture>ui_hud_frame_buyM</texture>		
-	</descr_static>
-
 	<price_mt_static x="35" y="10" width="347" height="40">
 		<phrase x="0" y="0" width="170" font="graffiti22" r="238" g="153" b="26">ui_st_your_items</phrase>
 		<phrase x="175" y="0" font="graffiti22" r="220" g="185" b="140">ui_st_price</phrase>

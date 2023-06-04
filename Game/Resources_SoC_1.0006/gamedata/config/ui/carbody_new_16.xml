@@ -44,14 +44,6 @@
 		<_left_top_texture x="5" y="10">ui\ui_inv_info_over_lt</_left_top_texture>
 	</frame_window>
 
-	<descr_static x="5" y="184" width="260" height="270" stretch="1" show_x="20" show_y="25">
-		<texture width="258" height="271">ui\ui_inv_info_over_b</texture>
-	</descr_static>
-
-	<auto_static x="395" y="461" width="220" height="30">
-		<text font="graffiti22" r="255" g="255" b="255" a="128">ui_st_description</text>
-	</auto_static>
-
 	<top_background x=0 y=0 width=1024 height=128>
 		<texture>ui\ui_top_background</texture>
 	</top_background>

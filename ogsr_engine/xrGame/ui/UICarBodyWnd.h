@@ -62,8 +62,6 @@ protected:
     CUIStatic* m_pUIStaticTop;
     CUIStatic* m_pUIStaticBottom;
 
-    CUIFrameWindow* m_pUIDescWnd;
-    CUIStatic* m_pUIStaticDesc;
     CUIItemInfo* m_pUIItemInfo;
 
     CUIStatic* m_pUIOurBagWnd;
@@ -139,6 +137,5 @@ protected:
     bool m_bShowAllInv{};
 
     CUICellItem* itm_to_descr{};
-    u32 delay_time{}, delay{};
-    Fvector2 info_offset{};
+    u32 delay_time{};
 };

@@ -81,7 +81,6 @@ protected:
     CUIStatic UIBagWnd;
     CUIStatic UIWeightWnd;
     CUIStatic UIMoneyWnd;
-    CUIStatic UIDescrWnd;
     CUIFrameWindow UIPersonalWnd;
 
     CUI3tButton* UIExitButton;
@@ -195,8 +194,7 @@ protected:
     u32 m_iCurrentActiveSlot{NO_ACTIVE_SLOT};
     
     CUICellItem* itm_to_descr{};
-    u32 delay_time{}, delay{};
-    Fvector2 info_offset{};
+    u32 delay_time{};
 
 public:
     PIItem CurrentIItem();

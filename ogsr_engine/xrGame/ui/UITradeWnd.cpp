@@ -76,7 +76,6 @@ struct CUITradeInternal
     CUICharacterInfo UICharacterInfoRight;
 
     // информация о перетаскиваемом предмете
-    CUIStatic UIDescWnd;
     CUIItemInfo UIItemInfo;
 
     SDrawStaticStruct* UIDealMsg{};
@@ -168,13 +167,8 @@ void CUITradeWnd::Init()
     m_uidata->UIOthersTradeWnd.AttachChild(&m_uidata->UIOthersTradeList);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_list", 3, &m_uidata->UIOthersTradeList);
 
-    AttachChild(&m_uidata->UIDescWnd);
-    xml_init.InitStatic(uiXml, "descr_static", 0, &m_uidata->UIDescWnd);
-    m_uidata->UIDescWnd.AttachChild(&m_uidata->UIItemInfo);
-    m_uidata->UIItemInfo.Init(0, 0, m_uidata->UIDescWnd.GetWidth(), m_uidata->UIDescWnd.GetHeight(), TRADE_ITEM_XML);
-    delay = uiXml.ReadAttribInt("descr_static", 0, "show_delay", 1);
-    info_offset.x = uiXml.ReadAttribFlt("descr_static", 0, "show_x");
-    info_offset.y = uiXml.ReadAttribFlt("descr_static", 0, "show_y");
+    AttachChild(&m_uidata->UIItemInfo);
+    m_uidata->UIItemInfo.Init(TRADE_ITEM_XML);
 
     xml_init.InitAutoStatic(uiXml, "auto_static", this);
 
@@ -624,8 +618,7 @@ void CUITradeWnd::Hide()
         Actor()->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
     }
     m_bShowAllInv = false;
-    if (Core.Features.test(xrCore::Feature::floating_description_window))
-        m_uidata->UIDescWnd.Reset();
+    m_uidata->UIItemInfo.Reset();
 }
 
 void CUITradeWnd::StartTrade()
@@ -1043,8 +1036,7 @@ void CUITradeWnd::SetCurrentItem(CUICellItem* itm)
     if (!m_pCurrentCellItem)
         itm_to_descr = nullptr;
     
-    if (!Core.Features.test(xrCore::Feature::floating_description_window))
-        m_uidata->UIItemInfo.InitItem(CurrentIItem());
+    //m_uidata->UIItemInfo.InitItem(CurrentIItem());
 
     if (!m_pCurrentCellItem)
         return;
@@ -1190,27 +1182,27 @@ void CUITradeWnd::DetachAddon(const char* addon_name, bool for_all)
 
 void CUITradeWnd::InitFloatingDescription(CUICellItem* itm)
 {
-    if (!Core.Features.test(xrCore::Feature::floating_description_window) || Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
+    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
         return;
     itm_to_descr = itm;
     m_uidata->UIItemInfo.InitItem((PIItem)itm_to_descr->m_pData);
-    delay_time = Device.dwTimeGlobal + delay * 1000;
-    BringToTop(&m_uidata->UIDescWnd);
+    delay_time = Device.dwTimeGlobal + m_uidata->UIItemInfo.show_delay * 1000;
+    BringToTop(&m_uidata->UIItemInfo);
 }
 void CUITradeWnd::UpdateFloatingItemDescription()
 {
-    if (!Core.Features.test(xrCore::Feature::floating_description_window) || Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
+    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
         return;
     auto cur_time = Device.dwTimeGlobal;
-    m_uidata->UIDescWnd.Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time && !m_pUIPropertiesBox->IsShown());
+    m_uidata->UIItemInfo.Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time && !m_pUIPropertiesBox->IsShown());
     Fvector2 v_res{1024.f, 768.f};
     Fvector2 pos{GetUICursor()->GetCursorPosition()};
-    pos.add(info_offset);
-    Fvector2 wnd_size{m_uidata->UIDescWnd.GetWidth(), m_uidata->UIDescWnd.GetHeight()};
+    pos.add(m_uidata->UIItemInfo.info_offset);
+    Fvector2 wnd_size{m_uidata->UIItemInfo.GetWidth(), m_uidata->UIItemInfo.GetHeight()};
     Fvector2 delta{pos.x + wnd_size.x - v_res.x, pos.y + wnd_size.y - v_res.y};
     if (delta.x > 0.f)
         pos.x -= delta.x;
     if (delta.y > 0.f)
         pos.y -= delta.y;
-    m_uidata->UIDescWnd.SetWndPos(pos);
+    m_uidata->UIItemInfo.SetWndPos(pos);
 }

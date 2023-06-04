@@ -12,6 +12,7 @@ public:
     virtual ~CUIArtefactParams();
     void Init();
     void SetInfo(CInventoryItem* obj);
+    bool Check(CInventoryItem* obj);
 
 protected:
     enum

@@ -7,6 +7,7 @@
 #include "UIListWnd.h"
 #include "UIProgressBar.h"
 #include "UIScrollView.h"
+#include "UIFrameWindow.h"
 
 #include "../string_table.h"
 #include "../Inventory_Item.h"
@@ -41,14 +42,31 @@ void CUIItemInfo::Init(LPCSTR xml_name)
 
     if (uiXml.NavigateToNode("main_frame", 0))
     {
-        Frect wnd_rect;
+        Frect wnd_rect{};
         wnd_rect.x1 = uiXml.ReadAttribFlt("main_frame", 0, "x", 0);
         wnd_rect.y1 = uiXml.ReadAttribFlt("main_frame", 0, "y", 0);
 
         wnd_rect.x2 = uiXml.ReadAttribFlt("main_frame", 0, "width", 0);
         wnd_rect.y2 = uiXml.ReadAttribFlt("main_frame", 0, "height", 0);
+        wnd_rect.x2 += wnd_rect.x1;
+        wnd_rect.y2 += wnd_rect.y1;
+        inherited::SetWndRect(wnd_rect);
 
-        inherited::Init(wnd_rect.x1, wnd_rect.y1, wnd_rect.x2, wnd_rect.y2);
+        show_delay = uiXml.ReadAttribFlt("main_frame", 0, "delay", 1);
+        info_offset.x = uiXml.ReadAttribFlt("main_frame", 0, "offset_x");
+        info_offset.y = uiXml.ReadAttribFlt("main_frame", 0, "offset_y");
+
+        min_height = uiXml.ReadAttribFlt("main_frame", 0, "min_height");
+
+        //inherited::Init(wnd_rect.x1, wnd_rect.y1, wnd_rect.x2, wnd_rect.y2);
+    }
+
+    if (uiXml.NavigateToNode("background_frame", 0))
+    {
+        UIBackground = xr_new<CUIFrameWindow>();
+        UIBackground->SetAutoDelete(true);
+        AttachChild(UIBackground);
+        xml_init.InitFrameWindow(uiXml, "background_frame", 0, UIBackground);
     }
 
     if (uiXml.NavigateToNode("static_name", 0))
@@ -131,12 +149,6 @@ void CUIItemInfo::Init(LPCSTR xml_name)
     xml_init.InitAutoStaticGroup(uiXml, "auto", 0, this);
 }
 
-void CUIItemInfo::Init(float x, float y, float width, float height, LPCSTR xml_name)
-{
-    inherited::Init(x, y, width, height);
-    Init(xml_name);
-}
-
 using namespace InventoryUtilities;
 
 void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
@@ -194,6 +206,15 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
             pItem->AdjustHeightToText();
             UIDesc->AddWindow(pItem, true);
         }
+        //
+        UIDesc->SetWndSize(Fvector2().set(UIDesc->GetWndSize().x, UIDesc->GetPadSize().y));
+        if (UIBackground)
+        {
+            float _height = _max(min_height, UIDesc->GetWndPos().y + UIDesc->GetWndSize().y);
+            UIBackground->SetHeight(_height);
+            SetHeight(_height);
+        }
+        //
         UIDesc->ScrollToBegin();
     }
     if (UIItemImage)
@@ -232,8 +253,11 @@ void CUIItemInfo::TryAddWpnInfo(CInventoryItem* obj)
 
 void CUIItemInfo::TryAddArtefactInfo(CInventoryItem* obj)
 {
-    UIArtefactParams->SetInfo(obj);
-    UIDesc->AddWindow(UIArtefactParams, false);
+    if (UIArtefactParams->Check(obj))
+    {
+        UIArtefactParams->SetInfo(obj);
+        UIDesc->AddWindow(UIArtefactParams, false);
+    }
 }
 
 void CUIItemInfo::TryAddEquipInfo(CInventoryItem* obj)

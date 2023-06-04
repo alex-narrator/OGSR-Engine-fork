@@ -1,29 +1,44 @@
 <?xml version='1.0' encoding="UTF-8"?>
 <w>
-
-	<static_name x="23" y="188" width="139" height="30" stretch="1">
-		<text font="letterica18" r="238" g="155" b="23" complex_mode="1" align="l" vert_align="c"/>		
+	<main_frame x="0" y="0" width="256" height="100" offset_x="20" offset_y="25" min_height="165"/>
+	
+	<background_frame x="0" y="0" width="256" height="0">
+		<texture>ui_inGame2_hint_wnd_main_window</texture>
+	</background_frame>
+	
+	<static_name x="10" y="10" width="235" height="20" stretch="1">
+		<text font="letterica18" r="238" g="155" b="23" complex_mode="1" align="l" vert_align="t"/>		
 	</static_name>
 
-	<static_weight x="23" y="222" width="67" height="20" stretch="1">
-		<text align="l" font="letterica16" r="135" g="128" b="122"/>
+<!-- 	<auto_static x="155" y="10" width="100" height="20">
+		<text  align="l" x="0" y="0" font="letterica16" r="240" g="217" b="182" vert_align="c">st_base_cost</text>
+	</auto_static> -->
+<!-- 	<auto_static x="10" y="40" width="100" height="20">
+		<text  align="l" x="0" y="0" font="letterica16" r="240" g="217" b="182" vert_align="c">st_weight</text>
+	</auto_static> -->
+<!-- 	<auto_static x="155" y="50" width="100" height="20">
+		<text  align="l" x="0" y="0" font="letterica16" r="240" g="217" b="182" vert_align="c">st_condition</text>
+	</auto_static> -->
+
+<!-- 	<static_cost x="180" y="10" width="67" height="20" stretch="1">
+		<text font="letterica16" r="238" g="155" b="23" align="r" vert_align="c"/>
+	</static_cost> -->
+
+	<static_weight x="10" y="30" width="30" height="20" stretch="1">
+		<text font="letterica16" r="238" g="155" b="23" align="l" vert_align="c"/>
 	</static_weight>
 
-	<static_cost x="215" y="188" width="83" height="30" stretch="1">
-		<text font="letterica18" r="238" g="155" b="23" align="c" vert_align="c"/>
-	</static_cost>
+<!-- 	<static_condition x="180" y="50" width="67" height="20" stretch="1">
+		<text font="letterica16" r="238" g="155" b="23" align="r" vert_align="c">st_condition</text>
+	</static_condition> -->
 
-	<static_condition x="113" y="222" width="72" height="20" stretch="1">
-		<text align="r" font="letterica16" r="135" g="128" b="122">st_condition</text>
-	</static_condition>
-
-	<descr_list x="20" y="245" width="305" height="193" always_show_scroll="0" left_ident="16">
-		<font font="letterica16" r="240" g="217" b="182"/>
+	<descr_list x="10" y="70" width="235" height="130" always_show_scroll="0" left_ident="16" bottom_indent="10">
+		<text font="letterica16" r="240" g="217" b="182"/>
 	</descr_list>
 
-	<image_static x="170" y="100" width="226" height="180" alignment="c" stretch="1"/>		
+	<image_static x="10" y="10" width="0" height="0" alignment="l" stretch="1"/>		
 	
-    <condition_progress x="210" y="227" width="107" height="8" horz="1" min="0" max="100" pos="100">
+    <condition_progress x="11" y="50" width="80" height="6" horz="1" min="0" max="100" pos="100">
 		<min_color r="255" g="0" b="0"/>
 		<max_color r="0" g="255" b="0"/>
 		<progress>

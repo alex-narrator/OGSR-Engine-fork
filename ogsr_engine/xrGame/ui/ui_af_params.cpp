@@ -53,9 +53,17 @@ LPCSTR af_item_sect_names[] = {
 };
 
 LPCSTR af_item_param_names[] = {
-    "ui_inv_health_boost", "ui_inv_power", "ui_inv_max_power", "ui_inv_satiety", "ui_inv_radiation", "ui_inv_psy_health", "ui_inv_alcohol", "ui_inv_wounds_heal",
+    "ui_inv_health_boost", 
+    "ui_inv_power", 
+    "ui_inv_max_power", 
+    "ui_inv_satiety", 
+    "ui_inv_radiation", 
+    "ui_inv_psy_health", 
+    "ui_inv_alcohol", 
+    "ui_inv_wounds_heal",
     //
-    "ui_inv_sprint", "ui_inv_jump",
+    "ui_inv_sprint", 
+    "ui_inv_jump",
     //
     "ui_inv_weight",
     //
@@ -69,6 +77,24 @@ LPCSTR af_item_param_names[] = {
     "ui_inv_explosion_protection", // "(explosion_imm)",
     "ui_inv_fire_wound_protection", // "(fire_wound_imm)",
 };
+
+bool CUIArtefactParams::Check(CInventoryItem* obj) 
+{ 
+    for (int i = 0; i < _max_item_index; ++i)
+    {
+        if (i < _hit_type_protection_index)
+        {
+            if (!fis_zero(obj->GetItemEffect(i)))
+                return true;
+        }
+        else
+        {
+            if (!fis_zero(obj->GetHitTypeProtection(i - _hit_type_protection_index)))
+                return true;
+        }
+    }
+    return false;
+}
 
 void CUIArtefactParams::Init()
 {
@@ -109,7 +135,7 @@ void CUIArtefactParams::SetInfo(CInventoryItem* obj)
     float _h{};
     DetachAll();
 
-    for (u32 i = 0; i < _max_item_index; ++i)
+    for (int i = 0; i < _max_item_index; ++i)
     {
         CUIStatic* _s = m_info_items[i];
         R_ASSERT2(_s, make_string("%s static %s not described", __FUNCTION__, af_item_sect_names[i]));

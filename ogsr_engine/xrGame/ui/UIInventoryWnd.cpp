@@ -77,15 +77,9 @@ void CUIInventoryWnd::Init()
 
     AttachChild(&UIMoneyWnd);
     xml_init.InitStatic(uiXml, "money_static", 0, &UIMoneyWnd);
-
-    AttachChild(&UIDescrWnd);
-    xml_init.InitStatic(uiXml, "descr_static", 0, &UIDescrWnd);
-    delay = uiXml.ReadAttribInt("descr_static", 0, "show_delay", 1);
-    info_offset.x = uiXml.ReadAttribFlt("descr_static", 0, "show_x");
-    info_offset.y = uiXml.ReadAttribFlt("descr_static", 0, "show_y");
-
-    UIDescrWnd.AttachChild(&UIItemInfo);
-    UIItemInfo.Init(0, 0, UIDescrWnd.GetWidth(), UIDescrWnd.GetHeight(), INVENTORY_ITEM_XML);
+    
+    AttachChild(&UIItemInfo);
+    UIItemInfo.Init(INVENTORY_ITEM_XML);
 
     AttachChild(&UIPersonalWnd);
     xml_init.InitFrameWindow(uiXml, "character_frame_window", 0, &UIPersonalWnd);
@@ -522,8 +516,7 @@ void CUIInventoryWnd::Hide()
         actor->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
         actor->EnableUIDOF(false);
     }
-    if (Core.Features.test(xrCore::Feature::floating_description_window))
-        UIDescrWnd.Reset();
+    UIItemInfo.Reset();
     HideSlotsHighlight();
 }
 
@@ -726,27 +719,27 @@ void CUIInventoryWnd::CheckForcedWeightUpdate()
 
 void CUIInventoryWnd::InitFloatingDescription(CUICellItem* itm)
 {
-    if (!Core.Features.test(xrCore::Feature::floating_description_window) || Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
+    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
         return;
     itm_to_descr = itm;
     UIItemInfo.InitItem((PIItem)itm_to_descr->m_pData);
-    delay_time = Device.dwTimeGlobal + delay * 1000;
-    BringToTop(&UIDescrWnd);
+    delay_time = Device.dwTimeGlobal + UIItemInfo.show_delay * 1000;
+    BringToTop(&UIItemInfo);
 }
 void CUIInventoryWnd::UpdateFloatingItemDescription()
 {
-    if (!Core.Features.test(xrCore::Feature::floating_description_window) || Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
+    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
         return;
     auto cur_time = Device.dwTimeGlobal;
-    UIDescrWnd.Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time && !UIPropertiesBox.IsShown());
+    UIItemInfo.Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time && !UIPropertiesBox.IsShown());
     Fvector2 v_res{1024.f, 768.f};
     Fvector2 pos{GetUICursor()->GetCursorPosition()};
-    pos.add(info_offset);
-    Fvector2 wnd_size{UIDescrWnd.GetWidth(), UIDescrWnd.GetHeight()};
+    pos.add(UIItemInfo.info_offset);
+    Fvector2 wnd_size{UIItemInfo.GetWidth(), UIItemInfo.GetHeight()};
     Fvector2 delta{pos.x + wnd_size.x - v_res.x, pos.y + wnd_size.y - v_res.y};
     if (delta.x > 0.f)
         pos.x -= delta.x;
     if (delta.y > 0.f)
         pos.y -= delta.y;
-    UIDescrWnd.SetWndPos(pos);
+    UIItemInfo.SetWndPos(pos);
 }

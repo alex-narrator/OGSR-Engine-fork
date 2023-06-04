@@ -121,23 +121,10 @@ void CUICarBodyWnd::Init()
     xml_init.InitDragDropListEx(uiXml, "dragdrop_list_other", 0, m_pUIOthersBagList);
 
     // информация о предмете
-    m_pUIDescWnd = xr_new<CUIFrameWindow>();
-    m_pUIDescWnd->SetAutoDelete(true);
-    AttachChild(m_pUIDescWnd);
-    xml_init.InitFrameWindow(uiXml, "frame_window", 0, m_pUIDescWnd);
-
-    m_pUIStaticDesc = xr_new<CUIStatic>();
-    m_pUIStaticDesc->SetAutoDelete(true);
-    m_pUIDescWnd->AttachChild(m_pUIStaticDesc);
-    xml_init.InitStatic(uiXml, "descr_static", 0, m_pUIStaticDesc);
-    delay = uiXml.ReadAttribInt("descr_static", 0, "show_delay", 1);
-    info_offset.x = uiXml.ReadAttribFlt("descr_static", 0, "show_x");
-    info_offset.y = uiXml.ReadAttribFlt("descr_static", 0, "show_y");
-
     m_pUIItemInfo = xr_new<CUIItemInfo>();
     m_pUIItemInfo->SetAutoDelete(true);
-    m_pUIDescWnd->AttachChild(m_pUIItemInfo);
-    m_pUIItemInfo->Init(0, 0, m_pUIDescWnd->GetWidth(), m_pUIDescWnd->GetHeight(), CARBODY_ITEM_XML);
+    AttachChild(m_pUIItemInfo);
+    m_pUIItemInfo->Init(CARBODY_ITEM_XML);
 
     xml_init.InitAutoStatic(uiXml, "auto_static", this);
 
@@ -148,7 +135,7 @@ void CUICarBodyWnd::Init()
     m_pUIPropertiesBox->Hide();
 
     SetCurrentItem(NULL);
-    m_pUIStaticDesc->SetText(NULL);
+    //m_pUIStaticDesc->SetText(NULL);
 
     m_pUITakeAll = xr_new<CUI3tButton>();
     m_pUITakeAll->SetAutoDelete(true);
@@ -299,8 +286,7 @@ void CUICarBodyWnd::Hide()
         actor->EnableUIDOF(false);
     }
     m_bShowAllInv = false;
-    if (Core.Features.test(xrCore::Feature::floating_description_window))
-        m_pUIDescWnd->Reset();
+    m_pUIItemInfo->Reset();
     PlaySnd(eInvSndClose);
 }
 
@@ -706,8 +692,7 @@ void CUICarBodyWnd::SetCurrentItem(CUICellItem* itm)
     if (!m_pCurrentCellItem)
         itm_to_descr = nullptr;
     
-    if (!Core.Features.test(xrCore::Feature::floating_description_window))
-        m_pUIItemInfo->InitItem(CurrentIItem());
+    //m_pUIItemInfo->InitItem(CurrentIItem());
 
     if (m_pCurrentCellItem)
     {
@@ -1070,27 +1055,27 @@ void CUICarBodyWnd::RepackAmmo()
 
 void CUICarBodyWnd::InitFloatingDescription(CUICellItem* itm)
 {
-    if (!Core.Features.test(xrCore::Feature::floating_description_window) || Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
+    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
         return;
     itm_to_descr = itm;
     m_pUIItemInfo->InitItem((PIItem)itm_to_descr->m_pData);
-    delay_time = Device.dwTimeGlobal + delay * 1000;
-    BringToTop(m_pUIDescWnd);
+    delay_time = Device.dwTimeGlobal + m_pUIItemInfo->show_delay * 1000;
+    BringToTop(m_pUIItemInfo);
 }
 void CUICarBodyWnd::UpdateFloatingItemDescription()
 {
-    if (!Core.Features.test(xrCore::Feature::floating_description_window) || Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
+    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
         return;
     auto cur_time = Device.dwTimeGlobal;
-    m_pUIDescWnd->Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time && !m_pUIPropertiesBox->IsShown());
+    m_pUIItemInfo->Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time && !m_pUIPropertiesBox->IsShown());
     Fvector2 v_res{1024.f, 768.f};
     Fvector2 pos{GetUICursor()->GetCursorPosition()};
-    pos.add(info_offset);
-    Fvector2 wnd_size{m_pUIDescWnd->GetWidth(), m_pUIDescWnd->GetHeight()};
+    pos.add(m_pUIItemInfo->info_offset);
+    Fvector2 wnd_size{m_pUIItemInfo->GetWidth(), m_pUIItemInfo->GetHeight()};
     Fvector2 delta{pos.x + wnd_size.x - v_res.x, pos.y + wnd_size.y - v_res.y};
     if (delta.x > 0.f)
         pos.x -= delta.x;
     if (delta.y > 0.f)
         pos.y -= delta.y;
-    m_pUIDescWnd->SetWndPos(pos);
+    m_pUIItemInfo->SetWndPos(pos);
 }
