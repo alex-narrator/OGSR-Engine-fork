@@ -280,12 +280,6 @@ protected:
     //устанавливается в game
     u8 m_loaded_ph_box_id{};
 
-    float m_fGroggyTreshold{};
-    ref_sound sndGroggy{};
-    shared_str m_GroggyEffector{};
-    shared_str m_InvEffOpen{};
-    shared_str m_InvEffClose{};
-
 private:
     void SwitchOutBorder(bool new_border_state);
 
@@ -812,8 +806,6 @@ public:
     bool IsRuckAmmoPlacement() { return m_bRuckAmmoPlacement; };
     void SetRuckAmmoPlacement(bool set_ruck) { m_bRuckAmmoPlacement = set_ruck; };
 
-    void DrawHUDMasks();
-
     void TryPlayAnimItemTake();
     void ActorCheckout();
     void ActorCheckGear();
@@ -837,8 +829,6 @@ protected:
 public:
     float GetItemBoostedParams(int);
     float GetTotalArtefactsEffect(int);
-
-    virtual void TryGroggyEffect(SHit* pHDS);
 
     bool SaveGameAllowed();
     bool InSafeHouse();

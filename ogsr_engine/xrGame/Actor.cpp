@@ -396,14 +396,6 @@ void CActor::Load(LPCSTR section)
 
     m_news_to_show = READ_IF_EXISTS(pSettings, r_u32, section, "news_to_show", NEWS_TO_SHOW);
 
-    if (pSettings->section_exist("actor_groggy"))
-    {
-        LPCSTR concussion_sect = "actor_groggy";
-        m_fGroggyTreshold = pSettings->r_float(concussion_sect, "treshold");
-        sndGroggy.create(pSettings->r_string(concussion_sect, "snd"), st_Effect, sg_SourceType);
-        m_GroggyEffector = pSettings->r_string(concussion_sect, "effector");
-    }
-
     m_fThrowImpulse = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "throw_impulse", 5.0f);
     m_fKickImpulse = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "kick_impulse", 250.f);
     m_fKickPower = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "kick_power", .1f);
@@ -413,8 +405,6 @@ void CActor::Load(LPCSTR section)
     m_uActiveItemInfoTTL = READ_IF_EXISTS(pSettings, r_u32, section, "active_item_info_ttl", 0);
     m_uGearInfoTTL = READ_IF_EXISTS(pSettings, r_u32, section, "gear_info_ttl", 0);
     dof_params_ui = READ_IF_EXISTS(pSettings, r_fvector4, "features", "dof_ui_params", (Fvector4{0, 0, 1, 0}));
-    m_InvEffOpen = READ_IF_EXISTS(pSettings, r_string, section, "inv_effector_open", nullptr);
-    m_InvEffClose = READ_IF_EXISTS(pSettings, r_string, section, "inv_effector_close", nullptr);
 }
 
 void CActor::PHHit(SHit& H) { m_pPhysics_support->in_Hit(H, !g_Alive()); }
@@ -865,10 +855,6 @@ void CActor::UpdateCL()
             wpn_cond = wpn->GetCondition();
         shader_exports.set_actor_params(Fvector{this->conditions().GetHealth(), outfit_cond, wpn_cond});
     }
-
-    if (auto ce = Actor()->Cameras().GetCamEffector((ECamEffectorType)effGroggy))
-        if (!sndGroggy._feedback())
-            RemoveEffector(this, effGroggy);
 
     if (!m_uActiveItemInfoTTL)
     {
@@ -1814,23 +1800,6 @@ float CActor::GetTotalArtefactsEffect(int i)
     return res;
 }
 
-void CActor::DrawHUDMasks()
-{
-    if (!g_Alive() || eacFirstEye != cam_active)
-        return;
-    auto pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
-    if (pWeapon && pWeapon->IsZoomed() && !pWeapon->show_indicators())
-        return;
-    if (GetNightVisionDevice())
-        GetNightVisionDevice()->DrawHUDMask();
-    if (GetOutfit())
-        GetOutfit()->DrawHUDMask();
-    if (GetHelmet())
-        GetHelmet()->DrawHUDMask();
-    if (GetGasMask())
-        GetGasMask()->DrawHUDMask();
-}
-
 void CActor::TryPlayAnimItemTake()
 {
     if (!inventory().ActiveItem())
@@ -1841,34 +1810,6 @@ void CActor::TryPlayAnimItemTake()
     if (hud_item->IsZoomed())
         hud_item->OnZoomOut();
     hud_item->PlayAnimOnItemTake();
-}
-
-void CActor::TryGroggyEffect(SHit* pHDS)
-{
-    if (GodMode() || fis_zero(m_fGroggyTreshold) || pHDS->damage() < m_fGroggyTreshold || !IsHitToHead(pHDS))
-        return;
-
-    // groggy effect
-    if (this == Level().CurrentControlEntity())
-    {
-        switch (pHDS->type())
-        {
-        case ALife::eHitTypeFireWound:
-        case ALife::eHitTypeStrike:
-        case ALife::eHitTypePhysicStrike: {
-            CEffectorCam* ce = Actor()->Cameras().GetCamEffector((ECamEffectorType)effGroggy);
-            if (!ce && !!m_GroggyEffector)
-            {
-                AddEffector(this, effGroggy, m_GroggyEffector, pHDS->damage());
-            }
-            Fvector point = Position();
-            point.y += CameraHeight();
-            sndGroggy.play_at_pos(this, point);
-        }
-        break;
-        default: break;
-        }
-    }
 }
 
 bool CActor::SaveGameAllowed()

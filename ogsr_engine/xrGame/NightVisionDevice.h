@@ -19,10 +19,7 @@ public:
     virtual void OnH_B_Independent(bool just_before_destroy);
 
     virtual bool can_be_attached() const;
-    virtual void afterAttach();
     virtual void afterDetach();
-
-    virtual void DrawHUDMask();
 
     virtual void Switch();
     virtual void Switch(bool);
@@ -38,7 +35,4 @@ protected:
     HUD_SOUND sndNightVisionBroken;
 
     shared_str m_NightVisionSect{};
-
-    CUIStaticItem* m_UINightVision{};
-    shared_str m_NightVisionTexture{};
 };

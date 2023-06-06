@@ -16,7 +16,6 @@ CNightVisionDevice::~CNightVisionDevice(void)
     HUD_SOUND::DestroySound(sndNightVisionOff);
     HUD_SOUND::DestroySound(sndNightVisionIdle);
     HUD_SOUND::DestroySound(sndNightVisionBroken);
-    xr_delete(m_UINightVision);
 }
 
 void CNightVisionDevice::Load(LPCSTR section)
@@ -33,7 +32,6 @@ void CNightVisionDevice::Load(LPCSTR section)
         HUD_SOUND::LoadSound(section, "snd_night_vision_broken", sndNightVisionBroken, SOUND_TYPE_ITEM_USING);
 
     m_NightVisionSect = READ_IF_EXISTS(pSettings, r_string, section, "night_vision_effector", nullptr);
-    m_NightVisionTexture = READ_IF_EXISTS(pSettings, r_string, section, "night_vision_texture", nullptr);
 }
 
 void CNightVisionDevice::Switch() { Switch(!m_bNightVisionOn); }
@@ -170,38 +168,9 @@ bool CNightVisionDevice::can_be_attached() const
     return pA ? (pA->GetNightVisionDevice() == this) : true;
 }
 
-void CNightVisionDevice::afterAttach()
-{
-    inherited::afterAttach();
-    if (smart_cast<CActor*>(H_Parent()))
-    {
-        if (m_UINightVision)
-            xr_delete(m_UINightVision);
-        if (!!m_NightVisionTexture)
-        {
-            m_UINightVision = xr_new<CUIStaticItem>();
-            m_UINightVision->Init(m_NightVisionTexture.c_str(), Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
-        }
-    }
-}
-
 void CNightVisionDevice::afterDetach()
 {
     inherited::afterDetach();
     if (smart_cast<CActor*>(H_Parent()))
-    {
         Switch(false);
-        if (m_UINightVision)
-            xr_delete(m_UINightVision);
-    }
-}
-
-void CNightVisionDevice::DrawHUDMask()
-{
-    if (m_UINightVision && m_bNightVisionOn && !!m_NightVisionTexture)
-    {
-        m_UINightVision->SetPos(0, 0);
-        m_UINightVision->SetRect(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
-        m_UINightVision->Render();
-    }
 }

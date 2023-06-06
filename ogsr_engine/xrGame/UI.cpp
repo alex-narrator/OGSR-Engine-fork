@@ -93,8 +93,6 @@ bool CUI::Render()
             PIItem item = pActor->inventory().ActiveItem();
             if (item && pActor->HUDview() && smart_cast<CHudItem*>(item))
                 (smart_cast<CHudItem*>(item))->OnDrawUI();
-
-            pActor->DrawHUDMasks();
         }
 
         if (GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW | HUD_DRAW_RT))

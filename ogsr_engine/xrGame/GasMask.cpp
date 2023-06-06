@@ -12,14 +12,11 @@ CGasMask::CGasMask()
     SetSlot(GASMASK_SLOT); 
     m_filters.clear();
 }
-CGasMask::~CGasMask() { xr_delete(m_UIVisor); }
 
 void CGasMask::Load(LPCSTR section)
 {
     inherited::Load(section);
     m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 1.f);
-    m_b_has_visor = READ_IF_EXISTS(pSettings, r_bool, section, "has_visor", true);
-    m_VisorTexture = READ_IF_EXISTS(pSettings, r_string, section, "visor_texture", nullptr);
     if (pSettings->line_exist(section, "filters"))
     {
         LPCSTR str = pSettings->r_string(section, "filters");
@@ -64,34 +61,8 @@ void CGasMask::UpdateCL()
 void CGasMask::OnMoveToSlot(EItemPlace prevPlace)
 {
     inherited::OnMoveToSlot(prevPlace);
-    if (m_pCurrentInventory)
-    {
-        if (auto pActor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner()))
-        {
-            m_uLastFilterDecreaseUpdateTime = Level().GetGameTime();
-            if (m_UIVisor)
-                xr_delete(m_UIVisor);
-            if (!!m_VisorTexture)
-            {
-                m_UIVisor = xr_new<CUIStaticItem>();
-                m_UIVisor->Init(m_VisorTexture.c_str(), Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
-            }
-        }
-    }
-}
-
-void CGasMask::OnMoveToRuck(EItemPlace prevPlace)
-{
-    inherited::OnMoveToRuck(prevPlace);
-    if (m_pCurrentInventory && !Level().is_removing_objects())
-    {
-        CActor* pActor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner());
-        if (pActor && prevPlace == eItemPlaceSlot)
-        {
-            if (m_UIVisor)
-                xr_delete(m_UIVisor);
-        }
-    }
+    if (m_pCurrentInventory && m_pCurrentInventory->GetOwner())
+        m_uLastFilterDecreaseUpdateTime = Level().GetGameTime();
 }
 
 float CGasMask::GetPowerLoss()
@@ -103,16 +74,6 @@ float CGasMask::GetPowerLoss()
     };
     return m_fPowerLoss;
 };
-
-void CGasMask::DrawHUDMask()
-{
-    if (m_UIVisor)
-    {
-        m_UIVisor->SetPos(0, 0);
-        m_UIVisor->SetRect(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
-        m_UIVisor->Render();
-    }
-}
 
 bool CGasMask::can_be_attached() const
 {

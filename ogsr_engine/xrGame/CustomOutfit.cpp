@@ -25,7 +25,6 @@ CCustomOutfit::CCustomOutfit()
 CCustomOutfit::~CCustomOutfit()
 {
     xr_delete(m_boneProtection);
-    xr_delete(m_UIVisor);
 }
 
 void CCustomOutfit::Load(LPCSTR section)
@@ -41,9 +40,6 @@ void CCustomOutfit::Load(LPCSTR section)
     m_full_icon_name = pSettings->r_string(section, "full_icon_name");
 
     m_bIsHelmetBuiltIn = READ_IF_EXISTS(pSettings, r_bool, section, "helmet_built_in", false);
-
-    m_b_has_visor = READ_IF_EXISTS(pSettings, r_bool, section, "has_visor", true);
-    m_VisorTexture = READ_IF_EXISTS(pSettings, r_string, section, "visor_texture", nullptr);
 
     bulletproof_display_bone = READ_IF_EXISTS(pSettings, r_string, section, "bulletproof_display_bone", "bip01_spine");
 }
@@ -93,14 +89,6 @@ void CCustomOutfit::OnMoveToSlot(EItemPlace prevPlace)
 
             if (m_bIsHelmetBuiltIn)
                 m_pCurrentInventory->DropSlotsToRuck(HELMET_SLOT);
-
-            if (m_UIVisor)
-                xr_delete(m_UIVisor);
-            if (!!m_VisorTexture && m_bIsHelmetBuiltIn)
-            {
-                m_UIVisor = xr_new<CUIStaticItem>();
-                m_UIVisor->Init(m_VisorTexture.c_str(), Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
-            }
         }
     }
 }
@@ -124,9 +112,6 @@ void CCustomOutfit::OnMoveToRuck(EItemPlace prevPlace)
             }
 
             g_player_hud->load_default();
-
-            if (m_UIVisor)
-                xr_delete(m_UIVisor);
         }
     }
 }
@@ -141,13 +126,3 @@ float CCustomOutfit::GetPowerLoss()
     };
     return m_fPowerLoss;
 };
-
-void CCustomOutfit::DrawHUDMask()
-{
-    if (m_UIVisor)
-    {
-        m_UIVisor->SetPos(0, 0);
-        m_UIVisor->SetRect(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
-        m_UIVisor->Render();
-    }
-}

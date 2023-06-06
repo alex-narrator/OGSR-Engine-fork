@@ -22,17 +22,11 @@ public:
     virtual bool can_be_attached() const override;
 
     virtual void OnMoveToSlot(EItemPlace prevPlace);
-    virtual void OnMoveToRuck(EItemPlace prevPlace);
-
-    virtual void DrawHUDMask();
-    bool HasVisor() const { return m_b_has_visor; };
 
 private:
     float m_fPowerLoss{};
     SBoneProtections* m_boneProtection;
 
 protected:
-    CUIStaticItem* m_UIVisor{};
-    shared_str m_VisorTexture{}, bulletproof_display_bone{};
-    bool m_b_has_visor{};
+    shared_str bulletproof_display_bone{};
 };
