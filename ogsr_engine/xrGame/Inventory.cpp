@@ -1266,7 +1266,7 @@ PIItem CInventory::GetAmmoByLimit(const char* sect, bool forActor, bool limit_ma
         const auto* ammo = smart_cast<CWeaponAmmo*>(pIItem);
         shared_str sect_to_compare = include_magazines ? ammo->m_ammoSect : ammo->cNameSect();
 
-        if (!ammo->m_boxCurr/* || include_magazines && !ammo->IsBoxReloadable()*/)
+        if (!ammo->m_boxCurr || include_magazines && !ammo->IsBoxReloadable())
             return false;
 
         if (!xr_strcmp(sect_to_compare, sect))
