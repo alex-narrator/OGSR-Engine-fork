@@ -68,7 +68,7 @@ void CGasMask::OnMoveToSlot(EItemPlace prevPlace)
     {
         if (auto pActor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner()))
         {
-            m_uLastFilterDecreaseUpdateTime = Level().GetGameDayTimeSec();
+            m_uLastFilterDecreaseUpdateTime = Level().GetGameTime();
             if (m_UIVisor)
                 xr_delete(m_UIVisor);
             if (!!m_VisorTexture)
