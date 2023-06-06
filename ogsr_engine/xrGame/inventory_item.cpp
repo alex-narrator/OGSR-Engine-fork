@@ -129,7 +129,7 @@ void CInventoryItem::Load(LPCSTR section)
     m_flags.set(Fbreakable, READ_IF_EXISTS(pSettings, r_bool, section, "breakable", FALSE));
     m_flags.set(FIsUniqueItem, READ_IF_EXISTS(pSettings, r_bool, section, "unique_item", FALSE));
 
-    //	m_fControlInertionFactor		= READ_IF_EXISTS(pSettings, r_float,section,"control_inertion_factor", 1.0f);
+    m_fControlInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "control_inertion_factor", 1.0f);
     m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
 
     m_always_ungroupable = READ_IF_EXISTS(pSettings, r_bool, section, "always_ungroupable", false);
@@ -803,15 +803,6 @@ void CInventoryItem::OnMoveToRuck(EItemPlace prevPlace)
 };
 
 void CInventoryItem::OnMoveOut(EItemPlace prevPlace) { OnMoveToRuck(prevPlace); };
-
-float CInventoryItem::GetControlInertionFactor()
-{
-    float weight_k = sqrtf(Weight());
-    // чтобы очень лёгкие предметы не давали огромной чувствительности
-    clamp(weight_k, 1.f, weight_k);
-    m_fControlInertionFactor = READ_IF_EXISTS(pSettings, r_float, object().cNameSect(), "control_inertion_factor", weight_k);
-    return m_fControlInertionFactor;
-}
 
 void CInventoryItem::TryBreakToPieces(bool play_effects)
 {

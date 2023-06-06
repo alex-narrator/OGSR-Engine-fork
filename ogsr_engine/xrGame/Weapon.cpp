@@ -1921,7 +1921,7 @@ bool CWeapon::SecondVPEnabled() const
 }
 
 // Чувствительность мышкии с оружием в руках во время прицеливания
-float CWeapon::GetControlInertionFactor()
+float CWeapon::GetControlInertionFactor() const
 {
     float fInertionFactor = inherited::GetControlInertionFactor();
     if (IsZoomed() && !IsRotatingToZoom())

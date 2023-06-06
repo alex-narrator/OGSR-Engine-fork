@@ -295,7 +295,7 @@ public:
 
     virtual float Weight() const;
     virtual u32 Cost() const;
-    virtual float GetControlInertionFactor();
+    virtual float GetControlInertionFactor() const;
 
     virtual bool IsScopeDynamicZoom() const { return m_bScopeDynamicZoom; };
     virtual float GetScopeZoomFactor() const { return m_fScopeZoomFactor; };

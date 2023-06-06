@@ -1,14 +1,81 @@
 <?xml version='1.0' encoding="UTF-8"?>
 <w>
-    <wpn_params x="0" y="0" width="157" height="65">
-		<!-- головний статик динамічного переліку параметрів -->
-		<cap_info x="0" y="0" width="91" height="0">
-			<text font="letterica16" r="124" g="119" b="115"></text>
-		</cap_info>	
+    <wpn_params x="0" y="0" width="157" height="200">
+		<cap_accuracy x="0" y="8" width="121" height="8">
+			<text font="letterica16" r="124" g="119" b="115">ui_inv_accuracy</text>
+		</cap_accuracy>		
+		<cap_handling x="118" y="8" width="121" height="8">
+			<text font="letterica16" r="124" g="119" b="115">ui_inv_handling</text>
+		</cap_handling>
+		<cap_damage x="0" y="39" width="121" height="8">
+			<text font="letterica16" r="124" g="119" b="115">ui_inv_damage</text>
+		</cap_damage>
+		<cap_rpm x="118" y="39" width="121" height="8">
+			<text font="letterica16" r="124" g="119" b="115">ui_inv_rate_of_fire</text>
+		</cap_rpm>
+		<cap_range x="0" y="70" width="121" height="8">
+			<text font="letterica16" r="124" g="119" b="115">ui_inv_range</text>
+		</cap_range>
+		<cap_reliability x="118" y="70" width="121" height="8">
+			<text font="letterica16" r="124" g="119" b="115">ui_inv_reliability</text>
+		</cap_reliability>		
 		
-		<list_item x="0" y="0" width="91" height="16">
-			<text font="letterica16" r="124" g="119" b="115"></text>
-		</list_item>
+		<progress_accuracy x="0" y="24" width="90" height="8" horz="1" min="0" max="1.5" pos="0">
+			<progress>
+				<texture a="255" r="255" g="255" b="255">ui_buymenu_progBar</texture>
+			</progress>
+			<background>
+				<texture a="100" r="255" g="255" b="255">ui_buymenu_progBar</texture>
+			</background>
+		</progress_accuracy>		
+		<progress_handling x="120" y="24" width="90" height="8" horz="1" min="0" max="100" pos="0">
+			<progress>
+				<texture a="255" r="255" g="255" b="255">ui_buymenu_progBar</texture>
+			</progress>
+			<background>
+				<texture a="100" r="255" g="255" b="255">ui_buymenu_progBar</texture>
+			</background>
+		</progress_handling>
+		<progress_damage x="0" y="55" width="90" height="8" horz="1" min="0" max="2" pos="0">
+			<progress>
+				<texture a="255" r="255" g="255" b="255">ui_buymenu_progBar</texture>
+			</progress>
+			<background>
+				<texture a="100" r="255" g="255" b="255">ui_buymenu_progBar</texture>
+			</background>
+		</progress_damage>		
+		<progress_rpm x="120" y="55" width="90" height="8" horz="1" min="0" max="1000" pos="0">
+			<progress>
+				<texture a="255" r="255" g="255" b="255">ui_buymenu_progBar</texture>
+			</progress>
+			<background>
+				<texture a="100" r="255" g="255" b="255">ui_buymenu_progBar</texture>
+			</background>
+		</progress_rpm>
+		<progress_range x="0" y="86" width="90" height="8" horz="1" min="0" max="1000" pos="0">
+			<progress>
+				<texture a="255" r="255" g="255" b="255">ui_buymenu_progBar</texture>
+			</progress>
+			<background>
+				<texture a="100" r="255" g="255" b="255">ui_buymenu_progBar</texture>
+			</background>
+		</progress_range>		
+		<progress_reliability x="120" y="86" width="90" height="8" horz="1" min="0" max="20000" pos="0">
+			<progress>
+				<texture a="255" r="255" g="255" b="255">ui_buymenu_progBar</texture>
+			</progress>
+			<background>
+				<texture a="120" r="255" g="255" b="255">ui_buymenu_progBar</texture>
+			</background>
+		</progress_reliability>		
+		
+		<auto_static x="0" y="105" width="210" height="12">
+			<text align="c" font="letterica16" r="240" g="217" b="182" vert_align="c">st_current_ammo_type</text>
+		</auto_static>
+		
+		<ammo_icon x="0" y="125" width="50" height="50" scale="0.75"/>
+		<mag_icon x="90" y="125" width="50" height="50" scale="0.75"/>
+		<ammo2_icon x="155" y="125" width="50" height="50" scale="0.75"/>
 		
 	</wpn_params>
 </w>

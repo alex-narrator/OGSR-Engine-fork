@@ -1,0 +1,56 @@
+local ltx = system_ini()
+
+function normalize(val)
+	if val > 100 then
+		val = 100
+	elseif val < 1 then
+		val  = 1
+	end
+	
+	return val
+end
+
+function GetRPM(section)
+	return ltx:r_float(section,"rpm")
+end
+
+function GetDamage(section)
+	return ltx:r_float(section,"hit_power")
+end
+
+function GetHandling(section)
+	local val	
+	local control_inertion_factor
+	
+	local control_inertion_factor = read_if_exists(ltx, section, "control_inertion_factor", 1) 	
+	local PDM_disp_base 		= read_if_exists(ltx, section, "PDM_disp_base", 1) 	
+	local PDM_disp_vel_factor	= read_if_exists(ltx, section, "PDM_disp_vel_factor", 1) 
+	
+	if control_inertion_factor < 2 and PDM_disp_base < 1.5 then
+		val = (1 - math.pow(PDM_disp_vel_factor - 0.5, 2) + math.pow(2 - control_inertion_factor,2))*50	
+	else
+		val = 15 - (2*PDM_disp_base + control_inertion_factor)
+	end	
+	
+	return normalize(val) 
+end
+
+function GetAccuracy(section)
+	local fire_dispersion_base	= read_if_exists(ltx, section, "fire_dispersion_base", 0)
+	local disp_in_moa = fire_dispersion_base * 60
+	local res = 1 / disp_in_moa
+	-- log3("dispertion %s MOA for weapon %s", disp_in_moa, section)
+	-- log3("res %s for weapon %s", res, section)
+	return res
+end
+
+function GetRange(section)
+	return read_if_exists(ltx, section, "fire_distance", 0)
+end
+
+function GetReliability(section)
+	local shot_dec = read_if_exists(ltx, section, "condition_shot_dec", 0.00001)
+	local resource = 1 / shot_dec
+	-- log3("resource %s for weapon %s", resource, section)
+	return resource
+end
