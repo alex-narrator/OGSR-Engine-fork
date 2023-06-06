@@ -105,9 +105,11 @@ add_to_type_list(CSE_ALifeItem)
     // флаги
     enum EStats {
         eTorchActive = (1 << 0),
-        eAttached = (1 << 1)
+        eNightVisionActive = (1 << 1),
+        eAttached = (1 << 2)
     };
 bool m_active{};
+bool m_nightvision_active{};
 bool m_attached{};
 CSE_ALifeItemTorch(LPCSTR caSection);
 virtual ~CSE_ALifeItemTorch();
@@ -349,21 +351,6 @@ public:
 // add_to_type_list(CSE_InventoryContainer)
 //#define script_type_list save_type_list(CSE_InventoryContainer)
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemNightVisionDevice, CSE_ALifeItem)
-// флаги
-enum EStats
-{
-    eNightVisionActive = (1 << 0),
-    eAttached = (1 << 1)
-};
-bool m_nightvision_active{};
-bool m_attached{};
-CSE_ALifeItemNightVisionDevice(LPCSTR caSection);
-virtual ~CSE_ALifeItemNightVisionDevice();
-virtual BOOL Net_Relevant();
-SERVER_ENTITY_DECLARE_END
-add_to_type_list(CSE_ALifeItemNightVisionDevice)
-#define script_type_list save_type_list(CSE_ALifeItemNightVisionDevice)
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemEatable, CSE_ALifeItem) CSE_ALifeItemEatable(LPCSTR);
 virtual ~CSE_ALifeItemEatable();
 virtual BOOL Net_Relevant();

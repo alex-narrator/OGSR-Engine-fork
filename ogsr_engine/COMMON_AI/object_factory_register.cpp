@@ -138,8 +138,6 @@
 #include "torch.h"
 #include "pda.h"
 
-#include "NightVisionDevice.h"
-
 #include "searchlight.h"
 
 #include "HangingLamp.h"
@@ -333,7 +331,6 @@ void CObjectFactory::register_classes()
     // Devices
     ADD(CTorch, CSE_ALifeItemTorch, CLSID_DEVICE_TORCH, "device_torch");
     ADD(CPda, CSE_ALifeItemPDA, CLSID_DEVICE_PDA, "device_pda");
-    ADD(CNightVisionDevice, CSE_ALifeItemNightVisionDevice, CLSID_DEVICE_NIGHT_VISION, "device_night_vision");
 
     // objects
     ADD(CProjector, CSE_ALifeObjectProjector, CLSID_OBJECT_PROJECTOR, "projector");

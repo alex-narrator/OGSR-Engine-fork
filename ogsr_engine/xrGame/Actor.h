@@ -28,7 +28,6 @@ class CGasMask;
 class CWarbelt;
 class CVest;
 class CTorch;
-class CNightVisionDevice;
 class CCustomDetectorSHOC;
 class CCustomDetector;
 class CKnownContactsRegistryWrapper;
@@ -667,7 +666,6 @@ public:
     virtual CGasMask* GetGasMask() const;
     virtual CVest* GetVest() const;
     virtual CTorch* GetTorch() const;
-    virtual CNightVisionDevice* GetNightVisionDevice() const;
 
     virtual CCustomDetectorSHOC* GetDetectorSHOC() const;
     virtual CCustomDetector* GetDetector() const;

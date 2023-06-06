@@ -36,7 +36,6 @@
 #include "HUDManager.h"
 #include "UIGameCustom.h"
 #include "Torch.h"
-#include "NightVisionDevice.h"
 
 // constexpr auto ROTATION_TIME = 0.25f;
 
@@ -1049,12 +1048,6 @@ bool CWeapon::Action(s32 cmd, u32 flags)
         if (IsZoomEnabled())
         {
             auto pActor = smart_cast<const CActor*>(H_Parent());
-            auto pNightVis = pActor->GetNightVisionDevice();
-            if (pNightVis && pNightVis->IsPowerOn())
-            {
-                HUD().GetUI()->AddInfoMessage("actor_state", "cant_aim");
-                return false;
-            }
 
             if (!pActor->conditions().IsCantWalk())
             {

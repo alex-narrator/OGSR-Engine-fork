@@ -27,7 +27,6 @@
 #include "Warbelt.h"
 #include "Vest.h"
 #include "Torch.h"
-#include "NightVisionDevice.h"
 #include "actorcondition.h"
 #include "UIGameCustom.h"
 
@@ -1614,7 +1613,6 @@ CHelmet* CActor::GetHelmet() const { return smart_cast<CHelmet*>(inventory().Ite
 CGasMask* CActor::GetGasMask() const { return smart_cast<CGasMask*>(inventory().ItemFromSlot(GASMASK_SLOT)); }
 CVest* CActor::GetVest() const { return smart_cast<CVest*>(inventory().ItemFromSlot(VEST_SLOT)); }
 CTorch* CActor::GetTorch() const { return smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT)); }
-CNightVisionDevice* CActor::GetNightVisionDevice() const { return smart_cast<CNightVisionDevice*>(inventory().ItemFromSlot(TORCH_SLOT)); }
 CCustomDetectorSHOC* CActor::GetDetectorSHOC() const { return smart_cast<CCustomDetectorSHOC*>(inventory().ItemFromSlot(DETECTOR_SLOT)); }
 CCustomDetector* CActor::GetDetector() const { return smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)); }
 

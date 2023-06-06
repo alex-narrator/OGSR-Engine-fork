@@ -6047,9 +6047,6 @@
     <ClInclude Include="Addons.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons</Filter>
     </ClInclude>
-    <ClInclude Include="NightVisionDevice.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
-    </ClInclude>
     <ClInclude Include="Helmet.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
@@ -8845,9 +8842,6 @@
     </ClCompile>
     <ClCompile Include="Addons.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons</Filter>
-    </ClCompile>
-    <ClCompile Include="NightVisionDevice.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
     </ClCompile>
     <ClCompile Include="Helmet.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>

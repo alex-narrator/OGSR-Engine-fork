@@ -132,7 +132,7 @@ GroupControlSection	= spawn_group
 discovery_dependency =
 $spawn				= "devices\torch"
 $prefetch 			= 32
-class				= D_NTVIS
+class				= TORCH_S
 cform				= skeleton
 visual				= equipments\light_night.ogf
 description			= enc_equipment_devic_device-night_vision
@@ -159,8 +159,6 @@ attach_position_offset	= 0.115, 0.00, 0.07
 attach_bone_name		= bip01_head
 auto_attach				= false
 
-night_vision				= on
-night_vision_texture		= hud_mask\nightvision\hud_nvg_gen1;wpn\wpn_crosshair;wpn\wpn_night
 night_vision_effector		= effector_nightvision ;postprocess_night
 
 snd_night_vision_on			= weapons\nv_start

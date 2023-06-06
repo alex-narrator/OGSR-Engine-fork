@@ -71,18 +71,23 @@ CTorch::~CTorch(void)
     glow_render.destroy();
     HUD_SOUND::DestroySound(sndTorchOn);
     HUD_SOUND::DestroySound(sndTorchOff);
+    //nv
+    HUD_SOUND::DestroySound(sndNightVisionOn);
+    HUD_SOUND::DestroySound(sndNightVisionOff);
+    HUD_SOUND::DestroySound(sndNightVisionIdle);
+    HUD_SOUND::DestroySound(sndNightVisionBroken);
 }
 
 void CTorch::Load(LPCSTR section)
 {
     inherited::Load(section);
     
-    m_light_descr_sect = READ_IF_EXISTS(pSettings, r_string, section, "light_definition", "torch_definition");
+    m_light_descr_sect = READ_IF_EXISTS(pSettings, r_string, section, "light_definition", nullptr);
     m_light_descr_sect_second = READ_IF_EXISTS(pSettings, r_string, section, "light_definition_second", nullptr);
 
     LoadLightDefinitions(m_light_descr_sect);
 
-    light_trace_bone = pSettings->r_string(section, "light_trace_bone");
+    light_trace_bone = READ_IF_EXISTS(pSettings, r_string, section, "light_trace_bone", nullptr);
 
     if (pSettings->line_exist(section, "snd_torch_on"))
         HUD_SOUND::LoadSound(section, "snd_torch_on", sndTorchOn, SOUND_TYPE_ITEM_USING);
@@ -90,16 +95,38 @@ void CTorch::Load(LPCSTR section)
         HUD_SOUND::LoadSound(section, "snd_torch_off", sndTorchOff, SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_torch_switch"))
         HUD_SOUND::LoadSound(section, "snd_torch_switch", sndTorchSwitch, SOUND_TYPE_ITEM_USING);
+    //nv
+    m_NightVisionSect = READ_IF_EXISTS(pSettings, r_string, section, "night_vision_effector", nullptr);
+
+    if (pSettings->line_exist(section, "snd_night_vision_on"))
+        HUD_SOUND::LoadSound(section, "snd_night_vision_on", sndNightVisionOn, SOUND_TYPE_ITEM_USING);
+    if (pSettings->line_exist(section, "snd_night_vision_off"))
+        HUD_SOUND::LoadSound(section, "snd_night_vision_off", sndNightVisionOff, SOUND_TYPE_ITEM_USING);
+    if (pSettings->line_exist(section, "snd_night_vision_idle"))
+        HUD_SOUND::LoadSound(section, "snd_night_vision_idle", sndNightVisionIdle, SOUND_TYPE_ITEM_USING);
+    if (pSettings->line_exist(section, "snd_night_vision_broken"))
+        HUD_SOUND::LoadSound(section, "snd_night_vision_broken", sndNightVisionBroken, SOUND_TYPE_ITEM_USING);
 }
 
-void CTorch::Switch()
-{
-    bool bActive = !m_switched_on;
-    Switch(bActive);
+void CTorch::Switch() 
+{ 
+    SwitchTorch(!m_switched_on); 
+    SwitchNightVision(!m_bNightVisionOn);
+}
+void CTorch::Switch(bool turn_on) 
+{ 
+    if (turn_on && fis_zero(GetPowerLevel()))
+        return;
+    SwitchTorch(turn_on); 
+    SwitchNightVision(turn_on);
 }
 
-void CTorch::Switch(bool turn_on)
+void CTorch::SwitchTorch() { SwitchTorch(!m_switched_on); }
+
+void CTorch::SwitchTorch(bool turn_on)
 {
+    if (!m_light_descr_sect)
+        return;
     if (turn_on && fis_zero(GetPowerLevel()))
         return;
     inherited::Switch(turn_on);
@@ -133,58 +160,8 @@ void CTorch::Switch(bool turn_on)
     }
 }
 
-bool CTorch::IsPowerOn() const { return (m_switched_on); }
-
-BOOL CTorch::net_Spawn(CSE_Abstract* DC)
+void CTorch::UpdateSwitchTorch()
 {
-    auto torch = smart_cast<CSE_ALifeItemTorch*>(DC);
-    R_ASSERT(torch);
-    cNameVisual_set(torch->get_visual());
-
-    R_ASSERT(!CFORM());
-    R_ASSERT(smart_cast<IKinematics*>(Visual()));
-    collidable.model = xr_new<CCF_Skeleton>(this);
-
-    if (!inherited::net_Spawn(DC))
-        return (FALSE);
-
-    // включить/выключить фонарик
-    //	Switch(torch->m_active);
-    m_switched_on = torch->m_active;
-    VERIFY(!torch->m_active || (torch->ID_Parent != 0xffff));
-
-    return (TRUE);
-}
-
-void CTorch::net_Destroy()
-{
-    Switch(false);
-    inherited::net_Destroy();
-}
-
-void CTorch::OnH_A_Chield()
-{
-    inherited::OnH_A_Chield();
-    m_focus.set(Position());
-    if (smart_cast<CActor*>(H_Parent()) && useVolumetric)
-        light_render->set_volumetric(useVolumetricForActor);
-}
-
-void CTorch::OnH_B_Independent(bool just_before_destroy)
-{
-    inherited::OnH_B_Independent(just_before_destroy);
-    time2hide = TIME_2_HIDE;
-
-    Switch(false);
-
-    HUD_SOUND::StopSound(sndTorchOn);
-    HUD_SOUND::StopSound(sndTorchOff);
-}
-
-void CTorch::UpdateCL()
-{
-    inherited::UpdateCL();
-
     if (!m_switched_on)
         return;
 
@@ -339,6 +316,152 @@ void CTorch::UpdateCL()
     glow_render->set_color(fclr);
 }
 
+void CTorch::SwitchNightVision() { SwitchNightVision(!m_bNightVisionOn); }
+
+void CTorch::SwitchNightVision(bool turn_on)
+{
+    auto pA = smart_cast<CActor*>(H_Parent());
+    if (!pA || !m_NightVisionSect)
+        return;
+
+    auto pActorTorch = pA->GetTorch();
+    if (pActorTorch && pActorTorch != this)
+        return;
+
+    if (turn_on && fis_zero(GetPowerLevel()))
+        return;
+    inherited::Switch(turn_on);
+
+    bool bPlaySoundFirstPerson = (pA == Level().CurrentViewEntity());
+
+    if (!!m_NightVisionSect)
+    {
+        const char* disabled_names = READ_IF_EXISTS(pSettings, r_string, cNameSect(), "disabled_maps", nullptr);
+        const char* curr_map = Level().name().c_str();
+        bool b_allow = true;
+        if (disabled_names)
+        {
+            u32 cnt = _GetItemCount(disabled_names);
+            string512 tmp;
+            for (u32 i = 0; i < cnt; ++i)
+            {
+                _GetItem(disabled_names, i, tmp);
+                if (!stricmp(tmp, curr_map))
+                {
+                    b_allow = false;
+                    break;
+                }
+            }
+        }
+
+        if (!b_allow)
+        {
+            HUD_SOUND::PlaySound(sndNightVisionBroken, pA->Position(), pA, bPlaySoundFirstPerson);
+            return;
+        }
+        else
+        {
+            m_bNightVisionOn = turn_on;
+
+            if (m_bNightVisionOn)
+            {
+                CEffectorPP* pp = pA->Cameras().GetPPEffector((EEffectorPPType)effNightvision);
+                if (!pp)
+                {
+                    AddEffector(pA, effNightvision, m_NightVisionSect);
+                    HUD_SOUND::PlaySound(sndNightVisionOn, pA->Position(), pA, bPlaySoundFirstPerson);
+                    HUD_SOUND::PlaySound(sndNightVisionIdle, pA->Position(), pA, bPlaySoundFirstPerson, true);
+                }
+            }
+        }
+    }
+    else
+    {
+        m_bNightVisionOn = false;
+    }
+
+    if (!m_bNightVisionOn)
+    {
+        CEffectorPP* pp = pA->Cameras().GetPPEffector((EEffectorPPType)effNightvision);
+        if (pp)
+        {
+            pp->Stop(1.0f);
+            HUD_SOUND::PlaySound(sndNightVisionOff, pA->Position(), pA, bPlaySoundFirstPerson);
+            HUD_SOUND::StopSound(sndNightVisionIdle);
+        }
+    }
+}
+
+void CTorch::UpdateSwitchNightVision()
+{
+    auto* pA = smart_cast<CActor*>(H_Parent());
+    if (pA && m_bNightVisionOn && !pA->Cameras().GetPPEffector((EEffectorPPType)effNightvision))
+        SwitchNightVision(true);
+}
+
+bool CTorch::IsPowerOn() const { return IsTorchOn() || IsNightVisionOn(); }
+
+BOOL CTorch::net_Spawn(CSE_Abstract* DC)
+{
+    auto torch = smart_cast<CSE_ALifeItemTorch*>(DC);
+    R_ASSERT(torch);
+    cNameVisual_set(torch->get_visual());
+
+    R_ASSERT(!CFORM());
+    R_ASSERT(smart_cast<IKinematics*>(Visual()));
+    collidable.model = xr_new<CCF_Skeleton>(this);
+
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
+
+    // включить/выключить фонарик
+    //	Switch(torch->m_active);
+    m_switched_on = torch->m_active;
+    VERIFY(!torch->m_active || (torch->ID_Parent != 0xffff));
+
+    m_bNightVisionOn = torch->m_nightvision_active;
+
+    return (TRUE);
+}
+
+void CTorch::net_Destroy()
+{
+    Switch(false);
+    inherited::net_Destroy();
+}
+
+void CTorch::OnH_A_Chield()
+{
+    inherited::OnH_A_Chield();
+    m_focus.set(Position());
+    if (smart_cast<CActor*>(H_Parent()) && useVolumetric)
+        light_render->set_volumetric(useVolumetricForActor);
+}
+
+void CTorch::OnH_B_Independent(bool just_before_destroy)
+{
+    inherited::OnH_B_Independent(just_before_destroy);
+    time2hide = TIME_2_HIDE;
+
+    Switch(false);
+
+    HUD_SOUND::StopSound(sndTorchOn);
+    HUD_SOUND::StopSound(sndTorchOff);
+    //nv
+    HUD_SOUND::StopSound(sndNightVisionOn);
+    HUD_SOUND::StopSound(sndNightVisionOff);
+    HUD_SOUND::StopSound(sndNightVisionIdle);
+    // m_NightVisionChargeTime		= m_NightVisionRechargeTime;
+}
+
+void CTorch::UpdateCL()
+{
+    inherited::UpdateCL();
+
+    UpdateSwitchTorch();
+    UpdateSwitchNightVision();
+}
+
 void CTorch::create_physic_shell() { CPhysicsShellHolder::create_physic_shell(); }
 
 void CTorch::activate_physic_shell() { CPhysicsShellHolder::activate_physic_shell(); }
@@ -350,6 +473,7 @@ void CTorch::net_Export(CSE_Abstract* E)
     inherited::net_Export(E);
     CSE_ALifeItemTorch* torch = smart_cast<CSE_ALifeItemTorch*>(E);
     torch->m_active = m_switched_on;
+    torch->m_nightvision_active = m_bNightVisionOn;
     const CActor* pA = smart_cast<const CActor*>(H_Parent());
     torch->m_attached = (pA && pA->attached(this));
 }
@@ -369,7 +493,7 @@ void CTorch::afterDetach()
 void CTorch::afterAttach()
 {
     inherited::afterAttach();
-    Switch(m_switched_on);
+    SwitchTorch(m_switched_on);
 }
 
 void CTorch::renderable_Render() { inherited::renderable_Render(); }
@@ -380,6 +504,9 @@ float CTorch::get_range() const { return light_render->get_range(); }
 
 void CTorch::LoadLightDefinitions(shared_str light_sect)
 {
+    if (!light_sect)
+        return;
+
     bool b_r2 = !!psDeviceFlags.test(rsR2);
     b_r2 |= !!psDeviceFlags.test(rsR3);
     b_r2 |= !!psDeviceFlags.test(rsR4);

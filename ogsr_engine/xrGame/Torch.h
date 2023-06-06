@@ -18,11 +18,11 @@ protected:
     float time2hide;
 
     u16 guid_bone{};
-    shared_str light_trace_bone;
+    shared_str light_trace_bone{};
 
     float m_delta_h;
     Fvector2 m_prev_hp;
-    bool m_switched_on;
+    bool m_switched_on{}, m_bNightVisionOn{};
     ref_light light_render;
     ref_light light_omni;
     ref_glow glow_render;
@@ -53,7 +53,18 @@ public:
 
     virtual void Switch();
     virtual void Switch(bool);
+
+    void SwitchTorch();
+    void SwitchTorch(bool);
+    void UpdateSwitchTorch();
+    //nv
+    void SwitchNightVision();
+    void SwitchNightVision(bool light_on);
+    void UpdateSwitchNightVision();
+
     virtual bool IsPowerOn() const;
+    virtual bool IsTorchOn() const { return m_switched_on; };
+    virtual bool IsNightVisionOn() const { return m_bNightVisionOn; };
 
     virtual bool can_be_attached() const;
     void calc_m_delta_h(float);
@@ -64,9 +75,20 @@ public:
     void SwitchMode();
 
 protected:
-    HUD_SOUND sndTorchOn, sndTorchOff, sndTorchSwitch;
+    HUD_SOUND 
+        sndTorchOn, 
+        sndTorchOff, 
+        sndTorchSwitch,
+        sndNightVisionOn,
+        sndNightVisionOff,
+        sndNightVisionIdle,
+        sndNightVisionBroken;
 
-    shared_str m_light_descr_sect{}, m_light_descr_sect_second{};
+    shared_str 
+        m_light_descr_sect{}, 
+        m_light_descr_sect_second{}, 
+        m_NightVisionSect{};
+
     bool m_bSecondMode{};
 
     enum EStats

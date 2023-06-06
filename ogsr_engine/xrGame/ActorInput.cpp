@@ -34,7 +34,6 @@
 #include "PDA.h"
 #include "ui/UIPDAWnd.h"
 
-#include "NightVisionDevice.h"
 #include "InventoryContainer.h"
 
 extern int g_bHudAdjustMode;
@@ -182,12 +181,12 @@ void CActor::IR_OnKeyboardPress(int cmd)
             pActiveWeapon->SwitchNightVision();
         else
         {
-            if (GetNightVisionDevice())
+            if (GetTorch())
             {
                 if (!IsFreeHands())
                     HUD().GetUI()->AddInfoMessage("item_usage", "hands_not_free");
                 else
-                    GetNightVisionDevice()->Switch();
+                    GetTorch()->SwitchNightVision();
             }
         }
     }
@@ -202,7 +201,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
                 if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
                     GetTorch()->SwitchMode();
                 else 
-                    GetTorch()->Switch();
+                    GetTorch()->SwitchTorch();
             }
         }
     }

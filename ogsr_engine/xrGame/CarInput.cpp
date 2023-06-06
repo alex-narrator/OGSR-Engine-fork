@@ -17,7 +17,7 @@
 #include "../Include/xrRender/Kinematics.h"
 #include "level.h"
 #include "CarWeapon.h"
-#include "NightVisionDevice.h"
+#include "Torch.h"
 #include "inventory.h"
 
 void CCar::OnMouseMove(int dx, int dy)
@@ -172,10 +172,10 @@ void CCar::OnKeyboardPress(int cmd)
         auto* Act = OwnerActor();
         if (Act)
         {
-            auto pNV = Act->GetNightVisionDevice();
-            if (pNV)
+            auto pTorch = Act->GetTorch();
+            if (pTorch)
             {
-                pNV->Switch();
+                pTorch->SwitchNightVision();
             }
         }
     }
