@@ -292,7 +292,7 @@ void CObjectFactory::register_classes()
     ADD(CWarbelt, CSE_ALifeItem, CLSID_WARBELT, "obj_warbelt");
     ADD(CVest, CSE_ALifeItemVest, CLSID_VEST, "obj_vest");
     ADD(CHelmet, CSE_ALifeItem, CLSID_HELMET, "obj_helmet");
-    ADD(CGasMask, CSE_ALifeItemGasMask, CLSID_GASMASK, "obj_gasmask");
+    ADD(CGasMask, CSE_ALifeItem, CLSID_GASMASK, "obj_gasmask");
 
     // Grenades
     ADD(CF1, CSE_ALifeItemGrenade, CLSID_GRENADE_F1, "wpn_grenade_f1");

@@ -149,7 +149,7 @@ bool CInventoryContainer::NeedForcedDescriptionUpdate() const
         {
             if (auto artefact = smart_cast<CArtefact*>(item))
             {
-                if (artefact->GetCondition() && artefact->m_fTTLOnDecrease)
+                if (artefact->GetCondition() && artefact->m_fDeteriorationTime)
                     return true;
             }
         }

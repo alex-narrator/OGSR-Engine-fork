@@ -355,7 +355,8 @@ void CUIPdaWnd::Draw()
 
     string16 tmp{};
     auto act_pda = Actor()->GetPDA();
-    sprintf_s(tmp, "%.f%s", act_pda->GetPowerLevelToShow(), "%");
+    float power = act_pda->GetPowerLevel() * 100.f;
+    sprintf_s(tmp, "%.f%s", power, "%");
     m_currentPower->SetText(tmp);
     m_currentPower->SetVisible(pda_workable);
 }

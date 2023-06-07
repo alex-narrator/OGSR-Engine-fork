@@ -284,13 +284,13 @@ public:
     virtual void TryBreakToPieces(bool);
     bool b_brake_item{};
     // проміжок часу до повного знищення
-    float m_fTTLOnDecrease{};
+    float m_fDeteriorationTime{};
     virtual void UpdateConditionDecrease();
     virtual void UpdatePowerConsumption();
     virtual bool NeedForcedDescriptionUpdate() const;
     void SetLastCondDecTime(u64);
-
-    float m_fTTLOnWork{};
+    //проміжок часу до повної розрядки
+    float m_fWorkTime{};
 
 protected:
     ALife::_TIME_ID m_uLastConditionDecTimeCalled{};
@@ -329,7 +329,6 @@ public:
 
     xr_vector<shared_str> m_power_sources{};
 
-    float m_fPowerConsumption{};
     bool m_bRechargeable{};
 
     const shared_str GetPowerSourceName() const { return m_power_sources[m_cur_power_source]; }
@@ -341,9 +340,9 @@ public:
     void ChangePowerLevel(float);
     void SetPowerLevel(float);
     virtual float GetPowerLevel() const { return m_fPowerLevel; };
-    virtual float GetPowerLevelToShow() const;
-    virtual float GetPowerConsumption() const { return m_fPowerConsumption; };
-    virtual float GetPowerCapacity() const { return m_fPowerCapacity; };
+    // витрата енергії у ігрових годинах
+    virtual float GetPowerConsumption() const { return (1.f / (GetWorkTime() * 3600.f)); };
+    virtual float GetWorkTime() const { return m_fWorkTime; };
     virtual bool CanBeCharged() const;
     //окремо для батарейок
     virtual bool CanBeRecharged() const;
@@ -352,8 +351,6 @@ public:
     virtual void Switch(bool);
     virtual void Switch();
     virtual bool IsPowerOn() const;
-
-    virtual void Recharge();
 
     LPCSTR GetAttachMenuTip() const { return m_sAttachMenuTip; };
     LPCSTR GetDetachMenuTip() const { return m_sDetachMenuTip; };
@@ -369,7 +366,10 @@ public:
     void Transfer(u16 from_id, u16 to_id = u16(-1));
 
     shared_str m_upgrade_icon_sect{};
-    Fvector2 m_upgrade_icon_ofset{};
+    Fvector2 m_upgrade_icon_offset{};
+
+    Fvector2 m_power_source_icon_offset{};
+    float m_power_source_icon_scale{};
 
 protected:
     HitImmunity::HitTypeSVec m_HitTypeProtection;
@@ -377,8 +377,7 @@ protected:
     svector<float, eEffectMax> m_ItemEffect;
 
     float m_fPowerLevel{};
-    float m_fPowerCapacity{};
-    u64 m_uLastPowerConsumingUpdateTime;
+    u64 m_uLastWorkUpdateTime;
 
     LPCSTR m_sAttachMenuTip{};
     LPCSTR m_sDetachMenuTip{};

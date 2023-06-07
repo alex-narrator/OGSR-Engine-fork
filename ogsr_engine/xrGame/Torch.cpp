@@ -563,7 +563,7 @@ void CTorch::LoadLightDefinitions(shared_str light_sect)
 
 float CTorch::get_range_val() const 
 { 
-    float res = m_fRange * (GetPowerLevelToShow() / 100.f);
+    float res = m_fRange * (GetPowerLevel());
     clamp(res, m_fRange * m_fRangeMinK, m_fRange);
     return res;
 }

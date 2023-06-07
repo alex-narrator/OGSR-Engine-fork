@@ -3,7 +3,6 @@
 #include "WeaponAmmo.h"
 #include "Weapon.h"
 #include "WeaponRPG7.h"
-#include "GasMask.h"
 #include "UIStaticItem.h"
 #include "UIStatic.h"
 #include "eatable_item.h"
@@ -634,13 +633,39 @@ void AttachUpgradeIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
     size.mul(_scale);
     size.x *= k_x;
 
-    Fvector2 pos{_item->m_upgrade_icon_ofset};
+    Fvector2 pos{_item->m_upgrade_icon_offset};
     pos.mul(_scale);
     pos.x *= k_x;
 
     upgrade_icon->SetWndRect(pos.x, pos.y, size.x, size.y);
     upgrade_icon->SetColor(color_rgba(255, 255, 255, 192));
     _main_icon->AttachChild(upgrade_icon);
+}
+void AttachPowerSourceIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
+{
+    if (!_item->m_power_source_icon_scale)
+        return;
+
+    CUIStatic* power_source_icon = xr_new<CUIStatic>();
+    power_source_icon->SetAutoDelete(true);
+
+    CIconParams params(_item->GetPowerSourceName());
+    Frect rect = params.original_rect();
+    params.set_shader(power_source_icon);
+
+    float k_x{UI()->get_current_kx()};
+
+    Fvector2 size{rect.width(), rect.height()};
+    size.mul(_scale * _item->m_power_source_icon_scale);
+    size.x *= k_x;
+
+    Fvector2 pos{_item->m_power_source_icon_offset};
+    pos.mul(_scale);
+    pos.x *= k_x;
+
+    power_source_icon->SetWndRect(pos.x, pos.y, size.x, size.y);
+    power_source_icon->SetColor(color_rgba(255, 255, 255, 192));
+    _main_icon->AttachChild(power_source_icon);
 }
 void AttachWpnAddonIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
 {
@@ -724,30 +749,6 @@ void AttachAmmoIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
     ammo_icon->SetColor(color_rgba(255, 255, 255, 192));
     _main_icon->AttachChild(ammo_icon);
 }
-void AttachFilterIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
-{
-    auto gasmask = smart_cast<CGasMask*>(_item);
-    CUIStatic* filter_icon = xr_new<CUIStatic>();
-    filter_icon->SetAutoDelete(true);
-
-    CIconParams params(gasmask->GetFilterName());
-    Frect rect = params.original_rect();
-    params.set_shader(filter_icon);
-
-    float k_x{UI()->get_current_kx()};
-
-    Fvector2 size{rect.width(), rect.height()};
-    size.mul(_scale * gasmask->filter_icon_scale);
-    size.x *= k_x;
-
-    Fvector2 pos{gasmask->filter_icon_ofset};
-    pos.mul(_scale);
-    pos.x *= k_x;
-
-    filter_icon->SetWndRect(pos.x, pos.y, size.x, size.y);
-    filter_icon->SetColor(color_rgba(255, 255, 255, 192));
-    _main_icon->AttachChild(filter_icon);
-}
 
 void InventoryUtilities::TryAttachIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
 {
@@ -755,6 +756,8 @@ void InventoryUtilities::TryAttachIcons(CUIStatic* _main_icon, PIItem _item, flo
 
     if (!!_item->m_upgrade_icon_sect)
         AttachUpgradeIcon(_main_icon, _item, _scale);
+    if (_item->IsPowerConsumer() && _item->IsPowerSourceAttachable() && _item->IsPowerSourceAttached())
+        AttachPowerSourceIcon(_main_icon, _item, _scale);
     if (smart_cast<CWeapon*>(_item))
     {
         AttachWpnAddonIcons(_main_icon, _item, _scale);
@@ -765,11 +768,6 @@ void InventoryUtilities::TryAttachIcons(CUIStatic* _main_icon, PIItem _item, flo
     if (auto ammo = smart_cast<CWeaponAmmo*>(_item); ammo && ammo->IsBoxReloadable() && ammo->m_boxCurr)
     {
         AttachAmmoIcon(_main_icon, _item, _scale);
-        return;
-    }
-    if (auto gasmask = smart_cast<CGasMask*>(_item); gasmask && gasmask->IsFilterInstalled())
-    {
-        AttachFilterIcon(_main_icon, _item, _scale);
         return;
     }
 }

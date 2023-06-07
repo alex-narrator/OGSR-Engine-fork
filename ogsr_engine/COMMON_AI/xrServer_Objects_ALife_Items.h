@@ -370,16 +370,6 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemVest)
 #define script_type_list save_type_list(CSE_ALifeItemVest)
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemGasMask, CSE_ALifeItem) 
-bool m_bIsFilterInstalled{};
-u8 m_cur_filter{};
-float m_fInstalledFilterCondition{};
-CSE_ALifeItemGasMask(LPCSTR caSection);
-virtual ~CSE_ALifeItemGasMask();
-SERVER_ENTITY_DECLARE_END
-add_to_type_list(CSE_ALifeItemGasMask)
-#define script_type_list save_type_list(CSE_ALifeItemGasMask)
-
 #pragma warning(pop)
 
 #endif

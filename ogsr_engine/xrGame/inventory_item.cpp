@@ -171,8 +171,8 @@ void CInventoryItem::Load(LPCSTR section)
     m_fRadiationAccumFactor = READ_IF_EXISTS(pSettings, r_float, section, "radiation_accum_factor", 0.f);
     m_fRadiationAccumLimit = READ_IF_EXISTS(pSettings, r_float, section, "radiation_accum_limit", 0.f);
     //
-    m_fTTLOnDecrease = READ_IF_EXISTS(pSettings, r_float, section, "ttl_on_dec", 0.f);
-    m_fTTLOnWork = READ_IF_EXISTS(pSettings, r_float, section, "ttl_on_work", 0.f);
+    m_fDeteriorationTime = READ_IF_EXISTS(pSettings, r_float, section, "deterioration_time", 0.f);
+    m_fWorkTime = READ_IF_EXISTS(pSettings, r_float, section, "work_time", 0.f);
     // hands
     eHandDependence = EHandDependence(READ_IF_EXISTS(pSettings, r_u32, section, "hand_dependence", hdNone));
     m_bIsSingleHanded = READ_IF_EXISTS(pSettings, r_bool, section, "single_handed", TRUE);
@@ -181,8 +181,7 @@ void CInventoryItem::Load(LPCSTR section)
 
     if (m_power_source_status != ALife::ePowerSourceDisabled)
     {
-        m_fPowerConsumption = READ_IF_EXISTS(pSettings, r_float, section, "power_consumption", 1.f);
-
+        m_fPowerLevel = READ_IF_EXISTS(pSettings, r_float, section, "power_level", 1.f);
         if (m_power_source_status == ALife::ePowerSourceAttachable)
         {
             if (pSettings->line_exist(section, "power_source"))
@@ -197,22 +196,22 @@ void CInventoryItem::Load(LPCSTR section)
             }
         }
     }
+    //батарейка
+    if (m_power_source_status == ALife::ePowerSourceDisabled && m_fWorkTime)
+        m_fPowerLevel = READ_IF_EXISTS(pSettings, r_float, section, "power_level", 1.f);
 
     m_bRechargeable = READ_IF_EXISTS(pSettings, r_bool, section, "rechargeable", false);
-    //батарейка
-    if (m_power_source_status == ALife::ePowerSourceDisabled && pSettings->line_exist(section, "power_capacity"))
-    {
-        m_fPowerCapacity = pSettings->r_float(section, "power_capacity");
-        m_fPowerLevel = m_fPowerCapacity;
-    }
 
     m_uSlotEnabled = READ_IF_EXISTS(pSettings, r_u32, section, "slot_enabled", NO_ACTIVE_SLOT);
 
     m_upgrade_icon_sect = READ_IF_EXISTS(pSettings, r_string, section, "upgrade_icon_sect", nullptr);
-    m_upgrade_icon_ofset = READ_IF_EXISTS(pSettings, r_fvector2, section, "upgrade_icon_ofset", Fvector2{});
+    m_upgrade_icon_offset = READ_IF_EXISTS(pSettings, r_fvector2, section, "upgrade_icon_ofset", Fvector2{});
 
     m_sAttachMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_attach_tip", "st_attach");
     m_sDetachMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_detach_tip", "st_detach");
+
+    m_power_source_icon_offset = READ_IF_EXISTS(pSettings, r_fvector2, section, "power_source_icon_offset", Fvector2{});
+    m_power_source_icon_scale = READ_IF_EXISTS(pSettings, r_float, section, "power_source_icon_scale", 0.f);
 }
 
 void CInventoryItem::ChangeCondition(float fDeltaCondition)
@@ -843,20 +842,20 @@ void CInventoryItem::UpdateConditionDecrease()
         return;
     }
 
-    if (fis_zero(m_fTTLOnDecrease))
+    if (fis_zero(m_fDeteriorationTime))
         return;
 
     float delta_time{};
     auto current_time{Level().GetGameTime()};
     if (current_time > m_uLastConditionDecTimeCalled)
-        delta_time = float(current_time - m_uLastConditionDecTimeCalled) / 1000.f;
+        delta_time = float(current_time - m_uLastConditionDecTimeCalled) * 0.001f;
 
     if (delta_time < CONDITION_DECREASE_UPDATE_TIME)
         return;
 
     SetLastCondDecTime(current_time);
 
-    float condition_dec = (1.f / (m_fTTLOnDecrease * 3600.f)) * // приведення до ігрових годин
+    float condition_dec = (1.f / (m_fDeteriorationTime * 3600.f)) * // приведення до ігрових годин
         delta_time;
 
     ChangeCondition(-condition_dec);
@@ -872,7 +871,7 @@ void CInventoryItem::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name
     icon_sect_name = m_object->cNameSect().c_str();
 }
 
-bool CInventoryItem::NeedForcedDescriptionUpdate() const { return !fis_zero(GetCondition()) && !fis_zero(m_fTTLOnDecrease) || IsPowerConsumer() && IsPowerOn(); }
+bool CInventoryItem::NeedForcedDescriptionUpdate() const { return !fis_zero(GetCondition()) && !fis_zero(m_fDeteriorationTime) || IsPowerConsumer() && IsPowerOn(); }
 
 float CInventoryItem::GetHitTypeProtection(int hit_type) const { return m_HitTypeProtection[hit_type] * GetCondition(); }
 
@@ -885,28 +884,27 @@ float CInventoryItem::GetItemEffect(int effect) const
 
 void CInventoryItem::UpdatePowerConsumption()
 {
-    if (!smart_cast<CActor*>(object().H_Parent()) || !IsPowerConsumer() || !IsPowerOn() || fis_zero(GetCondition()))
+    if (!smart_cast<CActor*>(object().H_Parent()) || !IsPowerConsumer() || !GetWorkTime() || !IsPowerOn() || fis_zero(GetCondition()))
         return;
 
     float delta_time{};
     auto current_time{Level().GetGameTime()};
 
-    if (current_time > m_uLastPowerConsumingUpdateTime)
-        delta_time = float(current_time - m_uLastPowerConsumingUpdateTime) / 1000.f;
+    if (current_time > m_uLastWorkUpdateTime)
+        delta_time = float(current_time - m_uLastWorkUpdateTime) * 0.001f;
 
     if (delta_time < POWER_CONSUMING_UPDATE_TIME)
         return;
 
-    m_uLastPowerConsumingUpdateTime = current_time;
+    m_uLastWorkUpdateTime = current_time;
 
-    float power_dec = (GetPowerConsumption() / 3600.f) * // приведення до ігрових годин
-        delta_time;
+    float power_dec = GetPowerConsumption() * delta_time;
 
     ChangePowerLevel(-power_dec);
-    //	Msg("%s for item %s", __FUNCTION__, object().cName().c_str());
+    //Msg("power dec %.8f, power level %.8f, power consumption %.8f, work time %.8f, delta time %.8f", power_dec, GetPowerLevel(), GetPowerConsumption(), GetWorkTime(), delta_time);
 }
 
-bool CInventoryItem::IsPowerConsumer() const { return m_power_source_status != ALife::ePowerSourceDisabled && !fis_zero(m_fPowerConsumption); }
+bool CInventoryItem::IsPowerConsumer() const { return m_power_source_status != ALife::ePowerSourceDisabled; }
 
 bool CInventoryItem::IsPowerSourceAttached() const
 {
@@ -920,7 +918,7 @@ bool CInventoryItem::IsPowerOn() const { return false; }
 void CInventoryItem::ChangePowerLevel(float value)
 {
     m_fPowerLevel += value;
-    clamp(m_fPowerLevel, 0.f, m_fPowerLevel);
+    clamp(m_fPowerLevel, 0.f, 1.f);
     if (fis_zero(m_fPowerLevel) && IsPowerOn())
         Switch(false);
 }
@@ -935,44 +933,33 @@ void CInventoryItem::SetPowerLevel(float value)
         Switch(false);
 }
 
-float CInventoryItem::GetPowerLevelToShow() const
-{
-    float res{m_fPowerLevel / m_fPowerCapacity * 100.f};
-    clamp(res, 0.f, 100.f);
-    return res;
-}
-
 void CInventoryItem::Switch() { Switch(!IsPowerOn()); }
 
 void CInventoryItem::Switch(bool turn_on)
 {
     if (!IsPowerConsumer())
         return;
-    m_uLastPowerConsumingUpdateTime = Level().GetGameTime();
+    m_uLastWorkUpdateTime = Level().GetGameTime();
     if (smart_cast<CActor*>(object().H_Parent()))
         Actor()->callback(GameObject::ePowerSwitch)(object().lua_game_object());
 }
 
-void CInventoryItem::Recharge() { SetPowerLevel(m_fPowerCapacity); }
+bool CInventoryItem::CanBeCharged() const { return IsPowerConsumer() && IsPowerSourceAttached() && !fis_zero(GetCondition()) && m_fPowerLevel < 1.f; }
 
-bool CInventoryItem::CanBeCharged() const { return IsPowerConsumer() && IsPowerSourceAttached() && !fis_zero(GetCondition()) && m_fPowerLevel < m_fPowerCapacity; }
-
-bool CInventoryItem::CanBeRecharged() const { return m_bRechargeable && !fis_zero(GetCondition()) && m_fPowerLevel < m_fPowerCapacity; }
+bool CInventoryItem::CanBeRecharged() const { return m_bRechargeable && !fis_zero(GetCondition()) && m_fPowerLevel < 1.f; }
 
 void CInventoryItem::InitAddons()
 {
     if (!IsPowerConsumer())
         return;
-    m_fPowerCapacity = 0.f;
 
     if (!IsPowerSourceAttached())
         return;
 
     const auto power_params_sect = IsPowerSourceAttachable() ? GetPowerSourceName() : object().cNameSect();
 
-    m_fPowerCapacity = READ_IF_EXISTS(pSettings, r_float, power_params_sect, "power_capacity", 0.f);
-    clamp(m_fPowerLevel, 0.f, m_fPowerCapacity);
-    m_uLastPowerConsumingUpdateTime = Level().GetGameTime();
+    m_fWorkTime = READ_IF_EXISTS(pSettings, r_float, power_params_sect, "ttl_on_work", 0.f);
+    m_uLastWorkUpdateTime = Level().GetGameTime();
 }
 
 LPCSTR CInventoryItem::GetBoneName(int bone_idx)

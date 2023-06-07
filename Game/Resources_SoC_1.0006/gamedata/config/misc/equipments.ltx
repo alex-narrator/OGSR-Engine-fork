@@ -142,7 +142,7 @@ inv_name			= battery
 inv_name_short		= battery
 inv_weight			= 0.1
 
-power_capacity 		= 400
+work_time = 2
 
 inv_grid_width     = 1
 inv_grid_height    = 1
@@ -162,7 +162,7 @@ inv_name_short		= pda_battery
 inv_weight			= 0.3
 
 rechargeable = true
-power_capacity = 800
+work_time = 48
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;vest;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 [vest]:identity_immunities
 GroupControlSection	= spawn_group
@@ -371,7 +371,7 @@ slot			= 19
 
 inv_show_condition = true
 
-;ttl_on_work = 1
+;work_time = 1
 
 position				= 0,0,0
 attach_angle_offset 	= 1.500, 0.043, 1.650
@@ -381,10 +381,13 @@ auto_attach				= false
 
 immunities_sect 			= sect_helm_respirator_immunities
 
-filters = filter_gp5
+power_source_status = 2
+power_source = filter_gp5
+power_source_icon_offset = 45,0
+power_source_icon_scale = 0.5
 
-radiation_protection 		= 0.1
-chemical_burn_protection 	= 0.1
+radiation_protection 		= 0.3
+chemical_burn_protection 	= 0.3
 
 [sect_helm_respirator_immunities]
 burn_immunity			= 0.04
@@ -417,10 +420,7 @@ inv_grid_x         = 30
 inv_grid_y         = 36
 cost				= 400
 
-ttl_on_work = 2
-
-radiation_protection 		= 0.3
-chemical_burn_protection 	= 0.3
+work_time = 2
 
 ;---------------------------------------------------------------------------------------------
 ;		ШЛЕМЫ

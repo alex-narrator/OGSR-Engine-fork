@@ -79,8 +79,6 @@ inv_grid_y         = 24
 cost				= 20
 
 power_source_status = 2
-power_consumption 	= 20
-;power_capacity 		= 200
 power_source 		= pda_battery
 
 attach_angle_offset		= 3.080506,-1.493053,-1.202040   ;устанавливается в радианах Angle*PI/180
@@ -110,7 +108,6 @@ inv_grid_y         = 12
 slot				= 9
 
 power_source_status = 2
-power_consumption 	= 100
 power_source 		= battery
 
 ;вещью нельзя торговать
@@ -125,6 +122,7 @@ auto_attach				= false
 snd_torch_on 			= weapons\nv_start
 snd_torch_off 			= weapons\nv_off
 
+light_definition 		= torch_definition
 light_definition_second = torch_definition_long_range
 
 [device_night_vision]:identity_immunities
@@ -148,7 +146,6 @@ inv_grid_y			= 12
 slot				= 9
 
 power_source_status = 2
-power_consumption 	= 100
 power_source 		= battery
 
 ;вещью нельзя торговать
@@ -159,6 +156,7 @@ attach_position_offset	= 0.115, 0.00, 0.07
 attach_bone_name		= bip01_head
 auto_attach				= false
 
+;night_vision_texture		= hud_mask\nightvision\hud_nvg_gen1;wpn\wpn_crosshair;wpn\wpn_night
 night_vision_effector		= effector_nightvision ;postprocess_night
 
 snd_night_vision_on			= weapons\nv_start
@@ -173,145 +171,122 @@ night_vision_discharge_time			= 20	;(c) время разрядки (работ�
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;DETECTORS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-[detector_simple]:identity_immunities
+[detector_base]:identity_immunities
 GroupControlSection	= spawn_group
 discovery_dependency =
-$spawn 				= "devices\detector_simple"
 $prefetch 			= 32
 class				= D_SIMDET
 cform				= skeleton
+ef_detector_type	= 1
+slot 				= 8
+belt 				= true
+vest 				= true
+power_source_status = 2
+power_source 		= battery
+
+[detector_simple]:detector_base
+$spawn 				= "devices\detector_simple"
 visual				= equipments\item_datchik1.ogf
 description			= enc_equipment_devic_detect1
 radius				= 10	;15
-buzzer_radius		= 1.5
-noise				= zone_mosquito_bald       ;detectors\geiger_noise_loop
-buzzer				= zone_mosquito_bald       ;detectors\DA-2_alarm_loop
-slot				= 8
-ef_detector_type	= 1
 
-inv_name			= Detector
-inv_name_short		= Detector
+inv_name			= st_detector
+inv_name_short		= st_detector
 inv_weight			= 0
 
 inv_grid_width		= 1
 inv_grid_height		= 1
 inv_grid_x			= 9
 inv_grid_y			= 14
-cost				= 500	;30
-;belt				= true;
-default_to_ruck		= false
+cost				= 1500	;30
 
-power_source_status = 2
-power_consumption 	= 50
-power_source 		= battery
 
 ;описание распознаваемых детектором зон
-zone_class_1		= zone_mosquito_bald
+;zone_class_1		= zone_mosquito_bald
 
-zone_sound_1_		= detectors\DA-2_beep1
-zone_sound_1_1		= detectors\DA-2_beep1
-zone_sound_1_2		= detectors\DA-2_beep1
-zone_sound_1_3		= detectors\DA-2_beep1
+;zone_sound_1_		= detectors\DA-2_beep1
+;zone_sound_1_1		= detectors\DA-2_beep1
+;zone_sound_1_2		= detectors\DA-2_beep1
+;zone_sound_1_3		= detectors\DA-2_beep1
 
-zone_min_freq_1		= 0.1	;0.5
-zone_max_freq_1		= 40
+;zone_min_freq_1		= 0.1	;0.5
+;zone_max_freq_1		= 40
 
-zone_class_2		= zone_mincer
-zone_sound_2_		= detectors\DA-2_beep1
-zone_min_freq_2		= 0.1
-zone_max_freq_2		= 20
+;zone_class_2		= zone_mincer
+;zone_sound_2_		= detectors\DA-2_beep1
+;zone_min_freq_2		= 0.1
+;zone_max_freq_2		= 20
 
-zone_class_3		= zone_radioactive
+zone_class_1		= zone_radioactive
 ; zone_sound_3_		= detectors\DA-2_beep1
-zone_sound_3_		= detectors\geiger_1
-zone_sound_3_1		= detectors\geiger_2
-zone_sound_3_2		= detectors\geiger_3
-zone_sound_3_3		= detectors\geiger_4
-zone_sound_3_4		= detectors\geiger_5
-zone_sound_3_5		= detectors\geiger_6
-zone_sound_3_6		= detectors\geiger_1
-zone_sound_3_7		= detectors\geiger_1
-zone_sound_3_8		= detectors\geiger_1
-zone_min_freq_3		= 1
-zone_max_freq_3		= 20
+zone_sound_1_		= detectors\geiger_1
+zone_sound_1_1		= detectors\geiger_2
+zone_sound_1_2		= detectors\geiger_3
+zone_sound_1_3		= detectors\geiger_4
+zone_sound_1_4		= detectors\geiger_5
+zone_sound_1_5		= detectors\geiger_6
+zone_sound_1_6		= detectors\geiger_1
+zone_sound_1_7		= detectors\geiger_1
+zone_sound_1_8		= detectors\geiger_1
+zone_min_freq_1		= 1
+zone_max_freq_1		= 20
 
-zone_class_4		= zone_gravi_zone
-zone_sound_4_		= detectors\DA-2_beep1
-zone_min_freq_4		= 0.5
-zone_max_freq_4		= 30
+zone_class_2		= zone_gravi_zone
+zone_sound_2_		= detectors\DA-2_beep1
+zone_min_freq_2		= 0.5
+zone_max_freq_2		= 30
 
 
-[detector_advances]:identity_immunities
-GroupControlSection	= spawn_group
-discovery_dependency =
+[detector_advances]:detector_base
 $spawn 				= "devices\detector_advanced"
-$prefetch 			= 32
-class				= D_SIMDET
-cform				= skeleton
 visual				= equipments\item_datchik2.ogf
+description			= enc_equipment_devic_detect2
 radius				= 10	;15
-buzzer_radius		= 1.5
-noise				= zone_mosquito_bald       ;detectors\geiger_noise_loop
-buzzer				= zone_mosquito_bald       ;detectors\DA-2_alarm_loop
 
-ef_detector_type	= 1
-
-night_vision_particle		= damage_fx\heli_burn
+night_vision_particle		= nature\flies_light ;damage_fx\heli_burn
 
 ;описание распознаваемых детектором зон
 zone_class_1		= zone_mosquito_bald
 zone_sound_1_		= detectors\DA-2_beep1
 zone_min_freq_1		= 0.1	;0.5
 zone_max_freq_1		= 40
-zone_map_location_1 = anomaly_zone_location
+;zone_map_location_1 = anomaly_zone_location
 
 zone_class_2		= zone_mincer
 zone_sound_2_		= detectors\DA-2_beep1
 zone_min_freq_2		= 0.1
 zone_max_freq_2		= 20
-zone_map_location_2 = anomaly_zone_location
+;zone_map_location_2 = anomaly_zone_location
 
-zone_class_3		= zone_radioactive
+;zone_class_3		= zone_radioactive
+;zone_sound_3_		= detectors\DA-2_beep1
+;zone_min_freq_3		= 1
+;zone_max_freq_3		= 20
+;zone_map_location_3 = anomaly_zone_location
+
+zone_class_3		= zone_gravi_zone
 zone_sound_3_		= detectors\DA-2_beep1
-zone_min_freq_3		= 1
-zone_max_freq_3		= 20
-zone_map_location_3 = anomaly_zone_location
+zone_min_freq_3		= 0.5
+zone_max_freq_3		= 30
+;zone_map_location_4 = anomaly_zone_location
 
-zone_class_4		= zone_gravi_zone
-zone_sound_4_		= detectors\DA-2_beep1
-zone_min_freq_4		= 0.5
-zone_max_freq_4		= 30
-zone_map_location_4 = anomaly_zone_location
-
-inv_name			= Detector
-inv_name_short		= Detector
+inv_name			= st_detector
+inv_name_short		= st_detector
 inv_weight			= 0
 
 inv_grid_width		= 1
 inv_grid_height		= 1
 inv_grid_x			= 15
 inv_grid_y			= 7
-cost				= 1000	;30
-;belt				= true;
-default_to_ruck		= false
-slot				= 8
+cost				= 3000	;30
 
 
-[detector_elite]:identity_immunities
-GroupControlSection	= spawn_group
-discovery_dependency =
+[detector_elite]:detector_base
 $spawn 				= "devices\detector_elite"
-$prefetch 			= 32
-class				= D_SIMDET
-cform				= skeleton
 visual				= equipments\item_datchik3.ogf
-radius				= 10	;15
-buzzer_radius		= 1.5
-noise				= zone_mosquito_bald       ;detectors\geiger_noise_loop
-buzzer				= zone_mosquito_bald       ;detectors\DA-2_alarm_loop
+radius				= 15
 
-ef_detector_type	= 1
-night_vision_particle		= damage_fx\heli_burn
+night_vision_particle		= nature\flies_light ;damage_fx\heli_burn
 
 
 ;описание распознаваемых детектором зон
@@ -341,7 +316,7 @@ zone_map_location_4 = anomaly_zone_location
 
 inv_name			= st_detector
 inv_name_short		= st_detector
-description			= st_detector_descr
+description			= enc_equipment_devic_detect3
 
 inv_weight			= 0
 
@@ -349,9 +324,7 @@ inv_grid_width		= 1
 inv_grid_height		= 1
 inv_grid_x			= 5
 inv_grid_y			= 14
-cost				= 1500	;30
-;belt				= true;
-slot				= 8
+cost				= 15000	;30
 
 attach_angle_offset		= -0.160570,-1.425061,-0.361283
 attach_position_offset	= 0.160570,-0.060214,0.020071
@@ -361,43 +334,40 @@ auto_attach				= false
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;DETECTORS COP;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-[detector_simple_cop]:identity_immunities
+[detector_cop_base]:identity_immunities
 GroupControlSection	= spawn_group
-$spawn 			= "devices\detector_simple"
 $prefetch 		= 32
-class			= DET_SIMP
 cform			= skeleton
-visual			= dynamics\devices\dev_detector_1\dev_detector_1.ogf
-
-hud			= detector_simple_hud
 animation_slot		= 7
+ef_detector_type	= 1
+slot			= 8
+belt = true
+vest = true
+night_vision_particle		= nature\flies_light
+power_source_status = 2
+power_source 		= battery
 
+[detector_simple_cop]:detector_cop_base
+
+$spawn 			= "devices\detector_simple"
+class			= DET_SIMP
+visual			= dynamics\devices\dev_detector_1\dev_detector_1.ogf
+hud			= detector_simple_hud
 inv_name		= st_detector1
 inv_name_short	= st_detector1
 description		= st_detector1_descr
 
-slot			= 8
-belt = true
-vest = true
 
-ef_detector_type	= 1
 inv_weight		= 0.5
 
 inv_grid_width		= 1
 inv_grid_height		= 1
 inv_grid_x		= 12
-inv_grid_y		= 23
+inv_grid_y		= 24
 cost			= 500
-default_to_ruck		= false
 
 af_radius		= 30
 af_vis_radius		= 3
-
-night_vision_particle		= damage_fx\heli_burn
-
-power_source_status = 2
-power_consumption 	= 10
-power_source 		= battery
 
 af_class_1		= af_cristall
 af_sound_1_		= detectors\art_beep1
@@ -438,10 +408,6 @@ af_freq_10		= 0.05, 2
 af_class_11		= af_compass
 af_sound_11_		= detectors\art_beep1
 af_freq_11		= 0.05, 2
-
-;zone_class_all = true
-;zone_sound_all_ = detectors\DA-2_beep1
-;zone_freq_all = 0.05, 2
 
 zone_class_1		= zone_radioactive
 zone_sound_1_		= detectors\geiger_1
@@ -485,8 +451,6 @@ lean_hud_offset_rot		= 0,0,0
 
 
 [detector_simple_hud]:detector_base_hud
-
-
 item_position				= -0.072424,0.030392,-0.012213
 item_orientation			= 324.640503,-189.627350,-183.009415
 
@@ -532,10 +496,8 @@ description		= st_detector2_descr
 inv_grid_width	= 1
 inv_grid_height	= 1
 inv_grid_x		= 13
-inv_grid_y		= 23
+inv_grid_y		= 24
 cost			= 1000
-
-night_vision_particle		= damage_fx\heli_burn
 
 hud			= detector_advanced_hud
 
@@ -609,7 +571,7 @@ hud			= detector_elite_hud
 inv_grid_width		= 1
 inv_grid_height		= 1
 inv_grid_x		= 14
-inv_grid_y		= 23
+inv_grid_y		= 24
 cost			= 2000
 
 ; elite x="0.00096" y="0.0035"
@@ -672,7 +634,8 @@ anm_idle_16x9			= dev_detector_3_idle_ws, dev_detector_3_idle
 anm_idle_moving_16x9		= dev_detector_3_idle_moving_ws, dev_detector_3_idle_moving
 anm_idle_sprint_16x9		= dev_detector_3_idle_moving_ws, dev_detector_3_idle_moving
 
-[detector_scientific_cop]:detector_elite_cop
+;;;;біодетектор
+[detector_bio_cop]:detector_elite_cop
 $spawn 				= "devices\detector_scientific"
 class				= DET_SCIE
 
@@ -681,12 +644,12 @@ visual			= dynamics\devices\dev_detector_4\dev_detector_4.ogf
 inv_name		= st_detector4
 inv_name_short	= st_detector4
 description		= st_detector4_descr
-hud			= detector_scientific_hud
+hud			= detector_bio_hud
 
 inv_grid_width		= 1
 inv_grid_height		= 1
 inv_grid_x		= 15
-inv_grid_y		= 23
+inv_grid_y		= 24
 cost			= 12500
 
 ; elite x="0.00096" y="0.0035"
@@ -701,7 +664,7 @@ creature_ui_mark_1 = human
 creature_class_2 = zombie
 creature_ui_mark_2 = human
 
-[detector_scientific_hud]:detector_base_hud
+[detector_bio_hud]:detector_base_hud
 item_position				= -0.071685,0.036188,-0.009934
 item_orientation			= 314.589233,-186.420761,-189.323669
 

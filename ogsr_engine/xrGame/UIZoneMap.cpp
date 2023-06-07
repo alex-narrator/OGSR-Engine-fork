@@ -77,7 +77,8 @@ void CUIZoneMap::Render()
     //
     string16 tmp{};
     auto act_pda = Actor()->GetPDA();
-    sprintf_s(tmp, "%.f%s", act_pda->GetPowerLevelToShow(), "%");
+    float power = act_pda->GetPowerLevel() * 100.f;
+    sprintf_s(tmp, "%.f%s", power, "%");
     m_CurrentPower.SetText(tmp);
     m_CurrentPower.SetVisible(pda_workable);
     m_CurrentTime.SetText(InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());

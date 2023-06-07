@@ -401,7 +401,7 @@ void CUIMainIngameWnd::Update()
         bool show_bar = IsHUDElementAllowed(eArmorPower);
         UIOutfitPowerStatic.Show(show_bar);
         if (show_bar && pOutfit)
-            UIOutfitPowerBar.SetProgressPos(pOutfit->GetPowerLevelToShow());
+            UIOutfitPowerBar.SetProgressPos(pOutfit->GetPowerLevel() * 100.f);
 
         UpdateActiveItemInfo();
 

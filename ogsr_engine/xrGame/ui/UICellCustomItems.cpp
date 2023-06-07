@@ -198,6 +198,23 @@ void CUIInventoryCellItem::Update()
         m_upgrade = CreateUpgradeIcon();
         AttachChild(m_upgrade);
     }
+
+    if (object()->IsPowerConsumer() && object()->IsPowerSourceAttachable())
+    {
+        if (object()->IsPowerSourceAttached() && object()->m_power_source_icon_scale)
+        {
+            if (!m_power_source)
+            {
+                m_power_source = CreatePowerSourceIcon();
+                AttachChild(m_power_source);
+            }
+        }
+        else if (m_power_source)
+        {
+            DetachChild(m_power_source);
+            m_power_source = nullptr;
+        }
+    }
 }
 
 CUIStatic* CUIInventoryCellItem::CreateUpgradeIcon()
@@ -214,7 +231,7 @@ CUIStatic* CUIInventoryCellItem::CreateUpgradeIcon()
     size.mul(base_scale);
     upgrade_icon->SetWndSize(size);
 
-    Fvector2 pos{object()->m_upgrade_icon_ofset};
+    Fvector2 pos{object()->m_upgrade_icon_offset};
     pos.mul(base_scale);
     upgrade_icon->SetWndPos(pos);
 
@@ -223,59 +240,28 @@ CUIStatic* CUIInventoryCellItem::CreateUpgradeIcon()
     return upgrade_icon;
 }
 
-CUIGasMaskCellItem::CUIGasMaskCellItem(CGasMask* itm) : inherited(itm) {}
-void CUIGasMaskCellItem::Update() 
-{ 
-    inherited::Update(); 
-    if (object()->IsFilterInstalled())
-    {
-        if (!m_filter)
-        {
-            m_filter = CreateFilterIcon();
-            AttachChild(m_filter);
-        }
-    }
-    else if (m_filter)
-    {
-        DetachChild(m_filter);
-        m_filter = nullptr;
-    }
-}
-CUIStatic* CUIGasMaskCellItem::CreateFilterIcon()
+CUIStatic* CUIInventoryCellItem::CreatePowerSourceIcon()
 {
-    auto filter_icon = xr_new<CUIStatic>();
-    filter_icon->SetAutoDelete(true);
-    CIconParams params(object()->GetFilterName());
-    params.set_shader(filter_icon);
+    auto power_source_icon = xr_new<CUIStatic>();
+    power_source_icon->SetAutoDelete(true);
+    CIconParams params(object()->GetPowerSourceName());
+    params.set_shader(power_source_icon);
 
     Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
     Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
 
     Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
-    size.mul(base_scale);
-    size.mul(object()->filter_icon_scale);
-    filter_icon->SetWndSize(size);
+    size.mul(base_scale);  
+    size.mul(object()->m_power_source_icon_scale);
+    power_source_icon->SetWndSize(size);
 
-    Fvector2 pos{object()->filter_icon_ofset};
+    Fvector2 pos{object()->m_power_source_icon_offset};
     pos.mul(base_scale);
-    filter_icon->SetWndPos(pos);
+    power_source_icon->SetWndPos(pos);
 
-    filter_icon->SetStretchTexture(true);
+    power_source_icon->SetStretchTexture(true);
 
-    return filter_icon;
-}
-bool CUIGasMaskCellItem::EqualTo(CUICellItem* itm)
-{
-    if (!inherited::EqualTo(itm))
-        return false;
-
-    auto ci = smart_cast<CUIGasMaskCellItem*>(itm);
-    if (!ci)
-        return false;
-
-    return object()->IsFilterInstalled() == ci->object()->IsFilterInstalled() &&
-        object()->GetFilterName() == ci->object()->GetFilterName() &&
-        fsimilar(object()->GetInstalledFilterCondition(), ci->object()->GetInstalledFilterCondition(), 0.01f);
+    return power_source_icon;
 }
 
 CUIAmmoCellItem::CUIAmmoCellItem(CWeaponAmmo* itm) : inherited(itm)

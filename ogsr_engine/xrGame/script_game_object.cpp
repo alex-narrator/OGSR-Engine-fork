@@ -504,7 +504,7 @@ float CScriptGameObject::GetPowerLevel() const
         ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member GetPowerLevel - item not a power consumer!");
         return 0.f;
     }
-    return inventory_item->GetPowerLevelToShow();
+    return inventory_item->GetPowerLevel();
 }
 void CScriptGameObject::SetPowerLevel(float val)
 {
@@ -519,8 +519,7 @@ void CScriptGameObject::SetPowerLevel(float val)
         ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member SetPowerLevel - item not a power consumer!");
         return;
     }
-    float _power_level = val * inventory_item->GetPowerCapacity();
-    inventory_item->SetPowerLevel(_power_level);
+    inventory_item->SetPowerLevel(val);
 }
 void CScriptGameObject::ChangePowerLevel(float val)
 {
@@ -535,8 +534,7 @@ void CScriptGameObject::ChangePowerLevel(float val)
         ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member ChangePowerLevel - item not a power consumer!");
         return;
     }
-    float _power_level = val * inventory_item->GetPowerCapacity();
-    inventory_item->ChangePowerLevel(_power_level);
+    inventory_item->ChangePowerLevel(val);
 }
 //
 void CScriptGameObject::eat(CScriptGameObject* item)

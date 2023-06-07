@@ -42,30 +42,15 @@ CSE_ALifeInventoryItem::CSE_ALifeInventoryItem(LPCSTR caSection)
     m_fRadiationRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, caSection, "radiation_restore_speed", 0.f);
 
     m_power_source_status = (EPowerSourceStatus)READ_IF_EXISTS(pSettings, r_u8, caSection, "power_source_status", 0);
-    
     if (m_power_source_status == EPowerSourceStatus::ePowerSourceAttachable)
     {
         // preinstalled non-permanent power source
         if(pSettings->line_exist(caSection, "power_source_installed"))
             m_cur_power_source = pSettings->r_u8(caSection, "power_source_installed");
-
-        LPCSTR str = pSettings->r_string(caSection, "power_source");
-        string128 power_source_sect{};
-        _GetItem(str, m_cur_power_source, power_source_sect);
-        m_fPowerLevel = READ_IF_EXISTS(pSettings, r_float, power_source_sect, "power_capacity", 0.f);
-    }
-    if (m_power_source_status == EPowerSourceStatus::ePowerSourcePermanent)
-    {
-        if (pSettings->line_exist(caSection, "power_level"))
-            m_fPowerLevel = pSettings->r_float(caSection, "power_level");
-        else
-            m_fPowerLevel = READ_IF_EXISTS(pSettings, r_float, caSection, "power_capacity", 0.f);
     }
     // батарейка
-    if (m_power_source_status == ALife::ePowerSourceDisabled && pSettings->line_exist(caSection, "power_capacity"))
-    {
-        m_fPowerLevel = pSettings->r_float(caSection, "power_capacity");
-    }
+    if (m_power_source_status != ALife::ePowerSourceDisabled || pSettings->line_exist(caSection, "ttl_on_work"))
+        m_fPowerLevel = READ_IF_EXISTS(pSettings, r_float, caSection, "power_level", 1.f);
 }
 
 CSE_Abstract* CSE_ALifeInventoryItem::init()
@@ -108,7 +93,7 @@ void CSE_ALifeInventoryItem::UPDATE_Write(NET_Packet& tNetPacket)
 {
     tNetPacket.w_float_q8(m_fCondition, 0.0f, 1.0f);
     tNetPacket.w_float(m_fRadiationRestoreSpeed);
-    tNetPacket.w_float(m_fPowerLevel);
+    tNetPacket.w_float_q8(m_fPowerLevel, 0.0f, 1.0f);
     tNetPacket.w_u8(m_cur_power_source);
     tNetPacket.w_u8(m_bIsPowerSourceAttached ? 1 : 0);
 
@@ -163,7 +148,7 @@ void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
     {
         tNetPacket.r_float_q8(m_fCondition, 0.0f, 1.0f);
         tNetPacket.r_float(m_fRadiationRestoreSpeed);
-        tNetPacket.r_float(m_fPowerLevel);
+        tNetPacket.r_float_q8(m_fPowerLevel, 0.0f, 1.0f);
         tNetPacket.r_u8(m_cur_power_source);
         m_bIsPowerSourceAttached = !!(tNetPacket.r_u8() & 0x1);
     }
@@ -1037,39 +1022,4 @@ void CSE_ALifeItemVest::UPDATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8(m_bIsPlateInstalled ? 1 : 0);
     tNetPacket.w_u8(m_cur_plate);
     tNetPacket.w_float_q8(m_fInstalledPlateCondition, 0.f, 1.f);
-}
-
-////////////////////////////////////////////////////////////////////////////
-// CSE_ALifeItemGasMask
-////////////////////////////////////////////////////////////////////////////
-CSE_ALifeItemGasMask::CSE_ALifeItemGasMask(LPCSTR caSection) : CSE_ALifeItem(caSection)
-{
-    if (pSettings->line_exist(caSection, "filter_installed"))
-    {
-        m_bIsFilterInstalled = true;
-        m_cur_filter = pSettings->r_u8(s_name, "filter_installed");
-    }
-}
-CSE_ALifeItemGasMask::~CSE_ALifeItemGasMask() {}
-void CSE_ALifeItemGasMask::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited::STATE_Read(tNetPacket, size); }
-void CSE_ALifeItemGasMask::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
-void CSE_ALifeItemGasMask::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Read(tNetPacket);
-
-    if (m_wVersion > 118)
-    {
-        u8 _data = tNetPacket.r_u8();
-        m_bIsFilterInstalled = !!(_data & 0x1);
-        tNetPacket.r_u8(m_cur_filter);
-        tNetPacket.r_float_q8(m_fInstalledFilterCondition, 0.f, 1.f);
-    }
-}
-void CSE_ALifeItemGasMask::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Write(tNetPacket);
-
-    tNetPacket.w_u8(m_bIsFilterInstalled ? 1 : 0);
-    tNetPacket.w_u8(m_cur_filter);
-    tNetPacket.w_float_q8(m_fInstalledFilterCondition, 0.f, 1.f);
 }
