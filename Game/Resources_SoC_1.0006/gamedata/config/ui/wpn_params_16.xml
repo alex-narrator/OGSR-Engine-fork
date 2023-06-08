@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding="UTF-8"?>
 <w>
-    <wpn_params x="0" y="0" width="157" height="200">
+    <wpn_params x="0" y="0" width="157" height="150" icons_x="50">
 		<cap_accuracy x="0" y="8" width="121" height="8">
 			<text font="letterica16" r="124" g="119" b="115">ui_inv_accuracy</text>
 		</cap_accuracy>		
@@ -69,13 +69,13 @@
 			</background>
 		</progress_reliability>		
 		
-		<auto_static x="0" y="105" width="210" height="12">
-			<text align="c" font="letterica16" r="240" g="217" b="182" vert_align="c">st_current_ammo_type</text>
+		<auto_static x="0" y="115" width="20" height="12">
+			<text align="l" font="letterica16" r="240" g="217" b="182" vert_align="c">st_current_ammo_type</text>
 		</auto_static>
 		
-		<ammo_icon x="0" y="125" width="50" height="50" scale="0.75"/>
-		<mag_icon x="90" y="125" width="50" height="50" scale="0.75"/>
-		<ammo2_icon x="155" y="125" width="50" height="50" scale="0.75"/>
+		<ammo_icon x="0" y="105" width="50" height="50" scale="0.75" autoscale="1"/>
+		<mag_icon x="0" y="105" width="50" height="50" scale="0.75" autoscale="1"/>
+		<ammo2_icon x="0" y="105" width="50" height="50" scale="0.75" autoscale="1"/>
 		
 	</wpn_params>
 </w>

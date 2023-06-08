@@ -36,5 +36,6 @@ protected:
     CUIStatic m_iconCurAmmo;
     CUIStatic m_iconCurMag;
     CUIStatic m_iconCurAmmo2;
-    float ammo_icon_scale{}, mag_icon_scale{}, ammo2_icon_scale{};
+    float ammo_icon_scale{}, mag_icon_scale{}, ammo2_icon_scale{}, icons_pos_left{};
+    bool scale_ammo{}, scale_mag{}, scale_ammo2{};
 };

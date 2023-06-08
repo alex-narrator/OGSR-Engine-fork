@@ -95,14 +95,19 @@ void CUIWpnParams::Init()
     xml_init.InitStatic(xml_doc, "wpn_params:cap_range", 0, &m_textRange);
     xml_init.InitStatic(xml_doc, "wpn_params:cap_reliability", 0, &m_textReliability);
 
+    icons_pos_left = xml_doc.ReadAttribFlt("wpn_params", 0, "icons_x", 1.f);
+
     xml_init.InitStatic(xml_doc, "wpn_params:ammo_icon", 0, &m_iconCurAmmo);
     ammo_icon_scale = xml_doc.ReadAttribFlt("wpn_params:ammo_icon", 0, "scale", 1.f);
+    scale_ammo = xml_doc.ReadAttribInt("wpn_params:ammo_icon", 0, "autoscale", 0);
 
     xml_init.InitStatic(xml_doc, "wpn_params:mag_icon", 0, &m_iconCurMag);
     mag_icon_scale = xml_doc.ReadAttribFlt("wpn_params:mag_icon", 0, "scale", 1.f);
+    scale_mag = xml_doc.ReadAttribInt("wpn_params:mag_icon", 0, "autoscale", 0);
 
     xml_init.InitStatic(xml_doc, "wpn_params:ammo2_icon", 0, &m_iconCurAmmo2);
     ammo2_icon_scale = xml_doc.ReadAttribFlt("wpn_params:ammo2_icon", 0, "scale", 1.f);
+    scale_ammo2 = xml_doc.ReadAttribInt("wpn_params:ammo2_icon", 0, "autoscale", 0);
 
     xml_init.InitProgressBar(xml_doc, "wpn_params:progress_accuracy", 0, &m_progressAccuracy);
     xml_init.InitProgressBar(xml_doc, "wpn_params:progress_damage", 0, &m_progressDamage);
@@ -124,7 +129,7 @@ bool CUIWpnParams::Check(CInventoryItem* obj)
     return smart_cast<CWeapon*>(obj) && !smart_cast<CWeaponBinoculars*>(obj);
 }
 
-void ShowIcon(CUIStatic& icon, shared_str sect, float scale)
+void ShowIcon(CUIStatic& icon, shared_str sect, float scale, float& pos_x, bool autoscale)
 {
     icon.Show(true);
     CIconParams params(sect);
@@ -138,10 +143,13 @@ void ShowIcon(CUIStatic& icon, shared_str sect, float scale)
     const auto& r = params.original_rect();
     size.set(r.width(), r.height());
     size.mul(scale);
+    if (autoscale)
+        size.mul(1 / params.grid_height);
     size.x *= UI()->get_current_kx();
 
     icon.SetWndRect(0, 0, size.x, size.y);
-    icon.SetWndPos(pos.x, pos.y);
+    icon.SetWndPos(/*pos.x*/ pos_x, pos.y);
+    pos_x += icon.GetWidth();
 }
 
 void CUIWpnParams::SetInfo(CInventoryItem* obj)
@@ -164,11 +172,12 @@ void CUIWpnParams::SetInfo(CInventoryItem* obj)
     m_progressReliability.SetProgressPos(g_lua_wpn_params->m_functorReliability(wpn_section.c_str(), object.lua_game_object()));
 
     auto wpn = smart_cast<CWeapon*>(obj);
+    float pos_x = icons_pos_left;
     if (wpn->GetAmmoElapsed())
-        ShowIcon(m_iconCurAmmo, wpn->m_magazine.back().m_ammoSect, ammo_icon_scale);
+        ShowIcon(m_iconCurAmmo, wpn->m_magazine.back().m_ammoSect, ammo_icon_scale, pos_x, scale_ammo);
     if (wpn->IsAddonAttached(eMagazine))
-        ShowIcon(m_iconCurMag, wpn->GetAddonName(eMagazine), mag_icon_scale);
+        ShowIcon(m_iconCurMag, wpn->GetAddonName(eMagazine), mag_icon_scale, pos_x, scale_mag);
     auto wpn_w_gl = smart_cast<CWeaponMagazinedWGrenade*>(obj);
     if (wpn_w_gl && wpn_w_gl->GetAmmoElapsed2())
-        ShowIcon(m_iconCurAmmo2, wpn_w_gl->m_magazine2.back().m_ammoSect, ammo2_icon_scale);
+        ShowIcon(m_iconCurAmmo2, wpn_w_gl->m_magazine2.back().m_ammoSect, ammo2_icon_scale, pos_x, scale_ammo2);
 }
