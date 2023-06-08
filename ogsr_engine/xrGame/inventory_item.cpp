@@ -884,7 +884,7 @@ float CInventoryItem::GetItemEffect(int effect) const
 
 void CInventoryItem::UpdatePowerConsumption()
 {
-    if (!smart_cast<CActor*>(object().H_Parent()) || !IsPowerConsumer() || !GetWorkTime() || !IsPowerOn() || fis_zero(GetCondition()))
+    if (!smart_cast<CActor*>(object().H_Parent()) || !IsPowerConsumer() || !IsPowerOn() || fis_zero(GetCondition()))
         return;
 
     float delta_time{};
@@ -904,7 +904,7 @@ void CInventoryItem::UpdatePowerConsumption()
     //Msg("power dec %.8f, power level %.8f, power consumption %.8f, work time %.8f, delta time %.8f", power_dec, GetPowerLevel(), GetPowerConsumption(), GetWorkTime(), delta_time);
 }
 
-bool CInventoryItem::IsPowerConsumer() const { return m_power_source_status != ALife::ePowerSourceDisabled; }
+bool CInventoryItem::IsPowerConsumer() const { return m_power_source_status != ALife::ePowerSourceDisabled && (IsPowerSourceAttached() || !IsPowerSourceAttachable()); }
 
 bool CInventoryItem::IsPowerSourceAttached() const
 {
@@ -958,7 +958,7 @@ void CInventoryItem::InitAddons()
 
     const auto power_params_sect = IsPowerSourceAttachable() ? GetPowerSourceName() : object().cNameSect();
 
-    m_fWorkTime = READ_IF_EXISTS(pSettings, r_float, power_params_sect, "ttl_on_work", 0.f);
+    m_fWorkTime = READ_IF_EXISTS(pSettings, r_float, power_params_sect, "work_time", 0.f);
     m_uLastWorkUpdateTime = Level().GetGameTime();
 }
 

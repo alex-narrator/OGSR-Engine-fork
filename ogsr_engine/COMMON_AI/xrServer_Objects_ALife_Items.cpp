@@ -49,7 +49,7 @@ CSE_ALifeInventoryItem::CSE_ALifeInventoryItem(LPCSTR caSection)
             m_cur_power_source = pSettings->r_u8(caSection, "power_source_installed");
     }
     // батарейка
-    if (m_power_source_status != ALife::ePowerSourceDisabled || pSettings->line_exist(caSection, "ttl_on_work"))
+    if (m_power_source_status != ALife::ePowerSourceDisabled || pSettings->line_exist(caSection, "work_time"))
         m_fPowerLevel = READ_IF_EXISTS(pSettings, r_float, caSection, "power_level", 1.f);
 }
 
