@@ -6065,7 +6065,7 @@
     <ClInclude Include="ui\UIEatableParams.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIEquipParams.h">
+    <ClInclude Include="ui\UIPowerParams.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClInclude>
     <ClInclude Include="GasMask.h">
@@ -8861,7 +8861,7 @@
     <ClCompile Include="ui\UIEatableParams.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UIEquipParams.cpp">
+    <ClCompile Include="ui\UIPowerParams.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClCompile>
     <ClCompile Include="GasMask.cpp">

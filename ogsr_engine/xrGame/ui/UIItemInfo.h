@@ -7,7 +7,7 @@ class CUIScrollView;
 class CUIProgressBar;
 class CUIWpnParams;
 class CUIArtefactParams;
-class CUIEquipParams;
+class CUIPowerParams;
 class CUIEatableParams;
 class CUIArmorParams;
 class CUIFrameWindow;
@@ -35,7 +35,7 @@ public:
 
     void TryAddWpnInfo(CInventoryItem* obj);
     void TryAddArtefactInfo(CInventoryItem* obj);
-    void TryAddEquipInfo(CInventoryItem* obj);
+    void TryAddPowerInfo(CInventoryItem* obj);
     void TryAddEatableInfo(CInventoryItem* obj);
     void TryAddArmorInfo(CInventoryItem* obj);
     void TryAddCustomInfo(CInventoryItem* obj);
@@ -52,7 +52,7 @@ public:
     CUIProgressBar* UICondProgresBar{};
     CUIWpnParams* UIWpnParams{};
     CUIArtefactParams* UIArtefactParams{};
-    CUIEquipParams* UIEquipParams{};
+    CUIPowerParams* UIPowerParams{};
     CUIEatableParams* UIEatableParams{};
     CUIArmorParams* UIArmorParams{};
 

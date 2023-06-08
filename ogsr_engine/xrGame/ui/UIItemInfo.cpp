@@ -15,7 +15,7 @@
 #include "../PhysicsShellHolder.h"
 #include "UIWpnParams.h"
 #include "ui_af_params.h"
-#include "UIEquipParams.h"
+#include "UIPowerParams.h"
 #include "UIEatableParams.h"
 #include "UIArmorParams.h"
 
@@ -27,7 +27,7 @@ CUIItemInfo::~CUIItemInfo()
 {
     xr_delete(UIWpnParams);
     xr_delete(UIArtefactParams);
-    xr_delete(UIEquipParams);
+    xr_delete(UIPowerParams);
     xr_delete(UIEatableParams);
     xr_delete(UIArmorParams);
 }
@@ -115,8 +115,8 @@ void CUIItemInfo::Init(LPCSTR xml_name)
         UIArtefactParams = xr_new<CUIArtefactParams>();
         UIArtefactParams->Init();
 
-        UIEquipParams = xr_new<CUIEquipParams>();
-        UIEquipParams->Init();
+        UIPowerParams = xr_new<CUIPowerParams>();
+        UIPowerParams->Init();
 
         UIEatableParams = xr_new<CUIEatableParams>();
         UIEatableParams->Init();
@@ -191,7 +191,7 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
         VERIFY(0 == UIDesc->GetSize());
         TryAddWpnInfo(pInvItem);
         TryAddArtefactInfo(pInvItem);
-        TryAddEquipInfo(pInvItem);
+        TryAddPowerInfo(pInvItem);
         TryAddEatableInfo(pInvItem);
         TryAddArmorInfo(pInvItem);
         TryAddCustomInfo(pInvItem);
@@ -260,12 +260,12 @@ void CUIItemInfo::TryAddArtefactInfo(CInventoryItem* obj)
     }
 }
 
-void CUIItemInfo::TryAddEquipInfo(CInventoryItem* obj)
+void CUIItemInfo::TryAddPowerInfo(CInventoryItem* obj)
 {
-    if (UIEquipParams->Check(obj))
+    if (UIPowerParams->Check(obj))
     {
-        UIEquipParams->SetInfo(obj);
-        UIDesc->AddWindow(UIEquipParams, false);
+        UIPowerParams->SetInfo(obj);
+        UIDesc->AddWindow(UIPowerParams, false);
     }
 }
 
@@ -331,9 +331,9 @@ void CUIItemInfo::Update()
             UIArtefactParams->SetInfo(m_pInvItem);
         }
 
-        if (UIEquipParams)
+        if (UIPowerParams)
         {
-            UIEquipParams->SetInfo(m_pInvItem);
+            UIPowerParams->SetInfo(m_pInvItem);
         }
     }
 

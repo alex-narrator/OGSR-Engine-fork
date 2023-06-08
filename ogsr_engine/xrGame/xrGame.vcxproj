@@ -470,7 +470,7 @@
     <ClInclude Include="ui\ArtefactDetectorUI.h" />
     <ClInclude Include="ui\UIArmorParams.h" />
     <ClInclude Include="ui\UIEatableParams.h" />
-    <ClInclude Include="ui\UIEquipParams.h" />
+    <ClInclude Include="ui\UIPowerParams.h" />
     <ClInclude Include="ui\UIHelper.h" />
     <ClInclude Include="ui\UIIconParams.h" />
     <ClInclude Include="ui\UILoadingScreen.h" />
@@ -1702,7 +1702,7 @@
     <ClCompile Include="ui\ArtefactDetectorUI.cpp" />
     <ClCompile Include="ui\UIArmorParams.cpp" />
     <ClCompile Include="ui\UIEatableParams.cpp" />
-    <ClCompile Include="ui\UIEquipParams.cpp" />
+    <ClCompile Include="ui\UIPowerParams.cpp" />
     <ClCompile Include="ui\UIHelper.cpp" />
     <ClCompile Include="ui\UIIconParams.cpp" />
     <ClCompile Include="ui\UILoadingScreen.cpp" />
