@@ -1773,8 +1773,6 @@ bool CActor::HasDetectorWorkable()
     auto item_in_det_slot = inventory().ItemFromSlot(DETECTOR_SLOT);
     return item_in_det_slot && item_in_det_slot->IsPowerOn() && !fis_zero(item_in_det_slot->GetCondition());
 }
-#include "PDA.h"
-bool CActor::HasPDAWorkable() { return GetPDA() && GetPDA()->IsPowerOn() && !fis_zero(GetPDA()->GetCondition()); }
 
 float CActor::GetItemBoostedParams(int type) { return m_ActorItemBoostedParam[type]; }
 

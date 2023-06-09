@@ -102,12 +102,6 @@ void CUIPdaWnd::Init()
     UIMainPdaFrame->AttachChild(UITimerBackground);
     xml_init.InitFrameLine(uiXml, "timer_frame_line", 0, UITimerBackground);
 
-    // Power level background
-    m_currentPower = xr_new<CUIStatic>();
-    m_currentPower->SetAutoDelete(true);
-    UIMainPdaFrame->AttachChild(m_currentPower);
-    xml_init.InitStatic(uiXml, "power_level", 0, m_currentPower);
-
     // Oкно карты
     UIMapWnd = xr_new<CUIMapWnd>();
     UIMapWnd->Init("pda_map.xml", "map_wnd");
@@ -181,7 +175,7 @@ bool CUIPdaWnd::OnMouse(float x, float y, EUIMessages mouse_action)
         {
             if (auto pda = Actor()->GetPDA())
             {
-                if (pda->IsPending())
+                if (pda->IsPending() || !pda->IsPowerOn())
                     return true;
 
                 if (mouse_action == WINDOW_LBUTTON_DOWN)
@@ -340,25 +334,15 @@ void CUIPdaWnd::Draw()
         return;
     last_frame = Device.dwFrame;
 
-	inherited::Draw();
-    /*DrawUpdatedSections								();*/
+    inherited::Draw();
 
-    bool pda_workable = Actor()->HasPDAWorkable();
+    auto pda = Actor()->GetPDA();
+    bool show = pda && pda->IsPowerOn();
     for (const auto& child_wnd : UIMainPdaFrame->GetChildWndList())
-    {
-        child_wnd->SetVisible(pda_workable);
-    }
-    if (!pda_workable)
+        child_wnd->SetVisible(show);
+    if (!show)
         return;
-
     DrawUpdatedSections();
-
-    string16 tmp{};
-    auto act_pda = Actor()->GetPDA();
-    float power = act_pda->GetPowerLevel() * 100.f;
-    sprintf_s(tmp, "%.f%s", power, "%");
-    m_currentPower->SetText(tmp);
-    m_currentPower->SetVisible(pda_workable);
 }
 
 void CUIPdaWnd::PdaContentsChanged(pda_section::part type, bool flash)

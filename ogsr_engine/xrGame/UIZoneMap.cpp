@@ -41,11 +41,6 @@ void CUIZoneMap::Init()
 
     xml_init.InitStatic(uiXml, "minimap:center", 0, &m_center);
 
-    xml_init.InitStatic(uiXml, "minimap:background:current_time", 0, &m_CurrentTime);
-    m_background.AttachChild(&m_CurrentTime);
-    xml_init.InitStatic(uiXml, "minimap:background:current_power", 0, &m_CurrentPower);
-    m_background.AttachChild(&m_CurrentPower);
-
     m_activeMap = xr_new<CUIMiniMap>();
     m_clipFrame.AttachChild(m_activeMap);
     m_activeMap->SetAutoDelete(true);
@@ -63,26 +58,12 @@ void CUIZoneMap::Init()
 
 void CUIZoneMap::Render()
 {
-    bool pda_workable = Actor()->HasPDAWorkable();
-
-    if (!pda_workable)
-    {
-        m_background.Draw();
-        m_CurrentPower.SetVisible(false);
-        m_CurrentTime.SetText("");
-        return;
-    }
-    m_clipFrame.Draw();
     m_background.Draw();
-    //
-    string16 tmp{};
-    auto act_pda = Actor()->GetPDA();
-    float power = act_pda->GetPowerLevel() * 100.f;
-    sprintf_s(tmp, "%.f%s", power, "%");
-    m_CurrentPower.SetText(tmp);
-    m_CurrentPower.SetVisible(pda_workable);
-    m_CurrentTime.SetText(InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
-    //
+
+    auto pda = Actor()->GetPDA();
+    if (!pda || !pda->IsPowerOn())
+        return;
+    m_clipFrame.Draw();
     m_compass.Draw();
 }
 
@@ -98,7 +79,8 @@ void CUIZoneMap::UpdateRadar(Fvector pos)
     m_background.Update();
     m_activeMap->SetActivePoint(pos);
 
-    if (m_activeMap->GetPointerDistance() > 0.5f && Actor()->HasPDAWorkable())
+    auto pda = Actor()->GetPDA();
+    if (m_activeMap->GetPointerDistance() > 0.5f && pda && pda->IsPowerOn())
     {
         string64 str;
         sprintf_s(str, "%.1f m.", m_activeMap->GetPointerDistance());
@@ -157,7 +139,7 @@ void CUIZoneMap::SetupCurrentMap()
 
 void CUIZoneMap::ApplyZoom() 
 {
-    Fvector2 wnd_size;
+    Fvector2 wnd_size{};
     float zoom_factor = float(m_clipFrame.GetWndRect().width()) / 100.0f;
     wnd_size.x = m_activeMap->BoundRect().width() * zoom_factor * m_fScale;
     wnd_size.y = m_activeMap->BoundRect().height() * zoom_factor * m_fScale;

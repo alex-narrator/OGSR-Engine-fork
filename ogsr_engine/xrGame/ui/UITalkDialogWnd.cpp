@@ -6,10 +6,11 @@
 #include "UIXmlInit.h"
 #include "UIScrollView.h"
 #include "UI3tButton.h"
-#include "../UI.h"
-#include "../actor.h"
-#include "../HUDManager.h"
-#include "../UIGameSP.h"
+#include "UI.h"
+#include "Actor.h"
+#include "PDA.h"
+#include "HUDManager.h"
+#include "UIGameSP.h"
 #include "UIPdaWnd.h"
 #include "UIDiaryWnd.h"
 
@@ -99,7 +100,8 @@ void CUITalkDialogWnd::Show()
     inherited::Enable(true);
 
     // режим бартерной торговли
-    if (g_actor->HasPDAWorkable())
+    auto pda = Actor()->GetPDA();
+    if (pda && pda->IsPowerOn())
         UIToTradeButton.SetText(*CStringTable().translate("ui_st_trade")); // напишем "торговать" на кнопке, вместо "бартер"
     else
         UIToTradeButton.SetText(*CStringTable().translate("ui_st_barter")); // напишем "бартер" на кнопке, вместо "торговать"

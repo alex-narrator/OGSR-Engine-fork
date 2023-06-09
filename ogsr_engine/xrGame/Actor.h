@@ -799,7 +799,6 @@ public:
     virtual bool IsHitToWarbelt(SHit* pHDS) const;
 
     bool HasDetectorWorkable();
-    bool HasPDAWorkable();
 
     bool IsRuckAmmoPlacement() { return m_bRuckAmmoPlacement; };
     void SetRuckAmmoPlacement(bool set_ruck) { m_bRuckAmmoPlacement = set_ruck; };

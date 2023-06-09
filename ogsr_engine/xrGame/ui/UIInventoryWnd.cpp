@@ -13,6 +13,7 @@
 #include "CustomOutfit.h"
 
 #include "Weapon.h"
+#include "PDA.h"
 
 #include "eatable_item.h"
 #include "inventory.h"
@@ -422,6 +423,7 @@ void CUIInventoryWnd::Update()
         InitInventory();
 
     CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(Level().CurrentEntity());
+    auto pda = Actor()->GetPDA();
 
     if (pEntityAlive)
     {
@@ -449,12 +451,12 @@ void CUIInventoryWnd::Update()
         }
 
         CInventoryOwner* pOurInvOwner = smart_cast<CInventoryOwner*>(pEntityAlive);
-        u32 _money = pOurInvOwner->get_money();
+        u32 _money = pOurInvOwner->get_money();        
 
         // update money
         string64 sMoney;
         sprintf_s(sMoney, "%d %s", _money, CStringTable().translate("ui_st_money_regional").c_str());
-        UIMoneyWnd.SetText(Actor()->HasPDAWorkable() ? sMoney : "");
+        UIMoneyWnd.SetText(pda && pda->IsPowerOn() ? sMoney : "");
 
         if (m_b_need_update_stats)
         {
@@ -467,7 +469,7 @@ void CUIInventoryWnd::Update()
     }
 
     UIStaticTimeString.SetText(InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
-    UIStaticTime.Show(Actor()->HasPDAWorkable());
+    UIStaticTime.Show(pda && pda->IsPowerOn());
     UpdateFloatingItemDescription();
 
     CUIWindow::Update();

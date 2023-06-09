@@ -356,10 +356,9 @@ void CUIMainIngameWnd::Update()
     if (!(Device.dwFrame % 30))
     {
         string256 text_str;
-        CPda* _pda = m_pActor->GetPDA();
-        bool pda_workable = m_pActor->HasPDAWorkable();
+        auto pda = m_pActor->GetPDA();
         u32 _cn = 0;
-        if (pda_workable && 0 != (_cn = _pda->ActiveContactsNum()))
+        if (pda && pda->IsPowerOn() && 0 != (_cn = pda->ActiveContactsNum()))
         {
             sprintf_s(text_str, "%d", _cn);
             UIPdaOnline.SetText(text_str);
@@ -561,8 +560,8 @@ void CUIMainIngameWnd::RenderQuickInfos()
 void CUIMainIngameWnd::ReceiveNews(GAME_NEWS_DATA* news)
 {
     VERIFY(news->texture_name.size());
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentEntity());
-    if (pActor->HasPDAWorkable() || !pActor->g_Alive())
+    auto pda = m_pActor->GetPDA();
+    if (pda && pda->IsPowerOn() || !m_pActor->g_Alive())
         HUD().GetUI()->m_pMessagesWnd->AddIconedPdaMessage(*(news->texture_name), news->tex_rect, news->SingleLineText(), news->show_time);
 }
 
@@ -678,10 +677,10 @@ void CUIMainIngameWnd::DestroyFlashingIcons()
 
 void CUIMainIngameWnd::UpdateFlashingIcons()
 {
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentEntity());
     for (FlashingIcons_it it = m_FlashingIcons.begin(); it != m_FlashingIcons.end(); ++it)
     {
-        if (pActor->HasPDAWorkable())
+        auto pda = m_pActor->GetPDA();
+        if (pda && pda->IsPowerOn())
             it->second->Update();
         else
             it->second->Show(false);
@@ -690,8 +689,7 @@ void CUIMainIngameWnd::UpdateFlashingIcons()
 
 void CUIMainIngameWnd::AnimateContacts(bool b_snd)
 {
-    CActor* pActor = smart_cast<CActor*>(Level().CurrentEntity());
-    if (!pActor->HasPDAWorkable())
+    if (!m_pActor->GetPDA() || !m_pActor->GetPDA()->IsPowerOn())
         return;
 
     UIPdaOnline.ResetClrAnimation();

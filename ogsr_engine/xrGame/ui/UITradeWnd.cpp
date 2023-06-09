@@ -8,6 +8,7 @@
 #include "HUDManager.h"
 #include "WeaponAmmo.h"
 #include "Actor.h"
+#include "PDA.h"
 #include "Trade.h"
 #include "UIGameSP.h"
 #include "UIInventoryUtilities.h"
@@ -239,7 +240,8 @@ void CUITradeWnd::InitTrade(CInventoryOwner* pOur, CInventoryOwner* pOthers)
     UpdateLists(eBoth);
 
     // режим бартерной торговли
-    if (!Actor()->HasPDAWorkable())
+    auto pda = Actor()->GetPDA();
+    if (!pda || !pda->IsPowerOn())
     {
         m_uidata->UIOurMoneyStatic.SetText(
             CStringTable().translate("ui_st_pda_account_unavailable").c_str()); // закроем статиком кол-во денег актора, т.к. оно еще не обновилось и не ноль
@@ -765,7 +767,8 @@ void CUITradeWnd::PerformTrade()
     {
         string256 deal_refuse_text; // строка с текстом сообщения-отказа при невозмжности совершить торговую сделку
         auto trader_name = others_money < 0 ? m_pOthersInvOwner->Name() : m_pInvOwner->Name();
-        auto refusal_text = Actor()->HasPDAWorkable() ? "st_not_enough_money_to_trade" : "st_not_enough_money_to_barter";
+        auto pda = Actor()->GetPDA();
+        auto refusal_text = pda && pda->IsPowerOn() ? "st_not_enough_money_to_trade" : "st_not_enough_money_to_barter";
         m_uidata->UIDealMsg = HUD().GetUI()->UIGame()->AddCustomStatic("not_enough_money", true);
         sprintf(deal_refuse_text, "%s: %s", trader_name, CStringTable().translate(refusal_text).c_str());
         m_uidata->UIDealMsg->wnd()->SetText(deal_refuse_text);
@@ -855,8 +858,8 @@ void CUITradeWnd::UpdatePrices()
         sprintf_s(buf, "%d %s", (int)m_pOthersInvOwner->get_money(), money_name);
         m_uidata->UIOtherMoneyStatic.SetText(buf);
     } // else
-    if (m_pOthersInvOwner->InfinitiveMoney() ||
-        (!m_pOthersInvOwner->InfinitiveMoney() && !Actor()->HasPDAWorkable())) // закроем --- счетчик денег контрагента, если в режиме бартера
+    auto pda = Actor()->GetPDA();
+    if (m_pOthersInvOwner->InfinitiveMoney() || !pda || !pda->IsPowerOn()) // закроем --- счетчик денег контрагента, если в режиме бартера
     {
         m_uidata->UIOtherMoneyStatic.SetText("---");
     }
