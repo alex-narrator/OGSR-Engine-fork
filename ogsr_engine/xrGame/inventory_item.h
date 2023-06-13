@@ -360,7 +360,7 @@ public:
     virtual float GetArmorHitFraction();
     virtual bool HasArmorToDisplay(int);
 
-    virtual float GetPowerLoss() { return 1.f; };
+    virtual float GetPowerLoss();
 
     virtual void Drop();
     void Transfer(u16 from_id, u16 to_id = u16(-1));
@@ -381,6 +381,8 @@ protected:
 
     LPCSTR m_sAttachMenuTip{};
     LPCSTR m_sDetachMenuTip{};
+
+    float m_fPowerLoss{};
 };
 
 #include "inventory_item_inline.h"

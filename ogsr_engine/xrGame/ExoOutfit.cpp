@@ -59,9 +59,7 @@ float CExoOutfit::GetExoFactor() const { return GetPowerLevel() ? m_fExoFactor :
 float CExoOutfit::GetPowerLoss()
 {
     float res = inherited::GetPowerLoss();
-    if (res < 1.f && !GetPowerLevel())
-        res = 1.0f;
-    return res;
+    return res < 0.f && !GetPowerLevel() ? 0.f : res;
 }
 
 bool CExoOutfit::IsPowerOn() const

@@ -373,25 +373,25 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
 
 float CEntityCondition::HitPowerEffect(float power_loss)
 {
-    float new_power_loss = power_loss;
+    float res{power_loss}, base_power_loss{power_loss};
 
     CInventoryOwner* pInvOwner = smart_cast<CInventoryOwner*>(m_object);
     if (!pInvOwner)
-        return new_power_loss;
+        return res;
 
     if (auto pOutfit = pInvOwner->GetOutfit())
-        new_power_loss *= pOutfit->GetPowerLoss();
+        res += base_power_loss * pOutfit->GetPowerLoss();
 
     if (auto pVest = pInvOwner->GetVest())
-        new_power_loss *= pVest->GetPowerLoss();
+        res += base_power_loss * pVest->GetPowerLoss();
 
     if (auto pHelmet = pInvOwner->GetHelmet())
-        new_power_loss *= pHelmet->GetPowerLoss();
+        res += base_power_loss * pHelmet->GetPowerLoss();
 
     if (auto pGasMask = pInvOwner->GetGasMask())
-        new_power_loss *= pGasMask->GetPowerLoss();
+        res += base_power_loss * pGasMask->GetPowerLoss();
 
-    return new_power_loss;
+    return res;
 }
 
 CWound* CEntityCondition::AddWound(float hit_power, ALife::EHitType hit_type, u16 element)

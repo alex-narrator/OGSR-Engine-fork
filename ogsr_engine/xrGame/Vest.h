@@ -28,7 +28,6 @@ public:
 
     virtual float GetHitTypeProtection(int) const override;
     float HitThruArmour(SHit* pHDS);
-    virtual float GetPowerLoss();
 
     bool IsBoneArmored(u16 bone) const;
 
@@ -56,7 +55,6 @@ protected:
     shared_str bulletproof_display_bone{};
 
 private:
-    float m_fPowerLoss{};
     SBoneProtections* m_boneProtection;
     bool m_bIsPlateInstalled{};
     float m_fInstalledPlateCondition{1.f};

@@ -18,9 +18,6 @@ public:
     virtual void Load(LPCSTR section);
 
     float HitThruArmour(SHit* pHDS);
-    // коэффициент на который домножается потеря силы
-    // если на персонаже надет костюм
-    virtual float GetPowerLoss();
 
     virtual float GetHitTypeProtection(int) const override;
 
@@ -30,8 +27,6 @@ public:
     virtual float GetExoFactor() const { return 1.f; };
 
 private:
-    float m_fPowerLoss{};
-
     shared_str m_ActorVisual;
     shared_str m_full_icon_name;
     SBoneProtections* m_boneProtection;

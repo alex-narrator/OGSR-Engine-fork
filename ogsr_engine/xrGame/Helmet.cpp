@@ -20,7 +20,6 @@ CHelmet::~CHelmet()
 void CHelmet::Load(LPCSTR section)
 {
     inherited::Load(section);
-    m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 1.f);
     bulletproof_display_bone = READ_IF_EXISTS(pSettings, r_string, section, "bulletproof_display_bone", "bip01_head");
 }
 
@@ -59,15 +58,6 @@ void CHelmet::OnMoveToSlot(EItemPlace prevPlace)
         }
     }
 }
-
-float CHelmet::GetPowerLoss()
-{
-    if (m_fPowerLoss < 1 && GetCondition() <= 0)
-    {
-        return 1.0f;
-    };
-    return m_fPowerLoss;
-};
 
 bool CHelmet::can_be_attached() const
 {

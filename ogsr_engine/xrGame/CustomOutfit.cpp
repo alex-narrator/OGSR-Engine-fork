@@ -35,8 +35,6 @@ void CCustomOutfit::Load(LPCSTR section)
 
     m_ef_equipment_type = pSettings->r_u32(section, "ef_equipment_type");
 
-    m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 1.f);
-
     m_full_icon_name = pSettings->r_string(section, "full_icon_name");
 
     m_bIsHelmetBuiltIn = READ_IF_EXISTS(pSettings, r_bool, section, "helmet_built_in", false);
@@ -117,12 +115,3 @@ void CCustomOutfit::OnMoveToRuck(EItemPlace prevPlace)
 }
 
 u32 CCustomOutfit::ef_equipment_type() const { return (m_ef_equipment_type); }
-
-float CCustomOutfit::GetPowerLoss()
-{
-    if (m_fPowerLoss < 1 && GetCondition() <= 0)
-    {
-        return 1.0f;
-    };
-    return m_fPowerLoss;
-};

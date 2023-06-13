@@ -9,14 +9,6 @@ CGasMask::CGasMask()
     SetSlot(GASMASK_SLOT); 
 }
 
-float CGasMask::GetPowerLoss()
-{
-    float res = inherited::GetPowerLoss();
-    if (res < 1.f && !GetPowerLevel())
-        res = 1.0f;
-    return res;
-};
-
 bool CGasMask::can_be_attached() const
 {
     const CActor* pA = smart_cast<const CActor*>(H_Parent());
@@ -27,7 +19,7 @@ void CGasMask::InitAddons()
 {
     inherited::InitAddons();
     auto section = IsPowerSourceAttachable() && IsPowerSourceAttached() ? GetPowerSourceName() : cNameSect();
-    m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 1.f);
+    m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 0.f);
 }
 
 bool CGasMask::IsPowerOn() const

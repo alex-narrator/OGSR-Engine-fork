@@ -212,6 +212,8 @@ void CInventoryItem::Load(LPCSTR section)
 
     m_power_source_icon_offset = READ_IF_EXISTS(pSettings, r_fvector2, section, "power_source_icon_offset", Fvector2{});
     m_power_source_icon_scale = READ_IF_EXISTS(pSettings, r_float, section, "power_source_icon_scale", 0.f);
+
+    m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 0.f);
 }
 
 void CInventoryItem::ChangeCondition(float fDeltaCondition)
@@ -815,6 +817,8 @@ void CInventoryItem::TryBreakToPieces(bool play_effects)
                 // играем звук
                 sndBreaking.play_no_feedback(object().H_Parent(), u32{}, float{}, &object().H_Parent()->Position());
                 SetDropManual(TRUE);
+                object().setEnabled(false);
+                object().setVisible(false);
             }
             else
             {
@@ -1083,3 +1087,5 @@ void CInventoryItem::SetLastCondDecTime(u64 time)
     if (auto se_iitm = smart_cast<CSE_ALifeInventoryItem*>(object().alife_object()))
         se_iitm->m_uLastConditionDecTimeCalled = m_uLastConditionDecTimeCalled;
 }
+
+float CInventoryItem::GetPowerLoss() { return m_fPowerLoss < 0.f && fis_zero(GetCondition()) ? 0.f : m_fPowerLoss; }

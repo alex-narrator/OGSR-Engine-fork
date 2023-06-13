@@ -13,9 +13,6 @@ public:
     virtual void Load(LPCSTR section);
 
     float HitThruArmour(SHit* pHDS);
-    // коэффициент на который домножается потеря силы
-    // если на персонаже надет костюм
-    virtual float GetPowerLoss();
 
     virtual float GetHitTypeProtection(int) const override;
 
@@ -24,7 +21,6 @@ public:
     virtual void OnMoveToSlot(EItemPlace prevPlace);
 
 private:
-    float m_fPowerLoss{};
     SBoneProtections* m_boneProtection;
 
 protected:

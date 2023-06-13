@@ -20,7 +20,6 @@ void CVest::Load(LPCSTR section)
     inherited::Load(section);
     m_iVestWidth = READ_IF_EXISTS(pSettings, r_u32, section, "vest_width", 0);
     m_iVestHeight = READ_IF_EXISTS(pSettings, r_u32, section, "vest_height", 0);
-    m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 1.f);
     bulletproof_display_bone = READ_IF_EXISTS(pSettings, r_string, section, "bulletproof_display_bone", "bip01_spine");
     if (pSettings->line_exist(section, "plates"))
     {
@@ -80,15 +79,6 @@ float CVest::HitThruArmour(SHit* pHDS)
     return hit_power;
 };
 
-float CVest::GetPowerLoss()
-{
-    if (m_fPowerLoss < 1 && GetCondition() <= 0)
-    {
-        return 1.0f;
-    };
-    return m_fPowerLoss;
-};
-
 bool CVest::IsBoneArmored(u16 bone) const { return !fis_zero(m_boneProtection->getBoneArmour(bone) && !fis_zero(m_fInstalledPlateCondition) && !fis_zero(GetCondition())); }
 
 const shared_str CVest::CurrProtectSect() const { return IsPlateInstalled() ? GetPlateName() : cNameSect(); }
@@ -106,7 +96,7 @@ void CVest::InitAddons()
         }
     }
     if (IsPlateInstalled())
-        m_fPowerLoss *= READ_IF_EXISTS(pSettings, r_float, GetPlateName(), "power_loss", 1.f);
+        m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, GetPlateName(), "power_loss", 0.f);
     inherited::InitAddons();
 }
 
