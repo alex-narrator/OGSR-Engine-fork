@@ -518,7 +518,6 @@ void CUIInventoryWnd::Hide()
         actor->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
         actor->EnableUIDOF(false);
     }
-    UIItemInfo.Reset();
     HideSlotsHighlight();
 }
 

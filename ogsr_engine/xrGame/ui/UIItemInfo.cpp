@@ -309,7 +309,7 @@ void CUIItemInfo::Draw()
 
 void CUIItemInfo::Update()
 {
-    if (m_pInvItem && m_pInvItem->NeedForcedDescriptionUpdate() && !m_pInvItem->GetDropManual())
+    if (m_pInvItem && m_pInvItem->NeedForcedDescriptionUpdate() && !m_pInvItem->GetDropManual() && IsShown())
     {
         if (UICondProgresBar)
         {

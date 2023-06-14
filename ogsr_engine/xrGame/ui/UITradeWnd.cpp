@@ -609,7 +609,6 @@ void CUITradeWnd::Hide()
         Actor()->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
     }
     m_bShowAllInv = false;
-    m_uidata->UIItemInfo.Reset();
 }
 
 void CUITradeWnd::StartTrade()
@@ -863,6 +862,9 @@ void CUITradeWnd::UpdatePrices()
     {
         m_uidata->UIOtherMoneyStatic.SetText("---");
     }
+
+    m_uidata->UIItemInfo.Show(false);
+    itm_to_descr = nullptr;
 }
 
 void CUITradeWnd::TransferItems(CUIDragDropListEx* pSellList, CUIDragDropListEx* pBuyList, CTrade* pTrade, bool bBuying)

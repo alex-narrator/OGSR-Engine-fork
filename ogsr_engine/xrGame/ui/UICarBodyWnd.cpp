@@ -285,7 +285,6 @@ void CUICarBodyWnd::Hide()
         actor->EnableUIDOF(false);
     }
     m_bShowAllInv = false;
-    m_pUIItemInfo->Reset();
     PlaySnd(eInvSndClose);
 }
 
@@ -332,6 +331,9 @@ void CUICarBodyWnd::UpdateLists()
         CUICellItem* itm = create_cell_item(inv_item);
         m_pUIOthersBagList->SetItem(itm);
     }
+
+    m_pUIItemInfo->Show(false);
+    itm_to_descr = nullptr;
 
     UpdateWeight();
     m_b_need_update = false;

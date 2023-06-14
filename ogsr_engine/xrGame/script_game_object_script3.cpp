@@ -358,9 +358,7 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("set_camera_fov", &CScriptGameObject::SetCamFOV)
 
         .def("set_max_weight", &CScriptGameObject::SetMaxWeight)
-        //.def("set_max_walk_weight", &CScriptGameObject::SetMaxWalkWeight)
         .def("get_max_weight", &CScriptGameObject::GetMaxWeight)
-        //.def("get_max_walk_weight", &CScriptGameObject::GetMaxWalkWeight)
         .def("get_inventory_weight", &CScriptGameObject::GetInventoryWeight)
         .def("calculate_item_price", &CScriptGameObject::CalcItemPrice)
 

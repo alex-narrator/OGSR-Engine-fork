@@ -186,7 +186,7 @@ protected:
     // режимы стрельбы
     bool m_bHasDifferentFireModes{};
     xr_vector<int> m_aFireModes;
-    int m_iCurFireMode{};
+    int m_iCurFireMode{1};
     string16 m_sCurFireMode;
     int m_iPrefferedFireMode{-1};
     u32 m_fire_zoomout_time = u32(-1);

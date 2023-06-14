@@ -85,6 +85,9 @@ void CUIInventoryWnd::InitInventory()
 
     UpdateCustomDraw();
 
+    UIItemInfo.Show(false);
+    itm_to_descr = nullptr;
+
     // Slots
     PIItem _itm = m_pInv->m_slots[KNIFE_SLOT].m_pIItem;
     if (_itm)

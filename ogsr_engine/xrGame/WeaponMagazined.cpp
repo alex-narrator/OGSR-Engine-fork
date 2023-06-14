@@ -149,7 +149,6 @@ void CWeaponMagazined::net_Export(CSE_Abstract* E)
         CCartridge& l_cartridge = *(m_magazine.begin() + i);
         wpn->m_AmmoIDs.push_back(l_cartridge.m_LocalAmmoType);
     }
-
     wpn->m_fAttachedSilencerCondition = m_fAttachedSilencerCondition;
     wpn->m_fAttachedScopeCondition = m_fAttachedScopeCondition;
     wpn->m_fAttachedGrenadeLauncherCondition = m_fAttachedGrenadeLauncherCondition;
@@ -253,6 +252,7 @@ void CWeaponMagazined::Load(LPCSTR section)
         m_iCurFireMode = ModesCount - 1;
         m_iPrefferedFireMode = READ_IF_EXISTS(pSettings, r_s16, section, "preffered_fire_mode", -1);
     }
+    SetQueueSize(GetCurrentFireMode());
 
     m_fire_zoomout_time = READ_IF_EXISTS(pSettings, r_u32, section, "fire_zoomout_time", u32(-1));
 
