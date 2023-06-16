@@ -643,6 +643,19 @@ void AdvanceGameTime(u32 _ms)
     GamePersistent().Environment().SetGameTime(Level().GetEnvironmentGameDayTimeSec(), Level().game->GetEnvironmentGameTimeFactor());
 }
 
+void ChangeGameTime(u32 days, u32 hours, u32 mins)
+{
+    auto game = smart_cast<game_sv_Single*>(Level().Server->game);
+    if (game && ai().get_alife())
+    {
+        u32 value = days * 86400 + hours * 3600 + mins * 60;
+        float fValue = static_cast<float>(value);
+        value *= 1000; // msec
+        g_pGamePersistent->Environment().ChangeGameTime(fValue);
+        game->alife().time_manager().change_game_time(value);
+    }
+}
+
 //
 void send_event_key_press(int dik) //Нажатие клавиши
 {
@@ -942,7 +955,7 @@ void CLevel::script_register(lua_State* L)
             // Real Wolf 07.07.2014
             def("vertex_id", ((u32(*)(const Fvector&)) & vertex_id)), def("vertex_id", ((u32(*)(u32, const Fvector&)) & vertex_id)), def("nearest_vertex_id", &nearest_vertex_id),
 
-            def("advance_game_time", &AdvanceGameTime),
+            def("advance_game_time", &AdvanceGameTime), def("change_game_time", &ChangeGameTime),
 
             def("get_target_dist", &GetTargetDist), def("get_target_obj", &GetTargetObj), def("get_current_ray_query", &GetCurrentRayQuery),
             //

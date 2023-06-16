@@ -31,6 +31,7 @@ public:
     IC void set_time_factor(float time_factor);
     IC ALife::_TIME_ID game_time() const;
     IC void advance_game_time(u32 time_ms);
+    IC void change_game_time(u32 value);
     IC float time_factor() const;
     IC float normal_time_factor() const;
 };

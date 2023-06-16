@@ -148,14 +148,14 @@ protected:
     bool OnItemSelected(CUICellItem* itm);
     bool OnItemRButtonClick(CUICellItem* itm);
 
-    CUIStatic UIProgressBack;
-    CUIStatic UIProgressBack_rank;
-    CUIStatic UIProgressBackRadiation; // отдельная подложка для убираемого прогрессбара радиации
-    CUIProgressBar UIProgressBarHealth;
-    CUIProgressBar UIProgressBarPsyHealth;
-    CUIProgressBar UIProgressBarRadiation;
-    CUIProgressBar UIProgressBarRank;
-    CUIProgressBar UIProgressBarSatiety;
+    //CUIStatic UIProgressBack;
+    //CUIStatic UIProgressBack_rank;
+    //CUIStatic UIProgressBackRadiation; // отдельная подложка для убираемого прогрессбара радиации
+    //CUIProgressBar UIProgressBarHealth;
+    //CUIProgressBar UIProgressBarPsyHealth;
+    //CUIProgressBar UIProgressBarRadiation;
+    //CUIProgressBar UIProgressBarRank;
+    //CUIProgressBar UIProgressBarSatiety;
 
     CUIPropertiesBox UIPropertiesBox;
 

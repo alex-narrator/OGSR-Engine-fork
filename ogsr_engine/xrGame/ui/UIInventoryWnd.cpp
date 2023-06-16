@@ -85,23 +85,23 @@ void CUIInventoryWnd::Init()
     AttachChild(&UIPersonalWnd);
     xml_init.InitFrameWindow(uiXml, "character_frame_window", 0, &UIPersonalWnd);
 
-    AttachChild(&UIProgressBack);
-    xml_init.InitStatic(uiXml, "progress_background", 0, &UIProgressBack);
+    //AttachChild(&UIProgressBack);
+    //xml_init.InitStatic(uiXml, "progress_background", 0, &UIProgressBack);
 
-    AttachChild(&UIProgressBackRadiation);
-    xml_init.InitStatic(uiXml, "progress_background_radiation", 0, &UIProgressBackRadiation);
+    //AttachChild(&UIProgressBackRadiation);
+    //xml_init.InitStatic(uiXml, "progress_background_radiation", 0, &UIProgressBackRadiation);
 
-    UIProgressBack.AttachChild(&UIProgressBarHealth);
-    xml_init.InitProgressBar(uiXml, "progress_bar_health", 0, &UIProgressBarHealth);
+    //UIProgressBack.AttachChild(&UIProgressBarHealth);
+    //xml_init.InitProgressBar(uiXml, "progress_bar_health", 0, &UIProgressBarHealth);
 
-    UIProgressBack.AttachChild(&UIProgressBarPsyHealth);
-    xml_init.InitProgressBar(uiXml, "progress_bar_psy", 0, &UIProgressBarPsyHealth);
+    //UIProgressBack.AttachChild(&UIProgressBarPsyHealth);
+    //xml_init.InitProgressBar(uiXml, "progress_bar_psy", 0, &UIProgressBarPsyHealth);
 
-    UIProgressBack.AttachChild(&UIProgressBarSatiety);
-    xml_init.InitProgressBar(uiXml, "progress_bar_satiety", 0, &UIProgressBarSatiety);
+    //UIProgressBack.AttachChild(&UIProgressBarSatiety);
+    //xml_init.InitProgressBar(uiXml, "progress_bar_satiety", 0, &UIProgressBarSatiety);
 
-    UIProgressBackRadiation.AttachChild(&UIProgressBarRadiation);
-    xml_init.InitProgressBar(uiXml, "progress_bar_radiation", 0, &UIProgressBarRadiation);
+    //UIProgressBackRadiation.AttachChild(&UIProgressBarRadiation);
+    //xml_init.InitProgressBar(uiXml, "progress_bar_radiation", 0, &UIProgressBarRadiation);
 
     UIPersonalWnd.AttachChild(&UIStaticPersonal);
     xml_init.InitStatic(uiXml, "static_personal", 0, &UIStaticPersonal);
@@ -427,28 +427,28 @@ void CUIInventoryWnd::Update()
 
     if (pEntityAlive)
     {
-        auto cond = &pEntityAlive->conditions();
+        //auto cond = &pEntityAlive->conditions();
 
-        float v = cond->GetHealth() * 100.0f;
-        UIProgressBarHealth.SetProgressPos(v);
+        //float v = cond->GetHealth() * 100.0f;
+        //UIProgressBarHealth.SetProgressPos(v);
 
-        v = cond->GetPsyHealth() * 100.0f;
-        UIProgressBarPsyHealth.SetProgressPos(v);
+        //v = cond->GetPsyHealth() * 100.0f;
+        //UIProgressBarPsyHealth.SetProgressPos(v);
 
-        v = cond->GetSatiety() * 100.0f;
-        UIProgressBarSatiety.SetProgressPos(v);
+        //v = cond->GetSatiety() * 100.0f;
+        //UIProgressBarSatiety.SetProgressPos(v);
 
-        v = cond->GetRadiation() * 100.0f;
-        if (Actor()->HasDetectorWorkable()) // удаляем шкалу радиации для прогрессбара в инвентаре если не экипирован детектор -- NO_RAD_UI_WITHOUT_DETECTOR_IN_SLOT
-        {
-            UIProgressBackRadiation.Show(true);
-            UIProgressBarRadiation.Show(true);
-            UIProgressBarRadiation.SetProgressPos(v);
-        }
-        else
-        {
-            UIProgressBackRadiation.Show(false);
-        }
+        //v = cond->GetRadiation() * 100.0f;
+        //if (Actor()->HasDetectorWorkable()) // удаляем шкалу радиации для прогрессбара в инвентаре если не экипирован детектор -- NO_RAD_UI_WITHOUT_DETECTOR_IN_SLOT
+        //{
+        //    UIProgressBackRadiation.Show(true);
+        //    UIProgressBarRadiation.Show(true);
+        //    UIProgressBarRadiation.SetProgressPos(v);
+        //}
+        //else
+        //{
+        //    UIProgressBackRadiation.Show(false);
+        //}
 
         CInventoryOwner* pOurInvOwner = smart_cast<CInventoryOwner*>(pEntityAlive);
         u32 _money = pOurInvOwner->get_money();        
