@@ -394,7 +394,7 @@ void CActorCondition::UpdateAlcohol()
 {
     // смерть при максимальном опьянении
     if (fsimilar(GetAlcohol(), 1.0f))
-        health() = 0.0f;
+        health() = -0.1f;
     else
     {
         m_fAlcohol += GetAlcoholRestore() * m_fDeltaTime;

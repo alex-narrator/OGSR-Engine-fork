@@ -103,8 +103,8 @@ void CUIInventoryWnd::Init()
     //UIProgressBackRadiation.AttachChild(&UIProgressBarRadiation);
     //xml_init.InitProgressBar(uiXml, "progress_bar_radiation", 0, &UIProgressBarRadiation);
 
-    UIPersonalWnd.AttachChild(&UIStaticPersonal);
-    xml_init.InitStatic(uiXml, "static_personal", 0, &UIStaticPersonal);
+    //UIPersonalWnd.AttachChild(&UIStaticPersonal);
+    //xml_init.InitStatic(uiXml, "static_personal", 0, &UIStaticPersonal);
     //	UIStaticPersonal.Init				(1, UIPersonalWnd.GetHeight() - 175, 260, 260);
 
     AttachChild(&UIOutfitInfo);

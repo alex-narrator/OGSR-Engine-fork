@@ -90,7 +90,7 @@ protected:
     CUIStatic UIStaticTime;
     CUIStatic UIStaticTimeString;
 
-    CUIStatic UIStaticPersonal;
+    //CUIStatic UIStaticPersonal;
 
     CUIDragDropListEx* m_pUIBagList{};
     CUIDragDropListEx* m_pUIBeltList{};
