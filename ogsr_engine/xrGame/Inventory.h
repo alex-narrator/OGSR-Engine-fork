@@ -22,6 +22,7 @@ public:
     bool m_bVisible{true};
     int m_blockCounter{};
     bool m_maySwitchFast{};
+    bool m_bNeedModule{};
 };
 enum EActivationReason
 {

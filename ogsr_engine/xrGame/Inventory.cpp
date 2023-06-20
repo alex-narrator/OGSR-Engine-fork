@@ -55,25 +55,14 @@ CInventory::CInventory()
     string256 temp;
     for (u32 i = 0; i < m_slots.size(); ++i)
     {
-        sprintf_s(temp, "slot_persistent_%d", i + 1);
-        if (pSettings->line_exist("inventory", temp))
-            m_slots[i].m_bPersistent = !!pSettings->r_bool("inventory", temp);
-        sprintf_s(temp, "slot_switch_fast_%d", i + 1);
+        sprintf_s(temp, "slot_persistent_%d", i);
+        m_slots[i].m_bPersistent = READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false);
+        sprintf_s(temp, "slot_switch_fast_%d", i);
         m_slots[i].setSwitchFast(READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false));
-    }
-
-    m_slots[PDA_SLOT].m_bVisible = false;
-    m_slots[OUTFIT_SLOT].m_bVisible = false;
-    m_slots[TORCH_SLOT].m_bVisible = false;
-    m_slots[HELMET_SLOT].m_bVisible = false;
-    m_slots[GASMASK_SLOT].m_bVisible = false;
-    m_slots[DETECTOR_SLOT].m_bVisible = false; // KRodin: это очень важно! Слот для зп-стайл детекторов должен быть НЕ активируемым!
-
-    for (u32 i = 0; i < m_slots.size(); ++i)
-    {
-        sprintf_s(temp, "slot_visible_%d", i + 1);
-        if (pSettings->line_exist("inventory", temp))
-            m_slots[i].m_bVisible = !!pSettings->r_bool("inventory", temp);
+        sprintf_s(temp, "slot_visible_%d", i);
+        m_slots[i].m_bVisible = READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, true);
+        sprintf_s(temp, "slot_need_module_%d", i);
+        m_slots[i].m_bNeedModule = READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false);
     }
 }
 
@@ -1535,14 +1524,11 @@ bool CInventory::IsSlotAllowed(u32 slot) const
     auto outfit = pActor->GetOutfit();
     switch (slot)
     {
-    case KNIFE_SLOT:
-    case APPARATUS_SLOT:
-    case GRENADE_SLOT:
-    case ARTEFACT_SLOT: return HasModuleForSlot(slot); break;
     case HELMET_SLOT: return (!outfit || !outfit->m_bIsHelmetBuiltIn); break;
     case GASMASK_SLOT: return (!outfit || !outfit->m_bIsHelmetBuiltIn); break;
     }
-    return true;
+    
+    return !m_slots[slot].m_bNeedModule || HasModuleForSlot(slot);
 }
 
 bool CInventory::HasModuleForSlot(u32 check_slot) const
