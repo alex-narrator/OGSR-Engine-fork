@@ -53,7 +53,6 @@ void CUIZoneMap::Init()
 
     m_clipFrame.AttachChild(&m_center);
     m_center.SetWndPos(m_clipFrame.GetWidth() / 2, m_clipFrame.GetHeight() / 2);
-    m_fScale = 1.f;
 }
 
 void CUIZoneMap::Render()

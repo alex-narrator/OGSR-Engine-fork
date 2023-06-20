@@ -22,6 +22,7 @@ enum ECallbackType
     eArticleInfo,
     eTaskStateChange,
     eMapLocationAdded,
+    eMapRelationLocationAdded,
 
     eUseObject,
 

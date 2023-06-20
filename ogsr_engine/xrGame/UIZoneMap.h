@@ -8,8 +8,8 @@ class CUICustomMap;
 
 class CUIZoneMap
 {
-    CUICustomMap* m_activeMap;
-    float m_fScale;
+    CUICustomMap* m_activeMap{};
+    float m_fScale{1.f};
 
     CUIStatic m_background;
     CUIStatic m_center;
