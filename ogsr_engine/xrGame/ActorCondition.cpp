@@ -72,8 +72,8 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     m_fStressFactor = READ_IF_EXISTS(pSettings, r_float, section, "stress_factor", 1.0f);
     m_fZoomEffectorK = READ_IF_EXISTS(pSettings, r_float, section, "power_to_zoom_effector_k", 10.0f);
 
-    m_fV_HealthMax = READ_IF_EXISTS(pSettings, r_float, section, "max_health_v", 0.f);
-    m_fBleedingHealthMaxDecrease = READ_IF_EXISTS(pSettings, r_float, section, "bleeding_max_health_dec", 0.f);
+    //m_fV_HealthMax = READ_IF_EXISTS(pSettings, r_float, section, "max_health_v", 0.f);
+    //m_fBleedingHealthMaxDecrease = READ_IF_EXISTS(pSettings, r_float, section, "bleeding_max_health_dec", 0.f);
 }
 
 // вычисление параметров с ходом времени
@@ -96,8 +96,8 @@ void CActorCondition::UpdateCondition()
         ConditionWalk(weight_k, isActorAccelerated(object().mstate_real, object().IsZoomAimingMode()), (object().mstate_real & mcSprint) != 0);
 
     inherited::UpdateCondition();
-    UpdatePowerMax();
-    UpdateHealthMax();
+    //UpdatePowerMax();
+    //UpdateHealthMax();
     UpdateHardHold();
     UpdateTutorialThresholds();
 }
@@ -185,8 +185,8 @@ void CActorCondition::save(NET_Packet& output_packet)
     save_data(m_fAlcohol, output_packet);
     save_data(m_condition_flags, output_packet);
     save_data(m_fSatiety, output_packet);
-    save_data(m_fPowerMax, output_packet);
-    output_packet.w_float(GetMaxHealth());
+    //save_data(m_fPowerMax, output_packet);
+    //output_packet.w_float(GetMaxHealth());
 }
 
 void CActorCondition::load(IReader& input_packet)
@@ -195,8 +195,8 @@ void CActorCondition::load(IReader& input_packet)
     load_data(m_fAlcohol, input_packet);
     load_data(m_condition_flags, input_packet);
     load_data(m_fSatiety, input_packet);
-    load_data(m_fPowerMax, input_packet);
-    object().SetMaxHealth(input_packet.r_float());
+    //load_data(m_fPowerMax, input_packet);
+    //object().SetMaxHealth(input_packet.r_float());
 }
 
 void CActorCondition::reinit()
@@ -415,15 +415,15 @@ void CActorCondition::UpdateAlcohol()
     }
 }
 
-void CActorCondition::UpdatePowerMax() { ChangeMaxPower(GetMaxPowerRestore() * m_fDeltaTime); }
-
-void CActorCondition::UpdateHealthMax() 
-{ 
-    float delta = m_fV_HealthMax * GetRegenK(); 
-    if (m_bIsBleeding)
-        delta -= BleedingSpeed() * m_fBleedingHealthMaxDecrease;
-    ChangeMaxHealth(delta * m_fDeltaTime);
-}
+//void CActorCondition::UpdatePowerMax() { ChangeMaxPower(GetMaxPowerRestore() * m_fDeltaTime); }
+//
+//void CActorCondition::UpdateHealthMax() 
+//{ 
+//    float delta = m_fV_HealthMax * GetRegenK(); 
+//    if (m_bIsBleeding)
+//        delta -= BleedingSpeed() * m_fBleedingHealthMaxDecrease;
+//    ChangeMaxHealth(delta * m_fDeltaTime);
+//}
 
 void CActorCondition::UpdateHardHold()
 {

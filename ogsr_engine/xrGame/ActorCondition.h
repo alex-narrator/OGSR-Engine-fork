@@ -43,8 +43,8 @@ private:
     virtual void UpdateAlcohol() override;
     virtual void UpdatePower() override;
     virtual void UpdatePsyHealth() override;
-    virtual void UpdatePowerMax();
-    virtual void UpdateHealthMax();
+    //virtual void UpdatePowerMax();
+    //virtual void UpdateHealthMax();
 
     void UpdateHardHold();
 
@@ -121,7 +121,7 @@ protected:
     float m_fLimpingHealthBegin{};
     float m_fLimpingHealthEnd{};
 
-    float m_fV_HealthMax{};
+    //float m_fV_HealthMax{};
 
 public:
     float m_fBleedingPowerDecrease{};
@@ -134,7 +134,7 @@ public:
     //
     float m_fZoomEffectorK{};
 
-    float m_fBleedingHealthMaxDecrease{};
+    //float m_fBleedingHealthMaxDecrease{};
 
     float GetSmoothOwerweightKoef();
     // коэфф. регенерации актора - зависит от сытости и дозы облучения

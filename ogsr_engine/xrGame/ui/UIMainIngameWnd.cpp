@@ -188,15 +188,15 @@ void CUIMainIngameWnd::Init()
     UIStaticHealth.AttachChild(&UIHealthBar);
     xml_init.InitProgressBar(uiXml, "progress_bar_health", 0, &UIHealthBar);
     //максимальне здоров'я
-    UIStaticHealth.AttachChild(&UIMaxHealthBar);
-    xml_init.InitProgressBar(uiXml, "progress_bar_health_max", 0, &UIMaxHealthBar);
+    //UIStaticHealth.AttachChild(&UIMaxHealthBar);
+    //xml_init.InitProgressBar(uiXml, "progress_bar_health_max", 0, &UIMaxHealthBar);
 
     //витривалість
     UIStaticPower.AttachChild(&UIPowerBar);
     xml_init.InitProgressBar(uiXml, "progress_bar_power", 0, &UIPowerBar);
     //максимальна витривалість
-    UIStaticPower.AttachChild(&UIMaxPowerBar);
-    xml_init.InitProgressBar(uiXml, "progress_bar_power_max", 0, &UIMaxPowerBar);
+    //UIStaticPower.AttachChild(&UIMaxPowerBar);
+    //xml_init.InitProgressBar(uiXml, "progress_bar_power_max", 0, &UIMaxPowerBar);
 
     // Полоса прогресса армора
     //UIStaticArmor.AttachChild(&UIArmorBar);
@@ -385,10 +385,10 @@ void CUIMainIngameWnd::Update()
         }
 
         UIHealthBar.SetProgressPos(m_pActor->GetfHealth() * 100.0f);
-        UIMaxHealthBar.SetProgressPos((1.f - m_pActor->GetMaxHealth()) * 100.0f);
+        //UIMaxHealthBar.SetProgressPos((1.f - m_pActor->GetMaxHealth()) * 100.0f);
 
         UIPowerBar.SetProgressPos(m_pActor->conditions().GetPower() * 100.0f);
-        UIMaxPowerBar.SetProgressPos((1.f - m_pActor->conditions().GetMaxPower()) * 100.0f);
+        //UIMaxPowerBar.SetProgressPos((1.f - m_pActor->conditions().GetMaxPower()) * 100.0f);
 
         // Armor bar
         auto pOutfit = m_pActor->GetOutfit();
