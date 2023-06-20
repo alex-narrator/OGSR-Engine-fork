@@ -152,34 +152,6 @@ void CUIInventoryWnd::InitInventory()
         m_pUIPdaList->SetItem(itm);
     }
 
-    _itm = m_pInv->m_slots[QUICK_SLOT_0].m_pIItem;
-    if (_itm)
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIQuickList_0->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[QUICK_SLOT_1].m_pIItem;
-    if (_itm)
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIQuickList_1->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[QUICK_SLOT_2].m_pIItem;
-    if (_itm)
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIQuickList_2->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[QUICK_SLOT_3].m_pIItem;
-    if (_itm)
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIQuickList_3->SetItem(itm);
-    }
-
     _itm = m_pInv->m_slots[HELMET_SLOT].m_pIItem;
     if (_itm)
     {
@@ -523,9 +495,7 @@ bool CUIInventoryWnd::OnItemSelected(CUICellItem* itm)
                         //
                         m_pUIGrenadeList, m_pUIArtefactList,
                         //
-                        m_pUIDetectorList, m_pUIOnHeadList, m_pUIPdaList,
-                        //
-                        m_pUIQuickList_0, m_pUIQuickList_1, m_pUIQuickList_2, m_pUIQuickList_3});
+                        m_pUIDetectorList, m_pUIOnHeadList, m_pUIPdaList});
     return false;
 }
 
@@ -701,11 +671,6 @@ void CUIInventoryWnd::ClearAllLists()
     m_pUIDetectorList->ClearAll(true);
     m_pUIOnHeadList->ClearAll(true);
     m_pUIPdaList->ClearAll(true);
-    //
-    m_pUIQuickList_0->ClearAll(true);
-    m_pUIQuickList_1->ClearAll(true);
-    m_pUIQuickList_2->ClearAll(true);
-    m_pUIQuickList_3->ClearAll(true);
 }
 
 void CUIInventoryWnd::UpdateWeight() { InventoryUtilities::UpdateWeight(UIWeightWnd, true); }

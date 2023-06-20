@@ -88,11 +88,6 @@ enum EGameActions
     kQUICK_SAVE,
     kQUICK_LOAD,
 
-    kUSE_QUICK_SLOT_0,
-    kUSE_QUICK_SLOT_1,
-    kUSE_QUICK_SLOT_2,
-    kUSE_QUICK_SLOT_3,
-
     kCHECKGEAR,
     kCHECKACTIVEITEM,
     kKICK,

@@ -18,11 +18,6 @@ enum : u32
     TORCH_SLOT,
     ARTEFACT_SLOT,
     HELMET_SLOT,
-    // quick slots
-    QUICK_SLOT_0,
-    QUICK_SLOT_1,
-    QUICK_SLOT_2,
-    QUICK_SLOT_3,
     // equipment
     WARBELT_SLOT,
     BACKPACK_SLOT,

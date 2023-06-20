@@ -56,8 +56,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
     LPCSTR detach_tip = CurrentIItem()->GetDetachMenuTip();
     bool b_wearable = (pOutfit || pVest || pWarbelt || pBackpack);
 
-    bool to_quick{};
-    if (!b_wearable && CurrentIItem()->GetSlot() != NO_ACTIVE_SLOT)
+     if (!b_wearable && CurrentIItem()->GetSlot() != NO_ACTIVE_SLOT)
     {
         auto& slots = CurrentIItem()->GetSlots();
         for (u8 i = 0; i < (u8)slots.size(); ++i)
@@ -67,11 +66,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
             {
                 if (!inv->m_slots[slot].m_pIItem || inv->m_slots[slot].m_pIItem != CurrentIItem())
                 {
-                    if (slot >= QUICK_SLOT_0 && slot <= QUICK_SLOT_3)
-                    {
-                        to_quick = true;
-                        continue;
-                    }
                     string128 full_action_text;
                     strconcat(sizeof(full_action_text), full_action_text, "st_move_to_slot_", std::to_string(slot).c_str());
                     UIPropertiesBox.AddItem(full_action_text, (void*)(__int64)slot, INVENTORY_TO_SLOT_ACTION);
@@ -79,11 +73,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
                 }
             }
         }
-    }
-    if (to_quick)
-    {
-        UIPropertiesBox.AddItem("st_to_quick_slot", NULL, INVENTORY_TO_QUICK);
-        b_show = true;
     }
 
     if (CurrentIItem()->Vest() && inv->CanPutInVest(CurrentIItem()))
@@ -286,30 +275,6 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
             }
             item->SetSlot(slots.size() ? slots[0] : NO_ACTIVE_SLOT);
             ToSlot(itm, true);
-        }
-        break;
-        case INVENTORY_TO_QUICK: {
-            auto& slots = item->GetSlots();
-            for (u8 i = 0; i < (u8)slots.size(); ++i)
-            {
-                auto slot = slots[i];
-                if (slot >= QUICK_SLOT_0 && slot <= QUICK_SLOT_3)
-                {
-                    item->SetSlot(slot);
-                    if (ToSlot(itm, false))
-                        return;
-                }
-            }
-            for (u8 i = 0; i < (u8)slots.size(); ++i)
-            {
-                auto slot = slots[i];
-                if (slot >= QUICK_SLOT_0 && slot <= QUICK_SLOT_3)
-                {
-                    item->SetSlot(slot);
-                    if (ToSlot(itm, true))
-                        return;
-                }
-            }
         }
         break;
         case INVENTORY_TO_BELT_ACTION: ToBelt(itm, false); break;

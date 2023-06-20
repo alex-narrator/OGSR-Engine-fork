@@ -39,10 +39,6 @@ constexpr auto INVENTORY_XML = "inventory_new.xml";
 CUIInventoryWnd* g_pInvWnd = NULL;
 
 CUIInventoryWnd::CUIInventoryWnd()
-    : m_pUIBagList(nullptr), m_pUIBeltList(nullptr), m_pUIVestList(nullptr), m_pUIOutfitList(nullptr), m_pUIHelmetList(nullptr), m_pUIGasMaskList(nullptr), m_pUIWarBeltList(nullptr),
-      m_pUIBackPackList(nullptr), m_pUITacticalVestList(nullptr), m_pUIKnifeList(nullptr), m_pUIFirstWeaponList(nullptr), m_pUISecondWeaponList(nullptr),
-      m_pUIBinocularList(nullptr), m_pUIGrenadeList(nullptr), m_pUIArtefactList(nullptr), m_pUIDetectorList(nullptr), m_pUIOnHeadList(nullptr), m_pUIPdaList(nullptr),
-      m_pUIQuickList_0(nullptr), m_pUIQuickList_1(nullptr), m_pUIQuickList_2(nullptr), m_pUIQuickList_3(nullptr)
 {
     Init();
     SetCurrentItem(NULL);
@@ -222,30 +218,6 @@ void CUIInventoryWnd::Init()
     xml_init.InitDragDropListEx(uiXml, "dragdrop_pda", 0, m_pUIPdaList);
     BindDragDropListEnents(m_pUIPdaList);
 
-    m_pUIQuickList_0 = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIQuickList_0);
-    m_pUIQuickList_0->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_quick_0", 0, m_pUIQuickList_0);
-    BindDragDropListEnents(m_pUIQuickList_0);
-
-    m_pUIQuickList_1 = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIQuickList_1);
-    m_pUIQuickList_1->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_quick_1", 0, m_pUIQuickList_1);
-    BindDragDropListEnents(m_pUIQuickList_1);
-
-    m_pUIQuickList_2 = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIQuickList_2);
-    m_pUIQuickList_2->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_quick_2", 0, m_pUIQuickList_2);
-    BindDragDropListEnents(m_pUIQuickList_2);
-
-    m_pUIQuickList_3 = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIQuickList_3);
-    m_pUIQuickList_3->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_quick_3", 0, m_pUIQuickList_3);
-    BindDragDropListEnents(m_pUIQuickList_3);
-
     for (u8 i = 0; i < SLOTS_TOTAL; i++)
         m_slots_array[i] = NULL;
     m_slots_array[OUTFIT_SLOT] = m_pUIOutfitList;
@@ -266,11 +238,6 @@ void CUIInventoryWnd::Init()
     m_slots_array[DETECTOR_SLOT] = m_pUIDetectorList;
     m_slots_array[TORCH_SLOT] = m_pUIOnHeadList;
     m_slots_array[PDA_SLOT] = m_pUIPdaList;
-
-    m_slots_array[QUICK_SLOT_0] = m_pUIQuickList_0;
-    m_slots_array[QUICK_SLOT_1] = m_pUIQuickList_1;
-    m_slots_array[QUICK_SLOT_2] = m_pUIQuickList_2;
-    m_slots_array[QUICK_SLOT_3] = m_pUIQuickList_3;
 
     // slot keys statisc
     m_pKnifeKey = xr_new<CUIStatic>();
@@ -300,22 +267,6 @@ void CUIInventoryWnd::Init()
     m_pDetectorKey = xr_new<CUIStatic>();
     m_pUIDetectorList->AttachChild(m_pDetectorKey);
     xml_init.InitStatic(uiXml, "detector_key_static", 0, m_pDetectorKey);
-
-    m_pQuick_0_Key = xr_new<CUIStatic>();
-    m_pUIQuickList_0->AttachChild(m_pQuick_0_Key);
-    xml_init.InitStatic(uiXml, "quickslot_0_key_static", 0, m_pQuick_0_Key);
-
-    m_pQuick_1_Key = xr_new<CUIStatic>();
-    m_pUIQuickList_1->AttachChild(m_pQuick_1_Key);
-    xml_init.InitStatic(uiXml, "quickslot_1_key_static", 0, m_pQuick_1_Key);
-
-    m_pQuick_2_Key = xr_new<CUIStatic>();
-    m_pUIQuickList_2->AttachChild(m_pQuick_2_Key);
-    xml_init.InitStatic(uiXml, "quickslot_2_key_static", 0, m_pQuick_2_Key);
-
-    m_pQuick_3_Key = xr_new<CUIStatic>();
-    m_pUIQuickList_3->AttachChild(m_pQuick_3_Key);
-    xml_init.InitStatic(uiXml, "quickslot_3_key_static", 0, m_pQuick_3_Key);
 
     // pop-up menu
     AttachChild(&UIPropertiesBox);

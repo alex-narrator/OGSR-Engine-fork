@@ -115,11 +115,6 @@ protected:
     CUIDragDropListEx* m_pUIOnHeadList{};
     CUIDragDropListEx* m_pUIPdaList{};
 
-    CUIDragDropListEx* m_pUIQuickList_0{};
-    CUIDragDropListEx* m_pUIQuickList_1{};
-    CUIDragDropListEx* m_pUIQuickList_2{};
-    CUIDragDropListEx* m_pUIQuickList_3{};
-
     // alpet: для индексированного доступа
     CUIDragDropListEx* m_slots_array[SLOTS_TOTAL];
 
@@ -131,10 +126,6 @@ protected:
     CUIStatic* m_pGrenadeKey;
     CUIStatic* m_pArtefactKey;
     CUIStatic* m_pDetectorKey;
-    CUIStatic* m_pQuick_0_Key;
-    CUIStatic* m_pQuick_1_Key;
-    CUIStatic* m_pQuick_2_Key;
-    CUIStatic* m_pQuick_3_Key;
 
     void ClearAllLists();
     void BindDragDropListEnents(CUIDragDropListEx* lst);

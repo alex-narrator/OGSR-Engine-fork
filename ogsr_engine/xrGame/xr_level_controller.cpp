@@ -96,11 +96,6 @@ xr_vector<_action> actions = {
     DEF_ACTION("quick_save", kQUICK_SAVE) 
     DEF_ACTION("quick_load", kQUICK_LOAD)
 
-	DEF_ACTION("use_quick_slot_0", kUSE_QUICK_SLOT_0)
-	DEF_ACTION("use_quick_slot_1", kUSE_QUICK_SLOT_1)
-	DEF_ACTION("use_quick_slot_2", kUSE_QUICK_SLOT_2)
-	DEF_ACTION("use_quick_slot_3", kUSE_QUICK_SLOT_3)
-
 	DEF_ACTION("check_gear", kCHECKGEAR)
 	DEF_ACTION("check_active_item", kCHECKACTIVEITEM)
 	DEF_ACTION("kick", kKICK)

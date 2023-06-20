@@ -224,56 +224,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
         OnPrevWeaponSlot();
     }
     break;
-    case kUSE_QUICK_SLOT_0:
-    case kUSE_QUICK_SLOT_1:
-    case kUSE_QUICK_SLOT_2:
-    case kUSE_QUICK_SLOT_3: {
-        if (!GetTrade()->IsInTradeState())
-        {
-            PIItem itm{};
-            switch (cmd)
-            {
-            case kUSE_QUICK_SLOT_0: itm = inventory().m_slots[QUICK_SLOT_0].m_pIItem; break;
-            case kUSE_QUICK_SLOT_1: itm = inventory().m_slots[QUICK_SLOT_1].m_pIItem; break;
-            case kUSE_QUICK_SLOT_2: itm = inventory().m_slots[QUICK_SLOT_2].m_pIItem; break;
-            case kUSE_QUICK_SLOT_3: itm = inventory().m_slots[QUICK_SLOT_3].m_pIItem; break;
-            }
-
-            if (itm)
-            {
-                string1024 str;
-
-                if (itm->cast_eatable_item())
-                {
-                    PIItem iitm = inventory().GetSameEatable(itm, false);
-
-                    if (iitm)
-                    {
-                        inventory().Eat(iitm);
-                        sprintf(str, "%s: %s", CStringTable().translate("st_item_used").c_str(), iitm->Name());
-                    }
-                    else
-                    {
-                        inventory().Eat(itm);
-                        sprintf(str, "%s: %s", CStringTable().translate("st_item_used").c_str(), itm->Name());
-                    }
-                    HUD().GetUI()->AddInfoMessage("item_usage", str, false);
-                }
-                else if (auto ammo = smart_cast<CWeaponAmmo*>(itm))
-                {
-                    if (auto wpn = smart_cast<CWeapon*>(inventory().ActiveItem()))
-                    {
-                        wpn->IsDirectReload(ammo);
-                    }
-                }
-            }
-            else
-            {
-                HUD().GetUI()->AddInfoMessage("item_usage", "st_quick_slot_empty");
-            }
-        }
-    }
-    break;
     case kLASER_ON: {
         if (auto wpn = smart_cast<CWeaponMagazined*>(inventory().ActiveItem()))
             wpn->SwitchLaser(!wpn->IsLaserOn());

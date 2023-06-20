@@ -582,34 +582,6 @@ bool CInventory::Action(s32 cmd, u32 flags)
         }
     }
     break;
-    case kUSE_QUICK_SLOT_0:
-    case kUSE_QUICK_SLOT_1:
-    case kUSE_QUICK_SLOT_2:
-    case kUSE_QUICK_SLOT_3: {
-        PIItem itm = NULL;
-
-        switch (cmd)
-        {
-        case kUSE_QUICK_SLOT_0: itm = m_slots[QUICK_SLOT_0].m_pIItem; break;
-        case kUSE_QUICK_SLOT_1: itm = m_slots[QUICK_SLOT_1].m_pIItem; break;
-        case kUSE_QUICK_SLOT_2: itm = m_slots[QUICK_SLOT_2].m_pIItem; break;
-        case kUSE_QUICK_SLOT_3: itm = m_slots[QUICK_SLOT_3].m_pIItem; break;
-        }
-
-        if (flags & CMD_START)
-        {
-            auto pHudItem = smart_cast<CHudItem*>(itm);
-            // если в слоте предмет без худа то и активировать его не нужно
-            if (!pHudItem)
-                return false;
-
-            if (m_iActiveSlot == itm->GetSlot())
-                b_send_event = Activate(NO_ACTIVE_SLOT);
-            else
-                b_send_event = Activate(itm->GetSlot(), eKeyAction);
-        }
-    }
-    break;
     }
 
     return false;
@@ -1631,10 +1603,7 @@ bool CInventory::activate_slot(u32 slot)
     case APPARATUS_SLOT:
     case BOLT_SLOT:
     case ARTEFACT_SLOT:
-    case QUICK_SLOT_0:
-    case QUICK_SLOT_1:
-    case QUICK_SLOT_2:
-    case QUICK_SLOT_3: return ItemFromSlot(slot) && ItemFromSlot(slot)->cast_hud_item();
+        return ItemFromSlot(slot) && ItemFromSlot(slot)->cast_hud_item();
     }
 
     return false;
