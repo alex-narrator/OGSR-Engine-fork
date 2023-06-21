@@ -20,6 +20,9 @@
 #include "Missile.h"
 #include "../xr_3da/x_ray.h"
 
+#include "game_object_space.h"
+#include "script_game_object.h"
+
 ENGINE_API extern float psHUD_FOV_def;
 
 CHudItem::CHudItem()
@@ -274,6 +277,9 @@ void CHudItem::OnStateSwitch(u32 S, u32 oldState)
     }
 
     g_player_hud->updateMovementLayerState();
+
+    if(auto actor = smart_cast<CActor*>(object().H_Parent()))
+        actor->callback(GameObject::eOnHudStateSwitch)(object().lua_game_object(), S, oldState);
 }
 
 bool CHudItem::Activate(bool now)

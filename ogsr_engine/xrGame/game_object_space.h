@@ -70,6 +70,8 @@ enum ECallbackType
     eOnUpdateHUDAddonsVisibiility,
     eOnAddonInit,
 
+    eOnHudStateSwitch,
+
     // Called when the player zooms their weapon in or out.
     eOnActorWeaponZoomIn,
     eOnActorWeaponZoomOut,
