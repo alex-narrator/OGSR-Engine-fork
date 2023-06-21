@@ -478,16 +478,8 @@ void CWeaponMagazined::ReloadMagazine()
 void CWeaponMagazined::Misfire()
 {
     inherited::Misfire();
-
-    if (IsZoomed() && !IsRotatingToZoom())
-    {
-        OnEmptyClick();
-    }
-    else
-    {
-        SetPending(TRUE);
-        SwitchState(eMisfire);
-    }
+    SetPending(TRUE);
+    SwitchState(eMisfire);
 }
 
 void CWeaponMagazined::OnStateSwitch(u32 S, u32 oldState)
@@ -534,6 +526,7 @@ void CWeaponMagazined::UpdateCL()
         case eShowing:
         case eHiding:
         case eReload:
+        case eMisfire:
         case eIdle:
             fTime -= dt;
             if (fTime < 0)
@@ -558,7 +551,6 @@ void CWeaponMagazined::UpdateCL()
                 OnZoomOut();
 
             break;
-        case eMisfire: state_Misfire(dt); break;
         case eMagEmpty: state_MagEmpty(dt); break;
         case eHidden: break;
         }
@@ -702,16 +694,6 @@ void CWeaponMagazined::state_Fire(float dt)
 
     if (m_iShotNum == m_iQueueSize)
         m_bStopedAfterQueueFired = true;
-
-    UpdateSounds();
-}
-
-void CWeaponMagazined::state_Misfire(float /**dt/**/)
-{
-    OnEmptyClick();
-    SwitchState(eIdle);
-
-    SetMisfire(true);
 
     UpdateSounds();
 }
@@ -2043,7 +2025,11 @@ void CWeaponMagazined::PlayAnimCheckMisfire()
     string128 check_misfire;
     xr_strconcat(check_misfire, "anm_check_misfire", IsAddonAttached(eLauncher) ? (!IsGrenadeMode() ? "_w_gl" : "_g") : "");
     if (AnimationExist(check_misfire))
+    {
+        if (IsZoomed())
+            OnZoomOut();
         PlayHUDMotion(check_misfire, true, GetState());
+    }
     else
         SwitchState(eIdle);
 }
