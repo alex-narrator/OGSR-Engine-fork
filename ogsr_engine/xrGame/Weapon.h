@@ -398,6 +398,8 @@ protected:
     virtual void Reload() { OnZoomOut(); };
     void StopShooting();
 
+    virtual void Misfire() {}
+
     // обработка визуализации выстрела
     virtual void OnShot(){};
     virtual void AddShotEffector();

@@ -31,6 +31,7 @@ protected:
     virtual void PlayAnimCheckout() override;
     virtual void PlayAnimCheckGear() override;
     virtual void PlayAnimKick() override;
+    virtual void PlayAnimCheckMisfire() override;
     virtual void PlayReloadSound();
     virtual void UpdateSounds() override;
 

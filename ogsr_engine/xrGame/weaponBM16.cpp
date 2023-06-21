@@ -271,3 +271,13 @@ void CWeaponBM16::PlayAnimKick()
     case 2: AnimationExist("anm_kick_2") ? PlayHUDMotion("anm_kick_2", true, GetState()) : PlayHUDMotion({"anim_draw_2", "anim_draw", "anm_show_2"}, true, GetState()); break;
     }
 }
+
+void CWeaponBM16::PlayAnimCheckMisfire()
+{
+    string128 anm_check_misfire;
+    xr_strconcat(anm_check_misfire, "anm_check_misfire", std::to_string(m_magazine.size()).c_str());
+    if (AnimationExist(anm_check_misfire))
+        PlayHUDMotion(anm_check_misfire, true, GetState());
+    else
+        SwitchState(eIdle);
+}

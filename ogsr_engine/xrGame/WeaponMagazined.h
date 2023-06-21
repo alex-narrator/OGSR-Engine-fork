@@ -127,6 +127,8 @@ public:
     virtual void FireStart();
     virtual void Reload();
 
+    virtual void Misfire() override;
+
     virtual void UpdateCL();
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
@@ -244,6 +246,8 @@ protected:
     virtual void PlayAnimAim();
     virtual void PlayAnimShoot();
     virtual void PlayReloadSound();
+
+    virtual void PlayAnimCheckMisfire();
 
     virtual int ShotsFired() { return m_iShotNum; }
     virtual float GetWeaponDeterioration() const;

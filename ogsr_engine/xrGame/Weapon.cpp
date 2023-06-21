@@ -1281,7 +1281,7 @@ BOOL CWeapon::CheckForMisfire()
     {
         FireEnd();
         SetMisfire(true);
-        SwitchState(eMisfire);
+        //SwitchState(eMisfire);
 
         return TRUE;
     }

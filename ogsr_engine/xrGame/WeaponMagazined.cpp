@@ -288,9 +288,12 @@ void CWeaponMagazined::FireStart()
     }
     else if (IsMisfire())
     {
-        OnEmptyClick();
-        if (ParentIsActor() && (Level().CurrentViewEntity() == H_Parent()))
+        //OnEmptyClick();
+        if (ParentIsActor())
+        {
             HUD().GetUI()->AddInfoMessage("item_state", "gun_jammed");
+            Misfire();
+        }
     }
     else if (eReload != GetState() && eMisfire != GetState())
         OnMagazineEmpty();
@@ -472,6 +475,21 @@ void CWeaponMagazined::ReloadMagazine()
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
 }
 
+void CWeaponMagazined::Misfire()
+{
+    inherited::Misfire();
+
+    if (IsZoomed() && !IsRotatingToZoom())
+    {
+        OnEmptyClick();
+    }
+    else
+    {
+        SetPending(TRUE);
+        SwitchState(eMisfire);
+    }
+}
+
 void CWeaponMagazined::OnStateSwitch(u32 S, u32 oldState)
 {
     inherited::OnStateSwitch(S, oldState);
@@ -481,6 +499,9 @@ void CWeaponMagazined::OnStateSwitch(u32 S, u32 oldState)
     case eFire: switch2_Fire(); break;
     case eFire2: switch2_Fire2(); break;
     case eMisfire:
+        PlayAnimCheckMisfire();
+        PlaySound(sndEmptyClick, get_LastFP());
+        SetPending(TRUE);
         break;
     case eMagEmpty:
         switch2_Empty();
@@ -744,6 +765,7 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
         ShutterAction();
         SwitchState(eIdle);
         break; // End of Shutter animation
+    case eMisfire: SwitchState(eIdle); break; // End of misfire animation
     default: inherited::OnAnimationEnd(state);
     }
 }
@@ -2014,6 +2036,16 @@ void CWeaponMagazined::PlayAnimFiremodes()
         PlayHUDMotion("anm_fire_modes", true, GetState());
     }
     PlaySound(sndFireModes, get_LastFP());
+}
+
+void CWeaponMagazined::PlayAnimCheckMisfire()
+{
+    string128 check_misfire;
+    xr_strconcat(check_misfire, "anm_check_misfire", IsAddonAttached(eLauncher) ? (!IsGrenadeMode() ? "_w_gl" : "_g") : "");
+    if (AnimationExist(check_misfire))
+        PlayHUDMotion(check_misfire, true, GetState());
+    else
+        SwitchState(eIdle);
 }
 //
 void CWeaponMagazined::ShutterAction() // передёргивание затвора
