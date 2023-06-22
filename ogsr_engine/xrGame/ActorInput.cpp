@@ -181,28 +181,18 @@ void CActor::IR_OnKeyboardPress(int cmd)
             pActiveWeapon->SwitchNightVision();
         else
         {
-            if (GetTorch())
-            {
-                if (!IsFreeHands())
-                    HUD().GetUI()->AddInfoMessage("item_usage", "hands_not_free");
-                else
-                    GetTorch()->SwitchNightVision();
-            }
+            if (GetTorch() && IsFreeHands())
+                GetTorch()->SwitchNightVision();
         }
     }
     break;
     case kTORCH: {
-        if (GetTorch())
+        if (GetTorch() && IsFreeHands())
         {
-            if (!IsFreeHands())
-                HUD().GetUI()->AddInfoMessage("item_usage", "hands_not_free");
+            if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
+                GetTorch()->SwitchMode();
             else
-            {
-                if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
-                    GetTorch()->SwitchMode();
-                else 
-                    GetTorch()->SwitchTorch();
-            }
+                GetTorch()->SwitchTorch();
         }
     }
     break;
@@ -235,6 +225,8 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
     break;
     case kKICK: {
+        if (conditions().IsCantWalk())
+            return;
         const auto hud_item = smart_cast<CHudItem*>(inventory().ActiveItem());
         if (hud_item && hud_item->GetHUDmode())
         {
@@ -259,14 +251,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
     break;
     case kCHECKGEAR: {
         ActorCheckGear();
-    }
-    break;
-    case kDROP_BACKPACK: {
-        if (GetBackpack() && GetBackpack()->HasQuickDrop())
-        {
-            GetBackpack()->SetDropManual(TRUE);
-            HUD().GetUI()->AddInfoMessage("item_usage", "st_backpack_dropped");
-        }
     }
     break;
     case kWPN_FUNC: {
@@ -746,11 +730,6 @@ void CActor::ActorKick()
     CGameObject* O = ObjectWeLookingAt();
     if (!O)
         return;
-    if (conditions().IsCantWalk())
-    {
-        HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
-        return;
-    }
 
     float mass_f = GetTotalMass(O);
 

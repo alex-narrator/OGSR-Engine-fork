@@ -197,8 +197,8 @@ public:
     u32 VestWidth() const;
     u32 VestHeight() const;
 
-    void DropBeltToRuck(bool = false);
-    void DropVestToRuck(bool = false);
+    void DropBeltToRuck();
+    void DropVestToRuck();
     void DropSlotsToRuck(u32 min_slot, u32 max_slot = NO_ACTIVE_SLOT);
     void BackpackItemsTransfer(CInventoryItem*, bool);
     bool IsSlotAllowed(u32) const;

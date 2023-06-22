@@ -269,38 +269,20 @@ void CWeaponKnife::switch2_Showing()
 
 void CWeaponKnife::FireStart()
 {
-    if (!ParentIsActor() || (ParentIsActor() && !Actor()->conditions().IsCantWalk()))
-    {
-        inherited::FireStart();
-        SwitchState(eFire);
-    }
-    //
-    if (ParentIsActor() && !GodMode())
-    {
-        if (!Actor()->conditions().IsCantWalk())
-            Actor()->conditions().ConditionJump(Weight() * 0.1f);
-        else
-            HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
-    }
-    //
+    inherited::FireStart();
+    SwitchState(eFire);
+
+    if (ParentIsActor() && !GodMode() && !Actor()->conditions().IsCantWalk())
+        Actor()->conditions().ConditionJump(Weight() * 0.1f);
 }
 
 void CWeaponKnife::Fire2Start()
 {
-    if (!ParentIsActor() || (ParentIsActor() && !Actor()->conditions().IsCantWalk()))
-    {
-        inherited::Fire2Start();
-        SwitchState(eFire2);
-    }
+    inherited::Fire2Start();
+    SwitchState(eFire2);
 
-    if (ParentIsActor() && !GodMode())
-    {
-        if (!Actor()->conditions().IsCantWalk())
-            Actor()->conditions().ConditionJump(Weight() * 0.1f);
-        else
-            HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
-    }
-    //
+    if (ParentIsActor() && !GodMode() && !Actor()->conditions().IsCantWalk())
+        Actor()->conditions().ConditionJump(Weight() * 0.1f);
 }
 
 bool CWeaponKnife::Action(s32 cmd, u32 flags)

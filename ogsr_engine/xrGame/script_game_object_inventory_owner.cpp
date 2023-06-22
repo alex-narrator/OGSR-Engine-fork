@@ -35,6 +35,7 @@
 #include "weaponmagazined.h"
 #include "ai/stalker/ai_stalker.h"
 #include "Torch.h"
+#include "CustomDetector.h"
 #include "customoutfit.h"
 #include "WeaponMagazinedWGrenade.h"
 
@@ -880,6 +881,25 @@ CScriptGameObject* CScriptGameObject::item_in_slot(u8 slot_id) const
 
     CInventoryItem* result = inventory_owner->inventory().m_slots[slot_id].m_pIItem;
     return (result ? result->object().lua_game_object() : 0);
+}
+
+CScriptGameObject* CScriptGameObject::active_detector() const
+{
+    CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
+    if (!inventory_owner)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member active_detector!");
+        return (0);
+    }
+
+    CInventoryItem* result = inventory_owner->inventory().ItemFromSlot(DETECTOR_SLOT);
+    if (result)
+    {
+        CCustomDetector* detector = smart_cast<CCustomDetector*>(result);
+        VERIFY(detector);
+        return (detector->IsPowerOn() && detector->GetHUDmode() ? result->object().lua_game_object() : 0);
+    }
+    return (0);
 }
 
 void CScriptGameObject::GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExisting) { Actor()->GameTaskManager().GiveGameTaskToActor(t, dt, bCheckExisting); }

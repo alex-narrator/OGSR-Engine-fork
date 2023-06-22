@@ -603,6 +603,8 @@ public:
     void make_object_visible_somewhen(CScriptGameObject* object);
 
     CScriptGameObject* item_in_slot(u8 slot_id) const;
+    CScriptGameObject* active_detector() const;
+
     u32 active_slot();
     void activate_slot(u8 slot_id);
 

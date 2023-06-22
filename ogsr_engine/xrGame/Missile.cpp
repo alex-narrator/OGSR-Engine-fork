@@ -594,14 +594,6 @@ bool CMissile::Action(s32 cmd, u32 flags)
     if (inherited::Action(cmd, flags))
         return true;
 
-    auto pActor = smart_cast<CActor*>(H_Parent());
-    bool b_have_no_power = pActor && pActor->conditions().IsCantWalk();
-    if (b_have_no_power && GetState() != eReady)
-    {
-        HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
-        return false;
-    }
-
     switch (cmd)
     {
     case kWPN_FIRE: {

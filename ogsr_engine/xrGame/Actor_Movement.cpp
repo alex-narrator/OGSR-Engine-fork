@@ -713,16 +713,7 @@ bool CActor::CanJump(float weight)
 
 bool CActor::CanMove()
 {
-    if (conditions().IsCantWalk())
-    {
-        if (mstate_wishful & mcAnyMove)
-        {
-            HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
-        }
-        return false;
-    }
-
-    if (IsTalking())
+    if (conditions().IsCantWalk()  || IsTalking())
         return false;
     else
         return true;

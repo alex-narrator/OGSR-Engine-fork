@@ -126,8 +126,8 @@ public:
     // Does weapon need's update?
     BOOL IsUpdating();
 
-    BOOL IsMisfire() const { return m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponMisfire; };
-    BOOL CheckForMisfire();
+    bool IsMisfire() const { return m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponMisfire; };
+    bool CheckForMisfire();
     void SetMisfire(bool on) { on ? m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponMisfire : m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponMisfire; }
 
     bool IsTriStateReload() const { return m_bTriStateReload; }

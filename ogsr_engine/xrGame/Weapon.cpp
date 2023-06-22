@@ -15,7 +15,6 @@
 
 #include "actor.h"
 #include "actoreffector.h"
-#include "ActorCondition.h"
 #include "level.h"
 
 #include "xr_level_controller.h"
@@ -920,9 +919,6 @@ void CWeapon::UpdateCL()
 
     if (actor)
     {
-        if (Actor()->conditions().IsCantWalk() && IsZoomed())
-            OnZoomOut();
-
         if (!HUD().GetUI()->MainInputReceiver() || !psActorFlags.test(AF_DOF_UI_WND))
         {
             UpdateDofAim();
@@ -1047,25 +1043,18 @@ bool CWeapon::Action(s32 cmd, u32 flags)
     case kWPN_ZOOM: {
         if (IsZoomEnabled())
         {
-            auto pActor = smart_cast<const CActor*>(H_Parent());
-
-            if (!pActor->conditions().IsCantWalk())
+            if (flags & CMD_START && !IsPending())
             {
-                if (flags & CMD_START && !IsPending())
-                {
-                    if (!psActorFlags.is(AF_HOLD_TO_AIM) && IsZoomed())
-                        OnZoomOut();
-                    else
-                        OnZoomIn();
-                }
-                else if (IsZoomed() && psActorFlags.is(AF_HOLD_TO_AIM))
-                {
+                if (!psActorFlags.is(AF_HOLD_TO_AIM) && IsZoomed())
                     OnZoomOut();
-                }
-                return true;
+                else
+                    OnZoomIn();
             }
-            else
-                HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
+            else if (IsZoomed() && psActorFlags.is(AF_HOLD_TO_AIM))
+            {
+                OnZoomOut();
+            }
+            return true;
         }
         else
             return false;
@@ -1266,13 +1255,13 @@ float CWeapon::GetConditionMisfireProbability() const
     return mis;
 }
 
-BOOL CWeapon::CheckForMisfire()
+bool CWeapon::CheckForMisfire()
 {
     if (Core.Features.test(xrCore::Feature::npc_simplified_shooting))
     {
         CActor* actor = smart_cast<CActor*>(H_Parent());
         if (!actor)
-            return FALSE;
+            return false;
     }
 
     float rnd = ::Random.randF(0.f, 1.f);
@@ -1283,11 +1272,11 @@ BOOL CWeapon::CheckForMisfire()
         SetMisfire(true);
         //SwitchState(eMisfire);
 
-        return TRUE;
+        return true;
     }
     else
     {
-        return FALSE;
+        return false;
     }
 }
 

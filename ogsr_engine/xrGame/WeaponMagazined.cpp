@@ -286,14 +286,9 @@ void CWeaponMagazined::FireStart()
                 SwitchState(eFire);
         }
     }
-    else if (IsMisfire())
+    else if (IsMisfire() && ParentIsActor())
     {
-        //OnEmptyClick();
-        if (ParentIsActor())
-        {
-            HUD().GetUI()->AddInfoMessage("item_state", "gun_jammed");
-            Misfire();
-        }
+        Misfire();            
     }
     else if (eReload != GetState() && eMisfire != GetState())
         OnMagazineEmpty();
@@ -375,10 +370,6 @@ void CWeaponMagazined::ReloadMagazine()
     if (IsMisfire() && (!HasChamber() || m_magazine.empty()))
     {
         SetMisfire(false);
-        if (ParentIsActor() && (Level().CurrentViewEntity() == H_Parent()))
-        {
-            HUD().GetUI()->AddInfoMessage("item_state", "gun_not_jammed");
-        }
     }
     // переменная блокирует использование
     // только разных типов патронов
@@ -1854,9 +1845,6 @@ float CWeaponMagazined::GetWeaponDeterioration() const
 #include "ui/UIMainIngameWnd.h"
 void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
 {
-    if (IsMisfire() && ParentIsActor() && (Level().CurrentViewEntity() == H_Parent()))
-        HUD().GetUI()->AddInfoMessage("item_state", "gun_jammed");
-
     auto CurrentHUD = HUD().GetUI()->UIMainIngameWnd;
     bool b_wpn_info = CurrentHUD->IsHUDElementAllowed(eActiveItem);
     bool b_gear_info = CurrentHUD->IsHUDElementAllowed(eGear);
@@ -2041,8 +2029,6 @@ void CWeaponMagazined::ShutterAction() // передёргивание затв�
     {
         b_spawn_ammo = false;
         SetMisfire(false);
-        if (ParentIsActor() && (Level().CurrentViewEntity() == H_Parent()))
-            HUD().GetUI()->AddInfoMessage("item_state", "gun_not_jammed");
     }
 
     if (HasChamber() && !m_magazine.empty())

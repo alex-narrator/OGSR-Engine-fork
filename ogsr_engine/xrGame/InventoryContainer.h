@@ -41,8 +41,6 @@ public:
     virtual void OnMoveToSlot(EItemPlace prevPlace);
     virtual void OnMoveOut(EItemPlace prevPlace);
 
-    virtual bool HasQuickDrop() const;
-
     virtual u32 GetSameItemCount(shared_str) const;
 
     void AddUniqueItems(TIItemContainer& items_container) const;
@@ -52,6 +50,5 @@ public:
 protected:
     void UpdateDropTasks();
     void UpdateDropItem(PIItem pIItem);
-    bool m_bQuickDrop{};
     xr_vector<shared_str> m_allowed_classes{};
 };

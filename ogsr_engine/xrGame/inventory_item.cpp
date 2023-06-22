@@ -308,6 +308,11 @@ void CInventoryItem::OnH_A_Independent()
 {
     m_eItemPlace = eItemPlaceUndefined;
     inherited::OnH_A_Independent();
+    if (b_brake_item)
+    {
+        object().setEnabled(false);
+        object().setVisible(false);
+    }
 }
 
 void CInventoryItem::OnH_B_Chield() {}
@@ -817,8 +822,6 @@ void CInventoryItem::TryBreakToPieces(bool play_effects)
                 // играем звук
                 sndBreaking.play_no_feedback(object().H_Parent(), u32{}, float{}, &object().H_Parent()->Position());
                 SetDropManual(TRUE);
-                object().setEnabled(false);
-                object().setVisible(false);
             }
             else
             {

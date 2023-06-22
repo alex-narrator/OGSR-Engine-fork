@@ -155,7 +155,10 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 {
     m_pInvItem = pInvItem;
     if (!m_pInvItem)
+    {
+        Show(false);
         return;
+    }
 
     string256 str;
     if (UIName)

@@ -619,8 +619,8 @@ void CActor::Die(CObject* who)
     };
 
     ///!!! чистка пояса
-    inventory().DropBeltToRuck(true);
-    inventory().DropVestToRuck(true);
+    inventory().DropBeltToRuck();
+    inventory().DropVestToRuck();
 
     cam_Set(eacFreeLook);
     mstate_wishful &= ~mcAnyMove;

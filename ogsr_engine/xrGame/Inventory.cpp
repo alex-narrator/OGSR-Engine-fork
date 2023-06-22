@@ -1455,20 +1455,20 @@ bool CInventory::IsAllItemsLoaded() const { return m_bUpdated; }
 
 bool CInventory::OwnerIsActor() const { return smart_cast<CActor*>(m_pOwner); }
 
-void CInventory::DropBeltToRuck(bool skip_volume_check)
+void CInventory::DropBeltToRuck()
 {
     if (!OwnerIsActor() || !IsAllItemsLoaded())
         return;
-    for (const auto& item : m_belt)
-        Ruck(item);
+    while (!m_belt.empty())
+        Ruck(m_belt.front());
 }
 
-void CInventory::DropVestToRuck(bool skip_volume_check)
+void CInventory::DropVestToRuck()
 {
     if (!OwnerIsActor() || !IsAllItemsLoaded())
         return;
-    for (const auto& item : m_vest)
-        Ruck(item);
+    while (!m_vest.empty())
+        Ruck(m_vest.front());
 }
 
 void CInventory::DropSlotsToRuck(u32 min_slot, u32 max_slot)

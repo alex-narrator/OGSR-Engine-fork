@@ -96,8 +96,6 @@ enum EGameActions
     kQUICK_THROW_GRENADE,
     kQUICK_KNIFE_STAB,
 
-    kDROP_BACKPACK,
-
     kLASTACTION = u32(-3),
     kNOTBINDED = u32(-2),
     kFORCEDWORD = u32(-1)

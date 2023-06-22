@@ -16,7 +16,6 @@
 void CInventoryContainer::Load(LPCSTR section)
 {
     inherited::Load(section);
-    m_bQuickDrop = READ_IF_EXISTS(pSettings, r_bool, section, "quick_drop", false);
     m_iItemsLimit = READ_IF_EXISTS(pSettings, r_u32, section, "items_limit", 0);
     if (pSettings->line_exist(section, "allowed_classes"))
     {
@@ -290,16 +289,6 @@ void CInventoryContainer::OnMoveOut(EItemPlace prevPlace)
             inv->BackpackItemsTransfer(this, true);
         }
     }
-}
-
-bool CInventoryContainer::HasQuickDrop() const
-{
-    for (const auto slot : m_slots)
-    {
-        if (slot == BACKPACK_SLOT && m_bQuickDrop)
-            return true;
-    }
-    return false;
 }
 
 u32 CInventoryContainer::GetSameItemCount(shared_str sect) const
