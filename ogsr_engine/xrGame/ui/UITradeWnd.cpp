@@ -8,7 +8,6 @@
 #include "HUDManager.h"
 #include "WeaponAmmo.h"
 #include "Actor.h"
-#include "PDA.h"
 #include "Trade.h"
 #include "UIGameSP.h"
 #include "UIInventoryUtilities.h"
@@ -238,20 +237,6 @@ void CUITradeWnd::InitTrade(CInventoryOwner* pOur, CInventoryOwner* pOthers)
     EnableAll();
 
     UpdateLists(eBoth);
-
-    // режим бартерной торговли
-    auto pda = Actor()->GetPDA();
-    if (!pda || !pda->IsPowerOn())
-    {
-        m_uidata->UIOurMoneyStatic.SetText(
-            CStringTable().translate("ui_st_pda_account_unavailable").c_str()); // закроем статиком кол-во денег актора, т.к. оно еще не обновилось и не ноль
-        m_uidata->UIOtherMoneyStatic.SetText(
-            CStringTable().translate("ui_st_pda_account_unavailable").c_str()); // закроем статиком кол-во денег контрагента, т.к. оно еще не обновилось и не ---
-        m_uidata->UIPerformTradeButton.SetText(CStringTable().translate("ui_st_barter").c_str()); // напишем "бартер" на кнопке, вместо "торговать"
-    }
-    else
-        m_uidata->UIPerformTradeButton.SetText(CStringTable().translate("ui_st_trade").c_str()); // вернём надпись "торговать" на кнопке, вместо "бартер"
-    //
 }
 
 void CUITradeWnd::ActivatePropertiesBox()
@@ -766,10 +751,8 @@ void CUITradeWnd::PerformTrade()
     {
         string256 deal_refuse_text; // строка с текстом сообщения-отказа при невозмжности совершить торговую сделку
         auto trader_name = others_money < 0 ? m_pOthersInvOwner->Name() : m_pInvOwner->Name();
-        auto pda = Actor()->GetPDA();
-        auto refusal_text = pda && pda->IsPowerOn() ? "st_not_enough_money_to_trade" : "st_not_enough_money_to_barter";
         m_uidata->UIDealMsg = HUD().GetUI()->UIGame()->AddCustomStatic("not_enough_money", true);
-        sprintf(deal_refuse_text, "%s: %s", trader_name, CStringTable().translate(refusal_text).c_str());
+        sprintf(deal_refuse_text, "%s: %s", trader_name, CStringTable().translate("st_not_enough_money_to_trade").c_str());
         m_uidata->UIDealMsg->wnd()->SetText(deal_refuse_text);
 
         m_uidata->UIDealMsg->m_endTime = Device.fTimeGlobal + 1.0f; // sec
@@ -856,9 +839,8 @@ void CUITradeWnd::UpdatePrices()
     {
         sprintf_s(buf, "%d %s", (int)m_pOthersInvOwner->get_money(), money_name);
         m_uidata->UIOtherMoneyStatic.SetText(buf);
-    } // else
-    auto pda = Actor()->GetPDA();
-    if (m_pOthersInvOwner->InfinitiveMoney() || !pda || !pda->IsPowerOn()) // закроем --- счетчик денег контрагента, если в режиме бартера
+    }
+    else if (m_pOthersInvOwner->InfinitiveMoney())
     {
         m_uidata->UIOtherMoneyStatic.SetText("---");
     }

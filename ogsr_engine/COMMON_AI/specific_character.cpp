@@ -174,7 +174,6 @@ void CSpecificCharacter::load_shared(LPCSTR)
         MoneyDef().max_money = pXML->ReadAttribInt("money", 0, "max");
         MoneyDef().inf_money = !!pXML->ReadAttribInt("money", 0, "infinitive");
         MoneyDef().max_money = _max(MoneyDef().max_money, MoneyDef().min_money); // :)
-        MoneyDef().barter_money = pXML->ReadAttribInt("money", 0, "barter", 100000);
     }
 
     if (pXML->NavigateToNode(pXML->GetLocalRoot(), "donation", 0))

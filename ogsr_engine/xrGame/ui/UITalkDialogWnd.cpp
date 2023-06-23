@@ -8,7 +8,6 @@
 #include "UI3tButton.h"
 #include "UI.h"
 #include "Actor.h"
-#include "PDA.h"
 #include "HUDManager.h"
 #include "UIGameSP.h"
 #include "UIPdaWnd.h"
@@ -98,14 +97,6 @@ void CUITalkDialogWnd::Show()
     InventoryUtilities::SendInfoToActor("ui_talk");
     inherited::Show(true);
     inherited::Enable(true);
-
-    // режим бартерной торговли
-    auto pda = Actor()->GetPDA();
-    if (pda && pda->IsPowerOn())
-        UIToTradeButton.SetText(*CStringTable().translate("ui_st_trade")); // напишем "торговать" на кнопке, вместо "бартер"
-    else
-        UIToTradeButton.SetText(*CStringTable().translate("ui_st_barter")); // напишем "бартер" на кнопке, вместо "торговать"
-    //
     ResetAll();
 }
 

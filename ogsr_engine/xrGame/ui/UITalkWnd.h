@@ -91,9 +91,4 @@ protected:
     DIALOG_SHARED_PTR m_pCurrentDialog;
     bool TopicMode();
     void ToTopicMode();
-
-    // режим бартерной торговли
-    u32 u_NonBarterMoney; // деньги на виртуальном ПДА-счете актора
-    u32 u_NonBarterMoneyOther; // деньги на виртуальном ПДА-счете контрагента
-    //
 };

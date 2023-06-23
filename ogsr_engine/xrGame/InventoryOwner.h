@@ -177,7 +177,6 @@ public:
     IC const CSpecificCharacter& SpecificCharacter() const { return CharacterInfo().m_SpecificCharacter; };
     bool InfinitiveMoney() { return CharacterInfo().m_SpecificCharacter.MoneyDef().inf_money; }
     
-    u32 GetBarterMoney() { return CharacterInfo().m_SpecificCharacter.MoneyDef().barter_money; }
     float GetDonateGoodwillK() { return CharacterInfo().m_SpecificCharacter.DonationDef().goodwill_k; }
     bool CanTakeDonations() { return CharacterInfo().m_SpecificCharacter.DonationDef().can_take; }
 
