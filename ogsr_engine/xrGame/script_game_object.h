@@ -608,7 +608,8 @@ public:
     u32 active_slot();
     void activate_slot(u8 slot_id);
 
-    void SwitchTorch(bool enable);
+    void SwitchTorch(bool);
+    void SwitchNightVision(bool);
 
 #ifdef DEBUG
     void debug_planner(const script_planner* planner);

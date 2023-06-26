@@ -285,6 +285,7 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .def("active_detector", &CScriptGameObject::active_detector)
 
         .def("switch_torch", &CScriptGameObject::SwitchTorch)
+        .def("switch_night_vision", &CScriptGameObject::SwitchNightVision)
 
         .def("get_xform", &CScriptGameObject::GetXForm)
 

@@ -926,15 +926,26 @@ void CScriptGameObject::activate_slot(u8 slot_id)
     inventory_owner->inventory().Activate(slot_id);
 }
 
-void CScriptGameObject::SwitchTorch(bool enable)
+void CScriptGameObject::SwitchTorch(bool on)
 {
     CTorch* torch = smart_cast<CTorch*>(&object());
     if (!torch)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member activate_slot!");
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member switch_torch!");
         return;
     }
-    torch->Switch(enable);
+    torch->SwitchTorch(on);
+}
+
+void CScriptGameObject::SwitchNightVision(bool on)
+{
+    CTorch* torch = smart_cast<CTorch*>(&object());
+    if (!torch)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member switch_night_vision!");
+        return;
+    }
+    torch->SwitchNightVision(on);
 }
 
 void CScriptGameObject::enable_movement(bool enable)

@@ -91,7 +91,7 @@ enum ECallbackType
     eOnWpnShellDrop,
     eOnThrowGrenade,
     eOnGoodwillChange,
-    eUpdateArtefactsOnBelt,
+    eUpdateItemsEffect,
     eLevelChangerAction,
 
     eAttachVehicle,

@@ -225,7 +225,7 @@ public:
 
     virtual bool unlimited_ammo() const;
 
-	virtual void UpdateItemsBoost();
+	virtual void UpdateItemsEffect();
 
     virtual float GetArtefactsProtection(int);
 

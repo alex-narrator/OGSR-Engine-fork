@@ -1153,7 +1153,7 @@ void CActor::shedule_Update(u32 DT)
     //	UpdateSleep									();
 
 	// для усіх предметів що впливають на параметри актора
-    UpdateItemsBoost();
+    UpdateItemsEffect();
     if (!m_holder)
         m_pPhysics_support->in_shedule_Update(DT);
 
@@ -1373,14 +1373,14 @@ void CActor::OnItemBelt(CInventoryItem* inventory_item, EItemPlace previous_plac
 void CActor::OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemVest(inventory_item, previous_place); }
 void CActor::OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemSlot(inventory_item, previous_place); }
 
-constexpr auto ITEMS_BOOST_TIME = 0.100f;
-void CActor::UpdateItemsBoost()
+constexpr auto ITEMS_UPDATE_TIME = 0.100f;
+void CActor::UpdateItemsEffect()
 {
     static float update_time{};
 
     float f_update_time{};
 
-    if (update_time < ITEMS_BOOST_TIME)
+    if (update_time < ITEMS_UPDATE_TIME)
     {
         update_time += conditions().fdelta_time();
         return;
@@ -1451,7 +1451,7 @@ void CActor::UpdateItemsBoost()
         cond->ApplyRestoreBoost(i, m_ActorItemBoostedParam[i] * f_update_time);
     }
 
-    callback(GameObject::eUpdateArtefactsOnBelt)(f_update_time);
+    callback(GameObject::eUpdateItemsEffect)(f_update_time);
 }
 
 float CActor::GetArtefactsProtection(int hit_type)

@@ -91,7 +91,7 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("on_level_map_click", int(GameObject::eUIMapClick)), value("on_pickup_item_showing", int(GameObject::eUIPickUpItemShowing)),
                     value("on_group_items", int(GameObject::eUIGroupItems)), value("on_weapon_shell_drop", int(GameObject::eOnWpnShellDrop)),
                     value("on_throw_grenade", int(GameObject::eOnThrowGrenade)), value("on_goodwill_change", int(GameObject::eOnGoodwillChange)),
-                    value("update_artefacts_on_belt", int(GameObject::eUpdateArtefactsOnBelt)), value("level_changer_action", int(GameObject::eLevelChangerAction)),
+                    value("update_items_effect", int(GameObject::eUpdateItemsEffect)), value("level_changer_action", int(GameObject::eLevelChangerAction)),
 
                     value("on_attach_vehicle", int(GameObject::eAttachVehicle)), value("on_detach_vehicle", int(GameObject::eDetachVehicle)),
                     value("on_use_vehicle", int(GameObject::eUseVehicle)),
