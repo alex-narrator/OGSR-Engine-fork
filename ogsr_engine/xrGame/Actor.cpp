@@ -1761,10 +1761,15 @@ void CActor::HitToEquipment(SHit* pHDS)
         auto item = slot.m_pIItem;
         if (!item)
             continue;
-        if (item == GetOutfit() || item == GetWarbelt() || item == GetBackpack() || item == GetHelmet() || item == GetGasMask() || item == GetVest())
+        if (item == GetOutfit() || 
+            item == GetWarbelt() || 
+            item == GetBackpack() || 
+            item == GetHelmet() || 
+            item == GetGasMask() || 
+            item == GetVest() || 
+            item == inventory().ItemFromSlot(BOLT_SLOT))
             continue;
         item->Hit(pHDS);
-        Msg("~ %s", __FUNCTION__);
     }
 }
 

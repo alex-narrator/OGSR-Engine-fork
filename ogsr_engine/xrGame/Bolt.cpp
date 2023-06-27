@@ -62,10 +62,3 @@ void CBolt::activate_physic_shell()
 void CBolt::SetInitiator(u16 id) { m_thrower_id = id; }
 
 u16 CBolt::Initiator() { return m_thrower_id; }
-
-void CBolt::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
-{
-    str_name = NameShort();
-    str_count = "";
-    icon_sect_name = *cNameSect();
-}

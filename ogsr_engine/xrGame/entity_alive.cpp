@@ -496,10 +496,10 @@ bool CEntityAlive::is_relation_enemy(const CEntityAlive* tpEntityAlive) const
 
 bool CEntityAlive::CheckEnemyStatus(CEntityAlive* tgt)
 {
-    if (g_Alive() && !wounded() && is_relation_enemy(tgt))
-    {
-        Msg("%s: %s is enemy for %s", __FUNCTION__, cName().c_str(), tgt->cName().c_str());
-    }
+    //if (g_Alive() && !wounded() && is_relation_enemy(tgt))
+    //{
+    //    Msg("%s: %s is enemy for %s", __FUNCTION__, cName().c_str(), tgt->cName().c_str());
+    //}
     return g_Alive() && !wounded() && is_relation_enemy(tgt);
 }
 

@@ -510,8 +510,8 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
     }
 
     //	if (bDebug)
-    Msg("%s %s hitted in bone [name %s][idx %d] with %f[%f]", __FUNCTION__, m_object->Name(), smart_cast<IKinematics*>(m_object->Visual())->LL_BoneName_dbg(pHDS->boneID),
-        pHDS->boneID, m_fHealthLost * 100.0f, hit_power_org);
+    //Msg("%s %s hitted in bone [name %s][idx %d] with %f[%f]", __FUNCTION__, m_object->Name(), smart_cast<IKinematics*>(m_object->Visual())->LL_BoneName_dbg(pHDS->boneID),
+    //    pHDS->boneID, m_fHealthLost * 100.0f, hit_power_org);
     // раны добавляются только живому
     if (bAddWound && GetHealth() > 0)
     {
