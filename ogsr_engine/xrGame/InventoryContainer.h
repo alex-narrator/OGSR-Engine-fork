@@ -47,6 +47,8 @@ public:
 
     virtual bool CanTakeItem(CInventoryItem*) const;
 
+    float HitThruArmour(SHit* pHDS);
+
 protected:
     void UpdateDropTasks();
     void UpdateDropItem(PIItem pIItem);

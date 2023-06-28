@@ -6,7 +6,6 @@
 #include "Helmet.h"
 #include "GasMask.h"
 #include "Vest.h"
-#include "Warbelt.h"
 #include "inventory.h"
 #include "wound.h"
 #include "level.h"
@@ -14,7 +13,6 @@
 #include "entity_alive.h"
 #include "../Include/xrRender/Kinematics.h"
 #include "object_broker.h"
-#include "CustomZone.h"
 
 constexpr auto MAX_HEALTH = 1.0f;
 constexpr auto MIN_HEALTH = -0.01f;
@@ -273,107 +271,31 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
     if (!pInvOwner)
         return pHDS->damage();
 
-    float new_hit_power = pHDS->damage();
+    SHit calc_hit = *pHDS;
 
-    auto pOutfit = pInvOwner->GetOutfit();
-    auto pHelmet = pInvOwner->GetHelmet();
-    auto pGasMask = pInvOwner->GetGasMask();
-    auto pVest = pInvOwner->GetVest();
-    auto pBackPack = pInvOwner->GetBackpack();
-    auto pWarbelt = pInvOwner->GetWarbelt();
-
-    if (smart_cast<CCustomZone*>(pHDS->who))
-    {
-        if (pHelmet)
-        {
-            new_hit_power *= (1.0f - pHelmet->GetHitTypeProtection(pHDS->type()));
-            pHelmet->Hit(pHDS);
-        }
-        if (pGasMask)
-        {
-            new_hit_power *= (1.0f - pGasMask->GetHitTypeProtection(pHDS->type()));
-            pGasMask->Hit(pHDS);
-        }
-        if (pBackPack)
-        {
-            //new_hit_power *= (1.0f - pBackPack->GetHitTypeProtection(pHDS->type()));
-            pBackPack->Hit(pHDS);
-        }
-        if (pVest)
-        {
-            new_hit_power *= (1.0f - pVest->GetHitTypeProtection(pHDS->type()));
-            pVest->Hit(pHDS);
-        }
-        if (pWarbelt)
-        {
-            pWarbelt->Hit(pHDS);
-        }
-        if (pOutfit)
-        {
-            new_hit_power *= (1.0f - pOutfit->GetHitTypeProtection(pHDS->type()));
-            pOutfit->Hit(pHDS);
-        }
-        return new_hit_power;
-    }
-
-    if (pInvOwner->IsHitToHead(pHDS))
-    {
-        if (pHelmet)
-        {
-            if (pHDS->hit_type == ALife::eHitTypeFireWound)
-                new_hit_power = pHelmet->HitThruArmour(pHDS);
-            else
-                new_hit_power *= (1.0f - pHelmet->GetHitTypeProtection(pHDS->type()));
-            pHelmet->Hit(pHDS);
-        }
-        if (pGasMask)
-        {
-            new_hit_power *= (1.0f - pGasMask->GetHitTypeProtection(pHDS->type()));
-            pGasMask->Hit(pHDS);
-        }
-        else if (pOutfit && pOutfit->m_bIsHelmetBuiltIn)
-        {
-            if (pHDS->hit_type == ALife::eHitTypeFireWound)
-                new_hit_power = pOutfit->HitThruArmour(pHDS);
-            else
-                new_hit_power *= (1.0f - pOutfit->GetHitTypeProtection(pHDS->type()));
-            pOutfit->Hit(pHDS);
-        }
-    }
+    if (auto backpack = pInvOwner->GetBackpack())
+        calc_hit.power = backpack->HitThruArmour(&calc_hit);
     else
-    {
-        if (pWarbelt && pInvOwner->IsHitToWarbelt(pHDS))
-            pWarbelt->Hit(pHDS);
-        if (pBackPack && pInvOwner->IsHitToBackPack(pHDS))
-        {
-            new_hit_power *= (1.0f - pBackPack->GetHitTypeProtection(pHDS->type()));
-            pBackPack->Hit(pHDS);
-            pHDS->power = new_hit_power; // рюкзак може захистити костюм від пошкоджень
-        }
-        if (pVest && pInvOwner->IsHitToVest(pHDS))
-        {
-            if (pHDS->hit_type == ALife::eHitTypeFireWound)
-                new_hit_power = pVest->HitThruArmour(pHDS);
-            else
-                new_hit_power *= (1.0f - pVest->GetHitTypeProtection(pHDS->type()));
-            pVest->Hit(pHDS);
-            pHDS->power = new_hit_power;
-        }
-        if (pOutfit)
-        {
-            if (pHDS->hit_type == ALife::eHitTypeFireWound)
-                new_hit_power = pOutfit->HitThruArmour(pHDS);
-            else
-                new_hit_power *= (1.0f - pOutfit->GetHitTypeProtection(pHDS->type()));
-            pOutfit->Hit(pHDS);
-        }
-    }
-    return new_hit_power;
+        pInvOwner->HitItemsInRuck(&calc_hit);
+
+    if (auto vest = pInvOwner->GetVest())
+        calc_hit.power = vest->HitThruArmour(&calc_hit);
+
+    if (auto outfit = pInvOwner->GetOutfit())
+        calc_hit.power = outfit->HitThruArmour(&calc_hit);
+
+    if (auto helmet = pInvOwner->GetHelmet())
+        calc_hit.power = helmet->HitThruArmour(&calc_hit);
+
+    if (auto gasmask = pInvOwner->GetGasMask())
+        calc_hit.power *= (1.0f - gasmask->GetHitTypeProtection(calc_hit.hit_type));
+
+    return calc_hit.power;
 }
 
 float CEntityCondition::HitPowerEffect(float power_loss)
 {
-    float res{power_loss}, base_power_loss{power_loss};
+    float base_power_loss{power_loss}, res{base_power_loss};
 
     CInventoryOwner* pInvOwner = smart_cast<CInventoryOwner*>(m_object);
     if (!pInvOwner)
@@ -514,16 +436,9 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
     //    pHDS->boneID, m_fHealthLost * 100.0f, hit_power_org);
     // раны добавляются только живому
     if (bAddWound && GetHealth() > 0)
-    {
-        if (auto pInvOwner = smart_cast<CInventoryOwner*>(m_object))
-        {
-            pHDS->power = hit_power;
-            pInvOwner->TryGroggyEffect(pHDS);
-        }
         return AddWound(hit_power * m_fWoundBoneScale, pHDS->hit_type, pHDS->boneID);
-    }
     else
-        return NULL;
+        return nullptr;
 }
 
 float CEntityCondition::BleedingSpeed()

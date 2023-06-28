@@ -64,22 +64,31 @@ float CVest::GetHitTypeProtection(int hit_type) const { return (hit_type == ALif
 float CVest::HitThruArmour(SHit* pHDS)
 {
     float hit_power = pHDS->power;
-    float BoneArmour = m_boneProtection->getBoneArmour(pHDS->boneID) * !fis_zero(GetCondition() * !fis_zero(m_fInstalledPlateCondition));
+    float ba = m_boneProtection->getBoneArmour(pHDS->bone()) * !fis_zero(GetCondition()) * !fis_zero(m_fInstalledPlateCondition);
+    if (!ba)
+        return hit_power;
 
-    Msg("%s %s take hit power [%.4f], hitted bone %s, bone armor [%.4f], hit AP [%.4f]", __FUNCTION__, Name(), hit_power,
-        smart_cast<IKinematics*>(smart_cast<CActor*>(m_pCurrentInventory->GetOwner())->Visual())->LL_BoneName_dbg(pHDS->boneID), BoneArmour, pHDS->ap);
+    auto hit_type = pHDS->type();
 
-    if (pHDS->ap < BoneArmour)
-    { // броню не пробито, хіт тільки від умовного удару в броню
-        hit_power *= m_boneProtection->m_fHitFrac;
+    //Msg("%s %s take hit power [%.4f], hitted bone %s, bone armor [%.4f], hit AP [%.4f]", __FUNCTION__, Name(), hit_power,
+    //    smart_cast<IKinematics*>(smart_cast<CActor*>(m_pCurrentInventory->GetOwner())->Visual())->LL_BoneName_dbg(pHDS->boneID), ba, pHDS->ap);
 
-        Msg("%s %s vest armor is not pierced, result hit power [%.4f]", __FUNCTION__, Name(), hit_power);
+    if (hit_type == ALife::eHitTypeFireWound)
+    {
+        // броню не пробито, хіт тільки від умовного удару в броню
+        if (pHDS->ap < ba)
+        {
+            hit_power *= m_boneProtection->m_fHitFrac;
+            //Msg("%s %s armor is not pierced, result hit power [%.4f]", __FUNCTION__, Name(), hit_power);
+        }
     }
+    else
+        hit_power *= (1.0f - GetHitTypeProtection(hit_type));
+
+    Hit(pHDS);
 
     return hit_power;
 };
-
-bool CVest::IsBoneArmored(u16 bone) const { return !fis_zero(m_boneProtection->getBoneArmour(bone) && !fis_zero(m_fInstalledPlateCondition) && !fis_zero(GetCondition())); }
 
 const shared_str CVest::CurrProtectSect() const { return IsPlateInstalled() ? GetPlateName() : cNameSect(); }
 
@@ -237,40 +246,11 @@ float CVest::Weight() const
 void CVest::Hit(SHit* pHDS)
 {
     inherited::Hit(pHDS);
-    auto actor = smart_cast<CActor*>(H_Parent());
-    if (actor && actor->GetVest() == this && !actor->is_from_behind(pHDS->direction()))
-        HitItemsInVest(pHDS);
+
     if (IsPlateInstalled() && pHDS->type() != ALife::eHitTypeRadiation)
     {
         float hit_power = pHDS->damage();
         hit_power *= m_HitTypeK[pHDS->hit_type];
         m_fInstalledPlateCondition -= hit_power;
     }
-}
-
-void CVest::HitItemsInVest(SHit* pHDS)
-{
-    TIItemContainer vest = m_pCurrentInventory->m_vest;
-    if (vest.empty())
-        return;
-
-    switch (pHDS->type())
-    {
-    case ALife::eHitTypeFireWound:
-    case ALife::eHitTypeWound:
-    case ALife::eHitTypeWound_2: {
-        u32 random_item = ::Random.randI(0, vest.size());
-        auto item = vest[random_item];
-        if (item)
-            item->Hit(pHDS);
-    }
-    break;
-    default: {
-        pHDS->power *= (1.0f - GetHitTypeProtection(pHDS->type()));
-        for (const auto& item : vest)
-            item->Hit(pHDS);
-    }
-    break;
-    }
-    Msg("~ %s", __FUNCTION__);
 }

@@ -10,8 +10,6 @@ public:
     virtual ~CWarbelt();
 
     virtual void Load(LPCSTR section);
-    virtual void Hit(SHit* pHDS);
-    void HitItemsInWarbelt(SHit* pHDS);
 
 protected:
     u32 m_iBeltWidth{};

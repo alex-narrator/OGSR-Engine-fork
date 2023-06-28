@@ -223,9 +223,7 @@ void CInventoryContainer::HitItemsInBackPack(SHit* pHDS)
     break;
     default: {
         for (const auto& item : ruck)
-        {
             item->Hit(pHDS);
-        }
     }
     break;
     }
@@ -254,9 +252,7 @@ void CInventoryContainer::HitItemsInContainer(SHit* pHDS)
         {
             item = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
             if (item)
-            {
                 item->Hit(pHDS);
-            }
         }
     }
     break;
@@ -338,3 +334,19 @@ bool CInventoryContainer::CanTakeItem(CInventoryItem* inventory_item) const
         res = res && (std::find(m_allowed_classes.begin(), m_allowed_classes.end(), pSettings->r_string(inventory_item->object().cNameSect(), "class")) != m_allowed_classes.end());
     return res;
 }
+
+float CInventoryContainer::HitThruArmour(SHit* pHDS)
+{
+    float hit_power = pHDS->damage();
+    auto actor = smart_cast<CActor*>(H_Parent());
+
+    if (!actor || !actor->IsHitToBackPack(pHDS))
+        return hit_power;
+
+    auto hit_type = pHDS->type();
+    hit_power *= (1.0f - GetHitTypeProtection(hit_type));
+
+    Hit(pHDS);
+
+    return hit_power;
+};

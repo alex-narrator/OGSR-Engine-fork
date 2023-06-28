@@ -484,7 +484,6 @@ void CActor::Hit(SHit* pHDS)
     {
         HDS.power *= (1.f - GetArtefactsProtection(pHDS->hit_type));
         inherited::Hit(&HDS);
-        HitToEquipment(&HDS);
     }
 }
 
@@ -631,11 +630,6 @@ void CActor::Die(CObject* who)
     m_HeavyBreathSnd.stop();
     m_BloodSnd.stop();
     m_HitSnd.stop();
-
-    RemoveEffector(this, effGroggy);
-    RemoveEffector(this, eCEItemUse);
-    RemoveEffector(this, eCEBoostEffect);
-    RemoveEffector(this, eCEUIWindowEffect);
 
     start_tutorial("game_over");
     xr_delete(m_sndShockEffector);
@@ -1715,13 +1709,9 @@ bool CActor::IsHitToBackPack(SHit* pHDS) const
     bool calculate_direction{true};
     // якщо хіт вогнепальний або поріз то має значення кістка попадання
     if (pHDS->type() == ALife::eHitTypeFireWound || pHDS->type() == ALife::eHitTypeWound || pHDS->type() == ALife::eHitTypeWound_2)
-    {
         calculate_direction = (pHDS->bone() == m_spine || pHDS->bone() == m_spine1 || pHDS->bone() == m_spine2);
-    }
     if (calculate_direction && is_from_behind(pHDS->direction()))
-    {
         return true;
-    }
     return false;
 }
 
@@ -1731,45 +1721,28 @@ bool CActor::IsHitToHead(SHit* pHDS) const
     return is_bone_head(*pK, pHDS->bone());
 }
 
-bool CActor::IsHitToVest(SHit* pHDS) const
+void CActor::HitItemsInRuck(SHit* pHDS)
 {
+    TIItemContainer ruck = inventory().m_ruck;
+    if (ruck.empty())
+        return;
+
     switch (pHDS->type())
     {
     case ALife::eHitTypeFireWound:
     case ALife::eHitTypeWound:
     case ALife::eHitTypeWound_2: {
-        // вважаємо що зношувати бронік треба тільки тоді як хіт потрапляє у броню
-        return GetVest() && GetVest()->IsBoneArmored(pHDS->bone());
+        u32 random_item = ::Random.randI(0, ruck.size());
+        auto item = ruck[random_item];
+        if (item)
+            item->Hit(pHDS);
     }
     break;
-    default: return true;
+    default: {
+        for (const auto& item : ruck)
+            item->Hit(pHDS);
     }
-}
-
-bool CActor::IsHitToWarbelt(SHit* pHDS) const
-{ 
-    auto pK = smart_cast<IKinematics*>(Visual()); 
-    return GetWarbelt() && pHDS->bone() == pK->LL_BoneID("bip01_pelvis");
-}
-
-void CActor::HitToEquipment(SHit* pHDS)
-{ 
-    if (!smart_cast<CCustomZone*>(pHDS->who))
-        return;
-    for (const auto& slot : inventory().m_slots)
-    {
-        auto item = slot.m_pIItem;
-        if (!item)
-            continue;
-        if (item == GetOutfit() || 
-            item == GetWarbelt() || 
-            item == GetBackpack() || 
-            item == GetHelmet() || 
-            item == GetGasMask() || 
-            item == GetVest() || 
-            item == inventory().ItemFromSlot(BOLT_SLOT))
-            continue;
-        item->Hit(pHDS);
+    break;
     }
 }
 

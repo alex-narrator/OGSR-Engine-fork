@@ -17,7 +17,6 @@ constexpr auto eStartEffectorID = 50;
 #define effBigMonsterHit (eStartEffectorID + 9)
 
 #define effNightvisionScope (eStartEffectorID + 10)
-#define effGroggy (eStartEffectorID + 11)
 
 constexpr auto effPoltergeistTeleDetectStartEffect = 2048;
 // warning: ~50 constants after effPoltergeistTeleDetectStartEffect are reserved for poltergeists
@@ -37,6 +36,3 @@ constexpr auto effPoltergeistTeleDetectStartEffect = 2048;
 #define eCEDOF ((ECamEffectorType)(cefNext + 16))
 #define eCEWeaponAction ((ECamEffectorType)(cefNext + 17))
 #define eCEActorMoving ((ECamEffectorType)(cefNext + 18))
-#define eCEItemUse ((ECamEffectorType)(cefNext + 19))
-#define eCEBoostEffect ((ECamEffectorType)(cefNext + 20))
-#define eCEUIWindowEffect ((ECamEffectorType)(cefNext + 21))

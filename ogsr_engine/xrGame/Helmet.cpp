@@ -26,17 +26,29 @@ void CHelmet::Load(LPCSTR section)
 float CHelmet::HitThruArmour(SHit* pHDS)
 {
     float hit_power = pHDS->power;
-    float BoneArmour = m_boneProtection->getBoneArmour(pHDS->boneID) * !fis_zero(GetCondition());
+    auto actor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner());
+    if (!actor || !actor->IsHitToHead(pHDS))
+        return hit_power;
 
-    Msg("%s %s take hit power [%.4f], hitted bone %s, bone armor [%.4f], hit AP [%.4f]", __FUNCTION__, Name(), hit_power,
-        smart_cast<IKinematics*>(smart_cast<CActor*>(m_pCurrentInventory->GetOwner())->Visual())->LL_BoneName_dbg(pHDS->boneID), BoneArmour, pHDS->ap);
+    auto hit_type = pHDS->type();
+    float ba = m_boneProtection->getBoneArmour(pHDS->bone()) * !fis_zero(GetCondition());
 
-    if (pHDS->ap < BoneArmour)
-    { // шолом не пробито, хіт тільки від умовного удару в броню
-        hit_power *= m_boneProtection->m_fHitFrac;
+    //Msg("%s %s take hit power [%.4f], hitted bone %s, bone armor [%.4f], hit AP [%.4f]", __FUNCTION__, Name(), hit_power,
+    //    smart_cast<IKinematics*>(smart_cast<CActor*>(m_pCurrentInventory->GetOwner())->Visual())->LL_BoneName_dbg(pHDS->boneID), ba, pHDS->ap);
 
-        Msg("%s %s helmet is not pierced, result hit power [%.4f]", __FUNCTION__, Name(), hit_power);
+    if (hit_type == ALife::eHitTypeFireWound)
+    {
+        // броню не пробито, хіт тільки від умовного удару в броню
+        if (pHDS->ap < ba)
+        {
+            hit_power *= m_boneProtection->m_fHitFrac;
+            //Msg("%s %s armor is not pierced, result hit power [%.4f]", __FUNCTION__, Name(), hit_power);
+        }
     }
+    else
+        hit_power *= (1.0f - GetHitTypeProtection(hit_type));
+
+    Hit(pHDS);
 
     return hit_power;
 };

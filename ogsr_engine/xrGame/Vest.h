@@ -21,15 +21,12 @@ public:
     virtual u32 Cost() const;
     virtual float Weight() const;
     virtual void Hit(SHit* pHDS);
-    void HitItemsInVest(SHit* pHDS);
 
     u32 GetVestWidth() const { return m_iVestWidth; }
     u32 GetVestHeight() const { return m_iVestHeight; }
 
     virtual float GetHitTypeProtection(int) const override;
     float HitThruArmour(SHit* pHDS);
-
-    bool IsBoneArmored(u16 bone) const;
 
     virtual float GetArmorByBone(int);
     virtual float GetArmorHitFraction();

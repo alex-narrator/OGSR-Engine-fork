@@ -152,8 +152,6 @@ public:
     virtual float GetCarryWeight() const;
     virtual float MaxCarryWeight() const;
 
-   	virtual void TryGroggyEffect(SHit* pHDS){};
-
     virtual CCustomOutfit* GetOutfit() const { return nullptr; };
     virtual CInventoryContainer* GetBackpack() const { return nullptr; };
     virtual CHelmet* GetHelmet() const { return nullptr; };
@@ -161,10 +159,7 @@ public:
     virtual CWarbelt* GetWarbelt() const { return nullptr; };
     virtual CGasMask* GetGasMask() const { return nullptr; };
 
-    virtual bool IsHitToBackPack(SHit* pHDS) const { return false; };
-    virtual bool IsHitToHead(SHit* pHDS) const { return false; };
-    virtual bool IsHitToVest(SHit* pHDS) const { return false; };
-    virtual bool IsHitToWarbelt(SHit* pHDS) const { return false; };
+    virtual void HitItemsInRuck(SHit* pHDS){};
 
     //////////////////////////////////////////////////////////////////////////
     //игровые характеристики персонажа
