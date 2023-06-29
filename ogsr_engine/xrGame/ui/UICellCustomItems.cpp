@@ -11,10 +11,6 @@
 #include "Actor.h"
 #include "Inventory.h"
 #include "UIInventoryWnd.h"
-#include "UICarBodyWnd.h"
-#include "UITradeWnd.h"
-#include "UITalkWnd.h"
-#include "UIGameSP.h"
 #include "UICursor.h"
 #include "UIXmlInit.h"
 #include "string_table.h"
@@ -94,20 +90,9 @@ void CUIInventoryCellItem::OnFocusReceive()
 {
     m_selected = true;
 
-    if (auto InvWnd = smart_cast<CUIInventoryWnd*>(this->OwnerList()->GetTop()))
-    {
-        InvWnd->HideSlotsHighlight();
-        InvWnd->ShowSlotsHighlight(object());
-    }
-
-    if (auto InvWnd = smart_cast<CUIInventoryWnd*>(this->OwnerList()->GetTop()))
-        InvWnd->InitFloatingDescription(this);
-    if (auto CarbodyWnd = smart_cast<CUICarBodyWnd*>(this->OwnerList()->GetTop()))
-        CarbodyWnd->InitFloatingDescription(this);
-    if (auto TradeWnd = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame())->TalkMenu->GetTradeWnd())
-        TradeWnd->InitFloatingDescription(this);
-
     inherited::OnFocusReceive();
+
+    GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_FOCUS_RECEIVED, nullptr);
 
     if (object()->object().m_spawned)
     {
@@ -120,14 +105,9 @@ void CUIInventoryCellItem::OnFocusLost()
 {
     m_selected = false;
 
-    if (auto InvWnd = smart_cast<CUIInventoryWnd*>(this->OwnerList()->GetTop()))
-    {
-        auto CellPos = this->m_pParentList->m_container->PickCell(GetUICursor()->GetCursorPosition());
-        if (!this->m_pParentList->m_container->ValidCell(CellPos) || this->m_pParentList->m_container->GetCellAt(CellPos).Empty())
-            InvWnd->HideSlotsHighlight();
-    }
-
     inherited::OnFocusLost();
+
+    GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_FOCUS_LOST, nullptr);
 
     if (object()->object().m_spawned)
     {
@@ -190,6 +170,14 @@ CUIDragItem* CUIInventoryCellItem::CreateDragItem()
 void CUIInventoryCellItem::Update()
 {
     inherited::Update();
+    if (CursorOverWindow())
+    {
+        Frect clientArea;
+        m_pParentList->GetClientArea(clientArea);
+        Fvector2 cp = GetUICursor()->GetCursorPosition();
+        if (clientArea.in(cp))
+            GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_FOCUSED_UPDATE, nullptr);
+    }
     if (Core.Features.test(xrCore::Feature::show_inv_item_condition))
         UpdateConditionProgressBar();
 

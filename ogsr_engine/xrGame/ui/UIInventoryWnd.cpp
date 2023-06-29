@@ -114,109 +114,109 @@ void CUIInventoryWnd::Init()
     UIBagWnd.AttachChild(m_pUIBagList);
     m_pUIBagList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_bag", 0, m_pUIBagList);
-    BindDragDropListEnents(m_pUIBagList);
+    BindDragDropListEvents(m_pUIBagList);
 
     m_pUIBeltList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIBeltList);
     m_pUIBeltList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_belt", 0, m_pUIBeltList);
-    BindDragDropListEnents(m_pUIBeltList);
+    BindDragDropListEvents(m_pUIBeltList);
 
     m_pUIVestList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIVestList);
     m_pUIVestList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_vest", 0, m_pUIVestList);
-    BindDragDropListEnents(m_pUIVestList);
+    BindDragDropListEvents(m_pUIVestList);
 
     m_pUIOutfitList = xr_new<CUIOutfitDragDropList>();
     AttachChild(m_pUIOutfitList);
     m_pUIOutfitList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_outfit", 0, m_pUIOutfitList);
-    BindDragDropListEnents(m_pUIOutfitList);
+    BindDragDropListEvents(m_pUIOutfitList);
 
     m_pUIHelmetList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIHelmetList);
     m_pUIHelmetList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_helmet", 0, m_pUIHelmetList);
-    BindDragDropListEnents(m_pUIHelmetList);
+    BindDragDropListEvents(m_pUIHelmetList);
 
     m_pUIGasMaskList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIGasMaskList);
     m_pUIGasMaskList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_gasmask", 0, m_pUIGasMaskList);
-    BindDragDropListEnents(m_pUIGasMaskList);
+    BindDragDropListEvents(m_pUIGasMaskList);
 
     m_pUIWarBeltList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIWarBeltList);
     m_pUIWarBeltList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_warbelt", 0, m_pUIWarBeltList);
-    BindDragDropListEnents(m_pUIWarBeltList);
+    BindDragDropListEvents(m_pUIWarBeltList);
 
     m_pUIBackPackList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIBackPackList);
     m_pUIBackPackList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_backpack", 0, m_pUIBackPackList);
-    BindDragDropListEnents(m_pUIBackPackList);
+    BindDragDropListEvents(m_pUIBackPackList);
 
     m_pUITacticalVestList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUITacticalVestList);
     m_pUITacticalVestList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_tactical_vest", 0, m_pUITacticalVestList);
-    BindDragDropListEnents(m_pUITacticalVestList);
+    BindDragDropListEvents(m_pUITacticalVestList);
 
     m_pUIKnifeList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIKnifeList);
     m_pUIKnifeList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_knife", 0, m_pUIKnifeList);
-    BindDragDropListEnents(m_pUIKnifeList);
+    BindDragDropListEvents(m_pUIKnifeList);
 
     m_pUIFirstWeaponList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIFirstWeaponList);
     m_pUIFirstWeaponList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_first_weapon", 0, m_pUIFirstWeaponList);
-    BindDragDropListEnents(m_pUIFirstWeaponList);
+    BindDragDropListEvents(m_pUIFirstWeaponList);
 
     m_pUISecondWeaponList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUISecondWeaponList);
     m_pUISecondWeaponList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_second_weapon", 0, m_pUISecondWeaponList);
-    BindDragDropListEnents(m_pUISecondWeaponList);
+    BindDragDropListEvents(m_pUISecondWeaponList);
 
     m_pUIBinocularList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIBinocularList);
     m_pUIBinocularList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_binocular", 0, m_pUIBinocularList);
-    BindDragDropListEnents(m_pUIBinocularList);
+    BindDragDropListEvents(m_pUIBinocularList);
 
     m_pUIGrenadeList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIGrenadeList);
     m_pUIGrenadeList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_grenade", 0, m_pUIGrenadeList);
-    BindDragDropListEnents(m_pUIGrenadeList);
+    BindDragDropListEvents(m_pUIGrenadeList);
 
     m_pUIArtefactList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIArtefactList);
     m_pUIArtefactList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_artefact", 0, m_pUIArtefactList);
-    BindDragDropListEnents(m_pUIArtefactList);
+    BindDragDropListEvents(m_pUIArtefactList);
 
     m_pUIDetectorList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIDetectorList);
     m_pUIDetectorList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_detector", 0, m_pUIDetectorList);
-    BindDragDropListEnents(m_pUIDetectorList);
+    BindDragDropListEvents(m_pUIDetectorList);
 
     m_pUIOnHeadList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIOnHeadList);
     m_pUIOnHeadList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_torch", 0, m_pUIOnHeadList);
-    BindDragDropListEnents(m_pUIOnHeadList);
+    BindDragDropListEvents(m_pUIOnHeadList);
 
     m_pUIPdaList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIPdaList);
     m_pUIPdaList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_pda", 0, m_pUIPdaList);
-    BindDragDropListEnents(m_pUIPdaList);
+    BindDragDropListEvents(m_pUIPdaList);
 
     for (u8 i = 0; i < SLOTS_TOTAL; i++)
         m_slots_array[i] = NULL;
@@ -421,7 +421,6 @@ void CUIInventoryWnd::Update()
 
     UIStaticTimeString.SetText(InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
     UIStaticTime.Show(pda && pda->IsPowerOn());
-    UpdateFloatingItemDescription();
 
     CUIWindow::Update();
 }
@@ -529,13 +528,17 @@ void CUIInventoryWnd::DetachAddon(const char* addon_name, bool for_all)
     }
 }
 
-void CUIInventoryWnd::BindDragDropListEnents(CUIDragDropListEx* lst)
+void CUIInventoryWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
 {
     lst->m_f_item_drop = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemDrop);
     lst->m_f_item_start_drag = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemStartDrag);
     lst->m_f_item_db_click = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemDbClick);
     lst->m_f_item_selected = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemSelected);
     lst->m_f_item_rbutton_click = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemRButtonClick);
+    //
+    lst->m_f_item_focus_received = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemFocusReceived);
+    lst->m_f_item_focus_lost = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemFocusLost);
+    lst->m_f_item_focused_update = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemFocusedUpdate);
 }
 
 #include "../xr_level_controller.h"
@@ -667,31 +670,4 @@ void CUIInventoryWnd::CheckForcedWeightUpdate()
     }
     if (need_update)
         UpdateWeight();
-}
-
-void CUIInventoryWnd::InitFloatingDescription(CUICellItem* itm)
-{
-    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
-        return;
-    itm_to_descr = itm;
-    UIItemInfo.InitItem((PIItem)itm_to_descr->m_pData);
-    delay_time = Device.dwTimeGlobal + UIItemInfo.show_delay * 1000;
-    BringToTop(&UIItemInfo);
-}
-void CUIInventoryWnd::UpdateFloatingItemDescription()
-{
-    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
-        return;
-    auto cur_time = Device.dwTimeGlobal;
-    UIItemInfo.Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time && !UIPropertiesBox.IsShown());
-    Fvector2 v_res{1024.f, 768.f};
-    Fvector2 pos{GetUICursor()->GetCursorPosition()};
-    pos.add(UIItemInfo.info_offset);
-    Fvector2 wnd_size{UIItemInfo.GetWidth(), UIItemInfo.GetHeight()};
-    Fvector2 delta{pos.x + wnd_size.x - v_res.x, pos.y + wnd_size.y - v_res.y};
-    if (delta.x > 0.f)
-        pos.x -= delta.x;
-    if (delta.y > 0.f)
-        pos.y -= delta.y;
-    UIItemInfo.SetWndPos(pos);
 }

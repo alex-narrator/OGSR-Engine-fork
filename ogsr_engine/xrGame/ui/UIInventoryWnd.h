@@ -128,7 +128,7 @@ protected:
     CUIStatic* m_pDetectorKey;
 
     void ClearAllLists();
-    void BindDragDropListEnents(CUIDragDropListEx* lst);
+    void BindDragDropListEvents(CUIDragDropListEx* lst);
 
     EListType GetType(CUIDragDropListEx* l);
     CUIDragDropListEx* GetSlotList(u8 slot_idx);
@@ -138,6 +138,10 @@ protected:
     bool OnItemDbClick(CUICellItem* itm);
     bool OnItemSelected(CUICellItem* itm);
     bool OnItemRButtonClick(CUICellItem* itm);
+    //
+    bool OnItemFocusReceived(CUICellItem* itm);
+    bool OnItemFocusLost(CUICellItem* itm);
+    bool OnItemFocusedUpdate(CUICellItem* itm);
 
     //CUIStatic UIProgressBack;
     //CUIStatic UIProgressBack_rank;
@@ -185,7 +189,6 @@ protected:
     u32 m_iCurrentActiveSlot{NO_ACTIVE_SLOT};
     
     CUICellItem* itm_to_descr{};
-    u32 delay_time{};
 
 public:
     PIItem CurrentIItem();
@@ -195,6 +198,4 @@ public:
     void CheckForcedWeightUpdate();
     void ReinitVestList();
     void ReinitSlotList(u32);
-    void UpdateFloatingItemDescription();
-    void InitFloatingDescription(CUICellItem* itm);
 };

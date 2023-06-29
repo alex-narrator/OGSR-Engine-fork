@@ -158,6 +158,8 @@ public:
     IC bool GetCustomDraw() const { return m_bCustomDraw; }
     IC void SetCustomDraw(bool b) { m_bCustomDraw = b; }
 
+    u32 GetFocusReceiveTime() { return m_dwFocusReceiveTime; }
+
 protected:
     bool m_bCustomDraw{};
 

@@ -545,7 +545,6 @@ void CUITradeWnd::Update()
             m_uidata->UIDealMsg = NULL;
         }
     }
-    UpdateFloatingItemDescription();
 }
 
 #include "UIInventoryUtilities.h"
@@ -844,9 +843,6 @@ void CUITradeWnd::UpdatePrices()
     {
         m_uidata->UIOtherMoneyStatic.SetText("---");
     }
-
-    m_uidata->UIItemInfo.Show(false);
-    itm_to_descr = nullptr;
 }
 
 void CUITradeWnd::TransferItems(CUIDragDropListEx* pSellList, CUIDragDropListEx* pBuyList, CTrade* pTrade, bool bBuying)
@@ -960,10 +956,9 @@ bool CUITradeWnd::OnItemDrop(CUICellItem* itm)
 bool CUITradeWnd::OnItemDbClick(CUICellItem* itm)
 {
     SetCurrentItem(itm);
-
     bool b_all = Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION));
     MoveItems(itm, b_all);
-
+    m_uidata->UIItemInfo.InitItem(nullptr);
     return true;
 }
 
@@ -1009,8 +1004,6 @@ void CUITradeWnd::SetCurrentItem(CUICellItem* itm)
     if (m_pCurrentCellItem == itm)
         return;
     m_pCurrentCellItem = itm;
-    if (!m_pCurrentCellItem)
-        itm_to_descr = nullptr;
     
     //m_uidata->UIItemInfo.InitItem(CurrentIItem());
 
@@ -1019,16 +1012,16 @@ void CUITradeWnd::SetCurrentItem(CUICellItem* itm)
 
     m_pCurrentCellItem->m_select_armament = true;
 
-    CUIDragDropListEx* owner = itm->OwnerList();
-    bool bBuying = (owner == &m_uidata->UIOurBagList) || (owner == &m_uidata->UIOurTradeList);
+    //CUIDragDropListEx* owner = itm->OwnerList();
+    //bool bBuying = (owner == &m_uidata->UIOurBagList) || (owner == &m_uidata->UIOurTradeList);
 
-    if (m_uidata->UIItemInfo.UICost)
-    {
-        string256 str;
+    //if (m_uidata->UIItemInfo.UICost)
+    //{
+    //    string256 str;
 
-        sprintf_s(str, "%d %s", m_pOthersTrade->GetItemPrice(CurrentIItem(), bBuying), money_name);
-        m_uidata->UIItemInfo.UICost->SetText(str);
-    }
+    //    sprintf_s(str, "%d %s", m_pOthersTrade->GetItemPrice(CurrentIItem(), bBuying), money_name);
+    //    m_uidata->UIItemInfo.UICost->SetText(str);
+    //}
 
     auto script_obj = CurrentIItem()->object().lua_game_object();
     g_actor->callback(GameObject::eCellItemSelect)(script_obj);
@@ -1043,6 +1036,10 @@ void CUITradeWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
     lst->m_f_item_db_click = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemDbClick);
     lst->m_f_item_selected = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemSelected);
     lst->m_f_item_rbutton_click = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemRButtonClick);
+    //
+    lst->m_f_item_focus_received = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemFocusReceived);
+    lst->m_f_item_focus_lost = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemFocusLost);
+    lst->m_f_item_focused_update = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemFocusedUpdate);
 }
 
 void CUITradeWnd::ColorizeItem(CUICellItem* itm, bool canTrade, bool highlighted)
@@ -1156,21 +1153,40 @@ void CUITradeWnd::DetachAddon(const char* addon_name, bool for_all)
     }
 }
 
-void CUITradeWnd::InitFloatingDescription(CUICellItem* itm)
+bool CUITradeWnd::OnItemFocusReceived(CUICellItem* itm)
 {
-    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
-        return;
     itm_to_descr = itm;
     m_uidata->UIItemInfo.InitItem((PIItem)itm_to_descr->m_pData);
-    delay_time = Device.dwTimeGlobal + m_uidata->UIItemInfo.show_delay * 1000;
+    CUIDragDropListEx* owner = itm->OwnerList();
+    bool bBuying = (owner == &m_uidata->UIOurBagList) || (owner == &m_uidata->UIOurTradeList);
+    if (m_uidata->UIItemInfo.UICost)
+    {
+        string256 str;
+        sprintf_s(str, "%d %s", m_pOthersTrade->GetItemPrice((PIItem)itm_to_descr->m_pData, bBuying), money_name);
+        m_uidata->UIItemInfo.UICost->SetText(str);
+    }
     BringToTop(&m_uidata->UIItemInfo);
+    return false;
 }
-void CUITradeWnd::UpdateFloatingItemDescription()
+
+bool CUITradeWnd::OnItemFocusLost(CUICellItem* itm)
 {
-    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
-        return;
-    auto cur_time = Device.dwTimeGlobal;
-    m_uidata->UIItemInfo.Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time && !m_pUIPropertiesBox->IsShown());
+    itm_to_descr = nullptr;
+    m_uidata->UIItemInfo.InitItem(nullptr);
+    return false;
+}
+
+bool CUITradeWnd::OnItemFocusedUpdate(CUICellItem* itm)
+{
+    if (!itm_to_descr || m_pUIPropertiesBox->IsShown() || Device.dwTimeGlobal < (itm_to_descr->GetFocusReceiveTime() + m_uidata->UIItemInfo.show_delay * 1000))
+    {
+        if (m_uidata->UIItemInfo.IsShown())
+            m_uidata->UIItemInfo.Show(false);
+        return false;
+    }
+    if (!m_uidata->UIItemInfo.IsShown())
+        m_uidata->UIItemInfo.Show(true);
+
     Fvector2 v_res{1024.f, 768.f};
     Fvector2 pos{GetUICursor()->GetCursorPosition()};
     pos.add(m_uidata->UIItemInfo.info_offset);
@@ -1181,4 +1197,5 @@ void CUITradeWnd::UpdateFloatingItemDescription()
     if (delta.y > 0.f)
         pos.y -= delta.y;
     m_uidata->UIItemInfo.SetWndPos(pos);
+    return false;
 }

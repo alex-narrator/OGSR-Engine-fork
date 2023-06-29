@@ -161,8 +161,8 @@ void CUICarBodyWnd::Init()
     AttachChild(m_pUIShowAllInv);
     xml_init.InitCheck(uiXml, "show_all_inv", 0, m_pUIShowAllInv);
 
-    BindDragDropListEnents(m_pUIOurBagList);
-    BindDragDropListEnents(m_pUIOthersBagList);
+    BindDragDropListEvents(m_pUIOurBagList);
+    BindDragDropListEvents(m_pUIOthersBagList);
 
     // Load sounds
     if (uiXml.NavigateToNode("action_sounds", 0))
@@ -331,9 +331,6 @@ void CUICarBodyWnd::UpdateLists()
         CUICellItem* itm = create_cell_item(inv_item);
         m_pUIOthersBagList->SetItem(itm);
     }
-
-    m_pUIItemInfo->Show(false);
-    itm_to_descr = nullptr;
 
     UpdateWeight();
     m_b_need_update = false;
@@ -635,7 +632,6 @@ void CUICarBodyWnd::Update()
     }
     CheckForcedWeightUpdate();
     Actor()->UpdateCameraDirection(m_pOtherGO);
-    UpdateFloatingItemDescription();
     inherited::Update();
 }
 
@@ -680,8 +676,6 @@ void CUICarBodyWnd::SetCurrentItem(CUICellItem* itm)
     if (m_pCurrentCellItem == itm)
         return;
     m_pCurrentCellItem = itm;
-    if (!m_pCurrentCellItem)
-        itm_to_descr = nullptr;
     
     //m_pUIItemInfo->InitItem(CurrentIItem());
 
@@ -878,6 +872,7 @@ bool CUICarBodyWnd::OnItemDbClick(CUICellItem* itm)
 {
     bool b_all = Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION));
     MoveItems(itm, b_all);
+    m_pUIItemInfo->InitItem(nullptr);
     return true;
 }
 
@@ -904,13 +899,17 @@ bool CUICarBodyWnd::TransferItem(PIItem itm, CGameObject* owner_from, CGameObjec
     return true;
 }
 
-void CUICarBodyWnd::BindDragDropListEnents(CUIDragDropListEx* lst)
+void CUICarBodyWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
 {
     lst->m_f_item_drop = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemDrop);
     lst->m_f_item_start_drag = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemStartDrag);
     lst->m_f_item_db_click = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemDbClick);
     lst->m_f_item_selected = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemSelected);
     lst->m_f_item_rbutton_click = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemRButtonClick);
+    //
+    lst->m_f_item_focus_received = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemFocusReceived);
+    lst->m_f_item_focus_lost = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemFocusLost);
+    lst->m_f_item_focused_update = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemFocusedUpdate);
 }
 
 void CUICarBodyWnd::PlaySnd(eInventorySndAction a)
@@ -1044,21 +1043,32 @@ void CUICarBodyWnd::RepackAmmo()
         m_pOtherInventoryBox->RepackAmmo();
 }
 
-void CUICarBodyWnd::InitFloatingDescription(CUICellItem* itm)
+bool CUICarBodyWnd::OnItemFocusReceived(CUICellItem* itm)
 {
-    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
-        return;
     itm_to_descr = itm;
     m_pUIItemInfo->InitItem((PIItem)itm_to_descr->m_pData);
-    delay_time = Device.dwTimeGlobal + m_pUIItemInfo->show_delay * 1000;
     BringToTop(m_pUIItemInfo);
+    return false;
 }
-void CUICarBodyWnd::UpdateFloatingItemDescription()
+
+bool CUICarBodyWnd::OnItemFocusLost(CUICellItem* itm)
 {
-    if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
-        return;
-    auto cur_time = Device.dwTimeGlobal;
-    m_pUIItemInfo->Show(itm_to_descr && itm_to_descr->m_selected && cur_time > delay_time && !m_pUIPropertiesBox->IsShown());
+    itm_to_descr = nullptr;
+    m_pUIItemInfo->InitItem(nullptr);
+    return false;
+}
+
+bool CUICarBodyWnd::OnItemFocusedUpdate(CUICellItem* itm)
+{
+    if (!itm_to_descr || m_pUIPropertiesBox->IsShown() || Device.dwTimeGlobal < (itm_to_descr->GetFocusReceiveTime() + m_pUIItemInfo->show_delay * 1000))
+    {
+        if (m_pUIItemInfo->IsShown())
+            m_pUIItemInfo->Show(false);
+        return false;
+    }
+    if (!m_pUIItemInfo->IsShown())
+        m_pUIItemInfo->Show(true);
+
     Fvector2 v_res{1024.f, 768.f};
     Fvector2 pos{GetUICursor()->GetCursorPosition()};
     pos.add(m_pUIItemInfo->info_offset);
@@ -1069,4 +1079,5 @@ void CUICarBodyWnd::UpdateFloatingItemDescription()
     if (delta.y > 0.f)
         pos.y -= delta.y;
     m_pUIItemInfo->SetWndPos(pos);
+    return false;
 }

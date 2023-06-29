@@ -43,9 +43,6 @@ public:
     void StartTrade();
     void StopTrade();
 
-    void UpdateFloatingItemDescription();
-    void InitFloatingDescription(CUICellItem* itm);
-
 protected:
     CUITradeInternal* m_uidata;
 
@@ -112,6 +109,10 @@ protected:
     bool OnItemDbClick(CUICellItem* itm);
     bool OnItemSelected(CUICellItem* itm);
     bool OnItemRButtonClick(CUICellItem* itm);
+    //
+    bool OnItemFocusReceived(CUICellItem* itm);
+    bool OnItemFocusLost(CUICellItem* itm);
+    bool OnItemFocusedUpdate(CUICellItem* itm);
 
     void BindDragDropListEvents(CUIDragDropListEx* lst);
 
@@ -130,5 +131,4 @@ protected:
     bool m_bShowAllInv{};
 
     CUICellItem* itm_to_descr{};
-    u32 delay_time{};
 };

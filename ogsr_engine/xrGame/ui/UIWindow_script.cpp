@@ -213,6 +213,8 @@ void CUIWindow::script_register(lua_State* L)
                       // CUIdragDropItem
                       value("DRAG_DROP_ITEM_DRAG", int(DRAG_DROP_ITEM_DRAG)), value("DRAG_DROP_ITEM_DROP", int(DRAG_DROP_ITEM_DROP)),
                       value("DRAG_DROP_ITEM_DB_CLICK", int(DRAG_DROP_ITEM_DB_CLICK)), value("DRAG_DROP_ITEM_RBUTTON_CLICK", int(DRAG_DROP_ITEM_RBUTTON_CLICK)),
+                      value("DRAG_DROP_ITEM_FOCUS_RECEIVED", int(DRAG_DROP_ITEM_FOCUS_RECEIVED)), value("DRAG_DROP_ITEM_FOCUS_LOST", int(DRAG_DROP_ITEM_FOCUS_LOST)),
+                      value("DRAG_DROP_ITEM_FOCUSED_UPDATE", int(DRAG_DROP_ITEM_FOCUSED_UPDATE)),
 
                       // CUIScrollBox
                       value("SCROLLBOX_MOVE", int(SCROLLBOX_MOVE)),

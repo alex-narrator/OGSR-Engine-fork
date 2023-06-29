@@ -76,6 +76,10 @@ protected:
     void OnItemSelected(CUIWindow* w, void* pData);
     void OnItemRButtonClick(CUIWindow* w, void* pData);
     void OnItemDBClick(CUIWindow* w, void* pData);
+    //
+    virtual void OnItemFocusReceived(CUIWindow* w, void* pData);
+    virtual void OnItemFocusLost(CUIWindow* w, void* pData);
+    virtual void OnItemFocusedUpdate(CUIWindow* w, void* pData);
 
 public:
     static CUIDragItem* m_drag_item;
@@ -90,6 +94,10 @@ public:
     DRAG_DROP_EVENT m_f_item_db_click;
     DRAG_DROP_EVENT m_f_item_selected;
     DRAG_DROP_EVENT m_f_item_rbutton_click;
+    //
+    DRAG_DROP_EVENT m_f_item_focus_received;
+    DRAG_DROP_EVENT m_f_item_focus_lost;
+    DRAG_DROP_EVENT m_f_item_focused_update;
 
     u32 back_color;
 

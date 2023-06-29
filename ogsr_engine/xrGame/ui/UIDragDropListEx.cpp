@@ -43,6 +43,9 @@ CUIDragDropListEx::CUIDragDropListEx()
     AddCallback("cell_item", DRAG_DROP_ITEM_SELECTED, fastdelegate::MakeDelegate(this, &CUIDragDropListEx::OnItemSelected));
     AddCallback("cell_item", DRAG_DROP_ITEM_RBUTTON_CLICK, fastdelegate::MakeDelegate(this, &CUIDragDropListEx::OnItemRButtonClick));
     AddCallback("cell_item", DRAG_DROP_ITEM_DB_CLICK, fastdelegate::MakeDelegate(this, &CUIDragDropListEx::OnItemDBClick));
+    AddCallback("cell_item", DRAG_DROP_ITEM_FOCUS_RECEIVED, fastdelegate::MakeDelegate(this, &CUIDragDropListEx::OnItemFocusReceived));
+    AddCallback("cell_item", DRAG_DROP_ITEM_FOCUS_LOST, fastdelegate::MakeDelegate(this, &CUIDragDropListEx::OnItemFocusLost));
+    AddCallback("cell_item", DRAG_DROP_ITEM_FOCUSED_UPDATE, fastdelegate::MakeDelegate(this, &CUIDragDropListEx::OnItemFocusedUpdate));
 
     back_color = 0xFFFFFFFF;
 }
@@ -214,6 +217,35 @@ void CUIDragDropListEx::OnItemSelected(CUIWindow* w, void* pData)
     VERIFY(m_selected_item);
     if (m_f_item_selected)
         m_f_item_selected(m_selected_item);
+}
+
+void CUIDragDropListEx::OnItemFocusReceived(CUIWindow* w, void* pData)
+{
+    inherited::OnFocusReceive();
+    if (m_f_item_focus_received)
+    {
+        CUICellItem* itm = smart_cast<CUICellItem*>(w);
+        m_f_item_focus_received(itm);
+    }
+}
+
+void CUIDragDropListEx::OnItemFocusLost(CUIWindow* w, void* pData)
+{
+    inherited::OnFocusLost();
+    if (m_f_item_focus_lost)
+    {
+        CUICellItem* itm = smart_cast<CUICellItem*>(w);
+        m_f_item_focus_lost(itm);
+    }
+}
+
+void CUIDragDropListEx::OnItemFocusedUpdate(CUIWindow* w, void* pData)
+{
+    if (m_f_item_focused_update)
+    {
+        CUICellItem* itm = smart_cast<CUICellItem*>(w);
+        m_f_item_focused_update(itm);
+    }
 }
 
 void CUIDragDropListEx::OnItemRButtonClick(CUIWindow* w, void* pData)
