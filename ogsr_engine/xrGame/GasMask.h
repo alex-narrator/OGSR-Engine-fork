@@ -15,4 +15,6 @@ public:
     virtual void InitAddons();
     virtual bool IsPowerOn() const;
     virtual float GetHitTypeProtection(int) const;
+
+    float HitThruArmour(SHit* pHDS);
 };

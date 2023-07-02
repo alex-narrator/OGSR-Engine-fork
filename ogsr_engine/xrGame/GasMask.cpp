@@ -42,3 +42,17 @@ float CGasMask::GetHitTypeProtection(int hit_type) const
     }
     return inherited::GetHitTypeProtection(hit_type);
 }
+
+float CGasMask::HitThruArmour(SHit* pHDS)
+{
+    float hit_power = pHDS->power;
+    auto actor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner());
+    if (!actor || !actor->IsHitToHead(pHDS))
+        return hit_power;
+
+    hit_power *= (1.0f - GetHitTypeProtection(pHDS->type()));
+
+    Hit(pHDS);
+
+    return hit_power;
+};

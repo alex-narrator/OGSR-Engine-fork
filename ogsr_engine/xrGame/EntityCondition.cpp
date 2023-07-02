@@ -288,7 +288,7 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
         calc_hit.power = helmet->HitThruArmour(&calc_hit);
 
     if (auto gasmask = pInvOwner->GetGasMask())
-        calc_hit.power *= (1.0f - gasmask->GetHitTypeProtection(calc_hit.hit_type));
+        calc_hit.power = gasmask->HitThruArmour(&calc_hit);
 
     return calc_hit.power;
 }
