@@ -35,6 +35,8 @@ public:
 
     LPCSTR GetUseMenuTip() const { return m_sUseMenuTip; };
 
+    bool m_bCanBeEaten{true};
+
 protected:
     // количество порций еды,
     //-1 - предмет нескінченного використання

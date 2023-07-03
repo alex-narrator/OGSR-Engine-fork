@@ -870,13 +870,18 @@ bool CInventory::Eat(PIItem pIItem, CInventoryOwner* eater)
     CEntityAlive* entity_alive = smart_cast<CEntityAlive*>(eater);
     R_ASSERT(entity_alive);
 
+    auto lua_go = smart_cast<CGameObject*>(pIItem)->lua_game_object();
+
     if (Actor()->m_inventory == this)
-        Actor()->callback(GameObject::eOnBeforeUseItem)((smart_cast<CGameObject*>(pIItem))->lua_game_object());
+        Actor()->callback(GameObject::eOnBeforeUseItem)(lua_go);
+
+    if (!pItemToEat->m_bCanBeEaten)
+        return false;
 
     pItemToEat->UseBy(entity_alive);
 
     if (Actor()->m_inventory == this)
-        Actor()->callback(GameObject::eUseObject)((smart_cast<CGameObject*>(pIItem))->lua_game_object());
+        Actor()->callback(GameObject::eUseObject)(lua_go);
 
     if (pItemToEat->Empty() && entity_alive->Local())
     {
