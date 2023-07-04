@@ -118,15 +118,6 @@ protected:
     // alpet: для индексированного доступа
     CUIDragDropListEx* m_slots_array[SLOTS_TOTAL];
 
-    // slot key static
-    CUIStatic* m_pKnifeKey;
-    CUIStatic* m_pFirstWeaponKey;
-    CUIStatic* m_pSecondWeaponKey;
-    CUIStatic* m_pBinocularKey;
-    CUIStatic* m_pGrenadeKey;
-    CUIStatic* m_pArtefactKey;
-    CUIStatic* m_pDetectorKey;
-
     void ClearAllLists();
     void BindDragDropListEvents(CUIDragDropListEx* lst);
 

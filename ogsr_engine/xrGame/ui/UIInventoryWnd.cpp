@@ -238,36 +238,7 @@ void CUIInventoryWnd::Init()
     m_slots_array[DETECTOR_SLOT] = m_pUIDetectorList;
     m_slots_array[TORCH_SLOT] = m_pUIOnHeadList;
     m_slots_array[PDA_SLOT] = m_pUIPdaList;
-
-    // slot keys statisc
-    m_pKnifeKey = xr_new<CUIStatic>();
-    m_pUIKnifeList->AttachChild(m_pKnifeKey);
-    xml_init.InitStatic(uiXml, "knife_key_static", 0, m_pKnifeKey);
-
-    m_pFirstWeaponKey = xr_new<CUIStatic>();
-    m_pUIFirstWeaponList->AttachChild(m_pFirstWeaponKey);
-    xml_init.InitStatic(uiXml, "first_weapon_key_static", 0, m_pFirstWeaponKey);
-
-    m_pSecondWeaponKey = xr_new<CUIStatic>();
-    m_pUISecondWeaponList->AttachChild(m_pSecondWeaponKey);
-    xml_init.InitStatic(uiXml, "second_weapon_key_static", 0, m_pSecondWeaponKey);
-
-    m_pBinocularKey = xr_new<CUIStatic>();
-    m_pUIBinocularList->AttachChild(m_pBinocularKey);
-    xml_init.InitStatic(uiXml, "binocular_key_static", 0, m_pBinocularKey);
-
-    m_pGrenadeKey = xr_new<CUIStatic>();
-    m_pUIGrenadeList->AttachChild(m_pGrenadeKey);
-    xml_init.InitStatic(uiXml, "grenade_key_static", 0, m_pGrenadeKey);
-
-    m_pArtefactKey = xr_new<CUIStatic>();
-    m_pUIArtefactList->AttachChild(m_pArtefactKey);
-    xml_init.InitStatic(uiXml, "artefact_key_static", 0, m_pArtefactKey);
-
-    m_pDetectorKey = xr_new<CUIStatic>();
-    m_pUIDetectorList->AttachChild(m_pDetectorKey);
-    xml_init.InitStatic(uiXml, "detector_key_static", 0, m_pDetectorKey);
-
+    
     // pop-up menu
     AttachChild(&UIPropertiesBox);
     UIPropertiesBox.Init(0, 0, 300, 300);
