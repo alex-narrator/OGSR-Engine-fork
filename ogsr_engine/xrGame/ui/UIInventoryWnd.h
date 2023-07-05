@@ -187,6 +187,7 @@ public:
     // обновление отрисовки сетки пояса
     void UpdateCustomDraw(bool = true);
     void CheckForcedWeightUpdate();
+    void ReinitBeltList();
     void ReinitVestList();
     void ReinitSlotList(u32);
 };

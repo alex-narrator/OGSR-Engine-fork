@@ -30,10 +30,11 @@ namespace InventoryUtilities
 // для сортировки
 bool GreaterRoomInRuck(PIItem item1, PIItem item2);
 // для проверки свободного места
-bool FreeRoom_inBelt(TIItemContainer& item_list, PIItem item, int width, int height);
-// теж саме що й FreeRoom_inBelt тільки для предметів з іконками height > width
-bool FreeRoom_inVest(TIItemContainer& item_list, PIItem item, int width, int height);
-bool HasFreeSpace(TIItemContainer&, PIItem, int, int);
+bool FreeRoom(TIItemContainer& item_list, PIItem item, int width, int height, bool vertical);
+bool FreeRoom_byRows(TIItemContainer& item_list, PIItem item, int width, int height);
+// теж саме що й FreeRoom_byRows тільки для предметів з іконками height > width
+bool FreeRoom_byColumns(TIItemContainer& item_list, PIItem item, int width, int height);
+bool HasFreeSpace(TIItemContainer&, PIItem, int, int, bool);
 
 // получить shader на иконки инвенторя
 ui_shader& GetEquipmentIconsShader(size_t icon_group = 0);

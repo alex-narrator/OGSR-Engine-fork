@@ -83,9 +83,9 @@ void CUIDragDropListEx::SetHighlightAllCells(bool b) { m_flags.set(flHighlightAl
 
 bool CUIDragDropListEx::GetHighlightAllCells() { return !!m_flags.test(flHighlightAllCells); }
 
-void CUIDragDropListEx::SetLineUpInColumns(bool b) { m_flags.set(flLineUpInColumns, b); }
+void CUIDragDropListEx::SetVerticalOrder(bool b) { m_flags.set(flVerticalOrder, b); }
 
-bool CUIDragDropListEx::GetLineUpInColumns() { return !!m_flags.test(flLineUpInColumns); }
+bool CUIDragDropListEx::GetVerticalOrder() { return !!m_flags.test(flVerticalOrder); }
 
 void CUIDragDropListEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 
@@ -642,7 +642,7 @@ Ivector2 CUICellContainer::FindFreeCell(const Ivector2& _size)
     if (m_pParentDragDropList->GetVerticalPlacement())
         std::swap(size.x, size.y);
 
-	if (m_pParentDragDropList->GetLineUpInColumns())
+	if (m_pParentDragDropList->GetVerticalOrder())
     {
         for (tmp.x = 0; tmp.x <= m_cellsCapacity.x - size.x; ++tmp.x)
             for (tmp.y = 0; tmp.y <= m_cellsCapacity.y - size.y; ++tmp.y)

@@ -74,6 +74,11 @@ void CUIInventoryWnd::InitInventory()
 
     m_pInv = &pInvOwner->inventory();
 
+    //порядок вишиковування елементів драгдропу тепер встановлюємо тут
+    //незалежно від XML-конфігу
+    m_pUIBeltList->SetVerticalOrder(m_pInv->m_bBeltVertical);
+    m_pUIVestList->SetVerticalOrder(m_pInv->m_bVestVertical);
+
     int bag_scroll = m_pUIBagList->ScrollPos();
 
     UIPropertiesBox.Hide();
@@ -186,6 +191,7 @@ void CUIInventoryWnd::InitInventory()
     CUICellItem* outfit = (_outfit) ? create_cell_item(_outfit) : NULL;
     m_pUIOutfitList->SetItem(outfit);
 
+    std::sort(m_pInv->m_belt.begin(), m_pInv->m_belt.end(), InventoryUtilities::GreaterRoomInRuck);
     for (const auto& item : m_pInv->m_belt)
     {
         CUICellItem* itm = create_cell_item(item);
@@ -323,6 +329,14 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
         }
         break;
         }
+
+        if (old_owner == m_pUIBeltList || old_owner == m_pUIVestList)
+        {
+            if (iitem->IsModule() && !iitem->IsDropPouch())
+                UpdateCustomDraw();
+
+            old_owner == m_pUIBeltList ? ReinitBeltList() : ReinitVestList();
+        }
     }
 
     return result;
@@ -374,8 +388,13 @@ bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
         break;
         }
 
-        if ((old_owner == m_pUIBeltList || old_owner == m_pUIVestList) && iitem->IsModule() && !iitem->IsDropPouch())
-            UpdateCustomDraw();
+        if (old_owner == m_pUIBeltList || old_owner == m_pUIVestList)
+        {
+            if (iitem->IsModule() && !iitem->IsDropPouch())
+                UpdateCustomDraw();
+
+            old_owner == m_pUIBeltList ? ReinitBeltList() : ReinitVestList();
+        }
 
         return true;
     }
@@ -416,8 +435,11 @@ bool CUIInventoryWnd::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
         // обновляем статик веса в инвентаре
         UpdateWeight();
         /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
+        ReinitBeltList();
         if (iitem->IsModule() && !iitem->IsDropPouch() && old_owner != m_pUIVestList)
             ReinitSlotList(iitem->GetSlotEnabled());
+        else if (old_owner == m_pUIVestList)
+            ReinitVestList();
 
         return true;
     }
@@ -458,9 +480,11 @@ bool CUIInventoryWnd::ToVest(CUICellItem* itm, bool b_use_cursor_pos)
         // обновляем статик веса в инвентаре
         UpdateWeight();
         /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
-        // ReinitVestList();
+        ReinitVestList();
         if (iitem->IsModule() && !iitem->IsDropPouch() && old_owner != m_pUIBeltList)
             ReinitSlotList(iitem->GetSlotEnabled());
+        else if (old_owner == m_pUIBeltList)
+            ReinitBeltList();
 
         return true;
     }
@@ -720,6 +744,18 @@ void CUIInventoryWnd::ClearAllLists()
 }
 
 void CUIInventoryWnd::UpdateWeight() { InventoryUtilities::UpdateWeight(UIWeightWnd, true); }
+
+void CUIInventoryWnd::ReinitBeltList()
+{
+    m_pUIBeltList->ClearAll(true);
+    UpdateCustomDraw(false);
+    std::sort(m_pInv->m_belt.begin(), m_pInv->m_belt.end(), InventoryUtilities::GreaterRoomInRuck);
+    for (const auto& item : m_pInv->m_belt)
+    {
+        CUICellItem* itm = create_cell_item(item);
+        m_pUIBeltList->SetItem(itm);
+    }
+}
 
 void CUIInventoryWnd::ReinitVestList()
 {

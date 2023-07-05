@@ -148,6 +148,8 @@ public:
     // максимальный вес инвентаря
     float m_fMaxWeight;
 
+    bool m_bBeltVertical{}, m_bVestVertical{};
+
 protected:
     void UpdateDropTasks();
     void UpdateDropItem(PIItem pIItem);

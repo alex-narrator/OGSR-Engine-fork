@@ -96,11 +96,16 @@ bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
     return false;
 }
 
-bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _item, int width, int height)
+bool InventoryUtilities::FreeRoom(TIItemContainer& item_list, PIItem _item, int width, int height, bool vertical)
 {
-    if (!HasFreeSpace(item_list, _item, width, height))
+    if (!HasFreeSpace(item_list, _item, width, height, vertical))
         return false;
 
+    return vertical ? FreeRoom_byColumns(item_list, _item, width, height) : FreeRoom_byRows(item_list, _item, width, height);
+}
+
+bool InventoryUtilities::FreeRoom_byRows(TIItemContainer& item_list, PIItem _item, int width, int height)
+{
     bool* ruck_room = (bool*)_malloca(width * height);
 
     int i, j, k, m;
@@ -178,11 +183,8 @@ bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _ite
     return true;
 }
 
-bool InventoryUtilities::FreeRoom_inVest(TIItemContainer& item_list, PIItem _item, int width, int height)
+bool InventoryUtilities::FreeRoom_byColumns(TIItemContainer& item_list, PIItem _item, int width, int height)
 {
-    if (!HasFreeSpace(item_list, _item, width, height))
-        return false;
-
     bool* ruck_room = (bool*)_malloca(width * height);
 
     int i, j, k, m;
@@ -260,9 +262,18 @@ bool InventoryUtilities::FreeRoom_inVest(TIItemContainer& item_list, PIItem _ite
     return true;
 }
 
-bool InventoryUtilities::HasFreeSpace(TIItemContainer& item_list, PIItem _item, int width, int height)
+bool InventoryUtilities::HasFreeSpace(TIItemContainer& item_list, PIItem _item, int width, int height, bool vertical)
 {
-    if (_item->GetGridWidth() > width || _item->GetGridHeight() > height)
+    Ivector2 r{_item->GetGridWidth(), _item->GetGridHeight()};
+
+    //широкі предмети не можна класти у вертикально-впорядкований масив
+    if (vertical && r.x > r.y)
+        return false;
+    // високі предмети не можна класти у горизонтально-впорядкований масив
+    if (!vertical && r.y > r.x)
+        return false;
+
+    if (r.x > width || r.y > height)
         return false;
 
     int list_area = width * height;

@@ -517,9 +517,14 @@ bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, const char* path, int index
     tmp = xml_doc.ReadAttribInt(path, index, "highlight_all_cells", 0);
     pWnd->SetHighlightAllCells(tmp != 0);
 
+    // цей параметр будемо читати не з XML а з секції [inventory] 
+    // бо від порядку вишиковування драгдропу залежить також 
+    // алгоритм пошуку вільного місця у інвентарі - 
+    // див. InventoryUtilities::FreeRoom
+    //     
     // вишиковувати іконки у драгдроп лістах зверху вниз по колонкам
-    tmp = xml_doc.ReadAttribInt(path, index, "line_up_in_columns", 0);
-    pWnd->SetLineUpInColumns(tmp != 0);
+    //tmp = xml_doc.ReadAttribInt(path, index, "vertical_order", 0);
+    //pWnd->SetVerticalOrder(tmp != 0);
 
     pWnd->back_color = GetColor(xml_doc, path, index, 0xFFFFFFFF);
 

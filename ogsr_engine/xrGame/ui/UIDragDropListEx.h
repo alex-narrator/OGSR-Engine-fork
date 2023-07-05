@@ -54,7 +54,7 @@ private:
         flVerticalPlacement = (1 << 3),
         flAlwaysShowScroll = (1 << 4),
         flVirtualCells = (1 << 5),
-        flLineUpInColumns = (1 << 6),
+        flVerticalOrder = (1 << 6),
         flHighlightCellSp = (1 << 7),
         flHighlightAllCells = (1 << 8),
     };
@@ -145,8 +145,8 @@ public:
     bool GetHighlightAllCells();
     void SetHighlightAllCells(bool b);
 
-    bool GetLineUpInColumns();
-    void SetLineUpInColumns(bool b);
+    bool GetVerticalOrder();
+    void SetVerticalOrder(bool b);
 
     bool GetConditionProgBarVisibility() { return m_bConditionProgBarVisible; };
     void SetConditionProgBarVisibility(bool b) { m_bConditionProgBarVisible = b; };

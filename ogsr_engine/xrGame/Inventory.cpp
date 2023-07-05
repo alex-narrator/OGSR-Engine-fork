@@ -64,6 +64,9 @@ CInventory::CInventory()
         sprintf_s(temp, "slot_need_module_%d", i);
         m_slots[i].m_bNeedModule = READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false);
     }
+
+    m_bBeltVertical = READ_IF_EXISTS(pSettings, r_bool, "inventory", "belt_vertical", false);
+    m_bVestVertical = READ_IF_EXISTS(pSettings, r_bool, "inventory", "vest_vertical", false);
 }
 
 void CInventory::Clear()
@@ -974,7 +977,7 @@ bool CInventory::CanPutInBelt(PIItem pIItem) const
         return false;
     auto belt = static_cast<TIItemContainer>(m_belt);
 
-    return FreeRoom_inBelt(belt, pIItem, BeltWidth(), BeltHeight());
+    return FreeRoom(belt, pIItem, BeltWidth(), BeltHeight(), m_bBeltVertical);
 }
 
 bool CInventory::CanPutInVest(PIItem pIItem) const
@@ -994,7 +997,7 @@ bool CInventory::CanPutInVest(PIItem pIItem) const
         return false;
     auto vest = static_cast<TIItemContainer>(m_vest);
 
-    return FreeRoom_inVest(vest, pIItem, VestWidth(), VestHeight());
+    return FreeRoom(vest, pIItem, VestWidth(), VestHeight(), m_bVestVertical);
 }
 // проверяет можем ли поместить вещь в рюкзак,
 // при этом реально ничего не меняется
