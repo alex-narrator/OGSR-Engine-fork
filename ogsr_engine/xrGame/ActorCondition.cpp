@@ -363,7 +363,9 @@ void CActorCondition::UpdatePower()
 
 void CActorCondition::UpdatePsyHealth()
 {
-    if (!fis_zero(m_fPsyHealth))
+    if (fis_zero(m_fPsyHealth))
+        health() = -0.1f;
+    else
     {
         m_fDeltaPsyHealth += GetPsyHealthRestore() * m_fDeltaTime;
         CEffectorPP* ppe = object().Cameras().GetPPEffector((EEffectorPPType)effPsyHealth);
@@ -386,8 +388,6 @@ void CActorCondition::UpdatePsyHealth()
                 RemoveEffector(m_object, effPsyHealth);
         }
     }
-    else
-        health() = 0.0f;
 }
 
 void CActorCondition::UpdateAlcohol()
