@@ -139,23 +139,6 @@ float CInventoryContainer::GetItemEffect(int effect) const
     return res;
 }
 
-bool CInventoryContainer::NeedForcedDescriptionUpdate() const
-{
-    for (const auto& item_id : m_items)
-    {
-        auto item = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
-        if (item)
-        {
-            if (auto artefact = smart_cast<CArtefact*>(item))
-            {
-                if (artefact->GetCondition() && artefact->m_fDeteriorationTime)
-                    return true;
-            }
-        }
-    }
-    return inherited::NeedForcedDescriptionUpdate();
-}
-
 float CInventoryContainer::GetContainmentArtefactEffect(int effect) const
 {
     float res{};

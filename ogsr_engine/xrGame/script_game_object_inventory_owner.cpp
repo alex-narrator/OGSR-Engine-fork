@@ -34,7 +34,6 @@
 #include "AI/Monsters/BaseMonster/base_monster.h"
 #include "weaponmagazined.h"
 #include "ai/stalker/ai_stalker.h"
-#include "Torch.h"
 #include "CustomDetector.h"
 #include "customoutfit.h"
 #include "WeaponMagazinedWGrenade.h"
@@ -924,28 +923,6 @@ void CScriptGameObject::activate_slot(u8 slot_id)
         return;
     }
     inventory_owner->inventory().Activate(slot_id);
-}
-
-void CScriptGameObject::SwitchTorch(bool on)
-{
-    CTorch* torch = smart_cast<CTorch*>(&object());
-    if (!torch)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member switch_torch!");
-        return;
-    }
-    torch->SwitchTorch(on);
-}
-
-void CScriptGameObject::SwitchNightVision(bool on)
-{
-    CTorch* torch = smart_cast<CTorch*>(&object());
-    if (!torch)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member switch_night_vision!");
-        return;
-    }
-    torch->SwitchNightVision(on);
 }
 
 void CScriptGameObject::enable_movement(bool enable)

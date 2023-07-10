@@ -172,7 +172,11 @@ public:
 
     float GetCondition() const { return m_fCondition; }
     void ChangeCondition(float fDeltaCondition);
-    virtual void SetCondition(float fNewCondition){m_fCondition = fNewCondition;}
+    virtual void SetCondition(float fNewCondition)
+    {
+        m_fCondition = fNewCondition;
+        ChangeCondition(0.0f);
+    }
 
     u8 selected_slot;
     const xr_vector<u8>& GetSlots() { return m_slots; }
@@ -281,19 +285,10 @@ public:
     bool m_highlight_equipped{};
     bool m_always_ungroupable{};
 
-    virtual void TryBreakToPieces(bool);
+    virtual void TryBreakToPieces();
     bool b_brake_item{};
-    // проміжок часу до повного знищення
-    float m_fDeteriorationTime{};
-    virtual void UpdateConditionDecrease();
-    virtual void UpdatePowerConsumption();
-    virtual bool NeedForcedDescriptionUpdate() const;
-    void SetLastCondDecTime(u64);
-    //проміжок часу до повної розрядки
-    float m_fWorkTime{};
 
 protected:
-    ALife::_TIME_ID m_uLastConditionDecTimeCalled{};
     // партікли знищення
     shared_str m_sBreakParticles;
     // звук знищення
@@ -322,30 +317,6 @@ public:
     virtual float GetItemEffect(int) const;
     virtual float GetHitTypeProtection(int) const;
 
-    // статус джерела живлення
-    ALife::EPowerSourceStatus m_power_source_status{};
-    u8 m_cur_power_source{};
-    bool m_bIsPowerSourceAttached{true};
-
-    xr_vector<shared_str> m_power_sources{};
-
-    bool m_bRechargeable{};
-
-    const shared_str GetPowerSourceName() const { return m_power_sources[m_cur_power_source]; }
-
-    virtual bool IsPowerSourceAttached() const;
-    virtual bool IsPowerSourceAttachable() const;
-
-    virtual bool IsPowerConsumer() const;
-    void ChangePowerLevel(float);
-    void SetPowerLevel(float);
-    virtual float GetPowerLevel() const { return m_fPowerLevel; };
-    // витрата енергії у ігрових годинах
-    virtual float GetPowerConsumption() const { return (1.f / (GetWorkTime() * 3600.f)); };
-    virtual float GetWorkTime() const { return m_fWorkTime; };
-    virtual bool CanBeCharged() const;
-    //окремо для батарейок
-    virtual bool CanBeRecharged() const;
     virtual void InitAddons();
 
     virtual void Switch(bool);
@@ -368,16 +339,10 @@ public:
     shared_str m_upgrade_icon_sect{};
     Fvector2 m_upgrade_icon_offset{};
 
-    Fvector2 m_power_source_icon_offset{};
-    float m_power_source_icon_scale{};
-
 protected:
     HitImmunity::HitTypeSVec m_HitTypeProtection;
 
     svector<float, eEffectMax> m_ItemEffect;
-
-    float m_fPowerLevel{};
-    u64 m_uLastWorkUpdateTime;
 
     LPCSTR m_sAttachMenuTip{};
     LPCSTR m_sDetachMenuTip{};

@@ -115,8 +115,6 @@ void CTorch::Switch()
 }
 void CTorch::Switch(bool turn_on) 
 { 
-    if (turn_on && fis_zero(GetPowerLevel()))
-        return;
     SwitchTorch(turn_on); 
     SwitchNightVision(turn_on);
 }
@@ -127,8 +125,7 @@ void CTorch::SwitchTorch(bool turn_on)
 {
     if (!m_light_descr_sect)
         return;
-    if (turn_on && fis_zero(GetPowerLevel()))
-        return;
+
     inherited::Switch(turn_on);
 
     bool was_switched_on = m_switched_on;
@@ -184,8 +181,8 @@ void CTorch::UpdateSwitchTorch()
             smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones_Invalidate();
 #pragma todo("KRodin: переделать под новый рендер!")
             // light_render->set_actor_torch(true);
-            light_render->set_range(get_range_val());
-            calc_m_delta_h(get_range_val());
+            light_render->set_range(m_fRange);
+            calc_m_delta_h(m_fRange);
         }
 
         if (H_Parent()->XFORM().c.distance_to_sqr(Device.vCameraPosition) < _sqr(OPTIMIZATION_DISTANCE))
@@ -328,8 +325,6 @@ void CTorch::SwitchNightVision(bool turn_on)
     if (pActorTorch && pActorTorch != this)
         return;
 
-    if (turn_on && fis_zero(GetPowerLevel()))
-        return;
     inherited::Switch(turn_on);
 
     bool bPlaySoundFirstPerson = (pA == Level().CurrentViewEntity());
@@ -559,13 +554,6 @@ void CTorch::LoadLightDefinitions(shared_str light_sect)
     glow_render->set_radius(pUserData->r_float(light_sect, "glow_radius"));
 
     calc_m_delta_h(m_fRange);
-}
-
-float CTorch::get_range_val() const 
-{ 
-    float res = m_fRange * (GetPowerLevel());
-    clamp(res, m_fRange * m_fRangeMinK, m_fRange);
-    return res;
 }
 
 void CTorch::SwitchMode()

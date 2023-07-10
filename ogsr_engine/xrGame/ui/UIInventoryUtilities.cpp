@@ -652,32 +652,7 @@ void AttachUpgradeIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
     upgrade_icon->SetColor(color_rgba(255, 255, 255, 192));
     _main_icon->AttachChild(upgrade_icon);
 }
-void AttachPowerSourceIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
-{
-    if (!_item->m_power_source_icon_scale)
-        return;
 
-    CUIStatic* power_source_icon = xr_new<CUIStatic>();
-    power_source_icon->SetAutoDelete(true);
-
-    CIconParams params(_item->GetPowerSourceName());
-    Frect rect = params.original_rect();
-    params.set_shader(power_source_icon);
-
-    float k_x{UI()->get_current_kx()};
-
-    Fvector2 size{rect.width(), rect.height()};
-    size.mul(_scale * _item->m_power_source_icon_scale);
-    size.x *= k_x;
-
-    Fvector2 pos{_item->m_power_source_icon_offset};
-    pos.mul(_scale);
-    pos.x *= k_x;
-
-    power_source_icon->SetWndRect(pos.x, pos.y, size.x, size.y);
-    power_source_icon->SetColor(color_rgba(255, 255, 255, 192));
-    _main_icon->AttachChild(power_source_icon);
-}
 void AttachWpnAddonIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
 {
     auto wpn = smart_cast<CWeapon*>(_item);
@@ -710,6 +685,7 @@ void AttachWpnAddonIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
         }
     }
 }
+
 void AttachGrenadeIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
 {
     auto rpg = smart_cast<CWeaponRPG7*>(_item);
@@ -736,6 +712,7 @@ void AttachGrenadeIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
     grenade_icon->SetColor(color_rgba(255, 255, 255, 192));
     _main_icon->AttachChild(grenade_icon);
 }
+
 void AttachAmmoIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
 {
     auto ammo = smart_cast<CWeaponAmmo*>(_item);
@@ -767,8 +744,6 @@ void InventoryUtilities::TryAttachIcons(CUIStatic* _main_icon, PIItem _item, flo
 
     if (!!_item->m_upgrade_icon_sect)
         AttachUpgradeIcon(_main_icon, _item, _scale);
-    if (_item->IsPowerConsumer() && _item->IsPowerSourceAttachable() && _item->IsPowerSourceAttached())
-        AttachPowerSourceIcon(_main_icon, _item, _scale);
     if (smart_cast<CWeapon*>(_item))
     {
         AttachWpnAddonIcons(_main_icon, _item, _scale);

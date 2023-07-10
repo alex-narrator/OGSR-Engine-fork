@@ -357,8 +357,6 @@ void CCustomDetector::Switch(bool turn_on)
     if (!turn_on)
         DisableUIDetection();
 
-    if (turn_on && fis_zero(GetPowerLevel()))
-        return;
     inherited::Switch(turn_on);
 
     m_bWorking = turn_on;
@@ -465,11 +463,9 @@ void CCustomDetector::SwitchMode()
 void CCustomDetector::ShowCurrentModeMsg()
 {
     string1024 str;
-    float power = GetPowerLevel() * 100.f;
-    if (CanSwitchModes())
-        sprintf(str, "%s: %s [%.0f%s]", NameShort(), CStringTable().translate(m_bAfMode ? "st_af_mode" : "st_zone_mode").c_str(), power, "%");
-    else
-        sprintf(str, "%s: [%.0f%s]", NameShort(), power, "%");
+    if (!CanSwitchModes())
+        return;
+    sprintf(str, "%s: %s", NameShort(), CStringTable().translate(m_bAfMode ? "st_af_mode" : "st_zone_mode").c_str());
     HUD().GetUI()->AddInfoMessage("item_usage", str, false);
 }
 

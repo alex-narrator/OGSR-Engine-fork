@@ -368,15 +368,6 @@ void CUICarBodyWnd::ActivatePropertiesBox()
         b_show = true;
     }
 
-    if (CurrentIItem()->IsPowerSourceAttachable() && CurrentIItem()->IsPowerSourceAttached() && CurrentIItem()->CanDetach(CurrentIItem()->GetPowerSourceName().c_str()))
-    {
-        _addon_sect = CurrentIItem()->GetPowerSourceName().c_str();
-        _addon_name = pSettings->r_string(_addon_sect, "inv_name_short");
-        sprintf(temp, "%s%s %s", _many, CStringTable().translate(detach_tip).c_str(), CStringTable().translate(_addon_name).c_str());
-        m_pUIPropertiesBox->AddItem(temp, (void*)_addon_sect, INVENTORY_DETACH_ADDON);
-        b_show = true;
-    }
-
     if (pAmmo)
     {
         if (pAmmo->IsBoxReloadable())
@@ -957,7 +948,7 @@ void CUICarBodyWnd::CheckForcedWeightUpdate()
     for (const auto& item : place_to_search)
     {
         auto artefact = smart_cast<CArtefact*>(item);
-        if (artefact && !fis_zero(artefact->m_fDeteriorationTime) && !fis_zero(artefact->GetCondition()) && !fis_zero(artefact->GetItemEffect(CInventoryItem::eAdditionalWeight)))
+        if (artefact && !fis_zero(artefact->GetCondition()) && !fis_zero(artefact->GetItemEffect(CInventoryItem::eAdditionalWeight)))
         {
             need_update = true;
             break;

@@ -15,7 +15,6 @@
 #include "../PhysicsShellHolder.h"
 #include "UIWpnParams.h"
 #include "ui_af_params.h"
-#include "UIPowerParams.h"
 #include "UIEatableParams.h"
 #include "UIArmorParams.h"
 
@@ -27,7 +26,6 @@ CUIItemInfo::~CUIItemInfo()
 {
     xr_delete(UIWpnParams);
     xr_delete(UIArtefactParams);
-    xr_delete(UIPowerParams);
     xr_delete(UIEatableParams);
     xr_delete(UIArmorParams);
 }
@@ -115,9 +113,6 @@ void CUIItemInfo::Init(LPCSTR xml_name)
         UIArtefactParams = xr_new<CUIArtefactParams>();
         UIArtefactParams->Init();
 
-        UIPowerParams = xr_new<CUIPowerParams>();
-        UIPowerParams->Init();
-
         UIEatableParams = xr_new<CUIEatableParams>();
         UIEatableParams->Init();
 
@@ -194,7 +189,6 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
         VERIFY(0 == UIDesc->GetSize());
         TryAddWpnInfo(pInvItem);
         TryAddArtefactInfo(pInvItem);
-        TryAddPowerInfo(pInvItem);
         TryAddEatableInfo(pInvItem);
         TryAddArmorInfo(pInvItem);
         TryAddCustomInfo(pInvItem);
@@ -263,15 +257,6 @@ void CUIItemInfo::TryAddArtefactInfo(CInventoryItem* obj)
     }
 }
 
-void CUIItemInfo::TryAddPowerInfo(CInventoryItem* obj)
-{
-    if (UIPowerParams->Check(obj))
-    {
-        UIPowerParams->SetInfo(obj);
-        UIDesc->AddWindow(UIPowerParams, false);
-    }
-}
-
 void CUIItemInfo::TryAddEatableInfo(CInventoryItem* obj)
 {
     if (UIEatableParams->Check(obj))
@@ -308,37 +293,4 @@ void CUIItemInfo::Draw()
 {
     if (m_pInvItem || m_b_force_drawing)
         inherited::Draw();
-}
-
-void CUIItemInfo::Update()
-{
-    if (m_pInvItem && m_pInvItem->NeedForcedDescriptionUpdate() && !m_pInvItem->GetDropManual() && IsShown())
-    {
-        if (UICondProgresBar)
-        {
-            float cond = m_pInvItem->GetCondition();
-            if (!UICondProgresBar->IsShown())
-                UICondProgresBar->Show(true);
-            UICondProgresBar->SetProgressPos(cond * 100.0f + 1.0f - EPS);
-        }
-
-        if (UICondition)
-        {
-            string256 str;
-            sprintf_s(str, "%.0f%s", m_pInvItem->GetCondition() * 100.0f, "%");
-            UICondition->SetText(str);
-        }
-
-        if (UIArtefactParams)
-        {
-            UIArtefactParams->SetInfo(m_pInvItem);
-        }
-
-        if (UIPowerParams)
-        {
-            UIPowerParams->SetInfo(m_pInvItem);
-        }
-    }
-
-    inherited::Update();
 }

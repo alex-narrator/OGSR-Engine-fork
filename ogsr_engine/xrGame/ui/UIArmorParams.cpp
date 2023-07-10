@@ -84,9 +84,7 @@ void CUIArmorParams::Init() {
 	CUIXmlInit::InitStatic(uiXml, _buff, 0, armor_header);
 }
 
-bool CUIArmorParams::Check(CInventoryItem* obj) {
-	return obj->HasArmorToDisplay(_hit_fraction);
-}
+bool CUIArmorParams::Check(CInventoryItem* obj) { return obj->HasArmorToDisplay(_hit_fraction); }
 
 void CUIArmorParams::SetInfo(CInventoryItem* obj) {
 	string128					text_to_show{};

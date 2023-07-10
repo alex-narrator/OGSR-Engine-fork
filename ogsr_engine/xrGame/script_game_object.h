@@ -176,15 +176,6 @@ public:
     float GetCondition() const;
     void SetCondition(float val);
     void ChangeCondition(float val);
-    //
-    bool IsPowerConsumer() const;
-    bool IsPowerOn() const;
-    bool IsPowerSourceAttached() const;
-    bool CanBeCharged() const;
-    bool CanBeRecharged() const;
-    float GetPowerLevel() const;
-    void SetPowerLevel(float val);
-    void ChangePowerLevel(float val);
 
     // CEntity
     _DECLARE_FUNCTION10(DeathTime, u32);
@@ -611,6 +602,9 @@ public:
     void SwitchTorch(bool);
     void SwitchNightVision(bool);
 
+    void SwitchPower(bool);
+    bool IsPowerOn();
+
 #ifdef DEBUG
     void debug_planner(const script_planner* planner);
 #endif
@@ -794,7 +788,8 @@ public:
     void SetActorJumpSpeed(float _factor);
     float GetActorWalkAccel() const;
     void SetActorWalkAccel(float _factor);
-    float GetActorExoFactor() const; // влияет на бег в экзе
+    float GetActorExoFactor() const;
+    void SetActorExoFactor(float _factor); // влияет на бег в экзе
     // KD
 
     // Real Wolf 07.07.2014.

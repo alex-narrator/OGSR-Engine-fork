@@ -27,7 +27,6 @@ public:
     virtual void shedule_Update(u32 dt);
 
     virtual float GetItemEffect(int) const;
-    virtual bool NeedForcedDescriptionUpdate() const;
     // окремий підрахунок діючих параметрів від артефактів у контейнері
     virtual float GetContainmentArtefactEffect(int) const;
     virtual float GetContainmentArtefactProtection(int) const;

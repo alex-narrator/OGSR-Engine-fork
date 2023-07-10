@@ -499,40 +499,7 @@ void CArtefact::SwitchAfParticles(bool bOn)
 
 float CArtefact::GetHitTypeProtection(int hit_type) const { return inherited::GetHitTypeProtection(hit_type) * GetRandomKoef(); }
 
-float CArtefact::GetItemEffect(int effect) const { return m_ItemEffect[effect] * GetCondition() * GetRandomKoef(); }
-
-#include "InventoryContainer.h"
-void CArtefact::UpdateConditionDecrease()
-{
-    bool can_be_decreased{};
-    if (H_Parent())
-    {
-        bool from_all = Core.Features.test(xrCore::Feature::artefacts_from_all);
-        if (auto container = smart_cast<CInventoryContainer*>(H_Parent()))
-        {
-            if (container->H_Parent())
-            {
-                if (auto actor = smart_cast<CActor*>(container->H_Parent()))
-                {
-                    if (from_all || actor->inventory().InBelt(container))
-                    {
-                        can_be_decreased = true;
-                    }
-                }
-            }
-        }
-        else if (auto actor = smart_cast<CActor*>(H_Parent()))
-        {
-            if (from_all || actor->inventory().InBelt(this))
-                can_be_decreased = true;
-        }
-    }
-    if (can_be_decreased)
-        inherited::UpdateConditionDecrease();
-    else
-        SetLastCondDecTime(Level().GetGameTime());
-    return;
-}
+//float CArtefact::GetItemEffect(int effect) const { return m_ItemEffect[effect] * GetCondition() * GetRandomKoef(); }
 
 //---SArtefactActivation----
 SArtefactActivation::SArtefactActivation(CArtefact* af, u32 owner_id)

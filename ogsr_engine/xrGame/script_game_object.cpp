@@ -436,105 +436,49 @@ void CScriptGameObject::ChangeCondition(float val)
     inventory_item->ChangeCondition(val);
 }
 //
-bool CScriptGameObject::IsPowerConsumer() const
+ #include "Torch.h"
+void CScriptGameObject::SwitchTorch(bool on)
 {
-    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
-    if (!inventory_item)
+    CTorch* torch = smart_cast<CTorch*>(&object());
+    if (!torch)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member IsPowerConsumer!");
-        return (false);
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member switch_torch!");
+        return;
     }
-    return (inventory_item->IsPowerConsumer());
+    torch->SwitchTorch(on);
 }
-bool CScriptGameObject::IsPowerOn() const
+
+void CScriptGameObject::SwitchNightVision(bool on)
 {
-    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
-    if (!inventory_item)
+    CTorch* torch = smart_cast<CTorch*>(&object());
+    if (!torch)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member IsPowerOn!");
-        return (false);
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member switch_night_vision!");
+        return;
     }
-    return (inventory_item->IsPowerOn());
+    torch->SwitchNightVision(on);
 }
-bool CScriptGameObject::IsPowerSourceAttached() const
+
+void CScriptGameObject::SwitchPower(bool on)
 {
-    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
-    if (!inventory_item)
+    auto iitem = smart_cast<CInventoryItem*>(&object());
+    if (!iitem)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member IsPowerSourceAttached!");
-        return (false);
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject : cannot access class member SwitchPower!");
+        return;
     }
-    if (!inventory_item->IsPowerConsumer())
+    iitem->Switch(on);
+}
+
+bool CScriptGameObject::IsPowerOn()
+{
+    auto iitem = smart_cast<CInventoryItem*>(&object());
+    if (!iitem)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member IsPowerSourceAttached - item not a power consumer!");
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject : cannot access class member IsPowerOn!");
         return false;
     }
-    return (inventory_item->IsPowerSourceAttached());
-}
-bool CScriptGameObject::CanBeCharged() const
-{
-    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
-    if (!inventory_item)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member CanBeCharged!");
-        return (false);
-    }
-    return (inventory_item->CanBeCharged());
-}
-bool CScriptGameObject::CanBeRecharged() const
-{
-    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
-    if (!inventory_item)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member CanBeRecharged!");
-        return (false);
-    }
-    return (inventory_item->CanBeRecharged());
-}
-float CScriptGameObject::GetPowerLevel() const
-{
-    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
-    if (!inventory_item)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member GetPowerLevel!");
-        return 0.f;
-    }
-    if (!inventory_item->IsPowerConsumer())
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member GetPowerLevel - item not a power consumer!");
-        return 0.f;
-    }
-    return inventory_item->GetPowerLevel();
-}
-void CScriptGameObject::SetPowerLevel(float val)
-{
-    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
-    if (!inventory_item)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member SetPowerLevel!");
-        return;
-    }
-    if (!inventory_item->IsPowerConsumer())
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member SetPowerLevel - item not a power consumer!");
-        return;
-    }
-    inventory_item->SetPowerLevel(val);
-}
-void CScriptGameObject::ChangePowerLevel(float val)
-{
-    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
-    if (!inventory_item)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member ChangePowerLevel!");
-        return;
-    }
-    if (!inventory_item->IsPowerConsumer())
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member ChangePowerLevel - item not a power consumer!");
-        return;
-    }
-    inventory_item->ChangePowerLevel(val);
+    return iitem->IsPowerOn();
 }
 //
 void CScriptGameObject::eat(CScriptGameObject* item)
@@ -743,7 +687,7 @@ float CScriptGameObject::GetActorJumpSpeed() const
     const CActor* act = smart_cast<CActor*>(&object());
     if (!act)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot perform SlowDownActor!");
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot perform GetActorJumpSpeed!");
         return 0.f;
     }
     return act->GetJumpSpeed();
@@ -753,7 +697,7 @@ float CScriptGameObject::GetActorWalkAccel() const
     const CActor* act = smart_cast<CActor*>(&object());
     if (!act)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot perform SlowDownActor!");
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot perform GetActorWalkAccel!");
         return 0.f;
     }
     return act->GetWalkAccel();
@@ -763,7 +707,7 @@ float CScriptGameObject::GetActorExoFactor() const
     const CActor* act = smart_cast<CActor*>(&object());
     if (!act)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot perform SlowDownActor!");
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot perform GetActorExoFactor!");
         return 0.f;
     }
     return act->GetExoFactor();
@@ -773,7 +717,7 @@ void CScriptGameObject::SetActorWalkAccel(float _factor)
     CActor* act = smart_cast<CActor*>(&object());
     if (!act)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot perform SlowDownActor!");
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot perform SetActorWalkAccel!");
         return;
     }
     act->SetWalkAccel(_factor);
@@ -783,12 +727,21 @@ void CScriptGameObject::SetActorJumpSpeed(float _factor)
     CActor* act = smart_cast<CActor*>(&object());
     if (!act)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot perform SlowDownActor!");
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot perform SetActorJumpSpeed!");
         return;
     }
     act->SetJumpSpeed(_factor);
 }
-
+void CScriptGameObject::SetActorExoFactor(float _factor)
+{
+    CActor* act = smart_cast<CActor*>(&object());
+    if (!act)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot perform SetActorExoFactor!");
+        return;
+    }
+    act->SetExoFactor(_factor);
+}
 CUIStatic* CScriptGameObject::GetCellItem() const
 {
     if (auto obj = smart_cast<CInventoryItem*>(&object()))

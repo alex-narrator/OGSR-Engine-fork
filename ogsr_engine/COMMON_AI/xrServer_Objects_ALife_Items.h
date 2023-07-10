@@ -51,18 +51,6 @@ CSE_ALifeObject* m_self{};
 u32 m_last_update_time{};
 //
 float m_fRadiationRestoreSpeed{};
-// статус джерела живлення
-enum EPowerSourceStatus
-{
-    ePowerSourceDisabled = 0, // без джерела живлення
-    ePowerSourcePermanent = 1, // незнімне джерело
-    ePowerSourceAttachable = 2 // від'ємне джерело
-};
-EPowerSourceStatus m_power_source_status{};
-u8 m_cur_power_source{};
-u64 m_uLastConditionDecTimeCalled{};
-bool m_bIsPowerSourceAttached{true};
-float m_fPowerLevel{};
 
 CSE_ALifeInventoryItem(LPCSTR caSection);
 virtual ~CSE_ALifeInventoryItem();

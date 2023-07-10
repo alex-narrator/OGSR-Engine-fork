@@ -40,17 +40,6 @@ CSE_ALifeInventoryItem::CSE_ALifeInventoryItem(LPCSTR caSection)
     State.linear_vel.set(Fvector{});
 
     m_fRadiationRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, caSection, "radiation_restore_speed", 0.f);
-
-    m_power_source_status = (EPowerSourceStatus)READ_IF_EXISTS(pSettings, r_u8, caSection, "power_source_status", 0);
-    if (m_power_source_status == EPowerSourceStatus::ePowerSourceAttachable)
-    {
-        // preinstalled non-permanent power source
-        if(pSettings->line_exist(caSection, "power_source_installed"))
-            m_cur_power_source = pSettings->r_u8(caSection, "power_source_installed");
-    }
-    // батарейка
-    if (m_power_source_status != ALife::ePowerSourceDisabled || pSettings->line_exist(caSection, "work_time"))
-        m_fPowerLevel = READ_IF_EXISTS(pSettings, r_float, caSection, "power_level", 1.f);
 }
 
 CSE_Abstract* CSE_ALifeInventoryItem::init()
@@ -67,9 +56,6 @@ void CSE_ALifeInventoryItem::STATE_Write(NET_Packet& tNetPacket)
 {
     tNetPacket.w_float(m_fCondition);
     State.position = base()->o_Position;
-    //
-    tNetPacket.w_float(m_fPowerLevel);
-    tNetPacket.w(&m_uLastConditionDecTimeCalled, sizeof(m_uLastConditionDecTimeCalled));
 }
 
 void CSE_ALifeInventoryItem::STATE_Read(NET_Packet& tNetPacket, u16 size)
@@ -79,25 +65,12 @@ void CSE_ALifeInventoryItem::STATE_Read(NET_Packet& tNetPacket, u16 size)
         tNetPacket.r_float(m_fCondition);
 
     State.position = base()->o_Position;
-    //
-    if (m_wVersion > 118)
-    {
-        tNetPacket.r_float(m_fPowerLevel);
-        tNetPacket.r(&m_uLastConditionDecTimeCalled, sizeof(m_uLastConditionDecTimeCalled));
-    }
 }
 
 static inline bool check(const u8& mask, const u8& test) { return (!!(mask & test)); }
 
 void CSE_ALifeInventoryItem::UPDATE_Write(NET_Packet& tNetPacket)
 {
-    tNetPacket.w_float_q8(m_fCondition, 0.0f, 1.0f);
-    tNetPacket.w_float(m_fRadiationRestoreSpeed);
-    tNetPacket.w_float_q8(m_fPowerLevel, 0.0f, 1.0f);
-    tNetPacket.w_u8(m_cur_power_source);
-    tNetPacket.w_u8(m_bIsPowerSourceAttached ? 1 : 0);
-
-
     if (!m_u8NumItems)
     {
         tNetPacket.w_u8(0);
@@ -143,16 +116,6 @@ void CSE_ALifeInventoryItem::UPDATE_Write(NET_Packet& tNetPacket)
 
 void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
 {
-    u16 m_wVersion = base()->m_wVersion;
-    if (m_wVersion > 118)
-    {
-        tNetPacket.r_float_q8(m_fCondition, 0.0f, 1.0f);
-        tNetPacket.r_float(m_fRadiationRestoreSpeed);
-        tNetPacket.r_float_q8(m_fPowerLevel, 0.0f, 1.0f);
-        tNetPacket.r_u8(m_cur_power_source);
-        m_bIsPowerSourceAttached = !!(tNetPacket.r_u8() & 0x1);
-    }
-
     tNetPacket.r_u8(m_u8NumItems);
     if (!m_u8NumItems)
     {

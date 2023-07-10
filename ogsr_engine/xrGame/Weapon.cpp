@@ -827,7 +827,7 @@ void CWeapon::OnH_B_Independent(bool just_before_destroy)
     m_fZoomRotationFactor = 0.f;
     dof_reload_effect = 0.f;
     dof_zoom_effect = 0.f;
-    shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
+    //shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
     UpdateXForm();
 }
 
@@ -965,6 +965,13 @@ void CWeapon::UpdateDofAim()
         dof_params_zoom.y * dof_zoom_effect, 
         dof_params_zoom.z * dof_zoom_effect, 
         dof_params_zoom.w * dof_zoom_effect);
+}
+
+void CWeapon::OnMoveToRuck(EItemPlace prevPlace)
+{
+    inherited::OnMoveToRuck(prevPlace);
+    if (ParentIsActor() && prevPlace == eItemPlaceSlot)
+        shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
 }
 
 void CWeapon::renderable_Render()

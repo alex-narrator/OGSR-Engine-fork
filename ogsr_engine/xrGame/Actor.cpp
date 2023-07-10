@@ -102,7 +102,7 @@ Flags32 psActorFlags = {AF_3D_SCOPES | AF_KEYPRESS_ON_START | AF_CAM_COLLISION |
 
 static bool updated{};
 
-CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
+CActor::CActor() : CEntityAlive()
 {
     encyclopedia_registry = xr_new<CEncyclopediaRegistryWrapper>();
     game_news_registry = xr_new<CGameNewsRegistryWrapper>();
@@ -1817,8 +1817,6 @@ bool CActor::SaveGameAllowed()
 }
 
 bool CActor::InSafeHouse() { return HasInfo("safehouse"); }
-
-float CActor::GetExoFactor() const { return GetOutfit() ? GetOutfit()->GetExoFactor() : 1.f; }
 
 bool CActor::IsFreeHands() const
 {

@@ -70,8 +70,6 @@ public:
     void calc_m_delta_h(float);
     float get_range() const;
 
-    float get_range_val() const;
-
     void SwitchMode();
 
 protected:

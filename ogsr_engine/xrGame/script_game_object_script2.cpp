@@ -85,15 +85,6 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .def("set_condition", &CScriptGameObject::SetCondition)
         .def("change_condition", &CScriptGameObject::ChangeCondition)
         //
-        .def("is_power_consumer", &CScriptGameObject::IsPowerConsumer)
-        .def("is_power_on", &CScriptGameObject::IsPowerOn)
-        .def("is_power_source_attached", &CScriptGameObject::IsPowerSourceAttached)
-        .def("can_be_charged", &CScriptGameObject::CanBeCharged)
-        .def("can_be_recharged", &CScriptGameObject::CanBeRecharged)
-        .def("get_power_level", &CScriptGameObject::GetPowerLevel)
-        .def("set_power_level", &CScriptGameObject::SetPowerLevel)
-        .def("change_power_level", &CScriptGameObject::ChangePowerLevel)
-        //
         .def("death_time", &CScriptGameObject::DeathTime)
         //		.def("armor",						&CScriptGameObject::Armor)
         .def("max_health", &CScriptGameObject::MaxHealth)
@@ -286,6 +277,9 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
 
         .def("switch_torch", &CScriptGameObject::SwitchTorch)
         .def("switch_night_vision", &CScriptGameObject::SwitchNightVision)
+        
+        .def("switch_power", &CScriptGameObject::SwitchPower)
+        .def("is_power_on", &CScriptGameObject::IsPowerOn)
 
         .def("get_xform", &CScriptGameObject::GetXForm)
 

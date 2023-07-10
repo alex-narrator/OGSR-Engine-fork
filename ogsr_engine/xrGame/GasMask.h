@@ -11,10 +11,5 @@ public:
 
     virtual bool can_be_attached() const override;
 
-    // инициализация свойств присоединенных аддонов
-    virtual void InitAddons();
-    virtual bool IsPowerOn() const;
-    virtual float GetHitTypeProtection(int) const;
-
     float HitThruArmour(SHit* pHDS);
 };

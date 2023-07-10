@@ -7,7 +7,6 @@ class CUIScrollView;
 class CUIProgressBar;
 class CUIWpnParams;
 class CUIArtefactParams;
-class CUIPowerParams;
 class CUIEatableParams;
 class CUIArmorParams;
 class CUIFrameWindow;
@@ -35,13 +34,11 @@ public:
 
     void TryAddWpnInfo(CInventoryItem* obj);
     void TryAddArtefactInfo(CInventoryItem* obj);
-    void TryAddPowerInfo(CInventoryItem* obj);
     void TryAddEatableInfo(CInventoryItem* obj);
     void TryAddArmorInfo(CInventoryItem* obj);
     void TryAddCustomInfo(CInventoryItem* obj);
 
     virtual void Draw();
-    virtual void Update();
     bool m_b_force_drawing{};
     CUIFrameWindow* UIBackground{}; 
     CUIStatic* UIName{};
@@ -52,7 +49,6 @@ public:
     CUIProgressBar* UICondProgresBar{};
     CUIWpnParams* UIWpnParams{};
     CUIArtefactParams* UIArtefactParams{};
-    CUIPowerParams* UIPowerParams{};
     CUIEatableParams* UIEatableParams{};
     CUIArmorParams* UIArmorParams{};
 

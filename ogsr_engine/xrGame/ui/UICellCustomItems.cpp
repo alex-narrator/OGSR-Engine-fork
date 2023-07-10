@@ -74,7 +74,6 @@ bool CUIInventoryCellItem::EqualTo(CUICellItem* itm)
         return false;
 
     return (fsimilar(object()->GetCondition(), ci->object()->GetCondition(), 0.01f) && fsimilar(object()->Weight(), ci->object()->Weight(), 0.01f) &&
-            fsimilar(object()->GetPowerLevel(), ci->object()->GetPowerLevel(), 0.01f) &&
             fsimilar(object()->GetItemEffect(CInventoryItem::eRadiationRestoreSpeed), ci->object()->GetItemEffect(CInventoryItem::eRadiationRestoreSpeed), 0.01f) &&
             object()->object().cNameSect() == ci->object()->object().cNameSect() && object()->m_eItemPlace == ci->object()->m_eItemPlace &&
             object()->Cost() == ci->object()->Cost());
@@ -186,23 +185,6 @@ void CUIInventoryCellItem::Update()
         m_upgrade = CreateUpgradeIcon();
         AttachChild(m_upgrade);
     }
-
-    if (object()->IsPowerConsumer() && object()->IsPowerSourceAttachable())
-    {
-        if (object()->IsPowerSourceAttached() && object()->m_power_source_icon_scale)
-        {
-            if (!m_power_source)
-            {
-                m_power_source = CreatePowerSourceIcon();
-                AttachChild(m_power_source);
-            }
-        }
-        else if (m_power_source)
-        {
-            DetachChild(m_power_source);
-            m_power_source = nullptr;
-        }
-    }
 }
 
 CUIStatic* CUIInventoryCellItem::CreateUpgradeIcon()
@@ -226,30 +208,6 @@ CUIStatic* CUIInventoryCellItem::CreateUpgradeIcon()
     upgrade_icon->SetStretchTexture(true);
 
     return upgrade_icon;
-}
-
-CUIStatic* CUIInventoryCellItem::CreatePowerSourceIcon()
-{
-    auto power_source_icon = xr_new<CUIStatic>();
-    power_source_icon->SetAutoDelete(true);
-    CIconParams params(object()->GetPowerSourceName());
-    params.set_shader(power_source_icon);
-
-    Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
-    Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
-
-    Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
-    size.mul(base_scale);  
-    size.mul(object()->m_power_source_icon_scale);
-    power_source_icon->SetWndSize(size);
-
-    Fvector2 pos{object()->m_power_source_icon_offset};
-    pos.mul(base_scale);
-    power_source_icon->SetWndPos(pos);
-
-    power_source_icon->SetStretchTexture(true);
-
-    return power_source_icon;
 }
 
 CUIAmmoCellItem::CUIAmmoCellItem(CWeaponAmmo* itm) : inherited(itm)

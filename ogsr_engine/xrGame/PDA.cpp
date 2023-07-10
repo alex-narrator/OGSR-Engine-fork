@@ -530,8 +530,6 @@ CPda::~CPda()
 
 void CPda::Switch(bool turn_on)
 {
-    if (turn_on && fis_zero(GetPowerLevel()))
-        return;
     inherited::Switch(turn_on);
 
     m_bTurnedOn = turn_on;

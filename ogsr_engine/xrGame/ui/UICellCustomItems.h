@@ -19,9 +19,7 @@ protected:
     void init_add();
 
     CUIStatic* m_upgrade{};
-    CUIStatic* m_power_source{};
     CUIStatic* CreateUpgradeIcon();
-    CUIStatic* CreatePowerSourceIcon();
 
 public:
     CUIInventoryCellItem(CInventoryItem* itm);

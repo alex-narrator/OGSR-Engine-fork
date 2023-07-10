@@ -250,8 +250,6 @@ void CCustomDetectorSHOC::OnMoveToBelt(EItemPlace prevPlace)
 
 void CCustomDetectorSHOC::Switch(bool turn_on)
 {
-    if (turn_on && fis_zero(GetPowerLevel()))
-        return;
     inherited::Switch(turn_on);
 
     m_bWorking = turn_on;

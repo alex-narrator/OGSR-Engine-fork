@@ -15,34 +15,6 @@ bool CGasMask::can_be_attached() const
     return pA ? (pA->GetGasMask() == this) : true;
 }
 
-void CGasMask::InitAddons()
-{
-    inherited::InitAddons();
-    auto section = IsPowerSourceAttachable() && IsPowerSourceAttached() ? GetPowerSourceName() : cNameSect();
-    m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 0.f);
-}
-
-bool CGasMask::IsPowerOn() const
-{
-    auto pActor = smart_cast<const CActor*>(H_Parent());
-    if (pActor && pActor->GetGasMask() == this)
-        return GetPowerLevel();
-    return false;
-}
-
-float CGasMask::GetHitTypeProtection(int hit_type) const 
-{ 
-    switch (hit_type)
-    {
-    case ALife::eHitTypeRadiation:
-    case ALife::eHitTypeChemicalBurn:
-        if (!GetPowerLevel())
-            return 0.f;
-        break;
-    }
-    return inherited::GetHitTypeProtection(hit_type);
-}
-
 float CGasMask::HitThruArmour(SHit* pHDS)
 {
     float hit_power = pHDS->power;

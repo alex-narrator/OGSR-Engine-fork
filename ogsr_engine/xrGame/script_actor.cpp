@@ -69,6 +69,8 @@ void set_jump_speed(CActor* pActor, float speed)
     get_movement(pActor)->SetJumpUpVelocity(speed);
 }
 
+float get_exo_factor(CActor* pActor){}
+
 CHitImmunity* get_immunities(CActor* pActor) { return pActor->conditions().cast_hit_immunities(); }
 
 CEntity::SEntityState* get_actor_state(CActor* pActor)
@@ -148,6 +150,7 @@ void CScriptActor::script_register(lua_State* L)
                .def_readwrite("hit_slowmo", &CActor::hit_slowmo)
                .def_readwrite("hit_probability", &CActor::hit_probability)
                .def_readwrite("walk_accel", &CActor::m_fWalkAccel)
+               .def_readwrite("exo_factor", &CActor::m_fExoFactor)
 
                .def_readwrite("run_coef", &CActor::m_fRunFactor)
                .def_readwrite("run_back_coef", &CActor::m_fRunBackFactor)

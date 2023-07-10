@@ -6065,9 +6065,6 @@
     <ClInclude Include="ui\UIEatableParams.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIPowerParams.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClInclude>
     <ClInclude Include="GasMask.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
@@ -8859,9 +8856,6 @@
       <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIEatableParams.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIPowerParams.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClCompile>
     <ClCompile Include="GasMask.cpp">

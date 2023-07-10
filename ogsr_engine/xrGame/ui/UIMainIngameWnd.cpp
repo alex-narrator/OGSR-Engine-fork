@@ -238,11 +238,6 @@ void CUIMainIngameWnd::Init()
 
     xml_init.InitStatic(uiXml, "invincible_static", 0, &UIInvincibleIcon);
     UIInvincibleIcon.Show(false);
-    //--
-    AttachChild(&UIOutfitPowerStatic);
-    xml_init.InitStatic(uiXml, "outfit_power_static", 0, &UIOutfitPowerStatic);
-    UIOutfitPowerStatic.AttachChild(&UIOutfitPowerBar);
-    xml_init.InitProgressBar(uiXml, "progress_bar_outfit_power", 0, &UIOutfitPowerBar);
 
     constexpr const char* warningStrings[] = {
         "jammed",
@@ -391,16 +386,11 @@ void CUIMainIngameWnd::Update()
         //UIMaxPowerBar.SetProgressPos((1.f - m_pActor->conditions().GetMaxPower()) * 100.0f);
 
         // Armor bar
-        auto pOutfit = m_pActor->GetOutfit();
+        //auto pOutfit = m_pActor->GetOutfit();
         //UIArmorBar.Show(pOutfit);
         //UIStaticArmor.Show(pOutfit);
         //if (pOutfit)
         //    UIArmorBar.SetProgressPos(pOutfit->GetCondition() * 100);
-        // armor power
-        bool show_bar = IsHUDElementAllowed(eArmorPower);
-        UIOutfitPowerStatic.Show(show_bar);
-        if (show_bar && pOutfit)
-            UIOutfitPowerBar.SetProgressPos(pOutfit->GetPowerLevel() * 100.f);
 
         UpdateActiveItemInfo();
 
@@ -818,11 +808,6 @@ bool CUIMainIngameWnd::IsHUDElementAllowed(EHUDElement element)
     case eGear: // Информация о снаряжении - панель артефактов, наполнение квикслотов, общее кол-во патронов к оружию в руках
     {
         return m_pActor->m_bShowGearInfo;
-    }
-    break;
-    case eArmorPower: 
-    {
-        return m_pActor->GetOutfit() && m_pActor->GetOutfit()->IsPowerConsumer();
     }
     break;
     default:
