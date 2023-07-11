@@ -398,12 +398,15 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
         m_flags.set(Fuseful_for_NPC, alife_object->m_flags.test(CSE_ALifeObject::flUsefulForAI));
     }
 
+    if (auto itm = smart_cast<CSE_ALifeInventoryItem*>(object().alife_object()))
+    {
+        m_fCondition = itm->m_fCondition;
+        m_ItemEffect[eRadiationRestoreSpeed] = itm->m_fRadiationRestoreSpeed;
+    }
+
     CSE_ALifeInventoryItem* pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(e);
     if (!pSE_InventoryItem)
         return TRUE;
-
-    m_fCondition = pSE_InventoryItem->m_fCondition;
-    m_ItemEffect[eRadiationRestoreSpeed] = pSE_InventoryItem->m_fRadiationRestoreSpeed;
 
     InitAddons();
 
