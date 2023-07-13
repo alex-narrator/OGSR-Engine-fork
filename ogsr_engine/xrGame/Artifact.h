@@ -106,7 +106,7 @@ public:
     float GetRandomKoef() const { return m_fRandomK; };
 
     virtual float GetHitTypeProtection(int) const;
-    //virtual float GetItemEffect(int) const;
+    virtual float GetItemEffect(int) const;
 
 //public:
 //    enum EAFHudStates

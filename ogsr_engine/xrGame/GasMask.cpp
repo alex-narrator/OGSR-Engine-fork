@@ -6,7 +6,8 @@
 
 CGasMask::CGasMask() 
 { 
-    SetSlot(GASMASK_SLOT); 
+    SetSlot(GASMASK_SLOT);
+    m_flags.set(FUsingCondition, TRUE);
 }
 
 bool CGasMask::can_be_attached() const

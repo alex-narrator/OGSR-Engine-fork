@@ -324,8 +324,7 @@ bool CArtefact::CanTake() const
 void CArtefact::Hide(bool now) { SwitchState(eHiding); }
 
 void CArtefact::Show(bool now) { SwitchState(eShowing); }
-#include "inventoryOwner.h"
-#include "Entity_alive.h"
+
 void CArtefact::UpdateXForm()
 {
     if (Device.dwFrame != dwXF_Frame)
@@ -374,7 +373,7 @@ void CArtefact::UpdateXForm()
         XFORM().mul(mRes, offset());
     }
 }
-#include "xr_level_controller.h"
+
 bool CArtefact::Action(s32 cmd, u32 flags)
 {
     switch (cmd)
@@ -499,7 +498,7 @@ void CArtefact::SwitchAfParticles(bool bOn)
 
 float CArtefact::GetHitTypeProtection(int hit_type) const { return inherited::GetHitTypeProtection(hit_type) * GetRandomKoef(); }
 
-//float CArtefact::GetItemEffect(int effect) const { return m_ItemEffect[effect] * GetCondition() * GetRandomKoef(); }
+float CArtefact::GetItemEffect(int effect) const { return m_ItemEffect[effect] * GetRandomKoef(); }
 
 //---SArtefactActivation----
 SArtefactActivation::SArtefactActivation(CArtefact* af, u32 owner_id)

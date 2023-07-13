@@ -9,6 +9,7 @@
 CHelmet::CHelmet()
 {
     SetSlot(HELMET_SLOT);
+    m_flags.set(FUsingCondition, TRUE);
     m_boneProtection = xr_new<SBoneProtections>();
 }
 

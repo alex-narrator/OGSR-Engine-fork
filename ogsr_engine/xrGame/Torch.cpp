@@ -516,7 +516,6 @@ void CTorch::LoadLightDefinitions(shared_str light_sect)
     m_color = pUserData->r_fcolor(light_sect, b_r2 ? "color_r2" : "color");
     fBrightness = m_color.intensity();
     m_fRange = pUserData->r_float(light_sect, (b_r2) ? "range_r2" : "range");
-    m_fRangeMinK = READ_IF_EXISTS(pUserData, r_float, light_sect, "range_min_k", 0.2f);
     light_render->set_color(m_color);
     light_render->set_range(m_fRange);
 

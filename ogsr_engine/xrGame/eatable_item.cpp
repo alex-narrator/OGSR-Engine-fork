@@ -169,10 +169,10 @@ void CEatableItem::UseBy(CEntityAlive* entity_alive)
 void CEatableItem::ZeroAllEffects()
 {
     for (int i = 0; i < eInfluenceMax; ++i)
-    {
-        // nullifying values
         m_ItemInfluence[i] = 0.f;
-    }
+    for (int i = 0; i < eBoostMax; ++i)
+        m_ItemBoost[i] = 0.f;
+    m_fBoostTime = 0.f;
 }
 
 float CEatableItem::GetOnePortionWeight()
@@ -216,14 +216,14 @@ float CEatableItem::GetItemInfluence(int influence) const
 {
     if (influence == eRadiationInfluence)
     {
-        return (m_ItemInfluence[influence] + GetItemEffect(eRadiationRestoreSpeed) * m_fSelfRadiationInfluence) * GetCondition();
+        return (m_ItemInfluence[influence] + GetItemEffect(eRadiationRestoreSpeed) * m_fSelfRadiationInfluence)/* * GetCondition()*/;
     }
-    return m_ItemInfluence[influence] * GetCondition();
+    return m_ItemInfluence[influence]/* * GetCondition()*/;
 }
 
-float CEatableItem::GetItemBoost(int boost) const { return m_ItemBoost[boost] * GetCondition(); }
+float CEatableItem::GetItemBoost(int boost) const { return m_ItemBoost[boost]/* * GetCondition()*/; }
 
-float CEatableItem::GetItemBoostTime() const { return m_fBoostTime * GetCondition(); }
+float CEatableItem::GetItemBoostTime() const { return m_fBoostTime/* * GetCondition()*/; }
 
 bool CEatableItem::IsInfluencer() const
 {

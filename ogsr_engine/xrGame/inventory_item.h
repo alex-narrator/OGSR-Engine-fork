@@ -285,8 +285,7 @@ public:
     bool m_highlight_equipped{};
     bool m_always_ungroupable{};
 
-    virtual void TryBreakToPieces();
-    bool b_brake_item{};
+    virtual void BreakItem();
 
 protected:
     // партікли знищення

@@ -34,9 +34,6 @@
 #include "debug_renderer.h"
 #endif
 
-//час оновлення декрементів у ігрових секундах
-constexpr auto CONDITION_DECREASE_UPDATE_TIME = 1.f;
-
 CInventoryItem::CInventoryItem()
 {
     SetDropManual(FALSE);
@@ -48,7 +45,7 @@ CInventoryItem::CInventoryItem()
     m_flags.set(FRuckDefault, FALSE);
     m_flags.set(FCanTake, TRUE);
     m_flags.set(FCanTrade, TRUE);
-    m_flags.set(FUsingCondition, TRUE);
+    m_flags.set(FUsingCondition, FALSE);
 
     m_HitTypeProtection.clear();
     m_HitTypeProtection.resize(ALife::eHitTypeMax);
@@ -122,7 +119,7 @@ void CInventoryItem::Load(LPCSTR section)
     m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
     m_flags.set(FAllowSprint, READ_IF_EXISTS(pSettings, r_bool, section, "sprint_allowed", TRUE));
     //
-    m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", TRUE));
+    m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", FALSE));
     m_flags.set(Fbreakable, READ_IF_EXISTS(pSettings, r_bool, section, "breakable", FALSE));
     m_flags.set(FIsUniqueItem, READ_IF_EXISTS(pSettings, r_bool, section, "unique_item", FALSE));
 
@@ -253,7 +250,8 @@ void CInventoryItem::Hit(SHit* pHDS)
 
     ChangeCondition(-hit_power);
 
-    TryBreakToPieces();
+    if (fis_zero(GetCondition()) && m_flags.test(Fbreakable) && !IsQuestItem())
+        BreakItem();
 }
 
 const char* CInventoryItem::Name() { return m_name.c_str(); }
@@ -276,11 +274,6 @@ void CInventoryItem::OnH_A_Independent()
 {
     m_eItemPlace = eItemPlaceUndefined;
     inherited::OnH_A_Independent();
-    if (b_brake_item)
-    {
-        object().setEnabled(false);
-        object().setVisible(false);
-    }
 }
 
 void CInventoryItem::OnH_B_Chield() {}
@@ -708,31 +701,31 @@ void CInventoryItem::OnMoveToRuck(EItemPlace prevPlace)
 
 void CInventoryItem::OnMoveOut(EItemPlace prevPlace) { OnMoveToRuck(prevPlace); };
 
-void CInventoryItem::TryBreakToPieces()
+void CInventoryItem::BreakItem()
 {
-    if (m_flags.test(Fbreakable) && fis_zero(GetCondition()) && !IsQuestItem() && !b_brake_item)
+    if (object().H_Parent())
     {
-        b_brake_item = true;
-        if (object().H_Parent())
+        object().setEnabled(false);
+        object().setVisible(false);
+        // играем звук
+        sndBreaking.play_no_feedback(object().H_Parent(), u32{}, float{}, &object().H_Parent()->Position());
+        // SetDropManual(TRUE);
+        m_pCurrentInventory->DropItem(cast_game_object());
+    }
+    else
+    {
+        // играем звук
+        sndBreaking.play_no_feedback(cast_game_object(), u32{}, float{}, &object().Position());
+        // отыграть партиклы разбивания
+        if (!!m_sBreakParticles)
         {
-            // играем звук
-            sndBreaking.play_no_feedback(object().H_Parent(), u32{}, float{}, &object().H_Parent()->Position());
-            SetDropManual(TRUE);
-        }
-        else
-        {
-            // играем звук
-            sndBreaking.play_no_feedback(cast_game_object(), u32{}, float{}, &object().Position());
-            // отыграть партиклы разбивания
-            if (!!m_sBreakParticles)
-            {
-                // показываем эффекты
-                CParticlesObject* pStaticPG;
-                pStaticPG = CParticlesObject::Create(m_sBreakParticles.c_str(), TRUE);
-                pStaticPG->play_at_pos(object().Position());
-            }
+            // показываем эффекты
+            CParticlesObject* pStaticPG;
+            pStaticPG = CParticlesObject::Create(m_sBreakParticles.c_str(), TRUE);
+            pStaticPG->play_at_pos(object().Position());
         }
     }
+    object().DestroyObject();
 }
 
 void CInventoryItem::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)

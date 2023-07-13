@@ -9,6 +9,7 @@
 CVest::CVest()
 {
     SetSlot(VEST_SLOT);
+    m_flags.set(FUsingCondition, TRUE);
     m_boneProtection = xr_new<SBoneProtections>();
     m_plates.clear();
 }
