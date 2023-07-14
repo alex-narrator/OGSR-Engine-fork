@@ -285,7 +285,7 @@ CScriptGameObject* GetCarBodyTarget()
     if (wnd == nullptr)
         return nullptr;
     if (wnd->m_pOtherGO != nullptr)
-        return smart_cast<CGameObject*>(wnd->m_pOtherGO)->lua_game_object();
+        return wnd->m_pOtherGO->lua_game_object();
     return nullptr;
 }
 

@@ -1615,7 +1615,7 @@ void CWeapon::setup_physic_shell() { CPhysicsShellHolder::setup_physic_shell(); 
 
 bool CWeapon::can_kill() const
 {
-    if (GetAmmoCurrent(true) || m_ammoTypes.empty())
+    if (GetAmmoCurrent(true) || m_ammoTypes.empty() || unlimited_ammo())
         return (true);
 
     return (false);
