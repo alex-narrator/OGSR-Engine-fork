@@ -5,6 +5,6 @@
 class CFoodItem : public CEatableItemObject
 {
 public:
-    CFoodItem();
-    virtual ~CFoodItem();
+    CFoodItem(){};
+    virtual ~CFoodItem(){};
 };

@@ -46,6 +46,8 @@
 #include "xrServer_Objects_ALife.h"
 #include "ai_object_location.h"
 
+#include "PDA.h"
+
 template <typename T>
 T* script_game_object_cast(CScriptGameObject* script_obj)
 {
@@ -147,6 +149,8 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
         .def("get_weapon_m", &script_game_object_cast<CWeaponMagazined>)
         .def("get_weapon_mwg", &script_game_object_cast<CWeaponMagazinedWGrenade>)
         .def("get_weapon_sg", &script_game_object_cast<CWeaponShotgun>)
+
+        .def("get_pda", &script_game_object_cast<CPda>)
 
         .def("ph_capture_object", (void(CScriptGameObject::*)(CScriptGameObject*))(&CScriptGameObject::PHCaptureObject))
         .def("ph_capture_object", (void(CScriptGameObject::*)(CScriptGameObject*, LPCSTR))(&CScriptGameObject::PHCaptureObject))
