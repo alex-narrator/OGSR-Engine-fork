@@ -31,9 +31,7 @@ void CScope::script_register(lua_State* L)
 		class_<CAdvancedDetector, CGameObject>("CAdvancedDetector").def(constructor<>()),
 		class_<CSimpleDetector, CGameObject>("CSimpleDetector").def(constructor<>()),
 		//food
-		class_<CFoodItem, CGameObject>("CFoodItem").def(constructor<>()),
-		//item
-		class_<CInventoryItemObject, CGameObject>("CInventoryItemObject").def(constructor<>())
+		class_<CFoodItem, CGameObject>("CFoodItem").def(constructor<>())
 	];
 }
 
