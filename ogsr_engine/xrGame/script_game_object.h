@@ -361,6 +361,10 @@ public:
     void ChangeCharacterReputation(int);
     void SetCharacterCommunity(LPCSTR, int, int);
 
+    void SetCharacterIcon(LPCSTR);
+    LPCSTR GetCharacterIcon();
+    LPCSTR GetDefaultCharacterIcon();
+
     u32 GetInventoryObjectCount() const;
 
     CScriptGameObject* GetActiveItem();

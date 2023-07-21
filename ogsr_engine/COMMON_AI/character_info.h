@@ -116,6 +116,10 @@ protected:
     void SetReputation(CHARACTER_REPUTATION_VALUE reputation);
     void SetCommunity(const CHARACTER_COMMUNITY& community) { m_CurrentCommunity = community; };
 
+    void SetIcon(LPCSTR icon) { m_SpecificCharacter.SetIcon(icon); }
+    LPCSTR GetIcon() { return m_SpecificCharacter.GetIcon(); }
+    LPCSTR GetDefaultIcon() { return m_SpecificCharacter.GetDefaultIcon(); }
+
 public:
     const shared_str& IconName() const;
 

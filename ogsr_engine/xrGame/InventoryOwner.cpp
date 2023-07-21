@@ -537,6 +537,23 @@ void CInventoryOwner::set_money(u32 amount, bool bSendEvent)
     }
 }
 
+void CInventoryOwner::SetName(LPCSTR name) 
+{ 
+    CEntityAlive* EA = smart_cast<CEntityAlive*>(this);
+    VERIFY(EA);
+
+    CSE_Abstract* e_entity = ai().alife().objects().object(EA->ID(), false);
+    if (!e_entity)
+        return;
+
+    CSE_ALifeTraderAbstract* trader = smart_cast<CSE_ALifeTraderAbstract*>(e_entity);
+    if (!trader)
+        return;
+    
+    m_game_name = name;
+    trader->m_character_name = name;
+}
+
 bool CInventoryOwner::use_default_throw_force() { return (true); }
 
 float CInventoryOwner::missile_throw_force()

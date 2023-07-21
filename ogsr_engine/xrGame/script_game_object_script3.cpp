@@ -186,6 +186,10 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("change_character_reputation", &CScriptGameObject::ChangeCharacterReputation)
         .def("character_community", &CScriptGameObject::CharacterCommunity)
         .def("set_character_community", &CScriptGameObject::SetCharacterCommunity)
+        
+        .def("set_character_icon", &CScriptGameObject::SetCharacterIcon)
+        .def("get_character_icon", &CScriptGameObject::GetCharacterIcon)
+        .def("get_default_character_icon", &CScriptGameObject::GetDefaultCharacterIcon)
 
         .def("get_actor_relation_flags", &CScriptGameObject::get_actor_relation_flags)
         .def("set_actor_relation_flags", &CScriptGameObject::set_actor_relation_flags)

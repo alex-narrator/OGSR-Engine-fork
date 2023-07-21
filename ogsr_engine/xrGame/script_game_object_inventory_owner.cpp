@@ -582,6 +582,43 @@ void CScriptGameObject::SetCharacterCommunity(LPCSTR comm, int squad, int group)
     entity->ChangeTeam(community.team(), squad, group);
 }
 
+void CScriptGameObject::SetCharacterIcon(LPCSTR icon)
+{
+    CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
+    CEntity* entity = smart_cast<CEntity*>(&object());
+
+    if (!pInventoryOwner || !entity)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "SetCharacterIcon available only for InventoryOwner");
+        return;
+    }
+    pInventoryOwner->SetIcon(icon);
+}
+LPCSTR CScriptGameObject::GetCharacterIcon()
+{
+    CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
+    CEntity* entity = smart_cast<CEntity*>(&object());
+
+    if (!pInventoryOwner || !entity)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "GetCharacterIcon available only for InventoryOwner");
+        return nullptr;
+    }
+    return pInventoryOwner->GetIcon();
+}
+LPCSTR CScriptGameObject::GetDefaultCharacterIcon()
+{
+    CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
+    CEntity* entity = smart_cast<CEntity*>(&object());
+
+    if (!pInventoryOwner || !entity)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "GetDefaultCharacterIcon available only for InventoryOwner");
+        return nullptr;
+    }
+    return pInventoryOwner->GetDefaultIcon();
+}
+
 LPCSTR CScriptGameObject::sound_voice_prefix() const
 {
     CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());

@@ -97,7 +97,7 @@ public:
     virtual LPCSTR Name() const;
     u32 get_money() const { return m_money; }
     void set_money(u32 amount, bool bSendEvent);
-    void SetName(LPCSTR name) { m_game_name = name; };
+    void SetName(LPCSTR name)/* { m_game_name = name; }*/;
 
 protected:
     u32 m_money;
@@ -181,6 +181,11 @@ public:
     virtual void ChangeRank(CHARACTER_RANK_VALUE);
     virtual void SetReputation(CHARACTER_REPUTATION_VALUE);
     virtual void ChangeReputation(CHARACTER_REPUTATION_VALUE);
+
+    //іконка персонажа
+    virtual void SetIcon(LPCSTR icon) { CharacterInfo().SetIcon(icon); };
+    virtual LPCSTR GetIcon() { return CharacterInfo().GetIcon(); };
+    virtual LPCSTR GetDefaultIcon() { return CharacterInfo().GetDefaultIcon(); };
 
     //для работы с relation system
     u16 object_id() const;

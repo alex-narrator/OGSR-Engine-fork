@@ -195,15 +195,6 @@ void CUICharacterInfo::InitCharacter(u16 id)
     }
 
     m_texture_name = chInfo.IconName().c_str();
-    if (Actor()->ID() == m_ownerID)
-    {
-        if (auto outfit = Actor()->GetOutfit())
-        {
-            if (pSettings->line_exist(outfit->cNameSect(), "actor_icon"))
-                m_texture_name = pSettings->r_string(outfit->cNameSect(), "actor_icon");
-        }
-
-    }
     m_icons[eUIIcon]->InitTexture(m_texture_name.c_str());
     m_icons[eUIIcon]->SetStretchTexture(true);
 

@@ -98,7 +98,7 @@ void CSpecificCharacter::load_shared(LPCSTR)
         data()->m_ActorDialogs.push_back(dialog_name);
     }
 
-    data()->m_icon_name = pXML->Read("icon", 0, "ui_npc_u_barman");
+    data()->m_default_icon_name = data()->m_icon_name = pXML->Read("icon", 0, "ui_npc_u_barman");
 
     //игровое имя персонажа
     data()->m_sGameName = pXML->Read("name", 0, "");
