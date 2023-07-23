@@ -17,6 +17,8 @@
 #include "../encyclopedia_article.h"
 #include "UIPdaAux.h"
 
+constexpr auto DIARY = "events_new.xml";
+
 extern u32 g_pda_info_state;
 
 CUIDiaryWnd::CUIDiaryWnd()
@@ -47,8 +49,8 @@ void RearrangeTabButtons(CUITabControl* pTab, xr_vector<Fvector2>& vec_sign_plac
 void CUIDiaryWnd::Init()
 {
     CUIXml uiXml;
-    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, "events_new.xml");
-    R_ASSERT3(xml_result, "xml file not found", "events_new.xml");
+    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, DIARY);
+    R_ASSERT3(xml_result, "xml file not found: events_new.xml", DIARY);
     CUIXmlInit xml_init;
 
     xml_init.InitWindow(uiXml, "main_wnd", 0, this);

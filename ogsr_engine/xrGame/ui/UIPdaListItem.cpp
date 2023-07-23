@@ -31,7 +31,7 @@ void CUIPdaListItem::Init(float x, float y, float width, float height)
 
     CUIXml uiXml;
     bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, PDA_CONTACT_CHAR);
-    R_ASSERT2(xml_result, "xml file not found");
+    R_ASSERT2(xml_result, "xml file not found: pda_character.xml");
 
     CUIXmlInit xml_init;
     UIInfo = xr_new<CUICharacterInfo>();

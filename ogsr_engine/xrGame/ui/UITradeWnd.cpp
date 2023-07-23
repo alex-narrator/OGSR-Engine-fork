@@ -109,7 +109,7 @@ void CUITradeWnd::Init()
 {
     CUIXml uiXml;
     bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, TRADE_XML);
-    R_ASSERT3(xml_result, "xml file not found", TRADE_XML);
+    R_ASSERT3(xml_result, "xml file not found: trade.xml", TRADE_XML);
     CUIXmlInit xml_init;
 
     xml_init.InitWindow(uiXml, "main", 0, this);

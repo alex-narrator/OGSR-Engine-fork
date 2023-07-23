@@ -23,7 +23,7 @@
 #include "../object_broker.h"
 #include "../string_table.h"
 
-#define ENCYCLOPEDIA_DIALOG_XML "encyclopedia.xml"
+constexpr auto ENCYCLOPEDIA_DIALOG_XML = "encyclopedia.xml";
 
 CUIEncyclopediaWnd::CUIEncyclopediaWnd() { prevArticlesCount = 0; }
 
@@ -33,7 +33,7 @@ void CUIEncyclopediaWnd::Init()
 {
     CUIXml uiXml;
     bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, ENCYCLOPEDIA_DIALOG_XML);
-    R_ASSERT3(xml_result, "xml file not found", ENCYCLOPEDIA_DIALOG_XML);
+    R_ASSERT3(xml_result, "xml file not found: encyclopedia.xml", ENCYCLOPEDIA_DIALOG_XML);
 
     CUIXmlInit xml_init;
 

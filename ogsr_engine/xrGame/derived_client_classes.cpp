@@ -164,6 +164,28 @@ void CInventoryScript::script_register(lua_State* L)
             //.def_readwrite("psy_health_restore_speed", &CInventoryItem::m_fPsyHealthRestoreSpeed)
             //.def_readwrite("radiation_restore_speed", &CInventoryItem::m_fRadiationRestoreSpeed)
 
+            .def("hit_type_protection", &CInventoryItem::GetHitTypeProtection) 
+            .def("hit_type_protection", (void(CInventoryItem::*)(int, float)) & CInventoryItem::SetHitTypeProtection)
+            .def("item_effect", &CInventoryItem::GetItemEffect)
+            .def("item_effect", (void(CInventoryItem::*)(int, float)) & CInventoryItem::SetItemEffect)
+
+            .def_readwrite("power_loss", &CCustomOutfit::m_fPowerLoss)
+
+            .enum_("effect")[
+                value("health_restore", int(CInventoryItem::eHealthRestoreSpeed)), 
+                value("power_restore", int(CInventoryItem::ePowerRestoreSpeed)), 
+                value("max_power_restore", int(CInventoryItem::eMaxPowerRestoreSpeed)), 
+                value("satiety_restore", int(CInventoryItem::eSatietyRestoreSpeed)), 
+                value("radiation_restore", int(CInventoryItem::eRadiationRestoreSpeed)), 
+                value("psy_health_restore", int(CInventoryItem::ePsyHealthRestoreSpeed)), 
+                value("alcohol_restore", int(CInventoryItem::eAlcoholRestoreSpeed)),  
+                value("wounds_heal_speed", int(CInventoryItem::eWoundsHealSpeed)), 
+                value("add_sprint", int(CInventoryItem::eAdditionalSprint)), 
+                value("add_hump", int(CInventoryItem::eAdditionalJump)), 
+                value("add_weight", int(CInventoryItem::eAdditionalWeight)), 
+                value("max_effect", int(CInventoryItem::eEffectMax))
+            ]
+
             //.property("class_name"						,			&get_lua_class_name)
             .property("inv_name", &get_item_name, &set_item_name)
             .property("inv_name_short", &get_item_name_short, &set_item_name_short)

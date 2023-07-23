@@ -13,7 +13,7 @@
 #include "UINewsItemWnd.h"
 #include "UIScrollView.h"
 
-#define NEWS_XML "news.xml"
+constexpr auto NEWS_XML = "news.xml";
 
 CUINewsWnd::CUINewsWnd() {}
 

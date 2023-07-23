@@ -4,14 +4,16 @@
 #include "UIFrameWindow.h"
 #include "UIXmlInit.h"
 
+constexpr auto HINT_ITEM = "hint_item.xml";
+
 CUIMapHint::~CUIMapHint() {}
 
 void CUIMapHint::Init()
 {
     CUIXmlInit xml_init;
     CUIXml uiXml;
-    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, "hint_item.xml");
-    R_ASSERT3(xml_result, "xml file not found", "hint_item.xml");
+    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, HINT_ITEM);
+    R_ASSERT3(xml_result, "xml file not found: hint_item.xml", HINT_ITEM);
 
     xml_init.InitWindow(uiXml, "hint_item", 0, this);
 

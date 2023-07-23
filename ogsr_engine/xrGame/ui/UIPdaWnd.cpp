@@ -22,6 +22,7 @@
 #include "UIStalkersRankingWnd.h"
 #include "UIActorInfo.h"
 #include "UIEventsWnd.h"
+#include "UIPdaFunctionsWnd.h"
 #include "../object_broker.h"
 #include "UIMessagesWindow.h"
 #include "UIMainIngameWnd.h"
@@ -47,6 +48,7 @@ CUIPdaWnd::CUIPdaWnd()
     UIActorInfo = NULL;
     UIStalkersRanking = NULL;
     UIEventsWnd = NULL;
+    UIFunctionsWnd = nullptr;
     m_updatedSectionImage = NULL;
     m_oldSectionImage = NULL;
 
@@ -64,6 +66,7 @@ CUIPdaWnd::~CUIPdaWnd()
     delete_data(UIActorInfo);
     delete_data(UIStalkersRanking);
     delete_data(UIEventsWnd);
+    delete_data(UIFunctionsWnd);
     delete_data(m_updatedSectionImage);
     delete_data(m_oldSectionImage);
 }
@@ -74,7 +77,7 @@ void CUIPdaWnd::Init()
 {
     CUIXml uiXml;
     bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, PDA_XML);
-    R_ASSERT3(xml_result, "xml file not found", PDA_XML);
+    R_ASSERT3(xml_result, "xml file not found: pda.xml", PDA_XML);
 
     CUIXmlInit xml_init;
 
@@ -126,8 +129,14 @@ void CUIPdaWnd::Init()
     UIStalkersRanking = xr_new<CUIStalkersRankingWnd>();
     UIStalkersRanking->Init();
 
+    //вікно квестів
     UIEventsWnd = xr_new<CUIEventsWnd>();
     UIEventsWnd->Init();
+
+    //вікно функцій
+    UIFunctionsWnd = xr_new<CUIPdaFunctionsWnd>();
+    UIFunctionsWnd->Init();
+
     // Tab control
     UITabControl = xr_new<CUITabControl>();
     UITabControl->SetAutoDelete(true);
@@ -285,7 +294,7 @@ void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
     {
     case eptDiary:
         m_pActiveDialog = smart_cast<CUIWindow*>(UIDiaryWnd);
-        InventoryUtilities::SendInfoToActor("ui_pda_events");
+        InventoryUtilities::SendInfoToActor("ui_pda_diary");
         g_pda_info_state &= ~pda_section::diary;
         break;
     case eptContacts:
@@ -315,6 +324,12 @@ void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
     case eptQuests:
         m_pActiveDialog = smart_cast<CUIWindow*>(UIEventsWnd);
         g_pda_info_state &= ~pda_section::quests;
+        InventoryUtilities::SendInfoToActor("ui_pda_quests");
+        break;
+    case eptFunctions:
+        m_pActiveDialog = smart_cast<CUIWindow*>(UIFunctionsWnd);
+        g_pda_info_state &= ~pda_section::functions;
+        InventoryUtilities::SendInfoToActor("ui_pda_functions");
         break;
     default: Msg("not registered button identifier [%d]", UITabControl->GetActiveIndex());
     }
@@ -439,6 +454,13 @@ void CUIPdaWnd::DrawUpdatedSections()
         draw_sign(m_updatedSectionImage, pos);
     else
         draw_sign(m_oldSectionImage, pos);
+
+    pos = m_sign_places_main[eptFunctions];
+    pos.add(tab_pos);
+    if (g_pda_info_state & pda_section::functions)
+        draw_sign(m_updatedSectionImage, pos);
+    else
+        draw_sign(m_oldSectionImage, pos);
 }
 
 void CUIPdaWnd::Reset()
@@ -458,6 +480,8 @@ void CUIPdaWnd::Reset()
         UIStalkersRanking->Reset();
     if (UIEventsWnd)
         UIEventsWnd->Reset();
+    if (UIFunctionsWnd)
+        UIFunctionsWnd->Reset();
 }
 
 void RearrangeTabButtons(CUITabControl* pTab, xr_vector<Fvector2>& vec_sign_places)

@@ -29,12 +29,14 @@ float g_fForceGrowSpeed{25.f};
 
 CUIProgressShape* g_MissileForceShape{};
 
+constexpr auto GRENADE_PROGRESS = "grenade.xml";
+
 void create_force_progress()
 {
     VERIFY(!g_MissileForceShape);
     CUIXml uiXml;
-    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, "grenade.xml");
-    R_ASSERT3(xml_result, "xml file not found", "grenade.xml");
+    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, GRENADE_PROGRESS);
+    R_ASSERT3(xml_result, "xml file not found: grenade.xml", GRENADE_PROGRESS);
 
     CUIXmlInit xml_init;
     g_MissileForceShape = xr_new<CUIProgressShape>();

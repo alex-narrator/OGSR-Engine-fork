@@ -17,6 +17,7 @@ enum EPdaTabs
     eptRanking,
     eptActorStatistic,
     eptEncyclopedia,
+    eptFunctions,
     eptNoActiveTab = u16(-1)
 };
 
@@ -33,6 +34,7 @@ enum part
     ranking = (1 << 12),
     statistics = (1 << 13),
     encyclopedia = (1 << 14),
+    functions = (1 << 15),
 
     news = diary | (1 << 1),
     info = diary | (1 << 2),

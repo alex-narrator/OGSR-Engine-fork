@@ -13,7 +13,7 @@
 #include "uicoloranimatorwrapper.h"
 #include "../object_broker.h"
 
-#define PDA_MSG_MAINGAME_CHAR "maingame_pda_msg.xml"
+constexpr auto PDA_MSG_MAINGAME_CHAR = "maingame_pda_msg.xml";
 
 using namespace InventoryUtilities;
 
@@ -25,7 +25,7 @@ void CUIPdaMsgListItem::Init(float x, float y, float width, float height)
 
     CUIXml uiXml;
     bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, PDA_MSG_MAINGAME_CHAR);
-    R_ASSERT2(xml_result, "xml file not found");
+    R_ASSERT2(xml_result, "xml file not found: maingame_pda_msg.xml");
 
     CUIXmlInit xml_init;
     AttachChild(&UIIcon);

@@ -744,6 +744,25 @@ float CInventoryItem::GetItemEffect(int effect) const
     return m_ItemEffect[effect] * condition_k;
 }
 
+void CInventoryItem::SetHitTypeProtection(int hit_type, float val) 
+{ 
+    if (hit_type >= ALife::eHitTypeMax)
+    {
+        Msg("![%s] object [%s] :  hit_type %d non valid, max existed hit_type is %d", __FUNCTION__, Name(), hit_type, ALife::eHitTypeMax - 1);
+        return;
+    }
+    m_HitTypeProtection[hit_type] = val; 
+}
+void CInventoryItem::SetItemEffect(int effect, float val) 
+{ 
+    if (effect >= eEffectMax)
+    {
+        Msg("![%s] object [%s] :  effect %d non valid, max existed effect is %d", __FUNCTION__, Name(), effect, eEffectMax - 1);
+        return;
+    }    
+    m_ItemEffect[effect] = val; 
+}
+
 bool CInventoryItem::IsPowerOn() const { return false; }
 
 void CInventoryItem::Switch() { Switch(!IsPowerOn()); }

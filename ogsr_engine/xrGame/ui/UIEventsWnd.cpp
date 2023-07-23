@@ -20,6 +20,8 @@
 #include "../alife_registry_wrappers.h"
 #include "../encyclopedia_article.h"
 
+constexpr auto EVENTS = "pda_events.xml";
+
 CUIEventsWnd::CUIEventsWnd() { m_flags.zero(); }
 
 CUIEventsWnd::~CUIEventsWnd()
@@ -31,8 +33,8 @@ CUIEventsWnd::~CUIEventsWnd()
 void CUIEventsWnd::Init()
 {
     CUIXml uiXml;
-    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, "pda_events.xml");
-    R_ASSERT3(xml_result, "xml file not found", "pda_events.xml");
+    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, EVENTS);
+    R_ASSERT3(xml_result, "xml file not found: pda_events.xml", EVENTS);
 
     CUIXmlInit xml_init;
     xml_init.InitWindow(uiXml, "main_wnd", 0, this);

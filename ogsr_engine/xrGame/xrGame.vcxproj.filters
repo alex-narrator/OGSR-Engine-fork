@@ -6068,6 +6068,9 @@
     <ClInclude Include="GasMask.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIPdaFunctionsWnd.h">
+      <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -8860,6 +8863,9 @@
     </ClCompile>
     <ClCompile Include="GasMask.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIPdaFunctionsWnd.cpp">
+      <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

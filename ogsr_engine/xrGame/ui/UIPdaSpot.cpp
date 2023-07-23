@@ -10,6 +10,8 @@
 #include "UI3tButton.h"
 #include "string_table.h"
 
+constexpr auto PDA_SPOT = "pda_spot.xml";
+
 CUIPdaSpot::CUIPdaSpot()
 {
     m_mainWnd = false;
@@ -46,8 +48,8 @@ void CUIPdaSpot::InitControls()
     this->SetWndRect(Frect().set(0.0f, 0.0f, 1024.f, 768.f));
 
     CUIXml uiXml;
-    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, "pda_spot.xml");
-    R_ASSERT3(xml_result, "xml file not found", "pda_spot.xml");
+    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, PDA_SPOT);
+    R_ASSERT3(xml_result, "xml file not found: pda_spot.xml", PDA_SPOT);
 
     CUIXmlInit xml_init;
 

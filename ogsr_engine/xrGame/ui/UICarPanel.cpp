@@ -3,14 +3,14 @@
 #include "UICarPanel.h"
 #include "UIXmlInit.h"
 
-constexpr LPCSTR CAR_PANEL_XML = "car_panel.xml";
-constexpr LPCSTR POINTER_ARROW_TEX = "ui\\hud_map_arrow";
+constexpr auto CAR_PANEL_XML = "car_panel.xml";
+constexpr auto POINTER_ARROW_TEX = "ui\\hud_map_arrow";
 
 void CUICarPanel::Init(float x, float y, float width, float height)
 {
     CUIXml uiXml;
     bool result = uiXml.Init(CONFIG_PATH, UI_PATH, CAR_PANEL_XML);
-    R_ASSERT3(result, "xml file not found", CAR_PANEL_XML);
+    R_ASSERT3(result, "xml file not found: car_panel.xml", CAR_PANEL_XML);
 
     CUIXmlInit xml_init;
     ////////////////////////////////////////////////////////////////////

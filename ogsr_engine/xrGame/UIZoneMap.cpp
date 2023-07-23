@@ -20,6 +20,8 @@
 #include "ui/UIInventoryUtilities.h"
 //////////////////////////////////////////////////////////////////////////
 
+constexpr auto ZONE_MAP = "zone_map.xml";
+
 CUIZoneMap::CUIZoneMap() {}
 
 CUIZoneMap::~CUIZoneMap() {}
@@ -27,8 +29,8 @@ CUIZoneMap::~CUIZoneMap() {}
 void CUIZoneMap::Init()
 {
     CUIXml uiXml;
-    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, "zone_map.xml");
-    R_ASSERT3(xml_result, "xml file not found", "zone_map.xml");
+    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, ZONE_MAP);
+    R_ASSERT3(xml_result, "xml file not found: zone_map.xml", ZONE_MAP);
 
     // load map background
     CUIXmlInit xml_init;

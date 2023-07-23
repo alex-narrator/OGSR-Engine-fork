@@ -316,6 +316,9 @@ public:
     virtual float GetItemEffect(int) const;
     virtual float GetHitTypeProtection(int) const;
 
+    virtual void SetItemEffect(int, float);
+    virtual void SetHitTypeProtection(int, float);
+
     virtual void InitAddons();
 
     virtual void Switch(bool);

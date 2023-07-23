@@ -23,8 +23,10 @@ CUIMessageBox::CUIMessageBox()
 
 CUIMessageBox::~CUIMessageBox() { Clear(); }
 
-#define BUTTON_UP_OFFSET 75
-#define BUTTON_WIDTH 140
+constexpr auto BUTTON_UP_OFFSET = 75;
+constexpr auto BUTTON_WIDTH = 140;
+
+constexpr auto MESSAGE_BOX = "message_box.xml";
 
 void CUIMessageBox::Clear()
 {
@@ -47,8 +49,8 @@ void CUIMessageBox::Init(LPCSTR box_template)
 {
     Clear();
     CUIXml uiXml;
-    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, "message_box.xml");
-    R_ASSERT3(xml_result, "xml file not found", "message_box.xml");
+    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, MESSAGE_BOX);
+    R_ASSERT3(xml_result, "xml file not found: message_box.xml", MESSAGE_BOX);
 
     CUIXmlInit xml_init;
 

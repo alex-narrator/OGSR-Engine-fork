@@ -25,6 +25,8 @@
 #include "visual_memory_manager.h"
 #include "location_manager.h"
 
+constexpr auto MAP_SPOTS = "map_spots.xml";
+
 CMapLocation::CMapLocation(LPCSTR type, u16 object_id, bool is_user_loc)
 {
     m_flags.zero();
@@ -72,8 +74,8 @@ void CMapLocation::LoadSpot(LPCSTR type, bool bReload)
     if (!g_uiSpotXml)
     {
         g_uiSpotXml = xr_new<CUIXml>();
-        bool xml_result = g_uiSpotXml->Init(CONFIG_PATH, UI_PATH, "map_spots.xml");
-        R_ASSERT3(xml_result, "xml file not found", "map_spots.xml");
+        bool xml_result = g_uiSpotXml->Init(CONFIG_PATH, UI_PATH, MAP_SPOTS);
+        R_ASSERT3(xml_result, "xml file not found: map_spots.xml", MAP_SPOTS);
     }
 
     XML_NODE* node = NULL;
