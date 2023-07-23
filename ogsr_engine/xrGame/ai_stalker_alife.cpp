@@ -109,7 +109,7 @@ void CAI_Stalker::attach_available_ammo(CWeapon* weapon)
         if (std::find(weapon->m_ammoTypes.begin(), weapon->m_ammoTypes.end(), (*I).m_item->object().cNameSect()) == weapon->m_ammoTypes.end())
             continue;
 
-        // buy_item_virtual			(*I);
+        buy_item_virtual(*I);
 
         ++count;
         if (count >= MAX_AMMO_ATTACH_COUNT)
@@ -170,7 +170,7 @@ void CAI_Stalker::choose_weapon(ALife::EWeaponPriorityType weapon_priority_type)
     }
     if (best_weapon)
     {
-        // buy_item_virtual			(*best_weapon);
+        buy_item_virtual(*best_weapon);
         attach_available_ammo(smart_cast<CWeapon*>(best_weapon->m_item));
     }
 }
