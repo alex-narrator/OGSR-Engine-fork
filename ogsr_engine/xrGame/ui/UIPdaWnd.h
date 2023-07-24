@@ -16,7 +16,6 @@ class CUIActorInfoWnd;
 class CUIStalkersRankingWnd;
 class CUIEventsWnd;
 class CUIPdaContactsWnd;
-class CUIPdaFunctionsWnd;
 
 class CUIPdaWnd : public CUIDialogWnd
 {
@@ -55,7 +54,6 @@ public:
     CUIActorInfoWnd* UIActorInfo;
     CUIStalkersRankingWnd* UIStalkersRanking;
     CUIEventsWnd* UIEventsWnd;
-    CUIPdaFunctionsWnd* UIFunctionsWnd;
     virtual void Reset();
 
 public:
