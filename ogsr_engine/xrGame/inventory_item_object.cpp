@@ -159,3 +159,7 @@ void CInventoryItemObject::modify_holder_params(float& range, float& fov) const 
 u32 CInventoryItemObject::ef_weapon_type() const { return (0); }
 
 bool CInventoryItemObject::Useful() const { return (CInventoryItem::Useful()); }
+
+using namespace luabind;
+#pragma optimize("s", on)
+void CInventoryItemObject::script_register(lua_State* L) { module(L)[class_<CInventoryItemObject, CGameObject>("CInventoryItemObject").def(constructor<>())]; }

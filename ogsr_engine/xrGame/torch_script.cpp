@@ -145,7 +145,5 @@ void CTorch::script_register(lua_State* L)
         .def_readonly("nvd_on", &CTorch::m_bNightVisionOn)
         .def("enable_nvd", (void(CTorch::*)(bool))(&CTorch::SwitchNightVision))
         .def("switch_nvd", (void(CTorch::*)())(&CTorch::SwitchNightVision))
-        
-        .def("get_torch_obj", &get_torch)
     ];
 }

@@ -44,8 +44,6 @@ class CInventoryItem : public CAttachableItem,
                        public pureRender
 #endif
 {
-    friend class CInventoryScript;
-
 private:
     typedef CAttachableItem inherited;
 
@@ -350,6 +348,13 @@ protected:
     LPCSTR m_sDetachMenuTip{};
 
     float m_fPowerLoss{};
+
+public:
+    DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
 #include "inventory_item_inline.h"
+
+add_to_type_list(CInventoryItem)
+#undef script_type_list
+#define script_type_list save_type_list(CInventoryItem)

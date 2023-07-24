@@ -8867,6 +8867,9 @@
     <ClCompile Include="ui\UIPdaFunctionsWnd.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
     </ClCompile>
+    <ClCompile Include="inventory_item_script.cpp">
+      <Filter>Core\Client\Objects\inventory\InventoryItem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="Explosive.h">

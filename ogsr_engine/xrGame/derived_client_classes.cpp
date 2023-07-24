@@ -121,79 +121,9 @@ CScriptGameObject* inventory_selected_item(CInventory* I)
 
 CScriptGameObject* get_inventory_target(CInventory* I) { return item_lua_object(I->m_pTarget); }
 
-LPCSTR get_item_name(CInventoryItem* I) { return I->Name(); }
-LPCSTR get_item_name_short(CInventoryItem* I) { return I->NameShort(); }
-
-#include "string_table.h"
-void set_item_name(CInventoryItem* item, LPCSTR name) { item->m_name = CStringTable().translate(name); }
-
-void set_item_name_short(CInventoryItem* item, LPCSTR name) { item->m_nameShort = CStringTable().translate(name); }
-
-LPCSTR get_item_description(CInventoryItem* I) { return I->m_Description.c_str(); }
-
-void set_item_description(CInventoryItem* item, LPCSTR text) { item->m_Description = CStringTable().translate(text); }
-
-void get_slots(luabind::object O)
-{
-    lua_State* L = O.lua_state();
-    CInventoryItem* itm = luabind::object_cast<CInventoryItem*>(O);
-    lua_createtable(L, 0, 0);
-    int tidx = lua_gettop(L);
-    if (itm)
-    {
-        for (u32 i = 0; i < itm->GetSlotsCount(); i++)
-        {
-            lua_pushinteger(L, i + 1); // key
-            lua_pushinteger(L, itm->GetSlots()[i]);
-            lua_settable(L, tidx);
-        }
-    }
-}
-
 void CInventoryScript::script_register(lua_State* L)
 {
     module(L)[
-
-        class_<CInventoryItem>("CInventoryItem")
-            .def_readonly("item_place", &CInventoryItem::m_eItemPlace)
-            .def_readwrite("item_condition", &CInventoryItem::m_fCondition)
-            .def_readwrite("inv_weight", &CInventoryItem::m_weight)
-            .def_readwrite("m_flags", &CInventoryItem::m_flags)
-            .def_readwrite("always_ungroupable", &CInventoryItem::m_always_ungroupable)
-
-            //.def_readwrite("psy_health_restore_speed", &CInventoryItem::m_fPsyHealthRestoreSpeed)
-            //.def_readwrite("radiation_restore_speed", &CInventoryItem::m_fRadiationRestoreSpeed)
-
-            .def("hit_type_protection", &CInventoryItem::GetHitTypeProtection) 
-            .def("hit_type_protection", (void(CInventoryItem::*)(int, float)) & CInventoryItem::SetHitTypeProtection)
-            .def("item_effect", &CInventoryItem::GetItemEffect)
-            .def("item_effect", (void(CInventoryItem::*)(int, float)) & CInventoryItem::SetItemEffect)
-
-            .def_readwrite("power_loss", &CCustomOutfit::m_fPowerLoss)
-
-            .enum_("effect")[
-                value("health_restore", int(CInventoryItem::eHealthRestoreSpeed)), 
-                value("power_restore", int(CInventoryItem::ePowerRestoreSpeed)), 
-                value("max_power_restore", int(CInventoryItem::eMaxPowerRestoreSpeed)), 
-                value("satiety_restore", int(CInventoryItem::eSatietyRestoreSpeed)), 
-                value("radiation_restore", int(CInventoryItem::eRadiationRestoreSpeed)), 
-                value("psy_health_restore", int(CInventoryItem::ePsyHealthRestoreSpeed)), 
-                value("alcohol_restore", int(CInventoryItem::eAlcoholRestoreSpeed)),  
-                value("wounds_heal_speed", int(CInventoryItem::eWoundsHealSpeed)), 
-                value("add_sprint", int(CInventoryItem::eAdditionalSprint)), 
-                value("add_hump", int(CInventoryItem::eAdditionalJump)), 
-                value("add_weight", int(CInventoryItem::eAdditionalWeight)), 
-                value("max_effect", int(CInventoryItem::eEffectMax))
-            ]
-
-            //.property("class_name"						,			&get_lua_class_name)
-            .property("inv_name", &get_item_name, &set_item_name)
-            .property("inv_name_short", &get_item_name_short, &set_item_name_short)
-            .property("cost", &CInventoryItem::Cost, &CInventoryItem::SetCost)
-            .property("slot", &CInventoryItem::GetSlot, &CInventoryItem::SetSlot)
-            .property("slots", &get_slots, raw<2>())
-            .property("description", &get_item_description, &set_item_description),
-        class_<CInventoryItemObject, bases<CInventoryItem, CGameObject>>("CInventoryItemObject"),
 
         class_<CInventory>("CInventory")
             .def_readwrite("max_weight", &CInventory::m_fMaxWeight)
@@ -202,13 +132,7 @@ void CInventoryScript::script_register(lua_State* L)
             .property("active_item", &inventory_active_item)
             .property("selected_item", &inventory_selected_item)
             .property("target", &get_inventory_target)
-            .def("is_active_slot_blocked", &CInventory::IsActiveSlotBlocked)
-
-        //.property	  ("class_name"					,			&get_lua_class_name)
-        //.def		  ("to_belt"					,			&item_to_slot,   raw(_2))
-        //.def		  ("to_slot"					,			&item_to_slot,   raw(_2))
-        //.def		  ("to_ruck"					,			&item_to_ruck,   raw(_2))
-        ,
+            .def("is_active_slot_blocked", &CInventory::IsActiveSlotBlocked)        ,
         class_<IInventoryBox>("IInventoryBox")
             .def("object", &IInventoryBox::GetObjectByIndex)
             .def("object", &IInventoryBox::GetObjectByName)

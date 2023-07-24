@@ -123,6 +123,8 @@
 #include "alife_smart_terrain_task.h"
 #include "game_graph.h"
 #include "smart_zone.h"
+#include "inventory_item.h"
+#include "inventory_item_object.h"
 #include "F1.h"
 #include "RGD5.h"
 #include "Addons.h"
