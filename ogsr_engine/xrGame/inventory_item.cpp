@@ -120,8 +120,6 @@ void CInventoryItem::Load(LPCSTR section)
     m_flags.set(FAllowSprint, READ_IF_EXISTS(pSettings, r_bool, section, "sprint_allowed", TRUE));
     //
     m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", FALSE));
-    m_flags.set(Fbreakable, READ_IF_EXISTS(pSettings, r_bool, section, "breakable", FALSE));
-    m_flags.set(FIsUniqueItem, READ_IF_EXISTS(pSettings, r_bool, section, "unique_item", FALSE));
 
     m_fControlInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "control_inertion_factor", 1.0f);
     m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
@@ -129,6 +127,8 @@ void CInventoryItem::Load(LPCSTR section)
     m_always_ungroupable = READ_IF_EXISTS(pSettings, r_bool, section, "always_ungroupable", false);
 
     m_need_brief_info = READ_IF_EXISTS(pSettings, r_bool, section, "show_brief_info", true);
+
+    b_breakable = READ_IF_EXISTS(pSettings, r_bool, section, "breakable", false);
 
     if (pSettings->line_exist(section, "break_particles"))
         m_sBreakParticles = pSettings->r_string(section, "break_particles");
@@ -250,7 +250,7 @@ void CInventoryItem::Hit(SHit* pHDS)
 
     ChangeCondition(-hit_power);
 
-    if (fis_zero(GetCondition()) && m_flags.test(Fbreakable) && !IsQuestItem())
+    if (fis_zero(GetCondition()) && b_breakable && !IsQuestItem())
         BreakItem();
 }
 
@@ -867,7 +867,7 @@ bool CInventoryItem::can_be_attached() const
 
 void CInventoryItem::SetDropTime(bool b_set)
 {
-    if (IsQuestItem() || IsUniqueItem())
+    if (IsQuestItem() || object().story_id() != INVALID_STORY_ID)
         return;
     if (auto se_itm = smart_cast<CSE_ALifeItem*>(object().alife_object()))
         se_itm->m_drop_time = b_set ? Level().GetGameTime() : 0;

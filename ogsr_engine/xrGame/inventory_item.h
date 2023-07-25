@@ -66,12 +66,10 @@ public:
         FIUngroupable = (1 << 13),
         FIHiddenForInventory = (1 << 14),
         Fvest = (1 << 15),
-        Fbreakable = (1 << 16),
-        FIsUniqueItem = (1 << 17),
     };
     const u32 ClrEquipped = READ_IF_EXISTS(pSettings, r_color, "dragdrop", "color_equipped", color_argb(255, 255, 225, 0));
     const u32 ClrUntradable = READ_IF_EXISTS(pSettings, r_color, "dragdrop", "color_untradable", color_argb(255, 124, 0, 0));
-    Flags32 m_flags;
+    Flags16 m_flags;
     CIconParams m_icon_params;
 
 public:
@@ -124,7 +122,6 @@ public:
     BOOL IsInvalid() const;
 
     BOOL IsQuestItem() const { return m_flags.test(FIsQuestItem); }
-    bool IsUniqueItem() const { return m_flags.test(FIsUniqueItem); }
 
     virtual u32 Cost() const; //{ return m_cost;	}
     virtual void SetCost(u32 cost) { m_cost = cost; }
@@ -152,6 +149,8 @@ public:
     shared_str m_nameComplex;
 
     EItemPlace m_eItemPlace{};
+
+    bool b_breakable{};
 
     virtual void OnMoveToSlot(EItemPlace prevPlace);
     virtual void OnMoveToBelt(EItemPlace prevPlace);

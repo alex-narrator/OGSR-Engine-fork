@@ -1298,19 +1298,19 @@ void CScriptGameObject::InvalidateInventory()
     inventory_owner->inventory().InvalidateState();
 }
 // functions for CInventoryItem class
-Flags32 CScriptGameObject::GetIIFlags()
+Flags16 CScriptGameObject::GetIIFlags()
 {
     CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
     if (!inventory_item)
     {
         ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryItem : cannot access class member GetIIFlags!");
-        return Flags32();
+        return Flags16();
     }
 
     return inventory_item->m_flags;
 }
 
-void CScriptGameObject::SetIIFlags(Flags32 flags)
+void CScriptGameObject::SetIIFlags(Flags16 flags)
 {
     CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
     if (!inventory_item)
