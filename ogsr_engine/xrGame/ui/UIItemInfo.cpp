@@ -149,7 +149,7 @@ using namespace InventoryUtilities;
 void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
 {
     m_pInvItem = pInvItem;
-    if (!m_pInvItem)
+    if (!m_pInvItem || m_pInvItem->object().getDestroy() || m_pInvItem->GetDropManual())
     {
         Show(false);
         return;
