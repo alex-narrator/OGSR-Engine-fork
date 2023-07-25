@@ -18,6 +18,7 @@ class CMapLocation;
 class CUIPropertiesBox;
 class CUIPdaSpot;
 class CUILevelMap;
+class CUIAnimatedStatic;
 
 DEFINE_MAP(shared_str, CUICustomMap*, GameMaps, GameMapsPairIt);
 
@@ -56,6 +57,8 @@ private:
     CUI3tButton* m_ToolBar[eMaxBtn];
     CUIMapHint* m_hint;
     CUIStatic* m_text_hint;
+
+    CUIAnimatedStatic* m_UIAnimation;
 
     void OnScrollV(CUIWindow*, void*);
     void OnScrollH(CUIWindow*, void*);

@@ -23,6 +23,8 @@
 #include "UIPdaSpot.h"
 #include "map_spot.h"
 
+#include "UIAnimatedStatic.h"
+
 #include <dinput.h> //remove me !!!
 #include "..\..\xr_3da\xr_input.h" //remove me !!!
 
@@ -238,6 +240,11 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
     m_UserSpotWnd = xr_new<CUIPdaSpot>();
     m_UserSpotWnd->SetAutoDelete(true);
     AttachChild(m_UserSpotWnd);
+
+    m_UIAnimation = xr_new<CUIAnimatedStatic>();
+    m_UIAnimation->SetAutoDelete(true);
+    m_UIMainFrame->AttachChild(m_UIAnimation);
+    xml_init.InitAnimatedStatic(uiXml, "a_static", 0, m_UIAnimation);
 }
 
 void CUIMapWnd::Show(bool status)
