@@ -919,7 +919,7 @@ void CWeapon::UpdateCL()
 
     if (actor)
     {
-        if (!HUD().GetUI()->MainInputReceiver() || !psActorFlags.test(AF_DOF_UI_WND))
+        if (!HUD().GetUI()->MainInputReceiver())
         {
             UpdateDofAim();
             UpdateDofReload();

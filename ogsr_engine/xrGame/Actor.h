@@ -831,7 +831,6 @@ public:
     bool InSafeHouse();
 
     bool IsFreeHands() const;
-    void EnableUIDOF(bool);
 
 protected:
     svector<float, eRestoreBoostMax> m_ActorItemBoostedParam;

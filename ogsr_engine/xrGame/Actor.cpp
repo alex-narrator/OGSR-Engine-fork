@@ -1826,14 +1826,6 @@ bool CActor::IsFreeHands() const
     return true;
 }
 
-void CActor::EnableUIDOF(bool enable) 
-{ 
-    if (!psActorFlags.test(AF_DOF_UI_WND))
-        return;
-    Fvector4 dof_param{enable ? dof_params_ui : Fvector4{}}; 
-    shader_exports.set_dof_params(dof_param.x, dof_param.y, dof_param.z, dof_param.w);
-}
-
 void CActor::SetHardHold(bool val)
 {
     if (val && (conditions().IsCantSprint() || conditions().IsLimping()))

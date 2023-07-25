@@ -280,9 +280,7 @@ void CUICarBodyWnd::Hide()
 
     if (const auto& actor = Actor())
     {
-        //actor->SetWeaponHideState(INV_STATE_INV_WND, false);
         actor->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
-        actor->EnableUIDOF(false);
     }
     m_bShowAllInv = false;
     PlaySnd(eInvSndClose);
@@ -637,11 +635,9 @@ void CUICarBodyWnd::Show()
     {
         if (auto act_item = smart_cast<CHudItem*>(actor->inventory().ActiveItem()); act_item && act_item->IsZoomed())
             act_item->OnZoomOut();
-        //actor->SetWeaponHideState(INV_STATE_INV_WND, true);
         actor->SetRuckAmmoPlacement(true);
         RepackAmmo();
         TryActivateKnife();
-        Actor()->EnableUIDOF(true);
     }
     PlaySnd(eInvSndOpen);
 }

@@ -208,16 +208,16 @@ void CUITalkWnd::Draw() { inherited::Draw(); }
 
 void CUITalkWnd::Show()
 {
+    InventoryUtilities::SendInfoToActor("ui_dialog");
     InitTalkDialog();
     inherited::Show();
-    m_pActor->EnableUIDOF(true);
 }
 
 //////////////////////////////////////////////////////////////////////////
 
 void CUITalkWnd::Hide()
 {
-    InventoryUtilities::SendInfoToActor("ui_talk_hide");
+    InventoryUtilities::SendInfoToActor("ui_dialog_hide");
     StopSnd();
     inherited::Hide();
     UITradeWnd->Hide();
@@ -229,8 +229,6 @@ void CUITalkWnd::Hide()
     if (m_pActor->IsTalking())
         m_pActor->StopTalk();
 
-    m_pActor->EnableUIDOF(false);
-    //
     m_pActor = NULL;
 }
 

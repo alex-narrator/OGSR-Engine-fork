@@ -238,8 +238,6 @@ void CUIPdaWnd::MouseMovement(float x, float y)
 void CUIPdaWnd::Show()
 {
     InventoryUtilities::SendInfoToActor("ui_pda");
-    Actor()->SetWeaponHideState(INV_STATE_PDA, true);
-    Actor()->EnableUIDOF(true);
     inherited::Show();
 }
 
@@ -248,8 +246,6 @@ void CUIPdaWnd::Hide()
     inherited::Hide();
     InventoryUtilities::SendInfoToActor("ui_pda_hide");
     HUD().GetUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, false);
-    Actor()->SetWeaponHideState(INV_STATE_PDA, false);
-    Actor()->EnableUIDOF(false);
 }
 
 void CUIPdaWnd::UpdateDateTime()

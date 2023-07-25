@@ -1393,7 +1393,6 @@ void CCC_RegisterCommands()
     //CMD3(CCC_Mask, "g_dof_zoom_old", &psActorFlags, AF_DOF_ZOOM);
     CMD3(CCC_Mask, "g_dof_zoom", &psActorFlags, AF_DOF_ZOOM_NEW);
     CMD3(CCC_Mask, "g_dof_reload", &psActorFlags, AF_DOF_RELOAD);
-    CMD3(CCC_Mask, "g_dof_ui_wnd", &psActorFlags, AF_DOF_UI_WND);
     //CMD4(CCC_Integer, "g_dof_zoom_far", &g_dof_zoom_far, 10, 100);
     //CMD4(CCC_Integer, "g_dof_zoom_near", &g_dof_zoom_near, 10, 100);
 
