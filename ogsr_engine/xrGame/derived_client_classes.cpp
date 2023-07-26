@@ -138,7 +138,6 @@ void CInventoryScript::script_register(lua_State* L)
             .def("object", &IInventoryBox::GetObjectByName)
             .def("object_count", &IInventoryBox::GetSize)
             .def("empty", &IInventoryBox::IsEmpty),
-        class_<CInventoryBox, bases<IInventoryBox, CGameObject>>("CInventoryBox"),
         class_<CInventoryContainer, bases<IInventoryBox, CInventoryItemObject>>("CInventoryContainer"),
 
         class_<CInventoryOwner>("CInventoryOwner")

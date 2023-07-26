@@ -7,6 +7,7 @@
 #include "AdvancedDetector.h"
 #include "EliteDetector.h"
 #include "FoodItem.h"
+#include "InventoryBox.h"
 
 using namespace luabind;
 
@@ -31,7 +32,9 @@ void CScope::script_register(lua_State* L)
 		class_<CAdvancedDetector, CGameObject>("CAdvancedDetector").def(constructor<>()),
 		class_<CSimpleDetector, CGameObject>("CSimpleDetector").def(constructor<>()),
 		//food
-		class_<CFoodItem, CGameObject>("CFoodItem").def(constructor<>())
+		class_<CFoodItem, CGameObject>("CFoodItem").def(constructor<>()),
+		//inventory box
+        class_<CInventoryBox, CGameObject>("CInventoryBox").def(constructor<>())
 	];
 }
 

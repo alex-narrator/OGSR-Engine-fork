@@ -484,31 +484,28 @@ extern void add_offline_impl(CSE_ALifeDynamicObject* object, const xr_vector<ALi
 
 class CSE_InventoryBoxAbstract
 {
-protected:
-    bool m_opened;
-
 public:
     CSE_InventoryBoxAbstract() = default;
 };
 
-class CSE_InventoryBox : public CSE_ALifeDynamicObjectVisual, public CSE_InventoryBoxAbstract
-{
-public:
-    CSE_InventoryBox(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection){};
-    virtual ~CSE_InventoryBox(){};
+SERVER_ENTITY_DECLARE_BEGIN2(CSE_InventoryBox, CSE_ALifeDynamicObjectVisual, CSE_InventoryBoxAbstract)
+CSE_InventoryBox(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection){};
+virtual ~CSE_InventoryBox(){};
 #ifdef XRGAME_EXPORTS
-    virtual void add_offline(const xr_vector<ALife::_OBJECT_ID>& saved_children, const bool& update_registries)
-    {
-        add_offline_impl(smart_cast<CSE_ALifeDynamicObjectVisual*>(this), saved_children, update_registries);
-        CSE_ALifeDynamicObjectVisual::add_offline(saved_children, update_registries);
-    }
-    virtual void add_online(const bool& update_registries)
-    {
-        add_online_impl(smart_cast<CSE_ALifeDynamicObjectVisual*>(this), update_registries);
-        CSE_ALifeDynamicObjectVisual::add_online(update_registries);
-    };
-#endif
+virtual void add_offline(const xr_vector<ALife::_OBJECT_ID>& saved_children, const bool& update_registries)
+{
+    add_offline_impl(smart_cast<CSE_ALifeDynamicObjectVisual*>(this), saved_children, update_registries);
+    CSE_ALifeDynamicObjectVisual::add_offline(saved_children, update_registries);
+}
+virtual void add_online(const bool& update_registries)
+{
+    add_online_impl(smart_cast<CSE_ALifeDynamicObjectVisual*>(this), update_registries);
+    CSE_ALifeDynamicObjectVisual::add_online(update_registries);
 };
+#endif
+SERVER_ENTITY_DECLARE_END
+add_to_type_list(CSE_InventoryBox)
+#define script_type_list save_type_list(CSE_InventoryBox)
 
 #pragma warning(pop)
 

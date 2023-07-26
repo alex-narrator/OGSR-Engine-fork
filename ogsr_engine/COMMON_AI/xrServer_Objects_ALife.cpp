@@ -1218,3 +1218,9 @@ void CSE_ALifeSmartZone::update() {}
 float CSE_ALifeSmartZone::detect_probability() { return (0.f); }
 
 void CSE_ALifeSmartZone::smart_touch(CSE_ALifeMonsterAbstract* monster) {}
+
+//CSE_InventoryBox
+void CSE_InventoryBox::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited1::STATE_Read(tNetPacket, size); }
+void CSE_InventoryBox::STATE_Write(NET_Packet& tNetPacket) { inherited1::STATE_Write(tNetPacket); }
+void CSE_InventoryBox::UPDATE_Read(NET_Packet& tNetPacket) { inherited1::UPDATE_Read(tNetPacket); }
+void CSE_InventoryBox::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_Write(tNetPacket); }
