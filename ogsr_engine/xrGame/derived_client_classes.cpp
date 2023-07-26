@@ -139,12 +139,7 @@ void CInventoryScript::script_register(lua_State* L)
             .def("object_count", &IInventoryBox::GetSize)
             .def("empty", &IInventoryBox::IsEmpty),
         class_<CInventoryBox, bases<IInventoryBox, CGameObject>>("CInventoryBox"),
-        class_<CInventoryContainer, bases<IInventoryBox, CInventoryItemObject>>("CInventoryContainer")
-            .property("cost", &CInventoryContainer::Cost)
-            .property("weight", &CInventoryContainer::Weight)
-            .property("is_opened", &CInventoryContainer::IsOpened),
-            //.def("open", &CInventoryContainer::open)
-            //.def("close", &CInventoryContainer::close),
+        class_<CInventoryContainer, bases<IInventoryBox, CInventoryItemObject>>("CInventoryContainer"),
 
         class_<CInventoryOwner>("CInventoryOwner")
             .def_readonly("inventory", &CInventoryOwner::m_inventory)

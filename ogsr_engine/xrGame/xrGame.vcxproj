@@ -2367,7 +2367,6 @@
     <ClCompile Include="..\COMMON_AI\xrServer_Objects_ALife_Items.cpp" />
     <ClCompile Include="..\COMMON_AI\xrServer_Objects_ALife_Items_script.cpp" />
     <ClCompile Include="..\COMMON_AI\xrServer_Objects_ALife_Items_script2.cpp" />
-    <ClCompile Include="..\COMMON_AI\xrServer_Objects_ALife_Items_script3.cpp" />
     <ClCompile Include="..\COMMON_AI\xrServer_Objects_ALife_Monsters.cpp" />
     <ClCompile Include="..\COMMON_AI\xrServer_Objects_ALife_Monsters_script.cpp" />
     <ClCompile Include="..\COMMON_AI\xrServer_Objects_ALife_Monsters_script2.cpp" />

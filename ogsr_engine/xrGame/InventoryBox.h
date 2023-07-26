@@ -8,7 +8,6 @@ protected:
     xr_vector<u16> m_items;
 
     void ProcessEvent(CGameObject* O, NET_Packet& P, u16 type);
-    bool b_opened{true};
     int m_iItemsLimit{};
 
 public:
@@ -23,8 +22,6 @@ public:
     virtual CGameObject* cast_game_object() { return NULL; };
     virtual CInventoryItem* cast_inventory_item() { return NULL; }
     virtual CGameObject& object() = 0;
-    virtual bool IsOpened() const { return b_opened; }
-    virtual void SetOpened(bool opened) { b_opened = opened; }
 
     virtual bool CanTakeItem(CInventoryItem*) const;
 

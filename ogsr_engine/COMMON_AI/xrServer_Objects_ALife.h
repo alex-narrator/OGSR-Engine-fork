@@ -479,7 +479,7 @@ SERVER_ENTITY_DECLARE_END
 // add_to_type_list(CSE_ALifeStationaryMgun)
 //#define script_type_list save_type_list(CSE_ALifeStationaryMgun)
 
-    extern void add_online_impl(CSE_ALifeDynamicObject* object, const bool& update_registries);
+extern void add_online_impl(CSE_ALifeDynamicObject* object, const bool& update_registries);
 extern void add_offline_impl(CSE_ALifeDynamicObject* object, const xr_vector<ALife::_OBJECT_ID>& saved_children, const bool& update_registries);
 
 class CSE_InventoryBoxAbstract

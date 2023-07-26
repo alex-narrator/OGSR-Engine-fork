@@ -19,7 +19,7 @@ using namespace luabind;
 #pragma optimize("s", on)
 void CArtefact::script_register(lua_State* L)
 {
-    module(L)[class_<CArtefact, CInventoryItemObject>("CArtefact")
+    module(L)[class_<CArtefact, CGameObject>("CArtefact").def(constructor<>())
                   .def_readwrite("can_spawn_zone", &CArtefact::m_bCanSpawnZone),
               class_<CMercuryBall, CGameObject>("CMercuryBall").def(constructor<>()), class_<CBlackDrops, CGameObject>("CBlackDrops").def(constructor<>()),
               class_<CBlackGraviArtefact, CGameObject>("CBlackGraviArtefact").def(constructor<>()), class_<CBastArtefact, CGameObject>("CBastArtefact").def(constructor<>()),

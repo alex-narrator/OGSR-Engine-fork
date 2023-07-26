@@ -316,8 +316,7 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemCustomOutfit)
 #define script_type_list save_type_list(CSE_ALifeItemCustomOutfit)
 
-    class CSE_InventoryContainer : public CSE_InventoryBoxAbstract,
-                                   public CSE_ALifeItem
+class CSE_InventoryContainer : public CSE_InventoryBoxAbstract, public CSE_ALifeItem
 {
 public:
     CSE_InventoryContainer(LPCSTR caSection) : CSE_ALifeItem(caSection){};

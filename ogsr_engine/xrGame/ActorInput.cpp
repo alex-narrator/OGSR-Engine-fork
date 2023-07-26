@@ -513,7 +513,7 @@ void CActor::ActorUse()
 
     bool is_add_act = Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION));
 
-    if (m_pInvBoxWeLookingAt && m_pInvBoxWeLookingAt->object().nonscript_usable() && m_pInvBoxWeLookingAt->IsOpened())
+    if (m_pInvBoxWeLookingAt && m_pInvBoxWeLookingAt->object().nonscript_usable())
     {
         if (smart_cast<CInventoryContainer*>(m_pInvBoxWeLookingAt) && is_add_act)
         {
