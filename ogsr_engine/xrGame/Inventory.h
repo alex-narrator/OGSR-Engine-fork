@@ -182,6 +182,9 @@ protected:
 
     bool m_drop_last_frame{};
 
+    Ivector2 m_BaseBelt{};
+    Ivector2 m_BaseVest{};
+
 private:
     bool m_bUpdated{};
 
@@ -193,11 +196,8 @@ public:
     // размещение патронов на поясе при разрядке оружия в руках
     void TryAmmoCustomPlacement(CInventoryItem* pIItem);
 
-    u32 BeltWidth() const;
-    u32 BeltHeight() const;
-
-    u32 VestWidth() const;
-    u32 VestHeight() const;
+    Ivector2 BeltArray() const;
+    Ivector2 VestArray() const;
 
     void DropBeltToRuck();
     void DropVestToRuck();

@@ -19,8 +19,7 @@ CVest::~CVest() { xr_delete(m_boneProtection); }
 void CVest::Load(LPCSTR section)
 {
     inherited::Load(section);
-    m_iVestWidth = READ_IF_EXISTS(pSettings, r_u32, section, "vest_width", 0);
-    m_iVestHeight = READ_IF_EXISTS(pSettings, r_u32, section, "vest_height", 0);
+    m_VestArray = READ_IF_EXISTS(pSettings, r_ivector2, section, "vest_array", Ivector2{});
     bulletproof_display_bone = READ_IF_EXISTS(pSettings, r_string, section, "bulletproof_display_bone", "bip01_spine");
     if (pSettings->line_exist(section, "plates"))
     {

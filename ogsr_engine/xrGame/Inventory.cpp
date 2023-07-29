@@ -50,6 +50,9 @@ CInventory::CInventory()
     m_fTakeDist = pSettings->r_float("inventory", "take_dist");
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
 
+    m_BaseBelt = READ_IF_EXISTS(pSettings, r_ivector2, "inventory", "base_belt", Ivector2{});
+    m_BaseVest = READ_IF_EXISTS(pSettings, r_ivector2, "inventory", "base_vest", Ivector2{});
+
     m_slots.resize(SLOTS_TOTAL);
 
     string256 temp;
@@ -970,14 +973,11 @@ bool CInventory::CanPutInBelt(PIItem pIItem) const
         return false;
     if (!IsAllItemsLoaded())
         return true;
-    auto pActor = smart_cast<CActor*>(m_pOwner);
-    if (pActor && !pActor->GetWarbelt())
-        return false;
     if (!InVest(pIItem) && HasSameModuleEquiped(pIItem))
         return false;
     auto belt = static_cast<TIItemContainer>(m_belt);
 
-    return FreeRoom(belt, pIItem, BeltWidth(), BeltHeight(), m_bBeltVertical);
+    return FreeRoom(belt, pIItem, BeltArray().x, BeltArray().y, m_bBeltVertical);
 }
 
 bool CInventory::CanPutInVest(PIItem pIItem) const
@@ -990,14 +990,11 @@ bool CInventory::CanPutInVest(PIItem pIItem) const
         return false;
     if (!IsAllItemsLoaded())
         return true;
-    auto pActor = smart_cast<CActor*>(m_pOwner);
-    if (pActor && !pActor->GetVest())
-        return false;
     if (!InBelt(pIItem) && HasSameModuleEquiped(pIItem))
         return false;
     auto vest = static_cast<TIItemContainer>(m_vest);
 
-    return FreeRoom(vest, pIItem, VestWidth(), VestHeight(), m_bVestVertical);
+    return FreeRoom(vest, pIItem, VestArray().x, VestArray().x, m_bVestVertical);
 }
 // проверяет можем ли поместить вещь в рюкзак,
 // при этом реально ничего не меняется
@@ -1431,32 +1428,18 @@ void CInventory::TryAmmoCustomPlacement(CInventoryItem* pIItem)
     }
 }
 
-u32 CInventory::BeltWidth() const
+Ivector2 CInventory::BeltArray() const
 {
     if (auto warbelt = m_pOwner->GetWarbelt())
-        return warbelt->GetBeltWidth();
-    return 0;
+        return warbelt->GetBeltArray();
+    return m_BaseBelt;
 }
 
-u32 CInventory::BeltHeight() const
-{
-    if (auto warbelt = m_pOwner->GetWarbelt())
-        return warbelt->GetBeltHeight();
-    return 0;
-}
-
-u32 CInventory::VestWidth() const
+Ivector2 CInventory::VestArray() const
 {
     if (auto vest = m_pOwner->GetVest())
-        return vest->GetVestWidth();
-    return 0;
-}
-
-u32 CInventory::VestHeight() const
-{
-    if (auto vest = m_pOwner->GetVest())
-        return vest->GetVestHeight();
-    return 0;
+        return vest->GetVestArray();
+    return m_BaseVest;
 }
 
 bool CInventory::IsAllItemsLoaded() const { return m_bUpdated; }
@@ -1556,6 +1539,9 @@ bool CInventory::HasModuleForSlot(u32 check_slot) const
 
 bool CInventory::HasSameModuleEquiped(PIItem item) const
 {
+    if (!item || item->object().getDestroy() || item->GetDropManual())
+        return false;
+
     if (!item->IsModule())
         return false;
     for (const auto& _item : m_vest)

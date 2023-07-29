@@ -12,12 +12,10 @@ public:
     virtual void Load(LPCSTR section);
 
 protected:
-    u32 m_iBeltWidth{};
-    u32 m_iBeltHeight{};
+    Ivector2 m_BeltArray{};
 
 public:
-    u32 GetBeltWidth() const { return m_iBeltWidth; }
-    u32 GetBeltHeight() const { return m_iBeltHeight; }
+    Ivector2 GetBeltArray() { return m_BeltArray; };
 
     virtual void OnMoveToSlot(EItemPlace prevPlace);
     virtual void OnMoveToRuck(EItemPlace prevPlace);

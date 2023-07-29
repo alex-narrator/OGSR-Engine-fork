@@ -22,8 +22,7 @@ public:
     virtual float Weight() const;
     virtual void Hit(SHit* pHDS);
 
-    u32 GetVestWidth() const { return m_iVestWidth; }
-    u32 GetVestHeight() const { return m_iVestHeight; }
+    Ivector2 GetVestArray() { return m_VestArray; };
 
     virtual float GetHitTypeProtection(int) const override;
     float HitThruArmour(SHit* pHDS);
@@ -47,8 +46,7 @@ public:
     virtual void DetachAll();
 
 protected:
-    u32 m_iVestWidth{};
-    u32 m_iVestHeight{};
+    Ivector2 m_VestArray{};
     shared_str bulletproof_display_bone{};
 
 private:

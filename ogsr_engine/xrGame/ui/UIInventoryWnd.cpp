@@ -449,14 +449,14 @@ void CUIInventoryWnd::HideSlotsHighlight()
 
 void CUIInventoryWnd::ShowSlotsHighlight(PIItem InvItem)
 {
-    if (InvItem->m_flags.test(CInventoryItem::Fbelt) && !Actor()->inventory().InBelt(InvItem))
+    if (m_pInv->CanPutInBelt(InvItem))
         m_pUIBeltList->enable_highlight(true);
 
-    if (InvItem->m_flags.test(CInventoryItem::Fvest) && !Actor()->inventory().InVest(InvItem))
+    if (m_pInv->CanPutInVest(InvItem))
         m_pUIVestList->enable_highlight(true);
 
     for (const u8 slot : InvItem->GetSlots())
-        if (auto DdList = m_slots_array[slot]; DdList && (!Actor()->inventory().InSlot(InvItem) || InvItem->GetSlot() != slot))
+        if (auto DdList = m_slots_array[slot]; DdList && m_pInv->CanPutInSlot(InvItem, slot))
             DdList->enable_highlight(true);
 }
 
@@ -572,21 +572,8 @@ void CUIInventoryWnd::UpdateCustomDraw(bool b_full_reinit)
     if (!smart_cast<CActor*>(Level().CurrentEntity()))
         return;
 
-    auto& inv = Actor()->inventory();
-    // u32 belt_size = inv.BeltSize();
-    Ivector2 belt_capacity{(int)inv.BeltWidth(), (int)inv.BeltHeight()};
-    // m_pUIBeltList->SetCellsAvailable(belt_size);
-    m_pUIBeltList->SetCellsCapacity(belt_capacity);
-
-    Ivector2 vest_capacity{(int)inv.VestWidth(), (int)inv.VestHeight()};
-    m_pUIVestList->SetCellsCapacity(vest_capacity);
-
-    // if (!Actor()->GetBackpack()) {
-    //	m_pUIBagList->SetCellsAvailable(0);
-    // }
-    // else {
-    //	m_pUIBagList->ResetCellsAvailable();
-    // }
+    m_pUIBeltList->SetCellsCapacity(m_pInv->BeltArray());
+    m_pUIVestList->SetCellsCapacity(m_pInv->VestArray());
 
     for (u8 i = 0; i < SLOTS_TOTAL; ++i)
     {
@@ -594,20 +581,8 @@ void CUIInventoryWnd::UpdateCustomDraw(bool b_full_reinit)
         if (!list)
             continue;
 
-        inv.IsSlotAllowed(i) ? list->ResetCellsCapacity() : list->SetCellsCapacity({});
-        list->Show(inv.IsSlotAllowed(i));
-
-        // switch (i)
-        //{
-        ////case HELMET_SLOT:
-        ////	inv.IsSlotAllowed(i) ? list->ResetCellsAvailable() : list->SetCellsAvailable(0);
-        ////break;
-        // default:
-        //{
-        //	inv.IsSlotAllowed(i) ?list->ResetCellsCapacity() : list->SetCellsCapacity({});
-        //	list->Show(inv.IsSlotAllowed(i));
-        // }break;
-        // }
+        m_pInv->IsSlotAllowed(i) ? list->ResetCellsCapacity() : list->SetCellsCapacity({});
+        list->Show(m_pInv->IsSlotAllowed(i));
     }
 
     if (b_full_reinit)

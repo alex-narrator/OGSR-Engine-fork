@@ -340,7 +340,7 @@ void CUIWarbeltCellItem::UpdateItemText()
     inherited::UpdateItemText();
 
     string32 str;
-    sprintf_s(str, "[%dx%d]", object()->GetBeltWidth(), object()->GetBeltHeight());
+    sprintf_s(str, "[%dx%d]", object()->GetBeltArray().x, object()->GetBeltArray().y);
 
     Fvector2 pos{GetWidth() - m_text_add->GetWidth(), GetHeight() - m_text_add->GetHeight()};
 
@@ -360,7 +360,7 @@ void CUIVestCellItem::UpdateItemText()
     inherited::UpdateItemText();
 
     string32 str;
-    sprintf_s(str, "[%dx%d]", object()->GetVestWidth(), object()->GetVestHeight());
+    sprintf_s(str, "[%dx%d]", object()->GetVestArray().x, object()->GetVestArray().y);
 
     Fvector2 pos{GetWidth() - m_text_add->GetWidth(), GetHeight() - m_text_add->GetHeight()};
 
