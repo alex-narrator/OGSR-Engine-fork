@@ -994,7 +994,7 @@ bool CInventory::CanPutInVest(PIItem pIItem) const
         return false;
     auto vest = static_cast<TIItemContainer>(m_vest);
 
-    return FreeRoom(vest, pIItem, VestArray().x, VestArray().x, m_bVestVertical);
+    return FreeRoom(vest, pIItem, VestArray().x, VestArray().y, m_bVestVertical);
 }
 // проверяет можем ли поместить вещь в рюкзак,
 // при этом реально ничего не меняется
