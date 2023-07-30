@@ -197,6 +197,8 @@ void CScriptActor::script_register(lua_State* L)
                .def("get_state_wishful", &CActor::get_state_wishful)
                .def("set_state_wishful", &CActor::set_state_wishful)
 
+               .def_readwrite("clear_crouch", &CActor::b_ClearCrouch)
+
                .def("IsDetectorActive", &CActor::IsDetectorActive),
                 //move commands
               class_<enum_exporter<EMoveCommand>>("move_command")

@@ -143,13 +143,14 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     cam_Active()->Set(-E->o_torso.yaw, E->o_torso.pitch, 0); // E->o_Angle.z);
 
     // *** movement state - respawn
-    mstate_wishful = 0;
+    mstate_wishful = b_ClearCrouch ? 0 : mcCrouch;
     if (m_loaded_ph_box_id == 1 || m_loaded_ph_box_id == 3)
-        mstate_wishful = mcCrouch;
+        mstate_real = mcCrouch;
     else if (m_loaded_ph_box_id == 2 || m_loaded_ph_box_id == 4)
-        mstate_wishful = mcCrouch | mcAccel;
-
-    mstate_old = mstate_real = 0;
+        mstate_real = mcCrouch | mcAccel;
+    else
+        mstate_real = 0;
+    mstate_old = mstate_real;
     m_bJumpKeyPressed = FALSE;
 
     NET_SavedAccel.set(0, 0, 0);
@@ -409,6 +410,7 @@ void CActor::save(NET_Packet& output_packet)
     CInventoryOwner::save(output_packet);
     output_packet.w_u8(u8(m_bOutBorder));
     output_packet.w_u8(u8(character_physics_support()->movement()->BoxID()));
+    output_packet.w_u8(u8(b_ClearCrouch));
 }
 
 void CActor::load(IReader& input_packet)
@@ -416,8 +418,8 @@ void CActor::load(IReader& input_packet)
     inherited::load(input_packet);
     CInventoryOwner::load(input_packet);
     m_bOutBorder = !!(input_packet.r_u8());
-    if (ai().get_alife()->header().version() > 5)
-        m_loaded_ph_box_id = input_packet.r_u8();
+    m_loaded_ph_box_id = input_packet.r_u8();
+    b_ClearCrouch = !!(input_packet.r_u8());
 }
 
 #ifdef DEBUG

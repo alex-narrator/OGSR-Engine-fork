@@ -112,21 +112,14 @@ void CActor::IR_OnKeyboardPress(int cmd)
     switch (cmd)
     {
     case kJUMP: {
-        if (mstate_wishful & mcLookout)
-            mstate_wishful &= ~mcLookout;
         mstate_wishful |= mcJump;
     }
     break;
     case kCROUCH: {
-        if (mstate_wishful & mcSprint)
-            mstate_wishful &= ~mcSprint;
-
-        if ((mstate_wishful & mcCrouchAccel) == mcCrouchAccel) // глубокий присед
-            mstate_wishful &= ~(mcCrouch | mcAccel);
-        else if (mstate_wishful & ~mcAccel) // присед
-            mstate_wishful |= (mcCrouch | mcAccel);
-        else // не присед
-            mstate_wishful |= mcCrouch;
+        if (!psActorFlags.test(AF_HOLD_TO_CROUCH))
+            b_ClearCrouch = !b_ClearCrouch;
+        if (!b_ClearCrouch)
+            mstate_wishful ^= mcCrouch;
     }
     break;
     case kSPRINT_TOGGLE: {
@@ -135,9 +128,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
             if (auto pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem()))
                 pWeapon->OnZoomOut();
         }
-
-        if (mstate_wishful & (mcCrouch | mcAccel | mcLookout))
-            mstate_wishful &= ~(mcCrouch | mcAccel | mcLookout);
 
         if (mstate_wishful & mcSprint)
             mstate_wishful &= ~mcSprint;
@@ -148,29 +138,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
     case kACCEL: {
         if (IsZoomAimingMode())
             SetHardHold(!IsHardHold()); // жесткий хват
-        else
-        {
-            if (mstate_wishful & mcCrouch)
-                return;
-            else if (mstate_wishful & mcAccel)
-                mstate_wishful &= ~mcAccel;
-            else
-                mstate_wishful |= mcAccel;
-        }
-    }
-    break;
-    case kL_LOOKOUT: {
-        if (mstate_wishful & mcLookout)
-            mstate_wishful &= ~mcLookout;
-        else
-            mstate_wishful |= mcLLookout;
-    }
-    break;
-    case kR_LOOKOUT: {
-        if (mstate_wishful & mcLookout)
-            mstate_wishful &= ~mcLookout;
-        else
-            mstate_wishful |= mcRLookout;
     }
     break;
     case kCAM_1: cam_Set(eacFirstEye); break;
@@ -326,6 +293,10 @@ void CActor::IR_OnKeyboardRelease(int cmd)
             if (GAME_PHASE_INPROGRESS == Game().Phase())
                 g_PerformDrop();
             break;
+        case kCROUCH:
+            if (psActorFlags.test(AF_HOLD_TO_CROUCH))
+                b_ClearCrouch = true;
+            break;
         }
     }
 }
@@ -379,10 +350,17 @@ void CActor::IR_OnKeyboardHold(int cmd)
             cam_Active()->Move(cmd, 0, LookFactor);
         break;
 
+    case kACCEL: mstate_wishful |= mcAccel; break;
     case kL_STRAFE: mstate_wishful |= mcLStrafe; break;
     case kR_STRAFE: mstate_wishful |= mcRStrafe; break;
+    case kL_LOOKOUT: mstate_wishful |= mcLLookout; break;
+    case kR_LOOKOUT: mstate_wishful |= mcRLookout; break;
     case kFWD: mstate_wishful |= mcFwd; break;
     case kBACK: mstate_wishful |= mcBack; break;
+    case kCROUCH:
+        if (psActorFlags.test(AF_HOLD_TO_CROUCH))
+            mstate_wishful |= mcCrouch;
+        break;
     }
 }
 

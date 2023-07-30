@@ -1397,6 +1397,7 @@ void CCC_RegisterCommands()
     //CMD4(CCC_Integer, "g_dof_zoom_near", &g_dof_zoom_near, 10, 100);
 
     CMD3(CCC_Mask, "g_hold_to_aim", &psActorFlags, AF_HOLD_TO_AIM);
+    CMD3(CCC_Mask, "g_hold_to_crouch", &psActorFlags, AF_HOLD_TO_CROUCH);
 
     // alife
 #ifdef DEBUG

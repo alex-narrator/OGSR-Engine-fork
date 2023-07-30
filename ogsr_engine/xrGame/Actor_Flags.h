@@ -22,6 +22,7 @@ enum
     AF_AI_VOLUMETRIC_LIGHTS = 1 << 17,
     AF_EFFECTS_ON_DEMORECORD = 1 << 18,
     AF_DOF_ZOOM_NEW = 1 << 19,
+    AF_HOLD_TO_CROUCH = 1 << 20,
 };
 
 enum

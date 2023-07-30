@@ -982,10 +982,15 @@ void CActor::shedule_Update(u32 DT)
 
         {
             //-----------------------------------------------------
+            mstate_wishful &= ~mcAccel;
             mstate_wishful &= ~mcLStrafe;
             mstate_wishful &= ~mcRStrafe;
+            mstate_wishful &= ~mcLLookout;
+            mstate_wishful &= ~mcRLookout;
             mstate_wishful &= ~mcFwd;
             mstate_wishful &= ~mcBack;
+            if (b_ClearCrouch)
+                mstate_wishful &= ~mcCrouch;
             //-----------------------------------------------------
         }
     }
