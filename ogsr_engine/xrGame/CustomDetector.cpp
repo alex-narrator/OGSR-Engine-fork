@@ -264,7 +264,7 @@ void CCustomDetector::UpdateVisibility()
             if (i0->m_parent_hud_item)
             {
                 u32 state = i0->m_parent_hud_item->GetState();
-                if (state == eReload || state == eSwitch || smart_cast<CGrenade*>(i0->m_parent_hud_item) && state == eThrowStart)
+                if (state == eReload || state == eSwitch)
                 {
                     HideDetector(true);
                     m_bNeedActivation = true;
