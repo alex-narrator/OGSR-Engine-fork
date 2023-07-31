@@ -70,10 +70,6 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     m_fMinPowerWalkJump = READ_IF_EXISTS(pSettings, r_float, section, "min_power_walk_jump", 1.0f);
     m_fAlcoholSatietyIntens = READ_IF_EXISTS(pSettings, r_float, section, "satiety_to_alcohol_effector_intensity", 1.0f);
     m_fStressFactor = READ_IF_EXISTS(pSettings, r_float, section, "stress_factor", 1.0f);
-    m_fZoomEffectorK = READ_IF_EXISTS(pSettings, r_float, section, "power_to_zoom_effector_k", 10.0f);
-
-    //m_fV_HealthMax = READ_IF_EXISTS(pSettings, r_float, section, "max_health_v", 0.f);
-    //m_fBleedingHealthMaxDecrease = READ_IF_EXISTS(pSettings, r_float, section, "bleeding_max_health_dec", 0.f);
 }
 
 // вычисление параметров с ходом времени
@@ -96,9 +92,6 @@ void CActorCondition::UpdateCondition()
         ConditionWalk(weight_k, isActorAccelerated(object().mstate_real, object().IsZoomAimingMode()), (object().mstate_real & mcSprint) != 0);
 
     inherited::UpdateCondition();
-    //UpdatePowerMax();
-    //UpdateHealthMax();
-    UpdateHardHold();
     UpdateTutorialThresholds();
 }
 
@@ -185,8 +178,6 @@ void CActorCondition::save(NET_Packet& output_packet)
     save_data(m_fAlcohol, output_packet);
     save_data(m_condition_flags, output_packet);
     save_data(m_fSatiety, output_packet);
-    //save_data(m_fPowerMax, output_packet);
-    //output_packet.w_float(GetMaxHealth());
 }
 
 void CActorCondition::load(IReader& input_packet)
@@ -195,8 +186,6 @@ void CActorCondition::load(IReader& input_packet)
     load_data(m_fAlcohol, input_packet);
     load_data(m_condition_flags, input_packet);
     load_data(m_fSatiety, input_packet);
-    //load_data(m_fPowerMax, input_packet);
-    //object().SetMaxHealth(input_packet.r_float());
 }
 
 void CActorCondition::reinit()
@@ -330,14 +319,11 @@ float CActorCondition::GetRegenK() { return (1.0f - GetRadiation()) * GetSatiety
 
 float CActorCondition::GetSmoothOwerweightKoef()
 {
-    float val{1.0f};
     float power_k = m_fMinPowerWalkJump + (1.0f - m_fMinPowerWalkJump) * GetPower(); // коэф влияния выносливости
     float overweight_k = object().GetCarryWeight() > object().MaxCarryWeight() ? // считаем коэф. только если есть перегруз
         object().MaxCarryWeight() / object().GetCarryWeight() : // коэф влияния перегруза
         1.0f;
-    val = power_k * overweight_k;
-    // Msg("SmoothOverweightK = %f", val);
-    return val;
+    return power_k * overweight_k;
 }
 
 float CActorCondition::GetStress()
@@ -349,8 +335,6 @@ float CActorCondition::GetStress()
         res *= (object().GetCarryWeight() / object().MaxCarryWeight());
     return res;
 }
-
-float CActorCondition::GetZoomEffectorKoef() { return m_fZoomEffectorK; };
 
 void CActorCondition::UpdatePower()
 {
@@ -415,39 +399,13 @@ void CActorCondition::UpdateAlcohol()
     }
 }
 
-//void CActorCondition::UpdatePowerMax() { ChangeMaxPower(GetMaxPowerRestore() * m_fDeltaTime); }
-//
-//void CActorCondition::UpdateHealthMax() 
-//{ 
-//    float delta = m_fV_HealthMax * GetRegenK(); 
-//    if (m_bIsBleeding)
-//        delta -= BleedingSpeed() * m_fBleedingHealthMaxDecrease;
-//    ChangeMaxHealth(delta * m_fDeltaTime);
-//}
-
-void CActorCondition::UpdateHardHold()
-{
-    if (!object().IsHardHold())
-        return;
-
-    if (IsCantSprint() || IsLimping())
-        object().SetHardHold(false);
-}
-
 float CActorCondition::BleedingSpeed() { return inherited::BleedingSpeed() * GetStress(); }
-
 float CActorCondition::GetWoundIncarnation() { return inherited::GetWoundIncarnation() * GetRegenK(); }
-
 float CActorCondition::GetHealthRestore() { return inherited::GetHealthRestore() * GetRegenK(); }
-
 float CActorCondition::GetPsyHealthRestore() { return inherited::GetPsyHealthRestore() * GetRegenK(); }
-
 float CActorCondition::GetPowerRestore() { return m_fV_Power * GetRegenK(); }
-
 float CActorCondition::GetMaxPowerRestore() { return m_fPowerLeakSpeed * GetStress(); }
-
 float CActorCondition::GetSatietyRestore() { return m_fV_Satiety * GetStress(); }
-
 float CActorCondition::GetAlcoholRestore() { return m_fV_Alcohol * GetStress(); }
  
 void CActorCondition::BoostParameters(const SBooster& B) 

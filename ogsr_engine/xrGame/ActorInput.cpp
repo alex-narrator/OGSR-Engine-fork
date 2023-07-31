@@ -135,11 +135,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
             mstate_wishful |= mcSprint;
     }
     break;
-    case kACCEL: {
-        if (IsZoomAimingMode())
-            SetHardHold(!IsHardHold()); // жесткий хват
-    }
-    break;
     case kCAM_1: cam_Set(eacFirstEye); break;
     case kCAM_2: cam_Set(eacLookAt); break;
     case kCAM_3: cam_Set(eacFreeLook); break;
@@ -349,7 +344,6 @@ void CActor::IR_OnKeyboardHold(int cmd)
         if (eacFreeLook != cam_active)
             cam_Active()->Move(cmd, 0, LookFactor);
         break;
-
     case kACCEL: mstate_wishful |= mcAccel; break;
     case kL_STRAFE: mstate_wishful |= mcLStrafe; break;
     case kR_STRAFE: mstate_wishful |= mcRStrafe; break;

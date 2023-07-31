@@ -43,10 +43,6 @@ private:
     virtual void UpdateAlcohol() override;
     virtual void UpdatePower() override;
     virtual void UpdatePsyHealth() override;
-    //virtual void UpdatePowerMax();
-    //virtual void UpdateHealthMax();
-
-    void UpdateHardHold();
 
 public:
     CActorCondition(CActor* object);
@@ -131,8 +127,6 @@ public:
     float m_fAlcoholSatietyIntens{1.f}; // коэфф. для рассчета интенсивности постэффекта опьянения от голода
     //
     float m_fStressFactor{1.f}; // фактор физнагрузки - множитель для коэффициента нагрузки актора при спринте и прыжке
-    //
-    float m_fZoomEffectorK{};
 
     //float m_fBleedingHealthMaxDecrease{};
 
@@ -141,8 +135,6 @@ public:
     float GetRegenK();
     // коэффициент нагрузки актора
     float GetStress();
-    // во сколько раз больше трясутся руки в прицеливании при полном отсутствии выносливости
-    float GetZoomEffectorKoef();
 
     float AlcoholSatiety() { return m_fAlcohol * (1.0f + m_fAlcoholSatietyIntens - GetSatiety()); }
 

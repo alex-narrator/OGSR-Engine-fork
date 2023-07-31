@@ -763,9 +763,8 @@ void CActor::UpdateCL()
     {
         if (pWeapon->IsZoomed())
         {
-            CEffectorZoomInertion* S = smart_cast<CEffectorZoomInertion*>(Cameras().GetCamEffector(eCEZoom));
-            if (S && !IsHardHold())
-                S->SetParams(pWeapon->GetControlInertionFactor() / GetExoFactor());
+            if (auto ezi = smart_cast<CEffectorZoomInertion*>(Cameras().GetCamEffector(eCEZoom)))
+                ezi->SetParams(pWeapon->GetControlInertionFactor() / GetExoFactor());
             m_bZoomAimingMode = true;
         }
 
@@ -1693,16 +1692,6 @@ bool CActor::IsDetectorActive() const
     return false;
 }
 
-float CActor::GetZoomEffectorK()
-{
-    float k = 1.f + (conditions().GetZoomEffectorKoef() * (1.f - conditions().GetPower()));
-    if (is_actor_crouch())
-        k *= 0.5f;
-    if (auto weapon = smart_cast<CWeapon*>(inventory().ActiveItem()))
-        k /= weapon->GetZoomFactor();
-    return k;
-}
-
 void CActor::BlockSprint()
 {
     if (mstate_wishful & mcSprint)
@@ -1829,11 +1818,4 @@ bool CActor::IsFreeHands() const
     if (active_hud_item && active_hud_item->IsPending())
         return false;
     return true;
-}
-
-void CActor::SetHardHold(bool val)
-{
-    if (val && (conditions().IsCantSprint() || conditions().IsLimping()))
-        return;
-    m_bIsHardHold = val;
 }

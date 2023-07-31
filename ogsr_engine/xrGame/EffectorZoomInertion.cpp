@@ -10,10 +10,6 @@
 
 constexpr const char* EFFECTOR_ZOOM_SECTION = "zoom_inertion_effector";
 
-bool external_zoom_osc = false; // alpet: флажок внешнего рассчета колебаний прицела (из скриптов).
-
-void switch_zoom_osc(bool bExternal) { external_zoom_osc = bExternal; }
-
 CEffectorZoomInertion* FindEffectorZoomInertion()
 {
     CActor* actor = Actor();
@@ -74,14 +70,14 @@ void CEffectorZoomInertion::Init(CWeaponMagazined* pWeapon)
     if (!pWeapon)
         return;
 
-    LoadParams(*pWeapon->cNameSect(), "ezi_");
+    LoadParams(pWeapon->cNameSect().c_str(), "ezi_");
 };
 
 void CEffectorZoomInertion::SetParams(float disp)
 {
     float old_disp = m_fDispRadius;
 
-    m_fDispRadius = disp * m_fZoomAimingDispK * Actor()->GetZoomEffectorK();
+    m_fDispRadius = disp * m_fZoomAimingDispK;
     if (m_fDispRadius < m_fDispMin)
         m_fDispRadius = m_fDispMin;
 
@@ -110,8 +106,8 @@ BOOL CEffectorZoomInertion::ProcessCam(SCamEffectorInfo& info)
 {
     bool camera_moved = false;
 
-    //определяем двигал ли прицелом актер
-    if (!info.d.similar(m_vOldCameraDir, m_fCameraMoveEpsilon) || Actor()->IsHardHold())
+    // определяем двигал ли прицелом актер
+    if (!info.d.similar(m_vOldCameraDir, m_fCameraMoveEpsilon) || m_bPauseEffect)
         camera_moved = true;
 
     /*
@@ -179,8 +175,7 @@ void CEffectorZoomInertion::script_register(lua_State* L)
             .def_readwrite("zoom_aim_disp_k", &CEffectorZoomInertion::m_fZoomAimingDispK)
             .def_readwrite("zoom_aim_speed_k", &CEffectorZoomInertion::m_fZoomAimingSpeedK)
             .def_readwrite("delta_time", &CEffectorZoomInertion::m_dwDeltaTime)
-
-        // */
-        ,
-        def("find_effector_zi", &FindEffectorZoomInertion), def("switch_zoom_osc", &switch_zoom_osc)];
+            .def_readwrite("pause_effect", &CEffectorZoomInertion::m_bPauseEffect), //hack to stop effect processing
+            
+            def("find_effector_zi", &FindEffectorZoomInertion)];
 }

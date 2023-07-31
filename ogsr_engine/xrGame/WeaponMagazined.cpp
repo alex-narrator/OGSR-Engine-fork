@@ -1728,14 +1728,14 @@ void CWeaponMagazined::OnZoomIn()
         if (ec)
             pActor->Cameras().RemoveCamEffector(eCEActorMoving);
 
-        CEffectorZoomInertion* S = smart_cast<CEffectorZoomInertion*>(pActor->Cameras().GetCamEffector(eCEZoom));
-        if (!S)
+        auto ezi = smart_cast<CEffectorZoomInertion*>(pActor->Cameras().GetCamEffector(eCEZoom));
+        if (!ezi)
         {
-            S = (CEffectorZoomInertion*)pActor->Cameras().AddCamEffector(xr_new<CEffectorZoomInertion>());
-            S->Init(this);
-        };
-        S->SetRndSeed(pActor->GetZoomRndSeed());
-        R_ASSERT(S);
+            ezi = (CEffectorZoomInertion*)pActor->Cameras().AddCamEffector(xr_new<CEffectorZoomInertion>());
+            ezi->Init(this);
+        }
+        ezi->SetRndSeed(pActor->GetZoomRndSeed());
+        R_ASSERT(ezi);
 
         if (IsAddonAttached(eScope) && !IsGrenadeMode())
         {
@@ -1763,7 +1763,6 @@ void CWeaponMagazined::OnZoomOut(bool rezoom)
 
     if (auto pActor = smart_cast<CActor*>(H_Parent()))
     {
-        pActor->SetHardHold(false);
         pActor->Cameras().RemoveCamEffector(eCEZoom);
         if (m_bVision)
         {

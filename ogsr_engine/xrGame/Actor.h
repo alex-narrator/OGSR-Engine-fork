@@ -789,10 +789,6 @@ public:
     void ActorKick();
     void ActorQuickThrowGrenade();
     void ActorQuickKnifeStab();
-    // множитель для управления интенсивностью эффектора качания в прицеливании
-    float GetZoomEffectorK();
-    void SetHardHold(bool val)/* { m_bIsHardHold = val; }*/;
-    bool IsHardHold() const { return m_bIsHardHold || is_actor_creep(); };
 
     void BlockSprint();
     // визначаємо чи треба передати хіт до рюкзака та його вмісту

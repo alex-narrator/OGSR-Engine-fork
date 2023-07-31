@@ -343,7 +343,7 @@ void CHudItem::UpdateCL()
         }
     }
 
-    AllowHudBobbing((Core.Features.test(xrCore::Feature::wpn_bobbing) && allow_bobbing && !Actor()->IsHardHold()) || Actor()->PsyAuraAffect);
+    AllowHudBobbing((Core.Features.test(xrCore::Feature::wpn_bobbing) && allow_bobbing) || Actor()->PsyAuraAffect);
 
     if (auto actor = smart_cast<CActor*>(object().H_Parent()))
     {
@@ -940,7 +940,6 @@ void CHudItem::UpdateInertion(Fmatrix& trans)
             clamp(m_fAimInertionK, -1.f, 1.f);
             _origin_offset += (_origin_offset * m_fAimInertionK);
             _tendto_speed -= (_tendto_speed * m_fAimInertionK);
-            _origin_offset *= !Actor()->IsHardHold();
         }
         else
         { // Худ в режиме "От бедра"
@@ -1007,13 +1006,12 @@ void CHudItem::UpdateHudAdditional(Fmatrix& trans, const bool need_update_collis
     //====================================================//
 
     auto pActor = smart_cast<const CActor*>(object().H_Parent());
-    const bool is_hard_hold = pActor->IsHardHold();
     const u32 iMovingState = pActor->MovingState();
     idx = b_aiming ? 1ui8 : 0ui8;
 
     //============= Боковой стрейф с оружием =============//
     {
-        const bool bEnabled = m_strafe_offset[2][idx].x && !is_hard_hold;
+        const bool bEnabled = m_strafe_offset[2][idx].x;
         if (!bEnabled)
             goto LOOKOUT_EFFECT;
 

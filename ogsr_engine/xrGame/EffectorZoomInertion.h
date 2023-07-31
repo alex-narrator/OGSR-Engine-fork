@@ -37,6 +37,8 @@ public:
 
     CRandom m_Random;
 
+    bool m_bPauseEffect{};
+
     void CalcNextPoint();
     void LoadParams(LPCSTR Section, LPCSTR Prefix);
 
