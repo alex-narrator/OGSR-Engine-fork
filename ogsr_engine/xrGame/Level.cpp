@@ -338,11 +338,12 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
 {
     //			Msg				("--- event[%d] for [%d]",type,dest);
     CObject* O = Objects.net_Find(dest);
-    if (0 == O)
+    if (!O)
     {
 #ifdef DEBUG
         Msg("* WARNING: c_EVENT[%d] to [%d]: unknown dest", type, dest);
 #endif // DEBUG
+        ProcessGameSpawnsDestroy(dest, type, P);
         return;
     }
     CGameObject* GO = smart_cast<CGameObject*>(O);
@@ -353,9 +354,23 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
     }
     if (type != GE_DESTROY_REJECT)
     {
+        bool skip_event = false;
         if (type == GE_DESTROY)
             Game().OnDestroy(GO);
-        GO->OnEvent(P, type);
+        else if (type == GE_OWNERSHIP_REJECT)
+        {
+            u32 pos = P.r_tell();
+            u16 id = P.r_u16();
+            P.r_seek(pos);
+            CObject* D = Objects.net_Find(id);
+            if (!D && MaybeJustDestroyedObject(id))
+            {
+                Msg("* [%s]: skip GE_OWNERSHIP_REJECT for just destroyed ID[%u] from %s[%u]", __FUNCTION__, id, O->cName().c_str(), O->ID());
+                skip_event = true;
+            }
+        }
+        if (!skip_event)
+            GO->OnEvent(P, type);
     }
     else
     { // handle GE_DESTROY_REJECT here
@@ -400,7 +415,7 @@ void CLevel::ProcessGameEvents()
             Msg("- d[%d],ts[%d] -- E[svT=%d],[evT=%d]",Device.dwTimeGlobal,timeServer(),svT,game_events->queue.begin()->timestamp);
         */
 
-        m_just_destroyed.clear();
+        bool clear_just_destroyed = false;
 
         while (game_events->available(svT))
         {
@@ -417,6 +432,7 @@ void CLevel::ProcessGameEvents()
             break;
             case M_EVENT: {
                 cl_Process_Event(dest, type, P);
+                clear_just_destroyed = true;
             }
             break;
             default: {
@@ -425,7 +441,11 @@ void CLevel::ProcessGameEvents()
             break;
             }
         }
+        if (clear_just_destroyed)
+            m_just_destroyed.clear();
     }
+    if (!is_removing_objects())
+        Device.seqParallel.push_back(fastdelegate::MakeDelegate(this, &CLevel::ProcessGameSpawns));
 }
 
 void CLevel::OnFrame()
@@ -785,6 +805,8 @@ void CLevel::GetGameTimeForShaders(u32& hours, u32& minutes, u32& seconds, u32& 
 void CLevel::OnSessionTerminate(LPCSTR reason) { MainMenu()->OnSessionTerminate(reason); }
 
 void CLevel::OnDestroyObject(u16 id) { m_just_destroyed.push_back(id); }
+
+bool CLevel::MaybeJustDestroyedObject(u16 id) { return std::find(m_just_destroyed.begin(), m_just_destroyed.end(), id) != m_just_destroyed.end(); }
 
 void CLevel::OnChangeCurrentWeather(const char* sect)
 {

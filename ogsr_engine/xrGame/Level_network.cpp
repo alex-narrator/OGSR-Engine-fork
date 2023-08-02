@@ -14,6 +14,8 @@
 #include "client_spawn_manager.h"
 #include "seniority_hierarchy_holder.h"
 #include "script_vars_storage.h"
+#include "xrServer_Object_Base.h"
+#include "object_destroyer.h"
 
 constexpr int max_objects_size = 2 * 1024;
 constexpr int max_objects_size_in_save = 6 * 1024;
@@ -47,6 +49,8 @@ void CLevel::remove_objects()
         //Sleep(100);
     }
 
+    Device.remove_from_seq_parallel(fastdelegate::MakeDelegate(this, &CLevel::ProcessGameSpawns));
+    delete_data(game_spawn_queue);
 
     BulletManager().Clear();
     ph_commander().clear();

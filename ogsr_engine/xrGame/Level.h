@@ -205,6 +205,7 @@ public:
     void cl_Process_Spawn(NET_Packet& P);
     void ProcessGameEvents();
     void ProcessGameSpawns();
+    void ProcessGameSpawnsDestroy(u16 dest, u16 type, NET_Packet& P);
 
     // Input
     virtual void IR_OnKeyboardPress(int btn);
@@ -309,6 +310,7 @@ public:
     void remove_objects();
     virtual void OnSessionTerminate(LPCSTR reason);
     void OnDestroyObject(u16 id) override;
+    bool MaybeJustDestroyedObject(u16 id);
     virtual void OnChangeCurrentWeather(const char* sect) override;
 
     DECLARE_SCRIPT_REGISTER_FUNCTION
