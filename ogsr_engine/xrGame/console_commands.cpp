@@ -1033,10 +1033,10 @@ public:
     }
 };
 
-class CCC_ReloadHUD : public IConsole_Command
+class CCC_ReloadUI : public IConsole_Command
 {
 public:
-    CCC_ReloadHUD(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    CCC_ReloadUI(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
     virtual void Execute(LPCSTR args) 
     { 
         if (g_hud)
@@ -1654,5 +1654,5 @@ void CCC_RegisterCommands()
     CMD4(CCC_Float, "missile_force_grow_speed", &g_fForceGrowSpeed, 1.0f, 50.0f); // скорость замаха гранатой/болтом
     CMD3(CCC_Mask, "g_bloodmarks_on_dynamics", &psActorFlags, AF_BLOODMARKS_ON_DYNAMIC);
     CMD3(CCC_Token, "g_save_mode", (u32*)&g_eSaveGameMode, save_game_mode_token);
-    CMD1(CCC_ReloadHUD, "reload_hud");
+    CMD1(CCC_ReloadUI, "reload_ui");
 }
