@@ -126,15 +126,7 @@ void CEntity::Hit(SHit* pHDS)
 
     // If Local() - perform some logic
     if (Local() && !g_Alive() && !AlreadyDie() && (m_killer_id == ALife::_OBJECT_ID(-1)))
-    {
         KillEntity(pHDS->whoID);
-        auto pK = smart_cast<IKinematics*>(Visual());
-        if (pHDS->bone() == pK->LL_BoneID("bip01_neck") || is_bone_head(*pK, pHDS->bone()) || is_backstab(*pK, pHDS))
-        {
-            b_disable_death_sound = true;
-            // Msg("%s disable death sound for %s", __FUNCTION__, cName().c_str());
-        }
-    }
     // must be last!!! @slipch
     inherited::Hit(pHDS);
 }

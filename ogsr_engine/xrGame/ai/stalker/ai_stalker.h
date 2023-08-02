@@ -137,6 +137,7 @@ public:
 
 public:
     bool m_wounded;
+    bool m_headshot{};
 
 public:
     CAI_Stalker();

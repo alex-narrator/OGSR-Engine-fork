@@ -296,17 +296,14 @@ void CAI_Stalker::Die(CObject* who)
     SelectAnimation(XFORM().k, movement().detail().direction(), movement().speed());
 
     sound().set_sound_mask(0);
-    if (is_special_killer(who))
-    {
-        sound().play(eStalkerSoundDieInAnomaly);
-    }
-    else if (!b_disable_death_sound)
-    {
-        sound().play(eStalkerSoundDie);
-    }
+    if (m_headshot)
+        sound().remove_active_sounds(u32(-1));
     else
     {
-        sound().remove_active_sounds(u32(-1));
+        if (is_special_killer(who))
+            sound().play(eStalkerSoundDieInAnomaly);
+        else
+            sound().play(eStalkerSoundDie);
     }
 
     m_hammer_is_clutched = m_clutched_hammer_enabled && !CObjectHandler::planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped) && !::Random.randI(0, 2);
