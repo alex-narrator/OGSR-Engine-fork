@@ -55,15 +55,7 @@ public:
     bool OnKeyboardHold(int cmd);
 
 protected:
-    CUIStatic UIStaticHealth;
-    CUIStatic UIStaticPower;
-    //CUIStatic UIStaticArmor;
     CUIStatic UIStaticQuickHelp;
-    CUIProgressBar UIHealthBar;
-    //CUIProgressBar UIMaxHealthBar;
-    CUIProgressBar UIPowerBar;
-    //CUIProgressBar UIMaxPowerBar;
-    //CUIProgressBar UIArmorBar;
     CUICarPanel UICarPanel;
     CUIMotionIcon UIMotionIcon;
     CUIZoneMap* UIZoneMap;

@@ -141,15 +141,6 @@ void CUIMainIngameWnd::Init()
 
     Enable(false);
 
-    AttachChild(&UIStaticHealth);
-    xml_init.InitStatic(uiXml, "static_health", 0, &UIStaticHealth);
-
-    //AttachChild(&UIStaticArmor);
-    //xml_init.InitStatic(uiXml, "static_armor", 0, &UIStaticArmor);
-
-    AttachChild(&UIStaticPower);
-    xml_init.InitStatic(uiXml, "static_power", 0, &UIStaticPower);
-
     AttachChild(&UIWeaponBack);
     xml_init.InitStatic(uiXml, "static_weapon", 0, &UIWeaponBack);
 
@@ -183,24 +174,6 @@ void CUIMainIngameWnd::Init()
 
     xml_init.InitStatic(uiXml, "static_pda_online", 0, &UIPdaOnline);
     UIZoneMap->Background().AttachChild(&UIPdaOnline);
-
-    // Полоса прогресса здоровья
-    UIStaticHealth.AttachChild(&UIHealthBar);
-    xml_init.InitProgressBar(uiXml, "progress_bar_health", 0, &UIHealthBar);
-    //максимальне здоров'я
-    //UIStaticHealth.AttachChild(&UIMaxHealthBar);
-    //xml_init.InitProgressBar(uiXml, "progress_bar_health_max", 0, &UIMaxHealthBar);
-
-    //витривалість
-    UIStaticPower.AttachChild(&UIPowerBar);
-    xml_init.InitProgressBar(uiXml, "progress_bar_power", 0, &UIPowerBar);
-    //максимальна витривалість
-    //UIStaticPower.AttachChild(&UIMaxPowerBar);
-    //xml_init.InitProgressBar(uiXml, "progress_bar_power_max", 0, &UIMaxPowerBar);
-
-    // Полоса прогресса армора
-    //UIStaticArmor.AttachChild(&UIArmorBar);
-    //xml_init.InitProgressBar(uiXml, "progress_bar_armor", 0, &UIArmorBar);
 
     // Подсказки, которые возникают при наведении прицела на объект
     AttachChild(&UIStaticQuickHelp);
@@ -379,25 +352,10 @@ void CUIMainIngameWnd::Update()
                 TurnOffWarningIcon(ewiSafehouse);
         }
 
-        UIHealthBar.SetProgressPos(m_pActor->GetfHealth() * 100.0f);
-        //UIMaxHealthBar.SetProgressPos((1.f - m_pActor->GetMaxHealth()) * 100.0f);
-
-        UIPowerBar.SetProgressPos(m_pActor->conditions().GetPower() * 100.0f);
-        //UIMaxPowerBar.SetProgressPos((1.f - m_pActor->conditions().GetMaxPower()) * 100.0f);
-
-        // Armor bar
-        //auto pOutfit = m_pActor->GetOutfit();
-        //UIArmorBar.Show(pOutfit);
-        //UIStaticArmor.Show(pOutfit);
-        //if (pOutfit)
-        //    UIArmorBar.SetProgressPos(pOutfit->GetCondition() * 100);
-
         UpdateActiveItemInfo();
 
         auto cond = &m_pActor->conditions();
 
-        //EWarningIcons i = ewiWeaponJammed;
-        //while (!external_icon_ctrl && i <= ewiInvincible)
         for (int i = 0; i < ewiThresholdMax && !external_icon_ctrl; ++i)
         {
             float value{};

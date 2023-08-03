@@ -212,7 +212,7 @@ void CLevel::ProcessGameSpawns()
     {
         CSE_Abstract* E = game_spawn_queue.front();
         game_spawn_queue.pop_front();
-        Msg("* [%s]: delayed spawn dwFrame[%u] ID[%d] ID_Parent[%d] name_replace[%s]", __FUNCTION__, Device.dwFrame, E->ID, E->ID_Parent, E->name_replace());
+        //Msg("* [%s]: delayed spawn dwFrame[%u] ID[%d] ID_Parent[%d] name_replace[%s]", __FUNCTION__, Device.dwFrame, E->ID, E->ID_Parent, E->name_replace());
         g_sv_Spawn(E);
         if (smart_cast<CSE_ALifeMonsterAbstract*>(E) || smart_cast<CSE_ALifeTraderAbstract*>(E))
         {
