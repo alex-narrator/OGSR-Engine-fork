@@ -325,6 +325,7 @@ void CWeaponScript::script_register(lua_State* L)
                   //.property("grenade_launcher_name", &get_grenade_launcher_name, &set_grenade_launcher_name)
 
                   .def_readonly("zoom_mode", &CWeapon::m_bZoomMode)
+                  .def("is_addon_attached", &CWeapon::IsAddonAttached)
 
                   .def_readwrite("scope_inertion_factor", &CWeapon::m_fScopeInertionFactor)
 
@@ -363,7 +364,12 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("switch_gl", &CWeaponMagazinedWGrenade::SwitchMode),
               class_<CMissile, CInventoryItemObject>("CMissile")
                   .def_readwrite("destroy_time", &CMissile::m_dwDestroyTime)
-                  .def_readwrite("destroy_time_max", &CMissile::m_dwDestroyTimeMax)];
+                  .def_readwrite("destroy_time_max", &CMissile::m_dwDestroyTimeMax),
+              class_<enum_exporter<eWeaponAddonType>>("addon").enum_("addon")[
+                  value("silencer", int(eSilencer)), value("scope", int(eScope)), value("launcher", int(eLauncher)), 
+                  value("laser", int(eLaser)), value("flashlight", int(eFlashlight)), value("stock", int(eStock)), 
+                  value("extender", int(eExtender)), value("forend", int(eForend)), value("magazine", int(eMagazine)), 
+                  value("max", int(eMaxAddon))]];
 }
 
 void CCustomMonsterScript::script_register(lua_State* L)
