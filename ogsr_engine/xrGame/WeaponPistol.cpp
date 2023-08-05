@@ -212,17 +212,6 @@ void CWeaponPistol::PlayAnimOnItemTake()
         inherited::PlayAnimOnItemTake();
 }
 
-void CWeaponPistol::PlayAnimCheckout()
-{
-    if (m_opened)
-    {
-        AnimationExist("anm_checkout_empty") ? PlayHUDMotion("anm_checkout_empty", true, GetState()) : PlayHUDMotion({"anim_empty", "anm_bore_empty"}, true, GetState());
-        PlaySound(sndCheckout, Position());
-    }
-    else
-        inherited::PlayAnimCheckout();
-}
-
 void CWeaponPistol::PlayAnimKick()
 {
     if (m_opened)

@@ -400,10 +400,6 @@ void CActor::Load(LPCSTR section)
     m_fKickPower = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "kick_power", .1f);
     m_fHoldingDistance = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "holding_distance", .5f); // расстояние перед актором на котором находится удерживаемый предмет
     clamp(m_fHoldingDistance, 0.0f, inventory().GetTakeDist());
-
-    m_uActiveItemInfoTTL = READ_IF_EXISTS(pSettings, r_u32, section, "active_item_info_ttl", 0);
-    m_uGearInfoTTL = READ_IF_EXISTS(pSettings, r_u32, section, "gear_info_ttl", 0);
-    dof_params_ui = READ_IF_EXISTS(pSettings, r_fvector4, "features", "dof_ui_params", (Fvector4{0, 0, 1, 0}));
 }
 
 void CActor::PHHit(SHit& H) { m_pPhysics_support->in_Hit(H, !g_Alive()); }
@@ -846,29 +842,6 @@ void CActor::UpdateCL()
         if (auto wpn = inventory().ActiveItem())
             wpn_cond = wpn->GetCondition();
         shader_exports.set_actor_params(Fvector{this->conditions().GetHealth(), outfit_cond, wpn_cond});
-    }
-
-    if (!m_uActiveItemInfoTTL)
-    {
-        m_bShowActiveItemInfo = true;
-    }
-    else if (m_bShowActiveItemInfo)
-    {
-        if (Device.dwTimeGlobal > m_uActiveItemInfoStartTime + m_uActiveItemInfoTTL)
-        {
-            m_bShowActiveItemInfo = false;
-        }
-    }
-    if (!m_uGearInfoTTL)
-    {
-        m_bShowGearInfo = true;
-    }
-    else if (m_bShowGearInfo)
-    {
-        if (Device.dwTimeGlobal > m_uGearInfoStartTime + m_uGearInfoTTL)
-        {
-            m_bShowGearInfo = false;
-        }
     }
 }
 

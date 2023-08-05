@@ -1844,9 +1844,9 @@ float CWeaponMagazined::GetWeaponDeterioration() const
 #include "ui/UIMainIngameWnd.h"
 void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
 {
-    auto CurrentHUD = HUD().GetUI()->UIMainIngameWnd;
-    bool b_wpn_info = CurrentHUD->IsHUDElementAllowed(eActiveItem);
-    bool b_gear_info = CurrentHUD->IsHUDElementAllowed(eGear);
+    auto main_wnd = HUD().GetUI()->UIMainIngameWnd;
+    bool b_wpn_info = main_wnd->m_bShowActiveItemInfo;
+    bool b_gear_info = main_wnd->m_bShowGearInfo;
 
     bool b_use_mags = AddonAttachable(eMagazine) && !IsGrenadeMode();
 

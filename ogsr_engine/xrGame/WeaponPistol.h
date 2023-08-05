@@ -36,7 +36,6 @@ public:
     virtual void PlayAnimShoot() override;
 
     virtual void PlayAnimOnItemTake() override;
-    virtual void PlayAnimCheckout() override;
     virtual void PlayAnimKick() override;
 
     virtual void UpdateSounds();

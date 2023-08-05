@@ -272,7 +272,7 @@ void CUIMainIngameWnd::Draw()
 
     CUIWindow::Draw();
 
-    if (IsHUDElementAllowed(ePDA))
+    if (m_bShowZoneMap)
         UIZoneMap->Render();
 
     RenderQuickInfos();
@@ -361,9 +361,8 @@ void CUIMainIngameWnd::Update()
             float value{};
             switch (i)
             {
-            case ewiRadiation:
-                if (IsHUDElementAllowed(eDetector))
-                    value = cond->GetRadiation();
+            case ewiRadiation: 
+                value = cond->GetRadiation();
                 break;
             case ewiWound: 
                 value = cond->BleedingSpeed(); 
@@ -437,9 +436,8 @@ void CUIMainIngameWnd::Update()
 
     UpdatePickUpItem();
 
-    bool show_panels = IsHUDElementAllowed(eGear);
-    m_beltPanel->Show(show_panels); // панель поясу та розгрузки
-    m_slotPanel->Show(show_panels); // панель слотів
+    m_beltPanel->Show(m_bShowGearInfo); // панель поясу та розгрузки
+    m_slotPanel->Show(m_bShowGearInfo); // панель слотів
 
     UpdateFlashingIcons(); // обновляем состояние мигающих иконок
 
@@ -710,7 +708,7 @@ void CUIMainIngameWnd::UpdatePickUpItem()
 void CUIMainIngameWnd::UpdateActiveItemInfo()
 {
     PIItem item = m_pActor->inventory().ActiveItem();
-    bool show_info = item && item->NeedBriefInfo() && (IsHUDElementAllowed(eActiveItem) || IsHUDElementAllowed(eGear));
+    bool show_info = item && item->NeedBriefInfo() && (m_bShowActiveItemInfo || m_bShowGearInfo);
 
     UIWeaponBack.Show(show_info);
     UIWeaponSignAmmo.Show(show_info);
@@ -738,42 +736,6 @@ void CUIMainIngameWnd::reset_ui()
     UIMotionIcon.ResetVisibility();
 }
 
-bool CUIMainIngameWnd::IsHUDElementAllowed(EHUDElement element)
-{
-    if (Device.Paused() || !m_pActor || m_pActor && !m_pActor->g_Alive())
-        return false;
-
-    switch (element)
-    {
-    case ePDA: // ПДА
-    {
-        return (m_pActor->m_bShowGearInfo && m_pActor->m_bShowActiveItemInfo || 
-            OnKeyboardHold(get_action_dik(kSCORES)) || 
-            m_pActor->inventory().GetActiveSlot() == BOLT_SLOT) &&
-            m_pActor->GetPDA();
-    }
-    break;
-    case eDetector: // Детектор (иконка радиационного заражения)
-    {
-        return m_pActor->HasDetectorWorkable();
-    }
-    break;
-    case eActiveItem: // Информация об предмете в руках (для оружия - кол-во/тип заряженных патронов, режим огня)
-    {
-        return m_pActor->inventory().ActiveItem() && m_pActor->m_bShowActiveItemInfo;
-    }
-    break;
-    case eGear: // Информация о снаряжении - панель артефактов, наполнение квикслотов, общее кол-во патронов к оружию в руках
-    {
-        return m_pActor->m_bShowGearInfo;
-    }
-    break;
-    default:
-        Msg("! unknown hud element");
-        return false;
-        break;
-    }
-}
 #include "../xr_3da/XR_IOConsole.h"
 bool CUIMainIngameWnd::OnKeyboardHold(int cmd)
 {
@@ -838,7 +800,12 @@ void CUIMainIngameWnd::script_register(lua_State* L)
 {
     module(L)[
 
-        class_<CUIMainIngameWnd, CUIWindow>("CUIMainIngameWnd").def("GetStatic", &GetStaticRaw, raw<2>()),
+        class_<CUIMainIngameWnd, CUIWindow>("CUIMainIngameWnd")
+            .def("GetStatic", &GetStaticRaw, raw<2>())
+            .def_readwrite("show_zone_map", &CUIMainIngameWnd::m_bShowZoneMap)
+            .def_readwrite("show_active_item_info", &CUIMainIngameWnd::m_bShowActiveItemInfo)
+            .def_readwrite("show_gear_info", &CUIMainIngameWnd::m_bShowGearInfo)
+        ,
         def("get_main_window", &GetMainIngameWindow) // get_mainingame_window better??
         ,
         def("setup_game_icon", &SetupGameIcon)];

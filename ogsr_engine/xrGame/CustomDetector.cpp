@@ -524,8 +524,6 @@ BOOL CCreatureList::feel_touch_contact(CObject* O)
     bool res = (m_TypesMap.find(species) != m_TypesMap.end()) || (m_TypesMap.find("class_all") != m_TypesMap.end());
     if (!pCreature->g_Alive() || smart_cast<CActor*>(pCreature))
         res = false;
-    if (!res && pCreature->g_Alive() && !smart_cast<CActor*>(pCreature))
-        Msg("~%s %s", __FUNCTION__, species);
 
     return res;
 }

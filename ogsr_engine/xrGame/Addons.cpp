@@ -26,6 +26,10 @@ void CScope::script_register(lua_State* L)
 		class_<CForend, CGameObject>("CForend").def(constructor<>()),
 		//devices
 		class_<CPda, CGameObject>("CPda").def(constructor<>()), 
+		class_<CCustomDetector, CGameObject>("CCustomDetector")
+			.def(constructor<>())
+			.def("can_switch_modes", &CCustomDetector::CanSwitchModes)
+			.def("is_af_mode", &CCustomDetector::IsAfMode),
 		class_<CSimpleDetectorSHOC, CGameObject>("CSimpleDetectorSHOC").def(constructor<>()),
 		class_<CScientificDetector, CGameObject>("CScientificDetector").def(constructor<>()),
 		class_<CEliteDetector, CGameObject>("CEliteDetector").def(constructor<>()), 

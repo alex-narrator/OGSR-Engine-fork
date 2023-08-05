@@ -1572,16 +1572,4 @@ void CHudItem::PlayAnimOnItemTake()
     PlaySound(sndOnItemTake, object().Position());
 }
 
-void CHudItem::PlayAnimCheckout()
-{
-    AnimationExist("anm_checkout") ? PlayHUDMotion("anm_checkout", true, GetState()) : PlayHUDMotion({"anim_idle", "anm_bore"}, true, GetState(), false);
-    PlaySound(sndCheckout, object().Position());
-}
-
-void CHudItem::PlayAnimCheckGear()
-{
-    AnimationExist("anm_check_gear") ? PlayHUDMotion("anm_check_gear", true, GetState()) : PlayHUDMotion({"anim_draw", "anm_show"}, true, GetState(), false);
-    PlaySound(sndCheckGear, object().Position());
-}
-
 void CHudItem::PlayAnimKick() { AnimationExist("anm_kick") ? PlayHUDMotion("anm_kick", true, GetState()) : PlayHUDMotion({"anim_draw", "anm_show"}, true, GetState(), false); }

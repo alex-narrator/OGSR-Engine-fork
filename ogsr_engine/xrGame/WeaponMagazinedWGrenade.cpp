@@ -927,34 +927,6 @@ void CWeaponMagazinedWGrenade::PlayAnimOnItemTake()
     PlaySound(sndOnItemTake, Position());
 }
 
-void CWeaponMagazinedWGrenade::PlayAnimCheckout()
-{
-    if (!IsAddonAttached(eLauncher))
-    {
-        inherited::PlayAnimCheckout();
-        return;
-    }
-    else if (IsGrenadeMode())
-        AnimationExist("anm_checkout_g") ? PlayHUDMotion("anm_checkout_g", true, GetState()) : PlayHUDMotion("anm_bore_g", true, GetState());
-    else
-        AnimationExist("anm_checkout_w_gl") ? PlayHUDMotion("anm_checkout_w_gl", true, GetState()) : PlayHUDMotion("anm_bore_w_gl", true, GetState());
-    PlaySound(sndCheckout, Position());
-}
-
-void CWeaponMagazinedWGrenade::PlayAnimCheckGear()
-{
-    if (!IsAddonAttached(eLauncher))
-    {
-        inherited::PlayAnimCheckGear();
-        return;
-    }
-    else if (IsGrenadeMode())
-        AnimationExist("anm_check_gear_g") ? PlayHUDMotion("anm_check_gear_g", true, GetState()) : PlayHUDMotion({"anim_draw_g", "anm_show_g"}, true, GetState());
-    else
-        AnimationExist("anm_check_gear_w_gl") ? PlayHUDMotion("anm_check_gear_w_gl", true, GetState()) : PlayHUDMotion({"anim_draw_gl", "anm_show_w_gl"}, true, GetState());
-    PlaySound(sndCheckGear, Position());
-}
-
 void CWeaponMagazinedWGrenade::PlayAnimKick()
 {
     if (!IsAddonAttached(eLauncher))

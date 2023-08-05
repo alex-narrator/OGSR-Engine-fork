@@ -803,22 +803,9 @@ public:
     void SetRuckAmmoPlacement(bool set_ruck) { m_bRuckAmmoPlacement = set_ruck; };
 
     void TryPlayAnimItemTake();
-    void ActorCheckout();
-    void ActorCheckGear();
-
-    bool m_bShowActiveItemInfo{};
-    bool m_bShowGearInfo{};
 
 protected:
-    bool m_bIsHardHold{};
     bool m_bRuckAmmoPlacement{};
-
-    u32 m_uActiveItemInfoTTL{};
-    u32 m_uGearInfoTTL{};
-    u32 m_uActiveItemInfoStartTime{};
-    u32 m_uGearInfoStartTime{};
-    u32 saved_state{(u32)-1};
-    Fvector4 dof_params_ui{};
 
 public:
     float GetItemBoostedParams(int);

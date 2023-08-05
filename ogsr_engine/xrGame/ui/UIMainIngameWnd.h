@@ -32,15 +32,6 @@ class CInventoryItem;
 class CUIXml;
 class CUIStatic;
 
-// Енумы элементов худа
-enum EHUDElement
-{
-    ePDA,
-    eDetector,
-    eActiveItem,
-    eGear,
-};
-
 class CUIMainIngameWnd : public CUIWindow
 {
 public:
@@ -73,6 +64,7 @@ protected:
 public:
     CUIStatic* GetPDAOnline() { return &UIPdaOnline; };
     CUIZoneMap* GetUIZoneMap() { return UIZoneMap; }
+    bool m_bShowZoneMap{}, m_bShowActiveItemInfo{}, m_bShowGearInfo{};
 
 protected:
     // 5 статиков для отображения иконок:
@@ -175,8 +167,6 @@ protected:
 
 public:
     void SetPickUpItem(CInventoryItem* PickUpItem);
-
-    bool IsHUDElementAllowed(EHUDElement element);
 
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };

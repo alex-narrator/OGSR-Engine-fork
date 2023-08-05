@@ -129,6 +129,9 @@ void CActor::IR_OnKeyboardPress(int cmd)
                 pWeapon->OnZoomOut();
         }
 
+        if (!psActorFlags.test(AF_HOLD_TO_CROUCH) && !b_ClearCrouch)
+            b_ClearCrouch = true;
+
         if (mstate_wishful & mcSprint)
             mstate_wishful &= ~mcSprint;
         else
@@ -205,14 +208,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
     break;
     case kQUICK_KNIFE_STAB: {
         ActorQuickKnifeStab();
-    }
-    break;
-    case kCHECKACTIVEITEM: {
-        ActorCheckout();
-    }
-    break;
-    case kCHECKGEAR: {
-        ActorCheckGear();
     }
     break;
     case kWPN_FUNC: {
@@ -782,43 +777,4 @@ void CActor::ActorQuickKnifeStab()
     }
     else
         pKnife->Action(kWPN_FIRE, CMD_START);
-}
-
-void CActor::ActorCheckout()
-{
-    if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)); det && det->GetHUDmode())
-        det->ShowCurrentModeMsg();
-
-    if (!inventory().ActiveItem() || m_bShowActiveItemInfo)
-        return;
-
-    m_bShowActiveItemInfo = true;
-    m_uActiveItemInfoStartTime = Device.dwTimeGlobal;
-
-    const auto hud_item = smart_cast<CHudItem*>(inventory().ActiveItem());
-    if (!hud_item || !hud_item->GetHUDmode() || hud_item->IsPending())
-        return;
-
-    if (hud_item && hud_item->IsZoomed())
-        hud_item->OnZoomOut();
-
-    hud_item->PlayAnimCheckout();
-}
-
-void CActor::ActorCheckGear()
-{
-    if (m_bShowGearInfo)
-        return;
-
-    m_bShowGearInfo = true;
-    m_uGearInfoStartTime = Device.dwTimeGlobal;
-
-    const auto hud_item = smart_cast<CHudItem*>(inventory().ActiveItem());
-    if (!hud_item || !hud_item->GetHUDmode() || hud_item->IsPending())
-        return;
-
-    if (hud_item && hud_item->IsZoomed())
-        hud_item->OnZoomOut();
-
-    hud_item->PlayAnimCheckGear();
 }

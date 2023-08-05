@@ -234,34 +234,6 @@ void CWeaponBM16::PlayAnimOnItemTake()
     PlaySound(sndOnItemTake, Position());
 }
 
-void CWeaponBM16::PlayAnimCheckout()
-{
-    switch (m_magazine.size())
-    {
-    case 0: AnimationExist("anm_checkout_0") ? PlayHUDMotion("anm_checkout_0", true, GetState()) : PlayHUDMotion({"anim_idle_0", "anm_bore_0"}, true, GetState()); break;
-    case 1: AnimationExist("anm_checkout_1") ? PlayHUDMotion("anm_checkout_1", true, GetState()) : PlayHUDMotion({"anim_idle_1", "anm_bore_1"}, true, GetState()); break;
-    case 2: AnimationExist("anm_checkout_2") ? PlayHUDMotion("anm_checkout_2", true, GetState()) : PlayHUDMotion({"anim_idle_2", "anm_bore_2"}, true, GetState()); break;
-    }
-    PlaySound(sndCheckout, H_Parent()->Position());
-}
-
-void CWeaponBM16::PlayAnimCheckGear()
-{
-    switch (m_magazine.size())
-    {
-    case 0:
-        AnimationExist("anm_check_gear_0") ? PlayHUDMotion("anm_check_gear_0", true, GetState()) : PlayHUDMotion({"anim_draw_0", "anim_draw", "anm_show_0"}, true, GetState());
-        break;
-    case 1:
-        AnimationExist("anm_check_gear_1") ? PlayHUDMotion("anm_check_gear_1", true, GetState()) : PlayHUDMotion({"anim_draw_1", "anim_draw", "anm_show_1"}, true, GetState());
-        break;
-    case 2:
-        AnimationExist("anm_check_gear_2") ? PlayHUDMotion("anm_check_gear_2", true, GetState()) : PlayHUDMotion({"anim_draw_2", "anim_draw", "anm_show_2"}, true, GetState());
-        break;
-    }
-    PlaySound(sndCheckGear, Position());
-}
-
 void CWeaponBM16::PlayAnimKick()
 {
     switch (m_magazine.size())

@@ -933,7 +933,7 @@ CScriptGameObject* CScriptGameObject::active_detector() const
     {
         CCustomDetector* detector = smart_cast<CCustomDetector*>(result);
         VERIFY(detector);
-        return (detector->IsPowerOn() && detector->GetHUDmode() ? result->object().lua_game_object() : 0);
+        return (detector->GetHUDmode() ? result->object().lua_game_object() : 0);
     }
     return (0);
 }

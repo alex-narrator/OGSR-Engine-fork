@@ -97,8 +97,6 @@ public:
     virtual void PlayAnimShutter() override;
     virtual void PlayAnimShutterMisfire() override;
     virtual void PlayAnimOnItemTake() override;
-    virtual void PlayAnimCheckout() override;
-    virtual void PlayAnimCheckGear() override;
     virtual void PlayAnimKick() override;
     virtual bool IsDirectReload(CWeaponAmmo*);
     virtual void SetQueueSize(int size);

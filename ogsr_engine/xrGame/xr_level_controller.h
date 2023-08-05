@@ -88,8 +88,6 @@ enum EGameActions
     kQUICK_SAVE,
     kQUICK_LOAD,
 
-    kCHECKGEAR,
-    kCHECKACTIVEITEM,
     kKICK,
     kADDITIONAL_ACTION,
 

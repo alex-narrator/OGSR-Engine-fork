@@ -160,8 +160,6 @@ public:
     virtual void PlayAnimDeviceSwitch(){};
 
     virtual void PlayAnimOnItemTake();
-    virtual void PlayAnimCheckout();
-    virtual void PlayAnimCheckGear();
 
     virtual void OnKick();
     virtual void switch2_Kick();
