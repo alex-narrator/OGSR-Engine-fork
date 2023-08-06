@@ -284,6 +284,8 @@ public:
 
     virtual void BreakItem();
 
+    string_unordered_map<shared_str, xr_vector<shared_str>> m_script_actions_map;
+
 protected:
     // партікли знищення
     shared_str m_sBreakParticles;

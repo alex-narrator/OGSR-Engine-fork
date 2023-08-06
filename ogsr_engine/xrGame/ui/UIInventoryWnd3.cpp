@@ -20,6 +20,8 @@
 #include "string_table.h"
 #include <regex>
 
+#include "script_game_object.h"
+
 void CUIInventoryWnd::EatItem(PIItem itm)
 {
     SetCurrentItem(nullptr);
@@ -213,6 +215,22 @@ void CUIInventoryWnd::ActivatePropertiesBox()
         b_show = true;
     }
 
+    for (const auto& action : CurrentIItem()->m_script_actions_map)
+    {
+        if (luabind::functor<bool> m_functorHasAction; ai().script_engine().functor(action.second[0].c_str(), m_functorHasAction))
+        {
+            if (m_functorHasAction(CurrentIItem()->object().lua_game_object()))
+            {
+                UIPropertiesBox.AddItem(CStringTable().translate(action.first.c_str()).c_str(), (void*)action.first.c_str(), INVENTORY_SCRIPT_ACTION);
+                b_show = true;
+            }
+        }
+        else
+        {
+            Msg("!Item-action-condition function [%s] not exist.", action.second[0].c_str());
+        }
+    }
+
     if (!CurrentIItem()->IsQuestItem())
     {
         sprintf(temp, "%s%s", _many, CStringTable().translate("st_drop").c_str());
@@ -277,7 +295,7 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
         break;
         case INVENTORY_EAT_ACTION: EatItem(CurrentIItem()); break;
         case INVENTORY_ATTACH_ADDON: AttachAddon((PIItem)(UIPropertiesBox.GetClickedItem()->GetData())); break;
-        case INVENTORY_DETACH_ADDON: DetachAddon((const char*)(UIPropertiesBox.GetClickedItem()->GetData()), for_all); break;
+        case INVENTORY_DETACH_ADDON: DetachAddon((LPCSTR)(UIPropertiesBox.GetClickedItem()->GetData()), for_all); break;
         case INVENTORY_RELOAD_MAGAZINE: {
             void* d = UIPropertiesBox.GetClickedItem()->GetData();
             auto Wpn = smart_cast<CWeapon*>(item);
@@ -316,6 +334,18 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
                 ammobox->UnloadBox();
             }
             InitInventory_delayed();
+        }
+        break;
+        case INVENTORY_SCRIPT_ACTION: {
+            auto it = CurrentIItem()->m_script_actions_map.find((LPCSTR)UIPropertiesBox.GetClickedItem()->GetData());
+            if (luabind::functor<void> m_functorDoAction; ai().script_engine().functor(it->second[1].c_str(), m_functorDoAction))
+            {
+                m_functorDoAction(CurrentIItem()->object().lua_game_object());
+            }
+            else
+            {
+                Msg("!Item-action function [%s] not exist.", it->second[1].c_str());
+            }
         }
         break;
         }

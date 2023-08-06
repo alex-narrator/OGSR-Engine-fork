@@ -112,6 +112,8 @@ enum EUIMessages : s16
 
     INVENTORY_MOVE_ACTION,
 
+    INVENTORY_SCRIPT_ACTION,
+
     // CUIAnimationBase
     EDIT_TEXT_CHANGED,
     EDIT_TEXT_COMMIT,
