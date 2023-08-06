@@ -278,10 +278,6 @@ void CUICarBodyWnd::Hide()
     if (m_pOtherInventoryBox)
         m_pOtherInventoryBox->m_in_use = false;
 
-    if (const auto& actor = Actor())
-    {
-        actor->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
-    }
     m_bShowAllInv = false;
     PlaySnd(eInvSndClose);
 }
@@ -635,7 +631,6 @@ void CUICarBodyWnd::Show()
     {
         if (auto act_item = smart_cast<CHudItem*>(actor->inventory().ActiveItem()); act_item && act_item->IsZoomed())
             act_item->OnZoomOut();
-        actor->SetRuckAmmoPlacement(true);
         RepackAmmo();
         TryActivateKnife();
     }

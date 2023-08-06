@@ -1238,7 +1238,7 @@ int CWeapon::GetAmmoCount_forType(shared_str const& ammo_type, u32 max) const
 
     m_pCurrentInventory->IterateAmmo(false, callback);
     if (max == 0 || res < max)
-        if (!ParentIsActor())
+        if (!ParentIsActor() || READ_IF_EXISTS(pSettings, r_bool, ammo_type, "ruck_reload", false))
             m_pCurrentInventory->IterateAmmo(true, callback);
 
     return res;

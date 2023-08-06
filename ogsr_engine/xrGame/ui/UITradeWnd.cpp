@@ -551,7 +551,6 @@ void CUITradeWnd::Show()
 
     if (const auto& actor = Actor())
     {
-        actor->SetRuckAmmoPlacement(true); // установим флаг перезарядки из рюкзака
         m_pInvOwner->inventory().RepackAmmo();
         m_pOthersInvOwner->inventory().RepackAmmo();
     }
@@ -579,10 +578,6 @@ void CUITradeWnd::Hide()
     m_uidata->UIOthersBagList.ClearAll(true);
     m_uidata->UIOthersTradeList.ClearAll(true);
 
-    if (const auto& actor = Actor())
-    {
-        Actor()->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
-    }
     m_bShowAllInv = false;
 }
 

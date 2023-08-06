@@ -1254,7 +1254,7 @@ PIItem CInventory::GetAmmoByLimit(const char* sect, bool forActor, bool limit_ma
         return false;
     };
 
-    bool include_ruck = !forActor || Actor()->IsRuckAmmoPlacement();
+    bool include_ruck = !forActor || HUD().GetUI()->MainInputReceiver() || READ_IF_EXISTS(pSettings, r_bool, sect, "ruck_reload", false);
 
     IterateAmmo(include_ruck, callback);
     if (include_magazines && !box) //шукали магазин та не знайшли
@@ -1396,7 +1396,7 @@ void CInventory::TryAmmoCustomPlacement(CInventoryItem* pIItem)
         pAmmo->m_bNeedFindPlace = false; // сбрасываем флажок спавна патронов
         if (!IsAllItemsLoaded())
             return;
-        if (!pActor->IsRuckAmmoPlacement())
+        if (!HUD().GetUI()->MainInputReceiver())
         { // если включены патроны с пояса, то для боеприпасов актора, которые спавнятся при разрядке
             if (pAmmo->IsBoxReloadable() && !pAmmo->m_boxCurr && HasDropPouch()) // якщо пустий магазин та є сумка для скидання - кладемо до рюкзаку
                 return;

@@ -799,9 +799,6 @@ public:
 
     bool HasDetectorWorkable();
 
-    bool IsRuckAmmoPlacement() { return m_bRuckAmmoPlacement; };
-    void SetRuckAmmoPlacement(bool set_ruck) { m_bRuckAmmoPlacement = set_ruck; };
-
 protected:
     bool m_bRuckAmmoPlacement{};
 

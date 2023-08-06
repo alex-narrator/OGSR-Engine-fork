@@ -81,28 +81,6 @@ void CUIInventoryWnd::Init()
     AttachChild(&UIPersonalWnd);
     xml_init.InitFrameWindow(uiXml, "character_frame_window", 0, &UIPersonalWnd);
 
-    //AttachChild(&UIProgressBack);
-    //xml_init.InitStatic(uiXml, "progress_background", 0, &UIProgressBack);
-
-    //AttachChild(&UIProgressBackRadiation);
-    //xml_init.InitStatic(uiXml, "progress_background_radiation", 0, &UIProgressBackRadiation);
-
-    //UIProgressBack.AttachChild(&UIProgressBarHealth);
-    //xml_init.InitProgressBar(uiXml, "progress_bar_health", 0, &UIProgressBarHealth);
-
-    //UIProgressBack.AttachChild(&UIProgressBarPsyHealth);
-    //xml_init.InitProgressBar(uiXml, "progress_bar_psy", 0, &UIProgressBarPsyHealth);
-
-    //UIProgressBack.AttachChild(&UIProgressBarSatiety);
-    //xml_init.InitProgressBar(uiXml, "progress_bar_satiety", 0, &UIProgressBarSatiety);
-
-    //UIProgressBackRadiation.AttachChild(&UIProgressBarRadiation);
-    //xml_init.InitProgressBar(uiXml, "progress_bar_radiation", 0, &UIProgressBarRadiation);
-
-    //UIPersonalWnd.AttachChild(&UIStaticPersonal);
-    //xml_init.InitStatic(uiXml, "static_personal", 0, &UIStaticPersonal);
-    //	UIStaticPersonal.Init				(1, UIPersonalWnd.GetHeight() - 175, 260, 260);
-
     AttachChild(&UIOutfitInfo);
     UIOutfitInfo.InitFromXml(uiXml);
     //.	xml_init.InitStatic					(uiXml, "outfit_info_window",0, &UIOutfitInfo);
@@ -412,7 +390,6 @@ void CUIInventoryWnd::Show()
     {
         if (auto act_item = smart_cast<CHudItem*>(actor->inventory().ActiveItem()); act_item && act_item->IsZoomed())
             act_item->OnZoomOut();
-        actor->SetRuckAmmoPlacement(true); // установим флаг перезарядки из рюкзака
         m_pInv->RepackAmmo();
     }
 }
@@ -433,7 +410,6 @@ void CUIInventoryWnd::Hide()
             actor->inventory().Activate(m_iCurrentActiveSlot);
             m_iCurrentActiveSlot = NO_ACTIVE_SLOT;
         }
-        actor->SetRuckAmmoPlacement(false); // сбросим флаг перезарядки из рюкзака
     }
     HideSlotsHighlight();
 }
