@@ -217,23 +217,6 @@ void CWeaponBM16::PlayAnimShutterMisfire()
     PlaySound(sndShutterMisfire, get_LastFP());
 }
 
-void CWeaponBM16::PlayAnimOnItemTake()
-{
-    switch (m_magazine.size())
-    {
-    case 0:
-        AnimationExist("anm_on_item_take_0") ? PlayHUDMotion("anm_on_item_take_0", true, GetState()) : PlayHUDMotion({"anim_draw_0", "anim_draw", "anm_show_0"}, true, GetState());
-        break;
-    case 1:
-        AnimationExist("anm_on_item_take_1") ? PlayHUDMotion("anm_on_item_take_1", true, GetState()) : PlayHUDMotion({"anim_draw_1", "anim_draw", "anm_show_1"}, true, GetState());
-        break;
-    case 2:
-        AnimationExist("anm_on_item_take_2") ? PlayHUDMotion("anm_on_item_take_2", true, GetState()) : PlayHUDMotion({"anim_draw_2", "anim_draw", "anm_show_2"}, true, GetState());
-        break;
-    }
-    PlaySound(sndOnItemTake, Position());
-}
-
 void CWeaponBM16::PlayAnimKick()
 {
     switch (m_magazine.size())

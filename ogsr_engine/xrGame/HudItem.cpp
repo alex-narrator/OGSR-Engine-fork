@@ -1566,10 +1566,4 @@ void CHudItem::switch2_Kick()
     SetPending(TRUE);
 }
 
-void CHudItem::PlayAnimOnItemTake()
-{
-    AnimationExist("anm_on_item_take") ? PlayHUDMotion("anm_on_item_take", true, GetState()) : PlayHUDMotion({"anim_draw", "anm_show"}, true, GetState(), false);
-    PlaySound(sndOnItemTake, object().Position());
-}
-
 void CHudItem::PlayAnimKick() { AnimationExist("anm_kick") ? PlayHUDMotion("anm_kick", true, GetState()) : PlayHUDMotion({"anim_draw", "anm_show"}, true, GetState(), false); }

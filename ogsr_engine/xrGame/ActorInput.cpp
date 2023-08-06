@@ -742,7 +742,7 @@ void CActor::ActorKick()
     //
     if (!GodMode())
         conditions().ConditionJump(mass_f / 50);
-    Msg("%s", __FUNCTION__);
+    //Msg("%s", __FUNCTION__);
 }
 #include "Grenade.h"
 void CActor::ActorQuickThrowGrenade()

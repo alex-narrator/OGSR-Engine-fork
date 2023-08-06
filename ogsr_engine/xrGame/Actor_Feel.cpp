@@ -159,7 +159,6 @@ void CActor::PickupModeUpdate_COD()
             Game().SendPickUpEvent(ID(), pNearestItem->object().ID());
             PickupModeOff();
             pNearestItem = nullptr;
-            TryPlayAnimItemTake();
         }
         HUD().GetUI()->UIMainIngameWnd->SetPickUpItem(pNearestItem);
         return;
@@ -236,7 +235,6 @@ void CActor::PickupModeUpdate_COD()
             Game().SendPickUpEvent(ID(), pNearestItem->object().ID());
             //PickupModeOff();
             pNearestItem = nullptr;
-            TryPlayAnimItemTake();
         }
     }
 

@@ -159,8 +159,6 @@ public:
     virtual void PlayAnimIdleMovingCrouchSlow();
     virtual void PlayAnimDeviceSwitch(){};
 
-    virtual void PlayAnimOnItemTake();
-
     virtual void OnKick();
     virtual void switch2_Kick();
     virtual void PlayAnimKick();

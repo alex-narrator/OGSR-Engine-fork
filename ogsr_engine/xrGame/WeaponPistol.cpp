@@ -199,19 +199,6 @@ void CWeaponPistol::PlayAnimShoot()
     }
 }
 
-void CWeaponPistol::PlayAnimOnItemTake()
-{
-    if (m_opened)
-    {
-        AnimationExist("anm_on_item_take_empty") ? 
-            PlayHUDMotion("anm_on_item_take_empty", true, GetState()) :
-            PlayHUDMotion({"anim_draw_empty", "anm_show_empty"}, true, GetState(), false);
-        PlaySound(sndOnItemTake, Position());
-    }
-    else
-        inherited::PlayAnimOnItemTake();
-}
-
 void CWeaponPistol::PlayAnimKick()
 {
     if (m_opened)

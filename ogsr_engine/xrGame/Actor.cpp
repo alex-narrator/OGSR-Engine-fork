@@ -1741,18 +1741,6 @@ float CActor::GetTotalArtefactsEffect(int i)
     return res;
 }
 
-void CActor::TryPlayAnimItemTake()
-{
-    if (!inventory().ActiveItem())
-        return;
-    const auto hud_item = smart_cast<CHudItem*>(inventory().ActiveItem());
-    if (!hud_item || !hud_item->GetHUDmode())
-        return;
-    if (hud_item->IsZoomed())
-        hud_item->OnZoomOut();
-    hud_item->PlayAnimOnItemTake();
-}
-
 bool CActor::SaveGameAllowed()
 {
     switch (g_eSaveGameMode)
