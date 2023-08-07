@@ -172,6 +172,8 @@ void CUIWpnParams::SetInfo(CInventoryItem* obj)
     m_progressReliability.SetProgressPos(g_lua_wpn_params->m_functorReliability(wpn_section.c_str(), object.lua_game_object()));
 
     auto wpn = smart_cast<CWeapon*>(obj);
+    if (!wpn->GetAmmoMagSize())
+        return;
     float pos_x = icons_pos_left;
     if (wpn->GetAmmoElapsed())
         ShowIcon(m_iconCurAmmo, wpn->m_magazine.back().m_ammoSect, ammo_icon_scale, pos_x, scale_ammo);
