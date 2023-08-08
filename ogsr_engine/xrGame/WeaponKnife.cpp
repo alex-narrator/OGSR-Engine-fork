@@ -192,13 +192,6 @@ void CWeaponKnife::OnAnimationEnd(u32 state)
 
             if (time != 0 && !m_attackMotionMarksAvailable)
                 KnifeStrike(state, p1, d);
-
-            if (ParentIsActor() && m_bIsQuickStab)
-            {
-                auto& inv = Actor()->inventory();
-                inv.Activate(inv.GetPrevActiveSlot(), eGeneral, true, true);
-                m_bIsQuickStab = false;
-            }
         }
         if (time == 0)
         {
@@ -208,10 +201,6 @@ void CWeaponKnife::OnAnimationEnd(u32 state)
     break;
     case eShowing:
         SwitchState(eIdle);
-        if (m_bIsQuickStab)
-        {
-            FireStart();
-        }
         break;
     case eIdle:
         SwitchState(eIdle);
@@ -256,7 +245,6 @@ void CWeaponKnife::switch2_Hidden()
 {
     signal_HideComplete();
     SetPending(FALSE);
-    m_bIsQuickStab = false;
 }
 
 void CWeaponKnife::switch2_Showing()

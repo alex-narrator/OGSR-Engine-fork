@@ -667,6 +667,12 @@ u32 CScriptGameObject::GetHudItemState()
     return k->GetState();
 }
 
+bool CScriptGameObject::IsPending() const
+{
+    CHudItem* k = smart_cast<CHudItem*>(&object());
+    return k && k->IsPending();
+}
+
 float CScriptGameObject::GetRadius()
 {
     CGameObject* k = smart_cast<CGameObject*>(&object());

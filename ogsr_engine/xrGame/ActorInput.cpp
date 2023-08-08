@@ -202,14 +202,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
             ActorKick();
     }
     break;
-    case kQUICK_THROW_GRENADE: {
-        ActorQuickThrowGrenade();
-    }
-    break;
-    case kQUICK_KNIFE_STAB: {
-        ActorQuickKnifeStab();
-    }
-    break;
     case kWPN_FUNC: {
         if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)); det && det->GetHUDmode())
             det->SwitchMode();
@@ -743,38 +735,4 @@ void CActor::ActorKick()
     if (!GodMode())
         conditions().ConditionJump(mass_f / 50);
     //Msg("%s", __FUNCTION__);
-}
-#include "Grenade.h"
-void CActor::ActorQuickThrowGrenade()
-{
-    auto& inv = inventory();
-    auto pGrenade = smart_cast<CGrenade*>(inv.m_slots[GRENADE_SLOT].m_pIItem);
-    if (!pGrenade)
-        return;
-
-    if (inv.GetActiveSlot() != GRENADE_SLOT)
-    {
-        inv.SetPrevActiveSlot(inv.GetActiveSlot());
-        pGrenade->m_bIsQuickThrow = true;
-        inv.Activate(GRENADE_SLOT, eGeneral, true, true);
-    }
-    else
-        pGrenade->Action(kWPN_FIRE, CMD_START);
-}
-#include "WeaponKnife.h"
-void CActor::ActorQuickKnifeStab()
-{
-    auto& inv = inventory();
-    auto pKnife = smart_cast<CWeaponKnife*>(inv.m_slots[KNIFE_SLOT].m_pIItem);
-    if (!pKnife)
-        return;
-
-    if (inv.GetActiveSlot() != KNIFE_SLOT)
-    {
-        inv.SetPrevActiveSlot(inv.GetActiveSlot());
-        pKnife->m_bIsQuickStab = true;
-        inv.Activate(KNIFE_SLOT, eGeneral, true, true);
-    }
-    else
-        pKnife->Action(kWPN_FIRE, CMD_START);
 }

@@ -68,8 +68,6 @@ public:
     virtual bool Action(s32 cmd, u32 flags);
     virtual bool CanBeUnloaded() { return false; };
 
-    bool m_bIsQuickStab{};
-
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 add_to_type_list(CWeaponKnife)

@@ -601,7 +601,7 @@ public:
     CScriptGameObject* active_detector() const;
 
     u32 active_slot();
-    void activate_slot(u8 slot_id);
+    void activate_slot(u8 slot_id, bool now = false);
 
     void SwitchTorch(bool);
     void SwitchNightVision(bool);
@@ -740,6 +740,7 @@ public:
     void SetIIFlags(Flags16);
     Flags16 GetIIFlags();
     u32 GetHudItemState();
+    bool IsPending() const;
     float GetRadius();
 
     // functions for object testing

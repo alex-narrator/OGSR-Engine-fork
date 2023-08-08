@@ -98,9 +98,6 @@ xr_vector<_action> actions = {
 
 	DEF_ACTION("kick", kKICK)
 	DEF_ACTION("additional_action", kADDITIONAL_ACTION)
-
-    DEF_ACTION("quick_throw_grenade", kQUICK_THROW_GRENADE)
-	DEF_ACTION("quick_knife_stab", kQUICK_KNIFE_STAB)
 };
 
 xr_vector<_binding> g_key_bindings;

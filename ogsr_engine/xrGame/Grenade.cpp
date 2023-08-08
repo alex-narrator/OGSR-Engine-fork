@@ -216,20 +216,12 @@ void CGrenade::PutNextToSlot()
             pNext = smart_cast<CGrenade*>(inv->SameGrenade(this, false));
 
         if (pNext)
+        {
             pNext->SetSlot(_grenade_slot);
+            inv->Slot(pNext);
+        }
 
         VERIFY(pNext != this);
-
-        auto pActor = smart_cast<CActor*>(inv->GetOwner());
-        if (!pNext || !inv->Slot(pNext, m_bIsQuickThrow) || m_bIsQuickThrow)
-        {
-            if (pActor)
-                inv->Activate(inv->GetPrevActiveSlot(), eGeneral, m_bIsQuickThrow, m_bIsQuickThrow);
-        }
-        if (m_bIsQuickThrow)
-        {
-            m_bIsQuickThrow = false;
-        }
     }
 }
 

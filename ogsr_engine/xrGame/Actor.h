@@ -787,8 +787,6 @@ public:
     float m_fHoldingDistance; // расстояние перед актором на котором находится удерживаемый предмет
     void ActorThrow();
     void ActorKick();
-    void ActorQuickThrowGrenade();
-    void ActorQuickKnifeStab();
 
     void BlockSprint();
     // визначаємо чи треба передати хіт до рюкзака та його вмісту
