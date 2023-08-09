@@ -154,10 +154,6 @@ void CHudItem::Load(LPCSTR section)
                             0.f); // aim-GL
 
     ////////////////////////////////////////////
-    m_throw_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "throw_hud_offset_pos", (Fvector{0.0f, 0.f, 0.f}));
-    m_throw_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "throw_hud_offset_rot", (Fvector{-15.f, -15.f, 20.f}));
-    m_throw_offset[2].set(READ_IF_EXISTS(pSettings, r_bool, section, "throw_enabled", false), READ_IF_EXISTS(pSettings, r_float, section, "throw_transition_time", 0.25f), 0.f);
-    ///////////////////////////////////////////
 
     //Загрузка параметров инерции --#SM+# Begin--
     constexpr float PITCH_OFFSET_R = 0.0f; // Насколько сильно ствол смещается вбок (влево) при вертикальных поворотах камеры
@@ -1194,7 +1190,7 @@ JUMP_EFFECT:
     {
         const bool bEnabled = m_jump_offset[2][idx].x;
         if (!bEnabled)
-            goto THROW_EFFECT;
+            goto APPLY_EFFECTS;
 
         float fJumpMaxTime = m_jump_offset[2][idx].y; // Макс. время в секундах, за которое произойдет смещение худа при прыжке
         float fFallMaxTime = m_fall_offset[2][idx].y; // Макс. время в секундах, за которое произойдет смещение худа при падении
@@ -1272,41 +1268,6 @@ JUMP_EFFECT:
         summary_rotate.add(jump_rot + fall_rot);
     }
     //====================================================//
-
-THROW_EFFECT:
-    //===== Ефект зсуву худа детектора підчас кидка болта/гранат ======//
-    {
-        const bool bEnabled = m_throw_offset[2].x && 
-            g_player_hud->attached_item(1) && g_player_hud->attached_item(1)->m_parent_hud_item == this;
-        if (!bEnabled)
-            goto APPLY_EFFECTS;
-
-        auto hi0 = g_player_hud->attached_item(0);
-        const bool b_throw_effect = hi0 && hi0->m_parent_hud_item && 
-            (hi0->m_parent_hud_item->GetState() == eReady || hi0->m_parent_hud_item->GetState() == eThrowStart);
-
-        float fThrowTransitionTime = m_throw_offset[2].y;
-
-        if (b_throw_effect)
-            m_fThrow_Factor += Device.fTimeDelta / fThrowTransitionTime;
-        else
-            m_fThrow_Factor -= Device.fTimeDelta / fThrowTransitionTime;
-
-        clamp(m_fThrow_Factor, 0.f, 1.f);
-
-        // офсет
-        Fvector throw_offs = m_throw_offset[0]; // pos
-        throw_offs.mul(m_fThrow_Factor); // множимо на фактор ефекту
-
-        // поворот
-        Fvector throw_rot = m_throw_offset[1]; // rot
-        throw_rot.mul(-PI / 180.f); // degrees to radians
-        throw_rot.mul(m_fThrow_Factor); // множимо на фактор ефекту
-
-        summary_offset.add(throw_offs);
-        summary_rotate.add(throw_rot);
-    }
-    //=================================================================//
 
 APPLY_EFFECTS:
     //================ Применение эффектов ===============//
