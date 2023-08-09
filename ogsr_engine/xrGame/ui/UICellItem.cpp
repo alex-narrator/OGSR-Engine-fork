@@ -377,8 +377,9 @@ void CUICellItem::ColorizeItems(std::initializer_list<CUIDragDropListEx*> args)
         auto Wpn = smart_cast<CWeaponMagazined*>(inventoryitem);
         auto Ammo = smart_cast<CWeaponAmmo*>(inventoryitem);
         auto Vest = smart_cast<CVest*>(inventoryitem);
+        auto& custom_highlight = inventoryitem->m_highlight_items;
 
-        bool b_colorize = (Wpn || Ammo || Vest);
+        bool b_colorize = (Wpn || Ammo || Vest || custom_highlight.size());
         if (!b_colorize)
             return;
 
@@ -398,6 +399,8 @@ void CUICellItem::ColorizeItems(std::initializer_list<CUIDragDropListEx*> args)
             std::copy(Ammo->m_ammoTypes.begin(), Ammo->m_ammoTypes.end(), std::back_inserter(ColorizeSects));
         if (Vest)
             std::copy(Vest->m_plates.begin(), Vest->m_plates.end(), std::back_inserter(ColorizeSects));
+        if (custom_highlight.size())
+            std::copy(custom_highlight.begin(), custom_highlight.end(), std::back_inserter(ColorizeSects));
     };
 
     auto ColorizeAmmoAddons = [&] {

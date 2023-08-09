@@ -188,6 +188,17 @@ void CInventoryItem::Load(LPCSTR section)
             m_script_actions_map.emplace(std::move(_GetItem(i_cust.c_str(), 0, str)), std::move(vect));
         }
     }
+    //custom highlight
+    if (pSettings->line_exist(section, "highlight_item"))
+    {
+        LPCSTR str = pSettings->r_string(section, "highlight_item");
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 item_section;
+            _GetItem(str, i, item_section);
+            m_highlight_items.push_back(item_section);
+        }
+    }
 }
 
 void CInventoryItem::ChangeCondition(float fDeltaCondition)

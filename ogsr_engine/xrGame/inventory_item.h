@@ -285,6 +285,7 @@ public:
     virtual void BreakItem();
 
     string_unordered_map<shared_str, xr_vector<shared_str>> m_script_actions_map;
+    xr_vector<shared_str> m_highlight_items{};
 
 protected:
     // партікли знищення
