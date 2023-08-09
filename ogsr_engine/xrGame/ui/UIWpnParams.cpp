@@ -64,10 +64,6 @@ CUIWpnParams::CUIWpnParams()
     AttachChild(&m_textRange);
     AttachChild(&m_textReliability);
 
-    AttachChild(&m_iconCurAmmo);
-    AttachChild(&m_iconCurMag);
-    AttachChild(&m_iconCurAmmo2);
-
     AttachChild(&m_progressAccuracy);
     AttachChild(&m_progressDamage);
     AttachChild(&m_progressHandling);
@@ -94,20 +90,6 @@ void CUIWpnParams::Init()
     xml_init.InitStatic(xml_doc, "wpn_params:cap_rpm", 0, &m_textRPM);
     xml_init.InitStatic(xml_doc, "wpn_params:cap_range", 0, &m_textRange);
     xml_init.InitStatic(xml_doc, "wpn_params:cap_reliability", 0, &m_textReliability);
-
-    icons_pos_left = xml_doc.ReadAttribFlt("wpn_params", 0, "icons_x", 1.f);
-
-    xml_init.InitStatic(xml_doc, "wpn_params:ammo_icon", 0, &m_iconCurAmmo);
-    ammo_icon_scale = xml_doc.ReadAttribFlt("wpn_params:ammo_icon", 0, "scale", 1.f);
-    scale_ammo = xml_doc.ReadAttribInt("wpn_params:ammo_icon", 0, "autoscale", 0);
-
-    xml_init.InitStatic(xml_doc, "wpn_params:mag_icon", 0, &m_iconCurMag);
-    mag_icon_scale = xml_doc.ReadAttribFlt("wpn_params:mag_icon", 0, "scale", 1.f);
-    scale_mag = xml_doc.ReadAttribInt("wpn_params:mag_icon", 0, "autoscale", 0);
-
-    xml_init.InitStatic(xml_doc, "wpn_params:ammo2_icon", 0, &m_iconCurAmmo2);
-    ammo2_icon_scale = xml_doc.ReadAttribFlt("wpn_params:ammo2_icon", 0, "scale", 1.f);
-    scale_ammo2 = xml_doc.ReadAttribInt("wpn_params:ammo2_icon", 0, "autoscale", 0);
 
     xml_init.InitProgressBar(xml_doc, "wpn_params:progress_accuracy", 0, &m_progressAccuracy);
     xml_init.InitProgressBar(xml_doc, "wpn_params:progress_damage", 0, &m_progressDamage);
@@ -157,10 +139,6 @@ void CUIWpnParams::SetInfo(CInventoryItem* obj)
     if (!g_lua_wpn_params)
         g_lua_wpn_params = xr_new<SLuaWpnParams>();
 
-    m_iconCurAmmo.Show(false);
-    m_iconCurMag.Show(false);
-    m_iconCurAmmo2.Show(false);
-
     const auto& object = obj->object();
     const auto wpn_section = object.cNameSect();
 
@@ -170,16 +148,4 @@ void CUIWpnParams::SetInfo(CInventoryItem* obj)
     m_progressHandling.SetProgressPos(g_lua_wpn_params->m_functorHandling(wpn_section.c_str(), object.lua_game_object()));
     m_progressRange.SetProgressPos(g_lua_wpn_params->m_functorRange(wpn_section.c_str(), object.lua_game_object()));
     m_progressReliability.SetProgressPos(g_lua_wpn_params->m_functorReliability(wpn_section.c_str(), object.lua_game_object()));
-
-    auto wpn = smart_cast<CWeapon*>(obj);
-    if (!wpn->GetAmmoMagSize())
-        return;
-    float pos_x = icons_pos_left;
-    if (wpn->GetAmmoElapsed())
-        ShowIcon(m_iconCurAmmo, wpn->m_magazine.back().m_ammoSect, ammo_icon_scale, pos_x, scale_ammo);
-    if (wpn->IsAddonAttached(eMagazine))
-        ShowIcon(m_iconCurMag, wpn->GetAddonName(eMagazine), mag_icon_scale, pos_x, scale_mag);
-    auto wpn_w_gl = smart_cast<CWeaponMagazinedWGrenade*>(obj);
-    if (wpn_w_gl && wpn_w_gl->GetAmmoElapsed2())
-        ShowIcon(m_iconCurAmmo2, wpn_w_gl->m_magazine2.back().m_ammoSect, ammo2_icon_scale, pos_x, scale_ammo2);
 }

@@ -251,11 +251,7 @@ void CWeaponScript::set_hit_power(CWeapon* wpn, luabind::object const& t)
     vector.w = object_cast<float>(t[4]);
 }
 
-LPCSTR get_scope_name(CWeapon* I) { return I->GetAddonName(eScope).c_str(); }
-
-LPCSTR get_silencer_name(CWeapon* I) { return I->GetAddonName(eSilencer).c_str(); }
-
-LPCSTR get_grenade_launcher_name(CWeapon* I) { return I->GetAddonName(eLauncher).c_str(); }
+LPCSTR get_addon_name(CWeapon* I, u32 addon) { return I->GetAddonName(addon).c_str(); }
 
 void CWeaponScript::script_register(lua_State* L)
 {
@@ -321,12 +317,9 @@ void CWeaponScript::script_register(lua_State* L)
                   .def_readwrite("silencer_status", &CWeapon::m_eSilencerStatus)
                   .def_readwrite("grenade_launcher_status", &CWeapon::m_eGrenadeLauncherStatus)
 
-                  //.property("scope_name", &get_scope_name, &set_scope_name)
-                  //.property("silencer_name", &get_silencer_name, &set_silencer_name)
-                  //.property("grenade_launcher_name", &get_grenade_launcher_name, &set_grenade_launcher_name)
-
                   .def_readonly("zoom_mode", &CWeapon::m_bZoomMode)
                   .def("is_addon_attached", &CWeapon::IsAddonAttached)
+                  .def("get_addon_name", &get_addon_name)
 
                   .def_readwrite("scope_inertion_factor", &CWeapon::m_fScopeInertionFactor)
 
