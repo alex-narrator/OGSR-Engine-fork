@@ -111,29 +111,6 @@ bool CUIWpnParams::Check(CInventoryItem* obj)
     return smart_cast<CWeapon*>(obj) && !smart_cast<CWeaponBinoculars*>(obj);
 }
 
-void ShowIcon(CUIStatic& icon, shared_str sect, float scale, float& pos_x, bool autoscale)
-{
-    icon.Show(true);
-    CIconParams params(sect);
-    params.set_shader(&icon);
-
-    Fvector2 size{}, pos{};
-    Frect rect{};
-    icon.GetAbsoluteRect(rect);
-    pos.set(rect.left, rect.top);
-
-    const auto& r = params.original_rect();
-    size.set(r.width(), r.height());
-    size.mul(scale);
-    if (autoscale)
-        size.mul(1 / params.grid_height);
-    size.x *= UI()->get_current_kx();
-
-    icon.SetWndRect(0, 0, size.x, size.y);
-    icon.SetWndPos(/*pos.x*/ pos_x, pos.y);
-    pos_x += icon.GetWidth();
-}
-
 void CUIWpnParams::SetInfo(CInventoryItem* obj)
 {
     if (!g_lua_wpn_params)
