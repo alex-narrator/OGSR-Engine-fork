@@ -72,9 +72,6 @@ void CUIInventoryWnd::Init()
     UIBagWnd.AttachChild(&UIWeightWnd);
     xml_init.InitStatic(uiXml, "weight_static", 0, &UIWeightWnd);
 
-    AttachChild(&UIMoneyWnd);
-    xml_init.InitStatic(uiXml, "money_static", 0, &UIMoneyWnd);
-    
     AttachChild(&UIItemInfo);
     UIItemInfo.Init(INVENTORY_ITEM_XML);
 
@@ -222,12 +219,6 @@ void CUIInventoryWnd::Init()
     UIPropertiesBox.Init(0, 0, 300, 300);
     UIPropertiesBox.Hide();
 
-    AttachChild(&UIStaticTime);
-    xml_init.InitStatic(uiXml, "time_static", 0, &UIStaticTime);
-
-    UIStaticTime.AttachChild(&UIStaticTimeString);
-    xml_init.InitStatic(uiXml, "time_static_str", 0, &UIStaticTimeString);
-
     UIExitButton = xr_new<CUI3tButton>();
     UIExitButton->SetAutoDelete(true);
     AttachChild(UIExitButton);
@@ -322,54 +313,16 @@ void CUIInventoryWnd::Update()
     if (m_b_need_reinit)
         InitInventory();
 
-    CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(Level().CurrentEntity());
-    auto pda = Actor()->GetPDA();
-
-    if (pEntityAlive)
+    if (smart_cast<CEntityAlive*>(Level().CurrentEntity()))
     {
-        //auto cond = &pEntityAlive->conditions();
-
-        //float v = cond->GetHealth() * 100.0f;
-        //UIProgressBarHealth.SetProgressPos(v);
-
-        //v = cond->GetPsyHealth() * 100.0f;
-        //UIProgressBarPsyHealth.SetProgressPos(v);
-
-        //v = cond->GetSatiety() * 100.0f;
-        //UIProgressBarSatiety.SetProgressPos(v);
-
-        //v = cond->GetRadiation() * 100.0f;
-        //if (Actor()->HasDetectorWorkable()) // удаляем шкалу радиации для прогрессбара в инвентаре если не экипирован детектор -- NO_RAD_UI_WITHOUT_DETECTOR_IN_SLOT
-        //{
-        //    UIProgressBackRadiation.Show(true);
-        //    UIProgressBarRadiation.Show(true);
-        //    UIProgressBarRadiation.SetProgressPos(v);
-        //}
-        //else
-        //{
-        //    UIProgressBackRadiation.Show(false);
-        //}
-
-        CInventoryOwner* pOurInvOwner = smart_cast<CInventoryOwner*>(pEntityAlive);
-        u32 _money = pOurInvOwner->get_money();        
-
-        // update money
-        string64 sMoney;
-        sprintf_s(sMoney, "%d %s", _money, CStringTable().translate("ui_st_money_regional").c_str());
-        UIMoneyWnd.SetText(pda && pda->IsPowerOn() ? sMoney : "");
-
         if (m_b_need_update_stats)
         {
             // update outfit parameters
             UIOutfitInfo.Update();
             m_b_need_update_stats = false;
         }
-
         CheckForcedWeightUpdate();
     }
-
-    UIStaticTimeString.SetText(InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());
-    UIStaticTime.Show(pda && pda->IsPowerOn());
 
     CUIWindow::Update();
 }

@@ -80,15 +80,12 @@ protected:
 
     CUIStatic UIBagWnd;
     CUIStatic UIWeightWnd;
-    CUIStatic UIMoneyWnd;
     CUIFrameWindow UIPersonalWnd;
 
     CUI3tButton* UIExitButton;
     CUI3tButton* UIOrganizeButton;
 
     CUIStatic UIStaticBottom;
-    CUIStatic UIStaticTime;
-    CUIStatic UIStaticTimeString;
 
     //CUIStatic UIStaticPersonal;
 
