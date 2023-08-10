@@ -347,8 +347,8 @@ public:
     void SwitchToTalk();
     void RunTalkDialog(CScriptGameObject* pToWho);
 
-    void HideWeapon();
-    void RestoreWeapon();
+    void HideWeapon(bool = false);
+    void RestoreWeapon(bool = false);
 
     LPCSTR ProfileName();
     LPCSTR CharacterName();
