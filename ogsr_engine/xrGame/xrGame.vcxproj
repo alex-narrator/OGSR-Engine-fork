@@ -1574,7 +1574,6 @@
     <ClInclude Include="ui\UICharacterInfo.h" />
     <ClInclude Include="ui\ui_af_params.h" />
     <ClInclude Include="ui\UIItemInfo.h" />
-    <ClInclude Include="ui\UIWpnParams.h" />
     <ClInclude Include="ui\UIOutfitInfo.h" />
     <ClInclude Include="ui\UIInventoryUtilities.h" />
     <ClInclude Include="callback_info.h" />
@@ -2507,7 +2506,6 @@
     <ClCompile Include="ui\UIEditKeyBind.cpp" />
     <ClCompile Include="ui\UIKeyBinding.cpp" />
     <ClCompile Include="ui\UICharacterInfo.cpp" />
-    <ClCompile Include="ui\UIWpnParams.cpp" />
     <ClCompile Include="ui\ui_af_params.cpp" />
     <ClCompile Include="ui\UIItemInfo.cpp" />
     <ClCompile Include="ui\UIOutfitInfo.cpp" />

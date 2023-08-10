@@ -5382,9 +5382,6 @@
     <ClInclude Include="ui\UIItemInfo.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIWpnParams.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIOutfitInfo.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\OutfitInfo</Filter>
     </ClInclude>
@@ -8483,9 +8480,6 @@
       <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIItemInfo.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIWpnParams.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIOutfitInfo.cpp">

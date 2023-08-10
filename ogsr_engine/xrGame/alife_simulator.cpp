@@ -18,11 +18,8 @@
 
 LPCSTR alife_section = "alife";
 
-extern void destroy_lua_wpn_params();
-
 void restart_all()
 {
-    destroy_lua_wpn_params();
     MainMenu()->DestroyInternal(true);
     xr_delete(g_object_factory);
     ai().script_engine().init();

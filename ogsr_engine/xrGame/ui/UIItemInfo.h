@@ -5,7 +5,6 @@ class CInventoryItem;
 class CUIStatic;
 class CUIScrollView;
 class CUIProgressBar;
-class CUIWpnParams;
 class CUIArtefactParams;
 class CUIEatableParams;
 class CUIArmorParams;
@@ -32,7 +31,6 @@ public:
     void Init(LPCSTR xml_name);
     void InitItem(CInventoryItem* pInvItem);
 
-    void TryAddWpnInfo(CInventoryItem* obj);
     void TryAddArtefactInfo(CInventoryItem* obj);
     void TryAddEatableInfo(CInventoryItem* obj);
     void TryAddArmorInfo(CInventoryItem* obj);
@@ -47,7 +45,6 @@ public:
     CUIStatic* UICondition{};
     CUIScrollView* UIDesc{};
     CUIProgressBar* UICondProgresBar{};
-    CUIWpnParams* UIWpnParams{};
     CUIArtefactParams* UIArtefactParams{};
     CUIEatableParams* UIEatableParams{};
     CUIArmorParams* UIArmorParams{};

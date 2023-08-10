@@ -13,7 +13,6 @@
 #include "../Inventory_Item.h"
 #include "UIInventoryUtilities.h"
 #include "../PhysicsShellHolder.h"
-#include "UIWpnParams.h"
 #include "ui_af_params.h"
 #include "UIEatableParams.h"
 #include "UIArmorParams.h"
@@ -24,7 +23,6 @@ CUIItemInfo::CUIItemInfo() {}
 
 CUIItemInfo::~CUIItemInfo()
 {
-    xr_delete(UIWpnParams);
     xr_delete(UIArtefactParams);
     xr_delete(UIEatableParams);
     xr_delete(UIArmorParams);
@@ -107,9 +105,6 @@ void CUIItemInfo::Init(LPCSTR xml_name)
 
     if (uiXml.NavigateToNode("descr_list", 0))
     {
-        UIWpnParams = xr_new<CUIWpnParams>();
-        UIWpnParams->Init();
-
         UIArtefactParams = xr_new<CUIArtefactParams>();
         UIArtefactParams->Init();
 
@@ -187,7 +182,6 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
     {
         UIDesc->Clear();
         VERIFY(0 == UIDesc->GetSize());
-        TryAddWpnInfo(pInvItem);
         TryAddArtefactInfo(pInvItem);
         TryAddEatableInfo(pInvItem);
         TryAddArmorInfo(pInvItem);
@@ -236,15 +230,6 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
         float scale = scale_x < scale_y ? scale_x : scale_y;
 
         TryAttachIcons(UIItemImage, pInvItem, scale);
-    }
-}
-
-void CUIItemInfo::TryAddWpnInfo(CInventoryItem* obj)
-{
-    if (UIWpnParams->Check(obj))
-    {
-        UIWpnParams->SetInfo(obj);
-        UIDesc->AddWindow(UIWpnParams, false);
     }
 }
 
