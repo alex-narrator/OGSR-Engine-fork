@@ -86,11 +86,11 @@ SRotation& get_actor_orientation(CActor* pActor) { return pActor->Orientation();
 
 // extern LPCSTR get_lua_class_name(luabind::object O);
 
-bool IsLimping(CActorCondition* C) { return C->m_condition_flags.test(CActorCondition::eLimping); }
+bool IsLimping(CActorCondition* C) { return C->IsLimping()/*m_condition_flags.test(CActorCondition::eLimping)*/; }
 
-bool IsCantWalk(CActorCondition* C) { return C->m_condition_flags.test(CActorCondition::eCantWalk); }
+bool IsCantWalk(CActorCondition* C) { return C->IsCantWalk()/*m_condition_flags.test(CActorCondition::eCantWalk)*/; }
 
-bool IsCantSprint(CActorCondition* C) { return C->m_condition_flags.test(CActorCondition::eCantSprint); }
+bool IsCantSprint(CActorCondition* C) { return C->IsCantSprint()/*m_condition_flags.test(CActorCondition::eCantSprint)*/; }
 
 void CScriptActor::script_register(lua_State* L)
 {
