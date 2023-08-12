@@ -731,8 +731,7 @@ void CInventoryItem::BreakItem()
         object().setVisible(false);
         // играем звук
         sndBreaking.play_no_feedback(object().H_Parent(), u32{}, float{}, &object().H_Parent()->Position());
-        // SetDropManual(TRUE);
-        m_pCurrentInventory->DropItem(cast_game_object());
+        SetDropManual(TRUE);
     }
     else
     {
