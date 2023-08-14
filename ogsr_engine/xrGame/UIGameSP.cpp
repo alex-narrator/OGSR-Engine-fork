@@ -101,6 +101,9 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
     if (!pActor->GetPDA() && bind != kINVENTORY)
         return false;
 
+    if (pActor->m_blocked_actions.find(bind) != pActor->m_blocked_actions.end())
+        return false;
+
     switch (bind)
     {
     case kINVENTORY:

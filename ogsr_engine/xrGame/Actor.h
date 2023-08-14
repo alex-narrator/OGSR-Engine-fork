@@ -519,6 +519,8 @@ public:
         mstate_real = 0;
     };
 
+    xr_map<EGameActions, bool> m_blocked_actions; // Вектор с заблокированными действиями. Real Wolf. 14.10.2014.
+
     //////////////////////////////////////////////////////////////////////////
     // Weapon fire control (оружие актрера)
     //////////////////////////////////////////////////////////////////////////
@@ -751,7 +753,7 @@ public:
 private:
     ALife::_OBJECT_ID m_holder_id;
 
-    xr_map<EGameActions, bool> m_blocked_actions; // Вектор с заблокированными действиями. Real Wolf. 14.10.2014.
+    //xr_map<EGameActions, bool> m_blocked_actions; // Вектор с заблокированными действиями. Real Wolf. 14.10.2014.
 public:
     virtual bool register_schedule() const { return false; }
     IC u32 get_state() const { return this->mstate_real; }
