@@ -673,6 +673,10 @@ void send_event_mouse_wheel(int vol) //Вращение колеса мыши
 {
     Level().IR_OnMouseWheel(vol);
 }
+bool get_key_state(int vol) // чи натиснуто клавішу
+{
+    return Level().IR_GetKeyState(vol);
+}
 //
 
 // Real Wolf 07.07.2014
@@ -960,7 +964,7 @@ void CLevel::script_register(lua_State* L)
             def("get_target_dist", &GetTargetDist), def("get_target_obj", &GetTargetObj), def("get_current_ray_query", &GetCurrentRayQuery),
             //
             def("send_event_key_press", &send_event_key_press), def("send_event_key_release", &send_event_key_release), def("send_event_key_hold", &send_event_key_hold),
-            def("send_event_mouse_wheel", &send_event_mouse_wheel),
+            def("send_event_mouse_wheel", &send_event_mouse_wheel), def("get_key_state", &get_key_state),
 
             def("change_level", &change_level), def("set_cam_inert", &set_cam_inert), def("set_monster_relation", &set_monster_relation), def("patrol_path_add", &patrol_path_add),
             def("patrol_path_remove", &patrol_path_remove), def("valid_vertex_id", &valid_vertex_id), def("vertex_count", &vertex_count), def("disable_vertex", &disable_vertex),
