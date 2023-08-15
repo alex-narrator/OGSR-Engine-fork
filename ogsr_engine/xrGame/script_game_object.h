@@ -684,8 +684,8 @@ public:
     void AddWound(float hit_power, int hit_type, u16 element);
     float GetItemWeight();
     u32 InvBoxCount();
-    void OpenInvBox(CScriptGameObject* object);
     CScriptGameObject* ObjectFromInvBox(int _i);
+    void StartCarbody(CScriptGameObject* object);
     float GetCamFOV();
     void SetCamFOV(float _fov);
 
