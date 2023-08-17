@@ -45,9 +45,6 @@ public:
 
     void UpdateLists_delayed();
     void CheckForcedWeightUpdate();
-    bool CheckMonsterAndKnife() const;
-    void TryPlayStabbing(PIItem itm, CGameObject* owner_from);
-    void TryActivateKnife();
     void RepackAmmo();
 
 protected:

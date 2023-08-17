@@ -99,7 +99,6 @@ void InitConsole()
     CORE_FEATURE_SET(pickup_check_overlaped, "features");
     CORE_FEATURE_SET(disable_dialog_break, "features");
     CORE_FEATURE_SET(artefacts_from_all, "features");
-    CORE_FEATURE_SET(knife_to_cut_parts, "features");
     CORE_FEATURE_SET(stop_anim_playing, "features");
     CORE_FEATURE_SET(use_luminocity, "features");
 }

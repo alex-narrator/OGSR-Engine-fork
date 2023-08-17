@@ -562,8 +562,6 @@ private:
 public:
     virtual bool run_home_point_when_enemy_inaccessible() const { return true; }
     virtual bool need_shotmark() const { return true; }
-
-    float m_fSkinDensityK; // коефіцієнт щільності шкіри для зрізання частини монстра (на неї множимо псування ножа за удар)
 };
 
 #include "base_monster_inline.h"

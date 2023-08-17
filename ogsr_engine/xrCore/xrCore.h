@@ -194,16 +194,15 @@ public:
             wpn_cost_include_addons     = 1ull << 12,
             use_luminocity              = 1ull << 13,
             colorize_ammo               = 1ull << 14,
-            knife_to_cut_parts          = 1ull << 15,
-            colorize_untradable         = 1ull << 16,
-            select_mode_1342            = 1ull << 17,
-            old_outfit_slot_style       = 1ull << 18,
-            npc_simplified_shooting     = 1ull << 19,
-            use_trade_deficit_factor    = 1ull << 20,
-            show_objectives_ondemand    = 1ull << 21,
-            pickup_check_overlaped      = 1ull << 22,
-            disable_dialog_break        = 1ull << 23,
-            no_progress_bar_animation   = 1ull << 24;
+            colorize_untradable         = 1ull << 15,
+            select_mode_1342            = 1ull << 16,
+            old_outfit_slot_style       = 1ull << 17,
+            npc_simplified_shooting     = 1ull << 18,
+            use_trade_deficit_factor    = 1ull << 19,
+            show_objectives_ondemand    = 1ull << 20,
+            pickup_check_overlaped      = 1ull << 21,
+            disable_dialog_break        = 1ull << 22,
+            no_progress_bar_animation   = 1ull << 23;
     };
 
     void _initialize(LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0);

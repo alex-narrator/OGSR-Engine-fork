@@ -114,9 +114,6 @@ void CBaseMonster::Load(LPCSTR section)
     m_base_aura.load_from_ini(pSettings, section);
 
     m_force_anti_aim = false;
-
-    m_fSkinDensityK = READ_IF_EXISTS(pSettings, r_float, section, "skin_density", 1.f);
-    clamp(m_fSkinDensityK, 1.f, m_fSkinDensityK);
 }
 
 void CBaseMonster::PostLoad(LPCSTR section)
