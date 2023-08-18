@@ -23,6 +23,7 @@ public:
     virtual void Hit(SHit* pHDS);
 
     Ivector2 GetVestArray() { return m_VestArray; };
+    bool GetVestVertical() { return m_VestVertical; };
 
     virtual float GetHitTypeProtection(int) const override;
     float HitThruArmour(SHit* pHDS);
@@ -47,6 +48,7 @@ public:
 
 protected:
     Ivector2 m_VestArray{};
+    bool m_VestVertical{};
     shared_str bulletproof_display_bone{};
 
 private:

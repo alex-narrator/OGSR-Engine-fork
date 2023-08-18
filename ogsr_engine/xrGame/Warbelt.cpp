@@ -12,6 +12,7 @@ void CWarbelt::Load(LPCSTR section)
 {
     inherited::Load(section);
     m_BeltArray = READ_IF_EXISTS(pSettings, r_ivector2, section, "belt_array", Ivector2{});
+    m_BeltVertical = READ_IF_EXISTS(pSettings, r_bool, section, "belt_vertical", false);
 }
 
 void CWarbelt::OnMoveToSlot(EItemPlace prevPlace)

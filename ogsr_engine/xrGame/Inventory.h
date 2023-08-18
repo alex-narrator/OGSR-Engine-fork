@@ -199,6 +199,9 @@ public:
     Ivector2 BeltArray() const;
     Ivector2 VestArray() const;
 
+    bool IsBeltVertical() const;
+    bool IsVestVertical() const;
+
     void DropBeltToRuck();
     void DropVestToRuck();
     void DropSlotsToRuck(u32 min_slot, u32 max_slot = NO_ACTIVE_SLOT);

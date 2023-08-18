@@ -20,6 +20,7 @@ void CVest::Load(LPCSTR section)
 {
     inherited::Load(section);
     m_VestArray = READ_IF_EXISTS(pSettings, r_ivector2, section, "vest_array", Ivector2{});
+    m_VestVertical = READ_IF_EXISTS(pSettings, r_bool, section, "vest_vertical", false);
     bulletproof_display_bone = READ_IF_EXISTS(pSettings, r_string, section, "bulletproof_display_bone", "bip01_spine");
     if (pSettings->line_exist(section, "plates"))
     {

@@ -977,7 +977,7 @@ bool CInventory::CanPutInBelt(PIItem pIItem) const
         return false;
     auto belt = static_cast<TIItemContainer>(m_belt);
 
-    return FreeRoom(belt, pIItem, BeltArray().x, BeltArray().y, m_bBeltVertical);
+    return FreeRoom(belt, pIItem, BeltArray().x, BeltArray().y, IsBeltVertical());
 }
 
 bool CInventory::CanPutInVest(PIItem pIItem) const
@@ -994,7 +994,7 @@ bool CInventory::CanPutInVest(PIItem pIItem) const
         return false;
     auto vest = static_cast<TIItemContainer>(m_vest);
 
-    return FreeRoom(vest, pIItem, VestArray().x, VestArray().y, m_bVestVertical);
+    return FreeRoom(vest, pIItem, VestArray().x, VestArray().y, IsVestVertical());
 }
 // проверяет можем ли поместить вещь в рюкзак,
 // при этом реально ничего не меняется
@@ -1440,6 +1440,20 @@ Ivector2 CInventory::VestArray() const
     if (auto vest = m_pOwner->GetVest())
         return vest->GetVestArray();
     return m_BaseVest;
+}
+
+bool CInventory::IsBeltVertical() const 
+{
+    if (auto warbelt = m_pOwner->GetWarbelt())
+        return warbelt->GetBeltVertical();
+    return m_bBeltVertical;
+}
+
+bool CInventory::IsVestVertical() const
+{
+    if (auto vest = m_pOwner->GetVest())
+        return vest->GetVestVertical();
+    return m_bVestVertical;
 }
 
 bool CInventory::IsAllItemsLoaded() const { return m_bUpdated; }
