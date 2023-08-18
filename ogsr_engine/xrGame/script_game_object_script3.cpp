@@ -282,7 +282,7 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         // KD
         // functions for CInventoryOwner class
         .def("item_on_belt", &CScriptGameObject::ItemOnBelt)
-        .def("item_on_vest", &CScriptGameObject::ItemOnBelt)
+        .def("item_on_vest", &CScriptGameObject::ItemOnVest)
         .def("item_in_ruck", &CScriptGameObject::ItemInRuck)
         .def("is_on_belt", &CScriptGameObject::IsOnBelt)
         .def("is_on_vest", &CScriptGameObject::IsOnVest)
@@ -299,6 +299,8 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("get_slot", &CScriptGameObject::GetSlot)
         .def("set_slot", &CScriptGameObject::SetSlot)
         .def("can_put_in_slot", &CScriptGameObject::CanPutInSlot)
+        .def("can_put_in_belt", &CScriptGameObject::CanPutInBelt)
+        .def("can_put_in_vest", &CScriptGameObject::CanPutInVest)
 
         // functions for CInventoryItem class
         .def("set_inventory_item_flags", &CScriptGameObject::SetIIFlags)

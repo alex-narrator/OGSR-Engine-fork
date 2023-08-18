@@ -1392,10 +1392,45 @@ bool CScriptGameObject::CanPutInSlot(CScriptGameObject* obj, u8 slot)
         return false;
     }
 
-    if (slot == NO_ACTIVE_SLOT)
-        slot = inventory_item->GetSlot();
-
     return inventory_owner->inventory().CanPutInSlot(inventory_item, slot);
+}
+
+bool CScriptGameObject::CanPutInBelt(CScriptGameObject* obj)
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&(obj->object()));
+    if (!inventory_item)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryItem : cannot access class member CanPutInBelt!");
+        return false;
+    }
+
+    CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
+    if (!inventory_owner)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member CanPutInBelt!");
+        return false;
+    }
+
+    return inventory_owner->inventory().CanPutInBelt(inventory_item);
+}
+
+bool CScriptGameObject::CanPutInVest(CScriptGameObject* obj)
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&(obj->object()));
+    if (!inventory_item)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryItem : cannot access class member CanPutInVest!");
+        return false;
+    }
+
+    CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
+    if (!inventory_owner)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member CanPutInVest!");
+        return false;
+    }
+
+    return inventory_owner->inventory().CanPutInVest(inventory_item);
 }
 
 // functions for CInventoryItem class

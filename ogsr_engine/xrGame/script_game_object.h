@@ -24,8 +24,6 @@
 #include "PHCharacter.h"
 #include "PHCapture.h"
 
-#include "inventory_space.h"
-
 enum EPdaMsg;
 enum ESoundTypes;
 enum ETaskState;
@@ -682,7 +680,9 @@ public:
     u32 VestSize() const;
     u32 RuckSize() const;
     void InvalidateInventory();
-    bool CanPutInSlot(CScriptGameObject* object, u8 slot = NO_ACTIVE_SLOT);
+    bool CanPutInSlot(CScriptGameObject* object, u8 slot);
+    bool CanPutInBelt(CScriptGameObject* object);
+    bool CanPutInVest(CScriptGameObject* object);
 
     void SetActorCamDir(Fvector _dir);
     void UpdateCondition();
