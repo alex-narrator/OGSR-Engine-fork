@@ -24,6 +24,8 @@
 #include "PHCharacter.h"
 #include "PHCapture.h"
 
+#include "inventory_space.h"
+
 enum EPdaMsg;
 enum ESoundTypes;
 enum ETaskState;
@@ -664,17 +666,23 @@ public:
     // KD
     // functions for CInventoryOwner class
     CScriptGameObject* ItemOnBelt(u32 item_id) const;
+    CScriptGameObject* ItemOnVest(u32 item_id) const;
     CScriptGameObject* ItemInRuck(u32 item_id) const;
     bool IsOnBelt(CScriptGameObject* object) const;
+    bool IsOnVest(CScriptGameObject* object) const;
     bool IsInRuck(CScriptGameObject* object) const;
     bool IsInSlot(CScriptGameObject* object) const;
     u8 GetSlot() const;
+    void SetSlot(u8 slot) const;
     void MoveToSlot(CScriptGameObject* object, bool bNotActivate = true);
     void MoveToBelt(CScriptGameObject* object);
+    void MoveToVest(CScriptGameObject* object);
     void MoveToRuck(CScriptGameObject* object);
     u32 BeltSize() const;
+    u32 VestSize() const;
     u32 RuckSize() const;
     void InvalidateInventory();
+    bool CanPutInSlot(CScriptGameObject* object, u8 slot = NO_ACTIVE_SLOT);
 
     void SetActorCamDir(Fvector _dir);
     void UpdateCondition();
