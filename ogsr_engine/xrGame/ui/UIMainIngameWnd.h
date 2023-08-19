@@ -81,6 +81,7 @@ protected:
     CUIStatic UIPsyHealthIcon;
     CUIStatic UIInvincibleIcon;
     CUIStatic UISafehouseIcon;
+    CUIStatic UIOverweightIcon;
 
     CUIStatic* m_UIIcons{};
     bool b_horz{};
@@ -103,6 +104,7 @@ public:
         ewiThresholdMax,
         ewiInvincible = ewiThresholdMax,
         ewiSafehouse,
+        ewiOverweight,
         ewiMax,
     };
 

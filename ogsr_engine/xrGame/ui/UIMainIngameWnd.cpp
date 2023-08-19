@@ -115,6 +115,7 @@ CUIMainIngameWnd::CUIMainIngameWnd()
     warn_icon_list[ewiPsyHealth] = &UIPsyHealthIcon;
     warn_icon_list[ewiSafehouse] = &UISafehouseIcon;
     warn_icon_list[ewiInvincible] = &UIInvincibleIcon;
+    warn_icon_list[ewiOverweight] = &UIOverweightIcon;
 }
 
 #include "UIProgressShape.h"
@@ -211,6 +212,9 @@ void CUIMainIngameWnd::Init()
 
     xml_init.InitStatic(uiXml, "invincible_static", 0, &UIInvincibleIcon);
     UIInvincibleIcon.Show(false);
+
+    xml_init.InitStatic(uiXml, "overweight_static", 0, &UIOverweightIcon);
+    UIOverweightIcon.Show(false);
 
     constexpr const char* warningStrings[] = {
         "jammed",
@@ -350,6 +354,11 @@ void CUIMainIngameWnd::Update()
                 SetWarningIconColor(ewiSafehouse, 0xffffffff);
             else
                 TurnOffWarningIcon(ewiSafehouse);
+
+            if (m_pActor->GetCarryWeight() > m_pActor->MaxCarryWeight())
+                SetWarningIconColor(ewiOverweight, 0xffffffff);
+            else
+                TurnOffWarningIcon(ewiOverweight);
         }
 
         UpdateActiveItemInfo();
@@ -547,6 +556,7 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
     case ewiPsyHealth: SetWarningIconColor(&UIPsyHealthIcon, cl); break;
     case ewiSafehouse: SetWarningIconColor(&UISafehouseIcon, cl); break;
     case ewiInvincible: SetWarningIconColor(&UIInvincibleIcon, cl); break;
+    case ewiOverweight: SetWarningIconColor(&UIOverweightIcon, cl); break;
 
     default: R_ASSERT(!"Unknown warning icon type"); break;
     }
