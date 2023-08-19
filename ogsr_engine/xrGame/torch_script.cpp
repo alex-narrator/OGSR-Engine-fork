@@ -111,23 +111,11 @@ void CTorch::SetVirtualSize(float size, int target)
     }
 }
 
-CTorch* get_torch(CScriptGameObject* script_obj)
-{
-    auto obj = &script_obj->object();
-    auto t = smart_cast<CTorch*>(obj);
-    if (t)
-        return t;
-    script_obj = script_obj->GetObjectByName("device_torch");
-    if (script_obj)
-        return get_torch(script_obj); // рекурсия
-    return nullptr;
-}
-
 using namespace luabind;
 #pragma optimize("s", on)
 void CTorch::script_register(lua_State* L)
 {
-    module(L)[class_<CTorch, CGameObject /*CInventoryItemObject*/>("CTorch").def(constructor<>())
+    module(L)[class_<CTorch, CGameObject>("CTorch").def(constructor<>())
         // alpet: управление параметрами света
         .def_readonly("on", &CTorch::m_switched_on)
         .def("enable", (void(CTorch::*)(bool))(&CTorch::SwitchTorch))
@@ -141,6 +129,7 @@ void CTorch::script_register(lua_State* L)
         .def("set_range", &CTorch::SetRange)
         .def("set_texture", &CTorch::SetTexture)
         .def("set_virtual_size", &CTorch::SetVirtualSize)
+        .def("switch_mode", &CTorch::SwitchMode)
         // работа с ПНВ
         .def_readonly("nvd_on", &CTorch::m_bNightVisionOn)
         .def("enable_nvd", (void(CTorch::*)(bool))(&CTorch::SwitchNightVision))
