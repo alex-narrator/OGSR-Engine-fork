@@ -27,7 +27,6 @@ protected:
     HUD_SOUND sndEmptyClick;
     HUD_SOUND sndReload, sndReloadPartly;
     bool sndReloadPartlyExist{};
-    HUD_SOUND sndFireModes;
     HUD_SOUND sndZoomChange;
     //
     HUD_SOUND sndShutter, sndShutterMisfire, sndUnload;
@@ -332,7 +331,6 @@ protected:
     virtual void switch2_Shutter();
     virtual void PlayAnimShutter();
     virtual void PlayAnimShutterMisfire();
-    virtual void PlayAnimFiremodes();
 
     virtual void UpdateMagazineVisibility();
 };

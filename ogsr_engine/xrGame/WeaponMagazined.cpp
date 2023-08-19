@@ -48,7 +48,6 @@ CWeaponMagazined::~CWeaponMagazined()
     HUD_SOUND::DestroySound(sndEmptyClick);
     HUD_SOUND::DestroySound(sndReload);
     HUD_SOUND::DestroySound(sndReloadPartly);
-    HUD_SOUND::DestroySound(sndFireModes);
     HUD_SOUND::DestroySound(sndZoomChange);
     HUD_SOUND::DestroySound(sndAimStart);
     HUD_SOUND::DestroySound(sndAimEnd);
@@ -82,7 +81,6 @@ void CWeaponMagazined::StopHUDSounds()
     HUD_SOUND::StopSound(sndEmptyClick);
     HUD_SOUND::StopSound(sndReload);
     HUD_SOUND::StopSound(sndReloadPartly);
-    HUD_SOUND::StopSound(sndFireModes);
     HUD_SOUND::StopSound(sndZoomChange);
     HUD_SOUND::StopSound(sndShot);
     HUD_SOUND::StopSound(sndSilencerShot);
@@ -202,7 +200,6 @@ void CWeaponMagazined::Load(LPCSTR section)
         sndReloadPartlyExist = true;
     }
 
-    HUD_SOUND::LoadSound(section, pSettings->line_exist(section, "snd_fire_modes") ? "snd_fire_modes" : "snd_empty", sndFireModes, m_eSoundEmptyClick);
     if (pSettings->line_exist(section, "snd_zoom_change"))
         HUD_SOUND::LoadSound(section, "snd_zoom_change", sndZoomChange, m_eSoundEmptyClick);
     //
@@ -582,8 +579,6 @@ void CWeaponMagazined::UpdateSounds()
         sndReloadPartly.set_position(get_LastFP());
     if (sndEmptyClick.playing())
         sndEmptyClick.set_position(get_LastFP());
-    if (sndFireModes.playing())
-        sndFireModes.set_position(get_LastFP());
     if (sndZoomChange.playing())
         sndZoomChange.set_position(get_LastFP());
     if (sndAimStart.playing())
@@ -846,7 +841,7 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
     if (inherited::Action(cmd, flags))
         return true;
     // если оружие чем-то занято, то ничего не делать
-    if (IsPending() && cmd != kWPN_FIREMODE_PREV && cmd != kWPN_FIREMODE_NEXT)
+    if (IsPending())
         return false;
     switch (cmd)
     {
@@ -1802,7 +1797,6 @@ void CWeaponMagazined::OnNextFireMode(bool opt)
         return;
     m_iCurFireMode = (m_iCurFireMode + 1 + m_aFireModes.size()) % m_aFireModes.size();
     SetQueueSize(GetCurrentFireMode());
-    PlayAnimFiremodes();
 };
 
 void CWeaponMagazined::OnPrevFireMode(bool opt)
@@ -1813,7 +1807,6 @@ void CWeaponMagazined::OnPrevFireMode(bool opt)
         return;
     m_iCurFireMode = (m_iCurFireMode - 1 + m_aFireModes.size()) % m_aFireModes.size();
     SetQueueSize(GetCurrentFireMode());
-    PlayAnimFiremodes();
 };
 
 void CWeaponMagazined::OnH_A_Chield()
@@ -1997,14 +1990,6 @@ void CWeaponMagazined::PlayAnimShutterMisfire()
     VERIFY(GetState() == eShutter);
     AnimationExist("anm_shutter_misfire") ? PlayHUDMotion("anm_shutter_misfire", true, GetState()) : PlayHUDMotion({"anim_draw", "anm_show"}, true, GetState(), false);
     PlaySound(sndShutterMisfire, get_LastFP());
-}
-void CWeaponMagazined::PlayAnimFiremodes()
-{
-    if (AnimationExist("anm_fire_modes"))
-    {
-        PlayHUDMotion("anm_fire_modes", true, GetState());
-    }
-    PlaySound(sndFireModes, get_LastFP());
 }
 
 void CWeaponMagazined::PlayAnimCheckMisfire()
