@@ -21,10 +21,11 @@
 #include "Warbelt.h"
 #include "HudItem.h"
 #include "Grenade.h"
+#include "PDA.h"
 
 #include "UIGameSP.h"
 #include "HudManager.h"
-#include "ui/UIInventoryWnd.h"
+#include "ui/UIPDAWnd.h"
 
 using namespace InventoryUtilities;
 
@@ -573,6 +574,26 @@ bool CInventory::Action(s32 cmd, u32 flags)
             else
             {
                 b_send_event = Activate(ARTEFACT_SLOT, eKeyAction);
+            }
+        }
+    }
+    break;
+    case kACTIVE_JOBS:
+    case kMAP:
+    case kCONTACTS: {
+        if (flags & CMD_START)
+        {
+            auto Pda = m_pOwner->GetPDA();
+            if (!Pda || !Pda->Is3DPDA() || !psActorFlags.test(AF_3D_PDA))
+                break;
+
+            if (GetActiveSlot() == PDA_SLOT && ActiveItem())
+                b_send_event = Activate(NO_ACTIVE_SLOT);
+            else
+            {
+                auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+                pGameSP->PdaMenu->SetActiveSubdialog(cmd == kACTIVE_JOBS ? eptQuests : (cmd == kMAP ? eptMap : eptContacts));
+                b_send_event = Activate(PDA_SLOT, eKeyAction);
             }
         }
     }
