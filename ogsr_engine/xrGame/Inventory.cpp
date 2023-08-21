@@ -26,6 +26,7 @@
 #include "UIGameSP.h"
 #include "HudManager.h"
 #include "ui/UIPDAWnd.h"
+#include "ui/UIInventoryWnd.h"
 
 using namespace InventoryUtilities;
 
@@ -278,8 +279,7 @@ bool CInventory::Slot(PIItem pIItem, bool bNotActivate)
     if (!CanPutInSlot(pIItem))
     {
         if (m_slots[pIItem->GetSlot()].m_pIItem == pIItem && !bNotActivate)
-            if (activate_slot(pIItem->GetSlot()))
-                Activate(pIItem->GetSlot());
+            Activate(pIItem->GetSlot());
 
         return false;
     }
@@ -309,8 +309,7 @@ bool CInventory::Slot(PIItem pIItem, bool bNotActivate)
         m_vest.erase(std::find(m_vest.begin(), m_vest.end(), pIItem));
 
     if ((m_iActiveSlot == pIItem->GetSlot() || (m_iActiveSlot == NO_ACTIVE_SLOT && m_iNextActiveSlot == NO_ACTIVE_SLOT)) && !bNotActivate)
-        if (activate_slot(pIItem->GetSlot()))
-            Activate(pIItem->GetSlot());
+        Activate(pIItem->GetSlot());
 
     auto PrevPlace = pIItem->m_eItemPlace;
     pIItem->m_eItemPlace = eItemPlaceSlot;
@@ -568,13 +567,9 @@ bool CInventory::Action(s32 cmd, u32 flags)
         if (flags & CMD_START)
         {
             if ((int)m_iActiveSlot == ARTEFACT_SLOT && m_slots[m_iActiveSlot].m_pIItem)
-            {
                 b_send_event = Activate(NO_ACTIVE_SLOT);
-            }
             else
-            {
                 b_send_event = Activate(ARTEFACT_SLOT, eKeyAction);
-            }
         }
     }
     break;
@@ -592,6 +587,8 @@ bool CInventory::Action(s32 cmd, u32 flags)
             else
             {
                 auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+                if (pGameSP->InventoryMenu->IsShown())
+                    break;
                 pGameSP->PdaMenu->SetActiveSubdialog(cmd == kACTIVE_JOBS ? eptQuests : (cmd == kMAP ? eptMap : eptContacts));
                 b_send_event = Activate(PDA_SLOT, eKeyAction);
             }
@@ -1604,23 +1601,6 @@ bool CInventory::HasDropPouch() const
         if (item->IsDropPouch())
             return true;
     }
-    return false;
-}
-
-bool CInventory::activate_slot(u32 slot)
-{
-    switch (slot)
-    {
-    case KNIFE_SLOT:
-    case FIRST_WEAPON_SLOT:
-    case SECOND_WEAPON_SLOT:
-    case GRENADE_SLOT:
-    case APPARATUS_SLOT:
-    case BOLT_SLOT:
-    case ARTEFACT_SLOT:
-        return ItemFromSlot(slot) && ItemFromSlot(slot)->cast_hud_item();
-    }
-
     return false;
 }
 

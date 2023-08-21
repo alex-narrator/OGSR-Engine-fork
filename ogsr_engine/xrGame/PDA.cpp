@@ -463,6 +463,10 @@ void CPda::OnMoveToRuck(EItemPlace prevPlace)
         if (joystick != BI_NONE && HudItemData())
             HudItemData()->m_model->LL_GetBoneInstance(joystick).reset_callback();
         g_player_hud->detach_item(this);
+
+        auto pdawnd = GetPdaWindow();
+        if (pdawnd && pdawnd->IsShown())
+            smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame())->ShowHidePda(false);
     }
 
     // KRodin: TODO: У нас нету слота пда, поэтому наверно не нужно тут делать скрытие UI. Сделать, если будет надо.

@@ -52,6 +52,8 @@ private:
     shared_str m_SpecificChracterOwner{};
     xr_string m_sFullName;
 
+    bool m_bTurnedOn{};
+
     const char* m_joystick_bone{};
     u16 joystick{BI_NONE};
     static void JoystickCallback(CBoneInstance* B);
@@ -80,5 +82,4 @@ public:
 protected:
     u8 GetCurrentHudOffsetIdx() const override { return (m_bZoomed || m_fZoomRotationFactor != 0.f) ? 1 : 0; }
     bool IsZoomed() const override { return m_bZoomed; }
-    bool m_bTurnedOn;
 };

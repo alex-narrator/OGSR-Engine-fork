@@ -40,18 +40,7 @@ LPCSTR tab_separator{};
 
 CUIPdaWnd::CUIPdaWnd()
 {
-    UIMapWnd = NULL;
-    UIPdaContactsWnd = NULL;
-    UIEncyclopediaWnd = NULL;
-    UIDiaryWnd = NULL;
-    UIActorInfo = NULL;
-    UIStalkersRanking = NULL;
-    UIEventsWnd = NULL;
-    m_updatedSectionImage = NULL;
-    m_oldSectionImage = NULL;
-
     last_cursor_pos.set(UI_BASE_WIDTH / 2.f, UI_BASE_HEIGHT / 2.f);
-
     Init();
 }
 
