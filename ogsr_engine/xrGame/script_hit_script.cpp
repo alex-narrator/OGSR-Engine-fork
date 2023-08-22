@@ -19,7 +19,9 @@ void CScriptHit::script_register(lua_State* L)
                   .enum_("hit_type")[value("burn", int(ALife::eHitTypeBurn)), value("shock", int(ALife::eHitTypeShock)), value("strike", int(ALife::eHitTypeStrike)),
                                      value("wound", int(ALife::eHitTypeWound)), value("radiation", int(ALife::eHitTypeRadiation)),
                                      value("telepatic", int(ALife::eHitTypeTelepatic)), value("chemical_burn", int(ALife::eHitTypeChemicalBurn)),
-                                     value("explosion", int(ALife::eHitTypeExplosion)), value("fire_wound", int(ALife::eHitTypeFireWound)), value("dummy", int(ALife::eHitTypeMax))]
+                                     value("explosion", int(ALife::eHitTypeExplosion)), value("fire_wound", int(ALife::eHitTypeFireWound)), 
+                                        value("wound2", int(ALife::eHitTypeWound_2)), value("phys_strike", int(ALife::eHitTypePhysicStrike)),
+                                        value("dummy", int(ALife::eHitTypeMax))]
                   .def_readwrite("power", &CScriptHit::m_fPower)
                   .def_readwrite("direction", &CScriptHit::m_tDirection)
                   .def_readwrite("draftsman", &CScriptHit::m_tpDraftsman)

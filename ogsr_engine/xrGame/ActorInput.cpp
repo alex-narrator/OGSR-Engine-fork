@@ -189,19 +189,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
             wpn->SwitchFlashlight(!wpn->IsFlashlightOn());
     }
     break;
-    case kKICK: {
-        if (conditions().IsCantWalk())
-            return;
-        const auto hud_item = smart_cast<CHudItem*>(inventory().ActiveItem());
-        if (hud_item && hud_item->GetHUDmode())
-        {
-            if (!hud_item->IsKick())
-                hud_item->OnKick();
-        }
-        else
-            ActorKick();
-    }
-    break;
     case kWPN_FUNC: {
         if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)); det && det->GetHUDmode())
             det->SwitchMode();
@@ -659,7 +646,9 @@ void CActor::ActorThrow()
         return;
     }
 
-    float mass_f = GetTotalMass(capture->taget_object());
+    float mass_f = capture->taget_object()->GetMass();
+    if (auto io = smart_cast<CInventoryOwner*>(capture->taget_object()))
+        mass_f += io->GetCarryWeight();
 
     bool drop_not_throw = Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)); // отпустить или отбросить предмет
 
@@ -677,62 +666,7 @@ void CActor::ActorThrow()
     capture->taget_object()->PPhysicsShell()->applyImpulse(dir, real_imp); // придадим предмету импульс в заданном направлении
     // Msg("throw_impulse [%f], real_imp [%f]", throw_impulse, real_imp);
 
-    if (!GodMode())
-        if (!drop_not_throw)
-            conditions().ConditionJump(mass_f / 50);
-    // Msg("power decreased on [%f]", mass_f / 50);
-}
-//
-#include "material_manager.h"
-void CActor::ActorKick()
-{
-    CGameObject* O = ObjectWeLookingAt();
-    if (!O)
-        return;
-
-    float mass_f = GetTotalMass(O);
-
-    float kick_impulse = m_fKickImpulse * conditions().GetPower() * GetExoFactor();
-    Fvector dir = Direction();
-    dir.y = sin(15.f * PI / 180.f);
-    dir.normalize();
-
-    u16 bone_id = 0;
-    collide::rq_result& RQ = HUD().GetCurrentRayQuery();
-    if (RQ.O == O && RQ.element != 0xffff)
-        bone_id = (u16)RQ.element;
-
-    clamp(mass_f, 1.0f, 100.f); // ограничить параметры хита
-
-    float act_item_weight{1.f};
-    if (inventory().ActiveItem() && inventory().ActiveItem()->Weight() > 1.f)
-        act_item_weight = inventory().ActiveItem()->Weight();
-    clamp(act_item_weight, 1.f, act_item_weight);
-    float hit_power = m_fKickPower * conditions().GetPower() * act_item_weight * GetExoFactor();
-
-    Fvector h_pos = O->Position();
-    SHit hit = SHit(hit_power, dir, this, bone_id, h_pos, kick_impulse, ALife::eHitTypePhysicStrike, 0.f, false);
-    O->Hit(&hit);
-    CEntityAlive* EA = smart_cast<CEntityAlive*>(O);
-    if (EA)
-    {
-        static float alive_kick_power = 3.f;
-        float real_imp = kick_impulse / mass_f;
-        dir.mul(pow(real_imp, alive_kick_power));
-        if (EA->character_physics_support())
-        {
-            EA->character_physics_support()->movement()->AddControlVel(dir);
-            EA->character_physics_support()->movement()->ApplyImpulse(dir.normalize(), kick_impulse * alive_kick_power);
-        }
-    }
-    // зіграємо звук коллізії
-    CDB::TRI* pTri = Level().ObjectSpace.GetStaticTris() + RQ.element;
-    u16 kick_material = smart_cast<CHudItem*>(inventory().ActiveItem()) ? GMLib.GetMaterialIdx("objects\\knife") : GMLib.GetMaterialIdx("creatures\\medium");
-    SGameMtlPair* mtl_pair = GMLib.GetMaterialPair(kick_material, pTri->material);
-    if (!mtl_pair->CollideSounds.empty())
-        GET_RANDOM(mtl_pair->CollideSounds).play_no_feedback(nullptr, 0, 0, &Position(), &kick_impulse);
-    //
-    if (!GodMode())
+    if (!GodMode() && !drop_not_throw)
         conditions().ConditionJump(mass_f / 50);
-    //Msg("%s", __FUNCTION__);
+    // Msg("power decreased on [%f]", mass_f / 50);
 }

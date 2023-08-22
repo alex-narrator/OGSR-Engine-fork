@@ -199,14 +199,6 @@ void CWeaponPistol::PlayAnimShoot()
     }
 }
 
-void CWeaponPistol::PlayAnimKick()
-{
-    if (m_opened)
-        AnimationExist("anm_kick_empty") ? PlayHUDMotion("anm_kick_empty", true, GetState()) : PlayHUDMotion({"anim_draw_empty", "anm_show_empty"}, true, GetState());
-    else
-        inherited::PlayAnimKick();
-}
-
 void CWeaponPistol::OnAnimationEnd(u32 state)
 {
     if ((state == eHiding || state == eShutter) && m_opened)

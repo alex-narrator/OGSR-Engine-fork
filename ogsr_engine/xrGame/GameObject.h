@@ -278,6 +278,4 @@ protected:
 public:
     void addFeelTouch(float, const luabind::object&, const luabind::functor<void>&, const luabind::functor<bool>&);
     void removeFeelTouch(const luabind::object&, const luabind::functor<void>&, const luabind::functor<bool>&);
-    // вернёт физмассу объекта + массу предметов в инвентаре, если таковой имеется
-    float GetTotalMass(CObject* object, float k = 1.0f) const;
 };

@@ -35,8 +35,6 @@ public:
     virtual void PlayAnimReload() override;
     virtual void PlayAnimShoot() override;
 
-    virtual void PlayAnimKick() override;
-
     virtual void UpdateSounds();
 
     virtual bool IsOpened() const { return m_opened; };

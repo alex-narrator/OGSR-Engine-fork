@@ -396,8 +396,6 @@ void CActor::Load(LPCSTR section)
     m_news_to_show = READ_IF_EXISTS(pSettings, r_u32, section, "news_to_show", NEWS_TO_SHOW);
 
     m_fThrowImpulse = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "throw_impulse", 5.0f);
-    m_fKickImpulse = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "kick_impulse", 250.f);
-    m_fKickPower = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "kick_power", .1f);
     m_fHoldingDistance = READ_IF_EXISTS(pSettings, r_float, "actor_capture", "holding_distance", .5f); // расстояние перед актором на котором находится удерживаемый предмет
     clamp(m_fHoldingDistance, 0.0f, inventory().GetTakeDist());
 }
@@ -1569,7 +1567,11 @@ float CActor::GetCarryWeight() const
     float res{CInventoryOwner::GetCarryWeight()};
     CPHCapture* capture = character_physics_support()->movement()->PHCapture();
     if (capture && capture->taget_object())
-        res += GetTotalMass(capture->taget_object(), 0.1f);
+    {
+        res += capture->taget_object()->GetMass();
+        if (auto io = smart_cast<CInventoryOwner*>(capture->taget_object()))
+            res += io->GetCarryWeight();
+    }
     return res;
 }
 

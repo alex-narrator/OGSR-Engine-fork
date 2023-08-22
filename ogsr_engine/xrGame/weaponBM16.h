@@ -27,7 +27,6 @@ protected:
     virtual void PlayAnimIdle();
     virtual void PlayAnimShutter() override;
     virtual void PlayAnimShutterMisfire() override;
-    virtual void PlayAnimKick() override;
     virtual void PlayAnimCheckMisfire() override;
     virtual void PlayReloadSound();
     virtual void UpdateSounds() override;

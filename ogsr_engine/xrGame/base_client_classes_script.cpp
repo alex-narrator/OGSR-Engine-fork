@@ -126,8 +126,7 @@ void CObjectScript::script_register(lua_State* L)
                                           value("eSwitch", int(CHudItem::EHudStates::eSwitch)), /*value("eDeviceSwitch", int(CHudItem::EHudStates::eDeviceSwitch)),*/
                                           value("eThrowStart", int(CHudItem::EHudStates::eThrowStart)), value("eReady", int(CHudItem::EHudStates::eReady)),
                                           value("eThrow", int(CHudItem::EHudStates::eThrow)), value("eThrowEnd", int(CHudItem::EHudStates::eThrowEnd)),
-                                          value("eActivating", int(CHudItem::EHudStates::eActivating)), value("eShutter", int(CHudItem::EHudStates::eShutter)),
-                                          value("eKick", int(CHudItem::EHudStates::eKick))]
+                                          value("eActivating", int(CHudItem::EHudStates::eActivating)), value("eShutter", int(CHudItem::EHudStates::eShutter))]
                   .enum_("RestrictionSpace")
                       [value("eDefaultRestrictorTypeNone", int(RestrictionSpace::eDefaultRestrictorTypeNone)),
                        value("eDefaultRestrictorTypeOut", int(RestrictionSpace::eDefaultRestrictorTypeOut)),

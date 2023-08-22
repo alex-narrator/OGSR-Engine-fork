@@ -175,13 +175,6 @@ void CHudItem::Load(LPCSTR section)
     inertion_data.m_tendto_speed = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_tendto_speed", TENDTO_SPEED);
     inertion_data.m_tendto_speed_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_tendto_speed", TENDTO_SPEED_AIM);
     //--#SM+# End--
-
-    if (pSettings->line_exist(section, "snd_on_item_take"))
-        HUD_SOUND::LoadSound(section, "snd_on_item_take", sndOnItemTake);
-    if (pSettings->line_exist(section, "snd_check_gear"))
-        HUD_SOUND::LoadSound(section, "snd_check_gear", sndCheckGear);
-    if (pSettings->line_exist(section, "snd_checkout"))
-        HUD_SOUND::LoadSound(section, "snd_checkout", sndCheckout);
 }
 
 void CHudItem::PlaySound(HUD_SOUND& hud_snd, const Fvector& position, bool overlap) 
@@ -265,9 +258,6 @@ void CHudItem::OnStateSwitch(u32 S, u32 oldState)
     }break;
     case eSprintEnd: {
         PlayAnimSprintEnd();
-    }break;
-    case eKick: {
-        switch2_Kick();
     }break;
     default: {
         if (S != eIdle)
@@ -402,9 +392,6 @@ void CHudItem::on_a_hud_attach()
 
 u32 CHudItem::PlayHUDMotion(const char* M, const bool bMixIn, const u32 state, const bool randomAnim, float speed)
 {
-    HUD_SOUND::StopSound(sndCheckout);
-    HUD_SOUND::StopSound(sndCheckGear);
-
     auto Wpn = g_player_hud->attached_item(0);
     auto Det = g_player_hud->attached_item(1);
 
@@ -1508,23 +1495,7 @@ void CHudItem::OnAnimationEnd(u32 state)
         SprintType = false;
         SwitchState(eIdle);
         break;
-    case eKick:
-        if (auto actor = smart_cast<CActor*>(object().H_Parent()))
-            actor->ActorKick();
-        SwitchState(eIdle);
-        break;
     }
 }
 
 bool CHudItem::AnmIdleMovingAllowed() const { return !HudBobbingAllowed() || Actor()->PsyAuraAffect; }
-
-void CHudItem::OnKick() { SwitchState(eKick); }
-void CHudItem::switch2_Kick()
-{
-    if (IsZoomed())
-        OnZoomOut();
-    PlayAnimKick();
-    SetPending(TRUE);
-}
-
-void CHudItem::PlayAnimKick() { AnimationExist("anm_kick") ? PlayHUDMotion("anm_kick", true, GetState()) : PlayHUDMotion({"anim_draw", "anm_show"}, true, GetState(), false); }

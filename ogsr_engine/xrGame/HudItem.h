@@ -42,7 +42,6 @@ public:
         eThrowEnd,
         eActivating,
         eShutter,
-        eKick,
     };
 
 private:
@@ -100,8 +99,6 @@ protected: //чтоб нельзя было вызвать на прямую
     bool BobbingEnable{};
     u32 m_dwStateTime{};
 
-    HUD_SOUND sndOnItemTake, sndCheckout, sndCheckGear;
-
 public:
     virtual void Load(LPCSTR section);
     virtual CHudItem* cast_hud_item() { return this; }
@@ -158,11 +155,6 @@ public:
     virtual void PlayAnimIdleMovingCrouch();
     virtual void PlayAnimIdleMovingCrouchSlow();
     virtual void PlayAnimDeviceSwitch(){};
-
-    virtual void OnKick();
-    virtual void switch2_Kick();
-    virtual void PlayAnimKick();
-    virtual bool IsKick() const { return GetState() == eKick; }
 
     virtual bool NeedBlendAnm();
 

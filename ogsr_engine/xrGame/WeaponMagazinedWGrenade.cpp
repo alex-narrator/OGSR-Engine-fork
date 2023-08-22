@@ -913,19 +913,6 @@ void CWeaponMagazinedWGrenade::PlayAnimShutterMisfire()
     PlaySound(sndShutterMisfire, get_LastFP());
 }
 
-void CWeaponMagazinedWGrenade::PlayAnimKick()
-{
-    if (!IsAddonAttached(eLauncher))
-    {
-        inherited::PlayAnimKick();
-        return;
-    }
-    else if (IsGrenadeMode())
-        AnimationExist("anm_kick_g") ? PlayHUDMotion("anm_kick_g", true, GetState()) : PlayHUDMotion({"anim_draw_g", "anm_show_g"}, true, GetState());
-    else
-        AnimationExist("anm_kick_w_gl") ? PlayHUDMotion("anm_kick_w_gl", true, GetState()) : PlayHUDMotion({"anim_draw_gl", "anm_show_w_gl"}, true, GetState());
-}
-
 void CWeaponMagazinedWGrenade::UnloadWeaponFull()
 {
     if (!IsGrenadeMode())

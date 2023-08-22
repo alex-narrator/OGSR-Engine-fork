@@ -784,11 +784,8 @@ public:
     bool IsDetectorActive() const;
 
 	float m_fThrowImpulse; // сила с которой актор отбрасывает предмет
-    float m_fKickImpulse; // імпульс копняка
-    float m_fKickPower; // сила копняка
     float m_fHoldingDistance; // расстояние перед актором на котором находится удерживаемый предмет
     void ActorThrow();
-    void ActorKick();
 
     void BlockSprint();
     // визначаємо чи треба передати хіт до рюкзака та його вмісту

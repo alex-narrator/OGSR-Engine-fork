@@ -1222,37 +1222,3 @@ void CGameObject::FeelTouchAddonsRelcase(CObject* O)
         });
     }
 }
-
-#include "entity_alive.h"
-#include "InventoryOwner.h"
-#include "CharacterPhysicsSupport.h"
-#include "PHMovementControl.h"
-float CGameObject::GetTotalMass(CObject* object, float k) const
-{
-    float mass_f = 0.f;
-
-    CEntityAlive* EA = smart_cast<CEntityAlive*>(object);
-    if (EA)
-    {
-        if (EA->character_physics_support())
-            mass_f = EA->character_physics_support()->movement()->GetMass();
-        else
-            mass_f = EA->GetMass();
-    }
-    else
-    {
-        CPhysicsShellHolder* sh = smart_cast<CPhysicsShellHolder*>(object);
-        if (sh)
-            mass_f = sh->GetMass() * k; // физмасса таскаемых объектов окружения великовата для прямого учёта в нагруженность актора
-
-        PIItem itm = smart_cast<PIItem>(object);
-        if (itm)
-            mass_f = itm->Weight();
-    }
-
-    CInventoryOwner* io = smart_cast<CInventoryOwner*>(object);
-    if (io)
-        mass_f += io->GetCarryWeight();
-
-    return mass_f;
-};

@@ -88,7 +88,6 @@ enum EGameActions
     kQUICK_SAVE,
     kQUICK_LOAD,
 
-    kKICK,
     kADDITIONAL_ACTION,
 
     kLASTACTION = u32(-3),

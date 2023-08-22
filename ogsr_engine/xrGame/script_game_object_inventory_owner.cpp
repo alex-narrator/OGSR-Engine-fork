@@ -37,6 +37,7 @@
 #include "CustomDetector.h"
 #include "customoutfit.h"
 #include "WeaponMagazinedWGrenade.h"
+#include "InventoryContainer.h"
 
 bool CScriptGameObject::GiveInfoPortion(LPCSTR info_id)
 {
@@ -1077,13 +1078,14 @@ void CScriptGameObject::SetActorMaxWeight(float max_weight)
 // получить суммарный вес инвентаря
 float CScriptGameObject::GetTotalWeight() const
 {
-    CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
-    if (!inventory_owner)
+    auto inv_owner = smart_cast<CInventoryOwner*>(&object());
+    auto inv_cont = smart_cast<CInventoryContainer*>(&object());
+    if (!inv_owner && !inv_cont)
     {
         ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member GetTotalWeight!");
         return (false);
     }
-    return (inventory_owner->inventory().TotalWeight());
+    return inv_owner ? inv_owner->inventory().TotalWeight() : inv_cont->Weight();
 }
 // получить вес предмета
 float CScriptGameObject::Weight() const
