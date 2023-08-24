@@ -698,6 +698,20 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
         {
             string_path nm;
             data->r_stringZ(nm, sizeof(nm));
+
+            //Anomaly motion reference support (anomaly_weapons\hud_hands_animation\*.omf)
+            if (strstr(nm, "\\*.omf"))
+            {
+                FS_FileSet fset;
+                FS.file_list(fset, "$game_meshes$", FS_ListFiles, nm);
+                FS.file_list(fset, "$level$", FS_ListFiles, nm);
+
+                for (FS_FileSet::iterator it = fset.begin(); it != fset.end(); it++)
+                    omfs.push_back((*it).name.c_str());
+
+                continue;
+            }
+
             xr_strcat(nm, ".omf");
             omfs.push_back(nm);
         }
