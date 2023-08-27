@@ -324,6 +324,8 @@ void CWeapon::Load(LPCSTR section)
     m_bScopeShowIndicators = !!READ_IF_EXISTS(pSettings, r_bool, section, "scope_show_indicators", true);
     m_bIgnoreScopeTexture = !!READ_IF_EXISTS(pSettings, r_bool, section, "ignore_scope_texture", false);
 
+    m_bIgnoreScopeSecond = !!READ_IF_EXISTS(pSettings, r_bool, section, "ignore_scope_second", false);
+
     m_fZoomFactor = CurrentZoomFactor();
 
     m_highlightAddons.clear();
@@ -1279,7 +1281,7 @@ void CWeapon::UpdateHUDAddonsVisibility()
     auto pWeaponVisual = smart_cast<IKinematics*>(Visual());
 
     if (AddonAttachable(eScope))
-        HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, IsAddonAttached(eScope));
+        HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, IsAddonAttached(eScope), TRUE);
 
     if (m_eScopeStatus == ALife::eAddonDisabled)
         HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, FALSE, TRUE);
@@ -1340,7 +1342,7 @@ void CWeapon::UpdateAddonsVisibility()
     {
         bone_id = pWeaponVisual->LL_BoneID(sbone);
 
-        if (AddonAttachable(eScope))
+        if (AddonAttachable(eScope) && bone_id != BI_NONE)
         {
             pWeaponVisual->LL_SetBoneVisible(bone_id, IsAddonAttached(eScope), TRUE);
         }
@@ -1457,7 +1459,7 @@ float CWeapon::CurrentZoomFactor()
     return res;
 }
 
-bool CWeapon::HasScopeSecond() const { return IsAddonAttached(eScope) && !IsGrenadeMode() && m_bHasScopeSecond; }
+bool CWeapon::HasScopeSecond() const { return IsAddonAttached(eScope) && !IsGrenadeMode() && m_bHasScopeSecond && !m_bIgnoreScopeSecond; }
 
 bool CWeapon::IsSecondScopeMode() const { return IsAddonAttached(eScope) && !IsGrenadeMode() && m_bScopeSecondMode; }
 

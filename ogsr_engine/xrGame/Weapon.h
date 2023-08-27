@@ -247,6 +247,7 @@ protected:
 
     bool m_bHasScopeSecond{};
     bool m_bScopeSecondMode{};
+    bool m_bIgnoreScopeSecond{};
 
     bool m_bRangeMeter{};
     Fvector2 m_vRangeMeterOffset{};
