@@ -989,16 +989,13 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
     if (result)
     {
         if (b_send_event)
-        {
-            // уничтожить подсоединенную вещь из инвентаря
-            //.			pIItem->Drop					();
             pIItem->object().DestroyObject();
-        };
 
-        //		if ( !ScopeRespawn( pIItem ) ) {
-        UpdateAddonsVisibility();
-        InitAddons();
-        //}
+        if (!ScopeRespawn(pIItem))
+        {
+            UpdateAddonsVisibility();
+            InitAddons();
+        }
 
         return true;
     }
@@ -1018,8 +1015,11 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
             item_condition = m_fAttachedScopeCondition;
         m_fAttachedScopeCondition = 1.f;
         //
-        UpdateAddonsVisibility();
-        InitAddons();
+        if (!ScopeRespawn(nullptr))
+        {
+            UpdateAddonsVisibility();
+            InitAddons();
+        }
 
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
@@ -1133,15 +1133,19 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
     if (m_UIScopeSecond)
         xr_delete(m_UIScopeSecond);
 
+    LPCSTR scope_texture_name{};
+
     // second scope mode
     m_bHasScopeSecond = READ_IF_EXISTS(pSettings, r_bool, section, "scope_second", false);
     if (m_bHasScopeSecond)
     {
         m_fScopeZoomFactorSecond = READ_IF_EXISTS(pSettings, r_float, section, "scope_zoom_factor_second", 1.0f);
-        if (LPCSTR scope_second_tex_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture_second", nullptr))
+
+        scope_texture_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture_second", nullptr);
+        if (scope_texture_name && !m_bIgnoreScopeTexture)
         {
             m_UIScopeSecond = xr_new<CUIStaticItem>();
-            m_UIScopeSecond->Init(scope_second_tex_name, Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
+            m_UIScopeSecond->Init(scope_texture_name, Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
         }
     }
 
@@ -1152,15 +1156,22 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
         if (IsScopeBroken())
         {
             m_fScopeZoomFactor = m_fIronSightZoomFactor;
-            if (LPCSTR scope_tex_name_broken = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture_broken", nullptr))
+
+            if (m_bIgnoreScopeTexture)
+                return;
+
+            scope_texture_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture_broken", nullptr);
+            if (scope_texture_name)
             {
                 m_UIScope = xr_new<CUIStaticItem>();
-                m_UIScope->Init(scope_tex_name_broken, Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
+                m_UIScope->Init(scope_texture_name, Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
             }
-            if (LPCSTR scope_second_tex_name_broken = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture_second_broken", nullptr))
+
+            scope_texture_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture_second_broken", nullptr);
+            if (scope_texture_name)
             {
                 m_UIScopeSecond = xr_new<CUIStaticItem>();
-                m_UIScopeSecond->Init(scope_second_tex_name_broken, Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
+                m_UIScopeSecond->Init(scope_texture_name, Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
             }
         }
 
@@ -1229,11 +1240,11 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
         m_uRangeMeterColor = READ_IF_EXISTS(pSettings, r_color, section, "range_meter_color", color_argb(255, 255, 255, 255));
     }
 
-    LPCSTR scope_tex_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture", nullptr);
-    if (!scope_tex_name)
+    scope_texture_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture", nullptr);
+    if (!scope_texture_name || m_bIgnoreScopeTexture)
         return;
     m_UIScope = xr_new<CUIStaticItem>();
-    m_UIScope->Init(scope_tex_name, Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
+    m_UIScope->Init(scope_texture_name, Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
 }
 
 void CWeaponMagazined::ApplySilencerParams()
@@ -2351,4 +2362,60 @@ void CWeaponMagazined::UpdateMagazineVisibility()
             HudItemData()->set_bone_visible(m_sHud_wpn_magazine_bone, show);
         }
     }
+}
+
+bool CWeaponMagazined::ScopeRespawn(PIItem pIItem)
+{
+    xr_string scope_respawn = "scope_respawn";
+    if (AddonAttachable(eScope) && IsAddonAttached(eScope))
+    {
+        scope_respawn += "_";
+        if (smart_cast<CScope*>(pIItem))
+            scope_respawn += pIItem->object().cNameSect().c_str();
+        else
+            scope_respawn += GetAddonName(eScope).c_str();
+    }
+
+    if (pSettings->line_exist(cNameSect(), scope_respawn.c_str()))
+    {
+        LPCSTR S = pSettings->r_string(cNameSect(), scope_respawn.c_str());
+        if (xr_strcmp(cName().c_str(), S) != 0)
+        {
+            CSE_Abstract* _abstract = Level().spawn_item(S, Position(), ai_location().level_vertex_id(), H_Parent()->ID(), true);
+            CSE_ALifeDynamicObject* sobj1 = alife_object();
+            CSE_ALifeDynamicObject* sobj2 = smart_cast<CSE_ALifeDynamicObject*>(_abstract);
+
+            NET_Packet P;
+            P.w_begin(M_UPDATE);
+            u32 position = P.w_tell();
+            P.w_u16(0);
+            sobj1->STATE_Write(P);
+            u16 size = u16(P.w_tell() - position);
+            P.w_seek(position, &size, sizeof(u16));
+            u16 id;
+            P.r_begin(id);
+            P.r_u16(size);
+            sobj2->STATE_Read(P, size);
+
+            net_Export(_abstract);
+
+            auto io = smart_cast<CInventoryOwner*>(H_Parent());
+            auto ii = smart_cast<CInventoryItem*>(this);
+            if (io)
+            {
+                if (io->inventory().InSlot(ii))
+                    io->SetNextItemSlot(ii->GetSlot());
+                else
+                    io->SetNextItemSlot(0);
+            }
+
+            DestroyObject();
+            sobj2->Spawn_Write(P, TRUE);
+            Level().Send(P, net_flags(TRUE));
+            F_entity_Destroy(_abstract);
+
+            return true;
+        }
+    }
+    return false;
 }

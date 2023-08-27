@@ -196,6 +196,7 @@ void CInventoryItem::Load(LPCSTR section)
         {
             string128 item_section;
             _GetItem(str, i, item_section);
+            ASSERT_FMT(pSettings->section_exist(item_section), "highlight_item section [%s] not found!", item_section);
             m_highlight_items.push_back(item_section);
         }
     }

@@ -273,7 +273,7 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .def("active_slot", &CScriptGameObject::active_slot)
         .def("activate_slot", &CScriptGameObject::activate_slot)
 
-        .def("active_detector", &CScriptGameObject::active_detector)
+        .def("active_item_2", &CScriptGameObject::active_item_left_hand)
 
         .def("switch_torch", &CScriptGameObject::SwitchTorch)
         .def("switch_night_vision", &CScriptGameObject::SwitchNightVision)

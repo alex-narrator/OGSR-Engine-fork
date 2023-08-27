@@ -214,7 +214,7 @@ void CPda::OnH_B_Independent(bool just_before_destroy)
     if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
         return;
 
-    HUD_SOUND::PlaySound(sndHide, Position(), H_Root(), !!GetHUDmode(), false, false);
+    PlaySound(sndHide, Position(), H_Root());
 
     SwitchState(eHidden);
     SetPending(FALSE);
@@ -309,7 +309,7 @@ void CPda::OnStateSwitch(u32 S, u32 oldState)
     case eShowing: {
         g_player_hud->attach_item(this);
 
-        HUD_SOUND::PlaySound(sndShow, Position(), H_Root(), !!GetHUDmode(), false, false);
+        PlaySound(sndShow, Position());
 
         PlayHUDMotion("anm_show", false, GetState());
 
@@ -319,7 +319,7 @@ void CPda::OnStateSwitch(u32 S, u32 oldState)
     case eHiding: {
         if (oldState != eHiding)
         {
-            HUD_SOUND::PlaySound(sndHide, Position(), H_Root(), !!GetHUDmode(), false, false);
+            PlaySound(sndHide, Position());
             PlayHUDMotion("anm_hide", true, GetState());
             SetPending(TRUE);
             m_bZoomed = false;

@@ -38,6 +38,7 @@
 #include "customoutfit.h"
 #include "WeaponMagazinedWGrenade.h"
 #include "InventoryContainer.h"
+#include "player_hud.h"
 
 bool CScriptGameObject::GiveInfoPortion(LPCSTR info_id)
 {
@@ -920,7 +921,7 @@ CScriptGameObject* CScriptGameObject::item_in_slot(u8 slot_id) const
     return (result ? result->object().lua_game_object() : 0);
 }
 
-CScriptGameObject* CScriptGameObject::active_detector() const
+CScriptGameObject* CScriptGameObject::active_item_left_hand() const
 {
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
@@ -929,12 +930,12 @@ CScriptGameObject* CScriptGameObject::active_detector() const
         return (0);
     }
 
-    CInventoryItem* result = inventory_owner->inventory().ItemFromSlot(DETECTOR_SLOT);
+    auto result = g_player_hud->attached_item(1);
     if (result)
     {
-        CCustomDetector* detector = smart_cast<CCustomDetector*>(result);
-        VERIFY(detector);
-        return (detector->GetHUDmode() ? result->object().lua_game_object() : 0);
+        auto item = smart_cast<CHudItem*>(result->m_parent_hud_item);
+        VERIFY(item);
+        return (item->GetHUDmode() ? item->object().lua_game_object() : 0);
     }
     return (0);
 }
