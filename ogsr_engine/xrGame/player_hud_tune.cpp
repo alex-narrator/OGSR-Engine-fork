@@ -308,9 +308,8 @@ void player_hud::DumpParamsToLog()
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("scope_zoom_offset%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("scope_zoom_rotate_x%s = %f", is_16x9 ? "_16x9" : "", rot_.x);
-            Msg("scope_zoom_rotate_y%s = %f", is_16x9 ? "_16x9" : "", rot_.y);
+            Msg("aim_scope_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+            Msg("aim_scope_hud_offset_rot%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
         else if (idx == hud_item_measures::m_hands_offset_type_gl_scope)
