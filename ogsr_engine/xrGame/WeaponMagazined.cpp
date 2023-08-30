@@ -113,6 +113,19 @@ BOOL CWeaponMagazined::net_Spawn(CSE_Abstract* DC)
 {
     BOOL bRes = inherited::net_Spawn(DC);
     const auto wpn = smart_cast<CSE_ALifeItemWeaponMagazined*>(DC);
+    m_iCurFireMode = wpn->m_u8CurFireMode;
+    if (HasFireModes() && m_iCurFireMode >= m_aFireModes.size())
+    {
+        Msg("! [%s]: %s: wrong m_iCurFireMode[%u/%u]", __FUNCTION__, cName().c_str(), m_iCurFireMode, m_aFireModes.size() - 1);
+        m_iCurFireMode = m_aFireModes.size() - 1;
+        auto se_obj = alife_object();
+        if (se_obj)
+        {
+            auto W = smart_cast<CSE_ALifeItemWeaponMagazined*>(se_obj);
+            W->m_u8CurFireMode = m_iCurFireMode;
+        }
+    }
+    SetQueueSize(GetCurrentFireMode());
     // multitype ammo loading
     for (u32 i = 0; i < wpn->m_AmmoIDs.size(); i++)
     {
@@ -141,6 +154,7 @@ void CWeaponMagazined::net_Export(CSE_Abstract* E)
 {
     inherited::net_Export(E);
     CSE_ALifeItemWeaponMagazined* wpn = smart_cast<CSE_ALifeItemWeaponMagazined*>(E);
+    wpn->m_u8CurFireMode = u8(m_iCurFireMode & 0x00ff);
     wpn->m_AmmoIDs.clear();
     for (u8 i = 0; i < m_magazine.size(); i++)
     {
@@ -156,7 +170,6 @@ void CWeaponMagazined::net_Export(CSE_Abstract* E)
 void CWeaponMagazined::save(NET_Packet& output_packet)
 {
     inherited::save(output_packet);
-    save_data(m_iCurFireMode, output_packet);
     save_data(m_iShotNum, output_packet);
     save_data(m_bScopeSecondMode, output_packet);
     save_data(m_fRTZoomFactor, output_packet);
@@ -166,8 +179,6 @@ void CWeaponMagazined::save(NET_Packet& output_packet)
 void CWeaponMagazined::load(IReader& input_packet)
 {
     inherited::load(input_packet);
-    load_data(m_iCurFireMode, input_packet);
-    SetQueueSize(GetCurrentFireMode());
     load_data(m_iShotNum, input_packet);
     load_data(m_bScopeSecondMode, input_packet);
     load_data(m_fRTZoomFactor, input_packet);
@@ -2398,6 +2409,12 @@ bool CWeaponMagazined::ScopeRespawn(PIItem pIItem)
             sobj2->STATE_Read(P, size);
 
             net_Export(_abstract);
+
+            //ці параметри не фігурують у net_Export цього класу або його предків
+            //todo: може таки перенести їх у експорт CInventoryItem
+            auto se_item = smart_cast<CSE_ALifeInventoryItem*>(sobj2);
+            se_item->m_fCondition = m_fCondition;
+            se_item->m_fRadiationRestoreSpeed = m_ItemEffect[eRadiationRestoreSpeed];
 
             auto io = smart_cast<CInventoryOwner*>(H_Parent());
             auto ii = smart_cast<CInventoryItem*>(this);

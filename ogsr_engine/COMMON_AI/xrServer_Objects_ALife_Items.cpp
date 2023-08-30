@@ -475,6 +475,20 @@ void CSE_ALifeItemWeapon::STATE_Read(NET_Packet& tNetPacket, u16 size)
 
     if (m_wVersion > 46)
         tNetPacket.r_u8(ammo_type);
+    //
+    if (m_wVersion > 118)
+    {
+        tNetPacket.r_u8(m_weapon_flags.flags);
+        tNetPacket.r_u8(m_cur_scope);
+        tNetPacket.r_u8(m_cur_silencer);
+        tNetPacket.r_u8(m_cur_glauncher);
+        tNetPacket.r_u8(m_cur_laser);
+        tNetPacket.r_u8(m_cur_flashlight);
+        tNetPacket.r_u8(m_cur_stock);
+        tNetPacket.r_u8(m_cur_extender);
+        tNetPacket.r_u8(m_cur_forend);
+        tNetPacket.r_u8(m_cur_magazine);
+    }
 }
 
 void CSE_ALifeItemWeapon::STATE_Write(NET_Packet& tNetPacket)
@@ -485,6 +499,17 @@ void CSE_ALifeItemWeapon::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8(wpn_state);
     tNetPacket.w_u8(m_addon_flags.get());
     tNetPacket.w_u8(ammo_type);
+    //
+    tNetPacket.w_u8(m_weapon_flags.get());
+    tNetPacket.w_u8(m_cur_scope);
+    tNetPacket.w_u8(m_cur_silencer);
+    tNetPacket.w_u8(m_cur_glauncher);
+    tNetPacket.w_u8(m_cur_laser);
+    tNetPacket.w_u8(m_cur_flashlight);
+    tNetPacket.w_u8(m_cur_stock);
+    tNetPacket.w_u8(m_cur_extender);
+    tNetPacket.w_u8(m_cur_forend);
+    tNetPacket.w_u8(m_cur_magazine);
 }
 
 void CSE_ALifeItemWeapon::OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, ClientID sender)
@@ -525,7 +550,20 @@ void CSE_ALifeItemWeaponShotGun::STATE_Write(NET_Packet& P) { inherited::STATE_W
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemWeaponMagazined
 ////////////////////////////////////////////////////////////////////////////
-CSE_ALifeItemWeaponMagazined::CSE_ALifeItemWeaponMagazined(const char* caSection) : CSE_ALifeItemWeapon(caSection) { m_AmmoIDs.clear(); }
+CSE_ALifeItemWeaponMagazined::CSE_ALifeItemWeaponMagazined(const char* caSection) : CSE_ALifeItemWeapon(caSection) 
+{ 
+    auto FireModesList = READ_IF_EXISTS(pSettings, r_string, caSection, "fire_modes", nullptr);
+    if (FireModesList)
+    {
+        int ModesCount = _GetItemCount(FireModesList);
+        m_u8CurFireMode = u8(ModesCount - 1);
+    }
+    else
+    {
+        m_u8CurFireMode = 0;
+    }
+    m_AmmoIDs.clear(); 
+}
 CSE_ALifeItemWeaponMagazined::~CSE_ALifeItemWeaponMagazined() {}
 
 void CSE_ALifeItemWeaponMagazined::UPDATE_Read(NET_Packet& P)
@@ -534,6 +572,8 @@ void CSE_ALifeItemWeaponMagazined::UPDATE_Read(NET_Packet& P)
 
     if (m_wVersion > 118)
     {
+        m_u8CurFireMode = P.r_u8();
+
         m_AmmoIDs.clear();
         u8 AmmoCount = P.r_u8();
         for (u8 i = 0; i < AmmoCount; i++)
@@ -550,6 +590,8 @@ void CSE_ALifeItemWeaponMagazined::UPDATE_Write(NET_Packet& P)
 {
     inherited::UPDATE_Write(P);
 
+    P.w_u8(m_u8CurFireMode);
+
     P.w_u8(u8(m_AmmoIDs.size()));
     for (u32 i = 0; i < m_AmmoIDs.size(); i++)
     {
@@ -561,8 +603,42 @@ void CSE_ALifeItemWeaponMagazined::UPDATE_Write(NET_Packet& P)
     P.w_float_q8(m_fAttachedMagazineCondition, 0.f, 1.f);
 }
 
-void CSE_ALifeItemWeaponMagazined::STATE_Read(NET_Packet& P, u16 size) { inherited::STATE_Read(P, size); }
-void CSE_ALifeItemWeaponMagazined::STATE_Write(NET_Packet& P) { inherited::STATE_Write(P); }
+void CSE_ALifeItemWeaponMagazined::STATE_Read(NET_Packet& P, u16 size) 
+{ 
+    inherited::STATE_Read(P, size); 
+    //
+    if (m_wVersion > 118)
+    {
+        m_u8CurFireMode = P.r_u8();
+
+        m_AmmoIDs.clear();
+        u8 AmmoCount = P.r_u8();
+        for (u8 i = 0; i < AmmoCount; i++)
+        {
+            m_AmmoIDs.push_back(P.r_u8());
+        }
+        P.r_float_q8(m_fAttachedSilencerCondition, 0.f, 1.f);
+        P.r_float_q8(m_fAttachedScopeCondition, 0.f, 1.f);
+        P.r_float_q8(m_fAttachedGrenadeLauncherCondition, 0.f, 1.f);
+        P.r_float_q8(m_fAttachedMagazineCondition, 0.f, 1.f);
+    }
+}
+void CSE_ALifeItemWeaponMagazined::STATE_Write(NET_Packet& P) 
+{ 
+    inherited::STATE_Write(P); 
+    //
+    P.w_u8(m_u8CurFireMode);
+
+    P.w_u8(u8(m_AmmoIDs.size()));
+    for (u32 i = 0; i < m_AmmoIDs.size(); i++)
+    {
+        P.w_u8(u8(m_AmmoIDs[i]));
+    }
+    P.w_float_q8(m_fAttachedSilencerCondition, 0.f, 1.f);
+    P.w_float_q8(m_fAttachedScopeCondition, 0.f, 1.f);
+    P.w_float_q8(m_fAttachedGrenadeLauncherCondition, 0.f, 1.f);
+    P.w_float_q8(m_fAttachedMagazineCondition, 0.f, 1.f);
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemWeaponMagazinedWGL
@@ -609,6 +685,13 @@ void CSE_ALifeItemWeaponMagazinedWGL::STATE_Read(NET_Packet& P, u16 size)
     {
         P.r_u8(ammo_type2);
         P.r_u16(a_elapsed2);
+        //
+        m_AmmoIDs2.clear();
+        u8 AmmoCount2 = P.r_u8();
+        for (u8 i = 0; i < AmmoCount2; i++)
+        {
+            m_AmmoIDs2.push_back(P.r_u8());
+        }
     }
 }
 
@@ -618,6 +701,12 @@ void CSE_ALifeItemWeaponMagazinedWGL::STATE_Write(NET_Packet& P)
 
     P.w_u8(ammo_type2);
     P.w_u16(a_elapsed2);
+    //
+    P.w_u8(u8(m_AmmoIDs2.size()));
+    for (u32 i = 0; i < m_AmmoIDs2.size(); i++)
+    {
+        P.w_u8(u8(m_AmmoIDs2[i]));
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////
