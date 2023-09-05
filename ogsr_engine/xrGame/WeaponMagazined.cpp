@@ -894,7 +894,7 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
 
 bool CWeaponMagazined::CanAttach(PIItem pIItem)
 {
-    auto pScope = smart_cast<CScope*>(pIItem);
+    auto pScope = smart_cast<CScope*>(pIItem) || smart_cast<CWeaponBinoculars*>(pIItem);
     auto pSilencer = smart_cast<CSilencer*>(pIItem);
     auto pLaser = smart_cast<CLaser*>(pIItem);
     auto pFlashlight = smart_cast<CFlashlight*>(pIItem);
@@ -951,7 +951,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 {
     bool result = false;
 
-    auto pScope = smart_cast<CScope*>(pIItem);
+    auto pScope = smart_cast<CScope*>(pIItem) || smart_cast<CWeaponBinoculars*>(pIItem);
     auto pSilencer = smart_cast<CSilencer*>(pIItem);
     auto pLaser = smart_cast<CLaser*>(pIItem);
     auto pFlashlight = smart_cast<CFlashlight*>(pIItem);
@@ -1144,7 +1144,7 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
     if (m_UIScopeSecond)
         xr_delete(m_UIScopeSecond);
 
-    LPCSTR scope_texture_name{};
+    LPCSTR scope_texture_name{}, shader_name{Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default"};
 
     // second scope mode
     m_bHasScopeSecond = READ_IF_EXISTS(pSettings, r_bool, section, "scope_second", false);
@@ -1156,7 +1156,7 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
         if (scope_texture_name && !m_bIgnoreScopeTexture)
         {
             m_UIScopeSecond = xr_new<CUIStaticItem>();
-            m_UIScopeSecond->Init(scope_texture_name, Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
+            m_UIScopeSecond->Init(scope_texture_name, shader_name, 0, 0, alNone);
         }
     }
 
@@ -1175,14 +1175,14 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
             if (scope_texture_name)
             {
                 m_UIScope = xr_new<CUIStaticItem>();
-                m_UIScope->Init(scope_texture_name, Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
+                m_UIScope->Init(scope_texture_name, shader_name, 0, 0, alNone);
             }
 
             scope_texture_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture_second_broken", nullptr);
             if (scope_texture_name)
             {
                 m_UIScopeSecond = xr_new<CUIStaticItem>();
-                m_UIScopeSecond->Init(scope_texture_name, Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
+                m_UIScopeSecond->Init(scope_texture_name, shader_name, 0, 0, alNone);
             }
         }
 
@@ -1255,7 +1255,7 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
     if (!scope_texture_name || m_bIgnoreScopeTexture)
         return;
     m_UIScope = xr_new<CUIStaticItem>();
-    m_UIScope->Init(scope_texture_name, Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
+    m_UIScope->Init(scope_texture_name, shader_name, 0, 0, alNone);
 }
 
 void CWeaponMagazined::ApplySilencerParams()
@@ -2381,7 +2381,7 @@ bool CWeaponMagazined::ScopeRespawn(PIItem pIItem)
     if (AddonAttachable(eScope) && IsAddonAttached(eScope))
     {
         scope_respawn += "_";
-        if (smart_cast<CScope*>(pIItem))
+        if (smart_cast<CScope*>(pIItem) || smart_cast<CWeaponBinoculars*>(pIItem))
             scope_respawn += pIItem->object().cNameSect().c_str();
         else
             scope_respawn += GetAddonName(eScope).c_str();
