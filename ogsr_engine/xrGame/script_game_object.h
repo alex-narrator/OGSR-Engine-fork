@@ -750,6 +750,7 @@ public:
     Flags16 GetIIFlags();
     u32 GetHudItemState();
     bool IsPending() const;
+    void StopAimInertion(bool);
     float GetRadius();
 
     // functions for object testing

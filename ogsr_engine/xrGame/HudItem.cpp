@@ -923,6 +923,7 @@ void CHudItem::UpdateInertion(Fmatrix& trans)
             clamp(m_fAimInertionK, -1.f, 1.f);
             _origin_offset += (_origin_offset * m_fAimInertionK);
             _tendto_speed -= (_tendto_speed * m_fAimInertionK);
+            _origin_offset *= !m_bStopAimInertion;
         }
         else
         { // Худ в режиме "От бедра"

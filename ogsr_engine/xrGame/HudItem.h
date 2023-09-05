@@ -191,6 +191,8 @@ public:
     virtual bool render_item_3d_ui_query() { return false; }
     virtual bool CheckCompatibility(CHudItem*) { return true; }
 
+    virtual void SetStopAimInertion(bool val) { m_bStopAimInertion = val; };
+
 protected:
     BOOL hud_mode;
     shared_str hud_sect;
@@ -300,6 +302,7 @@ protected:
     //void TimeLockAnimation();
     //virtual void DeviceUpdate(){};
     float m_fAimInertionK{};
+    bool m_bStopAimInertion{};
 
 private:
     shared_str world_sect;

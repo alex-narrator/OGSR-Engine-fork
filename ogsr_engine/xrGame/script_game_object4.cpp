@@ -679,6 +679,13 @@ bool CScriptGameObject::IsPending() const
     return k && k->IsPending();
 }
 
+void CScriptGameObject::StopAimInertion(bool val)
+{
+    CHudItem* k = smart_cast<CHudItem*>(&object());
+    if (k)
+        k->SetStopAimInertion(val);
+}
+
 float CScriptGameObject::GetRadius()
 {
     CGameObject* k = smart_cast<CGameObject*>(&object());
