@@ -22,7 +22,7 @@ public:
     bool m_bVisible{true};
     int m_blockCounter{};
     bool m_maySwitchFast{};
-    bool m_bNeedModule{};
+    bool m_bNeedUnlock{};
 };
 enum EActivationReason
 {
@@ -207,8 +207,8 @@ public:
     void DropSlotsToRuck(u32 min_slot, u32 max_slot = NO_ACTIVE_SLOT);
     void BackpackItemsTransfer(CInventoryItem*, bool);
     bool IsSlotAllowed(u32) const;
-    bool HasModuleForSlot(u32) const;
-    bool HasSameModuleEquiped(PIItem) const;
+    bool HasUnlockForSlot(u32) const;
+    bool HasLockForSlot(u32) const;
     bool HasDropPouch() const;
 
     bool IsAllItemsLoaded() const;

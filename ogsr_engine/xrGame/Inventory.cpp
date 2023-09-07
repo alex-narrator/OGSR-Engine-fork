@@ -66,8 +66,8 @@ CInventory::CInventory()
         m_slots[i].setSwitchFast(READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false));
         sprintf_s(temp, "slot_visible_%d", i);
         m_slots[i].m_bVisible = READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, true);
-        sprintf_s(temp, "slot_need_module_%d", i);
-        m_slots[i].m_bNeedModule = READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false);
+        sprintf_s(temp, "slot_need_unlock_%d", i);
+        m_slots[i].m_bNeedUnlock = READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false);
     }
 
     m_bBeltVertical = READ_IF_EXISTS(pSettings, r_bool, "inventory", "belt_vertical", false);
@@ -930,19 +930,10 @@ bool CInventory::InSlot(PIItem pIItem) const
         return true;
     return false;
 }
-bool CInventory::InBelt(PIItem pIItem) const
-{
-    if (Get(pIItem->object().ID(), false))
-        return true;
-    return false;
-}
+
+bool CInventory::InBelt(PIItem pIItem) const { return (std::find(m_belt.begin(), m_belt.end(), pIItem) != m_belt.end()); }
 bool CInventory::InVest(PIItem pIItem) const { return (std::find(m_vest.begin(), m_vest.end(), pIItem) != m_vest.end()); }
-bool CInventory::InRuck(PIItem pIItem) const
-{
-    if (Get(pIItem->object().ID(), true))
-        return true;
-    return false;
-}
+bool CInventory::InRuck(PIItem pIItem) const { return (std::find(m_ruck.begin(), m_ruck.end(), pIItem) != m_ruck.end()); }
 
 bool CInventory::CanPutInSlot(PIItem pIItem) const
 {
@@ -991,8 +982,6 @@ bool CInventory::CanPutInBelt(PIItem pIItem) const
         return false;
     if (!IsAllItemsLoaded())
         return true;
-    if (!InVest(pIItem) && HasSameModuleEquiped(pIItem))
-        return false;
     auto belt = static_cast<TIItemContainer>(m_belt);
 
     return FreeRoom(belt, pIItem, BeltArray().x, BeltArray().y, IsBeltVertical());
@@ -1008,8 +997,6 @@ bool CInventory::CanPutInVest(PIItem pIItem) const
         return false;
     if (!IsAllItemsLoaded())
         return true;
-    if (!InBelt(pIItem) && HasSameModuleEquiped(pIItem))
-        return false;
     auto vest = static_cast<TIItemContainer>(m_vest);
 
     return FreeRoom(vest, pIItem, VestArray().x, VestArray().y, IsVestVertical());
@@ -1544,46 +1531,70 @@ bool CInventory::IsSlotAllowed(u32 slot) const
     auto pActor = smart_cast<CActor*>(m_pOwner);
     if (!pActor || !IsAllItemsLoaded())
         return true;
-    auto outfit = pActor->GetOutfit();
-    switch (slot)
-    {
-    case HELMET_SLOT: return (!outfit || !outfit->m_bIsHelmetBuiltIn); break;
-    case GASMASK_SLOT: return (!outfit || !outfit->m_bIsHelmetBuiltIn); break;
-    }
     
-    return !m_slots[slot].m_bNeedModule || HasModuleForSlot(slot);
+    return (!m_slots[slot].m_bNeedUnlock || HasUnlockForSlot(slot)) && !HasLockForSlot(slot);
 }
 
-bool CInventory::HasModuleForSlot(u32 check_slot) const
+bool CInventory::HasUnlockForSlot(u32 check_slot) const
 {
+    
+    for (const auto& slot : m_slots)
+    {
+        auto item = slot.m_pIItem;
+        if (!item)
+            continue;
+        auto unlock_slots = item->GetSlotsUnlocked();
+        if (unlock_slots.empty())
+            continue;
+        if (std::find(unlock_slots.begin(), unlock_slots.end(), check_slot) != unlock_slots.end())
+            return true;
+    }
     for (const auto& item : m_vest)
     {
-        if (item->GetSlotEnabled() == check_slot)
+        auto unlock_slots = item->GetSlotsUnlocked();
+        if (unlock_slots.empty())
+            continue;
+        if (std::find(unlock_slots.begin(), unlock_slots.end(), check_slot) != unlock_slots.end())
             return true;
     }
     for (const auto& item : m_belt)
     {
-        if (item->GetSlotEnabled() == check_slot)
+        auto unlock_slots = item->GetSlotsUnlocked();
+        if (unlock_slots.empty())
+            continue;
+        if (std::find(unlock_slots.begin(), unlock_slots.end(), check_slot) != unlock_slots.end())
             return true;
     }
     return false;
 }
 
-bool CInventory::HasSameModuleEquiped(PIItem item) const
+bool CInventory::HasLockForSlot(u32 check_slot) const
 {
-    if (!item || item->object().getDestroy() || item->GetDropManual())
-        return false;
-
-    if (!item->IsModule())
-        return false;
-    for (const auto& _item : m_vest)
+    for (const auto& slot : m_slots)
     {
-        if (_item->GetSlotEnabled() == item->GetSlotEnabled())
+        auto item = slot.m_pIItem;
+        if (!item)
+            continue;
+        auto lock_slots = item->GetSlotsLocked();
+        if (lock_slots.empty())
+            continue;
+        if (std::find(lock_slots.begin(), lock_slots.end(), check_slot) != lock_slots.end())
             return true;
     }
-    for (const auto& _item : m_belt)
+    for (const auto& item : m_vest)
     {
-        if (_item->GetSlotEnabled() == item->GetSlotEnabled())
+        auto lock_slots = item->GetSlotsLocked();
+        if (lock_slots.empty())
+            continue;
+        if (std::find(lock_slots.begin(), lock_slots.end(), check_slot) != lock_slots.end())
+            return true;
+    }
+    for (const auto& item : m_belt)
+    {
+        auto lock_slots = item->GetSlotsLocked();
+        if (lock_slots.empty())
+            continue;
+        if (std::find(lock_slots.begin(), lock_slots.end(), check_slot) != lock_slots.end())
             return true;
     }
     return false;
@@ -1591,6 +1602,14 @@ bool CInventory::HasSameModuleEquiped(PIItem item) const
 
 bool CInventory::HasDropPouch() const
 {
+    for (const auto& slot : m_slots)
+    {
+        auto item = slot.m_pIItem;
+        if (!item)
+            continue;
+        if (item->IsDropPouch())
+            return true;
+    }
     for (const auto& item : m_vest)
     {
         if (item->IsDropPouch())

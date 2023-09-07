@@ -312,31 +312,15 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
 
     if (result)
     {
-        switch (_slot)
-        {
-        case DETECTOR_SLOT: 
-        {
+        if (_slot == DETECTOR_SLOT)
             if (auto det = smart_cast<CCustomDetector*>(iitem))
                 det->ToggleDetector(g_player_hud->attached_item(0) != nullptr);
-        }
-        break;
-        case WARBELT_SLOT:
-        case BACKPACK_SLOT:
-        case OUTFIT_SLOT:
-        case VEST_SLOT: 
-        {
+
+        if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
             UpdateCustomDraw();
-        }
-        break;
-        }
 
         if (old_owner == m_pUIBeltList || old_owner == m_pUIVestList)
-        {
-            if (iitem->IsModule() && !iitem->IsDropPouch())
-                UpdateCustomDraw();
-
             old_owner == m_pUIBeltList ? ReinitBeltList() : ReinitVestList();
-        }
     }
 
     return result;
@@ -377,24 +361,11 @@ bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
         else
             new_owner->SetItem(i);
 
-        switch (iitem->GetSlot())
-        {
-        case WARBELT_SLOT:
-        case BACKPACK_SLOT:
-        case OUTFIT_SLOT:
-        case VEST_SLOT: {
+        if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
             UpdateCustomDraw();
-        }
-        break;
-        }
 
         if (old_owner == m_pUIBeltList || old_owner == m_pUIVestList)
-        {
-            if (iitem->IsModule() && !iitem->IsDropPouch())
-                UpdateCustomDraw();
-
             old_owner == m_pUIBeltList ? ReinitBeltList() : ReinitVestList();
-        }
 
         return true;
     }
@@ -436,9 +407,11 @@ bool CUIInventoryWnd::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
         UpdateWeight();
         /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
         ReinitBeltList();
-        if (iitem->IsModule() && !iitem->IsDropPouch() && old_owner != m_pUIVestList)
-            ReinitSlotList(iitem->GetSlotEnabled());
-        else if (old_owner == m_pUIVestList)
+
+        if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
+            UpdateCustomDraw();
+
+        if (old_owner == m_pUIVestList)
             ReinitVestList();
 
         return true;
@@ -481,9 +454,11 @@ bool CUIInventoryWnd::ToVest(CUICellItem* itm, bool b_use_cursor_pos)
         UpdateWeight();
         /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
         ReinitVestList();
-        if (iitem->IsModule() && !iitem->IsDropPouch() && old_owner != m_pUIBeltList)
-            ReinitSlotList(iitem->GetSlotEnabled());
-        else if (old_owner == m_pUIBeltList)
+
+        if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
+            UpdateCustomDraw();
+
+        if (old_owner == m_pUIBeltList)
             ReinitBeltList();
 
         return true;

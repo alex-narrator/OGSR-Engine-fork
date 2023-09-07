@@ -168,8 +168,6 @@ void CInventoryItem::Load(LPCSTR section)
     eHandDependence = EHandDependence(READ_IF_EXISTS(pSettings, r_u32, section, "hand_dependence", hdNone));
     m_bIsSingleHanded = READ_IF_EXISTS(pSettings, r_bool, section, "single_handed", TRUE);
 
-    m_uSlotEnabled = READ_IF_EXISTS(pSettings, r_u32, section, "slot_enabled", NO_ACTIVE_SLOT);
-
     m_upgrade_icon_sect = READ_IF_EXISTS(pSettings, r_string, section, "upgrade_icon_sect", nullptr);
     m_upgrade_icon_offset = READ_IF_EXISTS(pSettings, r_fvector2, section, "upgrade_icon_ofset", Fvector2{});
 
@@ -200,6 +198,28 @@ void CInventoryItem::Load(LPCSTR section)
             m_highlight_items.push_back(item_section);
         }
     }
+
+    if (pSettings->line_exist(section, "slots_locked"))
+    {
+        LPCSTR str = pSettings->r_string(section, "slots_locked");
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 item_section;
+            _GetItem(str, i, item_section);
+            m_slots_locked.push_back(atoi(_GetItem(str, i, item_section)));
+        }
+    }
+    if (pSettings->line_exist(section, "slots_unlocked"))
+    {
+        LPCSTR str = pSettings->r_string(section, "slots_unlocked");
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 item_section;
+            _GetItem(str, i, item_section);
+            m_slots_unlocked.push_back(atoi(_GetItem(str, i, item_section)));
+        }
+    }
+    m_bIsDropPouch = READ_IF_EXISTS(pSettings, r_bool, section, "is_drop_pouch", false);
 }
 
 void CInventoryItem::ChangeCondition(float fDeltaCondition)
@@ -635,7 +655,7 @@ bool CInventoryItem::GetInvShowCondition() const { return m_icon_params.show_con
 
 void CInventoryItem::OnMoveToSlot(EItemPlace prevPlace)
 {
-    if (auto Actor = smart_cast<CActor*>(object().H_Parent()))
+    if (auto pActor = smart_cast<CActor*>(object().H_Parent()))
     {
         if (Core.Features.test(xrCore::Feature::equipped_untradable))
         {
@@ -649,6 +669,8 @@ void CInventoryItem::OnMoveToSlot(EItemPlace prevPlace)
             m_flags.set(FIUngroupable, TRUE);
             m_highlight_equipped = true;
         }
+        for (const auto slot : m_slots_locked)
+            pActor->inventory().DropSlotsToRuck(slot);
     }
 };
 
@@ -668,9 +690,10 @@ void CInventoryItem::OnMoveToBelt(EItemPlace prevPlace)
             m_flags.set(FIUngroupable, TRUE);
             m_highlight_equipped = true;
         }
-        if (IsModule() && !IsDropPouch() && prevPlace != eItemPlaceVest)
+        if (prevPlace != eItemPlaceVest)
         {
-            pActor->inventory().DropSlotsToRuck(GetSlotEnabled());
+            for (const auto slot : m_slots_locked)
+                pActor->inventory().DropSlotsToRuck(slot);
         }
     }
 };
@@ -691,9 +714,10 @@ void CInventoryItem::OnMoveToVest(EItemPlace prevPlace)
             m_flags.set(FIUngroupable, TRUE);
             m_highlight_equipped = true;
         }
-        if (IsModule() && !IsDropPouch() && prevPlace != eItemPlaceBelt)
+        if (prevPlace != eItemPlaceBelt)
         {
-            pActor->inventory().DropSlotsToRuck(GetSlotEnabled());
+            for (const auto slot : m_slots_locked)
+                pActor->inventory().DropSlotsToRuck(slot);
         }
     }
 };
@@ -714,10 +738,10 @@ void CInventoryItem::OnMoveToRuck(EItemPlace prevPlace)
             m_flags.set(FIUngroupable, FALSE);
             m_highlight_equipped = false;
         }
-        if (IsModule() && !IsDropPouch())
+        if (prevPlace != eItemPlaceUndefined)
         {
-            if (prevPlace == eItemPlaceBelt || prevPlace == eItemPlaceVest)
-                pActor->inventory().DropSlotsToRuck(GetSlotEnabled());
+            for (const auto slot : m_slots_locked)
+                pActor->inventory().DropSlotsToRuck(slot);
         }
     }
 };
@@ -884,7 +908,7 @@ void CInventoryItem::Transfer(u16 from_id, u16 to_id)
 bool CInventoryItem::can_be_attached() const
 {
     const auto actor = smart_cast<const CActor*>(object().H_Parent());
-    return actor ? IsModule() && (m_eItemPlace == eItemPlaceBelt || m_eItemPlace == eItemPlaceVest) : true;
+    return actor ? (m_eItemPlace == eItemPlaceBelt || m_eItemPlace == eItemPlaceVest || m_eItemPlace == eItemPlaceSlot) : true;
 }
 
 void CInventoryItem::SetDropTime(bool b_set)

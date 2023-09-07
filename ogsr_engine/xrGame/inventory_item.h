@@ -132,9 +132,9 @@ public:
     float m_fRadiationAccumFactor{}; // alpet: скорость появления вторичной радиактивности
     float m_fRadiationAccumLimit{}; // alpet: предел вторичной радиоактивности
 
-    virtual u32 GetSlotEnabled() const { return m_uSlotEnabled; }
-    virtual bool IsModule() const { return m_uSlotEnabled != NO_ACTIVE_SLOT; }
-    virtual bool IsDropPouch() const { return m_uSlotEnabled == u32(-1); }
+    xr_vector<u8> GetSlotsLocked() { return m_slots_locked; };
+    xr_vector<u8> GetSlotsUnlocked() { return m_slots_unlocked; };
+    bool IsDropPouch() { return m_bIsDropPouch; };
 
 public:
     CInventory* m_pCurrentInventory{};
@@ -212,7 +212,9 @@ protected:
     EHandDependence eHandDependence;
     bool m_bIsSingleHanded;
 
-    u32 m_uSlotEnabled{NO_ACTIVE_SLOT};
+    xr_vector<u8> m_slots_locked{};
+    xr_vector<u8> m_slots_unlocked{};
+    bool m_bIsDropPouch{};
 
     ////////// network //////////////////////////////////////////////////
 public:
