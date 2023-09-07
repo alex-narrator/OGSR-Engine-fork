@@ -133,6 +133,7 @@ void CInventoryScript::script_register(lua_State* L)
             .property("selected_item", &inventory_selected_item)
             .property("target", &get_inventory_target)
             .def("is_active_slot_blocked", &CInventory::IsActiveSlotBlocked)
+            .def("is_slot_allowed", &CInventory::IsSlotAllowed)
             .property("prev_active_slot", &CInventory::GetPrevActiveSlot, &CInventory::SetPrevActiveSlot),
         class_<IInventoryBox>("IInventoryBox")
             .def("object", &IInventoryBox::GetObjectByIndex)
