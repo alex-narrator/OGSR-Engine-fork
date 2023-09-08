@@ -75,7 +75,7 @@ struct hud_item_measures
     {
         m_hands_offset_type_normal, // Не прицеливаемся
         m_hands_offset_type_aim, // Смотрим в механический прицел
-        m_hands_offset_type_aim_second, // Дивимося у другий приціл
+        m_hands_offset_type_aim_alt, // Дивимося у другий приціл
         m_hands_offset_type_gl, // Смотрим в механический прицел в режиме ПГ
         m_hands_offset_type_aim_scope, // Смотрим в присоединяемый нетекстурный прицел (будь то 3д прицел или колиматор) если включен "use_scope_zoom"
         m_hands_offset_type_gl_scope, // Смотрим в присоединяемый нетекстурный прицел (будь то 3д прицел или колиматор) в режиме ПГ если включен "use_scope_grenade_zoom" - мне вот

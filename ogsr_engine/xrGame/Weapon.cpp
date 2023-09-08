@@ -1660,7 +1660,7 @@ u8 CWeapon::GetCurrentHudOffsetIdx() const
         const bool has_scope = AddonAttachable(eScope) && IsAddonAttached(eScope);
 
         if (IsSecondScopeMode())
-            return hud_item_measures::m_hands_offset_type_aim_second;
+            return hud_item_measures::m_hands_offset_type_aim_alt;
 
         if (IsGrenadeMode())
         {
