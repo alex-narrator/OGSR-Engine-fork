@@ -354,6 +354,7 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("detach_addon", &CWeaponMagazined::Detach)
                   .def("can_attach_addon", &CWeaponMagazined::CanAttach)
                   .def("can_detach_addon", &CWeaponMagazined::CanDetach)
+                  .def("respawn_weapon", &CWeaponMagazined::RespawnWeapon)
                   .def("switch_night_vision", (void(CWeaponMagazined::*)()) & CWeaponMagazined::SwitchNightVision),
               class_<CWeaponMagazinedWGrenade, CWeaponMagazined>("CWeaponMagazinedWGrenade")
                   .def_readwrite("gren_mag_size", &CWeaponMagazinedWGrenade::iMagazineSize2)

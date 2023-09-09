@@ -1002,7 +1002,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
         if (b_send_event)
             pIItem->object().DestroyObject();
 
-        if (!ScopeRespawn(pIItem))
+        if (!ScopeRespawn())
         {
             UpdateAddonsVisibility();
             InitAddons();
@@ -1026,7 +1026,7 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
             item_condition = m_fAttachedScopeCondition;
         m_fAttachedScopeCondition = 1.f;
         //
-        if (!ScopeRespawn(nullptr))
+        if (!ScopeRespawn())
         {
             UpdateAddonsVisibility();
             InitAddons();
@@ -2375,16 +2375,16 @@ void CWeaponMagazined::UpdateMagazineVisibility()
     }
 }
 
-bool CWeaponMagazined::ScopeRespawn(PIItem pIItem)
+bool CWeaponMagazined::ScopeRespawn()
 {
+    if (!AddonAttachable(eScope))
+        return false;
+
     xr_string scope_respawn = "scope_respawn";
-    if (AddonAttachable(eScope) && IsAddonAttached(eScope))
+    if (IsAddonAttached(eScope))
     {
         scope_respawn += "_";
-        if (smart_cast<CScope*>(pIItem) || smart_cast<CWeaponBinoculars*>(pIItem))
-            scope_respawn += pIItem->object().cNameSect().c_str();
-        else
-            scope_respawn += GetAddonName(eScope).c_str();
+        scope_respawn += GetAddonName(eScope).c_str();
     }
 
     if (pSettings->line_exist(cNameSect(), scope_respawn.c_str()))
@@ -2392,47 +2392,51 @@ bool CWeaponMagazined::ScopeRespawn(PIItem pIItem)
         LPCSTR S = pSettings->r_string(cNameSect(), scope_respawn.c_str());
         if (xr_strcmp(cName().c_str(), S) != 0)
         {
-            CSE_Abstract* _abstract = Level().spawn_item(S, Position(), ai_location().level_vertex_id(), H_Parent()->ID(), true);
-            CSE_ALifeDynamicObject* sobj1 = alife_object();
-            CSE_ALifeDynamicObject* sobj2 = smart_cast<CSE_ALifeDynamicObject*>(_abstract);
-
-            NET_Packet P;
-            P.w_begin(M_UPDATE);
-            u32 position = P.w_tell();
-            P.w_u16(0);
-            sobj1->STATE_Write(P);
-            u16 size = u16(P.w_tell() - position);
-            P.w_seek(position, &size, sizeof(u16));
-            u16 id;
-            P.r_begin(id);
-            P.r_u16(size);
-            sobj2->STATE_Read(P, size);
-
-            net_Export(_abstract);
-
-            //ці параметри не фігурують у net_Export цього класу або його предків
-            //todo: може таки перенести їх у експорт CInventoryItem
-            auto se_item = smart_cast<CSE_ALifeInventoryItem*>(sobj2);
-            se_item->m_fCondition = m_fCondition;
-            se_item->m_fRadiationRestoreSpeed = m_ItemEffect[eRadiationRestoreSpeed];
-
-            auto io = smart_cast<CInventoryOwner*>(H_Parent());
-            auto ii = smart_cast<CInventoryItem*>(this);
-            if (io)
-            {
-                if (io->inventory().InSlot(ii))
-                    io->SetNextItemSlot(ii->GetSlot());
-                else
-                    io->SetNextItemSlot(0);
-            }
-
-            DestroyObject();
-            sobj2->Spawn_Write(P, TRUE);
-            Level().Send(P, net_flags(TRUE));
-            F_entity_Destroy(_abstract);
-
+            RespawnWeapon(S);
             return true;
         }
     }
     return false;
+}
+
+void CWeaponMagazined::RespawnWeapon(LPCSTR section)
+{
+    CSE_Abstract* _abstract = Level().spawn_item(section, Position(), ai_location().level_vertex_id(), H_Parent()->ID(), true);
+    CSE_ALifeDynamicObject* sobj1 = alife_object();
+    CSE_ALifeDynamicObject* sobj2 = smart_cast<CSE_ALifeDynamicObject*>(_abstract);
+
+    NET_Packet P;
+    P.w_begin(M_UPDATE);
+    u32 position = P.w_tell();
+    P.w_u16(0);
+    sobj1->STATE_Write(P);
+    u16 size = u16(P.w_tell() - position);
+    P.w_seek(position, &size, sizeof(u16));
+    u16 id;
+    P.r_begin(id);
+    P.r_u16(size);
+    sobj2->STATE_Read(P, size);
+
+    net_Export(_abstract);
+
+    // ці параметри не фігурують у net_Export цього класу або його предків
+    // todo: може таки перенести їх у експорт CInventoryItem
+    auto se_item = smart_cast<CSE_ALifeInventoryItem*>(sobj2);
+    se_item->m_fCondition = m_fCondition;
+    se_item->m_fRadiationRestoreSpeed = m_ItemEffect[eRadiationRestoreSpeed];
+
+    auto io = smart_cast<CInventoryOwner*>(H_Parent());
+    auto ii = smart_cast<CInventoryItem*>(this);
+    if (io)
+    {
+        if (io->inventory().InSlot(ii))
+            io->SetNextItemSlot(ii->GetSlot());
+        else
+            io->SetNextItemSlot(0);
+    }
+
+    DestroyObject();
+    sobj2->Spawn_Write(P, TRUE);
+    Level().Send(P, net_flags(TRUE));
+    F_entity_Destroy(_abstract);
 }

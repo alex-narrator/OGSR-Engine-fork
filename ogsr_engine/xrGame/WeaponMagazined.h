@@ -333,5 +333,6 @@ protected:
     virtual void PlayAnimShutterMisfire();
 
     virtual void UpdateMagazineVisibility();
-    bool ScopeRespawn(PIItem);
+    bool ScopeRespawn();
+    void RespawnWeapon(LPCSTR);
 };
