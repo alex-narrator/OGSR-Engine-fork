@@ -2099,6 +2099,7 @@
     <ClCompile Include="pp_effector_distance.cpp" />
     <ClCompile Include="PostprocessAnimator.cpp" />
     <ClCompile Include="Warbelt.cpp" />
+    <ClCompile Include="weapon_ammo_script.cpp" />
     <ClCompile Include="zone_effector.cpp" />
     <ClCompile Include="EffectorShot.cpp" />
     <ClCompile Include="EffectorShotX.cpp" />

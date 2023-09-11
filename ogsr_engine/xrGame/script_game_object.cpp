@@ -436,6 +436,27 @@ void CScriptGameObject::ChangeCondition(float val)
     inventory_item->ChangeCondition(val);
 }
 //
+bool CScriptGameObject::GetMarked() const
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
+    if (!inventory_item)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member GetMarked!");
+        return false;
+    }
+    return inventory_item->GetMarked();
+}
+void CScriptGameObject::SetMarked(bool val)
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
+    if (!inventory_item)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member SetMarked!");
+        return;
+    }
+    inventory_item->SetMarked(val);
+}
+//
  #include "Torch.h"
 void CScriptGameObject::SwitchTorch(bool on)
 {

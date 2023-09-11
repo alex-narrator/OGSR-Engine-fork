@@ -220,6 +220,9 @@ void CInventoryItem::Load(LPCSTR section)
         }
     }
     m_bIsDropPouch = READ_IF_EXISTS(pSettings, r_bool, section, "is_drop_pouch", false);
+
+    m_marked_icon_sect = READ_IF_EXISTS(pSettings, r_string, section, "marked_icon_sect", nullptr);
+    m_marked_icon_offset = READ_IF_EXISTS(pSettings, r_fvector2, section, "marked_icon_ofset", Fvector2{});
 }
 
 void CInventoryItem::ChangeCondition(float fDeltaCondition)

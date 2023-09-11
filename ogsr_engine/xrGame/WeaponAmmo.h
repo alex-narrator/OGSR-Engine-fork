@@ -1,5 +1,6 @@
 #pragma once
 #include "inventory_item_object.h"
+#include "script_export_space.h"
 
 class CCartridge
 {
@@ -84,9 +85,16 @@ public:
 public:
     virtual CInventoryItem* can_make_killing(const CInventory* inventory) const;
     
-    bool m_bNeedFindPlace{};
+    bool m_bUnloadedFromWeapon{};
 
 protected:
     ref_sound sndLoad;
     ref_sound sndUnload;
+
+public:
+    DECLARE_SCRIPT_REGISTER_FUNCTION
 };
+
+add_to_type_list(CWeaponAmmo)
+#undef script_type_list
+#define script_type_list save_type_list(CWeaponAmmo)

@@ -751,7 +751,7 @@ void CSE_ALifeItemAmmo::STATE_Read(NET_Packet& tNetPacket, u16 size)
     tNetPacket.r_u16(a_elapsed);
     if (m_wVersion > 118)
     {
-        m_bNeedFindPlace = !!(tNetPacket.r_u8() & 0x1);
+        m_bUnloadedFromWeapon = !!(tNetPacket.r_u8() & 0x1);
         m_cur_ammo_type = tNetPacket.r_u8();
     }
 }
@@ -761,7 +761,7 @@ void CSE_ALifeItemAmmo::STATE_Write(NET_Packet& tNetPacket)
     inherited::STATE_Write(tNetPacket);
     tNetPacket.w_u16(a_elapsed);
 
-    tNetPacket.w_u8(m_bNeedFindPlace ? 1 : 0);
+    tNetPacket.w_u8(m_bUnloadedFromWeapon ? 1 : 0);
     tNetPacket.w_u8(m_cur_ammo_type);
 }
 

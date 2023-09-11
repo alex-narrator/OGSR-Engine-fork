@@ -21,6 +21,9 @@ protected:
     CUIStatic* m_upgrade{};
     CUIStatic* CreateUpgradeIcon();
 
+    CUIStatic* m_marked{};
+    CUIStatic* CreateMarkedIcon();
+
 public:
     CUIInventoryCellItem(CInventoryItem* itm);
     virtual void Update();

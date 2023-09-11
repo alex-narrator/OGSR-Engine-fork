@@ -73,10 +73,13 @@ bool CUIInventoryCellItem::EqualTo(CUICellItem* itm)
     if (fl1.test(CInventoryItem::FIUngroupable) || fl2.test(CInventoryItem::FIUngroupable))
         return false;
 
-    return (fsimilar(object()->GetCondition(), ci->object()->GetCondition(), 0.01f) && fsimilar(object()->Weight(), ci->object()->Weight(), 0.01f) &&
+    return (fsimilar(object()->GetCondition(), ci->object()->GetCondition(), 0.01f) && 
+            fsimilar(object()->Weight(), ci->object()->Weight(), 0.01f) &&
             fsimilar(object()->GetItemEffect(CInventoryItem::eRadiationRestoreSpeed), ci->object()->GetItemEffect(CInventoryItem::eRadiationRestoreSpeed), 0.01f) &&
-            object()->object().cNameSect() == ci->object()->object().cNameSect() && object()->m_eItemPlace == ci->object()->m_eItemPlace &&
-            object()->Cost() == ci->object()->Cost());
+            object()->object().cNameSect() == ci->object()->object().cNameSect() && 
+            object()->m_eItemPlace == ci->object()->m_eItemPlace &&
+            object()->Cost() == ci->object()->Cost()
+        );
 }
 
 CUIInventoryCellItem::~CUIInventoryCellItem()
@@ -129,6 +132,8 @@ CUIDragItem* CUIInventoryCellItem::CreateDragItem()
     CUIDragItem* i = inherited::CreateDragItem();
     if (m_upgrade)
         i->wnd()->AttachChild(CreateUpgradeIcon());
+    if (m_marked)
+        i->wnd()->AttachChild(CreateMarkedIcon());
     if (!b_auto_drag_childs)
         return i;
 
@@ -185,6 +190,17 @@ void CUIInventoryCellItem::Update()
         m_upgrade = CreateUpgradeIcon();
         AttachChild(m_upgrade);
     }
+
+    if (object()->GetMarked() && !!object()->m_marked_icon_sect && !m_marked)
+    {
+        m_marked = CreateMarkedIcon();
+        AttachChild(m_marked);
+    }
+    else if (!object()->GetMarked() && m_marked)
+    {
+        DetachChild(m_marked);
+        m_marked = nullptr;
+    }
 }
 
 CUIStatic* CUIInventoryCellItem::CreateUpgradeIcon()
@@ -208,6 +224,29 @@ CUIStatic* CUIInventoryCellItem::CreateUpgradeIcon()
     upgrade_icon->SetStretchTexture(true);
 
     return upgrade_icon;
+}
+
+CUIStatic* CUIInventoryCellItem::CreateMarkedIcon()
+{
+    auto marked_icon = xr_new<CUIStatic>();
+    marked_icon->SetAutoDelete(true);
+    CIconParams params(object()->m_marked_icon_sect);
+    params.set_shader(marked_icon);
+
+    Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
+    Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
+
+    Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
+    size.mul(base_scale);
+    marked_icon->SetWndSize(size);
+
+    Fvector2 pos{object()->m_marked_icon_offset};
+    pos.mul(base_scale);
+    marked_icon->SetWndPos(pos);
+
+    marked_icon->SetStretchTexture(true);
+
+    return marked_icon;
 }
 
 CUIAmmoCellItem::CUIAmmoCellItem(CWeaponAmmo* itm) : inherited(itm)

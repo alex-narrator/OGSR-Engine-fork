@@ -1396,9 +1396,9 @@ void CInventory::TryAmmoCustomPlacement(CInventoryItem* pIItem)
     if (!pActor)
         return;
 
-    if (pAmmo->m_bNeedFindPlace)
+    if (pAmmo->m_bUnloadedFromWeapon)
     {
-        pAmmo->m_bNeedFindPlace = false; // сбрасываем флажок спавна патронов
+        pAmmo->m_bUnloadedFromWeapon = false; // сбрасываем флажок спавна патронов
         if (!IsAllItemsLoaded())
             return;
         if (!HUD().GetUI()->MainInputReceiver())

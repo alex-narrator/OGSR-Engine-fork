@@ -110,7 +110,7 @@ add_to_type_list(CSE_ALifeItemTorch)
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemAmmo, CSE_ALifeItem) 
 u16 a_elapsed{};
 u16 m_boxSize{};
-bool m_bNeedFindPlace{};
+bool m_bUnloadedFromWeapon{};
 u8 m_cur_ammo_type{};
 xr_vector<shared_str> m_ammoTypes{};
 

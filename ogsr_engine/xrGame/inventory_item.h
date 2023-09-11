@@ -216,6 +216,8 @@ protected:
     xr_vector<u8> m_slots_unlocked{};
     bool m_bIsDropPouch{};
 
+    bool m_bIsMarkedItem{};
+
     ////////// network //////////////////////////////////////////////////
 public:
     virtual void net_Export(CSE_Abstract* E);
@@ -342,6 +344,11 @@ public:
 
     shared_str m_upgrade_icon_sect{};
     Fvector2 m_upgrade_icon_offset{};
+
+    bool GetMarked() { return m_bIsMarkedItem; };
+    void SetMarked(bool val) { m_bIsMarkedItem = val; };
+    shared_str m_marked_icon_sect{};
+    Fvector2 m_marked_icon_offset{};
 
 protected:
     HitImmunity::HitTypeSVec m_HitTypeProtection;

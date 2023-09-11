@@ -48,6 +48,7 @@
 
 #include "PDA.h"
 #include "CustomDetector.h"
+#include "WeaponAmmo.h"
 
 template <typename T>
 T* script_game_object_cast(CScriptGameObject* script_obj)
@@ -153,6 +154,7 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
 
         .def("get_pda", &script_game_object_cast<CPda>)
         .def("get_detector", &script_game_object_cast<CCustomDetector>)
+        .def("get_weapon_ammo", &script_game_object_cast<CWeaponAmmo>)
 
         .def("ph_capture_object", (void(CScriptGameObject::*)(CScriptGameObject*))(&CScriptGameObject::PHCaptureObject))
         .def("ph_capture_object", (void(CScriptGameObject::*)(CScriptGameObject*, LPCSTR))(&CScriptGameObject::PHCaptureObject))

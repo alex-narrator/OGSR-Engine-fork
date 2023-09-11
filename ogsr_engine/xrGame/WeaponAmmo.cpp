@@ -165,7 +165,7 @@ BOOL CWeaponAmmo::net_Spawn(CSE_Abstract* DC)
     if (m_boxCurr > m_boxSize)
         l_pA->a_elapsed = m_boxCurr = m_boxSize;
 
-    m_bNeedFindPlace = l_pA->m_bNeedFindPlace;
+    m_bUnloadedFromWeapon = l_pA->m_bUnloadedFromWeapon;
 
     if (IsBoxReloadable())
     {
