@@ -134,7 +134,6 @@ public:
 
     xr_vector<u8> GetSlotsLocked() { return m_slots_locked; };
     xr_vector<u8> GetSlotsUnlocked() { return m_slots_unlocked; };
-    bool IsDropPouch() { return m_bIsDropPouch; };
 
 public:
     CInventory* m_pCurrentInventory{};
@@ -214,7 +213,6 @@ protected:
 
     xr_vector<u8> m_slots_locked{};
     xr_vector<u8> m_slots_unlocked{};
-    bool m_bIsDropPouch{};
 
     bool m_bIsMarkedItem{};
 

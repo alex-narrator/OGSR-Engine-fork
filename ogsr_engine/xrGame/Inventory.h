@@ -73,10 +73,8 @@ public:
     bool Action(s32 cmd, u32 flags);
     void Update();
     // Ищет на поясе аналогичный IItem
-    PIItem Same(const PIItem pIItem, bool bSearchRuck) const;
-    // Ищет на поясе IItem для указанного слота
-    PIItem SameSlot(const u32 slot, PIItem pIItem, bool bSearchRuck) const;
-    PIItem SameGrenade(PIItem pIItem, bool bSearchRuck) const;
+    PIItem Same(const PIItem pIItem) const;
+    PIItem SameGrenade(PIItem pIItem) const;
     // Ищет на поясе или в рюкзаке IItem с указанным именем (cName())
     PIItem Get(const char* name, bool bSearchRuck) const;
     // Ищет на поясе или в рюкзаке IItem с указанным именем (id)
@@ -86,8 +84,8 @@ public:
     PIItem GetAny(const char* name) const;
 
     void Iterate(bool, std::function<bool(const PIItem)>) const;
-    void IterateAmmo(bool, std::function<bool(const PIItem)>) const;
-    PIItem GetAmmoByLimit(const char* sect, bool forActor, bool limit_max = false, bool include_magazines = false) const;
+    void IterateAmmo(std::function<bool(const PIItem)>) const;
+    PIItem GetAmmoByLimit(const char* sect, bool limit_max = false, bool include_magazines = false) const;
 
     // search both (ruck and belt)
     PIItem item(CLASS_ID cls_id) const;
@@ -123,6 +121,7 @@ public:
     TISlotArr m_slots;
 
     TIItemContainer GetActiveArtefactPlace() const;
+    bool CountAsMarked(PIItem) const;
 
     // возвращает все кроме PDA в слоте и болта
     void AddAvailableItems(TIItemContainer& items_container, bool for_trade) const;
@@ -192,9 +191,9 @@ public:
     PIItem GetSame(const PIItem pIItem, bool bSearchRuck) const; // получаем айтем из всего инвентаря или с пояса
     PIItem GetSameEatable(const PIItem pIItem, bool bSearchRuck) const; // получаем айтем из всего инвентаря или с пояса
     // считаем предметы в рюкзаке или на поясе + в слотах
-    virtual u32 GetSameItemCount(LPCSTR caSection, bool SearchRuck);
+    virtual u32 GetSameItemCount(LPCSTR caSection, bool = true);
     // размещение патронов на поясе при разрядке оружия в руках
-    void TryAmmoCustomPlacement(CInventoryItem* pIItem);
+    //void TryAmmoCustomPlacement(CInventoryItem* pIItem);
 
     Ivector2 BeltArray() const;
     Ivector2 VestArray() const;
@@ -209,7 +208,6 @@ public:
     bool IsSlotAllowed(u32) const;
     bool HasUnlockForSlot(u32) const;
     bool HasLockForSlot(u32) const;
-    bool HasDropPouch() const;
 
     bool IsAllItemsLoaded() const;
     bool OwnerIsActor() const;

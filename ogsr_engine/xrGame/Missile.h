@@ -68,8 +68,6 @@ protected:
 protected:
     bool m_throw;
 
-    bool HeadLampSwitch{}, NightVisionSwitch{};
-
     //время уничтожения
     u32 m_dwDestroyTime;
     u32 m_dwDestroyTimeMax;

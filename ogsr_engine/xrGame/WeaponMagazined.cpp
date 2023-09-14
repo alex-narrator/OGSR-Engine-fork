@@ -314,7 +314,7 @@ bool CWeaponMagazined::TryToGetAmmo(u32 id)
     if (!m_bDirectReload)
     {
         bool mag_weapon = AddonAttachable(eMagazine);
-        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[id].c_str(), ParentIsActor(), mag_weapon, mag_weapon));
+        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[id].c_str(), mag_weapon, mag_weapon));
     }
     return m_pAmmo && m_pAmmo->m_boxCurr && (!AddonAttachable(eMagazine) || m_pAmmo->IsBoxReloadable() || !iAmmoElapsed || IsGrenadeMode());
 }
@@ -404,13 +404,13 @@ void CWeaponMagazined::ReloadMagazine()
     {
         bool mag_weapon = AddonAttachable(eMagazine);
         // попытаться найти в инвентаре патроны текущего типа
-        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), ParentIsActor(), mag_weapon, mag_weapon));
+        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), mag_weapon, mag_weapon));
         if (!m_pAmmo && !m_bLockType)
         {
             for (u32 i = 0; i < m_ammoTypes.size(); ++i)
             {
                 // проверить патроны всех подходящих типов
-                m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[i].c_str(), ParentIsActor(), mag_weapon, mag_weapon));
+                m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[i].c_str(), mag_weapon, mag_weapon));
                 if (m_pAmmo)
                 {
                     m_ammoType = i;
@@ -1960,7 +1960,7 @@ void CWeaponMagazined::UnloadAmmo(int unload_count, bool spawn_ammo, bool detach
     {
         if (m_pCurrentInventory && !detach_magazine)
         { // упаковать разряжаемые патроны в неполную пачку
-            if (auto l_pA = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(_item.first, ParentIsActor(), true)))
+            if (auto l_pA = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(_item.first, true)))
             {
                 u16 l_free = l_pA->m_boxSize - l_pA->m_boxCurr;
                 l_pA->m_boxCurr = l_pA->m_boxCurr + (l_free < _item.second ? l_free : _item.second);
@@ -2142,7 +2142,7 @@ u32 CWeaponMagazined::GetMagazineCount() const
 {
     u32 iMagazinesCount{};
     for (const auto& magazine_sect : m_magazines)
-        iMagazinesCount += Actor()->inventory().GetSameItemCount(magazine_sect.c_str(), false);
+        iMagazinesCount += Actor()->inventory().GetSameItemCount(magazine_sect.c_str());
     return iMagazinesCount;
 }
 

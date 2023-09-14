@@ -6,6 +6,7 @@
 #include "Actor.h"
 #include "ActorCondition.h"
 #include "Inventory.h"
+#include "Grenade.h"
 #include "string_table.h"
 
 using namespace InventoryUtilities;
@@ -180,7 +181,7 @@ void CUISlotPanel::Draw()
 
         m_st.SetWndPos(pos.x, pos.y);
 
-        auto count = inv.GetSameItemCount(_itm->object().cNameSect().c_str(), false);
+        auto count = inv.GetSameItemCount(_itm->object().cNameSect().c_str(), smart_cast<CGrenade*>(_itm));
         if (count > 1)
         {
             float pos_x = m_counter_offset.x + (m_bVertical ? (pos.x + size.x) : pos.x);

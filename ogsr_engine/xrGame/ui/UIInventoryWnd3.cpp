@@ -221,14 +221,18 @@ void CUIInventoryWnd::ActivatePropertiesBox()
         {
             if (m_functorHasAction(CurrentIItem()->object().lua_game_object()))
             {
-                UIPropertiesBox.AddItem(CStringTable().translate(action.first.c_str()).c_str(), (void*)action.first.c_str(), INVENTORY_SCRIPT_ACTION);
+                LPCSTR tip_text{};
+                if (luabind::functor<LPCSTR> tip_func; ai().script_engine().functor(action.first.c_str(), tip_func))
+                    tip_text = tip_func(CurrentIItem()->object().lua_game_object());
+                else
+                    tip_text = CStringTable().translate(action.first).c_str();
+
+                UIPropertiesBox.AddItem(tip_text, (void*)action.first.c_str(), INVENTORY_SCRIPT_ACTION);
                 b_show = true;
             }
         }
         else
-        {
             Msg("!Item-action-condition function [%s] not exist.", action.second[0].c_str());
-        }
     }
 
     if (!CurrentIItem()->IsQuestItem())
@@ -339,13 +343,9 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
         case INVENTORY_SCRIPT_ACTION: {
             auto it = CurrentIItem()->m_script_actions_map.find((LPCSTR)UIPropertiesBox.GetClickedItem()->GetData());
             if (luabind::functor<void> m_functorDoAction; ai().script_engine().functor(it->second[1].c_str(), m_functorDoAction))
-            {
                 m_functorDoAction(CurrentIItem()->object().lua_game_object());
-            }
             else
-            {
                 Msg("!Item-action function [%s] not exist.", it->second[1].c_str());
-            }
         }
         break;
         }

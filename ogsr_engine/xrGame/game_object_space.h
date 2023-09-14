@@ -90,6 +90,7 @@ enum ECallbackType
     eUIGroupItems,
     eOnWpnShellDrop,
     eOnThrowGrenade,
+    eOnGrenadeTypeSwitch,
     eOnGoodwillChange,
     eUpdateItemsEffect,
     eLevelChangerAction,

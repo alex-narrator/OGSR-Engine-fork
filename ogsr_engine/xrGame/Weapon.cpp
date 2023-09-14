@@ -1222,10 +1222,7 @@ int CWeapon::GetAmmoCount_forType(shared_str const& ammo_type, u32 max) const
         return (max > 0 && res >= max);
     };
 
-    m_pCurrentInventory->IterateAmmo(false, callback);
-    if (max == 0 || res < max)
-        if (!ParentIsActor() || READ_IF_EXISTS(pSettings, r_bool, ammo_type, "ruck_reload", false))
-            m_pCurrentInventory->IterateAmmo(true, callback);
+    m_pCurrentInventory->IterateAmmo(callback);
 
     return res;
 }
@@ -1993,11 +1990,11 @@ u32 CWeapon::GetNextAmmoType()
         if (++l_newType >= m_ammoTypes.size())
         {
             for (l_newType = 0; l_newType < m_ammoTypes.size(); ++l_newType)
-                if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), ParentIsActor(), mag_weapon, mag_weapon))
+                if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), mag_weapon, mag_weapon))
                     break;
             break;
         }
-        if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), ParentIsActor(), mag_weapon, mag_weapon))
+        if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), mag_weapon, mag_weapon))
             break;
     }
     if (l_newType != m_set_next_ammoType_on_reload && l_newType < m_ammoTypes.size())

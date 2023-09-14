@@ -361,7 +361,7 @@ bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
         else
             new_owner->SetItem(i);
 
-        if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
+        if (!iitem->GetSlotsLocked().empty() || !iitem->GetSlotsUnlocked().empty())
             UpdateCustomDraw();
 
         if (old_owner == m_pUIBeltList || old_owner == m_pUIVestList)

@@ -349,12 +349,10 @@ void CWeaponAmmo::ReloadBox(LPCSTR ammo_sect)
     if (m_boxCurr && (m_ammoSect.c_str() != ammo_sect))
         UnloadBox();
 
-    bool forActor = g_actor->m_inventory == m_pCurrentInventory;
-
     while (m_boxCurr < m_boxSize)
     {
         CCartridge l_cartridge;
-        auto m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(ammo_sect, forActor));
+        auto m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(ammo_sect));
 
         if (!m_pAmmo || !m_pAmmo->Get(l_cartridge))
             break;

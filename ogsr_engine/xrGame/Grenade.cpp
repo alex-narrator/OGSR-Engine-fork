@@ -148,15 +148,6 @@ void CGrenade::Throw()
     }
     inherited::Throw();
 
-    //if (m_pCurrentInventory->GetOwner())
-    //{
-    //    CActor* pActor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner());
-    //    if (pActor)
-    //    {
-    //        Actor()->set_state_wishful(Actor()->get_state_wishful() & (~mcSprint));
-    //    }
-    //}
-
     m_fake_missile->processing_activate(); //@sliph
     m_thrown = true;
 
@@ -205,19 +196,18 @@ void CGrenade::PutNextToSlot()
     VERIFY(!getDestroy());
 
 	// выкинуть гранату из инвентаря
-    if (m_pCurrentInventory)
+    if (const auto inv = m_pCurrentInventory)
     {
-        auto& inv = m_pCurrentInventory;
-        auto _grenade_slot = this->GetSlot();
+        auto _grenade_slot = GetSlot();
         inv->Ruck(this);
-        inv->Belt(this);
-        auto pNext = smart_cast<CGrenade*>(inv->Same(this, false));
+        auto pNext = smart_cast<CGrenade*>(inv->Same(this));
         if (!pNext)
-            pNext = smart_cast<CGrenade*>(inv->SameGrenade(this, false));
+            pNext = smart_cast<CGrenade*>(inv->SameGrenade(this));
 
         if (pNext)
         {
             pNext->SetSlot(_grenade_slot);
+            inv->SetActiveSlot(NO_ACTIVE_SLOT);
             inv->Slot(pNext);
         }
 
@@ -254,27 +244,14 @@ bool CGrenade::Action(s32 cmd, u32 flags)
             const u32 state = GetState();
             if (state == eHidden || state == eIdle || state == eBore)
             {
-                if (const auto& inv = m_pCurrentInventory)
+                if (const auto inv = m_pCurrentInventory)
                 {
                     xr_map<shared_str, CGrenade*> tmp;
                     tmp.insert(mk_pair(cNameSect(), this));
-                    for (const auto& item : inv->m_vest)
+                    for (const auto& item : inv->m_all)
                     {
                         auto pGrenade = smart_cast<CGrenade*>(item);
-                        if (pGrenade && (tmp.find(pGrenade->cNameSect()) == tmp.end()))
-                            tmp.insert(mk_pair(pGrenade->cNameSect(), pGrenade));
-                    }
-                    for (const auto& item : inv->m_belt)
-                    {
-                        auto pGrenade = smart_cast<CGrenade*>(item);
-                        if (pGrenade && (tmp.find(pGrenade->cNameSect()) == tmp.end()))
-                            tmp.insert(mk_pair(pGrenade->cNameSect(), pGrenade));
-                    }
-                    for (const auto& slot : inv->m_slots)
-                    {
-                        const auto item = slot.m_pIItem;
-                        auto pGrenade = smart_cast<CGrenade*>(item);
-                        if (pGrenade && (tmp.find(pGrenade->cNameSect()) == tmp.end()))
+                        if (pGrenade && inv->CountAsMarked(item) && (tmp.find(pGrenade->cNameSect()) == tmp.end()))
                             tmp.insert(mk_pair(pGrenade->cNameSect(), pGrenade));
                     }
                     xr_map<shared_str, CGrenade*>::iterator curr_it = tmp.find(cNameSect());
@@ -288,21 +265,7 @@ bool CGrenade::Action(s32 cmd, u32 flags)
                     inv->Ruck(this);
                     inv->SetActiveSlot(NO_ACTIVE_SLOT);
                     inv->Slot(tgt);
-                    if (!inv->Vest(this)) // поточну гранату до розгрузки
-                        if (!inv->Belt(this)) // якщо ні то у пояс
-                        { 
-                            // перевіримо так щоб вільний слот був призначено автоматично
-                            // та пхнемо у слот якщо нікуди не лізе
-                            for (const auto& slot : GetSlots())
-                            {
-                                if (inv->CanPutInSlot(this, slot))
-                                {
-                                    SetSlot(slot);
-                                    inv->Slot(this);
-                                    break;
-                                }
-                            }
-                        }
+                    g_actor->callback(GameObject::eOnGrenadeTypeSwitch)(lua_game_object(), tgt->lua_game_object());
                 }
             }
         }
@@ -384,7 +347,7 @@ void CGrenade::Contact(CPhysicsShellHolder* obj)
 void CGrenade::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
 {
     str_name = NameShort();
-    u32 ThisGrenadeCount = m_pCurrentInventory->GetSameItemCount(cNameSect().c_str(), false);
+    u32 ThisGrenadeCount = m_pCurrentInventory->GetSameItemCount(cNameSect().c_str());
     string16 stmp{};
     auto main_wnd = HUD().GetUI()->UIMainIngameWnd;
 

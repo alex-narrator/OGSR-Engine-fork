@@ -117,8 +117,6 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
     if (!strict_placement)
         pIItem->m_eItemPlace = eItemPlaceUndefined;
 
-    TryAmmoCustomPlacement(pIItem);
-
     bool result = false;
     switch (pIItem->m_eItemPlace)
     {
@@ -655,131 +653,20 @@ void CInventory::UpdateDropItem(PIItem pIItem)
 }
 
 // ищем на поясе гранату такоже типа
-PIItem CInventory::Same(const PIItem pIItem, bool bSearchRuck) const
+PIItem CInventory::Same(const PIItem pIItem) const
 {
-    if (bSearchRuck)
-    {
-        for (const auto& item : m_ruck)
-        {
-            if ((item != pIItem) && !xr_strcmp(item->object().cNameSect(), pIItem->object().cNameSect()))
-                return item;
-        }
-    }
-    else
-    {
-        for (const auto& item : m_vest)
-        {
-            if ((item != pIItem) && !xr_strcmp(item->object().cNameSect(), pIItem->object().cNameSect()))
-                return item;
-        }
-        for (const auto& item : m_belt)
-        {
-            if ((item != pIItem) && !xr_strcmp(item->object().cNameSect(), pIItem->object().cNameSect()))
-                return item;
-        }
-        for (const auto& _slot : m_slots)
-        {
-            const auto _item = _slot.m_pIItem;
-            if (!_item)
-                continue;
-
-            if ((_item != pIItem) && !xr_strcmp(_item->object().cNameSect(), pIItem->object().cNameSect()))
-            {
-                return _item;
-            }
-        }
-    }
+    for (const auto& item : m_all)
+        if ((item != pIItem) && !xr_strcmp(item->object().cNameSect(), pIItem->object().cNameSect()) && CountAsMarked(item))
+            return item;
     return nullptr;
 }
 
 // ищем на поясе гранату для слота
-PIItem CInventory::SameSlot(const u32 slot, PIItem pIItem, bool bSearchRuck) const
+PIItem CInventory::SameGrenade(PIItem pIItem) const
 {
-    if (slot == NO_ACTIVE_SLOT)
-        return nullptr;
-
-    if (bSearchRuck)
-    {
-        for (const auto& _item : m_ruck)
-        {
-            if (_item != pIItem && _item->GetSlot() == slot)
-            {
-                return _item;
-            }
-        }
-    }
-    else
-    {
-        for (const auto& _item : m_vest)
-        {
-            if (_item != pIItem && _item->GetSlot() == slot)
-            {
-                return _item;
-            }
-        }
-        for (const auto& _item : m_belt)
-        {
-            if (_item != pIItem && _item->GetSlot() == slot)
-            {
-                return _item;
-            }
-        }
-        for (const auto& _slot : m_slots)
-        {
-            const auto _item = _slot.m_pIItem;
-            if (!_item)
-                continue;
-
-            if (_item != pIItem && _item->GetSlot() == slot)
-            {
-                return _item;
-            }
-        }
-    }
-    return nullptr;
-}
-
-// ищем на поясе гранату для слота
-PIItem CInventory::SameGrenade(PIItem pIItem, bool bSearchRuck) const
-{
-    if (bSearchRuck)
-    {
-        for (const auto& _item : m_ruck)
-        {
-            if (_item != pIItem && smart_cast<CGrenade*>(_item))
-            {
-                return _item;
-            }
-        }
-    }
-    else
-    {
-        for (const auto& _item : m_vest)
-        {
-            if (_item != pIItem && smart_cast<CGrenade*>(_item))
-            {
-                return _item;
-            }
-        }
-        for (const auto& _item : m_belt)
-        {
-            if (_item != pIItem && smart_cast<CGrenade*>(_item))
-            {
-                return _item;
-            }
-        }
-        for (const auto& _slot : m_slots)
-        {
-            const auto _item = _slot.m_pIItem;
-            if (!_item)
-                continue;
-
-            if (_item != pIItem && smart_cast<CGrenade*>(_item))
-            {
-                return _item;
-            }
-        }
-    }
+    for (const auto& _item : m_ruck)
+        if (_item != pIItem && smart_cast<CGrenade*>(_item) && CountAsMarked(_item))
+            return _item;
     return nullptr;
 }
 
@@ -1203,43 +1090,25 @@ void CInventory::Iterate(bool bSearchRuck, std::function<bool(const PIItem)> cal
     }
 }
 
-void CInventory::IterateAmmo(bool bSearchRuck, std::function<bool(const PIItem)> callback) const
+void CInventory::IterateAmmo(std::function<bool(const PIItem)> callback) const
 {
-    if (bSearchRuck)
-    {
-        for (const auto& item : m_ruck)
-            if (smart_cast<CWeaponAmmo*>(item) && callback(item))
-                return;
-    }
-    else
-    {
-        for (const auto& item : m_vest)
-            if (smart_cast<CWeaponAmmo*>(item) && callback(item))
-                return;
-        for (const auto& item : m_belt)
-            if (smart_cast<CWeaponAmmo*>(item) && callback(item))
-                return;
-        for (const auto& _slot : m_slots)
-        {
-            const auto item = _slot.m_pIItem;
-            if (smart_cast<CWeaponAmmo*>(item) && callback(item))
-                return;
-        }
-    }
+    for (const auto& item : m_all)
+        if (smart_cast<CWeaponAmmo*>(item) && CountAsMarked(item) && callback(item))
+            return;
 }
 
-PIItem CInventory::GetAmmoByLimit(const char* sect, bool forActor, bool limit_max, bool include_magazines) const
+PIItem CInventory::GetAmmoByLimit(const char* sect, bool limit_max, bool include_magazines) const
 {
     PIItem box{};
     u32 limit{};
 
     auto callback = [&](const auto pIItem) -> bool {
         const auto* ammo = smart_cast<CWeaponAmmo*>(pIItem);
-        shared_str sect_to_compare = include_magazines ? ammo->m_ammoSect : ammo->cNameSect();
 
         if (!ammo->m_boxCurr || include_magazines && !ammo->IsBoxReloadable())
             return false;
 
+        shared_str sect_to_compare = include_magazines ? ammo->m_ammoSect : ammo->cNameSect();
         if (!xr_strcmp(sect_to_compare, sect))
         {
             const bool size_fits_limit = (ammo->m_boxCurr == (limit_max ? ammo->m_boxSize : 1));
@@ -1259,13 +1128,11 @@ PIItem CInventory::GetAmmoByLimit(const char* sect, bool forActor, bool limit_ma
         return false;
     };
 
-    bool include_ruck = !forActor || HUD().GetUI()->MainInputReceiver() || READ_IF_EXISTS(pSettings, r_bool, sect, "ruck_reload", false);
-
-    IterateAmmo(include_ruck, callback);
+    IterateAmmo(callback);
     if (include_magazines && !box) //шукали магазин та не знайшли
     {
         include_magazines = false; //шукаємо набої у пачках
-        IterateAmmo(include_ruck, callback);
+        IterateAmmo(callback);
     }
 
     return box;
@@ -1359,78 +1226,15 @@ PIItem CInventory::GetSameEatable(const PIItem pIItem, bool bSearchRuck) const
     return item;
 }
 
-u32 CInventory::GetSameItemCount(LPCSTR caSection, bool SearchRuck)
+u32 CInventory::GetSameItemCount(LPCSTR caSection, bool marked_only)
 {
-    u32 l_dwCount = 0;
-    TIItemContainer& l_list = SearchRuck ? m_ruck : m_belt;
-    for (const auto& item : l_list)
+    u32 l_dwCount{};
+    for (const auto& item : m_all)
     {
-        if (item && item->Useful() && !xr_strcmp(item->object().cNameSect(), caSection))
+        if (item && item->Useful() && !xr_strcmp(item->object().cNameSect(), caSection) && (!marked_only || item->GetMarked()))
             ++l_dwCount;
     }
-    // помимо пояса еще и в слотах поищем
-    /*if (!SearchRuck)*/
-    for (const auto& item : m_vest)
-    {
-        if (item && item->Useful() && !xr_strcmp(item->object().cNameSect(), caSection))
-            ++l_dwCount;
-    }
-
-    for (const auto& _slot : m_slots)
-    {
-        PIItem item = _slot.m_pIItem;
-        if (item && item->Useful() && !xr_strcmp(item->object().cNameSect(), caSection))
-            ++l_dwCount;
-    }
-
-    return (l_dwCount);
-}
-
-void CInventory::TryAmmoCustomPlacement(CInventoryItem* pIItem)
-{
-    auto pAmmo = smart_cast<CWeaponAmmo*>(pIItem);
-    if (!pAmmo)
-        return;
-
-    auto pActor = smart_cast<CActor*>(m_pOwner);
-    if (!pActor)
-        return;
-
-    if (pAmmo->m_bUnloadedFromWeapon)
-    {
-        pAmmo->m_bUnloadedFromWeapon = false; // сбрасываем флажок спавна патронов
-        if (!IsAllItemsLoaded())
-            return;
-        if (!HUD().GetUI()->MainInputReceiver())
-        { // если включены патроны с пояса, то для боеприпасов актора, которые спавнятся при разрядке
-            if (pAmmo->IsBoxReloadable() && !pAmmo->m_boxCurr && HasDropPouch()) // якщо пустий магазин та є сумка для скидання - кладемо до рюкзаку
-                return;
-            if (CanPutInVest(pAmmo))
-            { // спробуємо до розгрузки
-                pAmmo->m_eItemPlace = eItemPlaceVest;
-                return;
-            }
-            else if (CanPutInBelt(pAmmo))
-            { // спробуємо до поясу
-                pAmmo->m_eItemPlace = eItemPlaceBelt;
-                return;
-            }
-            else
-            { // попробуем определить свободный слот и положить в него
-                for (const auto& slot : pAmmo->GetSlots())
-                {
-                    pAmmo->SetSlot(slot);
-                    if (CanPutInSlot(pAmmo))
-                    {
-                        pAmmo->m_eItemPlace = eItemPlaceSlot;
-                        return;
-                    }
-                }
-            }
-            if (!HasDropPouch()) // нікуди не вміщається та немає сумки для скидання - кидаємо на землю
-                pAmmo->Drop();
-        }
-    }
+    return l_dwCount;
 }
 
 Ivector2 CInventory::BeltArray() const
@@ -1600,30 +1404,9 @@ bool CInventory::HasLockForSlot(u32 check_slot) const
     return false;
 }
 
-bool CInventory::HasDropPouch() const
-{
-    for (const auto& slot : m_slots)
-    {
-        auto item = slot.m_pIItem;
-        if (!item)
-            continue;
-        if (item->IsDropPouch())
-            return true;
-    }
-    for (const auto& item : m_vest)
-    {
-        if (item->IsDropPouch())
-            return true;
-    }
-    for (const auto& item : m_belt)
-    {
-        if (item->IsDropPouch())
-            return true;
-    }
-    return false;
-}
-
 TIItemContainer CInventory::GetActiveArtefactPlace() const { return Core.Features.test(xrCore::Feature::artefacts_from_all) ? m_all : m_belt; }
+
+bool CInventory::CountAsMarked(PIItem item) const { return !OwnerIsActor() || HUD().GetUI()->MainInputReceiver() || item->GetMarked(); }
 
 void CInventory::RepackAmmo()
 {

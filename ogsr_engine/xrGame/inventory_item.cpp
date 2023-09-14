@@ -219,7 +219,6 @@ void CInventoryItem::Load(LPCSTR section)
             m_slots_unlocked.push_back(atoi(_GetItem(str, i, item_section)));
         }
     }
-    m_bIsDropPouch = READ_IF_EXISTS(pSettings, r_bool, section, "is_drop_pouch", false);
 
     m_marked_icon_sect = READ_IF_EXISTS(pSettings, r_string, section, "marked_icon_sect", nullptr);
     m_marked_icon_offset = READ_IF_EXISTS(pSettings, r_fvector2, section, "marked_icon_ofset", Fvector2{});
@@ -474,6 +473,7 @@ void CInventoryItem::save(NET_Packet& packet)
     if (object().H_Parent())
     {
         packet.w_u8(0);
+        save_data(m_bIsMarkedItem, packet);
         return;
     }
 
@@ -491,7 +491,10 @@ void CInventoryItem::load(IReader& packet)
 
     u8 tmp = packet.r_u8();
     if (!tmp)
+    {
+        load_data(m_bIsMarkedItem, packet);
         return;
+    }
 
     if (!object().PPhysicsShell())
     {
@@ -674,6 +677,8 @@ void CInventoryItem::OnMoveToSlot(EItemPlace prevPlace)
         }
         for (const auto slot : m_slots_locked)
             pActor->inventory().DropSlotsToRuck(slot);
+        for (const auto slot : m_slots_unlocked)
+            pActor->inventory().DropSlotsToRuck(slot);
     }
 };
 
@@ -696,6 +701,8 @@ void CInventoryItem::OnMoveToBelt(EItemPlace prevPlace)
         if (prevPlace != eItemPlaceVest)
         {
             for (const auto slot : m_slots_locked)
+                pActor->inventory().DropSlotsToRuck(slot);
+            for (const auto slot : m_slots_unlocked)
                 pActor->inventory().DropSlotsToRuck(slot);
         }
     }
@@ -721,6 +728,8 @@ void CInventoryItem::OnMoveToVest(EItemPlace prevPlace)
         {
             for (const auto slot : m_slots_locked)
                 pActor->inventory().DropSlotsToRuck(slot);
+            for (const auto slot : m_slots_unlocked)
+                pActor->inventory().DropSlotsToRuck(slot);
         }
     }
 };
@@ -744,6 +753,8 @@ void CInventoryItem::OnMoveToRuck(EItemPlace prevPlace)
         if (prevPlace != eItemPlaceUndefined)
         {
             for (const auto slot : m_slots_locked)
+                pActor->inventory().DropSlotsToRuck(slot);
+            for (const auto slot : m_slots_unlocked)
                 pActor->inventory().DropSlotsToRuck(slot);
         }
     }
