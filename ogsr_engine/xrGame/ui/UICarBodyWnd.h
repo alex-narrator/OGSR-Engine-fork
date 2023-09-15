@@ -75,8 +75,6 @@ protected:
     CUI3tButton* m_pUIOrganizeButton;
     CUI3tButton* m_pUIMoveAllFromRuckButton;
 
-    CUICheckButton* m_pUIShowAllInv;
-
 public:
     CUICellItem* m_pCurrentCellItem;
 
@@ -132,7 +130,6 @@ protected:
 
     bool CanMoveToOther(PIItem pItem, CGameObject* owner_to) const;
     void UpdateWeight();
-    bool m_bShowAllInv{};
 
     CUICellItem* itm_to_descr{};
 };

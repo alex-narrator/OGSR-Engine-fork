@@ -171,7 +171,7 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
 
         auto pActor = smart_cast<CActor*>(m_pOwner);
         const bool def_to_slot = pActor ? !pIItem->RuckDefault() : true;
-        if ((!force_ruck_default && def_to_slot && CanPutInSlot(pIItem)) || force_move_to_slot)
+        if ((!force_ruck_default && def_to_slot && CanPutInSlot(pIItem, true)) || force_move_to_slot)
         {
             if (pActor && Device.dwPrecacheFrame)
                 bNotActivate = true;
@@ -822,8 +822,16 @@ bool CInventory::InBelt(PIItem pIItem) const { return (std::find(m_belt.begin(),
 bool CInventory::InVest(PIItem pIItem) const { return (std::find(m_vest.begin(), m_vest.end(), pIItem) != m_vest.end()); }
 bool CInventory::InRuck(PIItem pIItem) const { return (std::find(m_ruck.begin(), m_ruck.end(), pIItem) != m_ruck.end()); }
 
-bool CInventory::CanPutInSlot(PIItem pIItem) const
+bool CInventory::CanPutInSlot(PIItem pIItem, bool b_check_all) const
 {
+    if (b_check_all && pIItem->GetSlotsCount() > 1)
+        for (const auto slot : pIItem->GetSlots())
+            if (CanPutInSlot(pIItem, slot))
+            {
+                pIItem->SetSlot(slot);
+                return true;
+            }
+
     if (!m_bSlotsUseful)
         return false;
 
@@ -851,7 +859,7 @@ bool CInventory::CanPutInSlot(PIItem pIItem, u8 slot) const
     if (!IsSlotAllowed(slot))
         return false;
 
-    if (slot < m_slots.size() && !m_slots[slot].m_pIItem)
+    if (slot < m_slots.size() && !m_slots[slot].m_pIItem && IsSlotAllowed(slot))
         return true;
 
     return false;

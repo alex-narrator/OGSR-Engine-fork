@@ -78,8 +78,6 @@ struct CUITradeInternal
     CUIItemInfo UIItemInfo;
 
     SDrawStaticStruct* UIDealMsg{};
-
-    CUICheckButton* m_pUIShowAllInv{};
 };
 
 bool others_zero_trade;
@@ -179,11 +177,6 @@ void CUITradeWnd::Init()
 
     AttachChild(&m_uidata->UIPerformDonationButton);
     xml_init.Init3tButton(uiXml, "button", 2, &m_uidata->UIPerformDonationButton);
-
-    m_uidata->m_pUIShowAllInv = xr_new<CUICheckButton>();
-    m_uidata->m_pUIShowAllInv->SetAutoDelete(true);
-    AttachChild(m_uidata->m_pUIShowAllInv);
-    xml_init.InitCheck(uiXml, "show_all_inv", 0, m_uidata->m_pUIShowAllInv);
 
     m_pUIPropertiesBox = xr_new<CUIPropertiesBox>();
     m_pUIPropertiesBox->SetAutoDelete(true);
@@ -359,6 +352,26 @@ void CUITradeWnd::ActivatePropertiesBox()
             b_show = true;
         }
 
+        for (const auto& action : CurrentIItem()->m_script_actions_map)
+        {
+            if (luabind::functor<bool> m_functorHasAction; ai().script_engine().functor(action.second[0].c_str(), m_functorHasAction))
+            {
+                if (m_functorHasAction(CurrentIItem()->object().lua_game_object()))
+                {
+                    LPCSTR tip_text{};
+                    if (luabind::functor<LPCSTR> tip_func; ai().script_engine().functor(action.first.c_str(), tip_func))
+                        tip_text = tip_func(CurrentIItem()->object().lua_game_object());
+                    else
+                        tip_text = CStringTable().translate(action.first).c_str();
+
+                    m_pUIPropertiesBox->AddItem(tip_text, (void*)action.first.c_str(), INVENTORY_SCRIPT_ACTION);
+                    b_show = true;
+                }
+            }
+            else
+                Msg("!Item-action-condition function [%s] not exist.", action.second[0].c_str());
+        }
+
         if (!CurrentIItem()->IsQuestItem())
         {
             sprintf(temp, "%s%s", _many, CStringTable().translate("st_drop").c_str());
@@ -408,11 +421,6 @@ void CUITradeWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         else if (pWnd == &m_uidata->UIPerformDonationButton)
         {
             PerformDonation();
-        }
-        else if (m_uidata->m_pUIShowAllInv == pWnd)
-        {
-            m_bShowAllInv = !m_bShowAllInv;
-            UpdateLists(e1st);
         }
     }
     else if (pWnd == m_pUIPropertiesBox && msg == PROPERTY_CLICKED)
@@ -475,6 +483,14 @@ void CUITradeWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             break;
             case INVENTORY_MOVE_ACTION: {
                 MoveItems(itm, for_all);
+            }
+            break;
+            case INVENTORY_SCRIPT_ACTION: {
+                auto it = CurrentIItem()->m_script_actions_map.find((LPCSTR)m_pUIPropertiesBox->GetClickedItem()->GetData());
+                if (luabind::functor<void> m_functorDoAction; ai().script_engine().functor(it->second[1].c_str(), m_functorDoAction))
+                    m_functorDoAction(CurrentIItem()->object().lua_game_object());
+                else
+                    Msg("!Item-action function [%s] not exist.", it->second[1].c_str());
             }
             break;
             }
@@ -577,8 +593,6 @@ void CUITradeWnd::Hide()
     m_uidata->UIOurTradeList.ClearAll(true);
     m_uidata->UIOthersBagList.ClearAll(true);
     m_uidata->UIOthersTradeList.ClearAll(true);
-
-    m_bShowAllInv = false;
 }
 
 void CUITradeWnd::StartTrade()
@@ -871,16 +885,7 @@ void CUITradeWnd::UpdateLists(EListType mode)
     if (mode == eBoth || mode == e1st)
     {
         ruck_list.clear();
-        if (m_bShowAllInv)
-            m_pInv->AddAvailableItems(ruck_list, false);
-        else
-        {
-            for (const auto& item : m_pInv->m_ruck)
-            {
-                if (CanMoveToOther(item, true))
-                    ruck_list.push_back(item);
-            }
-        }
+        m_pInv->AddAvailableItems(ruck_list, true);
         std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
         FillList(ruck_list, m_uidata->UIOurBagList, true);
     }
@@ -896,8 +901,13 @@ void CUITradeWnd::UpdateLists(EListType mode)
 
 void CUITradeWnd::FillList(TIItemContainer& cont, CUIDragDropListEx& dragDropList, bool our)
 {
+    auto show_item = [&](const auto pIItem) -> bool { return !pIItem->m_flags.test(CInventoryItem::FIHiddenForInventory); };
+
     for (const auto& item : cont)
     {
+        if (!show_item(item))
+            continue;
+
         CUICellItem* itm = create_cell_item(item);
         if (item->m_highlight_equipped)
             itm->m_select_equipped = true;

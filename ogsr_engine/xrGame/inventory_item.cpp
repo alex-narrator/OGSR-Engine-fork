@@ -473,7 +473,6 @@ void CInventoryItem::save(NET_Packet& packet)
     if (object().H_Parent())
     {
         packet.w_u8(0);
-        save_data(m_bIsMarkedItem, packet);
         return;
     }
 
@@ -491,10 +490,7 @@ void CInventoryItem::load(IReader& packet)
 
     u8 tmp = packet.r_u8();
     if (!tmp)
-    {
-        load_data(m_bIsMarkedItem, packet);
         return;
-    }
 
     if (!object().PPhysicsShell())
     {

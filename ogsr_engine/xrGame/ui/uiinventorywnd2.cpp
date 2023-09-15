@@ -88,127 +88,138 @@ void CUIInventoryWnd::InitInventory()
 
     UpdateCustomDraw();
 
+    auto show_item = [&](const auto pIItem) -> bool 
+    {
+        return !pIItem->m_flags.test(CInventoryItem::FIHiddenForInventory);
+    };
+
     // Slots
     PIItem _itm = m_pInv->m_slots[KNIFE_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIKnifeList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[FIRST_WEAPON_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIFirstWeaponList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[SECOND_WEAPON_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUISecondWeaponList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[APPARATUS_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIBinocularList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[GRENADE_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIGrenadeList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[ARTEFACT_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIArtefactList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[DETECTOR_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIDetectorList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[TORCH_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIOnHeadList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[PDA_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIPdaList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[HELMET_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIHelmetList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[GASMASK_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIGasMaskList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[WARBELT_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIWarBeltList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[BACKPACK_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIBackPackList->SetItem(itm);
     }
 
     _itm = m_pInv->m_slots[VEST_SLOT].m_pIItem;
-    if (_itm)
+    if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUITacticalVestList->SetItem(itm);
     }
 
     PIItem _outfit = m_pInv->m_slots[OUTFIT_SLOT].m_pIItem;
-    CUICellItem* outfit = (_outfit) ? create_cell_item(_outfit) : NULL;
+    CUICellItem* outfit = (_outfit && show_item(_outfit)) ? create_cell_item(_outfit) : NULL;
     m_pUIOutfitList->SetItem(outfit);
 
     std::sort(m_pInv->m_belt.begin(), m_pInv->m_belt.end(), InventoryUtilities::GreaterRoomInRuck);
     for (const auto& item : m_pInv->m_belt)
     {
-        CUICellItem* itm = create_cell_item(item);
-        m_pUIBeltList->SetItem(itm);
+        if (show_item(item))
+        {
+            CUICellItem* itm = create_cell_item(item);
+            m_pUIBeltList->SetItem(itm);
+        }
     }
 
     std::sort(m_pInv->m_vest.begin(), m_pInv->m_vest.end(), InventoryUtilities::GreaterRoomInRuck);
     for (const auto& item : m_pInv->m_vest)
     {
-        CUICellItem* itm = create_cell_item(item);
-        m_pUIVestList->SetItem(itm);
+        if (show_item(item))
+        {
+            CUICellItem* itm = create_cell_item(item);
+            m_pUIVestList->SetItem(itm);
+        }
     }
 
     std::sort(m_pInv->m_ruck.begin(), m_pInv->m_ruck.end(), InventoryUtilities::GreaterRoomInRuck);
     for (const auto& item : m_pInv->m_ruck)
     {
-        if (!item->m_flags.test(CInventoryItem::FIHiddenForInventory))
+        if (show_item(item))
         {
             CUICellItem* itm = create_cell_item(item);
             m_pUIBagList->SetItem(itm);

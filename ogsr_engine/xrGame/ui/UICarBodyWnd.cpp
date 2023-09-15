@@ -156,11 +156,6 @@ void CUICarBodyWnd::Init()
     AttachChild(m_pUIMoveAllFromRuckButton);
     xml_init.Init3tButton(uiXml, "move_all_from_ruck_button", 0, m_pUIMoveAllFromRuckButton);
 
-    m_pUIShowAllInv = xr_new<CUICheckButton>();
-    m_pUIShowAllInv->SetAutoDelete(true);
-    AttachChild(m_pUIShowAllInv);
-    xml_init.InitCheck(uiXml, "show_all_inv", 0, m_pUIShowAllInv);
-
     BindDragDropListEvents(m_pUIOurBagList);
     BindDragDropListEvents(m_pUIOthersBagList);
 
@@ -278,7 +273,6 @@ void CUICarBodyWnd::Hide()
     if (m_pOtherInventoryBox)
         m_pOtherInventoryBox->m_in_use = false;
 
-    m_bShowAllInv = false;
     PlaySnd(eInvSndClose);
 }
 
@@ -288,20 +282,18 @@ void CUICarBodyWnd::UpdateLists()
     m_pUIOurBagList->ClearAll(true);
     m_pUIOthersBagList->ClearAll(true);
 
-    ruck_list.clear();
-    if (m_bShowAllInv)
-        m_pActorInventoryOwner->inventory().AddAvailableItems(ruck_list, false);
-    else
-    {
-        for (const auto& item : m_pActorInventoryOwner->inventory().m_ruck)
-            ruck_list.push_back(item);
-    }
+    auto show_item = [&](const auto pIItem) -> bool { return !pIItem->m_flags.test(CInventoryItem::FIHiddenForInventory); };
 
+    ruck_list.clear();
+    m_pActorInventoryOwner->inventory().AddAvailableItems(ruck_list, true);
     std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
 
     // Наш рюкзак
     for (const auto& inv_item : ruck_list)
     {
+        if (!show_item(inv_item))
+            continue;
+
         CUICellItem* itm = create_cell_item(inv_item);
         if (inv_item->m_highlight_equipped)
         {
@@ -322,6 +314,9 @@ void CUICarBodyWnd::UpdateLists()
     // Чужой рюкзак
     for (const auto& inv_item : ruck_list)
     {
+        if (!show_item(inv_item))
+            continue;
+
         CUICellItem* itm = create_cell_item(inv_item);
         m_pUIOthersBagList->SetItem(itm);
     }
@@ -451,6 +446,27 @@ void CUICarBodyWnd::ActivatePropertiesBox()
         b_show = true;
     }
 
+    if (b_actor_inv)
+        for (const auto& action : CurrentIItem()->m_script_actions_map)
+        {
+            if (luabind::functor<bool> m_functorHasAction; ai().script_engine().functor(action.second[0].c_str(), m_functorHasAction))
+            {
+                if (m_functorHasAction(CurrentIItem()->object().lua_game_object()))
+                {
+                    LPCSTR tip_text{};
+                    if (luabind::functor<LPCSTR> tip_func; ai().script_engine().functor(action.first.c_str(), tip_func))
+                        tip_text = tip_func(CurrentIItem()->object().lua_game_object());
+                    else
+                        tip_text = CStringTable().translate(action.first).c_str();
+
+                    m_pUIPropertiesBox->AddItem(tip_text, (void*)action.first.c_str(), INVENTORY_SCRIPT_ACTION);
+                    b_show = true;
+                }
+            }
+            else
+                Msg("!Item-action-condition function [%s] not exist.", action.second[0].c_str());
+        }
+
     if (b_actor_inv && !CurrentIItem()->IsQuestItem())
     {
         sprintf(temp, "%s%s", _many, CStringTable().translate("st_drop").c_str());
@@ -502,11 +518,6 @@ void CUICarBodyWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         else if (m_pUIMoveAllFromRuckButton == pWnd)
         {
             MoveAllFromRuck();
-        }
-        else if (m_pUIShowAllInv == pWnd)
-        {
-            m_bShowAllInv = !m_bShowAllInv;
-            UpdateLists_delayed();
         }
     }
     else if (pWnd == m_pUIPropertiesBox && msg == PROPERTY_CLICKED)
@@ -569,6 +580,14 @@ void CUICarBodyWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             break;
             case INVENTORY_MOVE_ACTION: {
                 MoveItems(itm, for_all);
+            }
+            break;
+            case INVENTORY_SCRIPT_ACTION: {
+                auto it = CurrentIItem()->m_script_actions_map.find((LPCSTR)m_pUIPropertiesBox->GetClickedItem()->GetData());
+                if (luabind::functor<void> m_functorDoAction; ai().script_engine().functor(it->second[1].c_str(), m_functorDoAction))
+                    m_functorDoAction(CurrentIItem()->object().lua_game_object());
+                else
+                    Msg("!Item-action function [%s] not exist.", it->second[1].c_str());
             }
             break;
             }
