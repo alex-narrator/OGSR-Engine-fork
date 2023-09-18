@@ -242,34 +242,6 @@ void CInventoryContainer::HitItemsInContainer(SHit* pHDS)
     }
 }
 
-void CInventoryContainer::OnMoveToSlot(EItemPlace prevPlace)
-{
-    inherited::OnMoveToSlot(prevPlace);
-    auto& inv = m_pCurrentInventory;
-    if (inv)
-    {
-        auto pActor = smart_cast<CActor*>(inv->GetOwner());
-        if (pActor)
-        {
-            inv->BackpackItemsTransfer(this, false);
-        }
-    }
-}
-
-void CInventoryContainer::OnMoveOut(EItemPlace prevPlace)
-{
-    inherited::OnMoveOut(prevPlace);
-    auto& inv = m_pCurrentInventory;
-    if (inv && prevPlace == eItemPlaceSlot)
-    {
-        auto pActor = smart_cast<CActor*>(inv->GetOwner());
-        if (pActor)
-        {
-            inv->BackpackItemsTransfer(this, true);
-        }
-    }
-}
-
 u32 CInventoryContainer::GetSameItemCount(shared_str sect) const
 {
     u32 count{};

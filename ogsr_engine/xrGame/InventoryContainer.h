@@ -37,9 +37,6 @@ public:
     void HitItemsInBackPack(SHit* pHDS);
     void HitItemsInContainer(SHit* pHDS);
 
-    virtual void OnMoveToSlot(EItemPlace prevPlace);
-    virtual void OnMoveOut(EItemPlace prevPlace);
-
     virtual u32 GetSameItemCount(shared_str) const;
 
     void AddUniqueItems(TIItemContainer& items_container) const;

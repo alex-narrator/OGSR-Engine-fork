@@ -1311,33 +1311,6 @@ void CInventory::DropSlotsToRuck(u32 min_slot, u32 max_slot)
     }
 }
 
-#include "InventoryContainer.h"
-void CInventory::BackpackItemsTransfer(CInventoryItem* container, bool move_to_container)
-{
-    if (!OwnerIsActor() || !IsAllItemsLoaded())
-        return;
-    auto actor_id = m_pOwner->object_id();
-    auto container_id = container->object().ID();
-    if (move_to_container)
-    {
-        for (const auto& item : m_ruck)
-        {
-            item->Transfer(actor_id, container_id);
-        }
-    }
-    else
-    {
-        auto cont = smart_cast<CInventoryContainer*>(container);
-        if (!cont)
-            return;
-        for (const auto& item_id : cont->GetItems())
-        {
-            auto item = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
-            item->Transfer(container_id, actor_id);
-        }
-    }
-}
-
 bool CInventory::IsSlotAllowed(u32 slot) const
 {
     auto pActor = smart_cast<CActor*>(m_pOwner);

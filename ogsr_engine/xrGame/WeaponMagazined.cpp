@@ -1960,7 +1960,7 @@ void CWeaponMagazined::UnloadAmmo(int unload_count, bool spawn_ammo, bool detach
     {
         if (m_pCurrentInventory && !detach_magazine)
         { // упаковать разряжаемые патроны в неполную пачку
-            if (auto l_pA = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(_item.first, true)))
+            if (auto l_pA = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(_item.first)))
             {
                 u16 l_free = l_pA->m_boxSize - l_pA->m_boxCurr;
                 l_pA->m_boxCurr = l_pA->m_boxCurr + (l_free < _item.second ? l_free : _item.second);
