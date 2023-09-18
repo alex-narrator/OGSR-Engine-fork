@@ -84,8 +84,6 @@ public:
 
 public:
     virtual CInventoryItem* can_make_killing(const CInventory* inventory) const;
-    
-    bool m_bUnloadedFromWeapon{};
 
 protected:
     ref_sound sndLoad;

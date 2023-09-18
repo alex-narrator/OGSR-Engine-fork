@@ -1141,8 +1141,6 @@ void CWeapon::SpawnAmmo(u32 boxCurr, LPCSTR ammoSect, shared_str ammo_sect_in_ma
         if (boxCurr == 0xffffffff)
             boxCurr = l_pA->m_boxSize;
         
-        if (ParentIsActor() && m_pCurrentInventory->ActiveItem() == this)
-            l_pA->m_bUnloadedFromWeapon = true;
         if (pSettings->line_exist(ammoSect, "ammo_types") && !!ammo_sect_in_mag)
             l_pA->m_cur_ammo_type = (u8)std::distance(l_pA->m_ammoTypes.begin(), std::find(l_pA->m_ammoTypes.begin(), l_pA->m_ammoTypes.end(), ammo_sect_in_mag));
 
