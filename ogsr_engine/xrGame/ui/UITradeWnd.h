@@ -43,6 +43,8 @@ public:
     void StartTrade();
     void StopTrade();
 
+    void UpdateLists_delayed() { UpdateLists(eBoth); };
+
 protected:
     CUITradeInternal* m_uidata;
 

@@ -204,6 +204,10 @@ void CUIGameSP::ReInitShownUI()
         InventoryMenu->InitInventory_delayed();
     else if (UICarBodyMenu->IsShown())
         UICarBodyMenu->UpdateLists_delayed();
+    else if (TalkMenu->IsShown())
+        for (const auto child : TalkMenu->GetChildWndList())
+            if (auto trade_menu = smart_cast<CUITradeWnd*>(child))
+                trade_menu->UpdateLists_delayed();
 };
 
 extern ENGINE_API BOOL bShowPauseString;
