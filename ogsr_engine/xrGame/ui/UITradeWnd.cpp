@@ -1195,3 +1195,22 @@ bool CUITradeWnd::OnItemFocusedUpdate(CUICellItem* itm)
     m_uidata->UIItemInfo.SetWndPos(pos);
     return false;
 }
+
+void CUITradeWnd::UpdateLists_delayed()
+{
+    m_uidata->UIOurBagList.ClearAll(true);
+    m_uidata->UIOurTradeList.ClearAll(true);
+
+    m_uidata->UIOthersBagList.ClearAll(true);
+    m_uidata->UIOthersTradeList.ClearAll(true);
+
+    ruck_list.clear();
+    m_pInv->AddAvailableItems(ruck_list, true);
+    std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
+    FillList(ruck_list, m_uidata->UIOurBagList, true);
+
+    ruck_list.clear();
+    m_pOthersInv->AddAvailableItems(ruck_list, true);
+    std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
+    FillList(ruck_list, m_uidata->UIOthersBagList, false);
+}

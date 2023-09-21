@@ -20,6 +20,8 @@
 
 #include "WeaponMagazined.h"
 #include "WeaponMagazinedWGrenade.h"
+#include "Warbelt.h"
+#include "Vest.h"
 
 CUICellItem* CUIInventoryWnd::CurrentItem() { return m_pCurrentCellItem; }
 
@@ -327,7 +329,7 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
             if (auto det = smart_cast<CCustomDetector*>(iitem))
                 det->ToggleDetector(g_player_hud->attached_item(0) != nullptr);
 
-        if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
+        if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty() || smart_cast<CWarbelt*>(iitem) || smart_cast<CVest*>(iitem))
             UpdateCustomDraw();
 
         if (old_owner == m_pUIBeltList || old_owner == m_pUIVestList)
@@ -372,7 +374,7 @@ bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
         else
             new_owner->SetItem(i);
 
-        if (!iitem->GetSlotsLocked().empty() || !iitem->GetSlotsUnlocked().empty())
+        if (!iitem->GetSlotsLocked().empty() || !iitem->GetSlotsUnlocked().empty() || smart_cast<CWarbelt*>(iitem) || smart_cast<CVest*>(iitem))
             UpdateCustomDraw();
 
         if (old_owner == m_pUIBeltList || old_owner == m_pUIVestList)

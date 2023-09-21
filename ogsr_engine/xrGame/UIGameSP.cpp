@@ -206,7 +206,7 @@ void CUIGameSP::ReInitShownUI()
         UICarBodyMenu->UpdateLists_delayed();
     else if (TalkMenu->IsShown())
         for (const auto child : TalkMenu->GetChildWndList())
-            if (auto trade_menu = smart_cast<CUITradeWnd*>(child))
+            if (auto trade_menu = smart_cast<CUITradeWnd*>(child); trade_menu && trade_menu->IsShown())
                 trade_menu->UpdateLists_delayed();
 };
 
