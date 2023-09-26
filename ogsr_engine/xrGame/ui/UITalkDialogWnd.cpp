@@ -31,51 +31,33 @@ void CUITalkDialogWnd::Init(float x, float y, float width, float height)
 
     inherited::Init(x, y, width, height);
 
-    AttachChild(&UIStaticTop);
-    CUIXmlInit::InitStatic(*m_uiXml, "top_background", 0, &UIStaticTop);
-    AttachChild(&UIStaticBottom);
-    CUIXmlInit::InitStatic(*m_uiXml, "bottom_background", 0, &UIStaticBottom);
+    // Элементы автоматического добавления
+    CUIXmlInit::InitAutoStatic(*m_uiXml, "auto_static", this);
 
     // иконки с изображение нас и партнера по торговле
-    AttachChild(&UIOurIcon);
-    CUIXmlInit::InitStatic(*m_uiXml, "left_character_icon", 0, &UIOurIcon);
-    AttachChild(&UIOthersIcon);
-    CUIXmlInit::InitStatic(*m_uiXml, "right_character_icon", 0, &UIOthersIcon);
-    UIOurIcon.AttachChild(&UICharacterInfoLeft);
-    UICharacterInfoLeft.Init(0.0f, 0.0f, UIOurIcon.GetWidth(), UIOurIcon.GetHeight(), TRADE_CHARACTER_XML);
-    UIOthersIcon.AttachChild(&UICharacterInfoRight);
-    UICharacterInfoRight.Init(0.0f, 0.0f, UIOthersIcon.GetWidth(), UIOthersIcon.GetHeight(), TRADE_CHARACTER_XML);
+    UICharacterInfoLeft.Init(0.0f, 0.0f, 0.0f, 0.0f, TRADE_CHARACTER_XML);
+    UICharacterInfoRight.Init(0.0f, 0.0f, 0.0f, 0.0f, TRADE_CHARACTER_XML);
 
     // основной фрейм диалога
-    AttachChild(&UIDialogFrame);
-    CUIXmlInit::InitFrameLine(*m_uiXml, "frame_line_window", 0, &UIDialogFrame);
-    UIDialogFrame.UITitleText.SetElipsis(CUIStatic::eepEnd, 10);
+    AttachChild(&UIDialog);
+    CUIXmlInit::InitStatic(*m_uiXml, "dialog", 0, &UIDialog);
     // Фрейм с нащими фразами
-    AttachChild(&UIOurPhrasesFrame);
-    CUIXmlInit::InitFrameLine(*m_uiXml, "frame_line_window", 1, &UIOurPhrasesFrame);
-    UIOurPhrasesFrame.UITitleText.SetElipsis(CUIStatic::eepEnd, 10);
+    AttachChild(&UIOurPhrases);
+    CUIXmlInit::InitStatic(*m_uiXml, "phrases", 0, &UIOurPhrases);
 
     // Ответы
     UIAnswersList = xr_new<CUIScrollView>();
     UIAnswersList->SetAutoDelete(true);
-    UIDialogFrame.AttachChild(UIAnswersList);
+    UIDialog.AttachChild(UIAnswersList);
     CUIXmlInit::InitScrollView(*m_uiXml, "answers_list", 0, UIAnswersList);
     UIAnswersList->SetWindowName("---UIAnswersList");
 
     // Вопросы
     UIQuestionsList = xr_new<CUIScrollView>();
     UIQuestionsList->SetAutoDelete(true);
-    UIOurPhrasesFrame.AttachChild(UIQuestionsList);
+    UIOurPhrases.AttachChild(UIQuestionsList);
     CUIXmlInit::InitScrollView(*m_uiXml, "questions_list", 0, UIQuestionsList);
     UIQuestionsList->SetWindowName("---UIQuestionsList");
-
-    // кнопка перехода в режим торговли
-    AttachChild(&UIToTradeButton);
-    CUIXmlInit::Init3tButton(*m_uiXml, "button", 0, &UIToTradeButton);
-    UIToTradeButton.SetWindowName("trade_btn");
-
-    // Элементы автоматического добавления
-    CUIXmlInit::InitAutoStatic(*m_uiXml, "auto_static", this);
 
     // шрифт для индикации имени персонажа в окне разговора
     CUIXmlInit::InitFont(*m_uiXml, "font", 0, m_iNameTextColor, m_pNameTextFont);
@@ -85,9 +67,7 @@ void CUITalkDialogWnd::Init(float x, float y, float width, float height)
 
     SetWindowName("----CUITalkDialogWnd");
 
-    Register(&UIToTradeButton);
     AddCallback("question_item", LIST_ITEM_CLICKED, fastdelegate::MakeDelegate(this, &CUITalkDialogWnd::OnQuestionClicked));
-    AddCallback("trade_btn", BUTTON_CLICKED, fastdelegate::MakeDelegate(this, &CUITalkDialogWnd::OnTradeClicked));
 }
 
 #include "UIInventoryUtilities.h"
@@ -186,13 +166,8 @@ void CUITalkDialogWnd::AddIconedAnswer(LPCSTR text, LPCSTR texture_name, Frect t
 }
 void CUITalkDialogWnd::SetOsoznanieMode(bool b)
 {
-    UIOurIcon.Show(!b);
-    UIOthersIcon.Show(!b);
-
     UIAnswersList->Show(!b);
-    UIDialogFrame.Show(!b);
-
-    UIToTradeButton.Show(!b);
+    UIDialog.Show(!b);
 }
 
 void CUIQuestionItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }

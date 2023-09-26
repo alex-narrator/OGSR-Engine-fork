@@ -46,18 +46,7 @@ void CUIInventoryWnd::SetCurrentItem(CUICellItem* itm)
 void CUIInventoryWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     if (pWnd == &UIPropertiesBox && msg == PROPERTY_CLICKED)
-    {
         ProcessPropertiesBoxClicked();
-    }
-    else if (UIExitButton == pWnd && BUTTON_CLICKED == msg)
-    {
-        GetHolder()->StartStopMenu(this, true);
-    }
-    else if (UIOrganizeButton == pWnd && BUTTON_CLICKED == msg)
-    {
-        m_pInv->RepackAmmo();
-        InitInventory_delayed();
-    }
 
     CUIWindow::SendMessage(pWnd, msg, pData);
 }
@@ -75,6 +64,8 @@ void CUIInventoryWnd::InitInventory()
         return;
 
     m_pInv = &pInvOwner->inventory();
+
+    m_pInv->RepackAmmo();
 
     //порядок вишиковування елементів драгдропу тепер встановлюємо тут
     //незалежно від XML-конфігу
@@ -230,8 +221,6 @@ void CUIInventoryWnd::InitInventory()
 
     m_pUIBagList->SetScrollPos(bag_scroll);
 
-    UpdateWeight();
-
     m_b_need_reinit = false;
 }
 
@@ -257,7 +246,6 @@ void CUIInventoryWnd::DropCurrentItem(bool b_all)
 
     CurrentIItem()->Drop();
     SetCurrentItem(NULL);
-    UpdateWeight();
 
     PlaySnd(eInvDropItem);
     m_b_need_update_stats = true;
@@ -297,11 +285,6 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
         GetInventory()->Slot(iitem, !iitem->cast_hud_item());
         PlaySnd(eInvItemToSlot);
         m_b_need_update_stats = true;
-
-        /************************************************** added by Ray Twitty (aka Shadows) START **************************************************/
-        // обновляем статик веса в инвентаре
-        UpdateWeight();
-        /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
     }
     else
     { // in case slot is busy
@@ -364,11 +347,6 @@ bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
         VERIFY(result);
         CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
 
-        /************************************************** added by Ray Twitty (aka Shadows) START **************************************************/
-        // обновляем статик веса в инвентаре
-        UpdateWeight();
-        /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
-
         if (b_use_cursor_pos)
             new_owner->SetItem(i, old_owner->GetDragItemPosition());
         else
@@ -415,10 +393,6 @@ bool CUIInventoryWnd::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
         else
             new_owner->SetItem(i);
 
-        /************************************************** added by Ray Twitty (aka Shadows) START **************************************************/
-        // обновляем статик веса в инвентаре
-        UpdateWeight();
-        /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
         ReinitBeltList();
 
         if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
@@ -462,10 +436,6 @@ bool CUIInventoryWnd::ToVest(CUICellItem* itm, bool b_use_cursor_pos)
         else
             new_owner->SetItem(i);
 
-        /************************************************** added by Ray Twitty (aka Shadows) START **************************************************/
-        // обновляем статик веса в инвентаре
-        UpdateWeight();
-        /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
         ReinitVestList();
 
         if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
@@ -730,8 +700,6 @@ void CUIInventoryWnd::ClearAllLists()
     m_pUIOnHeadList->ClearAll(true);
     m_pUIPdaList->ClearAll(true);
 }
-
-void CUIInventoryWnd::UpdateWeight() { InventoryUtilities::UpdateWeight(UIWeightWnd, true); }
 
 void CUIInventoryWnd::ReinitBeltList()
 {

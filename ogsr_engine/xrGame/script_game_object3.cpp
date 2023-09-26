@@ -997,16 +997,6 @@ void CScriptGameObject::SetMaxWeight(float _weight)
     }
     e->inventory().SetMaxWeight(_weight);
 }
-//void CScriptGameObject::SetMaxWalkWeight(float _weight)
-//{
-//    CActor* e = smart_cast<CActor*>(&object());
-//    if (!e)
-//    {
-//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot access class member SetMaxWalkWeight!");
-//        return;
-//    }
-//    e->conditions().SetMaxWalkWeight(_weight);
-//}
 
 float CScriptGameObject::GetMaxWeight() const
 {
@@ -1019,21 +1009,7 @@ float CScriptGameObject::GetMaxWeight() const
 
     return e->MaxCarryWeight();
 }
-//float CScriptGameObject::GetMaxWalkWeight() const
-//{
-//    auto e = smart_cast<CActor*>(&object());
-//    if (!e)
-//    {
-//        Msg("!!CActor : cannot access class member GetMaxWalkWeight!");
-//        return 0;
-//    }
-//    float max_w = e->conditions().m_MaxWalkWeight + e->ArtefactsAddWeight();
-//    auto outfit = e->GetOutfit();
-//    if (outfit)
-//        max_w += outfit->m_additional_weight;
-//
-//    return max_w;
-//}
+
 float CScriptGameObject::GetInventoryWeight() const
 {
     auto e = smart_cast<CInventoryOwner*>(&object());

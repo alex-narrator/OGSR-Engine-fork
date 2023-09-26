@@ -620,6 +620,14 @@ LPCSTR CScriptGameObject::GetDefaultCharacterIcon()
     }
     return pInventoryOwner->GetDefaultIcon();
 }
+bool CScriptGameObject::InfinitiveMoney() const
+{
+    auto pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
+    if (!pInventoryOwner)
+        return false;
+
+    return pInventoryOwner->InfinitiveMoney();
+}
 
 LPCSTR CScriptGameObject::sound_voice_prefix() const
 {
@@ -675,11 +683,36 @@ void CScriptGameObject::SwitchToTrade()
         return;
 
     if (pGameSP->TalkMenu->IsShown())
-    {
         pGameSP->TalkMenu->SwitchToTrade();
-    }
 }
-void CScriptGameObject::SwitchToTalk() { R_ASSERT("switch_to_talk called ;)"); }
+void CScriptGameObject::SwitchToTalk() //{ R_ASSERT("switch_to_talk called ;)"); }
+{
+    CActor* pActor = smart_cast<CActor*>(&object());
+    if (!pActor)
+        return;
+
+    // только если находимся в режиме single
+    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+    if (!pGameSP)
+        return;
+
+    if (pGameSP->TalkMenu->GetTradeWnd()->IsShown())
+        pGameSP->TalkMenu->GetTradeWnd()->SwitchToTalk();
+}
+void CScriptGameObject::PerformTrade()
+{
+    CActor* pActor = smart_cast<CActor*>(&object());
+    if (!pActor)
+        return;
+
+    // только если находимся в режиме single
+    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+    if (!pGameSP)
+        return;
+
+    if (pGameSP->TalkMenu->GetTradeWnd()->IsShown())
+        pGameSP->TalkMenu->GetTradeWnd()->PerformTrade();
+}
 
 void CScriptGameObject::RunTalkDialog(CScriptGameObject* pToWho)
 {
@@ -1011,69 +1044,6 @@ void CScriptGameObject::SetActorMaxWeight(float max_weight)
     }
     pActor->inventory().SetMaxWeight(max_weight);
 }
-// получить и задать максимальный вес при котором можно ходить
-//float CScriptGameObject::GetActorMaxWalkWeight() const
-//{
-//    CActor* pActor = smart_cast<CActor*>(&object());
-//    if (!pActor)
-//    {
-//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot access class member GetActorMaxWalkWeight!");
-//        return (false);
-//    }
-//    return (pActor->conditions().m_MaxWalkWeight);
-//}
-//void CScriptGameObject::SetActorMaxWalkWeight(float max_walk_weight)
-//{
-//    CActor* pActor = smart_cast<CActor*>(&object());
-//    if (!pActor)
-//    {
-//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot access class member SetActorMaxWalkWeight!");
-//        return;
-//    }
-//    pActor->conditions().m_MaxWalkWeight = max_walk_weight;
-//}
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// получить и задать доп. вес для костюма
-//float CScriptGameObject::GetAdditionalMaxWeight() const
-//{
-//    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
-//    if (!outfit)
-//    {
-//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CCustomOutfit : cannot access class member GetAdditionalMaxWeight!");
-//        return (false);
-//    }
-//    return (outfit->m_additional_weight2);
-//}
-//float CScriptGameObject::GetAdditionalMaxWalkWeight() const
-//{
-//    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
-//    if (!outfit)
-//    {
-//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CCustomOutfit : cannot access class member GetAdditionalMaxWalkWeight!");
-//        return (false);
-//    }
-//    return (outfit->m_additional_weight);
-//}
-//void CScriptGameObject::SetAdditionalMaxWeight(float add_max_weight)
-//{
-//    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
-//    if (!outfit)
-//    {
-//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CCustomOutfit : cannot access class member SetAdditionalMaxWeight!");
-//        return;
-//    }
-//    outfit->m_additional_weight2 = add_max_weight;
-//}
-//void CScriptGameObject::SetAdditionalMaxWalkWeight(float add_max_walk_weight)
-//{
-//    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&object());
-//    if (!outfit)
-//    {
-//        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CCustomOutfit : cannot access class member SetAdditionalMaxWalkWeight!");
-//        return;
-//    }
-//    outfit->m_additional_weight = add_max_walk_weight;
-//}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // получить суммарный вес инвентаря

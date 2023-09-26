@@ -59,64 +59,16 @@ void CUICarBodyWnd::Init()
 
     xml_init.InitWindow(uiXml, "main", 0, this);
 
-    m_pUIStaticTop = xr_new<CUIStatic>();
-    m_pUIStaticTop->SetAutoDelete(true);
-    AttachChild(m_pUIStaticTop);
-    xml_init.InitStatic(uiXml, "top_background", 0, m_pUIStaticTop);
-
-    m_pUIStaticBottom = xr_new<CUIStatic>();
-    m_pUIStaticBottom->SetAutoDelete(true);
-    AttachChild(m_pUIStaticBottom);
-    xml_init.InitStatic(uiXml, "bottom_background", 0, m_pUIStaticBottom);
-
-    m_pUIOurIcon = xr_new<CUIStatic>();
-    m_pUIOurIcon->SetAutoDelete(true);
-    AttachChild(m_pUIOurIcon);
-    xml_init.InitStatic(uiXml, "static_icon", 0, m_pUIOurIcon);
-
-    m_pUIOthersIcon = xr_new<CUIStatic>();
-    m_pUIOthersIcon->SetAutoDelete(true);
-    AttachChild(m_pUIOthersIcon);
-    xml_init.InitStatic(uiXml, "static_icon", 1, m_pUIOthersIcon);
-
-    m_pUICharacterInfoLeft = xr_new<CUICharacterInfo>();
-    m_pUICharacterInfoLeft->SetAutoDelete(true);
-    m_pUIOurIcon->AttachChild(m_pUICharacterInfoLeft);
-    m_pUICharacterInfoLeft->Init(0, 0, m_pUIOurIcon->GetWidth(), m_pUIOurIcon->GetHeight(), "trade_character.xml");
-
-    m_pUICharacterInfoRight = xr_new<CUICharacterInfo>();
-    m_pUICharacterInfoRight->SetAutoDelete(true);
-    m_pUIOthersIcon->AttachChild(m_pUICharacterInfoRight);
-    m_pUICharacterInfoRight->Init(0, 0, m_pUIOthersIcon->GetWidth(), m_pUIOthersIcon->GetHeight(), "trade_character.xml");
-
-    m_pUIOurBagWnd = xr_new<CUIStatic>();
-    m_pUIOurBagWnd->SetAutoDelete(true);
-    AttachChild(m_pUIOurBagWnd);
-    xml_init.InitStatic(uiXml, "our_bag_static", 0, m_pUIOurBagWnd);
-
-    m_pUIOurWeightWnd = xr_new<CUIStatic>();
-    m_pUIOurWeightWnd->SetAutoDelete(true);
-    m_pUIOurBagWnd->AttachChild(m_pUIOurWeightWnd);
-    xml_init.InitStatic(uiXml, "our_weight_static", 0, m_pUIOurWeightWnd);
-
-    m_pUIOthersBagWnd = xr_new<CUIStatic>();
-    m_pUIOthersBagWnd->SetAutoDelete(true);
-    AttachChild(m_pUIOthersBagWnd);
-    xml_init.InitStatic(uiXml, "others_bag_static", 0, m_pUIOthersBagWnd);
-
-    m_pUIOthersLimitWnd = xr_new<CUIStatic>();
-    m_pUIOthersLimitWnd->SetAutoDelete(true);
-    m_pUIOthersBagWnd->AttachChild(m_pUIOthersLimitWnd);
-    xml_init.InitStatic(uiXml, "others_limit_static", 0, m_pUIOthersLimitWnd);
+    xml_init.InitAutoStatic(uiXml, "auto_static", this);
 
     m_pUIOurBagList = xr_new<CUIDragDropListEx>();
     m_pUIOurBagList->SetAutoDelete(true);
-    m_pUIOurBagWnd->AttachChild(m_pUIOurBagList);
+    AttachChild(m_pUIOurBagList);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_list_our", 0, m_pUIOurBagList);
 
     m_pUIOthersBagList = xr_new<CUIDragDropListEx>();
     m_pUIOthersBagList->SetAutoDelete(true);
-    m_pUIOthersBagWnd->AttachChild(m_pUIOthersBagList);
+    AttachChild(m_pUIOthersBagList);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_list_other", 0, m_pUIOthersBagList);
 
     // информация о предмете
@@ -125,8 +77,6 @@ void CUICarBodyWnd::Init()
     AttachChild(m_pUIItemInfo);
     m_pUIItemInfo->Init(CARBODY_ITEM_XML);
 
-    xml_init.InitAutoStatic(uiXml, "auto_static", this);
-
     m_pUIPropertiesBox = xr_new<CUIPropertiesBox>();
     m_pUIPropertiesBox->SetAutoDelete(true);
     AttachChild(m_pUIPropertiesBox);
@@ -134,27 +84,6 @@ void CUICarBodyWnd::Init()
     m_pUIPropertiesBox->Hide();
 
     SetCurrentItem(NULL);
-    //m_pUIStaticDesc->SetText(NULL);
-
-    m_pUITakeAll = xr_new<CUI3tButton>();
-    m_pUITakeAll->SetAutoDelete(true);
-    AttachChild(m_pUITakeAll);
-    xml_init.Init3tButton(uiXml, "take_all_btn", 0, m_pUITakeAll);
-
-    m_pUIExitButton = xr_new<CUI3tButton>();
-    m_pUIExitButton->SetAutoDelete(true);
-    AttachChild(m_pUIExitButton);
-    xml_init.Init3tButton(uiXml, "exit_button", 0, m_pUIExitButton);
-
-    m_pUIOrganizeButton = xr_new<CUI3tButton>();
-    m_pUIOrganizeButton->SetAutoDelete(true);
-    AttachChild(m_pUIOrganizeButton);
-    xml_init.Init3tButton(uiXml, "organize_button", 0, m_pUIOrganizeButton);
-
-    m_pUIMoveAllFromRuckButton = xr_new<CUI3tButton>();
-    m_pUIMoveAllFromRuckButton->SetAutoDelete(true);
-    AttachChild(m_pUIMoveAllFromRuckButton);
-    xml_init.Init3tButton(uiXml, "move_all_from_ruck_button", 0, m_pUIMoveAllFromRuckButton);
 
     BindDragDropListEvents(m_pUIOurBagList);
     BindDragDropListEvents(m_pUIOthersBagList);
@@ -186,19 +115,12 @@ void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, IInventoryBox* pInvBox)
     m_pActorGO = smart_cast<CGameObject*>(m_pActorInventoryOwner);
     m_pOtherGO = smart_cast<CGameObject*>(m_pOtherInventoryBox);
 
-    m_pUICharacterInfoLeft->InitCharacter(m_pActorGO->ID());
-    m_pUIOthersIcon->Show(false);
-    m_pUICharacterInfoRight->ClearInfo();
     m_pUIPropertiesBox->Hide();
-    EnableAll();
+
     UpdateLists();
 
-    m_pUIOthersLimitWnd->Show(m_pOtherInventoryBox->GetItemsLimit());
-
     if (auto obj = smart_cast<CInventoryBox*>(pInvBox))
-    {
         obj->callback(GameObject::eOnInvBoxOpen)();
-    }
 }
 
 void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryOwner* pOthers)
@@ -213,35 +135,11 @@ void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryOwner* pOthers)
     u16 our_id = m_pActorGO->ID();
     u16 other_id = m_pOtherGO->ID();
 
-    m_pUICharacterInfoLeft->InitCharacter(our_id);
-    m_pUIOthersIcon->Show(true);
-    m_pUIOthersLimitWnd->Show(false);
-
-    CBaseMonster* monster = NULL;
-    if (m_pOtherInventoryOwner)
-    {
-        monster = smart_cast<CBaseMonster*>(m_pOtherInventoryOwner);
-        if (monster || m_pOtherInventoryOwner->use_simplified_visual())
-        {
-            m_pUICharacterInfoRight->ClearInfo();
-            if (monster)
-            {
-                shared_str monster_tex_name = pSettings->r_string(monster->cNameSect(), "icon");
-                m_pUICharacterInfoRight->UIIcon().InitTexture(monster_tex_name.c_str());
-                m_pUICharacterInfoRight->UIIcon().SetStretchTexture(true);
-            }
-        }
-        else
-        {
-            m_pUICharacterInfoRight->InitCharacter(other_id);
-        }
-    }
-
     m_pUIPropertiesBox->Hide();
-    EnableAll();
+
     UpdateLists();
 
-    if (!monster)
+    if (!smart_cast<CBaseMonster*>(m_pOtherInventoryOwner))
     {
         CInfoPortionWrapper* known_info_registry = xr_new<CInfoPortionWrapper>();
         known_info_registry->registry().init(other_id);
@@ -278,6 +176,8 @@ void CUICarBodyWnd::Hide()
 
 void CUICarBodyWnd::UpdateLists()
 {
+    RepackAmmo();
+
     TIItemContainer ruck_list;
     m_pUIOurBagList->ClearAll(true);
     m_pUIOthersBagList->ClearAll(true);
@@ -321,7 +221,6 @@ void CUICarBodyWnd::UpdateLists()
         m_pUIOthersBagList->SetItem(itm);
     }
 
-    UpdateWeight();
     m_b_need_update = false;
 }
 
@@ -500,27 +399,7 @@ void CUICarBodyWnd::ActivatePropertiesBox()
 
 void CUICarBodyWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (BUTTON_CLICKED == msg)
-    {
-        if (m_pUITakeAll == pWnd)
-        {
-            TakeAll();
-        }
-        else if (m_pUIExitButton == pWnd)
-        {
-            GetHolder()->StartStopMenu(this, true);
-        }
-        else if (m_pUIOrganizeButton == pWnd)
-        {
-            RepackAmmo();
-            UpdateLists_delayed();
-        }
-        else if (m_pUIMoveAllFromRuckButton == pWnd)
-        {
-            MoveAllFromRuck();
-        }
-    }
-    else if (pWnd == m_pUIPropertiesBox && msg == PROPERTY_CLICKED)
+    if (pWnd == m_pUIPropertiesBox && msg == PROPERTY_CLICKED)
     {
         if (m_pUIPropertiesBox->GetClickedItem())
         {
@@ -634,7 +513,7 @@ void CUICarBodyWnd::Update()
     {
         GetHolder()->StartStopMenu(this, true);
     }
-    CheckForcedWeightUpdate();
+
     Actor()->UpdateCameraDirection(m_pOtherGO);
     inherited::Update();
 }
@@ -644,7 +523,6 @@ void CUICarBodyWnd::Show()
     InventoryUtilities::SendInfoToActor("ui_car_body");
     inherited::Show();
     SetCurrentItem(NULL);
-    UpdateWeight();
 
     if (const auto& actor = Actor())
     {
@@ -653,18 +531,6 @@ void CUICarBodyWnd::Show()
         RepackAmmo();
     }
     PlaySnd(eInvSndOpen);
-}
-
-void CUICarBodyWnd::DisableAll()
-{
-    m_pUIOurBagWnd->Enable(false);
-    m_pUIOthersBagWnd->Enable(false);
-}
-
-void CUICarBodyWnd::EnableAll()
-{
-    m_pUIOurBagWnd->Enable(true);
-    m_pUIOthersBagWnd->Enable(true);
 }
 
 CUICellItem* CUICarBodyWnd::CurrentItem() { return m_pCurrentCellItem; }
@@ -778,8 +644,6 @@ void CUICarBodyWnd::DropItems(bool b_all)
     old_owner->RemoveItem(ci, b_all);
 
     SetCurrentItem(NULL);
-
-    UpdateWeight();
 
     PlaySnd(eInvDropItem);
 }
@@ -933,39 +797,6 @@ bool CUICarBodyWnd::CanMoveToOther(PIItem pItem, CGameObject* owner_to) const
     else if (auto box = smart_cast<IInventoryBox*>(owner_to))
         can_move = box->CanTakeItem(pItem);
     return can_move;
-}
-
-void CUICarBodyWnd::UpdateWeight() 
-{ 
-    InventoryUtilities::UpdateWeight(*m_pUIOurWeightWnd);
-    if (m_pOtherInventoryBox)
-        InventoryUtilities::UpdateLimit(*m_pUIOthersLimitWnd, m_pOtherGO);
-}
-
-#include "InventoryContainer.h"
-void CUICarBodyWnd::CheckForcedWeightUpdate()
-{
-    bool need_update{};
-    auto place_to_search = m_pActorInventoryOwner->inventory().GetActiveArtefactPlace();
-    for (const auto& item : place_to_search)
-    {
-        auto artefact = smart_cast<CArtefact*>(item);
-        if (artefact && !fis_zero(artefact->GetCondition()) && !fis_zero(artefact->GetItemEffect(CInventoryItem::eAdditionalWeight)))
-        {
-            need_update = true;
-            break;
-        }
-        if (auto container = smart_cast<CInventoryContainer*>(item))
-        {
-            if (!fis_zero(container->GetContainmentArtefactEffect(CInventoryItem::eAdditionalWeight)))
-            {
-                need_update = true;
-                break;
-            }
-        }
-    }
-    if (need_update)
-        UpdateWeight();
 }
 
 void CUICarBodyWnd::DetachAddon(const char* addon_name, bool for_all)

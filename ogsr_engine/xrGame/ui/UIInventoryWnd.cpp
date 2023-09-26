@@ -57,26 +57,8 @@ void CUIInventoryWnd::Init()
 
     xml_init.InitWindow(uiXml, "main", 0, this);
 
-    AttachChild(&UIBeltSlots);
-    xml_init.InitStatic(uiXml, "belt_slots", 0, &UIBeltSlots);
-
-    AttachChild(&UIBack);
-    xml_init.InitStatic(uiXml, "back", 0, &UIBack);
-
-    AttachChild(&UIStaticBottom);
-    xml_init.InitStatic(uiXml, "bottom_static", 0, &UIStaticBottom);
-
-    AttachChild(&UIBagWnd);
-    xml_init.InitStatic(uiXml, "bag_static", 0, &UIBagWnd);
-
-    UIBagWnd.AttachChild(&UIWeightWnd);
-    xml_init.InitStatic(uiXml, "weight_static", 0, &UIWeightWnd);
-
     AttachChild(&UIItemInfo);
     UIItemInfo.Init(INVENTORY_ITEM_XML);
-
-    AttachChild(&UIPersonalWnd);
-    xml_init.InitFrameWindow(uiXml, "character_frame_window", 0, &UIPersonalWnd);
 
     AttachChild(&UIOutfitInfo);
     UIOutfitInfo.InitFromXml(uiXml);
@@ -86,7 +68,7 @@ void CUIInventoryWnd::Init()
     xml_init.InitAutoStatic(uiXml, "auto_static", this);
 
     m_pUIBagList = xr_new<CUIDragDropListEx>();
-    UIBagWnd.AttachChild(m_pUIBagList);
+    AttachChild(m_pUIBagList);
     m_pUIBagList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_bag", 0, m_pUIBagList);
     BindDragDropListEvents(m_pUIBagList);
@@ -219,16 +201,6 @@ void CUIInventoryWnd::Init()
     UIPropertiesBox.Init(0, 0, 300, 300);
     UIPropertiesBox.Hide();
 
-    UIExitButton = xr_new<CUI3tButton>();
-    UIExitButton->SetAutoDelete(true);
-    AttachChild(UIExitButton);
-    xml_init.Init3tButton(uiXml, "exit_button", 0, UIExitButton);
-
-    UIOrganizeButton = xr_new<CUI3tButton>();
-    UIOrganizeButton->SetAutoDelete(true);
-    AttachChild(UIOrganizeButton);
-    xml_init.Init3tButton(uiXml, "organize_button", 0, UIOrganizeButton);
-
     // Load sounds
 
     XML_NODE* stored_root = uiXml.GetLocalRoot();
@@ -321,7 +293,6 @@ void CUIInventoryWnd::Update()
             UIOutfitInfo.Update();
             m_b_need_update_stats = false;
         }
-        CheckForcedWeightUpdate();
     }
 
     CUIWindow::Update();
@@ -338,13 +309,6 @@ void CUIInventoryWnd::Show()
     PlaySnd(eInvSndOpen);
 
     m_b_need_update_stats = true;
-
-    if (const auto& actor = Actor())
-    {
-        if (auto act_item = smart_cast<CHudItem*>(actor->inventory().ActiveItem()); act_item && act_item->IsZoomed())
-            act_item->OnZoomOut();
-        m_pInv->RepackAmmo();
-    }
 }
 
 void CUIInventoryWnd::Hide()
@@ -516,29 +480,4 @@ void CUIInventoryWnd::UpdateCustomDraw(bool b_full_reinit)
 
     if (b_full_reinit)
         InitInventory_delayed();
-}
-#include "InventoryContainer.h"
-void CUIInventoryWnd::CheckForcedWeightUpdate()
-{
-    bool need_update{};
-    auto place_to_search = GetInventory()->GetActiveArtefactPlace();
-    for (const auto& item : place_to_search)
-    {
-        auto artefact = smart_cast<CArtefact*>(item);
-        if (artefact && !fis_zero(artefact->GetCondition()) && !fis_zero(artefact->GetItemEffect(CInventoryItem::eAdditionalWeight)))
-        {
-            need_update = true;
-            break;
-        }
-        if (auto container = smart_cast<CInventoryContainer*>(item))
-        {
-            if (!fis_zero(container->GetContainmentArtefactEffect(CInventoryItem::eAdditionalWeight)))
-            {
-                need_update = true;
-                break;
-            }
-        }
-    }
-    if (need_update)
-        UpdateWeight();
 }

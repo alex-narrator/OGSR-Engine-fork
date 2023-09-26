@@ -32,8 +32,6 @@ public:
     virtual void Show();
     virtual void Hide();
 
-    void DisableAll();
-    void EnableAll();
     virtual bool OnKeyboard(int dik, EUIMessages keyboard_action);
     virtual bool OnMouse(float x, float y, EUIMessages mouse_action);
 
@@ -44,6 +42,8 @@ public:
     void StopTrade();
 
     void UpdateLists_delayed();
+
+    void PerformTrade();
 
 protected:
     CUITradeInternal* m_uidata;
@@ -59,13 +59,12 @@ protected:
 
     void TransferItems(CUIDragDropListEx* pSellList, CUIDragDropListEx* pBuyList, CTrade* pTrade, bool bBuying);
 
-    void PerformTrade();
+    //void PerformTrade();
     void UpdatePrices();
     void ColorizeItem(CUICellItem* itm, bool canTrade, bool highlighted);
     void MoveItems(CUICellItem* itm, bool b_all);
     void DropItems(bool b_all); // выбросить предмет/стак предметов
     void EatItem();
-    void PerformDonation();
     void DetachAddon(const char* addon_name, bool);
 
     enum EListType

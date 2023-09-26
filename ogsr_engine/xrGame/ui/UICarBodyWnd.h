@@ -38,13 +38,10 @@ public:
     virtual void Show();
     virtual void Hide();
 
-    void DisableAll();
-    void EnableAll();
     virtual bool OnKeyboard(int dik, EUIMessages keyboard_action);
     virtual bool OnMouse(float x, float y, EUIMessages mouse_action);
 
     void UpdateLists_delayed();
-    void CheckForcedWeightUpdate();
     void RepackAmmo();
 
 protected:
@@ -53,27 +50,9 @@ protected:
     CUIDragDropListEx* m_pUIOurBagList;
     CUIDragDropListEx* m_pUIOthersBagList;
 
-    CUIStatic* m_pUIStaticTop;
-    CUIStatic* m_pUIStaticBottom;
-
     CUIItemInfo* m_pUIItemInfo;
 
-    CUIStatic* m_pUIOurBagWnd;
-    CUIStatic* m_pUIOthersBagWnd;
-
-    CUIStatic* m_pUIOurWeightWnd;
-    CUIStatic* m_pUIOthersLimitWnd;
-
-    // информация о персонажах
-    CUIStatic* m_pUIOurIcon;
-    CUIStatic* m_pUIOthersIcon;
-    CUICharacterInfo* m_pUICharacterInfoLeft;
-    CUICharacterInfo* m_pUICharacterInfoRight;
     CUIPropertiesBox* m_pUIPropertiesBox;
-    CUI3tButton* m_pUITakeAll;
-    CUI3tButton* m_pUIExitButton;
-    CUI3tButton* m_pUIOrganizeButton;
-    CUI3tButton* m_pUIMoveAllFromRuckButton;
 
 public:
     CUICellItem* m_pCurrentCellItem;
@@ -129,7 +108,6 @@ protected:
     void PlaySnd(eInventorySndAction a);
 
     bool CanMoveToOther(PIItem pItem, CGameObject* owner_to) const;
-    void UpdateWeight();
 
     CUICellItem* itm_to_descr{};
 };

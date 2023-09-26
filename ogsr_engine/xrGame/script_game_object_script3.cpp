@@ -190,6 +190,9 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("set_character_icon", &CScriptGameObject::SetCharacterIcon)
         .def("get_character_icon", &CScriptGameObject::GetCharacterIcon)
         .def("get_default_character_icon", &CScriptGameObject::GetDefaultCharacterIcon)
+            
+        .def("infinitive_money", &CScriptGameObject::InfinitiveMoney)
+        .def("perform_trade", &CScriptGameObject::PerformTrade)
 
         .def("get_actor_relation_flags", &CScriptGameObject::get_actor_relation_flags)
         .def("set_actor_relation_flags", &CScriptGameObject::set_actor_relation_flags)

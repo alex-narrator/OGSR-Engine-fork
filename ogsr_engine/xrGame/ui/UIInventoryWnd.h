@@ -73,22 +73,6 @@ protected:
     ref_sound sounds[eInvSndMax];
     void PlaySnd(eInventorySndAction a);
 
-    CUIStatic UIBeltSlots;
-    CUIStatic UIBack;
-    CUIStatic* UIRankFrame;
-    CUIStatic* UIRank{};
-
-    CUIStatic UIBagWnd;
-    CUIStatic UIWeightWnd;
-    CUIFrameWindow UIPersonalWnd;
-
-    CUI3tButton* UIExitButton;
-    CUI3tButton* UIOrganizeButton;
-
-    CUIStatic UIStaticBottom;
-
-    //CUIStatic UIStaticPersonal;
-
     CUIDragDropListEx* m_pUIBagList{};
     CUIDragDropListEx* m_pUIBeltList{};
     CUIDragDropListEx* m_pUIVestList{};
@@ -171,10 +155,8 @@ protected:
 
 public:
     PIItem CurrentIItem();
-    void UpdateWeight();
     // обновление отрисовки сетки пояса
     void UpdateCustomDraw(bool = true);
-    void CheckForcedWeightUpdate();
     void ReinitBeltList();
     void ReinitVestList();
     void ReinitSlotList(u32);

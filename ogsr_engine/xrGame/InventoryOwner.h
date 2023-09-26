@@ -48,7 +48,6 @@ public:
     virtual DLL_Pure* _construct();
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    void Init();
     virtual void Load(LPCSTR section);
     virtual void reinit();
     virtual void reload(LPCSTR section);
@@ -171,9 +170,6 @@ public:
     }
     IC const CSpecificCharacter& SpecificCharacter() const { return CharacterInfo().m_SpecificCharacter; };
     bool InfinitiveMoney() { return CharacterInfo().m_SpecificCharacter.MoneyDef().inf_money; }
-    
-    float GetDonateGoodwillK() { return CharacterInfo().m_SpecificCharacter.DonationDef().goodwill_k; }
-    bool CanTakeDonations() { return CharacterInfo().m_SpecificCharacter.DonationDef().can_take; }
 
     //установка группировки на клиентском и серверном объкте
     virtual void SetCommunity(CHARACTER_COMMUNITY_INDEX);

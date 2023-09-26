@@ -25,13 +25,12 @@ private:
 protected:
     //элементы декоративного интерфейса
     CUIFrameLineWnd* UIMainButtonsBackground;
-    CUIFrameLineWnd* UITimerBackground;
 
     // кнопки PDA
     CUITabControl* UITabControl;
 
     // Установить игровое время
-    void UpdateDateTime();
+    /*void UpdateDateTime();*/
     void DrawUpdatedSections();
 
 protected:
@@ -65,7 +64,7 @@ public:
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 
     virtual void Draw();
-    virtual void Update();
+    /*virtual void Update();*/
     virtual void Show();
     virtual void Hide();
     virtual bool OnMouse(float x, float y, EUIMessages mouse_action) override;

@@ -176,12 +176,6 @@ void CSpecificCharacter::load_shared(LPCSTR)
         MoneyDef().max_money = _max(MoneyDef().max_money, MoneyDef().min_money); // :)
     }
 
-    if (pXML->NavigateToNode(pXML->GetLocalRoot(), "donation", 0))
-    {
-        DonationDef().goodwill_k = pXML->ReadAttribFlt("donation", 0, "goodwill_k", 0.001);
-        DonationDef().can_take = !!pXML->ReadAttribInt("donation", 0, "can_take", 1);
-    }
-
 #endif
 
 #if 0

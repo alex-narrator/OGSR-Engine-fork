@@ -85,12 +85,6 @@ void CUIPdaWnd::Init()
     UIMainPdaFrame->AttachChild(UIMainButtonsBackground);
     xml_init.InitFrameLine(uiXml, "mbbackground_frame_line", 0, UIMainButtonsBackground);
 
-    // Timer background
-    UITimerBackground = xr_new<CUIFrameLineWnd>();
-    UITimerBackground->SetAutoDelete(true);
-    UIMainPdaFrame->AttachChild(UITimerBackground);
-    xml_init.InitFrameLine(uiXml, "timer_frame_line", 0, UITimerBackground);
-
     // Oкно карты
     UIMapWnd = xr_new<CUIMapWnd>();
     UIMapWnd->Init("pda_map.xml", "map_wnd");
@@ -235,26 +229,6 @@ void CUIPdaWnd::Hide()
     inherited::Hide();
     InventoryUtilities::SendInfoToActor("ui_pda_hide");
     HUD().GetUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, false);
-}
-
-void CUIPdaWnd::UpdateDateTime()
-{
-    static shared_str prevStrTime = " ";
-    xr_string strTime = *InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes);
-    strTime += " ";
-    strTime += *InventoryUtilities::GetGameDateAsString(InventoryUtilities::edpDateToDay);
-
-    if (xr_strcmp(strTime.c_str(), prevStrTime))
-    {
-        UITimerBackground->UITitleText.SetText(strTime.c_str());
-        prevStrTime = strTime.c_str();
-    }
-}
-
-void CUIPdaWnd::Update()
-{
-    inherited::Update();
-    UpdateDateTime();
 }
 
 void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)

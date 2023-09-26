@@ -40,17 +40,10 @@ public:
     //список вопросов, которые мы можем задавать персонажу
 
     //элементы интерфейса диалога
-    CUIFrameLineWnd UIDialogFrame;
-    CUIFrameLineWnd UIOurPhrasesFrame;
-
-    CUIStatic UIStaticTop;
-    CUIStatic UIStaticBottom;
-
-    CUI3tButton UIToTradeButton;
+    CUIStatic UIDialog;
+    CUIStatic UIOurPhrases;
 
     //информация о персонажах
-    CUIStatic UIOurIcon;
-    CUIStatic UIOthersIcon;
     CUICharacterInfo UICharacterInfoLeft;
     CUICharacterInfo UICharacterInfoRight;
 
