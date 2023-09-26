@@ -204,7 +204,7 @@ void CUITalkWnd::Draw() { inherited::Draw(); }
 
 void CUITalkWnd::Show()
 {
-    InventoryUtilities::SendInfoToActor("ui_dialog");
+    InventoryUtilities::SendInfoToActor("ui_talk");
     InitTalkDialog();
     inherited::Show();
 }
@@ -213,7 +213,7 @@ void CUITalkWnd::Show()
 
 void CUITalkWnd::Hide()
 {
-    InventoryUtilities::SendInfoToActor("ui_dialog_hide");
+    InventoryUtilities::SendInfoToActor("ui_talk_hide");
     StopSnd();
     inherited::Hide();
     UITradeWnd->Hide();

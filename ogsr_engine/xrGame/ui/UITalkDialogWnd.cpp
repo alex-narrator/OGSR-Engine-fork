@@ -74,7 +74,7 @@ void CUITalkDialogWnd::Init(float x, float y, float width, float height)
 #include "../string_table.h"
 void CUITalkDialogWnd::Show()
 {
-    InventoryUtilities::SendInfoToActor("ui_talk");
+    InventoryUtilities::SendInfoToActor("ui_dialog");
     inherited::Show(true);
     inherited::Enable(true);
     ResetAll();
@@ -82,7 +82,7 @@ void CUITalkDialogWnd::Show()
 
 void CUITalkDialogWnd::Hide()
 {
-    InventoryUtilities::SendInfoToActor("ui_talk_hide");
+    InventoryUtilities::SendInfoToActor("ui_dialog_hide");
     inherited::Show(false);
     inherited::Enable(false);
 }
