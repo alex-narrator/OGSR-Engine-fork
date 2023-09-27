@@ -149,6 +149,8 @@ public:
 
     bool m_bBeltVertical{}, m_bVestVertical{};
 
+    bool m_bBlockDetector{};
+
 protected:
     void UpdateDropTasks();
     void UpdateDropItem(PIItem pIItem);

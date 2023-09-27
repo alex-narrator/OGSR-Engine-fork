@@ -474,6 +474,8 @@ bool CCustomDetector::IsBlocked()
     auto actor = smart_cast<CActor*>(H_Parent());
     if (!actor)
         return false;
+    if (actor->inventory().m_bBlockDetector)
+        return true;
     if (actor->character_physics_support()->movement()->PHCapture())
         return true;
     if (auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame()))
