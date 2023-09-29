@@ -3,12 +3,13 @@
 #include "ParticlesObject.h"
 #include "PhysicsShell.h"
 #include "xr_level_controller.h"
+#include "Inventory.h"
 
 CBolt::CBolt(void)
 {
     m_weight = .1f;
     SetSlot(BOLT_SLOT);
-    m_flags.set(Fruck, FALSE);
+    m_flags.set(Fruck, Core.Features.test(xrCore::Feature::limited_bolts));
     m_thrower_id = u16(-1);
 }
 
@@ -37,12 +38,16 @@ void CBolt::Throw()
     CMissile* l_pBolt = smart_cast<CMissile*>(m_fake_missile);
     if (!l_pBolt)
         return;
+
+    if (m_pCurrentInventory)
+        l_pBolt->m_flags.set(FCanTake, m_pCurrentInventory->OwnerIsActor() && Core.Features.test(xrCore::Feature::limited_bolts));
+
     l_pBolt->set_destroy_time(u32(m_dwDestroyTimeMax / phTimefactor));
     inherited::Throw();
     spawn_fake_missile();
 }
 
-bool CBolt::Useful() const { return false; }
+bool CBolt::Useful() const { return /*false;*/ CanTake(); }
 
 bool CBolt::Action(s32 cmd, u32 flags)
 {
@@ -62,3 +67,21 @@ void CBolt::activate_physic_shell()
 void CBolt::SetInitiator(u16 id) { m_thrower_id = id; }
 
 u16 CBolt::Initiator() { return m_thrower_id; }
+
+void CBolt::State(u32 state, u32 oldState)
+{
+    switch (state)
+    {
+    case eThrowEnd: {
+        if (m_pPhysicsShell)
+            m_pPhysicsShell->Deactivate();
+        xr_delete(m_pPhysicsShell);
+        m_dwDestroyTime = 0xffffffff;
+
+        if (Local() && m_pCurrentInventory->OwnerIsActor() && Core.Features.test(xrCore::Feature::limited_bolts))
+            DestroyObject();
+    }
+    break;
+    };
+    inherited::State(state, oldState);
+}

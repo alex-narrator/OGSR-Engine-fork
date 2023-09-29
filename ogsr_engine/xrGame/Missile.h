@@ -50,8 +50,6 @@ public:
     virtual void State(u32 state, u32 oldState);
     virtual void OnStateSwitch(u32 S, u32 oldState);
     virtual void PlayAnimIdle();
-    //virtual void PlayAnimDeviceSwitch() override;
-    virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
 
 protected:
     virtual void UpdateXForm();

@@ -43,7 +43,6 @@ public:
 
     virtual void Deactivate(bool = false);
     virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
-    virtual bool StopSprintOnFire() { return false; }
 
 protected:
     //HUD_SOUND sndCheckout;

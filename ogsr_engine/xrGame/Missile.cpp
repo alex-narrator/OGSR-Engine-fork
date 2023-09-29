@@ -770,13 +770,6 @@ void CMissile::ExitContactCallback(bool& do_colide, bool bo1, dContact& c, SGame
     }
 }
 
-void CMissile::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
-{
-    str_name = NameShort();
-    str_count = "";
-    icon_sect_name = "";
-}
-
 float CMissile::GetMaxForce() const 
 { 
     float res = m_fMaxForce;

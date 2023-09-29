@@ -991,10 +991,7 @@ void CSE_ALifeItemBolt::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE
 
 void CSE_ALifeItemBolt::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); };
 
-bool CSE_ALifeItemBolt::can_save() const
-{
-    return (false); //! attached());
-}
+bool CSE_ALifeItemBolt::can_save() const {return Core.Features.test(xrCore::Feature::limited_bolts); } //(false); //! attached()); }
 bool CSE_ALifeItemBolt::used_ai_locations() const { return false; }
 
 ////////////////////////////////////////////////////////////////////////////

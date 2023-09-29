@@ -157,6 +157,12 @@ void CUIInventoryWnd::Init()
     xml_init.InitDragDropListEx(uiXml, "dragdrop_artefact", 0, m_pUIArtefactList);
     BindDragDropListEvents(m_pUIArtefactList);
 
+    m_pUIBoltList = xr_new<CUIDragDropListEx>();
+    AttachChild(m_pUIBoltList);
+    m_pUIBoltList->SetAutoDelete(true);
+    xml_init.InitDragDropListEx(uiXml, "dragdrop_bolt", 0, m_pUIBoltList);
+    BindDragDropListEvents(m_pUIBoltList);
+
     m_pUIDetectorList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIDetectorList);
     m_pUIDetectorList->SetAutoDelete(true);
@@ -191,6 +197,7 @@ void CUIInventoryWnd::Init()
 
     m_slots_array[GRENADE_SLOT] = m_pUIGrenadeList;
     m_slots_array[ARTEFACT_SLOT] = m_pUIArtefactList;
+    m_slots_array[BOLT_SLOT] = m_pUIBoltList;
 
     m_slots_array[DETECTOR_SLOT] = m_pUIDetectorList;
     m_slots_array[TORCH_SLOT] = m_pUIOnHeadList;

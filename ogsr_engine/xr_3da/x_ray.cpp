@@ -102,6 +102,7 @@ void InitConsole()
     CORE_FEATURE_SET(stop_anim_playing, "features");
     CORE_FEATURE_SET(use_luminocity, "features");
     CORE_FEATURE_SET(no_progress_bar_animation, "features");
+    CORE_FEATURE_SET(limited_bolts, "features");
 }
 
 void InitInput() { pInput = xr_new<CInput>(); }

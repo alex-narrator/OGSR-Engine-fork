@@ -28,7 +28,7 @@ public:
     virtual BOOL UsedAI_Locations() { return FALSE; }
     virtual IDamageSource* cast_IDamageSource() { return this; }
 
-    virtual bool StopSprintOnFire() { return false; }
+    virtual void State(u32 state, u32 oldState);
 
 protected:
     virtual size_t GetWeaponTypeForCollision() const override { return Bolt; }

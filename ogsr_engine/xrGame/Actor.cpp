@@ -1466,7 +1466,7 @@ void CActor::SetMissileOffset(const Fvector& vNewOffset) { m_vMissileOffset.set(
 void CActor::spawn_supplies()
 {
     inherited::spawn_supplies();
-    CInventoryOwner::spawn_supplies();
+    //CInventoryOwner::spawn_supplies();
 }
 
 void CActor::AnimTorsoPlayCallBack(CBlend* B)

@@ -91,6 +91,7 @@ protected:
 
     CUIDragDropListEx* m_pUIGrenadeList{};
     CUIDragDropListEx* m_pUIArtefactList{};
+    CUIDragDropListEx* m_pUIBoltList{};
 
     CUIDragDropListEx* m_pUIDetectorList{};
     CUIDragDropListEx* m_pUIOnHeadList{};

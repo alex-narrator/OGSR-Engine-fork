@@ -129,6 +129,13 @@ void CUIInventoryWnd::InitInventory()
         m_pUIArtefactList->SetItem(itm);
     }
 
+    _itm = m_pInv->m_slots[BOLT_SLOT].m_pIItem;
+    if (_itm && show_item(_itm))
+    {
+        CUICellItem* itm = create_cell_item(_itm);
+        m_pUIBoltList->SetItem(itm);
+    }
+
     _itm = m_pInv->m_slots[DETECTOR_SLOT].m_pIItem;
     if (_itm && show_item(_itm))
     {
@@ -470,7 +477,7 @@ bool CUIInventoryWnd::OnItemSelected(CUICellItem* itm)
                         //
                         m_pUIKnifeList, m_pUIFirstWeaponList, m_pUISecondWeaponList, m_pUIBinocularList,
                         //
-                        m_pUIGrenadeList, m_pUIArtefactList,
+                        m_pUIGrenadeList, m_pUIArtefactList, m_pUIBoltList,
                         //
                         m_pUIDetectorList, m_pUIOnHeadList, m_pUIPdaList});
     return false;
@@ -695,6 +702,7 @@ void CUIInventoryWnd::ClearAllLists()
     //
     m_pUIGrenadeList->ClearAll(true);
     m_pUIArtefactList->ClearAll(true);
+    m_pUIBoltList->ClearAll(true);
     //
     m_pUIDetectorList->ClearAll(true);
     m_pUIOnHeadList->ClearAll(true);
