@@ -476,10 +476,6 @@ bool CCustomDetector::IsBlocked()
         return false;
     if (actor->inventory().m_bBlockDetector)
         return true;
-    if (actor->character_physics_support()->movement()->PHCapture())
-        return true;
-    if (auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame()))
-        return pGameSP->IsDialogsShown();
     return false;
 }
 
