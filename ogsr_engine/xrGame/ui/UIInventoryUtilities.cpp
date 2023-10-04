@@ -643,54 +643,6 @@ u32 InventoryUtilities::GetRelationColor(ALife::ERelationType relation)
 #endif
 }
 
-void AttachUpgradeIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
-{
-    CUIStatic* upgrade_icon = xr_new<CUIStatic>();
-    upgrade_icon->SetAutoDelete(true);
-
-    CIconParams params(_item->m_upgrade_icon_sect);
-    Frect rect = params.original_rect();
-    params.set_shader(upgrade_icon);
-
-    float k_x{UI()->get_current_kx()};
-
-    Fvector2 size{rect.width(), rect.height()};
-    size.mul(_scale);
-    size.x *= k_x;
-
-    Fvector2 pos{_item->m_upgrade_icon_offset};
-    pos.mul(_scale);
-    pos.x *= k_x;
-
-    upgrade_icon->SetWndRect(pos.x, pos.y, size.x, size.y);
-    upgrade_icon->SetColor(color_rgba(255, 255, 255, 192));
-    _main_icon->AttachChild(upgrade_icon);
-}
-
-void AttachMarkedIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
-{
-    CUIStatic* marked_icon = xr_new<CUIStatic>();
-    marked_icon->SetAutoDelete(true);
-
-    CIconParams params(_item->m_marked_icon_sect);
-    Frect rect = params.original_rect();
-    params.set_shader(marked_icon);
-
-    float k_x{UI()->get_current_kx()};
-
-    Fvector2 size{rect.width(), rect.height()};
-    size.mul(_scale);
-    size.x *= k_x;
-
-    Fvector2 pos{_item->m_marked_icon_offset};
-    pos.mul(_scale);
-    pos.x *= k_x;
-
-    marked_icon->SetWndRect(pos.x, pos.y, size.x, size.y);
-    marked_icon->SetColor(color_rgba(255, 255, 255, 192));
-    _main_icon->AttachChild(marked_icon);
-}
-
 void AttachWpnAddonIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
 {
     auto wpn = smart_cast<CWeapon*>(_item);
@@ -751,49 +703,15 @@ void AttachGrenadeIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
     _main_icon->AttachChild(grenade_icon);
 }
 
-void AttachAmmoIcon(CUIStatic* _main_icon, PIItem _item, float _scale)
-{
-    auto ammo = smart_cast<CWeaponAmmo*>(_item);
-    CUIStatic* ammo_icon = xr_new<CUIStatic>();
-    ammo_icon->SetAutoDelete(true);
-
-    CIconParams params(ammo->m_ammoSect);
-    Frect rect = params.original_rect();
-    params.set_shader(ammo_icon);
-
-    float k_x{UI()->get_current_kx()};
-
-    Fvector2 size{rect.width(), rect.height()};
-    size.mul(_scale * ammo->ammo_icon_scale);
-    size.x *= k_x;
-
-    Fvector2 pos{ammo->ammo_icon_ofset};
-    pos.mul(_scale);
-    pos.x *= k_x;
-
-    ammo_icon->SetWndRect(pos.x, pos.y, size.x, size.y);
-    ammo_icon->SetColor(color_rgba(255, 255, 255, 192));
-    _main_icon->AttachChild(ammo_icon);
-}
-
 void InventoryUtilities::TryAttachIcons(CUIStatic* _main_icon, PIItem _item, float _scale)
 {
     _main_icon->DetachAll();
 
-    if (!!_item->m_upgrade_icon_sect)
-        AttachUpgradeIcon(_main_icon, _item, _scale);
-    if (_item->GetMarked() && !!_item->m_marked_icon_sect)
-        AttachMarkedIcon(_main_icon, _item, _scale);
     if (smart_cast<CWeapon*>(_item))
     {
         AttachWpnAddonIcons(_main_icon, _item, _scale);
         if (smart_cast<CWeaponRPG7*>(_item))
             AttachGrenadeIcon(_main_icon, _item, _scale);
-        return;
-    }
-    if (auto ammo = smart_cast<CWeaponAmmo*>(_item); ammo && ammo->IsBoxReloadable() && ammo->m_boxCurr)
-    {
-        AttachAmmoIcon(_main_icon, _item, _scale);
         return;
     }
 }

@@ -79,8 +79,7 @@ public:
     void SpawnAmmo(u32 boxCurr = 0xffffffff, LPCSTR ammoSect = NULL);
     bool IsDirectReload(CWeaponAmmo*);
 
-    float ammo_icon_scale{};
-    Fvector2 ammo_icon_ofset{};
+    LPCSTR GetAmmoSect() { return m_ammoSect.c_str(); }
 
 public:
     virtual CInventoryItem* can_make_killing(const CInventory* inventory) const;

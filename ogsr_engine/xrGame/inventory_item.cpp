@@ -168,9 +168,6 @@ void CInventoryItem::Load(LPCSTR section)
     eHandDependence = EHandDependence(READ_IF_EXISTS(pSettings, r_u32, section, "hand_dependence", hdNone));
     m_bIsSingleHanded = READ_IF_EXISTS(pSettings, r_bool, section, "single_handed", TRUE);
 
-    m_upgrade_icon_sect = READ_IF_EXISTS(pSettings, r_string, section, "upgrade_icon_sect", nullptr);
-    m_upgrade_icon_offset = READ_IF_EXISTS(pSettings, r_fvector2, section, "upgrade_icon_ofset", Fvector2{});
-
     m_sAttachMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_attach_tip", "st_attach");
     m_sDetachMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_detach_tip", "st_detach");
 
@@ -219,9 +216,6 @@ void CInventoryItem::Load(LPCSTR section)
             m_slots_unlocked.push_back(atoi(_GetItem(str, i, item_section)));
         }
     }
-
-    m_marked_icon_sect = READ_IF_EXISTS(pSettings, r_string, section, "marked_icon_sect", nullptr);
-    m_marked_icon_offset = READ_IF_EXISTS(pSettings, r_fvector2, section, "marked_icon_ofset", Fvector2{});
 }
 
 void CInventoryItem::ChangeCondition(float fDeltaCondition)

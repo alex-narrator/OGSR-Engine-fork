@@ -12,12 +12,6 @@ class CUIInventoryCellItem : public CUICellItem
 protected:
     bool b_auto_drag_childs;
 
-    CUIStatic* m_upgrade{};
-    CUIStatic* CreateUpgradeIcon();
-
-    CUIStatic* m_marked{};
-    CUIStatic* CreateMarkedIcon();
-
 public:
     CUIInventoryCellItem(CInventoryItem* itm);
     virtual void Update();
@@ -58,8 +52,6 @@ class CUIAmmoCellItem : public CUIInventoryCellItem
     typedef CUIInventoryCellItem inherited;
 
 protected:
-    CUIStatic* m_ammo_in_box{};
-    CUIStatic* CreateAmmoInBoxIcon();
     virtual void UpdateItemText();
 
 public:

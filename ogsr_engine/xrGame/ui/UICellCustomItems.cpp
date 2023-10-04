@@ -112,10 +112,6 @@ bool CUIInventoryCellItem::OnMouse(float x, float y, EUIMessages action)
 CUIDragItem* CUIInventoryCellItem::CreateDragItem()
 {
     CUIDragItem* i = inherited::CreateDragItem();
-    if (m_upgrade)
-        i->wnd()->AttachChild(CreateUpgradeIcon());
-    if (m_marked)
-        i->wnd()->AttachChild(CreateMarkedIcon());
     if (!b_auto_drag_childs)
         return i;
 
@@ -163,69 +159,6 @@ void CUIInventoryCellItem::Update()
     }
     if (Core.Features.test(xrCore::Feature::show_inv_item_condition))
         UpdateConditionProgressBar();
-
-    if (!!object()->m_upgrade_icon_sect && !m_upgrade)
-    {
-        m_upgrade = CreateUpgradeIcon();
-        AttachChild(m_upgrade);
-    }
-
-    if (object()->GetMarked() && !!object()->m_marked_icon_sect && !m_marked)
-    {
-        m_marked = CreateMarkedIcon();
-        AttachChild(m_marked);
-    }
-    else if (!object()->GetMarked() && m_marked)
-    {
-        DetachChild(m_marked);
-        m_marked = nullptr;
-    }
-}
-
-CUIStatic* CUIInventoryCellItem::CreateUpgradeIcon()
-{
-    auto upgrade_icon = xr_new<CUIStatic>();
-    upgrade_icon->SetAutoDelete(true);
-    CIconParams params(object()->m_upgrade_icon_sect);
-    params.set_shader(upgrade_icon);
-
-    Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
-    Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
-
-    Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
-    size.mul(base_scale);
-    upgrade_icon->SetWndSize(size);
-
-    Fvector2 pos{object()->m_upgrade_icon_offset};
-    pos.mul(base_scale);
-    upgrade_icon->SetWndPos(pos);
-
-    upgrade_icon->SetStretchTexture(true);
-
-    return upgrade_icon;
-}
-
-CUIStatic* CUIInventoryCellItem::CreateMarkedIcon()
-{
-    auto marked_icon = xr_new<CUIStatic>();
-    marked_icon->SetAutoDelete(true);
-    CIconParams params(object()->m_marked_icon_sect);
-    params.set_shader(marked_icon);
-
-    Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
-    Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
-
-    Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
-    size.mul(base_scale);
-    marked_icon->SetWndSize(size);
-
-    Fvector2 pos{object()->m_marked_icon_offset};
-    pos.mul(base_scale);
-    marked_icon->SetWndPos(pos);
-
-    marked_icon->SetStretchTexture(true);
-
-    return marked_icon;
 }
 
 CUIAmmoCellItem::CUIAmmoCellItem(CWeaponAmmo* itm) : inherited(itm) {}
@@ -246,22 +179,7 @@ void CUIAmmoCellItem::Update()
 {
     inherited::Update();
     if (object()->IsBoxReloadable())
-    {
         inherited::UpdateItemText();
-        if (object()->m_boxCurr)
-        {
-            if (!m_ammo_in_box)
-            {
-                m_ammo_in_box = CreateAmmoInBoxIcon();
-                AttachChild(m_ammo_in_box);
-            }
-        }
-        else if (m_ammo_in_box)
-        {
-            DetachChild(m_ammo_in_box);
-            m_ammo_in_box = nullptr;
-        }
-    }
     else
         UpdateItemText();
 }
@@ -298,30 +216,6 @@ void CUIAmmoCellItem::UpdateItemText()
         else
             SetText("");
     }
-}
-
-CUIStatic* CUIAmmoCellItem::CreateAmmoInBoxIcon()
-{ 
-    auto ammo_icon = xr_new<CUIStatic>();
-    ammo_icon->SetAutoDelete(true);
-    CIconParams params(object()->m_ammoSect);
-    params.set_shader(ammo_icon);
-
-    Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
-    Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
-
-    Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
-    size.mul(base_scale);
-    size.mul(object()->ammo_icon_scale);
-    ammo_icon->SetWndSize(size);
-
-    Fvector2 pos{object()->ammo_icon_ofset};
-    pos.mul(base_scale);
-    ammo_icon->SetWndPos(pos);
-
-    ammo_icon->SetStretchTexture(true);
-
-    return ammo_icon;
 }
 
 CUIEatableCellItem::CUIEatableCellItem(CEatableItem* itm) : inherited(itm) {}

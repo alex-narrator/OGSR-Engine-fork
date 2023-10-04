@@ -340,13 +340,8 @@ public:
     virtual void Drop();
     void Transfer(u16 from_id, u16 to_id = u16(-1));
 
-    shared_str m_upgrade_icon_sect{};
-    Fvector2 m_upgrade_icon_offset{};
-
     bool GetMarked() { return m_bIsMarkedItem; };
     void SetMarked(bool val) { m_bIsMarkedItem = val; };
-    shared_str m_marked_icon_sect{};
-    Fvector2 m_marked_icon_offset{};
 
 protected:
     HitImmunity::HitTypeSVec m_HitTypeProtection;

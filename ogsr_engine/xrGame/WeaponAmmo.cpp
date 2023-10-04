@@ -121,9 +121,6 @@ void CWeaponAmmo::Load(LPCSTR section)
             sndLoad.create(pSettings->r_string(section, "load_sound"), st_Effect, sg_SourceType);
         if (pSettings->line_exist(section, "unload_sound"))
             sndUnload.create(pSettings->r_string(section, "unload_sound"), st_Effect, sg_SourceType);
-
-        ammo_icon_scale = READ_IF_EXISTS(pSettings, r_float, section, "ammo_icon_scale", 0.5f);
-        ammo_icon_ofset = READ_IF_EXISTS(pSettings, r_fvector2, section, "ammo_icon_ofset", Fvector2{});
         //
         return;
     }
