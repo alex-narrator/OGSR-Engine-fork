@@ -15,6 +15,8 @@
 #include "WeaponBinoculars.h"
 #include "CustomOutfit.h"
 #include "UICellCustomItems.h"
+#include "Vest.h"
+#include "script_game_object.h"
 
 CUICellItem* CUICellItem::m_mouse_selected_item = nullptr;
 
@@ -239,7 +241,16 @@ void CUICellItem::UpdateConditionProgressBar()
                 m_condition_auto_width = false;
             float y = itm_grid_size.y * (cell_size.y + cell_space.y) - m_pConditionState->GetHeight() - 2.f;
             m_pConditionState->SetWndPos(Fvector2().set(x, y));
-            m_pConditionState->SetProgressPos(itm->GetCondition() * 100.0f);
+
+            float val = itm->GetCondition();
+            if (pSettings->line_exist("engine_callbacks", "cell_item_condition_callback"))
+            {
+                const char* callback = pSettings->r_string("engine_callbacks", "cell_item_condition_callback");
+                if (luabind::functor<float> lua_function; ai().script_engine().functor(callback, lua_function))
+                    val = lua_function(itm->object().lua_game_object());
+            }
+
+            m_pConditionState->SetProgressPos(val);
             m_pConditionState->Show(true);
             return;
         }
@@ -328,6 +339,14 @@ void CUICellItem::Update()
 
     inherited::Update();
     m_b_already_drawn = false;
+
+    if (m_pData && pSettings->line_exist("engine_callbacks", "on_cell_item_update"))
+    {
+        PIItem itm = (PIItem)m_pData;
+        const char* callback = pSettings->r_string("engine_callbacks", "on_cell_item_update");
+        if (luabind::functor<LPCSTR> lua_function; ai().script_engine().functor(callback, lua_function))
+            lua_function(itm->object().lua_game_object(), (CUIWindow*)this);
+    }
 }
 
 void CUICellItem::ColorizeItems(std::initializer_list<CUIDragDropListEx*> args)

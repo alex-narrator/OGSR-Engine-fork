@@ -331,6 +331,9 @@ void CWeaponAmmo::UnloadBox()
         m_boxCurr = 0;
     }
 
+    m_cur_ammo_type = 0;
+    m_ammoSect = m_ammoTypes[m_cur_ammo_type];
+
     if (pSettings->line_exist(cNameSect(), "unload_sound"))
     {
         if (sndUnload._feedback())

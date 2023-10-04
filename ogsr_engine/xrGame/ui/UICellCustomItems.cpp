@@ -29,24 +29,6 @@ CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
     b_auto_drag_childs = true;
 }
 
-void CUIInventoryCellItem::init_add()
-{
-    static CUIXml uiXml;
-    static bool is_xml_ready = false;
-    if (!is_xml_ready)
-    {
-        bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, "inventory_new.xml");
-        R_ASSERT3(xml_result, "file parsing error ", uiXml.m_xml_file_name);
-        is_xml_ready = true;
-    }
-
-    m_text_add = xr_new<CUIStatic>();
-    m_text_add->SetAutoDelete(true);
-    AttachChild(m_text_add);
-    CUIXmlInit::InitStatic(uiXml, "cell_item_text_add", 0, m_text_add);
-    m_text_add->Show(false);
-}
-
 bool CUIInventoryCellItem::EqualTo(CUICellItem* itm)
 {
     CUIInventoryCellItem* ci = smart_cast<CUIInventoryCellItem*>(itm);
@@ -145,9 +127,6 @@ CUIDragItem* CUIInventoryCellItem::CreateDragItem()
             if (Core.Features.test(xrCore::Feature::show_inv_item_condition))
                 if (s_child == m_text)
                     continue;
-
-            if (s_child == m_text_add)
-                continue;
 
             s = xr_new<CUIStatic>();
             s->SetAutoDelete(true);
@@ -249,13 +228,7 @@ CUIStatic* CUIInventoryCellItem::CreateMarkedIcon()
     return marked_icon;
 }
 
-CUIAmmoCellItem::CUIAmmoCellItem(CWeaponAmmo* itm) : inherited(itm)
-{
-    if (itm->IsBoxReloadable())
-    {
-        init_add();
-    }
-}
+CUIAmmoCellItem::CUIAmmoCellItem(CWeaponAmmo* itm) : inherited(itm) {}
 
 bool CUIAmmoCellItem::EqualTo(CUICellItem* itm)
 {
@@ -273,65 +246,24 @@ void CUIAmmoCellItem::Update()
 {
     inherited::Update();
     if (object()->IsBoxReloadable())
-        UpdateItemTextCustom();
-    else
-        UpdateItemText();
-}
-
-CUIStatic* CUIAmmoCellItem::CreateAmmoInBoxIcon()
-{ 
-    auto ammo_icon = xr_new<CUIStatic>();
-    ammo_icon->SetAutoDelete(true);
-    CIconParams params(object()->m_ammoSect);
-    params.set_shader(ammo_icon);
-
-    Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
-    Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
-
-    Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
-    size.mul(base_scale);
-    size.mul(object()->ammo_icon_scale);
-    ammo_icon->SetWndSize(size);
-
-    Fvector2 pos{object()->ammo_icon_ofset};
-    pos.mul(base_scale);
-    ammo_icon->SetWndPos(pos);
-
-    ammo_icon->SetStretchTexture(true);
-
-    return ammo_icon;
-}
-
-void CUIAmmoCellItem::UpdateItemTextCustom()
-{
-    inherited::UpdateItemText();
-
-    if (!m_text_add)
-        return;
-
-    string32 str;
-    sprintf_s(str, "%d/%d", object()->m_boxCurr, object()->m_boxSize);
-
-    Fvector2 pos{GetWidth() - m_text_add->GetWidth(), GetHeight() - m_text_add->GetHeight()};
-
-    m_text_add->SetWndPos(pos);
-    m_text_add->SetText(str);
-    m_text_add->Show(true);
-    BringToTop(m_text_add);
-
-    if (object()->m_boxCurr)
     {
-        if (!m_ammo_in_box)
+        inherited::UpdateItemText();
+        if (object()->m_boxCurr)
         {
-            m_ammo_in_box = CreateAmmoInBoxIcon();
-            AttachChild(m_ammo_in_box);
+            if (!m_ammo_in_box)
+            {
+                m_ammo_in_box = CreateAmmoInBoxIcon();
+                AttachChild(m_ammo_in_box);
+            }
+        }
+        else if (m_ammo_in_box)
+        {
+            DetachChild(m_ammo_in_box);
+            m_ammo_in_box = nullptr;
         }
     }
-    else if (m_ammo_in_box)
-    {
-        DetachChild(m_ammo_in_box);
-        m_ammo_in_box = nullptr;
-    }
+    else
+        UpdateItemText();
 }
 
 void CUIAmmoCellItem::UpdateItemText()
@@ -368,87 +300,31 @@ void CUIAmmoCellItem::UpdateItemText()
     }
 }
 
-CUIWarbeltCellItem::CUIWarbeltCellItem(CWarbelt* itm) : inherited(itm) { init_add(); }
-void CUIWarbeltCellItem::Update()
-{
-    inherited::Update();
-    UpdateItemText();
-}
-void CUIWarbeltCellItem::UpdateItemText()
-{
-    inherited::UpdateItemText();
+CUIStatic* CUIAmmoCellItem::CreateAmmoInBoxIcon()
+{ 
+    auto ammo_icon = xr_new<CUIStatic>();
+    ammo_icon->SetAutoDelete(true);
+    CIconParams params(object()->m_ammoSect);
+    params.set_shader(ammo_icon);
 
-    string32 str;
-    sprintf_s(str, "[%dx%d]", object()->GetBeltArray().x, object()->GetBeltArray().y);
+    Fvector2 inventory_size{INV_GRID_WIDTHF * m_grid_size.x, INV_GRID_HEIGHTF * m_grid_size.y};
+    Fvector2 base_scale{GetWidth() / inventory_size.x, GetHeight() / inventory_size.y};
 
-    Fvector2 pos{GetWidth() - m_text_add->GetWidth(), GetHeight() - m_text_add->GetHeight()};
+    Fvector2 size{params.grid_width * INV_GRID_WIDTHF, params.grid_height * INV_GRID_HEIGHTF};
+    size.mul(base_scale);
+    size.mul(object()->ammo_icon_scale);
+    ammo_icon->SetWndSize(size);
 
-    m_text_add->SetWndPos(pos);
-    m_text_add->SetText(str);
-    m_text_add->Show(true);
-}
+    Fvector2 pos{object()->ammo_icon_ofset};
+    pos.mul(base_scale);
+    ammo_icon->SetWndPos(pos);
 
-CUIVestCellItem::CUIVestCellItem(CVest* itm) : inherited(itm) { init_add(); }
-void CUIVestCellItem::Update()
-{
-    inherited::Update();
-    UpdateItemText();
-}
-void CUIVestCellItem::UpdateItemText()
-{
-    inherited::UpdateItemText();
+    ammo_icon->SetStretchTexture(true);
 
-    string32 str;
-    sprintf_s(str, "[%dx%d]", object()->GetVestArray().x, object()->GetVestArray().y);
-
-    Fvector2 pos{GetWidth() - m_text_add->GetWidth(), GetHeight() - m_text_add->GetHeight()};
-
-    m_text_add->SetWndPos(pos);
-    m_text_add->SetText(str);
-    m_text_add->Show(true);
+    return ammo_icon;
 }
 
-CUIContainerCellItem::CUIContainerCellItem(CInventoryContainer* itm) : inherited(itm)
-{
-    if (!fis_zero(object()->GetItemEffect(CInventoryItem::eAdditionalWeight)))
-    {
-        init_add();
-    }
-}
-void CUIContainerCellItem::Update()
-{
-    inherited::Update();
-    UpdateItemText();
-}
-void CUIContainerCellItem::UpdateItemText()
-{
-    inherited::UpdateItemText();
-
-    if (!m_text_add)
-        return;
-
-    string32 str;
-
-    float add_weight = object()->GetItemEffect(CInventoryItem::eAdditionalWeight) * Actor()->inventory().GetMaxWeight();
-    auto measure_weight = CStringTable().translate("st_kg").c_str();
-
-    if (!fis_zero(add_weight))
-        sprintf_s(str, "%.0f%s", add_weight, measure_weight);
-
-    Fvector2 pos{GetWidth() - m_text_add->GetWidth(), GetHeight() - m_text_add->GetHeight()};
-
-    m_text_add->SetWndPos(pos);
-    m_text_add->SetText(str);
-    m_text_add->Show(true);
-}
-
-CUIEatableCellItem::CUIEatableCellItem(CEatableItem* itm) : inherited(itm)
-{
-    if (itm->GetStartPortionsNum() > 1)
-    {
-        init_add();
-    }
-}
+CUIEatableCellItem::CUIEatableCellItem(CEatableItem* itm) : inherited(itm) {}
 
 bool CUIEatableCellItem::EqualTo(CUICellItem* itm)
 {
@@ -460,29 +336,6 @@ bool CUIEatableCellItem::EqualTo(CUICellItem* itm)
         return false;
 
     return object()->GetPortionsNum() == ci->object()->GetPortionsNum();
-}
-
-void CUIEatableCellItem::Update()
-{
-    inherited::Update();
-    UpdateItemText();
-}
-
-void CUIEatableCellItem::UpdateItemText()
-{
-    inherited::UpdateItemText();
-
-    if (!m_text_add)
-        return;
-
-    string32 str;
-    sprintf_s(str, "%d/%d", object()->GetPortionsNum(), object()->GetStartPortionsNum());
-
-    Fvector2 pos{GetWidth() - m_text_add->GetWidth(), GetHeight() - m_text_add->GetHeight()};
-
-    m_text_add->SetWndPos(pos);
-    m_text_add->SetText(str);
-    m_text_add->Show(true);
 }
 
 CUIArtefactCellItem::CUIArtefactCellItem(CArtefact* itm) : inherited(itm) {}
@@ -502,33 +355,7 @@ bool CUIArtefactCellItem::EqualTo(CUICellItem* itm)
 CUIWeaponCellItem::CUIWeaponCellItem(CWeapon* itm) : inherited(itm)
 {
     b_auto_drag_childs = false;
-
     m_cell_size.set(INV_GRID_WIDTHF, INV_GRID_HEIGHTF);
-
-    if (itm->GetAmmoMagSize())
-    {
-        init_add();
-    }
-}
-
-void CUIWeaponCellItem::UpdateItemText()
-{
-    inherited::UpdateItemText();
-
-    if (!m_text_add)
-        return;
-
-    string32 str;
-    auto pWeaponMag = smart_cast<CWeaponMagazined*>(object());
-    sprintf_s(str, "%d/%d%s", object()->GetAmmoElapsed(), object()->GetAmmoMagSize(),
-              pWeaponMag && (pWeaponMag->HasFireModes() || pWeaponMag->IsGrenadeMode()) ? pWeaponMag->GetCurrentFireModeStr() : "");
-
-    Fvector2 pos{GetWidth() - m_text_add->GetWidth(), GetHeight() - m_text_add->GetHeight()};
-
-    m_text_add->SetWndPos(pos);
-    m_text_add->SetText(str);
-    m_text_add->Show(true);
-    BringToTop(m_text_add);
 }
 
 #include "../object_broker.h"

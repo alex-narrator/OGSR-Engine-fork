@@ -4,9 +4,6 @@
 #include "WeaponRPG7.h"
 #include "eatable_item.h"
 #include "Artifact.h"
-#include "Warbelt.h"
-#include "Vest.h"
-#include "InventoryContainer.h"
 
 class CUIInventoryCellItem : public CUICellItem
 {
@@ -14,9 +11,6 @@ class CUIInventoryCellItem : public CUICellItem
 
 protected:
     bool b_auto_drag_childs;
-
-    CUIStatic* m_text_add{};
-    void init_add();
 
     CUIStatic* m_upgrade{};
     CUIStatic* CreateUpgradeIcon();
@@ -39,55 +33,12 @@ public:
     virtual ~CUIInventoryCellItem();
 };
 
-class CUIWarbeltCellItem : public CUIInventoryCellItem
-{
-    typedef CUIInventoryCellItem inherited;
-
-protected:
-    virtual void UpdateItemText();
-
-public:
-    CUIWarbeltCellItem(CWarbelt* itm);
-    virtual void Update();
-    CWarbelt* object() { return (CWarbelt*)m_pData; }
-};
-
-class CUIVestCellItem : public CUIInventoryCellItem
-{
-    typedef CUIInventoryCellItem inherited;
-
-protected:
-    virtual void UpdateItemText();
-
-public:
-    CUIVestCellItem(CVest* itm);
-    virtual void Update();
-    CVest* object() { return (CVest*)m_pData; }
-};
-
-class CUIContainerCellItem : public CUIInventoryCellItem
-{
-    typedef CUIInventoryCellItem inherited;
-
-protected:
-    virtual void UpdateItemText();
-
-public:
-    CUIContainerCellItem(CInventoryContainer* itm);
-    virtual void Update();
-    CInventoryContainer* object() { return (CInventoryContainer*)m_pData; }
-};
-
 class CUIEatableCellItem : public CUIInventoryCellItem
 {
     typedef CUIInventoryCellItem inherited;
 
-protected:
-    virtual void UpdateItemText();
-
 public:
     CUIEatableCellItem(CEatableItem* itm);
-    virtual void Update();
     virtual bool EqualTo(CUICellItem* itm);
     CEatableItem* object() { return (CEatableItem*)m_pData; }
 };
@@ -107,16 +58,15 @@ class CUIAmmoCellItem : public CUIInventoryCellItem
     typedef CUIInventoryCellItem inherited;
 
 protected:
-    virtual void UpdateItemText();
-    virtual void UpdateItemTextCustom();
     CUIStatic* m_ammo_in_box{};
     CUIStatic* CreateAmmoInBoxIcon();
+    virtual void UpdateItemText();
 
 public:
     CUIAmmoCellItem(CWeaponAmmo* itm);
-    virtual void Update();
     virtual bool EqualTo(CUICellItem* itm);
     CWeaponAmmo* object() { return (CWeaponAmmo*)m_pData; }
+    virtual void Update();
 };
 
 class CUIWeaponCellItem : public CUIInventoryCellItem
@@ -127,7 +77,6 @@ public:
     CUIStatic* m_addons[eMaxAddon]{};
 
 protected:
-    virtual void UpdateItemText();
     void CreateIcon(u32, CIconParams& params);
     void DestroyIcon(u32);
     CUIStatic* GetIcon(u32);

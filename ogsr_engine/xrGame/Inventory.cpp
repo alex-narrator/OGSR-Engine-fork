@@ -1397,7 +1397,7 @@ void CInventory::RepackAmmo()
     for (PIItem& _pIItem : m_ruck)
     {
         CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(_pIItem);
-        if (pAmmo && !pAmmo->IsBoxReloadable() && pAmmo->m_boxCurr < pAmmo->m_boxSize)
+        if (pAmmo && !pAmmo->IsBoxReloadable() && !pAmmo->GetMarked() && pAmmo->m_boxCurr < pAmmo->m_boxSize)
             _ammo.push_back(pAmmo);
     }
     while (!_ammo.empty())

@@ -38,18 +38,25 @@ void CInventoryItem::script_register(lua_State* L)
 
                .def_readwrite("power_loss", &CInventoryItem::m_fPowerLoss)
 
-               .enum_("effect")[value("health_restore", int(CInventoryItem::eHealthRestoreSpeed)), value("power_restore", int(CInventoryItem::ePowerRestoreSpeed)),
-                                value("max_power_restore", int(CInventoryItem::eMaxPowerRestoreSpeed)), value("satiety_restore", int(CInventoryItem::eSatietyRestoreSpeed)),
-                                value("radiation_restore", int(CInventoryItem::eRadiationRestoreSpeed)), value("psy_health_restore", int(CInventoryItem::ePsyHealthRestoreSpeed)),
-                                value("alcohol_restore", int(CInventoryItem::eAlcoholRestoreSpeed)), value("wounds_heal_speed", int(CInventoryItem::eWoundsHealSpeed)),
-                                value("add_sprint", int(CInventoryItem::eAdditionalSprint)), value("add_hump", int(CInventoryItem::eAdditionalJump)),
-                                value("add_weight", int(CInventoryItem::eAdditionalWeight)), value("max_effect", int(CInventoryItem::eEffectMax))]
-
                .def_readwrite("inv_name", &CInventoryItem::m_name)
                .def_readwrite("inv_name_short", &CInventoryItem::m_nameShort)
                .property("cost", &CInventoryItem::Cost, &CInventoryItem::SetCost)
                .property("slot", &CInventoryItem::GetSlot, &CInventoryItem::SetSlot)
                .property("slots", &get_slots, raw<2>())
-               .def_readwrite("description", &CInventoryItem::m_Description)
+               .def_readwrite("description", &CInventoryItem::m_Description),
+
+               class_<enum_exporter<ItemEffects>>("effect").enum_("effect")[
+                       value("health_restore", int(CInventoryItem::eHealthRestoreSpeed)), 
+                       value("power_restore", int(CInventoryItem::ePowerRestoreSpeed)),
+                       value("max_power_restore", int(CInventoryItem::eMaxPowerRestoreSpeed)), 
+                       value("satiety_restore", int(CInventoryItem::eSatietyRestoreSpeed)),
+                       value("radiation_restore", int(CInventoryItem::eRadiationRestoreSpeed)), 
+                       value("psy_health_restore", int(CInventoryItem::ePsyHealthRestoreSpeed)),
+                       value("alcohol_restore", int(CInventoryItem::eAlcoholRestoreSpeed)), 
+                       value("wounds_heal_speed", int(CInventoryItem::eWoundsHealSpeed)),
+                       value("add_sprint", int(CInventoryItem::eAdditionalSprint)), 
+                       value("add_jump", int(CInventoryItem::eAdditionalJump)),
+                       value("add_weight", int(CInventoryItem::eAdditionalWeight)), 
+                       value("max_effect", int(CInventoryItem::eEffectMax))]
     ];
 }

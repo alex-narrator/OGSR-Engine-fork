@@ -24,17 +24,5 @@ CUICellItem* create_cell_item(CInventoryItem* itm)
     if (pArtefact)
         return xr_new<CUIArtefactCellItem>(pArtefact);
 
-    auto pWarbelt = smart_cast<CWarbelt*>(itm);
-    if (pWarbelt)
-        return xr_new<CUIWarbeltCellItem>(pWarbelt);
-
-    auto pVest = smart_cast<CVest*>(itm);
-    if (pVest)
-        return xr_new<CUIVestCellItem>(pVest);
-
-    auto pContainer = smart_cast<CInventoryContainer*>(itm);
-    if (pContainer)
-        return xr_new<CUIContainerCellItem>(pContainer);
-
     return xr_new<CUIInventoryCellItem>(itm);
 }
