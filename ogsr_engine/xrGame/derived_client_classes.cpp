@@ -302,7 +302,9 @@ void CWeaponScript::script_register(lua_State* L)
 
                   .def_readonly("zoom_mode", &CWeapon::m_bZoomMode)
                   .def("is_addon_attached", &CWeapon::IsAddonAttached)
+                  .def("addon_attachable", &CWeapon::AddonAttachable)
                   .def("get_addon_name", &get_addon_name)
+                  .def("get_addon_offset", &CWeapon::GetAddonOffset)
 
                   .def_readwrite("scope_inertion_factor", &CWeapon::m_fScopeInertionFactor)
 
