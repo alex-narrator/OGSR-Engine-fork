@@ -6,9 +6,6 @@
 
 using namespace luabind;
 
-u8 CCar__IsLightsOn(CCar* self) { return self->IsLightsOn() ? 1 : 0; }
-u8 CCar__IsEngineOn(CCar* self) { return self->IsEngineOn() ? 1 : 0; }
-
 #pragma optimize("s", on)
 void CCar::script_register(lua_State* L)
 {
@@ -33,8 +30,8 @@ void CCar::script_register(lua_State* L)
                   .def("GetFuelTank", &CCar::GetFuelTank)
                   .def("GetFuel", &CCar::GetFuel)
                   .def("SetFuel", &CCar::SetFuel)
-                  .def("IsLightsOn", &CCar__IsLightsOn)
-                  .def("IsEngineOn", &CCar__IsEngineOn)
+                  .def("IsLightsOn", &CCar::IsLightsOn)
+                  .def("IsEngineOn", &CCar::IsEngineOn)
                   .def("SwitchEngine", &CCar::SwitchEngine)
                   .def("SwitchLights", &CCar::SwitchLights)
                   .def(constructor<>())];

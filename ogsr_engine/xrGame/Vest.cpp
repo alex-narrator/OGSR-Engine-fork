@@ -106,7 +106,7 @@ void CVest::InitAddons()
         }
     }
     if (IsPlateInstalled())
-        m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, GetPlateName(), "power_loss", 0.f);
+        m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, GetPlateName(), "power_loss", m_fPowerLoss);
     inherited::InitAddons();
 }
 

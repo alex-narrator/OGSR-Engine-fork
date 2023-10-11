@@ -47,7 +47,6 @@ public:
 
 protected:
     CUIStatic UIStaticQuickHelp;
-    CUICarPanel UICarPanel;
     CUIMotionIcon UIMotionIcon;
     CUIZoneMap* UIZoneMap;
 
@@ -151,7 +150,6 @@ protected:
     void RenderQuickInfos();
 
 public:
-    CUICarPanel& CarPanel() { return UICarPanel; };
     CUIMotionIcon& MotionIcon() { return UIMotionIcon; }
     void OnConnected();
     void reset_ui();

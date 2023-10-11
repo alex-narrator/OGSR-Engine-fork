@@ -700,15 +700,16 @@ void CEntityCondition::ApplyBooster(SBooster& B)
 
     BOOSTER_MAP::iterator it = m_boosters.find(B.m_BoostType);
     if (it != m_boosters.end())
-    {
-        auto& _b = it->second;
-        DisableBoostParameters(_b);
-        B.f_BoostValue += _b.f_BoostValue;
-        B.f_BoostTime += _b.f_BoostTime;
-    }
+        DisableBoostParameters(it->second);
+    //{
+    //    auto& _b = it->second;
+    //    DisableBoostParameters(_b);
+    //    B.f_BoostValue += _b.f_BoostValue;
+    //    B.f_BoostTime += _b.f_BoostTime;
+    //}
 
-    float limit = B.m_BoostType < eHitTypeProtectionBoosterIndex ? 5.f : 1.f;
-    clamp(B.f_BoostValue, -limit, limit);
+    //float limit = B.m_BoostType < eHitTypeProtectionBoosterIndex ? 5.f : 1.f;
+    //clamp(B.f_BoostValue, -limit, limit);
 
     m_boosters[B.m_BoostType] = B;
     BoostParameters(B);

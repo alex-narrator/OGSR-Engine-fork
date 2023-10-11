@@ -481,8 +481,10 @@ void CUIInventoryWnd::UpdateCustomDraw(bool b_full_reinit)
         if (!list)
             continue;
 
-        m_pInv->IsSlotAllowed(i) ? list->ResetCellsCapacity() : list->SetCellsCapacity({});
-        list->Show(m_pInv->IsSlotAllowed(i));
+        //m_pInv->IsSlotAllowed(i) ? list->ResetCellsCapacity() : list->SetCellsCapacity({});
+        //list->Show(m_pInv->IsSlotAllowed(i));
+        u32 cells = m_pInv->IsSlotAllowed(i) ? (list->CellsCapacity().x * list->CellsCapacity().y) : 0;
+        list->SetCellsAvailable(cells);
     }
 
     if (b_full_reinit)

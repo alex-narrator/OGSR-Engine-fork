@@ -498,13 +498,13 @@ void CCar::VisualUpdate(float fov)
             Owner()->XFORM().mul_43(XFORM(), m_sits_transforms);
         }
 
-        if (HUD().GetUI()) //
-        {
-            HUD().GetUI()->UIMainIngameWnd->CarPanel().Show(true);
-            HUD().GetUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth() /* /100.f*/);
-            HUD().GetUI()->UIMainIngameWnd->CarPanel().SetSpeed(lin_vel.magnitude() / 1000.f * 3600.f / 100.f);
-            HUD().GetUI()->UIMainIngameWnd->CarPanel().SetRPM(m_current_rpm / m_max_rpm / 2.f);
-        }
+        //if (HUD().GetUI()) //
+        //{
+        //    HUD().GetUI()->UIMainIngameWnd->CarPanel().Show(true);
+        //    HUD().GetUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth() /* /100.f*/);
+        //    HUD().GetUI()->UIMainIngameWnd->CarPanel().SetSpeed(lin_vel.magnitude() / 1000.f * 3600.f / 100.f);
+        //    HUD().GetUI()->UIMainIngameWnd->CarPanel().SetRPM(m_current_rpm / m_max_rpm / 2.f);
+        //}
     }
 
     UpdateExhausts();
@@ -563,8 +563,8 @@ void CCar::Hit(SHit* pHDS)
         CDelayedActionFuse::CheckCondition(GetfHealth());
     }
     CDamagableItem::HitEffect();
-    if (Owner() && Owner()->ID() == Level().CurrentEntity()->ID())
-        HUD().GetUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth() /* /100.f */);
+    //if (Owner() && Owner()->ID() == Level().CurrentEntity()->ID())
+    //    HUD().GetUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth() /* /100.f */);
 }
 
 void CCar::ChangeCondition(float fDeltaCondition)
@@ -573,8 +573,8 @@ void CCar::ChangeCondition(float fDeltaCondition)
     CDamagableItem::HitEffect();
     if (Local() && !g_Alive() && !AlreadyDie())
         KillEntity(Initiator());
-    if (Owner() && Owner()->ID() == Level().CurrentEntity()->ID())
-        HUD().GetUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth() /* /100.f */);
+    //if (Owner() && Owner()->ID() == Level().CurrentEntity()->ID())
+    //    HUD().GetUI()->UIMainIngameWnd->CarPanel().SetCarHealth(GetfHealth() /* /100.f */);
 }
 
 void CCar::PHHit(float P, Fvector& dir, CObject* who, s16 element, Fvector p_in_object_space, float impulse, ALife::EHitType hit_type)
@@ -630,7 +630,7 @@ void CCar::detach_Actor()
     Unclutch();
     ResetKeys();
     m_current_rpm = m_min_rpm;
-    HUD().GetUI()->UIMainIngameWnd->CarPanel().Show(false);
+    //HUD().GetUI()->UIMainIngameWnd->CarPanel().Show(false);
     /// Break();
     // H_SetParent(NULL);
     HandBreak();
