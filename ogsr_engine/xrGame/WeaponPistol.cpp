@@ -11,18 +11,13 @@ CWeaponPistol::CWeaponPistol(LPCSTR name) : CWeaponCustomPistol(name)
 
 CWeaponPistol::~CWeaponPistol(void) {}
 
-void CWeaponPistol::net_Destroy()
-{
-    inherited::net_Destroy();
-    // sounds
-    HUD_SOUND::DestroySound(sndClose);
-}
+void CWeaponPistol::net_Destroy() { inherited::net_Destroy(); }
 
 void CWeaponPistol::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    HUD_SOUND::LoadSound(section, "snd_close", sndClose, m_eSoundClose);
+    m_sounds.LoadSound(section, "snd_close", "sndClose", false, m_eSoundClose);
 }
 
 void CWeaponPistol::OnH_B_Chield()
@@ -109,7 +104,7 @@ void CWeaponPistol::PlayAnimIdle()
             if (AnimationExist("anm_idle_aim_end_empty"))
             {
                 PlayHUDMotion("anm_idle_aim_end_empty", true, GetState());
-                PlaySound(sndAimEnd, get_LastFP());
+                PlaySound("sndAimEnd", get_LastFP());
                 return;
             }
         }
@@ -129,7 +124,7 @@ void CWeaponPistol::PlayAnimAim()
             if (AnimationExist("anm_idle_aim_start_empty"))
             {
                 PlayHUDMotion("anm_idle_aim_start_empty", true, GetState());
-                PlaySound(sndAimStart, get_LastFP());
+                PlaySound("sndAimStart", get_LastFP());
                 return;
             }
         }
@@ -167,7 +162,7 @@ void CWeaponPistol::PlayAnimHide()
     VERIFY(GetState() == eHiding);
     if (m_opened)
     {
-        PlaySound(sndClose, get_LastFP());
+        PlaySound("sndClose", get_LastFP());
         PlayHUDMotion({"anim_close", "anm_hide_empty"}, true, GetState());
     }
     else
@@ -212,6 +207,5 @@ void CWeaponPistol::UpdateSounds()
 {
     inherited::UpdateSounds();
 
-    if (sndClose.playing())
-        sndClose.set_position(get_LastFP());
+    m_sounds.SetPosition("sndClose", get_LastFP());
 }

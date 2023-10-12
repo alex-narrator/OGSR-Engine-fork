@@ -56,15 +56,11 @@ protected:
     virtual void PlayAnimShutter();
     virtual void PlayAnimShutterMisfire();
 
-    HUD_SOUND sndShotBoth;
     ESoundTypes m_eSoundShotBoth;
 
     ESoundTypes m_eSoundOpen{};
     ESoundTypes m_eSoundAddCartridge;
     ESoundTypes m_eSoundClose;
-    HUD_SOUND m_sndOpen;
-    HUD_SOUND m_sndAddCartridge;
-    HUD_SOUND m_sndClose;
 
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };

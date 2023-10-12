@@ -145,10 +145,7 @@ CBinocularsVision::CBinocularsVision(CWeaponMagazined* parent)
     m_parent = parent;
     Load(m_parent->cNameSect());
 }
-CBinocularsVision::~CBinocularsVision()
-{
-    m_snd_found.destroy();
-}
+CBinocularsVision::~CBinocularsVision() {}
 
 void CBinocularsVision::Update()
 {
@@ -195,8 +192,7 @@ void CBinocularsVision::Update()
             new_vis_obj->create_default(m_frame_color.get());
             new_vis_obj->m_upd_speed = m_rotating_speed;
             new_vis_obj->m_visible_time = Device.dwTimeGlobal + m_min_visible_time;
-            if (NULL == m_snd_found._feedback())
-                m_snd_found.play_at_pos(0, Fvector().set(0, 0, 0), sm_2D);
+            m_sounds.PlaySound("found_snd", Fvector().set(0, 0, 0), NULL, true);
         }
     }
 
@@ -228,7 +224,7 @@ void CBinocularsVision::Load(const shared_str& section)
 {
     m_rotating_speed = pSettings->r_float(section, "vis_frame_speed");
     m_frame_color = pSettings->r_fcolor(section, "vis_frame_color");
-    m_snd_found.create(pSettings->r_string(section, "found_snd"), st_Effect, sg_SourceType);
+    m_sounds.LoadSound(section.c_str(), "found_snd", "found_snd", false, SOUND_TYPE_NO_SOUND);
     m_min_visible_time = READ_IF_EXISTS(pSettings, r_u32, section, "min_visible_time", 0);
     m_transparency_threshold = READ_IF_EXISTS(pSettings, r_float, section, "transparency_threshold", 0.f);
 }

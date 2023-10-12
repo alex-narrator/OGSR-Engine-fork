@@ -69,11 +69,11 @@ void CPda::Load(LPCSTR section)
         return;
 
     m_joystick_bone = READ_IF_EXISTS(pSettings, r_string, section, "joystick_bone", nullptr);
-    HUD_SOUND::LoadSound(section, "snd_draw", sndShow, SOUND_TYPE_ITEM_TAKING);
-    HUD_SOUND::LoadSound(section, "snd_holster", sndHide, SOUND_TYPE_ITEM_HIDING);
+    m_sounds.LoadSound(section, "snd_draw", "sndShow");
+    m_sounds.LoadSound(section, "snd_holster", "sndHide");
 
-    HUD_SOUND::LoadSound(section, "snd_btn_press", sndBtnPress, SOUND_TYPE_ITEM_USING);
-    HUD_SOUND::LoadSound(section, "snd_btn_release", sndBtnRelease, SOUND_TYPE_ITEM_USING);
+    m_sounds.LoadSound(section, "snd_btn_press", "sndBtnPress");
+    m_sounds.LoadSound(section, "snd_btn_release", "sndBtnRelease");
 
     m_thumb_rot[0] = READ_IF_EXISTS(pSettings, r_float, section, "thumb_rot_x", 0.f);
     m_thumb_rot[1] = READ_IF_EXISTS(pSettings, r_float, section, "thumb_rot_y", 0.f);
@@ -214,7 +214,7 @@ void CPda::OnH_B_Independent(bool just_before_destroy)
     if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
         return;
 
-    PlaySound(sndHide, Position(), H_Root());
+    PlaySound("sndHide", Position());
 
     SwitchState(eHidden);
     SetPending(FALSE);
@@ -309,7 +309,7 @@ void CPda::OnStateSwitch(u32 S, u32 oldState)
     case eShowing: {
         g_player_hud->attach_item(this);
 
-        PlaySound(sndShow, Position());
+        PlaySound("sndShow", Position());
 
         PlayHUDMotion("anm_show", false, GetState());
 
@@ -319,7 +319,7 @@ void CPda::OnStateSwitch(u32 S, u32 oldState)
     case eHiding: {
         if (oldState != eHiding)
         {
-            PlaySound(sndHide, Position());
+            PlaySound("sndHide", Position());
             PlayHUDMotion("anm_hide", true, GetState());
             SetPending(TRUE);
             m_bZoomed = false;
@@ -424,9 +424,9 @@ void CPda::JoystickCallback(CBoneInstance* B)
         press += diff;
 
         if (prev_press == 0.f && press < 0.f)
-            HUD_SOUND::PlaySound(Pda->sndBtnPress, B->mTransform.c, Pda->H_Root(), !!Pda->GetHUDmode(), false, false);
+            Pda->PlaySound("sndBtnPress", B->mTransform.c);
         else if (prev_press < -.001f && press >= -.001f)
-            HUD_SOUND::PlaySound(Pda->sndBtnRelease, B->mTransform.c, Pda->H_Root(), !!Pda->GetHUDmode(), false, false);
+            Pda->PlaySound("sndBtnRelease", B->mTransform.c);
     }
     else
         press = target_press;
@@ -521,16 +521,7 @@ void CPda::OnHiddenItem()
     pGameSP->ShowHidePda(false);
 }
 
-CPda::~CPda()
-{
-    if (!this_is_3d_pda)
-        return;
-
-    HUD_SOUND::DestroySound(sndShow);
-    HUD_SOUND::DestroySound(sndHide);
-    HUD_SOUND::DestroySound(sndBtnPress);
-    HUD_SOUND::DestroySound(sndBtnRelease);
-}
+CPda::~CPda() {}
 
 void CPda::Switch(bool turn_on)
 {

@@ -61,11 +61,6 @@ public:
     virtual void PlayAnimShoot();
     virtual void PlayAnimModeSwitch();
 
-    HUD_SOUND sndShotG;
-    HUD_SOUND sndReloadG;
-    HUD_SOUND sndSwitch;
-    HUD_SOUND sndShutterG;
-
     // дополнительные параметры патронов
     // для подствольника
     CWeaponAmmo* m_pAmmo2{};

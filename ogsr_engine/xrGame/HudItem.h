@@ -104,11 +104,13 @@ public:
     virtual CHudItem* cast_hud_item() { return this; }
 
     virtual void PlaySound(HUD_SOUND& snd, const Fvector& position, bool overlap = false);
+    virtual void PlaySound(LPCSTR alias, const Fvector& position);
+    virtual void PlaySound(LPCSTR alias, const Fvector& position, u8 index); // Alundaio: Play at index
 
     ///////////////////////////////////////////////
     // общие функции HUD
     ///////////////////////////////////////////////
-    virtual void StopHUDSounds(){};
+    virtual void StopHUDSounds() { m_sounds.StopAllSounds(); };
 
     //для предачи команд владельцем
     virtual bool Action(s32 cmd, u32 flags);
@@ -203,6 +205,7 @@ protected:
 
 protected:
     u32 m_animation_slot{u32(-1)};
+    HUD_SOUND_COLLECTION_LAYERED m_sounds{};
 
 public:
     IC u32 animation_slot() { return m_animation_slot; }

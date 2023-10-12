@@ -116,7 +116,7 @@ void CCustomDetector::OnStateSwitch(u32 S, u32 oldState)
     {
     case eShowing: {
         g_player_hud->attach_item(this);
-        PlaySound(sndShow, Position());
+        PlaySound("sndShow", Position());
         PlayHUDMotion({m_bFastAnimMode ? "anm_show_fast" : "anm_show"}, false, GetState());
         SetPending(TRUE);
         if (!IsPowerOn())
@@ -126,7 +126,7 @@ void CCustomDetector::OnStateSwitch(u32 S, u32 oldState)
     case eHiding: {
         if (oldState != eHiding)
         {
-            PlaySound(sndHide, Position());
+            PlaySound("sndHide", Position());
             PlayHUDMotion({m_bFastAnimMode ? "anm_hide_fast" : "anm_hide"}, false, GetState());
             SetPending(TRUE);
         }
@@ -165,10 +165,6 @@ void CCustomDetector::OnHiddenItem() {}
 
 CCustomDetector::~CCustomDetector()
 {
-    HUD_SOUND::DestroySound(sndShow);
-    HUD_SOUND::DestroySound(sndHide);
-    HUD_SOUND::DestroySound(sndSwitch);
-
     m_artefacts.destroy();
     m_zones.destroy();
     m_creatures.destroy();
@@ -214,10 +210,9 @@ void CCustomDetector::Load(LPCSTR section)
     m_nightvision_particle = READ_IF_EXISTS(pSettings, r_string, section, "night_vision_particle", nullptr);
     m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", 0.25f);
 
-    HUD_SOUND::LoadSound(section, "snd_draw", sndShow, SOUND_TYPE_ITEM_TAKING);
-    HUD_SOUND::LoadSound(section, "snd_holster", sndHide, SOUND_TYPE_ITEM_HIDING);
-    if (pSettings->line_exist(section, "snd_switch"))
-        HUD_SOUND::LoadSound(section, "snd_switch", sndSwitch);
+    m_sounds.LoadSound(section, "snd_draw", "sndShow");
+    m_sounds.LoadSound(section, "snd_holster", "sndHide");
+    m_sounds.LoadSound(section, "snd_switch", "sndSwitch");
 }
 
 void CCustomDetector::shedule_Update(u32 dt)
@@ -456,7 +451,7 @@ void CCustomDetector::SwitchMode()
     m_bAfMode = !m_bAfMode;
 
     AnimationExist("anm_switch_mode") ? PlayHUDMotion("anm_switch_mode", true, GetState()) : PlayHUDMotion({"anm_show_fast"}, true, GetState(), false);
-    PlaySound(sndSwitch, Position());
+    PlaySound("sndSwitch", Position());
     ShowCurrentModeMsg();
 }
 

@@ -230,8 +230,6 @@ protected:
     CZoneList m_zones;
     CCreatureList m_creatures;
 
-    HUD_SOUND sndShow, sndHide, sndSwitch;
-
     virtual size_t GetWeaponTypeForCollision() const override { return Detector; }
     virtual Fvector GetPositionForCollision() override;
     virtual Fvector GetDirectionForCollision() override;

@@ -107,11 +107,11 @@ void CArtefact::Load(LPCSTR section)
     m_af_rank = READ_IF_EXISTS(pSettings, r_u8, section, "af_rank", 0);
 
     if (pSettings->line_exist(section, "snd_draw"))
-        HUD_SOUND::LoadSound(section, "snd_draw", sndShow);
+        m_sounds.LoadSound(section, "snd_draw", "sndShow");
     if (pSettings->line_exist(section, "snd_holster"))
-        HUD_SOUND::LoadSound(section, "snd_holster", sndHide);
+        m_sounds.LoadSound(section, "snd_holster", "sndHide");
     if (pSettings->line_exist(section, "snd_activate"))
-        HUD_SOUND::LoadSound(section, "snd_activate", sndActivate);
+        m_sounds.LoadSound(section, "snd_activate", "sndActivate");
 }
 
 BOOL CArtefact::net_Spawn(CSE_Abstract* DC)
@@ -404,7 +404,7 @@ void CArtefact::OnStateSwitch(u32 S, u32 oldState)
     case eShowing: {
         SetPending(TRUE);
         PlayHUDMotion({"anim_show", "anm_show"}, false, S);
-        PlaySound(sndShow, Position());
+        PlaySound("sndShow", Position());
     }
     break;
     case eHiding: {
@@ -412,14 +412,14 @@ void CArtefact::OnStateSwitch(u32 S, u32 oldState)
         {
             SetPending(TRUE);
             PlayHUDMotion({"anim_hide", "anm_hide"}, true, S);
-            PlaySound(sndHide, Position());
+            PlaySound("sndHide", Position());
         }
     }
     break;
     case eActivating: {
         SetPending(TRUE);
         PlayHUDMotion({"anim_activate", "anm_activate"}, true, S);
-        PlaySound(sndActivate, Position());
+        PlaySound("sndActivate", Position());
     }
     break;
     case eIdle: {

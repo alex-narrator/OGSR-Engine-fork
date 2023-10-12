@@ -66,8 +66,6 @@ protected:
     u16 m_CarringBoneID;
     shared_str m_sParticlesName{};
 
-    HUD_SOUND sndShow, sndHide, sndActivate;
-
 protected:
     SArtefactActivation* m_activationObj{};
     //////////////////////////////////////////////////////////////////////////

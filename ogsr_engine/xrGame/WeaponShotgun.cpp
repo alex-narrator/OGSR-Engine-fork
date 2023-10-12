@@ -19,14 +19,7 @@ CWeaponShotgun::CWeaponShotgun(void) : CWeaponCustomPistol("TOZ34")
     m_eSoundAddCartridge = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING);
 }
 
-CWeaponShotgun::~CWeaponShotgun(void)
-{
-    // sounds
-    HUD_SOUND::DestroySound(sndShotBoth);
-    HUD_SOUND::DestroySound(m_sndOpen);
-    HUD_SOUND::DestroySound(m_sndAddCartridge);
-    HUD_SOUND::DestroySound(m_sndClose);
-}
+CWeaponShotgun::~CWeaponShotgun(void) {}
 
 void CWeaponShotgun::net_Destroy() { inherited::net_Destroy(); }
 
@@ -35,7 +28,7 @@ void CWeaponShotgun::Load(LPCSTR section)
     inherited::Load(section);
 
     // Звук и анимация для выстрела дуплетом
-    HUD_SOUND::LoadSound(section, "snd_shoot_duplet", sndShotBoth, m_eSoundShotBoth);
+    m_sounds.LoadSound(section, "snd_shoot_duplet", "sndShotBoth", false, m_eSoundShotBoth);
 
     if (pSettings->line_exist(section, "tri_state_reload"))
     {
@@ -44,9 +37,9 @@ void CWeaponShotgun::Load(LPCSTR section)
 
     if (m_bTriStateReload)
     {
-        HUD_SOUND::LoadSound(section, "snd_open_weapon", m_sndOpen, m_eSoundOpen);
-        HUD_SOUND::LoadSound(section, "snd_add_cartridge", m_sndAddCartridge, m_eSoundAddCartridge);
-        HUD_SOUND::LoadSound(section, "snd_close_weapon", m_sndClose, m_eSoundClose);
+        m_sounds.LoadSound(section, "snd_open_weapon", "m_sndOpen", false, m_eSoundOpen);
+        m_sounds.LoadSound(section, "snd_add_cartridge", "m_sndAddCartridge", false, m_eSoundAddCartridge);
+        m_sounds.LoadSound(section, "snd_close_weapon", "m_sndClose", false, m_eSoundClose);
     }
 }
 
@@ -98,7 +91,7 @@ void CWeaponShotgun::OnShotBoth()
     }
 
     // звук выстрела дуплетом
-    PlaySound(sndShotBoth, get_LastFP());
+    PlaySound("sndShotBoth", get_LastFP());
 
     // Camera
     AddShotEffector();
@@ -206,14 +199,11 @@ void CWeaponShotgun::switch2_Fire2()
 void CWeaponShotgun::UpdateSounds()
 {
     inherited::UpdateSounds();
-    if (sndShotBoth.playing())
-        sndShotBoth.set_position(get_LastFP());
-    if (m_sndOpen.playing())
-        m_sndOpen.set_position(get_LastFP());
-    if (m_sndAddCartridge.playing())
-        m_sndAddCartridge.set_position(get_LastFP());
-    if (m_sndClose.playing())
-        m_sndClose.set_position(get_LastFP());
+
+    m_sounds.SetPosition("sndShotBoth", get_LastFP());
+    m_sounds.SetPosition("m_sndOpen", get_LastFP());
+    m_sounds.SetPosition("m_sndAddCartridge", get_LastFP());
+    m_sounds.SetPosition("m_sndClose", get_LastFP());
 }
 
 bool CWeaponShotgun::Action(s32 cmd, u32 flags)
@@ -336,21 +326,21 @@ void CWeaponShotgun::OnStateSwitch(u32 S, u32 oldState)
 
 void CWeaponShotgun::switch2_StartReload()
 {
-    PlaySound(m_sndOpen, get_LastFP());
+    PlaySound("m_sndOpen", get_LastFP());
     PlayAnimOpenWeapon();
     SetPending(TRUE);
 }
 
 void CWeaponShotgun::switch2_AddCartgidge()
 {
-    PlaySound(m_sndAddCartridge, get_LastFP());
+    PlaySound("m_sndAddCartridge", get_LastFP());
     PlayAnimAddOneCartridgeWeapon();
     SetPending(TRUE);
 }
 
 void CWeaponShotgun::switch2_EndReload()
 {
-    PlaySound(m_sndClose, get_LastFP());
+    PlaySound("m_sndClose", get_LastFP());
     PlayAnimCloseWeapon();
     SetPending(TRUE);
 }
@@ -380,13 +370,13 @@ void CWeaponShotgun::PlayAnimShutter()
 {
     VERIFY(GetState() == eShutter);
     AnimationExist("anm_shutter") ? PlayHUDMotion("anm_shutter", true, GetState()) : PlayHUDMotion({"anm_shots"}, true, GetState());
-    PlaySound(sndShutter, get_LastFP());
+    PlaySound("sndShutter", get_LastFP());
 }
 void CWeaponShotgun::PlayAnimShutterMisfire()
 {
     VERIFY(GetState() == eShutter);
     AnimationExist("anm_shutter_misfire") ? PlayHUDMotion("anm_shutter_misfire", true, GetState()) : PlayHUDMotion({"anm_shots"}, true, GetState());
-    PlaySound(sndShutterMisfire, get_LastFP());
+    PlaySound("sndShutterMisfire", get_LastFP());
 }
 
 bool CWeaponShotgun::HaveCartridgeInInventory(u8 cnt)
@@ -462,13 +452,7 @@ u8 CWeaponShotgun::AddCartridge(u8 cnt)
     return cnt;
 }
 
-void CWeaponShotgun::StopHUDSounds()
-{
-    HUD_SOUND::StopSound(m_sndOpen);
-    HUD_SOUND::StopSound(m_sndAddCartridge);
-    HUD_SOUND::StopSound(m_sndClose);
-    inherited::StopHUDSounds();
-}
+void CWeaponShotgun::StopHUDSounds() { inherited::StopHUDSounds(); }
 
 bool CWeaponShotgun::CanAttach(PIItem pIItem)
 {

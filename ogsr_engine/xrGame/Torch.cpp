@@ -69,13 +69,6 @@ CTorch::~CTorch(void)
     light_render.destroy();
     light_omni.destroy();
     glow_render.destroy();
-    HUD_SOUND::DestroySound(sndTorchOn);
-    HUD_SOUND::DestroySound(sndTorchOff);
-    //nv
-    HUD_SOUND::DestroySound(sndNightVisionOn);
-    HUD_SOUND::DestroySound(sndNightVisionOff);
-    HUD_SOUND::DestroySound(sndNightVisionIdle);
-    HUD_SOUND::DestroySound(sndNightVisionBroken);
 }
 
 void CTorch::Load(LPCSTR section)
@@ -90,22 +83,22 @@ void CTorch::Load(LPCSTR section)
     light_trace_bone = READ_IF_EXISTS(pSettings, r_string, section, "light_trace_bone", nullptr);
 
     if (pSettings->line_exist(section, "snd_torch_on"))
-        HUD_SOUND::LoadSound(section, "snd_torch_on", sndTorchOn, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_torch_on", "sndTorchOn", false, SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_torch_off"))
-        HUD_SOUND::LoadSound(section, "snd_torch_off", sndTorchOff, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_torch_off", "sndTorchOff", false, SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_torch_switch"))
-        HUD_SOUND::LoadSound(section, "snd_torch_switch", sndTorchSwitch, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_torch_switch", "sndTorchSwitch", false, SOUND_TYPE_ITEM_USING);
     //nv
     m_NightVisionSect = READ_IF_EXISTS(pSettings, r_string, section, "night_vision_effector", nullptr);
 
     if (pSettings->line_exist(section, "snd_night_vision_on"))
-        HUD_SOUND::LoadSound(section, "snd_night_vision_on", sndNightVisionOn, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_night_vision_on", "sndNightVisionOn", false, SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_night_vision_off"))
-        HUD_SOUND::LoadSound(section, "snd_night_vision_off", sndNightVisionOff, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_night_vision_off", "sndNightVisionOff", false, SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_night_vision_idle"))
-        HUD_SOUND::LoadSound(section, "snd_night_vision_idle", sndNightVisionIdle, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_night_vision_idle", "sndNightVisionIdle", false, SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_night_vision_broken"))
-        HUD_SOUND::LoadSound(section, "snd_night_vision_broken", sndNightVisionBroken, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_night_vision_broken", "sndNightVisionBroken", false, SOUND_TYPE_ITEM_USING);
 }
 
 void CTorch::Switch() 
@@ -148,12 +141,10 @@ void CTorch::SwitchTorch(bool turn_on)
     auto pA = smart_cast<CActor*>(H_Parent());
     if (pA)
     {
-        bool bPlaySoundFirstPerson = (pA == Level().CurrentViewEntity());
-
-        if (m_switched_on && !was_switched_on)
-            HUD_SOUND::PlaySound(sndTorchOn, pA->Position(), pA, bPlaySoundFirstPerson);
-        else if (!m_switched_on && was_switched_on)
-            HUD_SOUND::PlaySound(sndTorchOff, pA->Position(), pA, bPlaySoundFirstPerson);
+        if (m_switched_on && !was_switched_on && m_sounds.FindSoundItem("sndTorchOn", false))
+            m_sounds.PlaySound("sndTorchOn", pA->Position(), pA, !!pA->HUDview());
+        else if (!m_switched_on && was_switched_on && m_sounds.FindSoundItem("sndTorchOff", false))
+            m_sounds.PlaySound("sndTorchOff", pA->Position(), pA, !!pA->HUDview());
     }
 }
 
@@ -327,8 +318,6 @@ void CTorch::SwitchNightVision(bool turn_on)
 
     inherited::Switch(turn_on);
 
-    bool bPlaySoundFirstPerson = (pA == Level().CurrentViewEntity());
-
     if (!!m_NightVisionSect)
     {
         const char* disabled_names = READ_IF_EXISTS(pSettings, r_string, cNameSect(), "disabled_maps", nullptr);
@@ -351,7 +340,8 @@ void CTorch::SwitchNightVision(bool turn_on)
 
         if (!b_allow)
         {
-            HUD_SOUND::PlaySound(sndNightVisionBroken, pA->Position(), pA, bPlaySoundFirstPerson);
+            if (m_sounds.FindSoundItem("sndNightVisionBroken", false))
+                m_sounds.PlaySound("sndNightVisionBroken", pA->Position(), pA, !!pA->HUDview());
             return;
         }
         else
@@ -364,8 +354,10 @@ void CTorch::SwitchNightVision(bool turn_on)
                 if (!pp)
                 {
                     AddEffector(pA, effNightvision, m_NightVisionSect);
-                    HUD_SOUND::PlaySound(sndNightVisionOn, pA->Position(), pA, bPlaySoundFirstPerson);
-                    HUD_SOUND::PlaySound(sndNightVisionIdle, pA->Position(), pA, bPlaySoundFirstPerson, true);
+                    if (m_sounds.FindSoundItem("sndNightVisionOn", false))
+                        m_sounds.PlaySound("sndNightVisionOn", pA->Position(), pA, !!pA->HUDview());
+                    if (m_sounds.FindSoundItem("sndNightVisionIdle", false))
+                        m_sounds.PlaySound("sndNightVisionIdle", pA->Position(), pA, !!pA->HUDview(), true);
                 }
             }
         }
@@ -381,8 +373,9 @@ void CTorch::SwitchNightVision(bool turn_on)
         if (pp)
         {
             pp->Stop(1.0f);
-            HUD_SOUND::PlaySound(sndNightVisionOff, pA->Position(), pA, bPlaySoundFirstPerson);
-            HUD_SOUND::StopSound(sndNightVisionIdle);
+            if (m_sounds.FindSoundItem("sndNightVisionOff", false))
+                m_sounds.PlaySound("sndNightVisionOff", pA->Position(), pA, !!pA->HUDview());
+            m_sounds.StopSound("sndNightVisionIdle");
         }
     }
 }
@@ -440,12 +433,7 @@ void CTorch::OnH_B_Independent(bool just_before_destroy)
 
     Switch(false);
 
-    HUD_SOUND::StopSound(sndTorchOn);
-    HUD_SOUND::StopSound(sndTorchOff);
-    //nv
-    HUD_SOUND::StopSound(sndNightVisionOn);
-    HUD_SOUND::StopSound(sndNightVisionOff);
-    HUD_SOUND::StopSound(sndNightVisionIdle);
+    m_sounds.StopAllSounds();
     // m_NightVisionChargeTime		= m_NightVisionRechargeTime;
 }
 
@@ -564,8 +552,8 @@ void CTorch::SwitchMode()
 
     LoadLightDefinitions(m_bSecondMode ? m_light_descr_sect_second : m_light_descr_sect);
 
-    if (auto pA = smart_cast<CActor*>(H_Parent()))
-        HUD_SOUND::PlaySound(sndTorchSwitch, pA->Position(), pA, pA == Level().CurrentViewEntity());
+    if (auto pA = smart_cast<CActor*>(H_Parent()); pA && m_sounds.FindSoundItem("sndTorchSwitch", false))
+        m_sounds.PlaySound("sndTorchSwitch", pA->Position(), pA, !!pA->HUDview());
 }
 
 void CTorch::save(NET_Packet& output_packet)

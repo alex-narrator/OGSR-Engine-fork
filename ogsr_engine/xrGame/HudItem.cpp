@@ -184,6 +184,11 @@ void CHudItem::PlaySound(HUD_SOUND& hud_snd, const Fvector& position, bool overl
     HUD_SOUND::PlaySound(hud_snd, position, object().H_Root(), !!GetHUDmode(), false, overlap);
 }
 
+void CHudItem::PlaySound(LPCSTR alias, const Fvector& position) { m_sounds.PlaySound(alias, position, object().H_Root(), !!GetHUDmode()); }
+// Alundaio: Play at index
+void CHudItem::PlaySound(LPCSTR alias, const Fvector& position, u8 index) { m_sounds.PlaySound(alias, position, object().H_Root(), !!GetHUDmode(), false, index); }
+//-Alundaio
+
 void CHudItem::net_Destroy() { m_dwStateTime = 0; }
 
 BOOL CHudItem::net_Spawn(CSE_Abstract* DC) { return TRUE; }

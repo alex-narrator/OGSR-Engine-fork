@@ -98,12 +98,6 @@ protected:
     Fvector m_vHudThrowPoint;
     Fvector m_vHudThrowDir;
 
-    //звук анимации "играния"
-    HUD_SOUND sndPlaying;
-    HUD_SOUND sndItemOn;
-
-    HUD_SOUND sndShow, sndHide;
-
     bool m_throwMotionMarksAvailable{};
 
 protected:

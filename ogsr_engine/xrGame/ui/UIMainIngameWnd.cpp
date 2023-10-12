@@ -251,9 +251,6 @@ void CUIMainIngameWnd::Init()
 
     uiXml.SetLocalRoot(uiXml.GetRoot());
 
-    //AttachChild(&UICarPanel);
-    //xml_init.InitWindow(uiXml, "car_panel", 0, &UICarPanel);
-
     AttachChild(&UIMotionIcon);
     UIMotionIcon.Init();
 

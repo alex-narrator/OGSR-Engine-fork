@@ -43,19 +43,9 @@ void create_force_progress()
     xml_init.InitProgressShape(uiXml, "progress", 0, g_MissileForceShape);
 }
 
-CMissile::CMissile(void)
-{
+CMissile::CMissile(void) {}
 
-}
-
-CMissile::~CMissile(void)
-{
-    HUD_SOUND::DestroySound(sndPlaying);
-    HUD_SOUND::DestroySound(sndItemOn);
-
-    HUD_SOUND::DestroySound(sndShow);
-    HUD_SOUND::DestroySound(sndHide);
-}
+CMissile::~CMissile(void) {}
 
 void CMissile::reinit()
 {
@@ -83,11 +73,13 @@ void CMissile::Load(LPCSTR section)
     m_vHudThrowPoint = pSettings->r_fvector3(*hud_sect, "throw_point");
     m_vHudThrowDir = pSettings->r_fvector3(*hud_sect, "throw_dir");
 
+    if (pSettings->line_exist(section, "snd_draw"))
+        m_sounds.LoadSound(section, "snd_draw", "sndShow");
+    if (pSettings->line_exist(section, "snd_holster"))
+        m_sounds.LoadSound(section, "snd_holster", "sndHide");
+    if (pSettings->line_exist(section, "snd_activate"))
     if (pSettings->line_exist(section, "snd_playing"))
-        HUD_SOUND::LoadSound(section, "snd_playing", sndPlaying);
-
-    if (pSettings->line_exist(section, "snd_item_on"))
-        HUD_SOUND::LoadSound(section, "snd_item_on", sndItemOn);
+        m_sounds.LoadSound(section, "snd_playing", "sndPlaying");
 
     m_ef_weapon_type = READ_IF_EXISTS(pSettings, r_u32, section, "ef_weapon_type", u32(-1));
 }
@@ -254,7 +246,7 @@ void CMissile::State(u32 state, u32 oldState)
     case eShowing: {
         SetPending(TRUE);
         PlayHUDMotion({"anim_show", "anm_show"}, false, GetState());
-        PlaySound(sndShow, Position());
+        PlaySound("sndShow", Position());
     }
     break;
     case eIdle: {
@@ -269,7 +261,7 @@ void CMissile::State(u32 state, u32 oldState)
             {
                 SetPending(TRUE);
                 PlayHUDMotion({"anim_hide", "anm_hide"}, true, GetState());
-                PlaySound(sndHide, Position());
+                PlaySound("sndHide", Position());
             }
         }
     }
@@ -311,14 +303,9 @@ void CMissile::State(u32 state, u32 oldState)
     }
     break;
     case eBore: {
-        PlaySound(sndPlaying, Position());
+        PlaySound("sndPlaying", Position());
         PlayHUDMotion({"anim_playing", "anm_bore"}, true, GetState());
     }
-    break;
-    //case eDeviceSwitch: {
-    //    SetPending(TRUE);
-    //    PlayAnimDeviceSwitch();
-    //}
     break;
     }
 }
@@ -330,19 +317,6 @@ void CMissile::PlayAnimIdle()
 
     PlayHUDMotion({"anim_idle", "anm_idle"}, true, GetState());
 }
-
-//void CMissile::PlayAnimDeviceSwitch()
-//{
-//    PlaySound(sndItemOn, Position());
-//
-//    if (AnimationExist("anm_headlamp_on"))
-//        PlayHUDMotion("anm_headlamp_on", true, GetState());
-//    else
-//    {
-//        DeviceUpdate();
-//        SwitchState(eIdle);
-//    }
-//}
 
 void CMissile::OnStateSwitch(u32 S, u32 oldState)
 {

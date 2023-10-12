@@ -75,7 +75,7 @@ void CExplosive::LightCreate()
 
 void CExplosive::LightDestroy() { m_pLight.destroy(); }
 
-CExplosive::~CExplosive(void) { sndExplode.destroy(); }
+CExplosive::~CExplosive(void) {}
 
 void CExplosive::Load(LPCSTR section) { Load(pSettings, section); }
 
@@ -112,8 +112,8 @@ void CExplosive::Load(CInifile* ini, LPCSTR section)
     //трассы для разлета осколков
     m_fFragmentSpeed = ini->r_float(section, "fragment_speed");
 
-    LPCSTR snd_name = ini->r_string(section, "snd_explode");
-    sndExplode.create(snd_name, st_Effect, m_eSoundExplode);
+    // Alundaio: LAYERED_SND_SHOOT
+    m_layered_sounds.LoadSound(ini, section, "snd_explode", "sndExplode", false, m_eSoundExplode);
 
     m_fExplodeDurationMax = ini->r_float(section, "explode_duration");
 
@@ -332,12 +332,7 @@ void CExplosive::Explode()
     //	Msg("---------CExplosive Explode [%d] frame[%d]",cast_game_object()->ID(), Device.dwFrame);
     OnBeforeExplosion();
     //играем звук взрыва
-    CObject* who = nullptr;
-    if (Initiator() != ALife::_OBJECT_ID(-1))
-    {
-        who = Level().Objects.net_Find(Initiator());
-    }
-    Sound->play_at_pos(sndExplode, who, pos, false);
+    m_layered_sounds.PlaySound("sndExplode", pos, smart_cast<CObject*>(this), false, false, (u8)-1);
 
     //показываем эффекты
 

@@ -20,7 +20,7 @@ CGrenade::CGrenade(void)
     m_destroy_callback.clear();
 }
 
-CGrenade::~CGrenade(void) { HUD_SOUND::DestroySound(sndThrow); }
+CGrenade::~CGrenade(void) { /*HUD_SOUND::DestroySound(sndThrow);*/ }
 
 void CGrenade::Load(LPCSTR section)
 {
@@ -28,7 +28,7 @@ void CGrenade::Load(LPCSTR section)
     CExplosive::Load(section);
 
     if (pSettings->line_exist(section, "snd_throw"))
-        HUD_SOUND::LoadSound(section, "snd_throw", sndThrow);
+        m_sounds.LoadSound(section, "snd_throw", "sndThrow");
 
     m_grenade_detonation_threshold_hit = READ_IF_EXISTS(pSettings, r_float, section, "detonation_threshold_hit", 100.f);
     b_impact_fuze = READ_IF_EXISTS(pSettings, r_bool, section, "impact_fuze", false);
@@ -104,7 +104,7 @@ void CGrenade::State(u32 state, u32 oldState)
     case eThrowStart: {
         Fvector C;
         Center(C);
-        PlaySound(sndThrow, C);
+        PlaySound("sndThrow", C);
     }
     break;
     case eThrowEnd: {

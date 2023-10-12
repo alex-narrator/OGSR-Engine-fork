@@ -30,24 +30,9 @@ constexpr const char* grenade_launcher_def_bone_cop = "grenade";
 
 CWeaponMagazinedWGrenade::CWeaponMagazinedWGrenade(LPCSTR name, ESoundTypes eSoundType) : CWeaponMagazined(name, eSoundType) {}
 
-CWeaponMagazinedWGrenade::~CWeaponMagazinedWGrenade(void)
-{
-    // sounds
-    HUD_SOUND::DestroySound(sndShotG);
-    HUD_SOUND::DestroySound(sndReloadG);
-    HUD_SOUND::DestroySound(sndSwitch);
-    HUD_SOUND::DestroySound(sndShutterG);
-}
+CWeaponMagazinedWGrenade::~CWeaponMagazinedWGrenade(void) {}
 
-void CWeaponMagazinedWGrenade::StopHUDSounds()
-{
-    HUD_SOUND::StopSound(sndShotG);
-    HUD_SOUND::StopSound(sndReloadG);
-    HUD_SOUND::StopSound(sndSwitch);
-    HUD_SOUND::StopSound(sndShutterG);
-
-    inherited::StopHUDSounds();
-}
+void CWeaponMagazinedWGrenade::StopHUDSounds() { inherited::StopHUDSounds(); }
 
 void CWeaponMagazinedWGrenade::Load(LPCSTR section)
 {
@@ -55,11 +40,11 @@ void CWeaponMagazinedWGrenade::Load(LPCSTR section)
     CRocketLauncher::Load(section);
 
     //// Sounds
-    HUD_SOUND::LoadSound(section, "snd_shoot_grenade", sndShotG, m_eSoundShot);
-    HUD_SOUND::LoadSound(section, "snd_reload_grenade", sndReloadG, m_eSoundReload);
-    HUD_SOUND::LoadSound(section, "snd_switch", sndSwitch, m_eSoundReload);
+    m_sounds.LoadSound(section, "snd_shoot_grenade", "sndShotG", false, m_eSoundShot);
+    m_sounds.LoadSound(section, "snd_reload_grenade", "sndReloadG", false, m_eSoundReload);
+    m_sounds.LoadSound(section, "snd_switch", "sndSwitch", false, m_eSoundReload);
     //
-    HUD_SOUND::LoadSound(section, pSettings->line_exist(section, "snd_shutter_g") ? "snd_shutter_g" : "snd_draw", sndShutterG, m_eSoundShutter);
+    m_sounds.LoadSound(section, pSettings->line_exist(section, "snd_shutter_g") ? "snd_shutter_g" : "snd_draw", "sndShutterG", false, m_eSoundShutter);
 
     m_sFlameParticles2 = pSettings->r_string(section, "grenade_flame_particles");
 
@@ -183,7 +168,7 @@ void CWeaponMagazinedWGrenade::switch2_Reload()
     VERIFY(GetState() == eReload);
     if (IsGrenadeMode())
     {
-        PlaySound(sndReloadG, get_LastFP2());
+        PlaySound("sndReloadG", get_LastFP2());
 
         PlayHUDMotion({"anim_reload_g", "anm_reload_g"}, false, GetState());
         SetPending(TRUE);
@@ -196,7 +181,7 @@ void CWeaponMagazinedWGrenade::OnShot()
 {
     if (IsGrenadeMode())
     {
-        PlaySound(sndShotG, get_LastFP2(), true);
+        PlaySound("sndShotG", get_LastFP2());
 
         AddShotEffector();
 
@@ -233,7 +218,7 @@ bool CWeaponMagazinedWGrenade::SwitchMode()
 
     PerformSwitchGL();
 
-    PlaySound(sndSwitch, get_LastFP());
+    PlaySound("sndSwitch", get_LastFP());
 
     PlayAnimModeSwitch();
 
@@ -710,7 +695,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                 if (AnimationExist(guns_aim_anm))
                 {
                     PlayHUDMotion(guns_aim_anm, true, GetState());
-                    PlaySound(sndAimStart, get_LastFP());
+                    PlaySound("sndAimStart", get_LastFP());
                     return;
                 }
             }
@@ -740,7 +725,7 @@ void CWeaponMagazinedWGrenade::PlayAnimIdle()
                 if (AnimationExist(guns_aim_anm))
                 {
                     PlayHUDMotion(guns_aim_anm, true, GetState());
-                    PlaySound(sndAimEnd, get_LastFP());
+                    PlaySound("sndAimEnd", get_LastFP());
                     return;
                 }
             }
@@ -860,12 +845,9 @@ void CWeaponMagazinedWGrenade::UpdateSounds()
 {
     inherited::UpdateSounds();
 
-    if (sndShotG.playing())
-        sndShotG.set_position(get_LastFP2());
-    if (sndReloadG.playing())
-        sndReloadG.set_position(get_LastFP2());
-    if (sndSwitch.playing())
-        sndSwitch.set_position(get_LastFP());
+    m_sounds.SetPosition("sndShotG", get_LastFP2());
+    m_sounds.SetPosition("sndReloadG", get_LastFP2());
+    m_sounds.SetPosition("sndSwitch", get_LastFP2());
 }
 
 void CWeaponMagazinedWGrenade::UpdateGrenadeVisibility(bool visibility)
@@ -897,7 +879,7 @@ void CWeaponMagazinedWGrenade::PlayAnimShutter()
         AnimationExist("anm_shutter_g") ? PlayHUDMotion("anm_shutter_g", true, GetState()) : PlayHUDMotion({"anim_draw_g", "anm_show_g"}, true, GetState());
     else
         AnimationExist("anm_shutter_w_gl") ? PlayHUDMotion("anm_shutter_w_gl", true, GetState()) : PlayHUDMotion({"anim_draw_gl", "anm_show_w_gl"}, true, GetState());
-    PlaySound(sndShutter, get_LastFP());
+    PlaySound("sndShutter", get_LastFP());
 }
 void CWeaponMagazinedWGrenade::PlayAnimShutterMisfire()
 {
@@ -910,7 +892,7 @@ void CWeaponMagazinedWGrenade::PlayAnimShutterMisfire()
         AnimationExist("anm_shutter_misfire_g") ? PlayHUDMotion("anm_shutter_misfire_g", true, GetState()) : PlayHUDMotion({"anim_draw_g", "anm_show_g"}, true, GetState());
     else
         AnimationExist("anm_shutter_misfire_w_gl") ? PlayHUDMotion("anm_shutter_misfire_w_gl", true, GetState()) : PlayHUDMotion({"anim_draw_gl", "anm_show_w_gl"}, true, GetState());
-    PlaySound(sndShutterMisfire, get_LastFP());
+    PlaySound("sndShutterMisfire", get_LastFP());
 }
 
 void CWeaponMagazinedWGrenade::UnloadWeaponFull()

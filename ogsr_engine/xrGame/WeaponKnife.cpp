@@ -22,12 +22,7 @@ CWeaponKnife::CWeaponKnife() : CWeapon("KNIFE")
     SetNextState(eHidden);
 }
 
-CWeaponKnife::~CWeaponKnife()
-{
-    HUD_SOUND::DestroySound(m_sndShot);
-    HUD_SOUND::DestroySound(m_sndShow);
-    HUD_SOUND::DestroySound(m_sndHide);
-}
+CWeaponKnife::~CWeaponKnife() {}
 
 void CWeaponKnife::Load(LPCSTR section)
 {
@@ -36,12 +31,12 @@ void CWeaponKnife::Load(LPCSTR section)
 
     fWallmarkSize = pSettings->r_float(section, "wm_size");
 
-    HUD_SOUND::LoadSound(section, "snd_shoot", m_sndShot, ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING));
+    m_sounds.LoadSound(section, "snd_shoot", "m_sndShot", false, SOUND_TYPE_WEAPON_SHOOTING);
 
     if (pSettings->line_exist(section, "snd_draw"))
-        HUD_SOUND::LoadSound(section, "snd_draw", m_sndShow);
+        m_sounds.LoadSound(section, "snd_draw", "m_sndShow");
     if (pSettings->line_exist(section, "snd_holster"))
-        HUD_SOUND::LoadSound(section, "snd_holster", m_sndHide);
+        m_sounds.LoadSound(section, "snd_holster", "m_sndHide");
 
     knife_material_idx = GMLib.GetMaterialIdx(KNIFE_MATERIAL_NAME);
 
@@ -131,7 +126,7 @@ void CWeaponKnife::KnifeStrike(u32 state, const Fvector& pos, const Fvector& dir
 
         const bool send_hit = SendHitAllowed(H_Parent());
 
-        PlaySound(m_sndShot, pos);
+        PlaySound("m_sndShot", pos);
 
         if (ParentIsActor())
         {
@@ -237,7 +232,7 @@ void CWeaponKnife::switch2_Hiding()
     FireEnd();
     VERIFY(GetState() == eHiding);
     PlayHUDMotion({"anim_hide", "anm_hide"}, true, GetState());
-    PlaySound(m_sndHide, Position());
+    PlaySound("m_sndHide", Position());
     SetPending(TRUE);
 }
 
@@ -251,7 +246,7 @@ void CWeaponKnife::switch2_Showing()
 {
     VERIFY(GetState() == eShowing);
     PlayHUDMotion({"anim_draw", "anm_show"}, false, GetState());
-    PlaySound(m_sndShow, Position());
+    PlaySound("m_sndShow", Position());
     SetPending(TRUE);
 }
 

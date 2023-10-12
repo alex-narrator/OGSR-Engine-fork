@@ -1,29 +1,28 @@
 #include "stdafx.h"
 #include "weaponBM16.h"
 
-CWeaponBM16::~CWeaponBM16() { HUD_SOUND::DestroySound(m_sndReload1); }
+CWeaponBM16::~CWeaponBM16() {}
 
 void CWeaponBM16::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    HUD_SOUND::LoadSound(section, "snd_reload_1", m_sndReload1, m_eSoundReload);
+    m_sounds.LoadSound(section, "snd_reload_1", "m_sndReload1", false, m_eSoundReload);
 }
 
 void CWeaponBM16::PlayReloadSound()
 {
     if (m_magazine.size() == 1 || !HaveCartridgeInInventory(2))
-        PlaySound(m_sndReload1, get_LastFP());
+        PlaySound("m_sndReload1", get_LastFP());
     else
-        PlaySound(sndReload, get_LastFP());
+        PlaySound("sndReload", get_LastFP());
 }
 
 void CWeaponBM16::UpdateSounds()
 {
     inherited::UpdateSounds();
 
-    if (m_sndReload1.playing())
-        m_sndReload1.set_position(get_LastFP());
+    m_sounds.SetPosition("m_sndReload1", get_LastFP());
 }
 
 void CWeaponBM16::PlayAnimShoot()
@@ -150,7 +149,7 @@ void CWeaponBM16::PlayAnimIdle()
             if (AnimationExist(guns_aim_anm))
             {
                 PlayHUDMotion(guns_aim_anm, true, GetState());
-                PlaySound(sndAimStart, get_LastFP());
+                PlaySound("sndAimStart", get_LastFP());
                 return;
             }
         }
@@ -162,7 +161,7 @@ void CWeaponBM16::PlayAnimIdle()
             if (AnimationExist(guns_aim_anm_full))
             {
                 PlayHUDMotion(guns_aim_anm_full, true, GetState());
-                PlaySound(sndAimEnd, get_LastFP());
+                PlaySound("sndAimEnd", get_LastFP());
                 return;
             }
         }
@@ -204,7 +203,7 @@ void CWeaponBM16::PlayAnimShutter()
     case 1: AnimationExist("anm_shutter_1") ? PlayHUDMotion("anm_shutter_1", true, GetState()) : PlayHUDMotion({"anim_draw_1", "anim_draw", "anm_show_1"}, true, GetState()); break;
     case 2: AnimationExist("anm_shutter_2") ? PlayHUDMotion("anm_shutter_2", true, GetState()) : PlayHUDMotion({"anim_draw_2", "anim_draw", "anm_show_2"}, true, GetState()); break;
     }
-    PlaySound(sndShutter, get_LastFP());
+    PlaySound("sndShutter", get_LastFP());
 }
 void CWeaponBM16::PlayAnimShutterMisfire()
 {
@@ -214,7 +213,7 @@ void CWeaponBM16::PlayAnimShutterMisfire()
     case 1: AnimationExist("anm_shutter_misfire_1") ? PlayHUDMotion("anm_shutter_misfire_1", true, GetState()) : PlayHUDMotion({"anim_draw_1", "anim_draw", "anm_show_1"}, true, GetState()); break;
     case 2: AnimationExist("anm_shutter_misfire_2") ? PlayHUDMotion("anm_shutter_misfire_2", true, GetState()) : PlayHUDMotion({"anim_draw_2", "anim_draw", "anm_show_2"}, true, GetState()); break;
     }
-    PlaySound(sndShutterMisfire, get_LastFP());
+    PlaySound("sndShutterMisfire", get_LastFP());
 }
 
 void CWeaponBM16::PlayAnimCheckMisfire()

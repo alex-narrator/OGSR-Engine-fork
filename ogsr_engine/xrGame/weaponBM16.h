@@ -7,9 +7,6 @@ class CWeaponBM16 : public CWeaponShotgun
 {
     typedef CWeaponShotgun inherited;
 
-protected:
-    HUD_SOUND m_sndReload1;
-
 public:
     virtual ~CWeaponBM16();
     virtual void Load(LPCSTR section);

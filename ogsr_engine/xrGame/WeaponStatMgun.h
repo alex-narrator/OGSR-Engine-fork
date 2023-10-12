@@ -56,7 +56,8 @@ private:
     Fvector2 m_dAngle;
     Fvector m_destEnemyDir;
     bool m_allow_fire;
-    HUD_SOUND sndShot;
+
+    HUD_SOUND_COLLECTION_LAYERED m_sounds;
     float camRelaxSpeed;
     float camMaxAngle;
 

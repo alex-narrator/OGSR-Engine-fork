@@ -73,14 +73,7 @@ public:
     void SwitchMode();
 
 protected:
-    HUD_SOUND 
-        sndTorchOn, 
-        sndTorchOff, 
-        sndTorchSwitch,
-        sndNightVisionOn,
-        sndNightVisionOff,
-        sndNightVisionIdle,
-        sndNightVisionBroken;
+    HUD_SOUND_COLLECTION_LAYERED m_sounds{};
 
     shared_str 
         m_light_descr_sect{}, 

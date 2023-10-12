@@ -9,6 +9,7 @@
 #include "..\xr_3da\render.h"
 #include "..\xr_3da\feel_touch.h"
 #include "inventory_item.h"
+#include "hudsound.h"
 #include "ai_sounds.h"
 #include "script_export_space.h"
 #include "DamageSource.h"
@@ -69,7 +70,7 @@ public:
     bool IsReadyToExplode() { return !!m_explosion_flags.test(flReadyToExplode); };
 
 protected:
-    bool IsSoundPlaying() { return !!sndExplode._feedback(); }
+    bool IsSoundPlaying() { return !!m_layered_sounds.FindSoundItem("sndExplode", true)->playing(); }
 
 private:
     void PositionUpdate();
@@ -140,8 +141,11 @@ protected:
     float m_fFragmentSpeed;
 
     //звуки
-    ref_sound sndExplode;
     ESoundTypes m_eSoundExplode;
+
+    // Alundaio: LAYERED_SND_SHOOT
+    HUD_SOUND_COLLECTION_LAYERED m_layered_sounds;
+    //-Alundaio
 
     //размер отметки на стенах
     float fWallmarkSize;

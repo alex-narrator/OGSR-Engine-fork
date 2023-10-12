@@ -58,8 +58,6 @@ private:
     u16 joystick{BI_NONE};
     static void JoystickCallback(CBoneInstance* B);
 
-    HUD_SOUND sndShow, sndHide, sndBtnPress, sndBtnRelease;
-
     bool this_is_3d_pda{};
 
 public:

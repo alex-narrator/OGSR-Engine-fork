@@ -21,35 +21,16 @@ private:
 
 protected:
     // Media :: sounds
-    HUD_SOUND sndShow;
-    HUD_SOUND sndHide;
-    HUD_SOUND sndShot;
-    HUD_SOUND sndEmptyClick;
-    HUD_SOUND sndReload, sndReloadPartly;
     bool sndReloadPartlyExist{};
-    HUD_SOUND sndZoomChange;
-    //
-    HUD_SOUND sndShutter, sndShutterMisfire, sndUnload;
-    HUD_SOUND sndZoomIn;
-    HUD_SOUND sndZoomOut;
-    HUD_SOUND sndNightVisionOn;
-    HUD_SOUND sndNightVisionOff;
-    HUD_SOUND sndNightVisionIdle;
-    HUD_SOUND sndNightVisionBroken;
-
-    HUD_SOUND sndLaserSwitch;
-    HUD_SOUND sndFlashlightSwitch;
-    HUD_SOUND sndAimStart, sndAimEnd;
-
     // звук текущего выстрела
-    HUD_SOUND* m_pSndShotCurrent{};
+    shared_str m_sSndShotCurrent;
 
     virtual void StopHUDSounds();
 
     // дополнительная информация о глушителе
     LPCSTR m_sSilencerFlameParticles{};
     LPCSTR m_sSilencerSmokeParticles{};
-    HUD_SOUND sndSilencerShot;
+    //HUD_SOUND sndSilencerShot;
 
     ESoundTypes m_eSoundShow;
     ESoundTypes m_eSoundHide;
@@ -95,6 +76,7 @@ protected:
     virtual void switch2_Showing();
 
     virtual void OnShot();
+    virtual void PlaySoundShot();
 
     virtual void OnEmptyClick();
 

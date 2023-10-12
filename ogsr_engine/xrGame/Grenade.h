@@ -45,9 +45,6 @@ public:
     virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
 
 protected:
-    //HUD_SOUND sndCheckout;
-    //ESoundTypes m_eSoundCheckout;
-    HUD_SOUND sndThrow;
     virtual size_t GetWeaponTypeForCollision() const override { return Knife_and_other; }
 
 private:
