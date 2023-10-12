@@ -162,6 +162,7 @@ protected:
     shared_str m_nightvision_particle{};
     bool m_bCanSwitchModes{};
     bool m_bAfMode{};
+    bool m_bThrowAnm{};
 
 public:
     CCustomDetector() = default;

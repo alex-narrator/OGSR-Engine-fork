@@ -137,6 +137,31 @@ void CCustomDetector::OnStateSwitch(u32 S, u32 oldState)
         SetPending(FALSE);
     }
     break;
+    case eThrowStart: {
+        if (AnimationExist("anm_throw_start"))
+        {
+            PlayHUDMotion("anm_throw_start", true, GetState());
+            SetPending(TRUE);
+        }
+        else
+            SwitchState(eThrow);
+    }
+    break;
+    case eThrow: {
+        PlayHUDMotion("anm_throw", true, GetState());
+        SetPending(FALSE);
+    }
+    break;
+    case eThrowEnd: {
+        if (AnimationExist("anm_throw_end"))
+        {
+            PlayHUDMotion("anm_throw_end", true, GetState());
+            SetPending(TRUE);
+        }
+        else
+            SwitchState(eIdle);
+    }
+    break;
     }
 }
 
@@ -152,6 +177,14 @@ void CCustomDetector::OnAnimationEnd(u32 state)
     case eHiding: {
         SwitchState(eHidden);
         g_player_hud->detach_item(this);
+    }
+    break;
+    case eThrowStart: {
+        SwitchState(eThrow);
+    }
+    break;
+    case eThrowEnd: {
+        SwitchState(eIdle);
     }
     break;
     }
@@ -213,6 +246,8 @@ void CCustomDetector::Load(LPCSTR section)
     m_sounds.LoadSound(section, "snd_draw", "sndShow");
     m_sounds.LoadSound(section, "snd_holster", "sndHide");
     m_sounds.LoadSound(section, "snd_switch", "sndSwitch");
+
+    m_bThrowAnm = pSettings->line_exist(hud_sect, "anm_throw");
 }
 
 void CCustomDetector::shedule_Update(u32 dt)
@@ -245,10 +280,10 @@ void CCustomDetector::UpdateWork()
 void CCustomDetector::UpdateVisibility()
 {
     // check visibility
+    bool bClimb = ((Actor()->MovingState() & mcClimb) != 0);
     attachable_hud_item* i0 = g_player_hud->attached_item(0);
-    if (GetState() == eIdle || GetState() == eShowing)
+    if (GetState() == eIdle || GetState() == eShowing || GetState() == eThrow || GetState() == eThrowStart)
     {
-        bool bClimb = ((Actor()->MovingState() & mcClimb) != 0);
         if (bClimb || IsBlocked())
         {
             HideDetector(true);
@@ -259,8 +294,20 @@ void CCustomDetector::UpdateVisibility()
             if (i0->m_parent_hud_item)
             {
                 u32 state = i0->m_parent_hud_item->GetState();
+                if (smart_cast<CMissile*>(i0->m_parent_hud_item))
+                {
+                    if ((state == eThrowStart || state == eReady) && GetState() == eIdle)
+                        SwitchState(eThrowStart);
+                    else if (state == eThrow && GetState() == eThrow)
+                        SwitchState(eThrowEnd);
+                    else if (state == eHiding && (GetState() == eThrowStart || GetState() == eThrow))
+                        SwitchState(eIdle);
+                }
                 if (state == eReload || state == eSwitch)
                 {
+                    if (GetState() == eThrowStart || GetState() == eThrow)
+                        SwitchState(eIdle);
+
                     HideDetector(true);
                     m_bNeedActivation = true;
                 }
@@ -269,8 +316,6 @@ void CCustomDetector::UpdateVisibility()
     }
     else if (m_bNeedActivation)
     {
-        attachable_hud_item* i0 = g_player_hud->attached_item(0);
-        bool bClimb = ((Actor()->MovingState() & mcClimb) != 0);
         if (!bClimb)
         {
             CHudItem* huditem = (i0) ? i0->m_parent_hud_item : nullptr;
