@@ -28,7 +28,7 @@ void CWeaponShotgun::Load(LPCSTR section)
     inherited::Load(section);
 
     // Звук и анимация для выстрела дуплетом
-    m_sounds.LoadSound(section, "snd_shoot_duplet", "sndShotBoth", false, m_eSoundShotBoth);
+    m_sounds.LoadSound(section, "snd_shoot_duplet", "sndShotBoth", m_eSoundShotBoth);
 
     if (pSettings->line_exist(section, "tri_state_reload"))
     {
@@ -37,9 +37,9 @@ void CWeaponShotgun::Load(LPCSTR section)
 
     if (m_bTriStateReload)
     {
-        m_sounds.LoadSound(section, "snd_open_weapon", "m_sndOpen", false, m_eSoundOpen);
-        m_sounds.LoadSound(section, "snd_add_cartridge", "m_sndAddCartridge", false, m_eSoundAddCartridge);
-        m_sounds.LoadSound(section, "snd_close_weapon", "m_sndClose", false, m_eSoundClose);
+        m_sounds.LoadSound(section, "snd_open_weapon", "m_sndOpen", m_eSoundOpen);
+        m_sounds.LoadSound(section, "snd_add_cartridge", "m_sndAddCartridge", m_eSoundAddCartridge);
+        m_sounds.LoadSound(section, "snd_close_weapon", "m_sndClose", m_eSoundClose);
     }
 }
 
@@ -91,7 +91,7 @@ void CWeaponShotgun::OnShotBoth()
     }
 
     // звук выстрела дуплетом
-    PlaySound("sndShotBoth", get_LastFP());
+    PlaySound("sndShotBoth", get_LastFP(), true);
 
     // Camera
     AddShotEffector();

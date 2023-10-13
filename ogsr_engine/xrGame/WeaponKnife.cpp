@@ -31,7 +31,7 @@ void CWeaponKnife::Load(LPCSTR section)
 
     fWallmarkSize = pSettings->r_float(section, "wm_size");
 
-    m_sounds.LoadSound(section, "snd_shoot", "m_sndShot", false, SOUND_TYPE_WEAPON_SHOOTING);
+    m_sounds.LoadSound(section, "snd_shoot", "m_sndShot", SOUND_TYPE_WEAPON_SHOOTING);
 
     if (pSettings->line_exist(section, "snd_draw"))
         m_sounds.LoadSound(section, "snd_draw", "m_sndShow");
@@ -126,7 +126,7 @@ void CWeaponKnife::KnifeStrike(u32 state, const Fvector& pos, const Fvector& dir
 
         const bool send_hit = SendHitAllowed(H_Parent());
 
-        PlaySound("m_sndShot", pos);
+        PlaySound("m_sndShot", pos, true);
 
         if (ParentIsActor())
         {

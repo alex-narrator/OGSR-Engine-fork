@@ -83,22 +83,22 @@ void CTorch::Load(LPCSTR section)
     light_trace_bone = READ_IF_EXISTS(pSettings, r_string, section, "light_trace_bone", nullptr);
 
     if (pSettings->line_exist(section, "snd_torch_on"))
-        m_sounds.LoadSound(section, "snd_torch_on", "sndTorchOn", false, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_torch_on", "sndTorchOn", SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_torch_off"))
-        m_sounds.LoadSound(section, "snd_torch_off", "sndTorchOff", false, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_torch_off", "sndTorchOff", SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_torch_switch"))
-        m_sounds.LoadSound(section, "snd_torch_switch", "sndTorchSwitch", false, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_torch_switch", "sndTorchSwitch", SOUND_TYPE_ITEM_USING);
     //nv
     m_NightVisionSect = READ_IF_EXISTS(pSettings, r_string, section, "night_vision_effector", nullptr);
 
     if (pSettings->line_exist(section, "snd_night_vision_on"))
-        m_sounds.LoadSound(section, "snd_night_vision_on", "sndNightVisionOn", false, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_night_vision_on", "sndNightVisionOn", SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_night_vision_off"))
-        m_sounds.LoadSound(section, "snd_night_vision_off", "sndNightVisionOff", false, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_night_vision_off", "sndNightVisionOff", SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_night_vision_idle"))
-        m_sounds.LoadSound(section, "snd_night_vision_idle", "sndNightVisionIdle", false, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_night_vision_idle", "sndNightVisionIdle", SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_night_vision_broken"))
-        m_sounds.LoadSound(section, "snd_night_vision_broken", "sndNightVisionBroken", false, SOUND_TYPE_ITEM_USING);
+        m_sounds.LoadSound(section, "snd_night_vision_broken", "sndNightVisionBroken", SOUND_TYPE_ITEM_USING);
 }
 
 void CTorch::Switch() 

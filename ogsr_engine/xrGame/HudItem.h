@@ -104,8 +104,7 @@ public:
     virtual CHudItem* cast_hud_item() { return this; }
 
     virtual void PlaySound(HUD_SOUND& snd, const Fvector& position, bool overlap = false);
-    virtual void PlaySound(LPCSTR alias, const Fvector& position);
-    virtual void PlaySound(LPCSTR alias, const Fvector& position, u8 index); // Alundaio: Play at index
+    virtual void PlaySound(LPCSTR alias, const Fvector& position, bool overlap = false);
 
     ///////////////////////////////////////////////
     // общие функции HUD

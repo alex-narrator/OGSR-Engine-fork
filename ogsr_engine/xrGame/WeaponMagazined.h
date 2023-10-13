@@ -76,7 +76,6 @@ protected:
     virtual void switch2_Showing();
 
     virtual void OnShot();
-    virtual void PlaySoundShot();
 
     virtual void OnEmptyClick();
 

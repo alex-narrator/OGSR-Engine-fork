@@ -7,18 +7,15 @@
 
 struct HUD_SOUND
 {
-    HUD_SOUND()
-    {
-        m_activeSnd = NULL;
-        m_b_exclusive = false;
-    }
-    ~HUD_SOUND() { m_activeSnd = NULL; }
+    HUD_SOUND() { m_activeSnd = nullptr; }
+    ~HUD_SOUND() { m_activeSnd = nullptr; }
 
     ////////////////////////////////////
     // работа со звуками
     /////////////////////////////////////
-    static void LoadSound(LPCSTR section, LPCSTR line, ref_sound& hud_snd, int type = sg_SourceType, float* volume = NULL, float* delay = NULL, float* freq = NULL);
-    static void LoadSound(CInifile* ini, LPCSTR section, LPCSTR line, ref_sound& hud_snd, int type = sg_SourceType, float* volume = NULL, float* delay = NULL, float* freq = NULL);
+    static void LoadSound(LPCSTR section, LPCSTR line, ref_sound& hud_snd, int type = sg_SourceType, float* volume = nullptr, float* delay = nullptr, float* freq = nullptr);
+    static void LoadSound(CInifile* ini, LPCSTR section, LPCSTR line, ref_sound& hud_snd, int type = sg_SourceType, float* volume = nullptr, float* delay = nullptr,
+                          float* freq = NULL);
 
     static void LoadSound(LPCSTR section, LPCSTR line, HUD_SOUND& hud_snd, int type = sg_SourceType);
     static void LoadSound(CInifile* ini, LPCSTR section, LPCSTR line, HUD_SOUND& hud_snd, int type = sg_SourceType);
@@ -44,7 +41,7 @@ struct HUD_SOUND
             if (m_activeSnd->snd._feedback() && !m_activeSnd->snd._feedback()->is_2D())
                 m_activeSnd->snd.set_position(pos);
             else
-                m_activeSnd = NULL;
+                m_activeSnd = nullptr;
         }
     }
 
@@ -57,7 +54,6 @@ struct HUD_SOUND
     };
     SSnd* m_activeSnd;
     xr_vector<SSnd> sounds;
-    bool m_b_exclusive;
     shared_str m_alias;
     bool operator==(LPCSTR alias) const { return 0 == stricmp(m_alias.c_str(), alias); }
 };
@@ -70,12 +66,12 @@ public:
     xr_vector<HUD_SOUND> m_sound_items; // Alundaio: made public
 
     HUD_SOUND* FindSoundItem(LPCSTR alias, bool b_assert); // AVO: made public to check if sound is loaded
-    void PlaySound(LPCSTR alias, const Fvector& position, const CObject* parent, bool hud_mode, bool looped = false, u8 index = u8(-1));
+    void PlaySound(LPCSTR alias, const Fvector& position, const CObject* parent, bool hud_mode, bool looped = false, bool overlap = false);
 
     void StopSound(LPCSTR alias);
 
-    void LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive = false, int type = sg_SourceType);
-    void LoadSound(CInifile* ini, LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive = false, int type = sg_SourceType);
+    void LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, int type = sg_SourceType);
+    void LoadSound(CInifile* ini, LPCSTR section, LPCSTR line, LPCSTR alias, int type = sg_SourceType);
 
     void SetPosition(LPCSTR alias, const Fvector& pos);
     void StopAllSounds();
@@ -84,16 +80,15 @@ public:
 // Alundaio:
 class HUD_SOUND_COLLECTION_LAYERED
 {
-    xr_vector<HUD_SOUND_COLLECTION> m_sound_items;
+    xr_vector<HUD_SOUND_COLLECTION> m_sound_layered_items;
 
 public:
-    ~HUD_SOUND_COLLECTION_LAYERED();
     HUD_SOUND* FindSoundItem(LPCSTR alias, bool b_assert);
-    void PlaySound(LPCSTR alias, const Fvector& position, const CObject* parent, bool hud_mode, bool looped = false, u8 index = u8(-1));
+    void PlaySound(LPCSTR alias, const Fvector& position, const CObject* parent, bool hud_mode, bool looped = false, bool overlap = false);
     void StopSound(LPCSTR alias);
     void StopAllSounds();
-    void LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive = false, int type = sg_SourceType);
-    void LoadSound(CInifile* ini, LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive = false, int type = sg_SourceType);
+    void LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, int type = sg_SourceType);
+    void LoadSound(CInifile* ini, LPCSTR section, LPCSTR line, LPCSTR alias, int type = sg_SourceType);
     void SetPosition(LPCSTR alias, const Fvector& pos);
 };
 //-Alundaio

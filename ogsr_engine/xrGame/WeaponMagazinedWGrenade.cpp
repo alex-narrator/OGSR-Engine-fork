@@ -40,11 +40,11 @@ void CWeaponMagazinedWGrenade::Load(LPCSTR section)
     CRocketLauncher::Load(section);
 
     //// Sounds
-    m_sounds.LoadSound(section, "snd_shoot_grenade", "sndShotG", false, m_eSoundShot);
-    m_sounds.LoadSound(section, "snd_reload_grenade", "sndReloadG", false, m_eSoundReload);
-    m_sounds.LoadSound(section, "snd_switch", "sndSwitch", false, m_eSoundReload);
+    m_sounds.LoadSound(section, "snd_shoot_grenade", "sndShotG", m_eSoundShot);
+    m_sounds.LoadSound(section, "snd_reload_grenade", "sndReloadG", m_eSoundReload);
+    m_sounds.LoadSound(section, "snd_switch", "sndSwitch", m_eSoundReload);
     //
-    m_sounds.LoadSound(section, pSettings->line_exist(section, "snd_shutter_g") ? "snd_shutter_g" : "snd_draw", "sndShutterG", false, m_eSoundShutter);
+    m_sounds.LoadSound(section, pSettings->line_exist(section, "snd_shutter_g") ? "snd_shutter_g" : "snd_draw", "sndShutterG", m_eSoundShutter);
 
     m_sFlameParticles2 = pSettings->r_string(section, "grenade_flame_particles");
 
@@ -181,7 +181,7 @@ void CWeaponMagazinedWGrenade::OnShot()
 {
     if (IsGrenadeMode())
     {
-        PlaySound("sndShotG", get_LastFP2());
+        PlaySound("sndShotG", get_LastFP2(), true);
 
         AddShotEffector();
 

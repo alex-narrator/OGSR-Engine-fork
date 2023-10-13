@@ -17,7 +17,7 @@ void CWeaponPistol::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    m_sounds.LoadSound(section, "snd_close", "sndClose", false, m_eSoundClose);
+    m_sounds.LoadSound(section, "snd_close", "sndClose", m_eSoundClose);
 }
 
 void CWeaponPistol::OnH_B_Chield()

@@ -77,7 +77,6 @@ void CMissile::Load(LPCSTR section)
         m_sounds.LoadSound(section, "snd_draw", "sndShow");
     if (pSettings->line_exist(section, "snd_holster"))
         m_sounds.LoadSound(section, "snd_holster", "sndHide");
-    if (pSettings->line_exist(section, "snd_activate"))
     if (pSettings->line_exist(section, "snd_playing"))
         m_sounds.LoadSound(section, "snd_playing", "sndPlaying");
 

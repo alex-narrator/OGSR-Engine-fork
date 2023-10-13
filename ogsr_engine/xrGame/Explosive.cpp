@@ -113,7 +113,7 @@ void CExplosive::Load(CInifile* ini, LPCSTR section)
     m_fFragmentSpeed = ini->r_float(section, "fragment_speed");
 
     // Alundaio: LAYERED_SND_SHOOT
-    m_layered_sounds.LoadSound(ini, section, "snd_explode", "sndExplode", false, m_eSoundExplode);
+    m_layered_sounds.LoadSound(ini, section, "snd_explode", "sndExplode", m_eSoundExplode);
 
     m_fExplodeDurationMax = ini->r_float(section, "explode_duration");
 
@@ -332,7 +332,7 @@ void CExplosive::Explode()
     //	Msg("---------CExplosive Explode [%d] frame[%d]",cast_game_object()->ID(), Device.dwFrame);
     OnBeforeExplosion();
     //играем звук взрыва
-    m_layered_sounds.PlaySound("sndExplode", pos, smart_cast<CObject*>(this), false, false, (u8)-1);
+    m_layered_sounds.PlaySound("sndExplode", pos, smart_cast<CObject*>(this), false);
 
     //показываем эффекты
 

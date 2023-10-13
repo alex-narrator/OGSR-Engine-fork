@@ -82,8 +82,8 @@ void CHelicopter::Load(LPCSTR section)
 
     // weapons
     CShootingObject::Load(section);
-    m_layered_sounds.LoadSound(section, "snd_shoot", "sndShoot", false, SOUND_TYPE_WEAPON_SHOOTING);
-    m_layered_sounds.LoadSound(section, "snd_shoot_rocket", "sndRocket", false, SOUND_TYPE_WEAPON_SHOOTING);
+    m_layered_sounds.LoadSound(section, "snd_shoot", "sndShoot", SOUND_TYPE_WEAPON_SHOOTING);
+    m_layered_sounds.LoadSound(section, "snd_shoot_rocket", "sndRocket", SOUND_TYPE_WEAPON_SHOOTING);
     CRocketLauncher::Load(section);
 
     UseFireTrail(m_enemy.bUseFireTrail); // temp force reloar disp params
