@@ -207,7 +207,6 @@ public:
     virtual bool CanSwitchModes() const { return m_bCanSwitchModes; }
     virtual void SwitchMode();
     virtual bool IsAfMode() const { return m_bAfMode; }
-    virtual void ShowCurrentModeMsg();
 
     virtual float GetDetectionRadius() const { return m_fDetectRadius; };
 

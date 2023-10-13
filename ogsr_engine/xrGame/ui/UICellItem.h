@@ -30,9 +30,7 @@ protected:
     int m_accelerator;
     virtual void UpdateItemText();
 
-    CUIProgressBar* m_pConditionState;
-    bool m_condition_auto_width;
-    CUIStatic* m_text;
+    CUIStatic* m_text{};
     void init();
 
 public:
@@ -67,7 +65,6 @@ public:
     bool m_b_already_drawn;
     bool m_b_destroy_childs;
     void ColorizeItems(std::initializer_list<CUIDragDropListEx*>);
-    void UpdateConditionProgressBar();
     bool m_selected;
     bool m_select_armament;
     bool m_select_equipped;

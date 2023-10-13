@@ -497,16 +497,6 @@ void CCustomDetector::SwitchMode()
 
     AnimationExist("anm_switch_mode") ? PlayHUDMotion("anm_switch_mode", true, GetState()) : PlayHUDMotion({"anm_show_fast"}, true, GetState(), false);
     PlaySound("sndSwitch", Position());
-    ShowCurrentModeMsg();
-}
-
-void CCustomDetector::ShowCurrentModeMsg()
-{
-    string1024 str;
-    if (!CanSwitchModes())
-        return;
-    sprintf(str, "%s: %s", NameShort(), CStringTable().translate(m_bAfMode ? "st_af_mode" : "st_zone_mode").c_str());
-    HUD().GetUI()->AddInfoMessage("item_usage", str, false);
 }
 
 bool CCustomDetector::IsBlocked()

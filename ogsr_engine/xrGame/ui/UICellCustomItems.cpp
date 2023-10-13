@@ -120,9 +120,8 @@ CUIDragItem* CUIInventoryCellItem::CreateDragItem()
     {
         if (auto s_child = smart_cast<CUIStatic*>(item))
         {
-            if (Core.Features.test(xrCore::Feature::show_inv_item_condition))
-                if (s_child == m_text)
-                    continue;
+            if (s_child == m_text)
+                continue;
 
             s = xr_new<CUIStatic>();
             s->SetAutoDelete(true);
@@ -157,8 +156,6 @@ void CUIInventoryCellItem::Update()
         if (clientArea.in(cp))
             GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_FOCUSED_UPDATE, nullptr);
     }
-    if (Core.Features.test(xrCore::Feature::show_inv_item_condition))
-        UpdateConditionProgressBar();
 }
 
 CUIAmmoCellItem::CUIAmmoCellItem(CWeaponAmmo* itm) : inherited(itm) {}
@@ -198,23 +195,13 @@ void CUIAmmoCellItem::UpdateItemText()
         string32 str;
         sprintf_s(str, "%d", total);
 
-        if (Core.Features.test(xrCore::Feature::show_inv_item_condition))
-        {
-            m_text->SetText(str);
-            m_text->Show(true);
-        }
-        else
-            SetText(str);
+        m_text->SetText(str);
+        m_text->Show(true);
     }
     else
     {
-        if (Core.Features.test(xrCore::Feature::show_inv_item_condition))
-        {
-            m_text->SetText("");
-            m_text->Show(false);
-        }
-        else
-            SetText("");
+        m_text->SetText("");
+        m_text->Show(false);
     }
 }
 

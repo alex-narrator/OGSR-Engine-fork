@@ -84,7 +84,6 @@ void InitConsole()
     CORE_FEATURE_SET(highlight_equipped, "dragdrop");
     CORE_FEATURE_SET(dynamic_sun_movement, "features");
     CORE_FEATURE_SET(wpn_bobbing, "features");
-    CORE_FEATURE_SET(show_inv_item_condition, "features");
     CORE_FEATURE_SET(remove_alt_keybinding, "features");
     CORE_FEATURE_SET(stop_anim_playing, "features");
     CORE_FEATURE_SET(corpses_collision, "features");

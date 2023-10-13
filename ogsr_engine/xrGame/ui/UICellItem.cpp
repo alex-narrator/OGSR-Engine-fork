@@ -28,13 +28,7 @@ CUICellItem::CUICellItem()
     m_b_already_drawn = false;
     SetAccelerator(0);
     m_b_destroy_childs = true;
-    if (Core.Features.test(xrCore::Feature::show_inv_item_condition))
-    {
-        m_text = NULL;
-        m_pConditionState = NULL;
-        m_condition_auto_width = false;
-        init();
-    }
+    init();
     m_selected = false;
     m_select_armament = false;
     m_select_equipped = false;
@@ -155,28 +149,16 @@ bool CUICellItem::HasChild(CUICellItem* item) { return (m_childs.end() != std::f
 void CUICellItem::UpdateItemText()
 {
     string32 str;
-    if (Core.Features.test(xrCore::Feature::show_inv_item_condition))
+    if (ChildsCount())
     {
-        if (ChildsCount())
-        {
-            sprintf_s(str, "x%d", ChildsCount() + 1);
-            m_text->SetText(str);
-            m_text->Show(true);
-        }
-        else
-        {
-            sprintf_s(str, "");
-            m_text->Show(false);
-        }
+        sprintf_s(str, "x%d", ChildsCount() + 1);
+        m_text->SetText(str);
+        m_text->Show(true);
     }
     else
     {
-        if (ChildsCount())
-            sprintf_s(str, "x%d", ChildsCount() + 1);
-        else
-            sprintf_s(str, "");
-
-        SetText(str);
+        sprintf_s(str, "");
+        m_text->Show(false);
     }
 }
 
@@ -203,59 +185,6 @@ void CUICellItem::init()
     AttachChild(m_text);
     CUIXmlInit::InitStatic(uiXml, "cell_item_text", 0, m_text);
     m_text->Show(false);
-
-    m_pConditionState = xr_new<CUIProgressBar>();
-    m_pConditionState->SetAutoDelete(true);
-    AttachChild(m_pConditionState);
-    CUIXmlInit::InitProgressBar(uiXml, "condition_progess_bar", 0, m_pConditionState);
-    m_pConditionState->Show(true);
-}
-
-void CUICellItem::UpdateConditionProgressBar()
-{
-    if (!m_pData)
-        return;
-
-    if (m_pParentList && m_pParentList->GetConditionProgBarVisibility())
-    {
-        PIItem itm = (PIItem)m_pData;
-        CWeapon* pWeapon = smart_cast<CWeapon*>(itm);
-        CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>(itm);
-
-        if (pWeapon || pOutfit || itm->GetInvShowCondition())
-        {
-            Ivector2 itm_grid_size = GetGridSize();
-            if (m_pParentList->GetVerticalPlacement())
-                std::swap(itm_grid_size.x, itm_grid_size.y);
-
-            Ivector2 cell_size = m_pParentList->CellSize();
-            Ivector2 cell_space = m_pParentList->CellsSpacing();
-            float x = 1.f;
-            if (m_condition_auto_width || fis_zero(m_pConditionState->GetWidth()))
-            {
-                x = 2.f;
-                m_pConditionState->SetWidth((float)cell_size.x - 4.f);
-                m_condition_auto_width = true;
-            }
-            else
-                m_condition_auto_width = false;
-            float y = itm_grid_size.y * (cell_size.y + cell_space.y) - m_pConditionState->GetHeight() - 2.f;
-            m_pConditionState->SetWndPos(Fvector2().set(x, y));
-
-            float val = itm->GetCondition();
-            if (pSettings->line_exist("engine_callbacks", "cell_item_condition_callback"))
-            {
-                const char* callback = pSettings->r_string("engine_callbacks", "cell_item_condition_callback");
-                if (luabind::functor<float> lua_function; ai().script_engine().functor(callback, lua_function))
-                    val = lua_function(itm->object().lua_game_object());
-            }
-
-            m_pConditionState->SetProgressPos(val);
-            m_pConditionState->Show(true);
-            return;
-        }
-    }
-    m_pConditionState->Show(false);
 }
 
 CUIDragItem::CUIDragItem(CUICellItem* parent)

@@ -10,6 +10,7 @@
 #include "UITextureMaster.h"
 #include "UIScrollView.h"
 #include "UIIconParams.h"
+#include "UIProgressBar.h"
 
 CFontManager& mngr() { return *(UI()->Font()); }
 
@@ -116,6 +117,7 @@ void CUIWindow::script_register(lua_State* L)
                   .def("FindChild", (CUIWindow * (CUIWindow::*)(LPCSTR)) & CUIWindow::FindChild)
                   .def("GetButton", &wnd_object_cast<CUIButton>)
                   .def("GetCUIStatic", &wnd_object_cast<CUIStatic>)
+                  .def("GetProgressBar", &wnd_object_cast<CUIProgressBar>)
                   .def("GetAbsoluteRect", (void(CUIWindow::*)(Frect&)) & CUIWindow::GetAbsoluteRect)
                   .def("BringToTop", &CUIWindow::BringToTop)
                   .def("BringToBottom", &CUIWindow::BringToBottom)
