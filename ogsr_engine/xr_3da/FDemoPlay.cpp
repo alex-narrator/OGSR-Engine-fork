@@ -9,6 +9,7 @@
 #include "motion.h"
 #include "Render.h"
 #include "CameraManager.h"
+#include "CustomHUD.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -17,7 +18,8 @@
 CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time) : CEffectorCam(cefDemo, life_time /*,FALSE*/)
 {
     Msg("*** Playing demo: %s", name);
-    Console->Execute("hud_weapon 0");
+    //Console->Execute("hud_weapon 0");
+    psHUD_Flags.set(HUD_WEAPON_RT, FALSE);
     if (g_bBenchmark)
         Console->Execute("hud_draw 0");
 
@@ -71,7 +73,8 @@ CDemoPlay::~CDemoPlay()
     stat_Stop();
     xr_delete(m_pMotion);
     xr_delete(m_MParam);
-    Console->Execute("hud_weapon 1");
+    //Console->Execute("hud_weapon 1");
+    psHUD_Flags.set(HUD_WEAPON_RT, TRUE);
     if (g_bBenchmark)
         Console->Execute("hud_draw 1");
 }
