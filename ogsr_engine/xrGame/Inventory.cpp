@@ -1141,9 +1141,9 @@ PIItem CInventory::GetAmmoByLimit(const char* sect, bool limit_max, xr_vector<sh
     };
 
     IterateAmmo(callback);
-    if (magazines && !box) // шукали магазин та не знайшли
+    if (mags.size() && !box) // шукали магазин та не знайшли
     {
-        magazines = nullptr; // шукаємо набої у пачках
+        mags = {}; // шукаємо набої у пачках
         IterateAmmo(callback);
     }
 
