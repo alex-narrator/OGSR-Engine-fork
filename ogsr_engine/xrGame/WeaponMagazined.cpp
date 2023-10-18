@@ -261,12 +261,10 @@ void CWeaponMagazined::Reload()
 // Real Wolf: Одна реализация на все участки кода.20.01.15
 bool CWeaponMagazined::TryToGetAmmo(u32 id)
 {
+    bool mag_weapon = AddonAttachable(eMagazine);
     if (!m_bDirectReload)
-    {
-        bool mag_weapon = AddonAttachable(eMagazine);
-        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[id].c_str(), mag_weapon, mag_weapon));
-    }
-    return m_pAmmo && m_pAmmo->m_boxCurr && (!AddonAttachable(eMagazine) || m_pAmmo->IsBoxReloadable() || !iAmmoElapsed || IsGrenadeMode());
+        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[id].c_str(), mag_weapon, &m_magazines));
+    return m_pAmmo && m_pAmmo->m_boxCurr && (!mag_weapon || m_pAmmo->IsBoxReloadable() || !iAmmoElapsed || IsGrenadeMode());
 }
 
 bool CWeaponMagazined::TryReload()
@@ -354,13 +352,13 @@ void CWeaponMagazined::ReloadMagazine()
     {
         bool mag_weapon = AddonAttachable(eMagazine);
         // попытаться найти в инвентаре патроны текущего типа
-        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), mag_weapon, mag_weapon));
+        m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[m_ammoType].c_str(), mag_weapon, &m_magazines));
         if (!m_pAmmo && !m_bLockType)
         {
             for (u32 i = 0; i < m_ammoTypes.size(); ++i)
             {
                 // проверить патроны всех подходящих типов
-                m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[i].c_str(), mag_weapon, mag_weapon));
+                m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[i].c_str(), mag_weapon, &m_magazines));
                 if (m_pAmmo)
                 {
                     m_ammoType = i;

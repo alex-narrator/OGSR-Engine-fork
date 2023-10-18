@@ -1988,11 +1988,11 @@ u32 CWeapon::GetNextAmmoType()
         if (++l_newType >= m_ammoTypes.size())
         {
             for (l_newType = 0; l_newType < m_ammoTypes.size(); ++l_newType)
-                if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), mag_weapon, mag_weapon))
+                if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), mag_weapon, &m_magazines))
                     break;
             break;
         }
-        if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), mag_weapon, mag_weapon))
+        if (unlimited_ammo() || m_pCurrentInventory->GetAmmoByLimit(m_ammoTypes[l_newType].c_str(), mag_weapon, &m_magazines))
             break;
     }
     if (l_newType != m_set_next_ammoType_on_reload && l_newType < m_ammoTypes.size())

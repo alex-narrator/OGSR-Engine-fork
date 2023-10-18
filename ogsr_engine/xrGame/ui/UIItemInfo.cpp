@@ -186,14 +186,14 @@ void CUIItemInfo::InitItem(CInventoryItem* pInvItem)
         TryAddEatableInfo(pInvItem);
         TryAddArmorInfo(pInvItem);
         TryAddCustomInfo(pInvItem);
-        if (m_desc_info.bShowDescrText)
+        if (m_desc_info.bShowDescrText && pInvItem->ItemDescription().size())
         {
             CUIStatic* pItem = xr_new<CUIStatic>();
             pItem->SetTextColor(m_desc_info.uDescClr);
             pItem->SetFont(m_desc_info.pDescFont);
             pItem->SetWidth(UIDesc->GetDesiredChildWidth());
             pItem->SetTextComplexMode(true);
-            pItem->SetText(*pInvItem->ItemDescription());
+            pItem->SetText(pInvItem->ItemDescription().c_str());
             pItem->AdjustHeightToText();
             UIDesc->AddWindow(pItem, true);
         }

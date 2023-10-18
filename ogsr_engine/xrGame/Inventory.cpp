@@ -1106,18 +1106,21 @@ void CInventory::IterateAmmo(std::function<bool(const PIItem)> callback) const
             return;
 }
 
-PIItem CInventory::GetAmmoByLimit(const char* sect, bool limit_max, bool include_magazines) const
+PIItem CInventory::GetAmmoByLimit(const char* sect, bool limit_max, xr_vector<shared_str>* magazines) const
 {
     PIItem box{};
     u32 limit{};
+    xr_vector<shared_str> mags{};
+    if (magazines)
+        mags = *magazines;
 
     auto callback = [&](const auto pIItem) -> bool {
         const auto* ammo = smart_cast<CWeaponAmmo*>(pIItem);
-
-        if (!ammo->m_boxCurr || include_magazines && !ammo->IsBoxReloadable())
+        
+        if (!ammo->m_boxCurr || mags.size() && (!ammo->IsBoxReloadable() || std::find(mags.begin(), mags.end(), ammo->cNameSect()) == mags.end()))
             return false;
 
-        shared_str sect_to_compare = include_magazines ? ammo->m_ammoSect : ammo->cNameSect();
+        shared_str sect_to_compare = mags.size() ? ammo->m_ammoSect : ammo->cNameSect();
         if (!xr_strcmp(sect_to_compare, sect))
         {
             const bool size_fits_limit = (ammo->m_boxCurr == (limit_max ? ammo->m_boxSize : 1));
@@ -1138,9 +1141,9 @@ PIItem CInventory::GetAmmoByLimit(const char* sect, bool limit_max, bool include
     };
 
     IterateAmmo(callback);
-    if (include_magazines && !box) //шукали магазин та не знайшли
+    if (magazines && !box) // шукали магазин та не знайшли
     {
-        include_magazines = false; //шукаємо набої у пачках
+        magazines = nullptr; // шукаємо набої у пачках
         IterateAmmo(callback);
     }
 

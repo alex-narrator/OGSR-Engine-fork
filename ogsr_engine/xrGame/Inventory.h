@@ -85,7 +85,7 @@ public:
 
     void Iterate(bool, std::function<bool(const PIItem)>) const;
     void IterateAmmo(std::function<bool(const PIItem)>) const;
-    PIItem GetAmmoByLimit(const char* sect, bool limit_max = false, bool include_magazines = false) const;
+    PIItem GetAmmoByLimit(const char* sect, bool limit_max = false, xr_vector<shared_str> *magazines = nullptr) const;
 
     // search both (ruck and belt)
     PIItem item(CLASS_ID cls_id) const;
