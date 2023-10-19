@@ -321,6 +321,7 @@ public:
     void MarkItemDropped(CScriptGameObject* item);
     bool MarkedDropped(CScriptGameObject* item);
     void UnloadMagazine(bool spawn_ammo = false, bool unload_gl = false);
+    bool IsDirectReload(CScriptGameObject* pItem);
 
     void DropItem(CScriptGameObject* pItem);
     void DropItemAndTeleport(CScriptGameObject* pItem, Fvector position);

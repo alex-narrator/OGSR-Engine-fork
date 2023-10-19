@@ -369,29 +369,29 @@ bool CUIInventoryWnd::TryUseItem(PIItem itm)
     return false;
 }
 
-bool CUIInventoryWnd::DropItem(PIItem itm, CUIDragDropListEx* lst)
-{
-    CUICellItem* _citem = lst->ItemsCount() ? lst->GetItemIdx(0) : nullptr;
-    PIItem _iitem = _citem ? (PIItem)_citem->m_pData : nullptr;
-
-    if (!_iitem)
-        return false;
-
-    if (_iitem->CanAttach(itm))
-    {
-        AttachAddon(_iitem);
-        return true;
-    }
-
-    auto ammo = itm->cast_weapon_ammo();
-
-    auto wpn = smart_cast<CWeaponMagazined*>(_iitem);
-    if (wpn && ammo && GetInventory()->InSlot(wpn))
-        return wpn->IsDirectReload(ammo);
-
-    auto ammo_mag = _iitem->cast_weapon_ammo();
-    if (ammo_mag && ammo)
-        return ammo_mag->IsDirectReload(ammo);
-
-    return /*true*/false;
-}
+//bool CUIInventoryWnd::DropItem(PIItem itm, CUIDragDropListEx* lst)
+//{
+//    CUICellItem* _citem = lst->ItemsCount() ? lst->GetItemIdx(0) : nullptr;
+//    PIItem _iitem = _citem ? (PIItem)_citem->m_pData : nullptr;
+//
+//    if (!_iitem)
+//        return false;
+//
+//    //if (_iitem->CanAttach(itm))
+//    //{
+//    //    AttachAddon(_iitem);
+//    //    return true;
+//    //}
+//
+//    //auto ammo = itm->cast_weapon_ammo();
+//
+//    //auto wpn = smart_cast<CWeaponMagazined*>(_iitem);
+//    //if (wpn && ammo && GetInventory()->InSlot(wpn))
+//    //    return wpn->IsDirectReload(ammo);
+//
+//    //auto ammo_mag = _iitem->cast_weapon_ammo();
+//    //if (ammo_mag && ammo)
+//    //    return ammo_mag->IsDirectReload(ammo);
+//
+//    return /*true*/false;
+//}

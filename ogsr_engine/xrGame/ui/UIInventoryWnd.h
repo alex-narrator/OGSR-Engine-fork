@@ -128,7 +128,7 @@ public:
     CUICellItem* m_pCurrentCellItem;
 
 protected:
-    bool DropItem(PIItem itm, CUIDragDropListEx* lst);
+    //bool DropItem(PIItem itm, CUIDragDropListEx* lst);
     bool TryUseItem(PIItem itm);
 
     void ProcessPropertiesBoxClicked();

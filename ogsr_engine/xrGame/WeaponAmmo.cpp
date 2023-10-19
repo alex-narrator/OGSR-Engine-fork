@@ -451,6 +451,8 @@ bool CWeaponAmmo::IsDirectReload(CWeaponAmmo* ammo_to_load)
     }
 
     m_cur_ammo_type = (u32)std::distance(m_ammoTypes.begin(), it);
+    m_ammoSect = m_ammoTypes[m_cur_ammo_type];
+    m_InvShortName = CStringTable().translate(pSettings->r_string(m_ammoSect, "inv_name_short"));
 
 
     if (pSettings->line_exist(cNameSect(), "load_sound"))

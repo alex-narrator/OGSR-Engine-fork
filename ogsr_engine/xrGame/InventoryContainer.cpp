@@ -71,22 +71,22 @@ float CInventoryContainer::Weight() const
     return res;
 }
 
-bool CInventoryContainer::CanTrade() const
-{
-    if (!IsEmpty()) // продавать можно только пустым
-        return false;
-    if (m_pCurrentInventory)
-    {
-        if (auto actor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner()))
-        {
-            if (this == actor->GetBackpack())
-            {
-                return false;
-            }
-        }
-    }
-    return inherited::CanTrade();
-}
+//bool CInventoryContainer::CanTrade() const
+//{
+//    if (!IsEmpty()) // продавать можно только пустым
+//        return false;
+//    if (m_pCurrentInventory)
+//    {
+//        if (auto actor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner()))
+//        {
+//            if (this == actor->GetBackpack())
+//            {
+//                return false;
+//            }
+//        }
+//    }
+//    return inherited::CanTrade();
+//}
 
 void CInventoryContainer::shedule_Update(u32 dt)
 {

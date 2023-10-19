@@ -500,9 +500,9 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
     {
     case iwSlot: {
         auto item = CurrentIItem();
-        //спробуємо тут атач адонів, заряджання набоїв та тому подібне
-        if (DropItem(CurrentIItem(), new_owner))
-            return true;
+        ////спробуємо тут атач адонів, заряджання набоїв та тому подібне
+        //if (DropItem(CurrentIItem(), new_owner))
+        //    return true;
 
         bool can_put = false;
         Ivector2 max_size = new_owner->CellSize();
@@ -526,7 +526,7 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
                     }
                     else
                     {
-                        if (!DropItem(CurrentIItem(), new_owner) && item->GetSlotsCount() > 0)
+                        if (/*!DropItem(CurrentIItem(), new_owner) && */item->GetSlotsCount() > 0)
                             Msg("! cannot put item %s into slot %d, allowed slots {%s}", name, i, item->GetSlotsSect());
                     }
                     break;
@@ -560,7 +560,7 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
     break;
     };
 
-    DropItem(CurrentIItem(), new_owner);
+    //DropItem(CurrentIItem(), new_owner);
 
     return true;
 }

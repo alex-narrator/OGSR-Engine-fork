@@ -291,6 +291,22 @@ void CScriptGameObject::UnloadMagazine(bool spawn_ammo, bool unload_gl)
     }
 }
 
+bool CScriptGameObject::IsDirectReload(CScriptGameObject* pItem)
+{
+    CWeapon* weapon = smart_cast<CWeapon*>(&object());
+    CWeaponAmmo* ammo = smart_cast<CWeaponAmmo*>(&object());
+
+    if (!weapon && !ammo)
+        return false;
+
+    CWeaponAmmo* ammo_to_load = smart_cast<CWeaponAmmo*>(&pItem->object());
+    if (!ammo_to_load)
+        return false;
+
+
+    return weapon ? weapon->IsDirectReload(ammo_to_load) : ammo->IsDirectReload(ammo_to_load);
+}
+
 void CScriptGameObject::DropItem(CScriptGameObject* pItem)
 {
     CInventoryOwner* owner = smart_cast<CInventoryOwner*>(&object());

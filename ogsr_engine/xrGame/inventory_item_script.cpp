@@ -43,7 +43,12 @@ void CInventoryItem::script_register(lua_State* L)
                .property("cost", &CInventoryItem::Cost, &CInventoryItem::SetCost)
                .property("slot", &CInventoryItem::GetSlot, &CInventoryItem::SetSlot)
                .property("slots", &get_slots, raw<2>())
-               .def_readwrite("description", &CInventoryItem::m_Description),
+               .def_readwrite("description", &CInventoryItem::m_Description)
+
+               .def("attach_addon", &CInventoryItem::Attach)
+               .def("detach_addon", &CInventoryItem::Detach)
+               .def("can_attach_addon", &CInventoryItem::CanAttach)
+               .def("can_detach_addon", &CInventoryItem::CanDetach),
 
                class_<enum_exporter<ItemEffects>>("effect").enum_("effect")[
                        value("health_restore", int(CInventoryItem::eHealthRestoreSpeed)), 
