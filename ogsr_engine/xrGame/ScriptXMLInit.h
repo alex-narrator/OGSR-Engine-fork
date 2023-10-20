@@ -66,6 +66,10 @@ public:
     CUIScrollView* InitScrollView(LPCSTR path, CUIWindow* parent);
     CUIProgressBar* InitProgressBar(LPCSTR path, CUIWindow* parent);
 
+    LPCSTR ReadAttrib(LPCSTR path, int index, LPCSTR attrib, LPCSTR default_str_val = "");
+    int ReadAttribInt(LPCSTR path, int index, LPCSTR attrib, int default_int_val = 0);
+    float ReadAttribFlt(LPCSTR path, int index, LPCSTR attrib, float default_flt_val = 0.0f);
+
 protected:
     CUIXml m_xml;
 };

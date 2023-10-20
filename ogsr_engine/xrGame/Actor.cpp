@@ -58,7 +58,7 @@
 #include "material_manager.h"
 #include "IColisiondamageInfo.h"
 #include "ui/UIMainIngameWnd.h"
-#include "ui/UIPanels.h"
+//#include "ui/UIPanels.h"
 #include "map_manager.h"
 #include "GameTaskManager.h"
 #include "actor_memory.h"

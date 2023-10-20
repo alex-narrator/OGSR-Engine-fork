@@ -294,7 +294,7 @@ void CCustomDetector::UpdateVisibility()
             if (i0->m_parent_hud_item)
             {
                 u32 state = i0->m_parent_hud_item->GetState();
-                if (smart_cast<CMissile*>(i0->m_parent_hud_item))
+                if (smart_cast<CMissile*>(i0->m_parent_hud_item) && m_bThrowAnm)
                 {
                     if ((state == eThrowStart || state == eReady) && GetState() == eIdle)
                         SwitchState(eThrowStart);

@@ -85,10 +85,10 @@ protected:
     CUIStatic* m_UIIcons{};
     bool b_horz{};
 
-public:
-    CUIBeltPanel* m_beltPanel;
-    CUISlotPanel* m_slotPanel;
-    CUIBoosterPanel* m_boosterPanel;
+//public:
+//    CUIBeltPanel* m_beltPanel;
+//    CUISlotPanel* m_slotPanel;
+//    CUIBoosterPanel* m_boosterPanel;
 
 public:
     // Енумы соответсвующие предупреждающим иконкам

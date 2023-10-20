@@ -35,7 +35,7 @@
 
 #include "../string_table.h"
 #include "clsid_game.h"
-#include "UIPanels.h"
+//#include "UIPanels.h"
 #include "UIMap.h"
 
 #ifdef DEBUG
@@ -103,9 +103,9 @@ CUIMainIngameWnd::CUIMainIngameWnd()
     m_pActor = nullptr;
     UIZoneMap = xr_new<CUIZoneMap>();
     m_pPickUpItem = nullptr;
-    m_beltPanel = xr_new<CUIBeltPanel>();
-    m_slotPanel = xr_new<CUISlotPanel>();
-    m_boosterPanel = xr_new<CUIBoosterPanel>();
+    //m_beltPanel = xr_new<CUIBeltPanel>();
+    //m_slotPanel = xr_new<CUISlotPanel>();
+    //m_boosterPanel = xr_new<CUIBoosterPanel>();
 
     warn_icon_list[ewiWeaponJammed] = &UIWeaponJammedIcon;
     warn_icon_list[ewiArmor] = &UIArmorIcon;
@@ -125,9 +125,9 @@ CUIMainIngameWnd::~CUIMainIngameWnd()
 {
     DestroyFlashingIcons();
     xr_delete(UIZoneMap);
-    xr_delete(m_beltPanel);
-    xr_delete(m_slotPanel);
-    xr_delete(m_boosterPanel);
+    //xr_delete(m_beltPanel);
+    //xr_delete(m_slotPanel);
+    //xr_delete(m_boosterPanel);
     HUD_SOUND::DestroySound(m_contactSnd);
     xr_delete(g_MissileForceShape);
 }
@@ -254,14 +254,14 @@ void CUIMainIngameWnd::Init()
     AttachChild(&UIMotionIcon);
     UIMotionIcon.Init();
 
-    m_beltPanel->InitFromXML(uiXml, "belt_panel", 0);
-    AttachChild(m_beltPanel);
+    //m_beltPanel->InitFromXML(uiXml, "belt_panel", 0);
+    //AttachChild(m_beltPanel);
 
-    m_slotPanel->InitFromXML(uiXml, "slot_panel", 0);
-    AttachChild(m_slotPanel);
+    //m_slotPanel->InitFromXML(uiXml, "slot_panel", 0);
+    //AttachChild(m_slotPanel);
 
-    m_boosterPanel->InitFromXML(uiXml, "booster_panel", 0);
-    AttachChild(m_boosterPanel);
+    //m_boosterPanel->InitFromXML(uiXml, "booster_panel", 0);
+    //AttachChild(m_boosterPanel);
 
     HUD_SOUND::LoadSound("maingame_ui", "snd_new_contact", m_contactSnd, SOUND_TYPE_IDLE);
 }
@@ -442,8 +442,8 @@ void CUIMainIngameWnd::Update()
 
     UpdatePickUpItem();
 
-    m_beltPanel->Show(m_bShowGearInfo); // панель поясу та розгрузки
-    m_slotPanel->Show(m_bShowGearInfo); // панель слотів
+    //m_beltPanel->Show(m_bShowGearInfo); // панель поясу та розгрузки
+    //m_slotPanel->Show(m_bShowGearInfo); // панель слотів
 
     UpdateFlashingIcons(); // обновляем состояние мигающих иконок
 
