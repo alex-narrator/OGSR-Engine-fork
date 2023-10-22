@@ -595,38 +595,20 @@ void InventoryUtilities::SendInfoToActor(LPCSTR info_id)
 
 u32 InventoryUtilities::GetGoodwillColor(CHARACTER_GOODWILL gw)
 {
-    u32 res = 0xffc0c0c0;
-    if (gw == NEUTRAL_GOODWILL)
-    {
-        res = 0xffc0c0c0;
-    }
-    else if (gw > 1000)
-    {
-        res = 0xff00ff00;
-    }
-    else if (gw < -1000)
-    {
-        res = 0xffff0000;
-    }
-    return res;
+    if (gw >= charInfoGoodwillStrings->rbegin()->first)
+        return 0xff00ff00;
+    if (gw < charInfoGoodwillStrings->begin()->first)
+        return 0xffff0000;
+    return 0xffc0c0c0;
 }
 
 u32 InventoryUtilities::GetReputationColor(CHARACTER_REPUTATION_VALUE rv)
 {
-    u32 res = 0xffc0c0c0;
-    if (rv == NEUTAL_REPUTATION)
-    {
-        res = 0xffc0c0c0;
-    }
-    else if (rv > 50)
-    {
-        res = 0xff00ff00;
-    }
-    else if (rv < -50)
-    {
-        res = 0xffff0000;
-    }
-    return res;
+    if (rv >= charInfoReputationStrings->rbegin()->first)
+        return 0xff00ff00;
+    if (rv < charInfoReputationStrings->begin()->first)
+        return 0xffff0000;
+    return 0xffc0c0c0;
 }
 
 u32 InventoryUtilities::GetRelationColor(ALife::ERelationType relation)

@@ -186,6 +186,7 @@ void CUICharacterInfo::InitCharacter(u16 id)
     {
         sprintf_s(str, "%s", *stbl.translate(GetReputationAsText(chInfo.Reputation().value())));
         m_icons[eUIReputation]->SetText(str);
+        m_icons[eUIReputation]->SetTextColor(GetReputationColor(chInfo.Reputation().value()));
     }
 
     if (m_icons[eUICommunity])
