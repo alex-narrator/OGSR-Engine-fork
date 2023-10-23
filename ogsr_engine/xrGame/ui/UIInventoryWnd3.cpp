@@ -357,13 +357,20 @@ bool CUIInventoryWnd::TryUseItem(PIItem itm)
     if (!itm)
         return false;
 
-    if (itm->GetSlotsCount() || itm->Belt() || itm->Vest())
-        return false;
+    //if (itm->GetSlotsCount() || itm->Belt() || itm->Vest())
+    //    return false;
 
-    if (smart_cast<CEatableItem*>(itm))
+    //if (smart_cast<CEatableItem*>(itm))
+    //{
+    //    EatItem(itm);
+    //    return true;
+    //}
+
+    if (pSettings->line_exist("engine_callbacks", "ui_inventory_try_use_item"))
     {
-        EatItem(itm);
-        return true;
+        const char* callback = pSettings->r_string("engine_callbacks", "ui_inventory_try_use_item");
+        if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
+            return lua_function(itm->object().lua_game_object());
     }
 
     return false;

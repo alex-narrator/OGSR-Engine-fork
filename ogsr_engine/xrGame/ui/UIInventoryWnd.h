@@ -97,6 +97,9 @@ protected:
     CUIDragDropListEx* m_pUIOnHeadList{};
     CUIDragDropListEx* m_pUIPdaList{};
 
+    //окремо для маркованих предметів
+    CUIDragDropListEx* m_pUIMarkedList{};
+
     // alpet: для индексированного доступа
     CUIDragDropListEx* m_slots_array[SLOTS_TOTAL];
 
@@ -142,6 +145,10 @@ protected:
     bool ToBag(CUICellItem* itm, bool b_use_cursor_pos);
     bool ToBelt(CUICellItem* itm, bool b_use_cursor_pos);
     bool ToVest(CUICellItem* itm, bool b_use_cursor_pos);
+
+    bool CanMoveToMarked(PIItem itm);
+    bool OnToMarked(CUICellItem* itm, bool b_use_cursor_pos);
+    void OnFromMarked(PIItem itm);
 
     void AttachAddon(PIItem item_to_upgrade);
     void DetachAddon(const char* addon_name, bool);

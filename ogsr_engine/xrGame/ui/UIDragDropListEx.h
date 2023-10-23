@@ -15,6 +15,7 @@ enum EListType
     iwBag,
     iwBelt,
     iwVest,
+    iwMarked,
 };
 
 struct CUICell

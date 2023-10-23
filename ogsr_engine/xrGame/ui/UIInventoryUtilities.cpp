@@ -44,21 +44,6 @@ bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
 {
     Ivector2 r1{item1->GetGridWidth(), item1->GetGridHeight()}, r2{item2->GetGridWidth(), item2->GetGridHeight()};
 
-    if (item1->GetMarked() && !item2->GetMarked())
-        return true;
-
-    if (!item1->GetMarked() && item2->GetMarked())
-        return false;
-
-    if (item1->GetMarked() && item2->GetMarked())
-    {
-        if (r1.x > r2.x)
-            return true;
-
-        if (r1.y > r2.y)
-            return true;
-    }
-
     if (r1.x > r2.x)
         return true;
 

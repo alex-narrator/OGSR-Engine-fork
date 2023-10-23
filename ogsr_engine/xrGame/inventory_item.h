@@ -341,7 +341,11 @@ public:
     void Transfer(u16 from_id, u16 to_id = u16(-1));
 
     bool GetMarked() { return m_bIsMarkedItem; };
-    void SetMarked(bool val) { m_bIsMarkedItem = val; };
+    void SetMarked(bool val) 
+    {
+        m_bIsMarkedItem = val; 
+        m_highlight_equipped = val;
+    };
 
 protected:
     HitImmunity::HitTypeSVec m_HitTypeProtection;

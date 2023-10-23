@@ -60,7 +60,8 @@ bool CUIInventoryCellItem::EqualTo(CUICellItem* itm)
             fsimilar(object()->GetItemEffect(CInventoryItem::eRadiationRestoreSpeed), ci->object()->GetItemEffect(CInventoryItem::eRadiationRestoreSpeed), 0.01f) &&
             object()->object().cNameSect() == ci->object()->object().cNameSect() && 
             object()->m_eItemPlace == ci->object()->m_eItemPlace &&
-            object()->Cost() == ci->object()->Cost()
+            object()->Cost() == ci->object()->Cost() && 
+            object()->GetMarked() == ci->object()->GetMarked()
         );
 }
 
