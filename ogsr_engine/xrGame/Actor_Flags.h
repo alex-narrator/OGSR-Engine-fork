@@ -38,11 +38,3 @@ extern Flags32 psActorFlags;
 extern Flags32 psCallbackFlags;
 
 extern BOOL GodMode();
-
-enum ESaveGameMode
-{
-    eSaveGameDefault,
-    eSaveGameEnemyCheck,
-    eSaveGameSafehouseCheck,
-};
-extern ESaveGameMode g_eSaveGameMode;

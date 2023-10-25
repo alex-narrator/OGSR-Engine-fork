@@ -803,9 +803,6 @@ public:
     float GetItemBoostedParams(int);
     float GetTotalArtefactsEffect(int);
 
-    bool SaveGameAllowed();
-    bool InSafeHouse();
-
     bool IsFreeHands() const;
 
 protected:

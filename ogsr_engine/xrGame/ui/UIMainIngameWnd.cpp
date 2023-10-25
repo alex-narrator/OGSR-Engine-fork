@@ -347,11 +347,6 @@ void CUIMainIngameWnd::Update()
             else if (!external_icon_ctrl)
                 TurnOffWarningIcon(ewiInvincible);
 
-            if (m_pActor->InSafeHouse())
-                SetWarningIconColor(ewiSafehouse, 0xffffffff);
-            else
-                TurnOffWarningIcon(ewiSafehouse);
-
             if (m_pActor->GetCarryWeight() > m_pActor->MaxCarryWeight())
                 SetWarningIconColor(ewiOverweight, 0xffffffff);
             else

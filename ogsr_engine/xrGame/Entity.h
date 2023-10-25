@@ -117,7 +117,6 @@ public:
     bool is_backstab_bone(IKinematics& K, u16 bone);
     bool is_backstab(IKinematics& K, SHit* pHDS);
     bool is_from_behind(const Fvector& direction) const;
-    virtual bool CheckEnemyStatus(CEntityAlive* tgt) { return false; }
 
 private:
     ALife::_OBJECT_ID m_killer_id;

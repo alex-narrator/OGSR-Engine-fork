@@ -150,8 +150,6 @@ public:
     virtual ALife::ERelationType tfGetRelationType(const CEntityAlive* tpEntityAlive) const;
     virtual bool is_relation_enemy(const CEntityAlive* tpEntityAlive) const;
 
-    virtual bool CheckEnemyStatus(CEntityAlive* tgt);
-
     virtual bool wounded() const { return false; }
 
 public:

@@ -103,12 +103,6 @@ ENGINE_API extern int g_3dscopes_fps_factor;
 
 extern float g_fForceGrowSpeed;
 
-ESaveGameMode g_eSaveGameMode{};
-xr_token save_game_mode_token[]{{"sg_default", eSaveGameDefault}, // класичний режим
-                                {"sg_no_enemies", eSaveGameEnemyCheck}, // збереження без ворогів поряд
-                                {"sg_safehouse", eSaveGameSafehouseCheck}, // збереження тільки у безпечних місцях
-                                {0, 0}};
-
 void get_files_list(xr_vector<shared_str>& files, LPCSTR dir, LPCSTR file_ext)
 {
     VERIFY(dir && file_ext);
@@ -435,6 +429,15 @@ public:
             Msg("cannot make saved game because actor is dead :(");
             return;
         }
+        bool save_allowed = true;
+        if (pSettings->line_exist("engine_callbacks", "can_save_game"))
+        {
+            const char* callback = pSettings->r_string("engine_callbacks", "can_save_game");
+            if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
+                save_allowed = lua_function();
+        }
+        if (!save_allowed)
+            return;
 
         string_path S, S1;
         S[0] = 0;
@@ -1653,6 +1656,5 @@ void CCC_RegisterCommands()
 
     CMD4(CCC_Float, "missile_force_grow_speed", &g_fForceGrowSpeed, 1.0f, 50.0f); // скорость замаха гранатой/болтом
     CMD3(CCC_Mask, "g_bloodmarks_on_dynamics", &psActorFlags, AF_BLOODMARKS_ON_DYNAMIC);
-    CMD3(CCC_Token, "g_save_mode", (u32*)&g_eSaveGameMode, save_game_mode_token);
     CMD1(CCC_ReloadUI, "reload_ui");
 }
