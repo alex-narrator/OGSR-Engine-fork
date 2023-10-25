@@ -100,10 +100,10 @@ public:
         ewiWound,
         ewiStarvation,
         ewiPsyHealth,
+        ewiOverweight,
         ewiThresholdMax,
         ewiInvincible = ewiThresholdMax,
         ewiSafehouse,
-        ewiOverweight,
         ewiMax,
     };
 

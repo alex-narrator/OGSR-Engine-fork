@@ -223,6 +223,7 @@ void CUIMainIngameWnd::Init()
         "wounds", 
         "starvation", 
         "psy",
+        "overweight",
         //"invincible",
         //"safehouse",
     };
@@ -347,10 +348,15 @@ void CUIMainIngameWnd::Update()
             else if (!external_icon_ctrl)
                 TurnOffWarningIcon(ewiInvincible);
 
-            if (m_pActor->GetCarryWeight() > m_pActor->MaxCarryWeight())
-                SetWarningIconColor(ewiOverweight, 0xffffffff);
+            if (m_pActor->HasInfo("safehouse"))
+                SetWarningIconColor(ewiSafehouse, 0xffffffff);
             else
-                TurnOffWarningIcon(ewiOverweight);
+                TurnOffWarningIcon(ewiSafehouse);
+
+            //if (m_pActor->GetCarryWeight() > m_pActor->MaxCarryWeight())
+            //    SetWarningIconColor(ewiOverweight, 0xffffffff);
+            //else
+            //    TurnOffWarningIcon(ewiOverweight);
         }
 
         UpdateActiveItemInfo();
@@ -381,6 +387,9 @@ void CUIMainIngameWnd::Update()
                 break;
             case ewiPsyHealth: 
                 value = 1 - cond->GetPsyHealth(); 
+                break;
+            case ewiOverweight: 
+                value = m_pActor->GetCarryWeight() / m_pActor->MaxCarryWeight(); 
                 break;
             default: R_ASSERT(!"Unknown type of warning icon");
             }
