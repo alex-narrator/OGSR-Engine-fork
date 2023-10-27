@@ -161,7 +161,7 @@ void CHudItem::Load(LPCSTR section)
     constexpr float PITCH_OFFSET_D = 0.02f; // Насколько сильно ствол приближается\отдаляется при вертикальных поворотах камеры
     constexpr float PITCH_LOW_LIMIT = -PI; // Минимальное значение pitch при использовании совместно с PITCH_OFFSET_N
     constexpr float ORIGIN_OFFSET = -0.05f; // Фактор влияния инерции на положение ствола (чем меньше, тем масштабней инерция)
-    constexpr float ORIGIN_OFFSET_AIM = -0.03f; // (Для прицеливания)
+    constexpr float ORIGIN_OFFSET_AIM = -0.01f; // (Для прицеливания)
     constexpr float TENDTO_SPEED = 5.f; // Скорость нормализации положения ствола
     constexpr float TENDTO_SPEED_AIM = 8.f; // (Для прицеливания)
 
@@ -918,9 +918,9 @@ void CHudItem::UpdateInertion(Fmatrix& trans)
         float _tendto_speed, _origin_offset;
         if (GetCurrentHudOffsetIdx() > 0)
         { // Худ в режиме "Прицеливание"
-            float factor = GetInertionFactor();
-            _tendto_speed = inertion_data.m_tendto_speed_aim - (inertion_data.m_tendto_speed_aim - inertion_data.m_tendto_speed) * factor;
-            _origin_offset = inertion_data.m_origin_offset_aim - (inertion_data.m_origin_offset_aim - inertion_data.m_origin_offset) * factor;
+            //float factor = GetInertionFactor();
+            _tendto_speed = inertion_data.m_tendto_speed_aim/* - (inertion_data.m_tendto_speed_aim - inertion_data.m_tendto_speed) * factor*/;
+            _origin_offset = inertion_data.m_origin_offset_aim/* - (inertion_data.m_origin_offset_aim - inertion_data.m_origin_offset) * factor*/;
             // вплив адонів на інерцію у прицілюванні
             clamp(m_fAimInertionK, -1.f, 1.f);
             _origin_offset += (_origin_offset * m_fAimInertionK);

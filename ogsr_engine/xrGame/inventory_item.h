@@ -321,8 +321,6 @@ public:
     virtual void SetItemEffect(int, float);
     virtual void SetHitTypeProtection(int, float);
 
-    virtual void InitAddons();
-
     virtual void Switch(bool);
     virtual void Switch();
     virtual bool IsPowerOn() const;

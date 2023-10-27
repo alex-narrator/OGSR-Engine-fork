@@ -706,7 +706,7 @@ float CActor::currentFOV()
     float current_fov = g_fov;
     const auto pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
 
-    if (eacFirstEye == cam_active && pWeapon && pWeapon->IsZoomed() && (!pWeapon->ZoomTexture() || (!pWeapon->IsRotatingToZoom() && pWeapon->ZoomTexture())))
+    if (eacFirstEye == cam_active && pWeapon && pWeapon->IsZoomed() && !pWeapon->IsRotatingToZoom())
         current_fov /= pWeapon->GetZoomFactor();
 
     return current_fov;

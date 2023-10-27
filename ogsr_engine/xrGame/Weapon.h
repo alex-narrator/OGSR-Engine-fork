@@ -162,7 +162,7 @@ public:
     void UpdateAddonsVisibility();
     void UpdateHUDAddonsVisibility();
     // инициализация свойств присоединенных аддонов
-    //virtual void InitAddons(){};
+    virtual void InitAddons(){};
 
     // для отоброажения иконок апгрейдов в интерфейсе
     Fvector2 GetAddonOffset(u32);
@@ -226,7 +226,7 @@ protected:
     // текстура для другого приціла, у режимі прицілювання
     CUIStaticItem* m_UIScopeSecond{};
     // коэффициент увеличения прицеливания
-    float m_fIronSightZoomFactor;
+    float m_fIronSightZoomFactor{1.f};
     // коэффициент увеличения прицела
     float m_fScopeZoomFactor{1.f};
     float m_fScopeZoomFactorSecond{1.f};

@@ -441,8 +441,6 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
     if (!pSE_InventoryItem)
         return TRUE;
 
-    InitAddons();
-
     return TRUE;
 }
 
@@ -819,8 +817,6 @@ bool CInventoryItem::IsPowerOn() const { return false; }
 void CInventoryItem::Switch() { Switch(!IsPowerOn()); }
 
 void CInventoryItem::Switch(bool turn_on) {}
-
-void CInventoryItem::InitAddons() {}
 
 LPCSTR CInventoryItem::GetBoneName(int bone_idx)
 {

@@ -1092,7 +1092,7 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
         }
     }
 
-    if (!IsAddonAttached(eScope) || IsScopeBroken())
+    if (!IsAddonAttached(eScope) || IsScopeBroken() && !m_bIgnoreScopeTexture)
     {
         m_bScopeDynamicZoom = m_bVision = m_bNightVisionEnabled = m_bRangeMeter = false;
 
