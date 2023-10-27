@@ -110,10 +110,6 @@ protected:
     bool OnItemDbClick(CUICellItem* itm);
     bool OnItemSelected(CUICellItem* itm);
     bool OnItemRButtonClick(CUICellItem* itm);
-    //
-    bool OnItemFocusReceived(CUICellItem* itm);
-    bool OnItemFocusLost(CUICellItem* itm);
-    bool OnItemFocusedUpdate(CUICellItem* itm);
 
     void BindDragDropListEvents(CUIDragDropListEx* lst);
 

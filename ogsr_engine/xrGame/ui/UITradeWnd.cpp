@@ -54,9 +54,6 @@ struct CUITradeInternal
     CUIDragDropListEx UIOurTradeList;
     CUIDragDropListEx UIOthersTradeList;
 
-    // информация о перетаскиваемом предмете
-    CUIItemInfo UIItemInfo;
-
     SDrawStaticStruct* UIDealMsg{};
 };
 
@@ -112,9 +109,6 @@ void CUITradeWnd::Init()
 
     AttachChild(&m_uidata->UIOthersTradeList);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_list_other_trade", 0, &m_uidata->UIOthersTradeList);
-
-    AttachChild(&m_uidata->UIItemInfo);
-    m_uidata->UIItemInfo.Init(TRADE_ITEM_XML);
 
     m_pUIPropertiesBox = xr_new<CUIPropertiesBox>();
     m_pUIPropertiesBox->SetAutoDelete(true);
@@ -837,7 +831,6 @@ bool CUITradeWnd::OnItemDbClick(CUICellItem* itm)
     SetCurrentItem(itm);
     bool b_all = Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION));
     MoveItems(itm, b_all);
-    m_uidata->UIItemInfo.InitItem(nullptr);
     return true;
 }
 
@@ -915,10 +908,6 @@ void CUITradeWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
     lst->m_f_item_db_click = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemDbClick);
     lst->m_f_item_selected = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemSelected);
     lst->m_f_item_rbutton_click = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemRButtonClick);
-    //
-    lst->m_f_item_focus_received = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemFocusReceived);
-    lst->m_f_item_focus_lost = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemFocusLost);
-    lst->m_f_item_focused_update = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemFocusedUpdate);
 }
 
 void CUITradeWnd::ColorizeItem(CUICellItem* itm, bool canTrade, bool highlighted)
@@ -1008,53 +997,6 @@ void CUITradeWnd::DetachAddon(const char* addon_name, bool for_all)
     {
         pActor->inventory().Activate(NO_ACTIVE_SLOT);
     }
-}
-
-bool CUITradeWnd::OnItemFocusReceived(CUICellItem* itm)
-{
-    itm_to_descr = itm;
-    m_uidata->UIItemInfo.InitItem((PIItem)itm_to_descr->m_pData);
-    CUIDragDropListEx* owner = itm->OwnerList();
-    bool bBuying = (owner == &m_uidata->UIOurBagList) || (owner == &m_uidata->UIOurTradeList);
-    if (m_uidata->UIItemInfo.UICost)
-    {
-        string256 str;
-        sprintf_s(str, "%d %s", m_pOthersTrade->GetItemPrice((PIItem)itm_to_descr->m_pData, bBuying), money_name);
-        m_uidata->UIItemInfo.UICost->SetText(str);
-    }
-    BringToTop(&m_uidata->UIItemInfo);
-    return false;
-}
-
-bool CUITradeWnd::OnItemFocusLost(CUICellItem* itm)
-{
-    itm_to_descr = nullptr;
-    m_uidata->UIItemInfo.InitItem(nullptr);
-    return false;
-}
-
-bool CUITradeWnd::OnItemFocusedUpdate(CUICellItem* itm)
-{
-    if (!itm_to_descr || m_pUIPropertiesBox->IsShown() || Device.dwTimeGlobal < (itm_to_descr->GetFocusReceiveTime() + m_uidata->UIItemInfo.show_delay * 1000))
-    {
-        if (m_uidata->UIItemInfo.IsShown())
-            m_uidata->UIItemInfo.Show(false);
-        return false;
-    }
-    if (!m_uidata->UIItemInfo.IsShown())
-        m_uidata->UIItemInfo.Show(true);
-
-    Fvector2 v_res{1024.f, 768.f};
-    Fvector2 pos{GetUICursor()->GetCursorPosition()};
-    pos.add(m_uidata->UIItemInfo.info_offset);
-    Fvector2 wnd_size{m_uidata->UIItemInfo.GetWidth(), m_uidata->UIItemInfo.GetHeight()};
-    Fvector2 delta{pos.x + wnd_size.x - v_res.x, pos.y + wnd_size.y - v_res.y};
-    if (delta.x > 0.f)
-        pos.x -= delta.x;
-    if (delta.y > 0.f)
-        pos.y -= delta.y;
-    m_uidata->UIItemInfo.SetWndPos(pos);
-    return false;
 }
 
 void CUITradeWnd::UpdateLists_delayed()

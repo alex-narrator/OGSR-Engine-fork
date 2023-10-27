@@ -71,12 +71,6 @@ void CUICarBodyWnd::Init()
     AttachChild(m_pUIOthersBagList);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_list_other", 0, m_pUIOthersBagList);
 
-    // информация о предмете
-    m_pUIItemInfo = xr_new<CUIItemInfo>();
-    m_pUIItemInfo->SetAutoDelete(true);
-    AttachChild(m_pUIItemInfo);
-    m_pUIItemInfo->Init(CARBODY_ITEM_XML);
-
     m_pUIPropertiesBox = xr_new<CUIPropertiesBox>();
     m_pUIPropertiesBox->SetAutoDelete(true);
     AttachChild(m_pUIPropertiesBox);
@@ -736,7 +730,6 @@ bool CUICarBodyWnd::OnItemDbClick(CUICellItem* itm)
 {
     bool b_all = Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION));
     MoveItems(itm, b_all);
-    m_pUIItemInfo->InitItem(nullptr);
     return true;
 }
 
@@ -769,10 +762,6 @@ void CUICarBodyWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
     lst->m_f_item_db_click = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemDbClick);
     lst->m_f_item_selected = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemSelected);
     lst->m_f_item_rbutton_click = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemRButtonClick);
-    //
-    lst->m_f_item_focus_received = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemFocusReceived);
-    lst->m_f_item_focus_lost = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemFocusLost);
-    lst->m_f_item_focused_update = fastdelegate::MakeDelegate(this, &CUICarBodyWnd::OnItemFocusedUpdate);
 }
 
 void CUICarBodyWnd::PlaySnd(eInventorySndAction a)
@@ -826,43 +815,4 @@ void CUICarBodyWnd::RepackAmmo()
         m_pOtherInventoryOwner->inventory().RepackAmmo();
     else
         m_pOtherInventoryBox->RepackAmmo();
-}
-
-bool CUICarBodyWnd::OnItemFocusReceived(CUICellItem* itm)
-{
-    itm_to_descr = itm;
-    m_pUIItemInfo->InitItem((PIItem)itm_to_descr->m_pData);
-    BringToTop(m_pUIItemInfo);
-    return false;
-}
-
-bool CUICarBodyWnd::OnItemFocusLost(CUICellItem* itm)
-{
-    itm_to_descr = nullptr;
-    m_pUIItemInfo->InitItem(nullptr);
-    return false;
-}
-
-bool CUICarBodyWnd::OnItemFocusedUpdate(CUICellItem* itm)
-{
-    if (!itm_to_descr || m_pUIPropertiesBox->IsShown() || Device.dwTimeGlobal < (itm_to_descr->GetFocusReceiveTime() + m_pUIItemInfo->show_delay * 1000))
-    {
-        if (m_pUIItemInfo->IsShown())
-            m_pUIItemInfo->Show(false);
-        return false;
-    }
-    if (!m_pUIItemInfo->IsShown())
-        m_pUIItemInfo->Show(true);
-
-    Fvector2 v_res{1024.f, 768.f};
-    Fvector2 pos{GetUICursor()->GetCursorPosition()};
-    pos.add(m_pUIItemInfo->info_offset);
-    Fvector2 wnd_size{m_pUIItemInfo->GetWidth(), m_pUIItemInfo->GetHeight()};
-    Fvector2 delta{pos.x + wnd_size.x - v_res.x, pos.y + wnd_size.y - v_res.y};
-    if (delta.x > 0.f)
-        pos.x -= delta.x;
-    if (delta.y > 0.f)
-        pos.y -= delta.y;
-    m_pUIItemInfo->SetWndPos(pos);
-    return false;
 }

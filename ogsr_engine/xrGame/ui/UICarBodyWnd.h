@@ -50,8 +50,6 @@ protected:
     CUIDragDropListEx* m_pUIOurBagList;
     CUIDragDropListEx* m_pUIOthersBagList;
 
-    CUIItemInfo* m_pUIItemInfo;
-
     CUIPropertiesBox* m_pUIPropertiesBox;
 
 public:
@@ -85,10 +83,6 @@ protected:
     bool OnItemDbClick(CUICellItem* itm);
     bool OnItemSelected(CUICellItem* itm);
     bool OnItemRButtonClick(CUICellItem* itm);
-    //
-    bool OnItemFocusReceived(CUICellItem* itm);
-    bool OnItemFocusLost(CUICellItem* itm);
-    bool OnItemFocusedUpdate(CUICellItem* itm);
 
     bool TransferItem(PIItem itm, CGameObject* owner_from, CGameObject* owner_to);
     void BindDragDropListEvents(CUIDragDropListEx* lst);

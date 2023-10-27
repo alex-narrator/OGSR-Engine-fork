@@ -686,8 +686,6 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
     auto __item = (PIItem)itm->m_pData;
     auto old_owner = itm->OwnerList();
 
-    UIItemInfo.InitItem(nullptr);
-
     if (TryUseItem(__item))
         return true;
 
@@ -742,55 +740,6 @@ bool CUIInventoryWnd::OnItemRButtonClick(CUICellItem* itm)
 {
     SetCurrentItem(itm);
     ActivatePropertiesBox();
-    return false;
-}
-
-bool CUIInventoryWnd::OnItemFocusReceived(CUICellItem* itm)
-{
-    itm_to_descr = itm;
-    auto iitem_to_descr = (PIItem)itm_to_descr->m_pData;
-
-    HideSlotsHighlight();
-    ShowSlotsHighlight(iitem_to_descr);
-
-    UIItemInfo.InitItem(iitem_to_descr);
-    BringToTop(&UIItemInfo);
-    return false;
-}
-
-bool CUIInventoryWnd::OnItemFocusLost(CUICellItem* itm)
-{
-    itm_to_descr = nullptr;
-
-    auto CellPos = itm->OwnerList()->m_container->PickCell(GetUICursor()->GetCursorPosition());
-    if (!itm->OwnerList()->m_container->ValidCell(CellPos) || itm->OwnerList()->m_container->GetCellAt(CellPos).Empty())
-        HideSlotsHighlight();
-
-    UIItemInfo.InitItem(nullptr);
-    return false;
-}
-
-bool CUIInventoryWnd::OnItemFocusedUpdate(CUICellItem* itm)
-{
-    if (!itm_to_descr || UIPropertiesBox.IsShown() || Device.dwTimeGlobal < (itm_to_descr->GetFocusReceiveTime() + UIItemInfo.show_delay * 1000))
-    {
-        if (UIItemInfo.IsShown())
-            UIItemInfo.Show(false);
-        return false;
-    }
-    if (!UIItemInfo.IsShown())
-        UIItemInfo.Show(true);
-
-    Fvector2 v_res{1024.f, 768.f};
-    Fvector2 pos{GetUICursor()->GetCursorPosition()};
-    pos.add(UIItemInfo.info_offset);
-    Fvector2 wnd_size{UIItemInfo.GetWidth(), UIItemInfo.GetHeight()};
-    Fvector2 delta{pos.x + wnd_size.x - v_res.x, pos.y + wnd_size.y - v_res.y};
-    if (delta.x > 0.f)
-        pos.x -= delta.x;
-    if (delta.y > 0.f)
-        pos.y -= delta.y;
-    UIItemInfo.SetWndPos(pos);
     return false;
 }
 

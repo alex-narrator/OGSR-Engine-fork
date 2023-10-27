@@ -57,9 +57,6 @@ void CUIInventoryWnd::Init()
 
     xml_init.InitWindow(uiXml, "main", 0, this);
 
-    AttachChild(&UIItemInfo);
-    UIItemInfo.Init(INVENTORY_ITEM_XML);
-
     AttachChild(&UIOutfitInfo);
     UIOutfitInfo.InitFromXml(uiXml);
     //.	xml_init.InitStatic					(uiXml, "outfit_info_window",0, &UIOutfitInfo);
@@ -414,10 +411,6 @@ void CUIInventoryWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
     lst->m_f_item_db_click = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemDbClick);
     lst->m_f_item_selected = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemSelected);
     lst->m_f_item_rbutton_click = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemRButtonClick);
-    //
-    lst->m_f_item_focus_received = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemFocusReceived);
-    lst->m_f_item_focus_lost = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemFocusLost);
-    lst->m_f_item_focused_update = fastdelegate::MakeDelegate(this, &CUIInventoryWnd::OnItemFocusedUpdate);
 }
 
 #include "../xr_level_controller.h"
