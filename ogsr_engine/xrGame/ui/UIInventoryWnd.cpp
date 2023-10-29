@@ -472,7 +472,7 @@ bool CUIInventoryWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-void CUIInventoryWnd::UpdateCustomDraw(bool b_full_reinit)
+void CUIInventoryWnd::UpdateCustomDraw()
 {
     if (!smart_cast<CActor*>(Level().CurrentEntity()))
         return;
@@ -491,7 +491,32 @@ void CUIInventoryWnd::UpdateCustomDraw(bool b_full_reinit)
         u32 cells = m_pInv->IsSlotAllowed(i) ? (list->CellsCapacity().x * list->CellsCapacity().y) : 0;
         list->SetCellsAvailable(cells);
     }
+}
 
-    if (b_full_reinit)
-        InitInventory_delayed();
+#include "Warbelt.h"
+#include "Vest.h"
+void CUIInventoryWnd::TryReinitLists(PIItem iitem)
+{
+    bool update_custom_draw{};
+    if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
+    {
+        for (const auto& slot : iitem->GetSlotsLocked())
+            ReinitSlotList(slot);
+        for (const auto& slot : iitem->GetSlotsUnlocked())
+            ReinitSlotList(slot);
+        update_custom_draw = true;
+    }
+    if (smart_cast<CWarbelt*>(iitem))
+    {
+        ReinitBeltList();
+        update_custom_draw = true;
+    }
+    if (smart_cast<CVest*>(iitem))
+    {
+        ReinitVestList();
+        update_custom_draw = true;
+    }
+    ReinitMarkedList();
+    if (update_custom_draw)
+        UpdateCustomDraw();
 }

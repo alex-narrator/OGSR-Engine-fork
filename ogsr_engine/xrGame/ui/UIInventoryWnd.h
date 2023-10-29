@@ -159,8 +159,10 @@ protected:
 public:
     PIItem CurrentIItem();
     // обновление отрисовки сетки пояса
-    void UpdateCustomDraw(bool = true);
+    void UpdateCustomDraw();
     void ReinitBeltList();
     void ReinitVestList();
+    void ReinitMarkedList();
     void ReinitSlotList(u32);
+    void TryReinitLists(PIItem);
 };

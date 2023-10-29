@@ -20,8 +20,6 @@
 
 #include "WeaponMagazined.h"
 #include "WeaponMagazinedWGrenade.h"
-#include "Warbelt.h"
-#include "Vest.h"
 
 CUICellItem* CUIInventoryWnd::CurrentItem() { return m_pCurrentCellItem; }
 
@@ -334,14 +332,7 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
             if (auto det = smart_cast<CCustomDetector*>(iitem))
                 det->ToggleDetector(g_player_hud->attached_item(0) != nullptr);
 
-        if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty() || smart_cast<CWarbelt*>(iitem) || smart_cast<CVest*>(iitem))
-            UpdateCustomDraw();
-
-        if (old_owner == m_pUIBeltList || old_owner == m_pUIVestList)
-            old_owner == m_pUIBeltList ? ReinitBeltList() : ReinitVestList();
-
-        if (old_owner == m_pUIMarkedList)
-            OnFromMarked(iitem);
+        TryReinitLists(iitem);
     }
 
     return result;
@@ -377,11 +368,8 @@ bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
         else
             new_owner->SetItem(i);
 
-        if (!iitem->GetSlotsLocked().empty() || !iitem->GetSlotsUnlocked().empty() || smart_cast<CWarbelt*>(iitem) || smart_cast<CVest*>(iitem))
-            UpdateCustomDraw();
-
-        if (old_owner == m_pUIBeltList || old_owner == m_pUIVestList)
-            old_owner == m_pUIBeltList ? ReinitBeltList() : ReinitVestList();
+        if (old_owner != m_pUIBagList)
+            TryReinitLists(iitem);
 
         return true;
     }
@@ -431,7 +419,7 @@ bool CUIInventoryWnd::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
 #ifdef DEBUG
         bool result =
 #endif
-            GetInventory()->Belt(iitem);
+        GetInventory()->Belt(iitem);
         PlaySnd(eInvItemToBelt);
         m_b_need_update_stats = true;
         VERIFY(result);
@@ -443,13 +431,7 @@ bool CUIInventoryWnd::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
         else
             new_owner->SetItem(i);
 
-        ReinitBeltList();
-
-        if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
-            UpdateCustomDraw();
-
-        if (old_owner == m_pUIVestList)
-            ReinitVestList();
+        TryReinitLists(iitem);
         
         if (old_owner == m_pUIMarkedList)
             OnFromMarked(iitem);
@@ -489,13 +471,7 @@ bool CUIInventoryWnd::ToVest(CUICellItem* itm, bool b_use_cursor_pos)
         else
             new_owner->SetItem(i);
 
-        ReinitVestList();
-
-        if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
-            UpdateCustomDraw();
-
-        if (old_owner == m_pUIBeltList)
-            ReinitBeltList();
+        TryReinitLists(iitem);
         
         if (old_owner == m_pUIMarkedList)
             OnFromMarked(iitem);
@@ -781,8 +757,14 @@ void CUIInventoryWnd::ClearAllLists()
 
 void CUIInventoryWnd::ReinitBeltList()
 {
+    for (u32 i = 0; i < m_pUIBeltList->ItemsCount(); ++i)
+    {
+        auto itm = m_pUIBeltList->GetItemIdx(i);
+        PIItem iitem = (PIItem)itm->m_pData;
+        if (!m_pInv->InBelt(iitem))
+            AddItemToBag(iitem);
+    }
     m_pUIBeltList->ClearAll(true);
-    UpdateCustomDraw(false);
     std::sort(m_pInv->m_belt.begin(), m_pInv->m_belt.end(), InventoryUtilities::GreaterRoomInRuck);
     for (const auto& item : m_pInv->m_belt)
     {
@@ -793,13 +775,32 @@ void CUIInventoryWnd::ReinitBeltList()
 
 void CUIInventoryWnd::ReinitVestList()
 {
+    for (u32 i = 0; i < m_pUIVestList->ItemsCount(); ++i)
+    {
+        auto itm = m_pUIVestList->GetItemIdx(i);
+        PIItem iitem = (PIItem)itm->m_pData;
+        if (!m_pInv->InVest(iitem))
+            AddItemToBag(iitem);
+    }
     m_pUIVestList->ClearAll(true);
-    UpdateCustomDraw(false);
     std::sort(m_pInv->m_vest.begin(), m_pInv->m_vest.end(), InventoryUtilities::GreaterRoomInRuck);
     for (const auto& item : m_pInv->m_vest)
     {
         CUICellItem* itm = create_cell_item(item);
         m_pUIVestList->SetItem(itm);
+    }
+}
+
+void CUIInventoryWnd::ReinitMarkedList()
+{
+    m_pUIMarkedList->ClearAll(true);
+    for (const auto& item : m_pInv->m_all)
+    {
+        if (item->GetMarked())
+        {
+            CUICellItem* itm = create_cell_item(item);
+            m_pUIMarkedList->SetItem(itm);
+        }
     }
 }
 
@@ -809,8 +810,18 @@ void CUIInventoryWnd::ReinitSlotList(u32 slot)
     if (!slot_list)
         return;
 
+    if(!m_pInv->IsSlotAllowed(slot))
+        for (u32 i = 0; i < slot_list->ItemsCount(); ++i)
+        {
+            auto itm = slot_list->RemoveItem(slot_list->GetItemIdx(i), false);
+            m_pUIBagList->SetItem(itm);
+            if (slot == WARBELT_SLOT)
+                ReinitBeltList();
+            if (slot == VEST_SLOT)
+                ReinitVestList();
+        }
+
     slot_list->ClearAll(true);
-    UpdateCustomDraw(false);
 
     PIItem _itm = m_pInv->m_slots[slot].m_pIItem;
     if (_itm)
