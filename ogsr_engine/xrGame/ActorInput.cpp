@@ -154,10 +154,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
     case kTORCH: {
         if (GetTorch() && IsFreeHands())
         {
-            if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
-                GetTorch()->SwitchMode();
-            else
-                GetTorch()->SwitchTorch();
+            GetTorch()->SwitchTorch();
         }
     }
     break;

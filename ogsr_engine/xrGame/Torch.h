@@ -48,9 +48,6 @@ public:
 
     virtual void UpdateCL();
 
-    virtual void save(NET_Packet& output_packet);
-    virtual void load(IReader& input_packet);
-
     virtual void Switch();
     virtual void Switch(bool);
 
@@ -70,14 +67,11 @@ public:
     void calc_m_delta_h(float);
     float get_range() const;
 
-    void SwitchMode();
-
 protected:
     HUD_SOUND_COLLECTION_LAYERED m_sounds{};
 
     shared_str 
-        m_light_descr_sect{}, 
-        m_light_descr_sect_second{}, 
+        m_light_descr_sect{},
         m_NightVisionSect{};
 
     bool m_bSecondMode{};

@@ -76,7 +76,6 @@ void CTorch::Load(LPCSTR section)
     inherited::Load(section);
     
     m_light_descr_sect = READ_IF_EXISTS(pSettings, r_string, section, "light_definition", nullptr);
-    m_light_descr_sect_second = READ_IF_EXISTS(pSettings, r_string, section, "light_definition_second", nullptr);
 
     LoadLightDefinitions(m_light_descr_sect);
 
@@ -172,8 +171,6 @@ void CTorch::UpdateSwitchTorch()
             smart_cast<IKinematics*>(H_Parent()->Visual())->CalculateBones_Invalidate();
 #pragma todo("KRodin: переделать под новый рендер!")
             // light_render->set_actor_torch(true);
-            light_render->set_range(m_fRange);
-            calc_m_delta_h(m_fRange);
         }
 
         if (H_Parent()->XFORM().c.distance_to_sqr(Device.vCameraPosition) < _sqr(OPTIMIZATION_DISTANCE))
@@ -541,32 +538,4 @@ void CTorch::LoadLightDefinitions(shared_str light_sect)
     glow_render->set_radius(pUserData->r_float(light_sect, "glow_radius"));
 
     calc_m_delta_h(m_fRange);
-}
-
-void CTorch::SwitchMode()
-{
-    if (!m_light_descr_sect_second)
-        return;
-
-    m_bSecondMode = !m_bSecondMode;
-
-    LoadLightDefinitions(m_bSecondMode ? m_light_descr_sect_second : m_light_descr_sect);
-
-    if (auto pA = smart_cast<CActor*>(H_Parent()); pA && m_sounds.FindSoundItem("sndTorchSwitch", false))
-        m_sounds.PlaySound("sndTorchSwitch", pA->Position(), pA, !!pA->HUDview());
-}
-
-void CTorch::save(NET_Packet& output_packet)
-{
-    inherited::save(output_packet);
-    save_data(m_bSecondMode, output_packet);
-}
-
-void CTorch::load(IReader& input_packet)
-{
-    inherited::load(input_packet);
-    bool b_saved_mode{};
-    load_data(b_saved_mode, input_packet);
-    if (b_saved_mode != m_bSecondMode)
-        SwitchMode();
 }
