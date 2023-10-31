@@ -248,12 +248,6 @@ protected:
 public:
     // Real Wolf.20.01.15
     virtual bool TryToGetAmmo(u32);
-    //
-    LPCSTR m_NightVisionSect{};
-    bool m_bNightVisionOn{};
-    void SwitchNightVision(bool, bool);
-    void UpdateSwitchNightVision();
-    void SwitchNightVision();
 
     virtual float GetConditionMisfireProbability() const;
 
@@ -293,7 +287,6 @@ public:
     virtual void Hit(SHit* pHDS);
     virtual bool IsHitToAddon(SHit* pHDS);
 
-    virtual bool IsNightVisionEnabled() const { return m_bNightVisionEnabled; };
     virtual bool IsVisionPresent() const { return m_bVision; };
 
     virtual void SwitchLaser(bool on);
@@ -305,8 +298,6 @@ public:
     virtual void DetachAll();
 
 protected:
-    bool m_bNightVisionEnabled{};
-    bool m_bNightVisionSwitchedOn{true};
     // передёргивание затвора
     virtual void OnShutter();
     virtual void switch2_Shutter();

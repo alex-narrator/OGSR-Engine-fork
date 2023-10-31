@@ -249,10 +249,6 @@ protected:
     bool m_bScopeSecondMode{};
     bool m_bIgnoreScopeSecond{};
 
-    bool m_bRangeMeter{};
-    Fvector2 m_vRangeMeterOffset{};
-    u32 m_uRangeMeterColor{};
-
     bool m_bUseScopeZoom{};
     bool m_bUseScopeGrenadeZoom{};
     bool m_bUseScopeDOF{};
@@ -310,8 +306,6 @@ public:
     virtual bool IsSilencerBroken() const { return false; };
     virtual bool IsScopeBroken() const { return false; };
     virtual bool IsGrenadeLauncherBroken() const { return false; };
-
-    virtual bool HasRangeMeter() const { return m_bRangeMeter && !IsScopeBroken(); };
 
     virtual float GetZoomRotationTime() const { return m_fZoomRotateTime; }
 

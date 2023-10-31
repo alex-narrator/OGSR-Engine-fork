@@ -122,7 +122,6 @@ void CWeaponMagazined::save(NET_Packet& output_packet)
     save_data(m_iShotNum, output_packet);
     save_data(m_bScopeSecondMode, output_packet);
     save_data(m_fRTZoomFactor, output_packet);
-    save_data(m_bNightVisionSwitchedOn, output_packet);
 }
 
 void CWeaponMagazined::load(IReader& input_packet)
@@ -131,7 +130,6 @@ void CWeaponMagazined::load(IReader& input_packet)
     load_data(m_iShotNum, input_packet);
     load_data(m_bScopeSecondMode, input_packet);
     load_data(m_fRTZoomFactor, input_packet);
-    load_data(m_bNightVisionSwitchedOn, input_packet);
 }
 
 void CWeaponMagazined::Load(LPCSTR section)
@@ -507,7 +505,6 @@ void CWeaponMagazined::UpdateCL()
     {
         if (m_binoc_vision)
             m_binoc_vision->Update();
-        UpdateSwitchNightVision();
     }
 
     UpdateSounds();
@@ -1094,7 +1091,7 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
 
     if (!IsAddonAttached(eScope) || IsScopeBroken() && !m_bIgnoreScopeTexture)
     {
-        m_bScopeDynamicZoom = m_bVision = m_bNightVisionEnabled = m_bRangeMeter = false;
+        m_bScopeDynamicZoom = m_bVision = false;
 
         if (IsScopeBroken())
         {
@@ -1133,26 +1130,6 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
     if (m_bVision)
         binoc_vision_sect = section;
 
-    m_bNightVisionEnabled = !!READ_IF_EXISTS(pSettings, r_bool, section, "night_vision", false);
-    if (m_bNightVisionEnabled)
-    {
-        m_sounds.StopSound("sndNightVisionOn");
-        m_sounds.StopSound("sndNightVisionOff");
-        m_sounds.StopSound("sndNightVisionIdle");
-        m_sounds.StopSound("sndNightVisionBroken");
-
-        if (pSettings->line_exist(section, "snd_night_vision_on"))
-            m_sounds.LoadSound(section, "snd_night_vision_on", "sndNightVisionOn", SOUND_TYPE_ITEM_USING);
-        if (pSettings->line_exist(section, "snd_night_vision_off"))
-            m_sounds.LoadSound(section, "snd_night_vision_off", "sndNightVisionOff", SOUND_TYPE_ITEM_USING);
-        if (pSettings->line_exist(section, "snd_night_vision_idle"))
-            m_sounds.LoadSound(section, "snd_night_vision_idle", "sndNightVisionIdle", SOUND_TYPE_ITEM_USING);
-        if (pSettings->line_exist(section, "snd_night_vision_broken"))
-            m_sounds.LoadSound(section, "snd_night_vision_broken", "sndNightVisionBroken", SOUND_TYPE_ITEM_USING);
-
-        m_NightVisionSect = READ_IF_EXISTS(pSettings, r_string, section, "night_vision_effector", nullptr);
-    }
-
     auto scope_zoom_line = READ_IF_EXISTS(pSettings, r_string, section, "scope_zoom_factor", nullptr);
     m_bScopeDynamicZoom = false;
     if (scope_zoom_line)
@@ -1173,14 +1150,6 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
                 m_sounds.LoadSound(section, "snd_zoom_change", "sndZoomChange", SOUND_TYPE_ITEM_USING);
         }
         m_uZoomStepCount = _count > 2 ? atoi(_GetItem(scope_zoom_line, 2, tmp)) : 2;
-    }
-
-    m_bRangeMeter = READ_IF_EXISTS(pSettings, r_bool, section, "range_meter", false);
-    if (m_bRangeMeter)
-    {
-        Fvector2 fvec_def{0.f, 0.05f};
-        m_vRangeMeterOffset = READ_IF_EXISTS(pSettings, r_fvector2, section, "range_meter_offset", fvec_def);
-        m_uRangeMeterColor = READ_IF_EXISTS(pSettings, r_color, section, "range_meter_color", color_argb(255, 255, 255, 255));
     }
 
     scope_texture_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture", nullptr);
@@ -1693,8 +1662,6 @@ void CWeaponMagazined::OnZoomIn()
                 return;
             if (m_bVision && !m_binoc_vision)
                 m_binoc_vision = xr_new<CBinocularsVision>(this);
-            if (m_bNightVisionSwitchedOn)
-                SwitchNightVision(true, false);
         }
     }
 }
@@ -1718,7 +1685,6 @@ void CWeaponMagazined::OnZoomOut(bool rezoom)
             VERIFY(m_binoc_vision);
             xr_delete(m_binoc_vision);
         }
-        SwitchNightVision(false, false);
     }
     if (rezoom)
         OnZoomIn();
@@ -1977,69 +1943,6 @@ void CWeaponMagazined::ShutterAction() // передёргивание затв�
         PHGetLinearVell(vel);
         OnShellDrop(get_LastSP(), vel);
     }
-}
-
-void CWeaponMagazined::SwitchNightVision(bool vision_on, bool switch_sound)
-{
-    if (!m_bNightVisionEnabled || IsGrenadeMode())
-        return;
-
-    CActor* pA = smart_cast<CActor*>(H_Parent());
-    if (!pA)
-        return;
-
-    if (vision_on)
-    {
-        m_bNightVisionOn = true;
-    }
-    else
-    {
-        m_bNightVisionOn = false;
-    }
-
-    if (m_bNightVisionOn)
-    {
-        CEffectorPP* pp = pA->Cameras().GetPPEffector((EEffectorPPType)effNightvisionScope);
-        if (!pp)
-        {
-            if (!!m_NightVisionSect)
-            {
-                AddEffector(pA, effNightvisionScope, m_NightVisionSect);
-                if (switch_sound)
-                    PlaySound("sndNightVisionOn", pA->Position());
-                PlaySound("sndNightVisionIdle", pA->Position());
-            }
-        }
-    }
-    else
-    {
-        CEffectorPP* pp = pA->Cameras().GetPPEffector((EEffectorPPType)effNightvisionScope);
-        if (pp)
-        {
-            pp->Stop(1.0f);
-            if (switch_sound)
-                PlaySound("sndNightVisionOff", pA->Position());
-            m_sounds.StopSound("sndNightVisionIdle");
-        }
-    }
-}
-
-void CWeaponMagazined::UpdateSwitchNightVision()
-{
-    if (!m_bNightVisionEnabled || !m_bNightVisionSwitchedOn)
-        return;
-
-    auto* pA = smart_cast<CActor*>(H_Parent());
-    if (pA && m_bNightVisionOn && !pA->Cameras().GetPPEffector((EEffectorPPType)effNightvision))
-        SwitchNightVision(true, false);
-}
-
-void CWeaponMagazined::SwitchNightVision()
-{
-    if (!m_bNightVisionEnabled || IsGrenadeMode() || IsSecondScopeMode())
-        return;
-    m_bNightVisionSwitchedOn = !m_bNightVisionSwitchedOn;
-    SwitchNightVision(!m_bNightVisionOn, true);
 }
 
 void CWeaponMagazined::DeteriorateSilencerAttachable(float fDeltaCondition)

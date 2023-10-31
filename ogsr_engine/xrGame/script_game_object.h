@@ -609,7 +609,6 @@ public:
     void activate_slot(u8 slot_id, bool now = false);
 
     void SwitchTorch(bool);
-    void SwitchNightVision(bool);
 
     void SwitchPower(bool);
     bool IsPowerOn();

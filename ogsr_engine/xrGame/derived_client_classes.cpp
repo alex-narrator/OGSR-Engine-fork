@@ -341,8 +341,7 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("can_attach_addon", &CWeaponMagazined::CanAttach)
                   .def("can_detach_addon", &CWeaponMagazined::CanDetach)
                   .def("respawn_weapon", &CWeaponMagazined::RespawnWeapon)
-                  .def("firemod_string", &CWeaponMagazined::GetCurrentFireModeStr)
-                  .def("switch_night_vision", (void(CWeaponMagazined::*)()) & CWeaponMagazined::SwitchNightVision),
+                  .def("firemod_string", &CWeaponMagazined::GetCurrentFireModeStr),
               class_<CWeaponMagazinedWGrenade, CWeaponMagazined>("CWeaponMagazinedWGrenade")
                   .def_readwrite("gren_mag_size", &CWeaponMagazinedWGrenade::iMagazineSize2)
                   .def("switch_gl", &CWeaponMagazinedWGrenade::SwitchMode),

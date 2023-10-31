@@ -466,18 +466,7 @@ void CScriptGameObject::SwitchTorch(bool on)
         ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member switch_torch!");
         return;
     }
-    torch->SwitchTorch(on);
-}
-
-void CScriptGameObject::SwitchNightVision(bool on)
-{
-    CTorch* torch = smart_cast<CTorch*>(&object());
-    if (!torch)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member switch_night_vision!");
-        return;
-    }
-    torch->SwitchNightVision(on);
+    torch->Switch(on);
 }
 
 void CScriptGameObject::SwitchPower(bool on)

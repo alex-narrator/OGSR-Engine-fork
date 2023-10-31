@@ -93,11 +93,9 @@ add_to_type_list(CSE_ALifeItem)
     // флаги
     enum EStats {
         eTorchActive = (1 << 0),
-        eNightVisionActive = (1 << 1),
-        eAttached = (1 << 2)
+        eAttached = (1 << 1)
     };
 bool m_active{};
-bool m_nightvision_active{};
 bool m_attached{};
 CSE_ALifeItemTorch(LPCSTR caSection);
 virtual ~CSE_ALifeItemTorch();

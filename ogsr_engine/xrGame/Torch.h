@@ -22,7 +22,7 @@ protected:
 
     float m_delta_h;
     Fvector2 m_prev_hp;
-    bool m_switched_on{}, m_bNightVisionOn{};
+    bool m_switched_on{};
     ref_light light_render;
     ref_light light_omni;
     ref_glow glow_render;
@@ -51,17 +51,7 @@ public:
     virtual void Switch();
     virtual void Switch(bool);
 
-    void SwitchTorch();
-    void SwitchTorch(bool);
-    void UpdateSwitchTorch();
-    //nv
-    void SwitchNightVision();
-    void SwitchNightVision(bool light_on);
-    void UpdateSwitchNightVision();
-
-    virtual bool IsPowerOn() const;
-    virtual bool IsTorchOn() const { return m_switched_on; };
-    virtual bool IsNightVisionOn() const { return m_bNightVisionOn; };
+    virtual bool IsPowerOn() const { return m_switched_on; };
 
     virtual bool can_be_attached() const;
     void calc_m_delta_h(float);
@@ -70,9 +60,7 @@ public:
 protected:
     HUD_SOUND_COLLECTION_LAYERED m_sounds{};
 
-    shared_str 
-        m_light_descr_sect{},
-        m_NightVisionSect{};
+    shared_str m_light_descr_sect{};
 
     bool m_bSecondMode{};
 

@@ -285,7 +285,7 @@ float CVisualMemoryManager::object_luminocity(const CGameObject* game_object) co
         return (1.f);
 
     const auto* pTorch = smart_cast<const CTorch*>(pActor->GetCurrentTorch());
-    if (pTorch && pTorch->IsTorchOn())
+    if (pTorch && pTorch->IsPowerOn())
     {
         float dist = m_object->Position().distance_to(game_object->Position());
         if (dist < pTorch->get_range())
