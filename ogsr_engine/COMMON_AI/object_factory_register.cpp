@@ -134,6 +134,7 @@
 #include "SimpleDetector.h"
 #include "EliteDetector.h"
 #include "AdvancedDetector.h"
+#include "CustomDevice.h"
 
 #include "torch.h"
 #include "pda.h"
@@ -264,7 +265,7 @@ void CObjectFactory::register_classes()
     ADD(CSilencer, CSE_ALifeItem, CLSID_OBJECT_W_SILENCER, "wpn_silencer");
     ADD(CGrenadeLauncher, CSE_ALifeItem, CLSID_OBJECT_W_GLAUNCHER, "wpn_grenade_launcher");
     ADD(CLaser, CSE_ALifeItem, CLSID_OBJECT_W_LASER, "wpn_laser");
-    ADD(CFlashlight, CSE_ALifeItem, CLSID_OBJECT_W_FLASHLIGHT, "wpn_flashlight");
+    ADD(CAddonFlashlight, CSE_ALifeItem, CLSID_OBJECT_W_FLASHLIGHT, "wpn_flashlight");
     ADD(CStock, CSE_ALifeItem, CLSID_OBJECT_W_STOCK, "wpn_stock");
     ADD(CExtender, CSE_ALifeItem, CLSID_OBJECT_W_EXTENDER, "wpn_extender");
     ADD(CForend, CSE_ALifeItem, CLSID_OBJECT_W_FOREND, "wpn_forend");
@@ -331,6 +332,8 @@ void CObjectFactory::register_classes()
     // Devices
     ADD(CTorch, CSE_ALifeItemTorch, CLSID_DEVICE_TORCH, "device_torch");
     ADD(CPda, CSE_ALifeItemPDA, CLSID_DEVICE_PDA, "device_pda");
+
+    ADD(CCustomDevice, CSE_ALifeItem, CLSID_DEVICE_CUSTOM, "device_custom");
 
     // objects
     ADD(CProjector, CSE_ALifeObjectProjector, CLSID_OBJECT_PROJECTOR, "projector");

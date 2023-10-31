@@ -1020,7 +1020,7 @@ void CInventory::Items_SetCurrentEntityHud(bool current_entity)
 void CInventory::SetSlotsBlocked(u16 mask, bool bBlock, bool now)
 {
     bool bChanged = false;
-    m_bBlockDetector = bBlock;
+    m_bBlockDevice = bBlock;
     for (int i = 0; i < SLOTS_TOTAL; ++i)
     {
         if (mask & (1 << i))

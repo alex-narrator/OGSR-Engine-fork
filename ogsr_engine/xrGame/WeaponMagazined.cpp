@@ -826,7 +826,7 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
     auto pScope = smart_cast<CScope*>(pIItem) || smart_cast<CWeaponBinoculars*>(pIItem);
     auto pSilencer = smart_cast<CSilencer*>(pIItem);
     auto pLaser = smart_cast<CLaser*>(pIItem);
-    auto pFlashlight = smart_cast<CFlashlight*>(pIItem);
+    auto pFlashlight = smart_cast<CAddonFlashlight*>(pIItem);
     auto pStock = smart_cast<CStock*>(pIItem);
     auto pForend = smart_cast<CForend*>(pIItem);
 
@@ -883,7 +883,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
     auto pScope = smart_cast<CScope*>(pIItem) || smart_cast<CWeaponBinoculars*>(pIItem);
     auto pSilencer = smart_cast<CSilencer*>(pIItem);
     auto pLaser = smart_cast<CLaser*>(pIItem);
-    auto pFlashlight = smart_cast<CFlashlight*>(pIItem);
+    auto pFlashlight = smart_cast<CAddonFlashlight*>(pIItem);
     auto pStock = smart_cast<CStock*>(pIItem);
     auto pForend = smart_cast<CForend*>(pIItem);
 

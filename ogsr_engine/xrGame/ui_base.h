@@ -53,6 +53,11 @@ class C2DFrustum
 public:
     void CreateFromRect(const Frect& rect);
     sPoly2D* ClipPoly(sPoly2D& S, sPoly2D& D) const;
+    void Clear()
+    {
+        if (planes.size())
+            planes.clear();
+    }
 };
 
 class ui_core : public CDeviceResetNotifier

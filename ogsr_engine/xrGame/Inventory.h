@@ -149,7 +149,7 @@ public:
 
     bool m_bBeltVertical{}, m_bVestVertical{};
 
-    bool m_bBlockDetector{};
+    bool m_bBlockDevice{};
 
 protected:
     void UpdateDropTasks();

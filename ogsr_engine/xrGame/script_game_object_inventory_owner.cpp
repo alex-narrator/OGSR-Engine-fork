@@ -976,7 +976,7 @@ CScriptGameObject* CScriptGameObject::active_item_left_hand() const
     if (!inventory_owner)
     {
         ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member active_detector!");
-        return (0);
+        return nullptr;
     }
 
     auto result = g_player_hud->attached_item(1);
@@ -984,9 +984,9 @@ CScriptGameObject* CScriptGameObject::active_item_left_hand() const
     {
         auto item = smart_cast<CHudItem*>(result->m_parent_hud_item);
         VERIFY(item);
-        return (item->GetHUDmode() ? item->object().lua_game_object() : 0);
+        return (item->GetHUDmode() ? item->object().lua_game_object() : nullptr);
     }
-    return (0);
+    return nullptr;
 }
 
 void CScriptGameObject::GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExisting) { Actor()->GameTaskManager().GiveGameTaskToActor(t, dt, bCheckExisting); }

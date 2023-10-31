@@ -6,6 +6,7 @@
 #include "Artifact.h"
 #include "entity_alive.h"
 #include "ai_sounds.h"
+#include "CustomDevice.h"
 
 class CInventoryOwner;
 
@@ -151,58 +152,32 @@ public:
 
 class CUIArtefactDetectorBase;
 
-class CCustomDetector : public CHudItemObject
+class CCustomDetector : public CCustomDevice
 {
-    typedef CHudItemObject inherited;
+    typedef CCustomDevice inherited;
 
 protected:
     CUIArtefactDetectorBase* m_ui{};
-    bool m_bFastAnimMode{};
-    bool m_bNeedActivation{};
     shared_str m_nightvision_particle{};
     bool m_bCanSwitchModes{};
     bool m_bAfMode{};
-    bool m_bThrowAnm{};
 
 public:
     CCustomDetector() = default;
     virtual ~CCustomDetector();
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC) override;
     virtual void Load(LPCSTR section) override;
 
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
 
-    virtual void OnH_A_Chield() override;
     virtual void OnH_B_Independent(bool just_before_destroy) override;
 
     virtual void shedule_Update(u32 dt) override;
-    virtual void UpdateCL() override;
 
-    virtual bool IsPowerOn() const;
     virtual void Switch(bool);
 
-    virtual void OnMoveToSlot(EItemPlace prevPlace) override;
-    virtual void OnMoveToRuck(EItemPlace prevPlace) override;
-    virtual void OnMoveToBelt(EItemPlace prevPlace) override;
-    virtual void OnMoveToVest(EItemPlace prevPlace) override;
-
-    virtual void OnActiveItem() override;
-    virtual void OnHiddenItem() override;
-    virtual void OnStateSwitch(u32 S, u32 oldState) override;
-    virtual void OnAnimationEnd(u32 state) override;
-    virtual void UpdateXForm() override;
-
-    void ToggleDetector(bool bFastMode);
-    void HideDetector(bool bFastMode);
-    void ShowDetector(bool bFastMode);
-    virtual bool CheckCompatibility(CHudItem* itm) override;
-
     virtual u32 ef_detector_type() const override { return 1; }
-
-    bool IsZoomed() const override;
-    bool IsAiming() const;
 
     virtual bool CanSwitchModes() const { return m_bCanSwitchModes; }
     virtual void SwitchMode();
@@ -211,8 +186,6 @@ public:
     virtual float GetDetectionRadius() const { return m_fDetectRadius; };
 
 protected:
-    bool CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate);
-    void UpdateVisibility();
     virtual void UpdateWork();
     virtual void UpdateAf() {}
     virtual void CreateUI() {}
@@ -223,18 +196,9 @@ protected:
 
     virtual void DisableUIDetection(){};
 
-    bool m_bWorking{};
     float m_fDetectRadius{};
     float m_fAfVisRadius{};
     CAfList m_artefacts;
     CZoneList m_zones;
     CCreatureList m_creatures;
-
-    virtual size_t GetWeaponTypeForCollision() const override { return Detector; }
-    virtual Fvector GetPositionForCollision() override;
-    virtual Fvector GetDirectionForCollision() override;
-
-    virtual u8 GetCurrentHudOffsetIdx() const override { return IsAiming(); };
-
-    virtual bool IsBlocked();
 };

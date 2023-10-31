@@ -60,12 +60,12 @@ public:
 ///////////////////////////////////////////////////////////////
 // Flashlight - апгрейд оружия фонарь 
 ///////////////////////////////////////////////////////////////
-class CFlashlight : public CInventoryItemObject {
+class CAddonFlashlight : public CInventoryItemObject {
 private:
 	typedef CInventoryItemObject inherited;
 public:
-	CFlashlight(void){};
-	virtual ~CFlashlight(void){};
+	CAddonFlashlight(void){};
+	virtual ~CAddonFlashlight(void){};
 };
 ///////////////////////////////////////////////////////////////
 // Stock - збройовий апгрейд приклад

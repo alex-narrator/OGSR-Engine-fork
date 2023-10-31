@@ -6065,6 +6065,9 @@
     <ClInclude Include="GasMask.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
+    <ClInclude Include="CustomDevice.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -8857,6 +8860,9 @@
     </ClCompile>
     <ClCompile Include="weapon_ammo_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Ammo</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomDevice.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

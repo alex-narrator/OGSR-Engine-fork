@@ -23,6 +23,9 @@
 #include "game_object_space.h"
 #include "script_game_object.h"
 
+#include "ui\UIScriptWnd.h"
+#include "ui_base.h"
+
 ENGINE_API extern float psHUD_FOV_def;
 
 CHudItem::CHudItem()
@@ -33,6 +36,8 @@ CHudItem::CHudItem()
     AllowHudInertion(TRUE);
 
     m_bobbing = std::make_unique<CWeaponBobbing>(this);
+
+    script_ui_matrix.identity();
 }
 
 DLL_Pure* CHudItem::_construct()
@@ -175,6 +180,18 @@ void CHudItem::Load(LPCSTR section)
     inertion_data.m_tendto_speed = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_tendto_speed", TENDTO_SPEED);
     inertion_data.m_tendto_speed_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_tendto_speed", TENDTO_SPEED_AIM);
     //--#SM+# End--
+
+	// Rezy - Custom Script 3D UI
+    if (script_ui_funct = READ_IF_EXISTS(pSettings, r_string, section, "custom_ui_func", nullptr))
+    {
+        script_ui_bone = READ_IF_EXISTS(pSettings, r_string, section, "custom_ui_bone", "wpn_body");
+        script_ui_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "custom_ui_pos", Fvector().set(0.f, 0.f, 0.f));
+        script_ui_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "custom_ui_rot", Fvector().set(0.f, 0.f, 0.f));
+
+        script_ui_offset[1].mul(PI / 180.f);
+        script_ui_matrix.setHPB(script_ui_offset[1].x, script_ui_offset[1].y, script_ui_offset[1].z);
+        script_ui_matrix.translate_over(script_ui_offset[0]);
+    }
 }
 
 void CHudItem::PlaySound(HUD_SOUND& hud_snd, const Fvector& position, bool overlap) 
@@ -346,6 +363,8 @@ void CHudItem::UpdateCL()
             default: break;
             }
         }
+        if (script_ui)
+            script_ui->Update();
     }
 }
 
@@ -390,6 +409,59 @@ void CHudItem::on_a_hud_attach()
         //		Msg("no active motion");
 #endif // #ifdef DEBUG
     }
+    //
+    if (script_ui_funct && nullptr == script_ui)
+    {
+        luabind::functor<CUIDialogWndEx*> funct;
+        if (ai().script_engine().functor(script_ui_funct, funct))
+        {
+            CUIDialogWndEx* ret = funct(object().lua_game_object());
+            CUIWindow* pScriptWnd = ret ? smart_cast<CUIWindow*>(ret) : (0);
+            if (pScriptWnd)
+                script_ui = pScriptWnd;
+            else
+                Msg("[%s]: Failed to load script UI [%s]!", object().cNameSect().c_str(), script_ui_funct);
+        }
+        else
+            Msg("[%s]: Script UI functor [%s] does not exist!", object().cNameSect().c_str(), script_ui_funct);
+    }
+}
+
+void CHudItem::render_item_3d_ui()
+{
+    if (render_item_3d_ui_query() && script_ui)
+    {
+        Fmatrix LM;
+        Fmatrix trans = HudItemData()->m_item_transform;
+        u16 bid = HudItemData()->m_model->LL_BoneID(script_ui_bone);
+        Fmatrix ui_bone = HudItemData()->m_model->LL_GetTransform(bid);
+        LM.mul(trans, ui_bone);
+
+        //if (g_player_hud->m_adjust_mode)
+        //{
+        //    Fmatrix script_ui_adjust_matrix;
+        //    script_ui_adjust_matrix.identity();
+        //    Fvector& pos = g_player_hud->m_adjust_ui_offset[0];
+        //    Fvector& rot = g_player_hud->m_adjust_ui_offset[1];
+
+        //    script_ui_adjust_matrix.setHPB(rot.x, rot.y, rot.z);
+        //    script_ui_adjust_matrix.translate_over(pos);
+        //    LM.mulB_43(script_ui_adjust_matrix);
+        //}
+        //else
+            LM.mulB_43(script_ui_matrix);
+
+        IUIRender::ePointType bk = UI()->m_currentPointType;
+        UI()->m_currentPointType = IUIRender::pttLIT;
+        UIRender->CacheSetXformWorld(LM);
+        UIRender->CacheSetCullMode(IUIRender::cmNONE);
+        UI()->ScreenFrustumLIT().Clear();
+        script_ui->Draw();
+        UI()->m_currentPointType = bk;
+    }
+
+    //	Restore cull mode
+    UIRender->CacheSetCullMode(IUIRender::cmCCW);
 }
 
 u32 CHudItem::PlayHUDMotion(const char* M, const bool bMixIn, const u32 state, const bool randomAnim, float speed)

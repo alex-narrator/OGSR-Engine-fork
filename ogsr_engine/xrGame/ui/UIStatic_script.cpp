@@ -29,6 +29,7 @@ void CUIStatic::script_register(lua_State* L)
                   .def("Init", (void(CUIStatic::*)(float, float, float, float)) & CUIStatic::Init)
                   .def("Init", (void(CUIStatic::*)(LPCSTR, float, float, float, float)) & CUIStatic::Init)
                   .def("InitTexture", &CUIStatic::InitTexture)
+                  .def("InitTextureEx", &CUIStatic::InitTextureEx)
                   .def("SetTextureOffset", &CUIStatic::SetTextureOffset)
 
                   .def("GetOriginalRect", &CUIStatic::GetOriginalRect)

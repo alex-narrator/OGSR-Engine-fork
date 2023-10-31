@@ -15,7 +15,7 @@
 #include "game_object_space.h"
 #include "script_callback_ex.h"
 #include "script_game_object.h"
-#include "CustomDetector.h"
+#include "CustomDevice.h"
 #include "player_hud.h"
 
 #include "WeaponMagazined.h"
@@ -329,8 +329,8 @@ bool CUIInventoryWnd::ToSlot(CUICellItem* itm, bool force_place)
     if (result)
     {
         if (_slot == DETECTOR_SLOT)
-            if (auto det = smart_cast<CCustomDetector*>(iitem))
-                det->ToggleDetector(g_player_hud->attached_item(0) != nullptr);
+            if (auto dev = smart_cast<CCustomDevice*>(iitem))
+                dev->ToggleDevice(g_player_hud->attached_item(0) != nullptr);
 
         TryReinitLists(iitem);
     }

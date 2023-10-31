@@ -6,6 +6,7 @@
 #include "SimpleDetector.h"
 #include "AdvancedDetector.h"
 #include "EliteDetector.h"
+#include "CustomDevice.h"
 #include "FoodItem.h"
 #include "InventoryBox.h"
 
@@ -20,7 +21,7 @@ void CScope::script_register(lua_State* L)
 		class_<CSilencer, CGameObject>("CSilencer").def(constructor<>()),
 		class_<CGrenadeLauncher, CGameObject>("CGrenadeLauncher").def(constructor<>()),
 		class_<CLaser, CGameObject>("CLaser").def(constructor<>()),
-		class_<CFlashlight, CGameObject>("CFlashlight").def(constructor<>()),
+		class_<CAddonFlashlight, CGameObject>("CAddonFlashlight").def(constructor<>()),
 		class_<CStock, CGameObject>("CStock").def(constructor<>()),
 		class_<CExtender, CGameObject>("CExtender").def(constructor<>()),
 		class_<CForend, CGameObject>("CForend").def(constructor<>()),
@@ -35,6 +36,7 @@ void CScope::script_register(lua_State* L)
 		class_<CEliteDetector, CGameObject>("CEliteDetector").def(constructor<>()), 
 		class_<CAdvancedDetector, CGameObject>("CAdvancedDetector").def(constructor<>()),
 		class_<CSimpleDetector, CGameObject>("CSimpleDetector").def(constructor<>()),
+		class_<CCustomDevice, CGameObject>("CCustomDevice").def(constructor<>()),
 		//food
 		class_<CFoodItem, CGameObject>("CFoodItem").def(constructor<>()),
 		//inventory box

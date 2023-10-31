@@ -28,7 +28,7 @@
 #include "HudItem.h"
 #include "WeaponMagazined.h"
 #include "../xr_3da/xr_input.h"
-#include "CustomDetector.h"
+#include "CustomDevice.h"
 #include "WeaponKnife.h"
 #include "Missile.h"
 #include "PDA.h"
@@ -149,8 +149,8 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
     break;
     case kWPN_8: {
-        if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)))
-            det->ToggleDetector(/*g_player_hud->attached_item(0) != nullptr*/ false);
+        if (auto dev = smart_cast<CCustomDevice*>(inventory().ItemFromSlot(DETECTOR_SLOT)))
+            dev->ToggleDevice(/*g_player_hud->attached_item(0) != nullptr*/ false);
     }
     break;
     case kUSE: ActorUse(); break;
@@ -177,8 +177,8 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
     break;
     case kWPN_FUNC: {
-        if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)); det && det->GetHUDmode())
-            det->SwitchMode();
+        if (auto dev = smart_cast<CCustomDevice*>(inventory().ItemFromSlot(DETECTOR_SLOT)); dev && dev->GetHUDmode())
+            dev->SwitchMode();
     }
     break;
     }

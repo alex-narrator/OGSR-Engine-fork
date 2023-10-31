@@ -13,6 +13,7 @@ class CInventoryItem;
 struct attachable_hud_item;
 class motion_marks;
 class CMotionDef;
+class CUIWindow;
 
 #include "actor_defs.h"
 #include "hudsound.h"
@@ -98,6 +99,12 @@ protected: //чтоб нельзя было вызвать на прямую
     bool SprintType{};
     bool BobbingEnable{};
     u32 m_dwStateTime{};
+
+	CUIWindow* script_ui{};
+    LPCSTR script_ui_funct{};
+    LPCSTR script_ui_bone{};
+    Fvector script_ui_offset[2]{}; // pos, rot
+    Fmatrix script_ui_matrix{};
 
 public:
     virtual void Load(LPCSTR section);
@@ -188,8 +195,8 @@ public:
 
     virtual void render_hud_mode(){};
     virtual bool need_renderable() { return true; };
-    virtual void render_item_3d_ui() {}
-    virtual bool render_item_3d_ui_query() { return false; }
+    virtual void render_item_3d_ui();
+    virtual bool render_item_3d_ui_query() { return true; }
     virtual bool CheckCompatibility(CHudItem*) { return true; }
 
     virtual void SetStopAimInertion(bool val) { m_bStopAimInertion = val; };
