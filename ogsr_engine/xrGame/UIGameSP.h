@@ -17,6 +17,8 @@ class CUIMessageBox;
 class IInventoryBox;
 class CInventoryOwner;
 
+class CInventoryItem;
+
 class CUIGameSP : public CUIGameCustom
 {
 private:
@@ -38,6 +40,8 @@ public:
     void StartCarBody(CInventoryOwner* pOurInv, CInventoryOwner* pOthers);
     void StartCarBody(CInventoryOwner* pOurInv, IInventoryBox* pBox);
     virtual void ReInitShownUI();
+    virtual void AddToUIList(CInventoryItem*);
+    virtual void RemoveFromUIList(CInventoryItem*);
     void ChangeLevel(GameGraph::_GRAPH_ID game_vert_id, u32 level_vert_id, Fvector pos, Fvector ang, Fvector pos2, Fvector ang2, bool b);
 
     virtual void HideShownDialogs();

@@ -208,7 +208,31 @@ void CUIGameSP::ReInitShownUI()
         for (const auto child : TalkMenu->GetChildWndList())
             if (auto trade_menu = smart_cast<CUITradeWnd*>(child); trade_menu && trade_menu->IsShown())
                 trade_menu->UpdateLists_delayed();
-};
+}
+
+void CUIGameSP::AddToUIList(CInventoryItem* item)
+{
+    if (InventoryMenu->IsShown())
+        InventoryMenu->AddToUIList(item);
+    else if (UICarBodyMenu->IsShown())
+        UICarBodyMenu->AddToUIList(item);
+    else if (TalkMenu->IsShown())
+        for (const auto child : TalkMenu->GetChildWndList())
+            if (auto trade_menu = smart_cast<CUITradeWnd*>(child); trade_menu && trade_menu->IsShown())
+                trade_menu->AddToUIList(item);
+}
+
+void CUIGameSP::RemoveFromUIList(CInventoryItem* item)
+{
+    if (InventoryMenu->IsShown())
+        InventoryMenu->RemoveFromUIList(item);
+    else if (UICarBodyMenu->IsShown())
+        UICarBodyMenu->RemoveFromUIList(item);
+    else if (TalkMenu->IsShown())
+        for (const auto child : TalkMenu->GetChildWndList())
+            if (auto trade_menu = smart_cast<CUITradeWnd*>(child); trade_menu && trade_menu->IsShown())
+                trade_menu->RemoveFromUIList(item);
+}
 
 extern ENGINE_API BOOL bShowPauseString;
 

@@ -56,17 +56,17 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
             {
                 pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
                 if (Level().CurrentViewEntity() == this)
-                    HUD().GetUI()->UIGame()->ReInitShownUI();
+                    HUD().GetUI()->UIGame()->AddToUIList(smart_cast<CInventoryItem*>(O));
             };
 
             //добавить отсоединенный аддон в инвентарь
-            if (pGameSP)
-            {
-                if (pGameSP->MainInputReceiver() == pGameSP->InventoryMenu)
-                {
-                    pGameSP->InventoryMenu->AddItemToBag(smart_cast<CInventoryItem*>(O));
-                }
-            }
+            //if (pGameSP)
+            //{
+            //    if (pGameSP->MainInputReceiver() == pGameSP->InventoryMenu)
+            //    {
+            //        pGameSP->InventoryMenu->AddItemToBag(smart_cast<CInventoryItem*>(O));
+            //    }
+            //}
         }
         else
         {
@@ -101,7 +101,7 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
         }
 
         if (Level().CurrentViewEntity() == this && HUD().GetUI() && HUD().GetUI()->UIGame())
-            HUD().GetUI()->UIGame()->ReInitShownUI();
+            HUD().GetUI()->UIGame()->RemoveFromUIList(smart_cast<CInventoryItem*>(O));
     }
     break;
     }

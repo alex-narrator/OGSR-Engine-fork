@@ -253,6 +253,11 @@ void CUIInventoryWnd::DropCurrentItem(bool b_all)
     if (!CurrentIItem() || CurrentIItem()->IsQuestItem())
         return;
 
+    CUICellItem* ci = CurrentItem();
+    if (!ci)
+        return;
+    CUIDragDropListEx* old_owner = ci->OwnerList();
+
     if (b_all)
     {
         u32 cnt = CurrentItem()->ChildsCount();
@@ -265,7 +270,9 @@ void CUIInventoryWnd::DropCurrentItem(bool b_all)
     }
 
     CurrentIItem()->Drop();
-    SetCurrentItem(NULL);
+    old_owner->RemoveItem(ci, b_all);
+
+    SetCurrentItem(nullptr);
 
     PlaySnd(eInvDropItem);
     m_b_need_update_stats = true;
@@ -828,5 +835,63 @@ void CUIInventoryWnd::ReinitSlotList(u32 slot)
     {
         CUICellItem* itm = create_cell_item(_itm);
         slot_list->SetItem(itm);
+    }
+}
+
+void CUIInventoryWnd::AddToUIList(CInventoryItem* item)
+{
+    CUICellItem* itm = create_cell_item(item);
+    switch (item->m_eItemPlace)
+    {
+    case eItemPlaceRuck: 
+        if (item->GetMarked())
+            m_pUIMarkedList->SetItem(itm);
+        else
+            m_pUIBagList->SetItem(itm);
+        break;
+    case eItemPlaceBelt: 
+        m_pUIBeltList->SetItem(itm);
+        break;
+    case eItemPlaceVest: 
+        m_pUIVestList->SetItem(itm);
+        break;
+    case eItemPlaceSlot: 
+        GetSlotList(item->GetSlot())->SetItem(itm);
+        break;
+    case eItemPlaceUndefined: break;
+    }
+}
+
+void CUIInventoryWnd::RemoveFromUIList(CInventoryItem* item) 
+{ 
+    auto find_item = [&](const auto list) -> bool { 
+        for (u32 i = 0; i < list->ItemsCount(); ++i)
+        {
+            auto citm = list->GetItemIdx(i);
+            auto iitm = (PIItem)citm->m_pData;
+            if (iitm == item)
+            {
+                list->RemoveItem(citm, false);
+                return true;
+            }
+        }
+        return false;
+    };
+
+    if (find_item(m_pUIMarkedList))
+        return;
+    if (find_item(m_pUIBagList))
+        return;
+    if (find_item(m_pUIBeltList))
+        return;
+    if (find_item(m_pUIVestList))
+        return;
+    for (u8 i = 0; i < SLOTS_TOTAL; ++i)
+    {
+        auto list = GetSlotList(i);
+        if (!list)
+            continue;
+        if (find_item(list))
+            return;
     }
 }

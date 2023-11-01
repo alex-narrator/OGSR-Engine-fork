@@ -10,6 +10,7 @@ class CUICaption;
 class CUIStatic;
 class CUIWindow;
 class CUIXml;
+class CInventoryItem;
 
 struct SDrawStaticStruct : public IPureDestroyableObject
 {
@@ -82,6 +83,8 @@ public:
 
     CUIDialogWnd* MainInputReceiver();
     virtual void ReInitShownUI() = 0;
+    virtual void AddToUIList(CInventoryItem*){};
+    virtual void RemoveFromUIList(CInventoryItem*){};
     virtual void HideShownDialogs(){};
 
     void AddCustomMessage(LPCSTR id, float x, float y, float font_size, CGameFont* pFont, u16 alignment, u32 color);

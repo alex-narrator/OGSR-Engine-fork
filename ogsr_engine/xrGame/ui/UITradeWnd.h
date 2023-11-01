@@ -42,6 +42,8 @@ public:
     void StopTrade();
 
     void UpdateLists_delayed();
+    void AddToUIList(CInventoryItem*);
+    void RemoveFromUIList(CInventoryItem*);
 
     void PerformTrade();
 

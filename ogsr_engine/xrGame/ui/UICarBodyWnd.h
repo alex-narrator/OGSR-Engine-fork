@@ -42,6 +42,8 @@ public:
     virtual bool OnMouse(float x, float y, EUIMessages mouse_action);
 
     void UpdateLists_delayed();
+    void AddToUIList(CInventoryItem*);
+    void RemoveFromUIList(CInventoryItem*);
     void RepackAmmo();
 
 protected:

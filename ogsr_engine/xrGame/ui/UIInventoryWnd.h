@@ -35,6 +35,8 @@ public:
 
     void InitInventory();
     void InitInventory_delayed();
+    void AddToUIList(CInventoryItem*);
+    void RemoveFromUIList(CInventoryItem*);
     virtual bool StopAnyMove() { return false; }
 
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
