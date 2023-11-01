@@ -25,7 +25,7 @@
 void CUIInventoryWnd::EatItem(PIItem itm)
 {
     SetCurrentItem(nullptr);
-    //m_b_need_reinit = true;
+    m_b_need_reinit = true;
     if (!itm->Useful())
         return;
     GetInventory()->Eat(itm);
@@ -326,7 +326,7 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
                 auto ammobox = static_cast<CWeaponAmmo*>(itm->Child(i)->m_pData);
                 ammobox->ReloadBox(sect_to_load);
             }
-            //InitInventory_delayed();
+            InitInventory_delayed();
         }
         break;
         case INVENTORY_UNLOAD_AMMO_BOX: {
@@ -337,7 +337,7 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
                 auto ammobox = static_cast<CWeaponAmmo*>(itm->Child(i)->m_pData);
                 ammobox->UnloadBox();
             }
-            //InitInventory_delayed();
+            InitInventory_delayed();
         }
         break;
         case INVENTORY_SCRIPT_ACTION: {

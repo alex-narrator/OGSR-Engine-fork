@@ -475,7 +475,7 @@ void CUICarBodyWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             case INVENTORY_UNLOAD_AMMO_BOX:
             case INVENTORY_DETACH_ADDON: {
                 SetCurrentItem(nullptr);
-                //UpdateLists_delayed();
+                UpdateLists_delayed();
             }
             break;
             }
@@ -815,35 +815,4 @@ void CUICarBodyWnd::RepackAmmo()
         m_pOtherInventoryOwner->inventory().RepackAmmo();
     else
         m_pOtherInventoryBox->RepackAmmo();
-}
-
-void CUICarBodyWnd::AddToUIList(CInventoryItem* item) 
-{
-    CUICellItem* itm = create_cell_item(item);
-    if (item->m_pCurrentInventory->OwnerIsActor())
-        m_pUIOurBagList->SetItem(itm);
-    else
-        m_pUIOthersBagList->SetItem(itm);
-}
-
-void CUICarBodyWnd::RemoveFromUIList(CInventoryItem* item) 
-{
-    auto find_item = [&](const auto list) -> bool {
-        for (u32 i = 0; i < list->ItemsCount(); ++i)
-        {
-            auto citm = list->GetItemIdx(i);
-            auto iitm = (PIItem)citm->m_pData;
-            if (iitm == item)
-            {
-                list->RemoveItem(citm, false);
-                return true;
-            }
-        }
-        return false;
-    };
-
-    if (find_item(m_pUIOurBagList))
-        return;
-    if (find_item(m_pUIOthersBagList))
-        return;
 }

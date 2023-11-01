@@ -1002,41 +1002,22 @@ void CUITradeWnd::DetachAddon(const char* addon_name, bool for_all)
 void CUITradeWnd::UpdateLists_delayed()
 {
     m_pInvOwner->inventory().RepackAmmo();
-    UpdateLists(eBoth);
-}
 
-void CUITradeWnd::AddToUIList(CInventoryItem* item) 
-{
-    CUICellItem* itm = create_cell_item(item);
-    if (item->m_pCurrentInventory->OwnerIsActor())
-        m_uidata->UIOurBagList.SetItem(itm);
-    else
-        m_uidata->UIOthersBagList.SetItem(itm);
+    m_uidata->UIOurBagList.ClearAll(true);
+    m_uidata->UIOurTradeList.ClearAll(true);
 
-}
+    m_uidata->UIOthersBagList.ClearAll(true);
+    m_uidata->UIOthersTradeList.ClearAll(true);
 
-void CUITradeWnd::RemoveFromUIList(CInventoryItem* item) 
-{
-    auto find_item = [&](const auto list) -> bool {
-        for (u32 i = 0; i < list->ItemsCount(); ++i)
-        {
-            auto citm = list->GetItemIdx(i);
-            auto iitm = (PIItem)citm->m_pData;
-            if (iitm == item)
-            {
-                list->RemoveItem(citm, false);
-                return true;
-            }
-        }
-        return false;
-    };
+    ruck_list.clear();
+    m_pInv->AddAvailableItems(ruck_list, true);
+    std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
+    FillList(ruck_list, m_uidata->UIOurBagList, true);
 
-    if (find_item(&m_uidata->UIOurBagList))
-        return;
-    if (find_item(&m_uidata->UIOurTradeList))
-        return;
-    if (find_item(&m_uidata->UIOthersBagList))
-        return;
-    if (find_item(&m_uidata->UIOthersTradeList))
-        return;
+    ruck_list.clear();
+    m_pOthersInv->AddAvailableItems(ruck_list, true);
+    std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
+    FillList(ruck_list, m_uidata->UIOthersBagList, false);
+
+    UpdatePrices();
 }

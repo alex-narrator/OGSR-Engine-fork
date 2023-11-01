@@ -72,7 +72,7 @@ void IInventoryBox::ProcessEvent(CGameObject* O, NET_Packet& P, u16 type)
         itm->H_SetParent(NULL, dont_create_shell);
 
         if (Actor() && HUD().GetUI() && HUD().GetUI()->UIGame())
-            HUD().GetUI()->UIGame()->RemoveFromUIList(smart_cast<CInventoryItem*>(O));
+            HUD().GetUI()->UIGame()->ReInitShownUI();
 
         if (auto obj = smart_cast<CGameObject*>(itm))
         {
