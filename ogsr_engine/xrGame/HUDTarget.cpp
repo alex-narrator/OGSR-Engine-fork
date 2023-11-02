@@ -220,6 +220,9 @@ void CHUDTarget::Render()
     if (const u32 State = Actor->get_state() & mcSprint)
         return;
 
+    if (Actor->m_bHideCrosshair)
+        return;
+
     Fvector2 scr_size;
     scr_size.set(float(Device.dwWidth), float(Device.dwHeight));
     float size_x = scr_size.x * di_size;

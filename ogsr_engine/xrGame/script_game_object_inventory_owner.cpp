@@ -938,6 +938,9 @@ void CScriptGameObject::RestoreWeapon(bool now) { Actor()->SetWeaponHideState(IN
 
 void CScriptGameObject::HideWeapon(bool now) { Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true, now); }
 
+void CScriptGameObject::HideCrosshair(bool hide) { Actor()->m_bHideCrosshair = hide; }
+void CScriptGameObject::HardCrosshair(bool on) { Actor()->m_bHardCrosshair = on; }
+
 int CScriptGameObject::animation_slot() const
 {
     CHudItem* hud_item = smart_cast<CHudItem*>(&object());

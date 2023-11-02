@@ -352,6 +352,8 @@ public:
 
     void HideWeapon(bool = false);
     void RestoreWeapon(bool = false);
+    void HideCrosshair(bool);
+    void HardCrosshair(bool);
 
     LPCSTR ProfileName();
     LPCSTR CharacterName();

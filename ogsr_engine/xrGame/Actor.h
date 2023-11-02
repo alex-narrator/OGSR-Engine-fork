@@ -804,6 +804,8 @@ public:
     float GetTotalArtefactsEffect(int);
 
     bool IsFreeHands() const;
+    bool m_bHideCrosshair{};
+    bool m_bHardCrosshair{true};
 
 protected:
     svector<float, eRestoreBoostMax> m_ActorItemBoostedParam;

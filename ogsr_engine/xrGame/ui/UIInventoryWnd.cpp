@@ -294,7 +294,7 @@ void CUIInventoryWnd::Draw() { CUIWindow::Draw(); }
 
 void CUIInventoryWnd::Update()
 {
-    if (m_b_need_reinit || m_pInv->ModifyFrame() == Device.dwFrame)
+    if (m_b_need_reinit/* || m_pInv->StateInvalid()*/)
         InitInventory();
 
     if (smart_cast<CEntityAlive*>(Level().CurrentEntity()))
