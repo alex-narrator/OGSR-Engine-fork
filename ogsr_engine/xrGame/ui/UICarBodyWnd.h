@@ -62,7 +62,7 @@ public:
     CGameObject* m_pOtherGO{};
 
 protected:
-    void UpdateLists();
+    //void UpdateLists();
 
     void ActivatePropertiesBox();
     void EatItem();
@@ -87,6 +87,16 @@ protected:
     bool TransferItem(PIItem itm, CGameObject* owner_from, CGameObject* owner_to);
     void BindDragDropListEvents(CUIDragDropListEx* lst);
 
+    enum EListType
+    {
+        eNone,
+        e1st,
+        e2nd,
+        eBoth
+    };
+
+    void UpdateLists(EListType);
+
     enum eInventorySndAction
     {
         eInvSndOpen = 0,
@@ -102,6 +112,4 @@ protected:
     void PlaySnd(eInventorySndAction a);
 
     bool CanMoveToOther(PIItem pItem, CGameObject* owner_to) const;
-
-    CUICellItem* itm_to_descr{};
 };

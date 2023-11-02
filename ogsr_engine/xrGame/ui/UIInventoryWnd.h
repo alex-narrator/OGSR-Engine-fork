@@ -153,8 +153,6 @@ protected:
 
     TIItemContainer ruck_list;
     u32 m_iCurrentActiveSlot{NO_ACTIVE_SLOT};
-    
-    CUICellItem* itm_to_descr{};
 
 public:
     PIItem CurrentIItem();

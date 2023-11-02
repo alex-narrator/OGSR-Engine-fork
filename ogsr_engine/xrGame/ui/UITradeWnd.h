@@ -16,6 +16,7 @@ class CUITradeWnd : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
+    bool m_b_need_update{};
 
 public:
     CUITradeWnd();
@@ -41,7 +42,7 @@ public:
     void StartTrade();
     void StopTrade();
 
-    void UpdateLists_delayed();
+    void UpdateLists_delayed() { m_b_need_update = true; };
 
     void PerformTrade();
 
@@ -125,6 +126,4 @@ protected:
 
     ref_sound sounds[eInvSndMax];
     void PlaySnd(eInventorySndAction a);
-
-    CUICellItem* itm_to_descr{};
 };

@@ -417,7 +417,6 @@ void CUITradeWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         case INVENTORY_UNLOAD_AMMO_BOX:
         case INVENTORY_DETACH_ADDON: {
             SetCurrentItem(nullptr);
-            UpdateLists(e1st);
         }
         break;
         }
@@ -437,15 +436,15 @@ void CUITradeWnd::Update()
 {
     EListType et = eNone;
 
-    if (m_pInv->ModifyFrame() == Device.dwFrame && m_pOthersInv->ModifyFrame() == Device.dwFrame)
+    if (m_b_need_update || m_pInv->StateInvalid() && m_pOthersInv->StateInvalid())
     {
         et = eBoth;
     }
-    else if (m_pInv->ModifyFrame() == Device.dwFrame)
+    else if (m_pInv->StateInvalid())
     {
         et = e1st;
     }
-    else if (m_pOthersInv->ModifyFrame() == Device.dwFrame)
+    else if (m_pOthersInv->StateInvalid())
     {
         et = e2nd;
     }
@@ -477,7 +476,7 @@ void CUITradeWnd::Show()
     ResetAll();
     m_uidata->UIDealMsg = NULL;
 
-    UpdateLists_delayed();
+    UpdateLists(eBoth);
 
     PlaySnd(eInvSndOpen);
 }
@@ -669,6 +668,9 @@ void CUITradeWnd::PerformTrade()
 
 bool CUITradeWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 {
+    if (m_b_need_update)
+        return true;
+
     if (m_pUIPropertiesBox->GetVisible())
         m_pUIPropertiesBox->OnKeyboard(dik, keyboard_action);
 
@@ -680,6 +682,9 @@ bool CUITradeWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 
 bool CUITradeWnd::OnMouse(float x, float y, EUIMessages mouse_action)
 {
+    if (m_b_need_update)
+        return true;
+
     if (mouse_action == WINDOW_RBUTTON_DOWN)
     {
         if (m_pUIPropertiesBox->IsShown())
@@ -749,6 +754,7 @@ void CUITradeWnd::UpdateLists(EListType mode)
     {
         m_uidata->UIOurBagList.ClearAll(true);
         m_uidata->UIOurTradeList.ClearAll(true);
+        m_pInvOwner->inventory().RepackAmmo();
     }
 
     if (mode == eBoth || mode == e2nd)
@@ -774,6 +780,8 @@ void CUITradeWnd::UpdateLists(EListType mode)
         std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
         FillList(ruck_list, m_uidata->UIOthersBagList, false);
     }
+
+    m_b_need_update = false;
 }
 
 void CUITradeWnd::FillList(TIItemContainer& cont, CUIDragDropListEx& dragDropList, bool our)
@@ -997,27 +1005,4 @@ void CUITradeWnd::DetachAddon(const char* addon_name, bool for_all)
     {
         pActor->inventory().Activate(NO_ACTIVE_SLOT);
     }
-}
-
-void CUITradeWnd::UpdateLists_delayed()
-{
-    m_pInvOwner->inventory().RepackAmmo();
-
-    m_uidata->UIOurBagList.ClearAll(true);
-    m_uidata->UIOurTradeList.ClearAll(true);
-
-    m_uidata->UIOthersBagList.ClearAll(true);
-    m_uidata->UIOthersTradeList.ClearAll(true);
-
-    ruck_list.clear();
-    m_pInv->AddAvailableItems(ruck_list, true);
-    std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
-    FillList(ruck_list, m_uidata->UIOurBagList, true);
-
-    ruck_list.clear();
-    m_pOthersInv->AddAvailableItems(ruck_list, true);
-    std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
-    FillList(ruck_list, m_uidata->UIOthersBagList, false);
-
-    UpdatePrices();
 }

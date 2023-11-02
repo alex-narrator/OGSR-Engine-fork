@@ -49,24 +49,6 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
             O->H_SetParent(smart_cast<CObject*>(this));
 
             inventory().Take(_GO, false, true);
-
-            CUIGameSP* pGameSP = NULL;
-            CUI* ui = HUD().GetUI();
-            if (ui && ui->UIGame())
-            {
-                pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-                if (Level().CurrentViewEntity() == this)
-                    HUD().GetUI()->UIGame()->ReInitShownUI();
-            };
-
-            //добавить отсоединенный аддон в инвентарь
-            if (pGameSP)
-            {
-                if (pGameSP->MainInputReceiver() == pGameSP->InventoryMenu)
-                {
-                    pGameSP->InventoryMenu->AddItemToBag(smart_cast<CInventoryItem*>(O));
-                }
-            }
         }
         else
         {
@@ -99,9 +81,6 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
             //.				feel_touch_deny(O,2000);
             Level().m_feel_deny.feel_touch_deny(O, 1000);
         }
-
-        if (Level().CurrentViewEntity() == this && HUD().GetUI() && HUD().GetUI()->UIGame())
-            HUD().GetUI()->UIGame()->ReInitShownUI();
     }
     break;
     }

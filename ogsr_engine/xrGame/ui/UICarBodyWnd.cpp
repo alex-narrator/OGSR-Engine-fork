@@ -111,7 +111,7 @@ void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, IInventoryBox* pInvBox)
 
     m_pUIPropertiesBox->Hide();
 
-    UpdateLists();
+    UpdateLists(eBoth);
 
     if (auto obj = smart_cast<CInventoryBox*>(pInvBox))
         obj->callback(GameObject::eOnInvBoxOpen)();
@@ -131,7 +131,7 @@ void CUICarBodyWnd::InitCarBody(CInventoryOwner* pOur, CInventoryOwner* pOthers)
 
     m_pUIPropertiesBox->Hide();
 
-    UpdateLists();
+    UpdateLists(eBoth);
 
     if (!smart_cast<CBaseMonster*>(m_pOtherInventoryOwner))
     {
@@ -166,56 +166,6 @@ void CUICarBodyWnd::Hide()
         m_pOtherInventoryBox->m_in_use = false;
 
     PlaySnd(eInvSndClose);
-}
-
-void CUICarBodyWnd::UpdateLists()
-{
-    RepackAmmo();
-
-    TIItemContainer ruck_list;
-    m_pUIOurBagList->ClearAll(true);
-    m_pUIOthersBagList->ClearAll(true);
-
-    auto show_item = [&](const auto pIItem) -> bool { return !pIItem->m_flags.test(CInventoryItem::FIHiddenForInventory); };
-
-    ruck_list.clear();
-    m_pActorInventoryOwner->inventory().AddAvailableItems(ruck_list, true);
-    std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
-
-    // Наш рюкзак
-    for (const auto& inv_item : ruck_list)
-    {
-        if (!show_item(inv_item))
-            continue;
-
-        CUICellItem* itm = create_cell_item(inv_item);
-        if (inv_item->m_highlight_equipped)
-        {
-            itm->m_select_equipped = true;
-            itm->SetColor(reinterpret_cast<CInventoryItem*>(itm->m_pData)->ClrEquipped);
-        }
-        m_pUIOurBagList->SetItem(itm);
-    }
-
-    ruck_list.clear();
-    if (m_pOtherInventoryOwner)
-        m_pOtherInventoryOwner->inventory().AddAvailableItems(ruck_list, false);
-    else
-        m_pOtherInventoryBox->AddAvailableItems(ruck_list);
-
-    std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
-
-    // Чужой рюкзак
-    for (const auto& inv_item : ruck_list)
-    {
-        if (!show_item(inv_item))
-            continue;
-
-        CUICellItem* itm = create_cell_item(inv_item);
-        m_pUIOthersBagList->SetItem(itm);
-    }
-
-    m_b_need_update = false;
 }
 
 void CUICarBodyWnd::ActivatePropertiesBox()
@@ -475,7 +425,6 @@ void CUICarBodyWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             case INVENTORY_UNLOAD_AMMO_BOX:
             case INVENTORY_DETACH_ADDON: {
                 SetCurrentItem(nullptr);
-                UpdateLists_delayed();
             }
             break;
             }
@@ -489,18 +438,25 @@ void CUICarBodyWnd::Draw() { inherited::Draw(); }
 
 void CUICarBodyWnd::Update()
 {
-    if (m_b_need_update || m_pActorInventoryOwner->inventory().ModifyFrame() == Device.dwFrame ||
-        (m_pOtherInventoryOwner && m_pOtherInventoryOwner->inventory().ModifyFrame() == Device.dwFrame))
+    EListType et = eNone;
+
+    if (m_b_need_update ||
+        m_pActorInventoryOwner->inventory().StateInvalid() &&
+            (m_pOtherInventoryOwner && m_pOtherInventoryOwner->inventory().StateInvalid() || m_pOtherInventoryBox && m_pOtherInventoryBox->StateInvalid()))
     {
-        if (m_pUIOurBagList && m_pUIOthersBagList)
-        {
-            int our_scroll = m_pUIOurBagList->ScrollPos();
-            int other_scroll = m_pUIOthersBagList->ScrollPos();
-            UpdateLists();
-            m_pUIOurBagList->SetScrollPos(our_scroll);
-            m_pUIOthersBagList->SetScrollPos(other_scroll);
-        }
+        et = eBoth;
     }
+    else if (m_pActorInventoryOwner->inventory().StateInvalid())
+    {
+        et = e1st;
+    }
+    else if (m_pOtherInventoryOwner && m_pOtherInventoryOwner->inventory().StateInvalid() || m_pOtherInventoryBox && m_pOtherInventoryBox->StateInvalid())
+    {
+        et = e2nd;
+    }
+
+    if (et != eNone)
+        UpdateLists(et);
 
     if (m_pOtherGO &&
         m_pActorGO->Position().distance_to(m_pOtherGO->Position()) - m_pOtherGO->Radius() - m_pActorGO->Radius() > m_pActorInventoryOwner->inventory().GetTakeDist() + 0.5f)
@@ -510,6 +466,64 @@ void CUICarBodyWnd::Update()
 
     Actor()->UpdateCameraDirection(m_pOtherGO);
     inherited::Update();
+}
+
+void CUICarBodyWnd::UpdateLists(EListType mode)
+{
+    TIItemContainer ruck_list;
+    auto show_item = [&](const auto pIItem) -> bool { return !pIItem->m_flags.test(CInventoryItem::FIHiddenForInventory); };
+
+    if (mode == eBoth || mode == e1st)
+    {
+        int our_scroll = m_pUIOurBagList->ScrollPos();
+        m_pUIOurBagList->ClearAll(true);
+        m_pActorInventoryOwner->inventory().RepackAmmo();
+
+        ruck_list.clear();
+        m_pActorInventoryOwner->inventory().AddAvailableItems(ruck_list, true);
+        std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
+        // Наш рюкзак
+        for (const auto& inv_item : ruck_list)
+        {
+            if (!show_item(inv_item))
+                continue;
+            CUICellItem* itm = create_cell_item(inv_item);
+            if (inv_item->m_highlight_equipped)
+            {
+                itm->m_select_equipped = true;
+                itm->SetColor(reinterpret_cast<CInventoryItem*>(itm->m_pData)->ClrEquipped);
+            }
+            m_pUIOurBagList->SetItem(itm);
+        }
+        m_pUIOurBagList->SetScrollPos(our_scroll);
+    }
+
+    if (mode == eBoth || mode == e2nd)
+    {
+        int other_scroll = m_pUIOthersBagList->ScrollPos();
+        m_pUIOthersBagList->ClearAll(true);
+        if (m_pOtherInventoryOwner)
+            m_pOtherInventoryOwner->inventory().RepackAmmo();
+        else
+            m_pOtherInventoryBox->RepackAmmo();
+        ruck_list.clear();
+        if (m_pOtherInventoryOwner)
+            m_pOtherInventoryOwner->inventory().AddAvailableItems(ruck_list, false);
+        else
+            m_pOtherInventoryBox->AddAvailableItems(ruck_list);
+        std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
+        // Чужой рюкзак
+        for (const auto& inv_item : ruck_list)
+        {
+            if (!show_item(inv_item))
+                continue;
+            CUICellItem* itm = create_cell_item(inv_item);
+            m_pUIOthersBagList->SetItem(itm);
+        }
+        m_pUIOthersBagList->SetScrollPos(other_scroll);
+    }
+
+    m_b_need_update = false;
 }
 
 void CUICarBodyWnd::Show()

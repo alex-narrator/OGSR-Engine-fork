@@ -140,6 +140,7 @@ public:
 
     u32 ModifyFrame() const { return m_dwModifyFrame; }
     void InvalidateState() { m_dwModifyFrame = Device.dwFrame; }
+    bool StateInvalid() { return m_dwModifyFrame == Device.dwFrame; }
     void Items_SetCurrentEntityHud(bool current_entity);
     bool isBeautifulForActiveSlot(CInventoryItem* pIItem);
     bool IsActiveSlotBlocked() const;

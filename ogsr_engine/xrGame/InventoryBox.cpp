@@ -49,6 +49,7 @@ void IInventoryBox::ProcessEvent(CGameObject* O, NET_Packet& P, u16 type)
             }
         }
         smart_cast<PIItem>(itm)->SetDropTime(false);
+        InvalidateState();
     }
     break;
     case GE_OWNERSHIP_REJECT:
@@ -71,9 +72,6 @@ void IInventoryBox::ProcessEvent(CGameObject* O, NET_Packet& P, u16 type)
         /*Msg("~ [%s: REJECT] object [%s] with id [%u] parent [%s]", __FUNCTION__, itm->cName().c_str(), id, itm->H_Parent()->cName().c_str());*/
         itm->H_SetParent(NULL, dont_create_shell);
 
-        if (Actor() && HUD().GetUI() && HUD().GetUI()->UIGame())
-            HUD().GetUI()->UIGame()->ReInitShownUI();
-
         if (auto obj = smart_cast<CGameObject*>(itm))
         {
             O->callback(GameObject::eOnInvBoxItemDrop)(obj->lua_game_object());
@@ -84,6 +82,7 @@ void IInventoryBox::ProcessEvent(CGameObject* O, NET_Packet& P, u16 type)
             }
         }
         smart_cast<PIItem>(itm)->SetDropTime(true);
+        InvalidateState();
     }
     break;
     };

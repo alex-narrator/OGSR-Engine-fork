@@ -9,6 +9,8 @@ protected:
 
     void ProcessEvent(CGameObject* O, NET_Packet& P, u16 type);
     int m_iItemsLimit{};
+    // кадр на котором произошло последнее изменение в инвенторе
+    u32 m_dwModifyFrame{};
 
 public:
     bool m_in_use{};
@@ -29,6 +31,10 @@ public:
     virtual int GetItemsLimit() const { return m_iItemsLimit; };
 
     virtual void RepackAmmo();
+
+    u32 ModifyFrame() const { return m_dwModifyFrame; }
+    void InvalidateState() { m_dwModifyFrame = Device.dwFrame; }
+    bool StateInvalid() { return m_dwModifyFrame == Device.dwFrame; }
 };
 
 template <class Based>
