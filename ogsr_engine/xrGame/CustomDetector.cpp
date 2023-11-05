@@ -80,13 +80,6 @@ void CCustomDetector::OnH_B_Independent(bool just_before_destroy)
     m_artefacts.clear();
     m_zones.clear();
     m_creatures.clear();
-
-    if (GetState() != eHidden)
-    {
-        // Detaching hud item and animation stop in OnH_A_Independent
-        Switch(false);
-        SwitchState(eHidden);
-    }
 }
 
 void CCustomDetector::Switch(bool turn_on)
@@ -148,6 +141,24 @@ void CCustomDetector::UpdateNightVisionMode()
             }
         }
     }
+}
+
+void CCustomDetector::OnMoveToSlot(EItemPlace prevPlace)
+{
+    inherited::OnMoveToSlot(prevPlace);
+    Switch(true);
+}
+
+void CCustomDetector::OnMoveToBelt(EItemPlace prevPlace)
+{
+    inherited::OnMoveToBelt(prevPlace);
+    Switch(true);
+}
+
+void CCustomDetector::OnMoveToVest(EItemPlace prevPlace)
+{
+    inherited::OnMoveToVest(prevPlace);
+    Switch(true);
 }
 
 void CCustomDetector::SwitchMode() 

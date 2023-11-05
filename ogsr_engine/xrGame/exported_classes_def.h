@@ -28,6 +28,7 @@
 #include "StalkerOutfit.h"
 #include "space_restrictor.h"
 #include "Torch.h"
+#include "Flashlight.h"
 #include "Weapon.h"
 #include "WeaponMagazined.h"
 #include "WeaponMagazinedWGrenade.h"

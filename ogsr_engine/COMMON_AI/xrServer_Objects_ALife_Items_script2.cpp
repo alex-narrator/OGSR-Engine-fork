@@ -39,3 +39,4 @@ void CSE_ALifeItemWeaponMagazinedWGL::script_register(lua_State* L)
 
 void CSE_ALifeItemEatable::script_register(lua_State* L) { module(L)[luabind_class_item1(CSE_ALifeItemEatable, "cse_alife_item_eatable", CSE_ALifeItem)]; }
 void CSE_ALifeItemVest::script_register(lua_State* L) { module(L)[luabind_class_item1(CSE_ALifeItemVest, "cse_alife_item_vest", CSE_ALifeItem)]; }
+void CSE_ALifeItemDevice::script_register(lua_State* L) { module(L)[luabind_class_item1(CSE_ALifeItemDevice, "cse_alife_item_device", CSE_ALifeItem)]; }

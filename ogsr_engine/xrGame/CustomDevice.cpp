@@ -23,8 +23,6 @@ void CCustomDevice::Load(LPCSTR section)
     m_sounds.LoadSound(section, "snd_draw", "sndShow");
     m_sounds.LoadSound(section, "snd_holster", "sndHide");
     m_sounds.LoadSound(section, "snd_switch", "sndSwitch");
-
-    m_bThrowAnm = pSettings->line_exist(hud_sect, "anm_throw");
 }
 
 BOOL CCustomDevice::net_Spawn(CSE_Abstract* DC)
@@ -164,17 +162,19 @@ void CCustomDevice::OnStateSwitch(u32 S, u32 oldState)
     case eShowing: {
         g_player_hud->attach_item(this);
         PlaySound("sndShow", Position());
-        PlayHUDMotion({m_bFastAnimMode ? "anm_show_fast" : "anm_show"}, false, GetState());
+        IsZoomed() && AnimationExist("anm_zoom_show") ? 
+            PlayHUDMotion("anm_zoom_show", false, GetState()) :
+            PlayHUDMotion({m_bFastAnimMode ? "anm_show_fast" : "anm_show"}, false, GetState());
         SetPending(TRUE);
-        //if (!IsPowerOn())
-        //    DisableUIDetection();
     }
     break;
     case eHiding: {
         if (oldState != eHiding)
         {
             PlaySound("sndHide", Position());
-            PlayHUDMotion({m_bFastAnimMode ? "anm_hide_fast" : "anm_hide"}, false, GetState());
+            IsZoomed() && AnimationExist(m_bFastAnimMode ? "anm_zoom_hide_fast" : "anm_zoom_hide") ?
+                PlayHUDMotion({m_bFastAnimMode ? "anm_zoom_hide_fast" : "anm_zoom_hide"}, false, GetState()) :
+                PlayHUDMotion({m_bFastAnimMode ? "anm_hide_fast" : "anm_hide"}, false, GetState());
             SetPending(TRUE);
         }
     }
@@ -209,6 +209,27 @@ void CCustomDevice::OnStateSwitch(u32 S, u32 oldState)
             SwitchState(eIdle);
     }
     break;
+    case eIdleZoom: {
+        if (AnimationExist("anm_idle_zoom"))
+            PlayHUDMotion("anm_idle_zoom", true, GetState());
+        else
+            SwitchState(eIdle);
+    }
+    break;
+    case eIdleZoomIn: {
+        if (AnimationExist("anm_zoom_in"))
+            PlayHUDMotion("anm_zoom_in", true, GetState());
+        else
+            SwitchState(eIdle);
+    }
+    break;
+    case eIdleZoomOut: {
+        if (AnimationExist("anm_zoom_out"))
+            PlayHUDMotion("anm_zoom_out", true, GetState());
+        else
+            SwitchState(eIdle);
+    }
+    break;
     }
 }
 
@@ -218,7 +239,10 @@ void CCustomDevice::OnAnimationEnd(u32 state)
     switch (state)
     {
     case eShowing: {
-        SwitchState(eIdle);
+        if (IsZoomed() && AnimationExist("anm_idle_zoom"))
+            SwitchState(eIdleZoom);
+        else
+            SwitchState(eIdle);
     }
     break;
     case eHiding: {
@@ -234,6 +258,12 @@ void CCustomDevice::OnAnimationEnd(u32 state)
         SwitchState(eIdle);
     }
     break;
+    case eIdleZoomIn: 
+        SwitchState(eIdleZoom);
+    break;
+    case eIdleZoomOut: 
+        SwitchState(eIdle);
+    break;
     }
 }
 
@@ -242,7 +272,7 @@ void CCustomDevice::UpdateVisibility()
     // check visibility
     bool bClimb = ((Actor()->MovingState() & mcClimb) != 0);
     attachable_hud_item* i0 = g_player_hud->attached_item(0);
-    if (GetState() == eIdle || GetState() == eShowing || GetState() == eThrow || GetState() == eThrowStart)
+    if (GetState() == eIdle || GetState() == eIdleZoom || GetState() == eShowing || GetState() == eThrow || GetState() == eThrowStart)
     {
         if (bClimb || IsBlocked())
         {
@@ -254,7 +284,7 @@ void CCustomDevice::UpdateVisibility()
             if (i0->m_parent_hud_item)
             {
                 u32 state = i0->m_parent_hud_item->GetState();
-                if (smart_cast<CMissile*>(i0->m_parent_hud_item) && m_bThrowAnm)
+                if (smart_cast<CMissile*>(i0->m_parent_hud_item) && AnimationExist("anm_throw"))
                 {
                     if ((state == eThrowStart || state == eReady) && GetState() == eIdle)
                         SwitchState(eThrowStart);
@@ -262,6 +292,13 @@ void CCustomDevice::UpdateVisibility()
                         SwitchState(eThrowEnd);
                     else if (state == eHiding && (GetState() == eThrowStart || GetState() == eThrow))
                         SwitchState(eIdle);
+                }
+                if (auto wpn = smart_cast<CWeapon*>(i0->m_parent_hud_item) && AnimationExist("anm_idle_zoom"))
+                {
+                    if (IsZoomed() && GetState() != eIdleZoom)
+                        SwitchState(eIdleZoomIn);
+                    else if (!IsZoomed() && GetState() == eIdleZoom)
+                        SwitchState(eIdleZoomOut);
                 }
                 if (state == eReload || state == eSwitch)
                 {
@@ -293,6 +330,18 @@ void CCustomDevice::OnActiveItem() {}
 
 void CCustomDevice::OnHiddenItem() {}
 
+void CCustomDevice::OnH_B_Independent(bool just_before_destroy)
+{
+    inherited::OnH_B_Independent(just_before_destroy);
+
+    if (GetState() != eHidden)
+    {
+        // Detaching hud item and animation stop in OnH_A_Independent
+        Switch(false);
+        SwitchState(eHidden);
+    }
+}
+
 void CCustomDevice::OnMoveToRuck(EItemPlace prevPlace)
 {
     inherited::OnMoveToRuck(prevPlace);
@@ -303,24 +352,6 @@ void CCustomDevice::OnMoveToRuck(EItemPlace prevPlace)
     }
     Switch(false);
     StopCurrentAnimWithoutCallback();
-}
-
-void CCustomDevice::OnMoveToSlot(EItemPlace prevPlace)
-{
-    inherited::OnMoveToSlot(prevPlace);
-    Switch(true);
-}
-
-void CCustomDevice::OnMoveToBelt(EItemPlace prevPlace)
-{
-    inherited::OnMoveToBelt(prevPlace);
-    Switch(true);
-}
-
-void CCustomDevice::OnMoveToVest(EItemPlace prevPlace)
-{
-    inherited::OnMoveToVest(prevPlace);
-    Switch(true);
 }
 
 Fvector CCustomDevice::GetPositionForCollision()

@@ -2098,6 +2098,9 @@
     <Filter Include="AI\AScript\ScriptClasses\UI\LoadScreen">
       <UniqueIdentifier>{a98119e5-515e-4cbe-844d-ef75fbe162e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Client\Objects\items &amp; weapons\Devices\Flashlight">
+      <UniqueIdentifier>{1ab601e5-15c9-43f5-9476-50f8ca434003}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6068,6 +6071,9 @@
     <ClInclude Include="CustomDevice.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
     </ClInclude>
+    <ClInclude Include="Flashlight.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices\Flashlight</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -8863,6 +8869,12 @@
     </ClCompile>
     <ClCompile Include="CustomDevice.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="Flashlight.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices\Flashlight</Filter>
+    </ClCompile>
+    <ClCompile Include="flashlight_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices\Flashlight</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

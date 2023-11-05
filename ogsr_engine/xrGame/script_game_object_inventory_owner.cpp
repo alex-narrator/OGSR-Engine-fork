@@ -973,12 +973,12 @@ CScriptGameObject* CScriptGameObject::item_in_slot(u8 slot_id) const
     return (result ? result->object().lua_game_object() : 0);
 }
 
-CScriptGameObject* CScriptGameObject::active_item_left_hand() const
+CScriptGameObject* CScriptGameObject::active_device() const
 {
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member active_detector!");
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member active_device!");
         return nullptr;
     }
 

@@ -135,6 +135,7 @@
 #include "EliteDetector.h"
 #include "AdvancedDetector.h"
 #include "CustomDevice.h"
+#include "Flashlight.h"
 
 #include "torch.h"
 #include "pda.h"
@@ -333,7 +334,8 @@ void CObjectFactory::register_classes()
     ADD(CTorch, CSE_ALifeItemTorch, CLSID_DEVICE_TORCH, "device_torch");
     ADD(CPda, CSE_ALifeItemPDA, CLSID_DEVICE_PDA, "device_pda");
 
-    ADD(CCustomDevice, CSE_ALifeItem, CLSID_DEVICE_CUSTOM, "device_custom");
+    ADD(CFlashlight, CSE_ALifeItemDevice, CLSID_DEVICE_FLASHLIGHT, "device_flashlight");
+    ADD(CCustomDevice, CSE_ALifeItemDevice, CLSID_DEVICE_CUSTOM, "device_custom");
 
     // objects
     ADD(CProjector, CSE_ALifeObjectProjector, CLSID_OBJECT_PROJECTOR, "projector");

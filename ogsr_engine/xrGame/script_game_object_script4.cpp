@@ -49,6 +49,7 @@
 #include "PDA.h"
 #include "CustomDetector.h"
 #include "WeaponAmmo.h"
+#include "Flashlight.h"
 
 template <typename T>
 T* script_game_object_cast(CScriptGameObject* script_obj)
@@ -147,6 +148,7 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
         .def("get_outfit", &script_game_object_cast<CCustomOutfit>)
         .def("get_space_restrictor", &script_game_object_cast<CSpaceRestrictor>)
         .def("get_torch", &script_game_object_cast<CTorch>)
+        .def("get_flashlight", &script_game_object_cast<CFlashlight>)
         .def("get_weapon", &script_game_object_cast<CWeapon>)
         .def("get_weapon_m", &script_game_object_cast<CWeaponMagazined>)
         .def("get_weapon_mwg", &script_game_object_cast<CWeaponMagazinedWGrenade>)

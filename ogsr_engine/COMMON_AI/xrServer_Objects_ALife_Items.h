@@ -355,6 +355,13 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemVest)
 #define script_type_list save_type_list(CSE_ALifeItemVest)
 
+SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemDevice, CSE_ALifeItem)
+CSE_ALifeItemDevice(LPCSTR caSection);
+virtual ~CSE_ALifeItemDevice();
+SERVER_ENTITY_DECLARE_END
+add_to_type_list(CSE_ALifeItemDevice)
+#define script_type_list save_type_list(CSE_ALifeItemDevice)
+
 #pragma warning(pop)
 
 #endif

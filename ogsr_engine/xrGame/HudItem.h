@@ -43,6 +43,9 @@ public:
         eThrowEnd,
         eActivating,
         eShutter,
+        eIdleZoom,
+        eIdleZoomIn,
+        eIdleZoomOut,
     };
 
 private:
@@ -200,6 +203,8 @@ public:
     virtual bool CheckCompatibility(CHudItem*) { return true; }
 
     virtual void SetStopAimInertion(bool val) { m_bStopAimInertion = val; };
+
+    void SetToScreenCenter(Fvector& dir, Fvector& pos, float distance = 0.1f);
 
 protected:
     BOOL hud_mode;

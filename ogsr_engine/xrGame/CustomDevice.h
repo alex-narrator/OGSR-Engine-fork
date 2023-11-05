@@ -5,7 +5,6 @@ class CCustomDevice : public CHudItemObject
     typedef CHudItemObject inherited;
 
 protected:
-    bool m_bThrowAnm{};
     bool m_bFastAnimMode{};
     bool m_bNeedActivation{};
     bool m_bWorking{};
@@ -29,6 +28,8 @@ public:
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
 
+    virtual void OnH_B_Independent(bool just_before_destroy) override;
+
     virtual void OnActiveItem() override;
     virtual void OnHiddenItem() override;
     virtual void OnStateSwitch(u32 S, u32 oldState) override;
@@ -47,10 +48,7 @@ public:
     void ShowDevice(bool bFastMode);
     virtual bool CheckCompatibility(CHudItem* itm) override;
 
-    virtual void OnMoveToSlot(EItemPlace prevPlace) override;
     virtual void OnMoveToRuck(EItemPlace prevPlace) override;
-    virtual void OnMoveToBelt(EItemPlace prevPlace) override;
-    virtual void OnMoveToVest(EItemPlace prevPlace) override;
 
     bool IsZoomed() const override;
     bool IsAiming() const;

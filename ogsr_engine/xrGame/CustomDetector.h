@@ -185,6 +185,10 @@ public:
 
     virtual float GetDetectionRadius() const { return m_fDetectRadius; };
 
+    virtual void OnMoveToSlot(EItemPlace prevPlace) override;
+    virtual void OnMoveToBelt(EItemPlace prevPlace) override;
+    virtual void OnMoveToVest(EItemPlace prevPlace) override;
+
 protected:
     virtual void UpdateWork();
     virtual void UpdateAf() {}

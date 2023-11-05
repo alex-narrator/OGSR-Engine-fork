@@ -1574,3 +1574,14 @@ void CHudItem::OnAnimationEnd(u32 state)
 }
 
 bool CHudItem::AnmIdleMovingAllowed() const { return !HudBobbingAllowed() || Actor()->PsyAuraAffect; }
+
+#include "ActorEffector.h"
+void CHudItem::SetToScreenCenter(Fvector& dir, Fvector& pos, float distance)
+{
+    auto pActor = smart_cast<CActor*>(object().H_Parent());
+    if (!pActor)
+        return;
+    dir = pActor->Cameras().Direction();
+    pos = pActor->Cameras().Position();
+    pos.mad(pos, dir, distance);
+}

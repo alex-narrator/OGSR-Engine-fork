@@ -8,6 +8,11 @@
 #include "Car.h"
 #include "ui/UIMessagesWindow.h"
 
+#include "player_hud.h"
+#include "Inventory.h"
+#include "Weapon.h"
+#include "Flashlight.h"
+
 CFontManager::CFontManager()
 {
     Device.seqDeviceReset.Add(this, REG_PRIORITY_HIGH);
@@ -289,6 +294,14 @@ void CHUDManager::Render_Actor_Shadow() // added by KD
     if (A->active_cam() != eacFirstEye)
         return; // KD: we need to render actor shadow only in first eye cam mode because
                 // in other modes actor model already in scene graph and renders well
+
+    if (auto hi = g_player_hud->attached_item(1); hi && hi->m_parent_hud_item)
+        if (auto flashlight = smart_cast<CFlashlight*>(hi->m_parent_hud_item); flashlight && flashlight->IsPowerOn())
+            return;
+
+    if (auto wpn = smart_cast<CWeapon*>(A->inventory().ActiveItem()); wpn && wpn->IsFlashlightOn())
+        return;
+
     ::Render->set_Object(O->H_Root());
     O->renderable_Render();
 }

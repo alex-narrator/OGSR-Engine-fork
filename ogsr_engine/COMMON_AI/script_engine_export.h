@@ -163,4 +163,5 @@
 #include "script_rq_result.h"
 #include "EffectorZoomInertion.h"
 #include "WeaponAmmo.h"
+#include "Flashlight.h"
 #endif

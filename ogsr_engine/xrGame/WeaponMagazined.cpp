@@ -1376,16 +1376,6 @@ void CWeaponMagazined::LoadFlashlightParams(LPCSTR section)
         m_sounds.LoadSound(section, "snd_flashlight_switch", "sndFlashlightSwitch", SOUND_TYPE_ITEM_USING);
 }
 
-void SetToScreenCenter(Fvector& dir, Fvector& pos, float distance, CWeapon* wpn)
-{
-    auto pActor = smart_cast<CActor*>(wpn->H_Parent());
-    if (!pActor)
-        return;
-    dir = pActor->Cameras().Direction();
-    pos = pActor->Cameras().Position();
-    pos.mad(pos, dir, distance);
-}
-
 void CWeaponMagazined::UpdateLaser()
 {
     if (IsAddonAttached(eLaser))
@@ -1411,7 +1401,7 @@ void CWeaponMagazined::UpdateLaser()
             {
                 if (IsZoomed() && !IsRotatingToZoom())
                 {
-                    SetToScreenCenter(laser_dir, laser_pos, laserdot_attach_aim_dist, this);
+                    SetToScreenCenter(laser_dir, laser_pos, laserdot_attach_aim_dist);
                 }
                 else if (laserdot_attach_bone.size())
                 {
@@ -1474,8 +1464,8 @@ void CWeaponMagazined::UpdateFlashlight()
             {
                 if (IsZoomed() && !IsRotatingToZoom())
                 {
-                    SetToScreenCenter(flashlight_dir, flashlight_pos, flashlight_attach_aim_dist, this);
-                    SetToScreenCenter(flashlight_dir_omni, flashlight_pos_omni, flashlight_attach_aim_dist, this);
+                    SetToScreenCenter(flashlight_dir, flashlight_pos, flashlight_attach_aim_dist);
+                    SetToScreenCenter(flashlight_dir_omni, flashlight_pos_omni, flashlight_attach_aim_dist);
                 }
                 else
                 {

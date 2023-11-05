@@ -1072,3 +1072,13 @@ void CSE_ALifeItemVest::UPDATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8(m_cur_plate);
     tNetPacket.w_float_q8(m_fInstalledPlateCondition, 0.f, 1.f);
 }
+
+////////////////////////////////////////////////////////////////////////////
+// CSE_ALifeItemDevice
+////////////////////////////////////////////////////////////////////////////
+CSE_ALifeItemDevice::CSE_ALifeItemDevice(LPCSTR caSection) : CSE_ALifeItem(caSection) {}
+CSE_ALifeItemDevice::~CSE_ALifeItemDevice() {}
+void CSE_ALifeItemDevice::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited::STATE_Read(tNetPacket, size); }
+void CSE_ALifeItemDevice::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
+void CSE_ALifeItemDevice::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
+void CSE_ALifeItemDevice::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
