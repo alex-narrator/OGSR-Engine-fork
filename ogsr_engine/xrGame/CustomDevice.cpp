@@ -60,9 +60,7 @@ void CCustomDevice::UpdateCL()
 
     UpdateVisibility();
     if (!IsPowerOn())
-    {
         return;
-    }
     UpdateWork();
 }
 
@@ -220,7 +218,7 @@ void CCustomDevice::OnStateSwitch(u32 S, u32 oldState)
         if (AnimationExist("anm_zoom_in"))
             PlayHUDMotion("anm_zoom_in", true, GetState());
         else
-            SwitchState(eIdle);
+            SwitchState(eIdleZoom);
     }
     break;
     case eIdleZoomOut: {

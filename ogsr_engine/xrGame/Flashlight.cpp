@@ -75,7 +75,7 @@ void CFlashlight::LoadLightDefinitions(shared_str light_sect)
     light_render->set_cone(deg2rad(pSettings->r_float(light_sect, "spot_angle")));
     light_render->set_texture(READ_IF_EXISTS(pSettings, r_string, light_sect, "spot_texture", nullptr));
 
-    glow_render->set_texture(pSettings->r_string(light_sect, "glow_texture"));
+    glow_render->set_texture(READ_IF_EXISTS(pSettings, r_string, light_sect, "glow_texture", nullptr));
     glow_render->set_color(m_color);
     glow_render->set_radius(pSettings->r_float(light_sect, "glow_radius"));
 }
