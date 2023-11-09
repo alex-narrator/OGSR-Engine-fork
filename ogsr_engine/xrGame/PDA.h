@@ -74,6 +74,9 @@ public:
     virtual void Switch(bool);
     virtual bool IsPowerOn() const { return m_bTurnedOn; };
 
+    virtual void Show(bool = false);
+    virtual void Hide(bool = false);
+
     bool m_bZoomed{};
     float m_thumb_rot[2]{};
 

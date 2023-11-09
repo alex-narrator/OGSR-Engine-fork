@@ -269,7 +269,7 @@ void CCustomDevice::OnAnimationEnd(u32 state)
 
 void CCustomDevice::UpdateVisibility()
 {
-    if (!H_Parent())
+    if (!H_Parent() || !smart_cast<CActor*>(H_Parent()))
         return;
     // check visibility
     bool bClimb = ((Actor()->MovingState() & mcClimb) != 0);

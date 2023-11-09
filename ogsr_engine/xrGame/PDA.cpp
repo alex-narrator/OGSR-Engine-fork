@@ -496,7 +496,7 @@ void CPda::OnActiveItem()
     if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
         return;
 
-    SwitchState(eShowing);
+    //SwitchState(eShowing);
 
     if (!psActorFlags.test(AF_3D_PDA))
         return;
@@ -512,7 +512,7 @@ void CPda::OnHiddenItem()
     if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
         return;
 
-    SwitchState(eHiding);
+    //SwitchState(eHiding);
 
     if (!psActorFlags.test(AF_3D_PDA))
         return;
@@ -532,4 +532,41 @@ void CPda::Switch(bool turn_on)
         m_changed = true;
     else
         m_active_contacts.clear();
+}
+
+void CPda::Show(bool now)
+{
+    if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
+        return;
+
+    if (!psActorFlags.test(AF_3D_PDA))
+        return;    
+
+    if (now)
+    {
+        StopCurrentAnimWithoutCallback();
+        OnStateSwitch(eIdle, GetState());
+        SetState(eIdle);
+        StopHUDSounds();
+    }
+    else
+        SwitchState(eShowing);
+}
+
+void CPda::Hide(bool now)
+{
+    if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
+        return;
+
+    if (!psActorFlags.test(AF_3D_PDA))
+        return;
+
+    if (now)
+    {
+        OnStateSwitch(eHidden, GetState());
+        SetState(eHidden);
+        StopHUDSounds();
+    }
+    else
+        SwitchState(eHiding);
 }

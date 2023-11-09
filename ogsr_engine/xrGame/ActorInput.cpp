@@ -414,9 +414,9 @@ extern bool g_bDisableAllInput;
 
 void CActor::ActorUse()
 {
-    auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (auto Pda = GetPDA(); Pda && Pda->Is3DPDA() && psActorFlags.test(AF_3D_PDA) && pGameSP->PdaMenu->IsShown())
-        return;
+    //auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+    //if (auto Pda = GetPDA(); Pda && Pda->Is3DPDA() && psActorFlags.test(AF_3D_PDA) && pGameSP->PdaMenu->IsShown())
+    //    return;
 
     if (g_bDisableAllInput || HUD().GetUI()->MainInputReceiver())
         return;
