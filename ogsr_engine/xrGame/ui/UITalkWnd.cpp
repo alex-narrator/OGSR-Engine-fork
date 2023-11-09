@@ -360,13 +360,6 @@ void CUITalkWnd::PlaySnd(LPCSTR text)
     StopSnd();
 
     string_path fn{};
-    int size = xr_strlen(text) + xr_strlen("characters_voice\\dialogs\\") + xr_strlen(".ogg");
-    int lim = sizeof(fn) / 2;
-    if (size >= lim)
-    {
-        Msg("~[%s] : skip search sound for phrase - text is too long [%u > %u], phrase text:\n %s", __FUNCTION__, size, lim, text);
-        return;
-    }
     strconcat(sizeof(fn), fn, "characters_voice\\dialogs\\", text, ".ogg");
     if (FS.exist("$game_sounds$", fn))
     {

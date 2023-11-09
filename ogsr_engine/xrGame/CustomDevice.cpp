@@ -23,6 +23,8 @@ void CCustomDevice::Load(LPCSTR section)
     m_sounds.LoadSound(section, "snd_draw", "sndShow");
     m_sounds.LoadSound(section, "snd_holster", "sndHide");
     m_sounds.LoadSound(section, "snd_switch", "sndSwitch");
+
+    m_bWorkIndependent = READ_IF_EXISTS(pSettings, r_bool, section, "work_independent", false);
 }
 
 BOOL CCustomDevice::net_Spawn(CSE_Abstract* DC)
@@ -43,7 +45,7 @@ void CCustomDevice::load(IReader& input_packet)
     load_data(m_bNeedActivation, input_packet);
 }
 
-bool CCustomDevice::IsPowerOn() const { return m_bWorking && H_Parent() && H_Parent() == Level().CurrentViewEntity(); }
+bool CCustomDevice::IsPowerOn() const { return m_bWorking && (H_Parent() && H_Parent() == Level().CurrentViewEntity() || m_bWorkIndependent); }
 
 void CCustomDevice::Switch(bool turn_on)
 {
@@ -55,7 +57,7 @@ void CCustomDevice::UpdateCL()
 {
     inherited::UpdateCL();
 
-    if (H_Parent() != Level().CurrentEntity())
+    if (H_Parent() != Level().CurrentEntity() && !m_bWorkIndependent)
         return;
 
     UpdateVisibility();
@@ -267,6 +269,8 @@ void CCustomDevice::OnAnimationEnd(u32 state)
 
 void CCustomDevice::UpdateVisibility()
 {
+    if (!H_Parent())
+        return;
     // check visibility
     bool bClimb = ((Actor()->MovingState() & mcClimb) != 0);
     attachable_hud_item* i0 = g_player_hud->attached_item(0);
@@ -335,7 +339,8 @@ void CCustomDevice::OnH_B_Independent(bool just_before_destroy)
     if (GetState() != eHidden)
     {
         // Detaching hud item and animation stop in OnH_A_Independent
-        Switch(false);
+        if (!m_bWorkIndependent)
+            Switch(false);
         SwitchState(eHidden);
     }
 }

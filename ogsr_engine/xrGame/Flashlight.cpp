@@ -27,6 +27,8 @@ void CFlashlight::Load(LPCSTR section)
 {
     inherited::Load(section);
     LoadLightDefinitions(READ_IF_EXISTS(pSettings, r_string, section, "light_definition", nullptr));
+
+    light_direction = READ_IF_EXISTS(pSettings, r_fvector3, section, "light_direction", Fvector().set(0.f, 0.f, 1.0f));
 }
 
 void CFlashlight::LoadLightDefinitions(shared_str light_sect)
@@ -104,6 +106,18 @@ void CFlashlight::UpdateWork()
             else
                 light_render->set_volumetric(psActorFlags.test(AF_AI_VOLUMETRIC_LIGHTS));
         }
+    }
+    else if (!H_Parent())
+    {
+        Fvector last_pos = Position();
+
+        light_render->set_position(last_pos);
+        light_omni->set_position(last_pos);
+        glow_render->set_position(last_pos);
+
+        light_render->set_rotation(light_direction, Fvector{});
+        light_omni->set_rotation(light_direction, Fvector{});
+        glow_render->set_direction(light_direction);
     }
 
     // calc color animator
