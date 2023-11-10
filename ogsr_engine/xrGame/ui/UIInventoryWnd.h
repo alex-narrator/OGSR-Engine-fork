@@ -79,7 +79,6 @@ protected:
 
     CUIOutfitDragDropList* m_pUIOutfitList{};
     CUIDragDropListEx* m_pUIHelmetList{};
-    CUIDragDropListEx* m_pUIGasMaskList{};
     CUIDragDropListEx* m_pUIWarBeltList{};
     CUIDragDropListEx* m_pUIBackPackList{};
     CUIDragDropListEx* m_pUITacticalVestList{};

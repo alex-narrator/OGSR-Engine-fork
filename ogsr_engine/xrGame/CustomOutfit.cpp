@@ -38,8 +38,7 @@ void CCustomOutfit::Load(LPCSTR section)
 
     m_full_icon_name = pSettings->r_string(section, "full_icon_name");
 
-    m_bIsHelmetBuiltIn = std::find(m_slots_locked.begin(), m_slots_locked.end(), HELMET_SLOT) != m_slots_locked.end() || 
-        std::find(m_slots_locked.begin(), m_slots_locked.end(), GASMASK_SLOT) != m_slots_locked.end();
+    m_bIsHelmetBuiltIn = std::find(m_slots_locked.begin(), m_slots_locked.end(), HELMET_SLOT) != m_slots_locked.end();
 
     bulletproof_display_bone = READ_IF_EXISTS(pSettings, r_string, section, "bulletproof_display_bone", "bip01_spine");
 }

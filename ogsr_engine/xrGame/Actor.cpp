@@ -23,7 +23,6 @@
 #include "character_info.h"
 #include "CustomOutfit.h"
 #include "Helmet.h"
-#include "GasMask.h"
 #include "Warbelt.h"
 #include "Vest.h"
 #include "Torch.h"
@@ -1371,7 +1370,6 @@ void CActor::UpdateItemsEffect()
         auto outfit = GetOutfit();
         auto vest = GetVest();
         auto helmet = GetHelmet();
-        auto gasmask = GetGasMask();
         auto backpack = GetBackpack();
 
         if (i == eRadiationBoost)
@@ -1390,8 +1388,6 @@ void CActor::UpdateItemsEffect()
                         radiation_restore_speed *= (1.f - backpack->GetHitTypeProtection(ALife::eHitTypeRadiation));
                     if (helmet && inventory().InRuck(item)) // шолом захищає від радіації речей у рюкзаку
                         radiation_restore_speed *= (1.f - helmet->GetHitTypeProtection(ALife::eHitTypeRadiation));
-                    if (gasmask && inventory().InRuck(item)) // маска захищає від радіації речей у рюкзаку
-                        radiation_restore_speed *= (1.f - gasmask->GetHitTypeProtection(ALife::eHitTypeRadiation));
                 }
                 m_ActorItemBoostedParam[i] += radiation_restore_speed;
             }
@@ -1409,9 +1405,6 @@ void CActor::UpdateItemsEffect()
             // helmet
             if (helmet && !fis_zero(helmet->GetCondition()))
                 m_ActorItemBoostedParam[i] += helmet->GetItemEffect(i);
-            // gasmask
-            if (gasmask && !fis_zero(gasmask->GetCondition()))
-                m_ActorItemBoostedParam[i] += gasmask->GetItemEffect(i);
             // backpack
             if (backpack && !fis_zero(backpack->GetCondition()))
                 m_ActorItemBoostedParam[i] += backpack->GetItemEffect(i);
@@ -1583,7 +1576,6 @@ CCustomOutfit* CActor::GetOutfit() const { return smart_cast<CCustomOutfit*>(inv
 CWarbelt* CActor::GetWarbelt() const { return smart_cast<CWarbelt*>(inventory().ItemFromSlot(WARBELT_SLOT)); }
 CInventoryContainer* CActor::GetBackpack() const { return smart_cast<CInventoryContainer*>(inventory().ItemFromSlot(BACKPACK_SLOT)); }
 CHelmet* CActor::GetHelmet() const { return smart_cast<CHelmet*>(inventory().ItemFromSlot(HELMET_SLOT)); }
-CGasMask* CActor::GetGasMask() const { return smart_cast<CGasMask*>(inventory().ItemFromSlot(GASMASK_SLOT)); }
 CVest* CActor::GetVest() const { return smart_cast<CVest*>(inventory().ItemFromSlot(VEST_SLOT)); }
 CTorch* CActor::GetTorch() const { return smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT)); }
 CCustomDetectorSHOC* CActor::GetDetectorSHOC() const { return smart_cast<CCustomDetectorSHOC*>(inventory().ItemFromSlot(DETECTOR_SLOT)); }
