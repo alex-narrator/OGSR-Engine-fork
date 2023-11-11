@@ -75,6 +75,12 @@ void CUIInventoryCellItem::OnFocusReceive()
 {
     m_selected = true;
 
+    if (auto InvWnd = smart_cast<CUIInventoryWnd*>(this->OwnerList()->GetTop()))
+    {
+        InvWnd->HideSlotsHighlight();
+        InvWnd->ShowSlotsHighlight(object());
+    }
+
     inherited::OnFocusReceive();
 
     GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_FOCUS_RECEIVED, nullptr);
@@ -89,6 +95,13 @@ void CUIInventoryCellItem::OnFocusReceive()
 void CUIInventoryCellItem::OnFocusLost()
 {
     m_selected = false;
+
+    if (auto InvWnd = smart_cast<CUIInventoryWnd*>(this->OwnerList()->GetTop()))
+    {
+        auto CellPos = this->m_pParentList->m_container->PickCell(GetUICursor()->GetCursorPosition());
+        if (!this->m_pParentList->m_container->ValidCell(CellPos) || this->m_pParentList->m_container->GetCellAt(CellPos).Empty())
+            InvWnd->HideSlotsHighlight();
+    }
 
     inherited::OnFocusLost();
 
