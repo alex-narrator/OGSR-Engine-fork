@@ -449,14 +449,6 @@ void CInventoryOwner::OnItemSlot(CInventoryItem* inventory_item, EItemPlace prev
     object->callback(GameObject::eOnItemToSlot)(inventory_item->object().lua_game_object(), previous_place);
     attach(inventory_item);
 }
-void CInventoryOwner::OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place)
-{
-    CGameObject* object = smart_cast<CGameObject*>(this);
-    VERIFY(object);
-    object->callback(GameObject::eOnItemToVest)(inventory_item->object().lua_game_object(), previous_place);
-    attach(inventory_item);
-}
-
 
 CInventoryItem* CInventoryOwner::GetCurrentOutfit() const { return inventory().m_slots[OUTFIT_SLOT].m_pIItem; }
 

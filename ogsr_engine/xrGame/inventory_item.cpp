@@ -40,7 +40,6 @@ CInventoryItem::CInventoryItem()
     SetSlot(NO_ACTIVE_SLOT);
     m_flags.zero();
     m_flags.set(Fbelt, FALSE);
-    m_flags.set(Fvest, FALSE);
     m_flags.set(Fruck, TRUE);
     m_flags.set(FRuckDefault, FALSE);
     m_flags.set(FCanTake, TRUE);
@@ -112,7 +111,6 @@ void CInventoryItem::Load(LPCSTR section)
         m_Description = CStringTable().translate(pSettings->r_string(section, "description"));
 
     m_flags.set(Fbelt, READ_IF_EXISTS(pSettings, r_bool, section, "belt", FALSE));
-    m_flags.set(Fvest, READ_IF_EXISTS(pSettings, r_bool, section, "vest", FALSE));
     m_flags.set(FRuckDefault, READ_IF_EXISTS(pSettings, r_bool, section, "default_to_ruck", FALSE));
     m_flags.set(FCanTake, READ_IF_EXISTS(pSettings, r_bool, section, "can_take", TRUE));
     m_flags.set(FCanTrade, READ_IF_EXISTS(pSettings, r_bool, section, "can_trade", TRUE));
@@ -687,39 +685,10 @@ void CInventoryItem::OnMoveToBelt(EItemPlace prevPlace)
             m_flags.set(FIUngroupable, TRUE);
             m_highlight_equipped = true;
         }
-        if (prevPlace != eItemPlaceVest)
-        {
-            for (const auto slot : m_slots_locked)
-                pActor->inventory().DropSlotsToRuck(slot);
-            for (const auto slot : m_slots_unlocked)
-                pActor->inventory().DropSlotsToRuck(slot);
-        }
-    }
-};
-
-void CInventoryItem::OnMoveToVest(EItemPlace prevPlace)
-{
-    if (auto pActor = smart_cast<CActor*>(object().H_Parent()))
-    {
-        if (Core.Features.test(xrCore::Feature::equipped_untradable))
-        {
-            m_flags.set(FIAlwaysUntradable, TRUE);
-            m_flags.set(FIUngroupable, TRUE);
-            if (Core.Features.test(xrCore::Feature::highlight_equipped))
-                m_highlight_equipped = true;
-        }
-        else if (Core.Features.test(xrCore::Feature::highlight_equipped))
-        {
-            m_flags.set(FIUngroupable, TRUE);
-            m_highlight_equipped = true;
-        }
-        if (prevPlace != eItemPlaceBelt)
-        {
-            for (const auto slot : m_slots_locked)
-                pActor->inventory().DropSlotsToRuck(slot);
-            for (const auto slot : m_slots_unlocked)
-                pActor->inventory().DropSlotsToRuck(slot);
-        }
+        for (const auto slot : m_slots_locked)
+            pActor->inventory().DropSlotsToRuck(slot);
+        for (const auto slot : m_slots_unlocked)
+            pActor->inventory().DropSlotsToRuck(slot);
     }
 };
 
@@ -909,7 +878,7 @@ void CInventoryItem::Transfer(u16 from_id, u16 to_id)
 bool CInventoryItem::can_be_attached() const
 {
     const auto actor = smart_cast<const CActor*>(object().H_Parent());
-    return actor ? (m_eItemPlace == eItemPlaceBelt || m_eItemPlace == eItemPlaceVest || m_eItemPlace == eItemPlaceSlot) : true;
+    return actor ? (m_eItemPlace == eItemPlaceBelt || m_eItemPlace == eItemPlaceSlot) : true;
 }
 
 void CInventoryItem::SetDropTime(bool b_set)

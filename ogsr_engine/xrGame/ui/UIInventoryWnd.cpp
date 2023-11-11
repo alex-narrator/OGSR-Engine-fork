@@ -76,12 +76,6 @@ void CUIInventoryWnd::Init()
     xml_init.InitDragDropListEx(uiXml, "dragdrop_belt", 0, m_pUIBeltList);
     BindDragDropListEvents(m_pUIBeltList);
 
-    m_pUIVestList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIVestList);
-    m_pUIVestList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_vest", 0, m_pUIVestList);
-    BindDragDropListEvents(m_pUIVestList);
-
     m_pUIOutfitList = xr_new<CUIOutfitDragDropList>();
     AttachChild(m_pUIOutfitList);
     m_pUIOutfitList->SetAutoDelete(true);
@@ -94,23 +88,11 @@ void CUIInventoryWnd::Init()
     xml_init.InitDragDropListEx(uiXml, "dragdrop_helmet", 0, m_pUIHelmetList);
     BindDragDropListEvents(m_pUIHelmetList);
 
-    m_pUIWarBeltList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIWarBeltList);
-    m_pUIWarBeltList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_warbelt", 0, m_pUIWarBeltList);
-    BindDragDropListEvents(m_pUIWarBeltList);
-
     m_pUIBackPackList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIBackPackList);
     m_pUIBackPackList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_backpack", 0, m_pUIBackPackList);
     BindDragDropListEvents(m_pUIBackPackList);
-
-    m_pUITacticalVestList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUITacticalVestList);
-    m_pUITacticalVestList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_tactical_vest", 0, m_pUITacticalVestList);
-    BindDragDropListEvents(m_pUITacticalVestList);
 
     m_pUIKnifeList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIKnifeList);
@@ -182,9 +164,7 @@ void CUIInventoryWnd::Init()
         m_slots_array[i] = NULL;
     m_slots_array[OUTFIT_SLOT] = m_pUIOutfitList;
     m_slots_array[HELMET_SLOT] = m_pUIHelmetList;
-    m_slots_array[WARBELT_SLOT] = m_pUIWarBeltList;
     m_slots_array[BACKPACK_SLOT] = m_pUIBackPackList;
-    m_slots_array[VEST_SLOT] = m_pUITacticalVestList;
 
     m_slots_array[KNIFE_SLOT] = m_pUIKnifeList;
     m_slots_array[FIRST_WEAPON_SLOT] = m_pUIFirstWeaponList;
@@ -212,7 +192,6 @@ void CUIInventoryWnd::Init()
     ::Sound->create(sounds[eInvSndClose], uiXml.Read("snd_close", 0, NULL), st_Effect, sg_SourceType);
     ::Sound->create(sounds[eInvItemToSlot], uiXml.Read("snd_item_to_slot", 0, NULL), st_Effect, sg_SourceType);
     ::Sound->create(sounds[eInvItemToBelt], uiXml.Read("snd_item_to_belt", 0, NULL), st_Effect, sg_SourceType);
-    ::Sound->create(sounds[eInvItemToVest], uiXml.Read("snd_item_to_vest", 0, NULL), st_Effect, sg_SourceType);
     ::Sound->create(sounds[eInvItemToRuck], uiXml.Read("snd_item_to_ruck", 0, NULL), st_Effect, sg_SourceType);
     ::Sound->create(sounds[eInvProperties], uiXml.Read("snd_properties", 0, NULL), st_Effect, sg_SourceType);
     ::Sound->create(sounds[eInvDropItem], uiXml.Read("snd_drop_item", 0, NULL), st_Effect, sg_SourceType);
@@ -228,8 +207,6 @@ EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
         return iwBag;
     if (l == m_pUIBeltList)
         return iwBelt;
-    if (l == m_pUIVestList)
-        return iwVest;
     if (l == m_pUIMarkedList)
         return iwMarked;
 
@@ -339,7 +316,6 @@ void CUIInventoryWnd::Hide()
 void CUIInventoryWnd::HideSlotsHighlight()
 {
     m_pUIBeltList->enable_highlight(false);
-    m_pUIVestList->enable_highlight(false);
     m_pUIMarkedList->enable_highlight(false);
     for (const auto& DdList : m_slots_array)
         if (DdList)
@@ -350,9 +326,6 @@ void CUIInventoryWnd::ShowSlotsHighlight(PIItem InvItem)
 {
     if (m_pInv->CanPutInBelt(InvItem))
         m_pUIBeltList->enable_highlight(true);
-
-    if (m_pInv->CanPutInVest(InvItem))
-        m_pUIVestList->enable_highlight(true);
 
     if (CanMoveToMarked(InvItem))
         m_pUIMarkedList->enable_highlight(true);
@@ -470,8 +443,8 @@ void CUIInventoryWnd::UpdateCustomDraw()
     if (!smart_cast<CActor*>(Level().CurrentEntity()))
         return;
 
-    m_pUIBeltList->SetCellsCapacity(m_pInv->BeltArray());
-    m_pUIVestList->SetCellsCapacity(m_pInv->VestArray());
+    //m_pUIBeltList->SetCellsCapacity(m_pInv->BeltArray());
+    m_pUIBeltList->SetCellsAvailable(m_pInv->BeltSize());
 
     for (u8 i = 0; i < SLOTS_TOTAL; ++i)
     {
@@ -486,8 +459,6 @@ void CUIInventoryWnd::UpdateCustomDraw()
     }
 }
 
-#include "Warbelt.h"
-#include "Vest.h"
 void CUIInventoryWnd::TryReinitLists(PIItem iitem)
 {
     bool update_custom_draw{};
@@ -499,14 +470,9 @@ void CUIInventoryWnd::TryReinitLists(PIItem iitem)
             ReinitSlotList(slot);
         update_custom_draw = true;
     }
-    if (smart_cast<CWarbelt*>(iitem))
+    if (smart_cast<CCustomOutfit*>(iitem))
     {
         ReinitBeltList();
-        update_custom_draw = true;
-    }
-    if (smart_cast<CVest*>(iitem))
-    {
-        ReinitVestList();
         update_custom_draw = true;
     }
     ReinitMarkedList();

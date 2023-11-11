@@ -18,12 +18,6 @@ CHelmet::~CHelmet()
     xr_delete(m_boneProtection);
 }
 
-void CHelmet::Load(LPCSTR section)
-{
-    inherited::Load(section);
-    bulletproof_display_bone = READ_IF_EXISTS(pSettings, r_string, section, "bulletproof_display_bone", "bip01_head");
-}
-
 float CHelmet::HitThruArmour(SHit* pHDS)
 {
     float hit_power = pHDS->power;

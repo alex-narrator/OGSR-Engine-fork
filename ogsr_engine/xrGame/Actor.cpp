@@ -23,8 +23,6 @@
 #include "character_info.h"
 #include "CustomOutfit.h"
 #include "Helmet.h"
-#include "Warbelt.h"
-#include "Vest.h"
 #include "Torch.h"
 #include "actorcondition.h"
 #include "UIGameCustom.h"
@@ -135,7 +133,6 @@ CActor::CActor() : CEntityAlive()
 
     //разрешить использование пояса в inventory
     inventory().SetBeltUseful(true);
-    inventory().SetVestUseful(true);
 
     m_anims = xr_new<SActorMotions>();
     m_vehicle_anims = xr_new<SActorVehicleAnims>();
@@ -612,7 +609,6 @@ void CActor::Die(CObject* who)
 
     ///!!! чистка пояса
     inventory().DropBeltToRuck();
-    inventory().DropVestToRuck();
 
     cam_Set(eacFreeLook);
     mstate_wishful &= ~mcAnyMove;
@@ -1338,7 +1334,6 @@ void CActor::OnItemDropUpdate()
 }
 void CActor::OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemRuck(inventory_item, previous_place); }
 void CActor::OnItemBelt(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemBelt(inventory_item, previous_place); }
-void CActor::OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemVest(inventory_item, previous_place); }
 void CActor::OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemSlot(inventory_item, previous_place); }
 
 constexpr auto ITEMS_UPDATE_TIME = 0.100f;
@@ -1368,7 +1363,6 @@ void CActor::UpdateItemsEffect()
         m_ActorItemBoostedParam[i] = 0.f;
         
         auto outfit = GetOutfit();
-        auto vest = GetVest();
         auto helmet = GetHelmet();
         auto backpack = GetBackpack();
 
@@ -1382,8 +1376,6 @@ void CActor::UpdateItemsEffect()
                 { // що взяте в руки те випромінює на повну
                     if (outfit) // костюм захищає від радіації речей
                         radiation_restore_speed *= (1.f - outfit->GetHitTypeProtection(ALife::eHitTypeRadiation));
-                    if (vest && inventory().InRuck(item)) // бронежилет захищає від радіації речей у рюкзаку
-                        radiation_restore_speed *= (1.f - vest->GetHitTypeProtection(ALife::eHitTypeRadiation));
                     if (backpack && inventory().InRuck(item)) // рюкзак захищає від радіації речей у рюкзаку
                         radiation_restore_speed *= (1.f - backpack->GetHitTypeProtection(ALife::eHitTypeRadiation));
                     if (helmet && inventory().InRuck(item)) // шолом захищає від радіації речей у рюкзаку
@@ -1399,9 +1391,6 @@ void CActor::UpdateItemsEffect()
             // outfit
             if (outfit && !fis_zero(outfit->GetCondition()))
                 m_ActorItemBoostedParam[i] += outfit->GetItemEffect(i);
-            // vest
-            if (vest && !fis_zero(vest->GetCondition()))
-                m_ActorItemBoostedParam[i] += vest->GetItemEffect(i);
             // helmet
             if (helmet && !fis_zero(helmet->GetCondition()))
                 m_ActorItemBoostedParam[i] += helmet->GetItemEffect(i);
@@ -1573,10 +1562,8 @@ float CActor::GetMass() { return g_Alive() ? character_physics_support()->moveme
 bool CActor::is_on_ground() { return (character_physics_support()->movement()->Environment() != CPHMovementControl::peInAir); }
 
 CCustomOutfit* CActor::GetOutfit() const { return smart_cast<CCustomOutfit*>(inventory().ItemFromSlot(OUTFIT_SLOT)); }
-CWarbelt* CActor::GetWarbelt() const { return smart_cast<CWarbelt*>(inventory().ItemFromSlot(WARBELT_SLOT)); }
 CInventoryContainer* CActor::GetBackpack() const { return smart_cast<CInventoryContainer*>(inventory().ItemFromSlot(BACKPACK_SLOT)); }
 CHelmet* CActor::GetHelmet() const { return smart_cast<CHelmet*>(inventory().ItemFromSlot(HELMET_SLOT)); }
-CVest* CActor::GetVest() const { return smart_cast<CVest*>(inventory().ItemFromSlot(VEST_SLOT)); }
 CTorch* CActor::GetTorch() const { return smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT)); }
 CCustomDetectorSHOC* CActor::GetDetectorSHOC() const { return smart_cast<CCustomDetectorSHOC*>(inventory().ItemFromSlot(DETECTOR_SLOT)); }
 CCustomDetector* CActor::GetDetector() const { return smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)); }

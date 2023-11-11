@@ -345,16 +345,6 @@ SERVER_ENTITY_DECLARE_END
 add_to_type_list(CSE_ALifeItemEatable)
 #define script_type_list save_type_list(CSE_ALifeItemEatable)
 
-SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemVest, CSE_ALifeItem) 
-bool m_bIsPlateInstalled{};
-u8 m_cur_plate{};
-float m_fInstalledPlateCondition{1.f};
-CSE_ALifeItemVest(LPCSTR caSection);
-virtual ~CSE_ALifeItemVest();
-SERVER_ENTITY_DECLARE_END
-add_to_type_list(CSE_ALifeItemVest)
-#define script_type_list save_type_list(CSE_ALifeItemVest)
-
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemDevice, CSE_ALifeItem)
 CSE_ALifeItemDevice(LPCSTR caSection);
 virtual ~CSE_ALifeItemDevice();

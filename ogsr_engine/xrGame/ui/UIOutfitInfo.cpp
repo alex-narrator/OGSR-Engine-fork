@@ -9,7 +9,6 @@
 #include "CustomOutfit.h"
 #include "InventoryContainer.h"
 #include "Helmet.h"
-#include "Vest.h"
 #include "ActorCondition.h"
 #include "../string_table.h"
 
@@ -113,7 +112,6 @@ void CUIOutfitInfo::Update()
     auto outfit = actor->GetOutfit();
     auto backpack = actor->GetBackpack();
     auto helmet = actor->GetHelmet();
-    auto vest = actor->GetVest();
 
     auto& cond = actor->conditions();
 
@@ -137,8 +135,6 @@ void CUIOutfitInfo::Update()
                 _val += Actor()->GetTotalArtefactsEffect(i);
                 if (outfit)
                     _val += outfit->GetItemEffect(i);
-                if (vest)
-                    _val += vest->GetItemEffect(i);
                 if (backpack)
                     _val += backpack->GetItemEffect(i);
                 if (helmet)
@@ -150,8 +146,6 @@ void CUIOutfitInfo::Update()
             _val += Actor()->GetArtefactsProtection(i - _hit_type_protection_index);
             if (outfit)
                 _val += outfit->GetHitTypeProtection(i - _hit_type_protection_index);
-            if (vest)
-                _val += vest->GetHitTypeProtection(i - _hit_type_protection_index);
             // рюкзак захищає актора за досить специфічних умов (див. CActor::IsHitToBackPack)
             // тож не будемо відображати його захисні хар-ки тут
             //if (backpack)

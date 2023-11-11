@@ -50,18 +50,15 @@ public:
 
     bool Slot(PIItem pIItem, bool bNotActivate = false);
     bool Belt(PIItem pIItem);
-    bool Vest(PIItem pIItem);
     bool Ruck(PIItem pIItem);
 
     bool InSlot(PIItem pIItem) const;
     bool InBelt(PIItem pIItem) const;
-    bool InVest(PIItem pIItem) const;
     bool InRuck(PIItem pIItem) const;
 
     bool CanPutInSlot(PIItem pIItem, bool = false) const;
     bool CanPutInSlot(PIItem pIItem, u8 slot) const;
     bool CanPutInBelt(PIItem pIItem) const;
-    bool CanPutInVest(PIItem pIItem) const;
     bool CanPutInRuck(PIItem pIItem) const;
 
     bool CanTakeItem(CInventoryItem* inventory_item) const;
@@ -112,12 +109,9 @@ public:
     void SetSlotsUseful(bool slots_useful) { m_bSlotsUseful = slots_useful; }
     bool IsBeltUseful() const { return m_bBeltUseful; }
     void SetBeltUseful(bool belt_useful) { m_bBeltUseful = belt_useful; }
-    bool IsVestUseful() const { return m_bVestUseful; }
-    void SetVestUseful(bool vest_useful) { m_bVestUseful = vest_useful; }
 
     void SetSlotsBlocked(u16 mask, bool bBlock, bool now = false);
-    TIItemContainer m_all;
-    TIItemContainer m_ruck, m_belt, m_vest;
+    TIItemContainer m_all{}, m_ruck{}, m_belt{};
     TISlotArr m_slots;
 
     TIItemContainer GetActiveArtefactPlace() const;
@@ -148,7 +142,7 @@ public:
     // максимальный вес инвентаря
     float m_fMaxWeight;
 
-    bool m_bBeltVertical{}, m_bVestVertical{};
+    bool m_bBeltVertical{};
 
     bool m_bBlockDevice{};
 
@@ -169,7 +163,6 @@ protected:
 
     // флаг, показывающий наличие пояса в инвенторе
     bool m_bBeltUseful{};
-    bool m_bVestUseful{};
     // флаг, допускающий использование слотов
     bool m_bSlotsUseful{true};
 
@@ -184,8 +177,7 @@ protected:
 
     bool m_drop_last_frame{};
 
-    Ivector2 m_BaseBelt{};
-    Ivector2 m_BaseVest{};
+    int m_iMaxBelt{};
 
 private:
     bool m_bUpdated{};
@@ -195,17 +187,10 @@ public:
     PIItem GetSameEatable(const PIItem pIItem, bool bSearchRuck) const; // получаем айтем из всего инвентаря или с пояса
     // считаем предметы в рюкзаке или на поясе + в слотах
     virtual u32 GetSameItemCount(LPCSTR caSection, bool = true);
-    // размещение патронов на поясе при разрядке оружия в руках
-    //void TryAmmoCustomPlacement(CInventoryItem* pIItem);
 
-    Ivector2 BeltArray() const;
-    Ivector2 VestArray() const;
-
-    bool IsBeltVertical() const;
-    bool IsVestVertical() const;
+    int BeltSize() const;
 
     void DropBeltToRuck();
-    void DropVestToRuck();
     void DropSlotsToRuck(u32 min_slot, u32 max_slot = NO_ACTIVE_SLOT);
     bool IsSlotAllowed(u32) const;
     bool HasUnlockForSlot(u32) const;

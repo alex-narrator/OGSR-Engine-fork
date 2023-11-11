@@ -477,8 +477,6 @@
     <ClInclude Include="ui\UIPanels.h" />
     <ClInclude Include="ui\UIPdaSpot.h" />
     <ClInclude Include="ui_defs.h" />
-    <ClInclude Include="Vest.h" />
-    <ClInclude Include="Warbelt.h" />
     <ClInclude Include="wrapper_abstract.h" />
     <ClInclude Include="wrapper_abstract_inline.h" />
     <ClInclude Include="action_management_config.h" />
@@ -1709,7 +1707,6 @@
     <ClCompile Include="ui\UILoadingScreen.cpp" />
     <ClCompile Include="ui\UIPanels.cpp" />
     <ClCompile Include="ui\UIPdaSpot.cpp" />
-    <ClCompile Include="Vest.cpp" />
     <ClCompile Include="visual_memory_manager.cpp" />
     <ClCompile Include="visual_memory_params.cpp" />
     <ClCompile Include="vision_client.cpp" />
@@ -2101,7 +2098,6 @@
     <ClCompile Include="pp_effector_custom.cpp" />
     <ClCompile Include="pp_effector_distance.cpp" />
     <ClCompile Include="PostprocessAnimator.cpp" />
-    <ClCompile Include="Warbelt.cpp" />
     <ClCompile Include="weapon_ammo_script.cpp" />
     <ClCompile Include="zone_effector.cpp" />
     <ClCompile Include="EffectorShot.cpp" />

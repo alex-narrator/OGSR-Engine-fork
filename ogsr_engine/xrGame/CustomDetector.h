@@ -187,7 +187,6 @@ public:
 
     virtual void OnMoveToSlot(EItemPlace prevPlace) override;
     virtual void OnMoveToBelt(EItemPlace prevPlace) override;
-    virtual void OnMoveToVest(EItemPlace prevPlace) override;
 
 protected:
     virtual void UpdateWork();

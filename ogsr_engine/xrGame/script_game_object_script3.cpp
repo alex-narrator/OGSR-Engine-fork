@@ -255,7 +255,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 
         .def("iterate_inventory", &CScriptGameObject::IterateInventory)
         .def("iterate_belt", &CScriptGameObject::IterateBelt)
-        .def("iterate_vest", &CScriptGameObject::IterateVest)
         .def("iterate_slots", &CScriptGameObject::IterateSlots)
         .def("iterate_ruck", &CScriptGameObject::IterateRuck)
         .def("mark_item_dropped", &CScriptGameObject::MarkItemDropped)
@@ -289,25 +288,20 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         // KD
         // functions for CInventoryOwner class
         .def("item_on_belt", &CScriptGameObject::ItemOnBelt)
-        .def("item_on_vest", &CScriptGameObject::ItemOnVest)
         .def("item_in_ruck", &CScriptGameObject::ItemInRuck)
         .def("is_on_belt", &CScriptGameObject::IsOnBelt)
-        .def("is_on_vest", &CScriptGameObject::IsOnVest)
         .def("is_in_ruck", &CScriptGameObject::IsInRuck)
         .def("is_in_slot", &CScriptGameObject::IsInSlot)
         .def("move_to_ruck", &CScriptGameObject::MoveToRuck)
         .def("move_to_belt", &CScriptGameObject::MoveToBelt)
-        .def("move_to_vest", &CScriptGameObject::MoveToVest)
         .def("move_to_slot", &CScriptGameObject::MoveToSlot)
         .def("belt_count", &CScriptGameObject::BeltSize)
-        .def("vest_count", &CScriptGameObject::VestSize)
         .def("ruck_count", &CScriptGameObject::RuckSize)
         .def("invalidate_inventory", &CScriptGameObject::InvalidateInventory)
         .def("get_slot", &CScriptGameObject::GetSlot)
         .def("set_slot", &CScriptGameObject::SetSlot)
         .def("can_put_in_slot", &CScriptGameObject::CanPutInSlot)
         .def("can_put_in_belt", &CScriptGameObject::CanPutInBelt)
-        .def("can_put_in_vest", &CScriptGameObject::CanPutInVest)
 
         // functions for CInventoryItem class
         .def("set_inventory_item_flags", &CScriptGameObject::SetIIFlags)

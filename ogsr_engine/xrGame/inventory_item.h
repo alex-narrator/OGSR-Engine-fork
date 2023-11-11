@@ -65,7 +65,6 @@ public:
         FIAlwaysUntradable = (1 << 12),
         FIUngroupable = (1 << 13),
         FIHiddenForInventory = (1 << 14),
-        Fvest = (1 << 15),
     };
     const u32 ClrEquipped = READ_IF_EXISTS(pSettings, r_color, "dragdrop", "color_equipped", color_argb(255, 255, 225, 0));
     const u32 ClrUntradable = READ_IF_EXISTS(pSettings, r_color, "dragdrop", "color_untradable", color_argb(255, 124, 0, 0));
@@ -153,7 +152,6 @@ public:
 
     virtual void OnMoveToSlot(EItemPlace prevPlace);
     virtual void OnMoveToBelt(EItemPlace prevPlace);
-    virtual void OnMoveToVest(EItemPlace prevPlace);
     virtual void OnMoveToRuck(EItemPlace prevPlace);
     virtual void OnMoveOut(EItemPlace prevPlace);
 
@@ -185,8 +183,6 @@ public:
 
     bool Belt() { return !!m_flags.test(Fbelt); }
     void Belt(bool on_belt) { m_flags.set(Fbelt, on_belt); }
-    bool Vest() { return !!m_flags.test(Fvest); }
-    void Vest(bool on_vest) { m_flags.set(Fvest, on_vest); }
     bool Ruck() { return !!m_flags.test(Fruck); }
     void Ruck(bool on_ruck) { m_flags.set(Fruck, on_ruck); }
     bool RuckDefault() { return !!m_flags.test(FRuckDefault); }

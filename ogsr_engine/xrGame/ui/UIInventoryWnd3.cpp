@@ -14,9 +14,7 @@
 #include "UICellItem.h"
 #include "UIListBoxItem.h"
 #include "CustomOutfit.h"
-#include "Vest.h"
 #include "InventoryContainer.h"
-#include "Warbelt.h"
 #include "string_table.h"
 #include <regex>
 
@@ -41,8 +39,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
     auto pEatableItem = smart_cast<CEatableItem*>(CurrentIItem());
     auto pOutfit = smart_cast<CCustomOutfit*>(CurrentIItem());
     auto pContainer = smart_cast<CInventoryContainer*>(CurrentIItem());
-    auto pWarbelt = smart_cast<CWarbelt*>(CurrentIItem());
-    auto pVest = smart_cast<CVest*>(CurrentIItem());
     auto pWeapon = smart_cast<CWeapon*>(CurrentIItem());
     auto pAmmo = smart_cast<CWeaponAmmo*>(CurrentIItem());
 
@@ -56,7 +52,7 @@ void CUIInventoryWnd::ActivatePropertiesBox()
     LPCSTR _many = b_many ? "•" : "";
     LPCSTR _addon_name{};
     LPCSTR detach_tip = CurrentIItem()->GetDetachMenuTip();
-    bool b_wearable = (pOutfit || pVest || pWarbelt || pBackpack);
+    bool b_wearable = (pOutfit || pBackpack);
 
      if (!b_wearable && CurrentIItem()->GetSlot() != NO_ACTIVE_SLOT)
     {
@@ -75,12 +71,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
                 }
             }
         }
-    }
-
-    if (CurrentIItem()->Vest() && inv->CanPutInVest(CurrentIItem()))
-    {
-        UIPropertiesBox.AddItem("st_move_to_vest", NULL, INVENTORY_TO_VEST_ACTION);
-        b_show = true;
     }
 
     if (CurrentIItem()->Belt() && inv->CanPutInBelt(CurrentIItem()))
@@ -104,15 +94,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
     }
 
     const char* _addon_sect{};
-
-    if (pVest && pVest->IsPlateInstalled() && pVest->CanDetach(pVest->GetPlateName().c_str()))
-    {
-        _addon_sect = pVest->GetPlateName().c_str();
-        _addon_name = pSettings->r_string(_addon_sect, "inv_name_short");
-        sprintf(temp, "%s%s %s", _many, CStringTable().translate(detach_tip).c_str(), CStringTable().translate(_addon_name).c_str());
-        UIPropertiesBox.AddItem(temp, (void*)_addon_sect, INVENTORY_DETACH_ADDON);
-        b_show = true;
-    }
 
     if (pAmmo && pAmmo->IsBoxReloadable())
     {
@@ -291,7 +272,6 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
         }
         break;
         case INVENTORY_TO_BELT_ACTION: ToBelt(itm, false); break;
-        case INVENTORY_TO_VEST_ACTION: ToVest(itm, false); break;
         case INVENTORY_TO_BAG_ACTION: ToBag(itm, false); break;
         case INVENTORY_DROP_ACTION: {
             DropCurrentItem(for_all);
@@ -357,15 +337,6 @@ bool CUIInventoryWnd::TryUseItem(PIItem itm)
     if (!itm)
         return false;
 
-    //if (itm->GetSlotsCount() || itm->Belt() || itm->Vest())
-    //    return false;
-
-    //if (smart_cast<CEatableItem*>(itm))
-    //{
-    //    EatItem(itm);
-    //    return true;
-    //}
-
     if (pSettings->line_exist("engine_callbacks", "ui_inventory_try_use_item"))
     {
         const char* callback = pSettings->r_string("engine_callbacks", "ui_inventory_try_use_item");
@@ -375,30 +346,3 @@ bool CUIInventoryWnd::TryUseItem(PIItem itm)
 
     return false;
 }
-
-//bool CUIInventoryWnd::DropItem(PIItem itm, CUIDragDropListEx* lst)
-//{
-//    CUICellItem* _citem = lst->ItemsCount() ? lst->GetItemIdx(0) : nullptr;
-//    PIItem _iitem = _citem ? (PIItem)_citem->m_pData : nullptr;
-//
-//    if (!_iitem)
-//        return false;
-//
-//    //if (_iitem->CanAttach(itm))
-//    //{
-//    //    AttachAddon(_iitem);
-//    //    return true;
-//    //}
-//
-//    //auto ammo = itm->cast_weapon_ammo();
-//
-//    //auto wpn = smart_cast<CWeaponMagazined*>(_iitem);
-//    //if (wpn && ammo && GetInventory()->InSlot(wpn))
-//    //    return wpn->IsDirectReload(ammo);
-//
-//    //auto ammo_mag = _iitem->cast_weapon_ammo();
-//    //if (ammo_mag && ammo)
-//    //    return ammo_mag->IsDirectReload(ammo);
-//
-//    return /*true*/false;
-//}

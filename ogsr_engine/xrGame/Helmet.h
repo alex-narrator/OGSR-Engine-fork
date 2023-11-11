@@ -10,8 +10,6 @@ public:
     CHelmet();
     virtual ~CHelmet();
 
-    virtual void Load(LPCSTR section);
-
     float HitThruArmour(SHit* pHDS);
 
     virtual float GetHitTypeProtection(int) const override;
@@ -22,7 +20,4 @@ public:
 
 private:
     SBoneProtections* m_boneProtection;
-
-protected:
-    shared_str bulletproof_display_bone{};
 };

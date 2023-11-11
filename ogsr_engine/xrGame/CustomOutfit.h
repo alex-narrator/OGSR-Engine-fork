@@ -38,7 +38,5 @@ public:
     const shared_str& GetFullIconName() const { return m_full_icon_name; };
 
     bool m_bIsHelmetBuiltIn{};
-
-protected:
-    shared_str bulletproof_display_bone{};
+    int m_iBeltSize{};
 };

@@ -19,9 +19,7 @@ enum : u32
     ARTEFACT_SLOT,
     HELMET_SLOT,
     // equipment
-    WARBELT_SLOT,
     BACKPACK_SLOT,
-    VEST_SLOT,
     //
     SLOTS_TOTAL,
     NO_ACTIVE_SLOT = 255
@@ -42,7 +40,6 @@ enum EItemPlace
     eItemPlaceSlot,
     eItemPlaceBelt,
     eItemPlaceRuck,
-    eItemPlaceVest,
 };
 
 extern u32 INV_STATE_LADDER;

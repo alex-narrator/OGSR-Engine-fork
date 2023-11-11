@@ -155,12 +155,6 @@ void CCustomDetector::OnMoveToBelt(EItemPlace prevPlace)
     Switch(true);
 }
 
-void CCustomDetector::OnMoveToVest(EItemPlace prevPlace)
-{
-    inherited::OnMoveToVest(prevPlace);
-    Switch(true);
-}
-
 void CCustomDetector::SwitchMode() 
 {
     if (!CanSwitchModes())

@@ -82,8 +82,6 @@ void CUIBeltPanel::Draw()
     auto& inv = pActor->inventory();
 
     TIItemContainer items_to_show{};
-    for (const auto& itm : inv.m_vest)
-        TryAddToShowList(items_to_show, itm, m_bGroupSimilar);
     for (const auto& itm : inv.m_belt)
         TryAddToShowList(items_to_show, itm, m_bGroupSimilar);
 

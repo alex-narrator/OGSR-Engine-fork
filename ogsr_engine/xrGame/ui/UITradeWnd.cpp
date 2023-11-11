@@ -16,7 +16,6 @@
 #include "Weapon.h"
 #include "WeaponMagazined.h"
 #include "WeaponMagazinedWGrenade.h"
-#include "Vest.h"
 #include "inventory.h"
 #include "level.h"
 #include "string_table.h"
@@ -166,7 +165,6 @@ void CUITradeWnd::ActivatePropertiesBox()
     auto pWeapon = smart_cast<CWeapon*>(CurrentIItem());
     auto pAmmo = smart_cast<CWeaponAmmo*>(CurrentIItem());
     auto pEatableItem = smart_cast<CEatableItem*>(CurrentIItem());
-    auto pVest = smart_cast<CVest*>(CurrentIItem());
 
     LPCSTR detach_tip = CurrentIItem()->GetDetachMenuTip();
 
@@ -184,15 +182,6 @@ void CUITradeWnd::ActivatePropertiesBox()
 
     if (b_actor_inv)
     {
-        if (pVest && pVest->IsPlateInstalled() && pVest->CanDetach(pVest->GetPlateName().c_str()))
-        {
-            _addon_sect = pVest->GetPlateName().c_str();
-            _addon_name = pSettings->r_string(_addon_sect, "inv_name_short");
-            sprintf(temp, "%s%s %s", _many, CStringTable().translate(detach_tip).c_str(), CStringTable().translate(_addon_name).c_str());
-            m_pUIPropertiesBox->AddItem(temp, (void*)_addon_sect, INVENTORY_DETACH_ADDON);
-            b_show = true;
-        }
-  
         if (pAmmo && pAmmo->IsBoxReloadable())
         {
             // reload AmmoBox

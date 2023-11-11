@@ -17,8 +17,6 @@
 #include "game_base_space.h"
 #include "clsid_game.h"
 #include "CustomOutfit.h"
-#include "Vest.h"
-#include "Warbelt.h"
 #include "HudItem.h"
 #include "Grenade.h"
 #include "PDA.h"
@@ -52,8 +50,8 @@ CInventory::CInventory()
     m_fTakeDist = pSettings->r_float("inventory", "take_dist");
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
 
-    m_BaseBelt = READ_IF_EXISTS(pSettings, r_ivector2, "inventory", "base_belt", Ivector2{});
-    m_BaseVest = READ_IF_EXISTS(pSettings, r_ivector2, "inventory", "base_vest", Ivector2{});
+    m_iMaxBelt = READ_IF_EXISTS(pSettings, r_u32, "inventory", "max_belt", 0);
+    m_bBeltVertical = READ_IF_EXISTS(pSettings, r_bool, "inventory", "belt_vertical", false);
 
     m_slots.resize(SLOTS_TOTAL);
 
@@ -69,9 +67,6 @@ CInventory::CInventory()
         sprintf_s(temp, "slot_need_unlock_%d", i);
         m_slots[i].m_bNeedUnlock = READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false);
     }
-
-    m_bBeltVertical = READ_IF_EXISTS(pSettings, r_bool, "inventory", "belt_vertical", false);
-    m_bVestVertical = READ_IF_EXISTS(pSettings, r_bool, "inventory", "vest_vertical", false);
 }
 
 void CInventory::Clear()
@@ -79,7 +74,6 @@ void CInventory::Clear()
     m_all.clear();
     m_ruck.clear();
     m_belt.clear();
-    m_vest.clear();
 
     for (auto& slot : m_slots)
         slot.m_pIItem = nullptr;
@@ -129,15 +123,6 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
             R_ASSERT(Ruck(pIItem));
         }
         break;
-    case eItemPlaceVest:
-        result = Vest(pIItem);
-        if (!result)
-        {
-            Msg("!![%s] cant put in vest item [%s], moving to ruck...", __FUNCTION__, pIItem->object().cName().c_str());
-            pIItem->m_eItemPlace = eItemPlaceRuck;
-            R_ASSERT(Ruck(pIItem));
-        }
-        break;
     case eItemPlaceRuck: result = Ruck(pIItem);
 #ifdef DEBUG
         if (!result)
@@ -183,11 +168,6 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
             result = Belt(pIItem);
             VERIFY(result);
         }
-        else if (!force_ruck_default && !pIItem->RuckDefault() && CanPutInVest(pIItem))
-        {
-            result = Vest(pIItem);
-            VERIFY(result);
-        }
         else
         {
             result = Ruck(pIItem);
@@ -223,12 +203,6 @@ bool CInventory::DropItem(CGameObject* pObj)
     case eItemPlaceBelt: {
         ASSERT_FMT(InBelt(pIItem), "CInventory::DropItem: InBelt(pIItem): %s, owner [%s]", pObj->cName().c_str(), m_pOwner->Name());
         m_belt.erase(std::find(m_belt.begin(), m_belt.end(), pIItem));
-        pIItem->object().processing_deactivate();
-    }
-    break;
-    case eItemPlaceVest: {
-        ASSERT_FMT(InVest(pIItem), "CInventory::DropItem: InVest(pIItem): %s, owner [%s]", pObj->cName().c_str(), m_pOwner->Name());
-        m_vest.erase(std::find(m_vest.begin(), m_vest.end(), pIItem));
         pIItem->object().processing_deactivate();
     }
     break;
@@ -303,8 +277,6 @@ bool CInventory::Slot(PIItem pIItem, bool bNotActivate)
         m_ruck.erase(std::find(m_ruck.begin(), m_ruck.end(), pIItem));
     if (InBelt(pIItem))
         m_belt.erase(std::find(m_belt.begin(), m_belt.end(), pIItem));
-    if (InVest(pIItem))
-        m_vest.erase(std::find(m_vest.begin(), m_vest.end(), pIItem));
 
     if ((m_iActiveSlot == pIItem->GetSlot() || (m_iActiveSlot == NO_ACTIVE_SLOT && m_iNextActiveSlot == NO_ACTIVE_SLOT)) && !bNotActivate)
         Activate(pIItem->GetSlot());
@@ -334,8 +306,6 @@ bool CInventory::Belt(PIItem pIItem)
     }
     if (InRuck(pIItem))
         m_ruck.erase(std::find(m_ruck.begin(), m_ruck.end(), pIItem));
-    if (InVest(pIItem))
-        m_vest.erase(std::find(m_vest.begin(), m_vest.end(), pIItem));
 
     m_belt.push_back(pIItem);
 
@@ -346,43 +316,6 @@ bool CInventory::Belt(PIItem pIItem)
     pIItem->m_eItemPlace = eItemPlaceBelt;
     m_pOwner->OnItemBelt(pIItem, PrevPlace);
     pIItem->OnMoveToBelt(PrevPlace);
-
-    if (in_slot)
-        pIItem->object().processing_deactivate();
-
-    pIItem->object().processing_activate();
-
-    return true;
-}
-
-bool CInventory::Vest(PIItem pIItem)
-{
-    if (!CanPutInVest(pIItem))
-        return false;
-
-    // вещь была в слоте
-    bool in_slot = InSlot(pIItem);
-    if (in_slot)
-    {
-        if (m_iActiveSlot == pIItem->GetSlot())
-            Activate(NO_ACTIVE_SLOT);
-        m_slots[pIItem->GetSlot()].m_pIItem = NULL;
-    }
-
-    if (InRuck(pIItem))
-        m_ruck.erase(std::find(m_ruck.begin(), m_ruck.end(), pIItem));
-    if (InBelt(pIItem))
-        m_belt.erase(std::find(m_belt.begin(), m_belt.end(), pIItem));
-
-    m_vest.push_back(pIItem);
-
-    CalcTotalWeight();
-    InvalidateState();
-
-    auto PrevPlace = pIItem->m_eItemPlace;
-    pIItem->m_eItemPlace = eItemPlaceVest;
-    m_pOwner->OnItemVest(pIItem, PrevPlace);
-    pIItem->OnMoveToVest(PrevPlace);
 
     if (in_slot)
         pIItem->object().processing_deactivate();
@@ -407,8 +340,6 @@ bool CInventory::Ruck(PIItem pIItem)
     }
     if (InBelt(pIItem))
         m_belt.erase(std::find(m_belt.begin(), m_belt.end(), pIItem));
-    if (InVest(pIItem))
-        m_vest.erase(std::find(m_vest.begin(), m_vest.end(), pIItem));
 
     m_ruck.push_back(pIItem);
 
@@ -819,7 +750,6 @@ bool CInventory::InSlot(PIItem pIItem) const
 }
 
 bool CInventory::InBelt(PIItem pIItem) const { return (std::find(m_belt.begin(), m_belt.end(), pIItem) != m_belt.end()); }
-bool CInventory::InVest(PIItem pIItem) const { return (std::find(m_vest.begin(), m_vest.end(), pIItem) != m_vest.end()); }
 bool CInventory::InRuck(PIItem pIItem) const { return (std::find(m_ruck.begin(), m_ruck.end(), pIItem) != m_ruck.end()); }
 
 bool CInventory::CanPutInSlot(PIItem pIItem, bool b_check_all) const
@@ -879,23 +809,9 @@ bool CInventory::CanPutInBelt(PIItem pIItem) const
         return true;
     auto belt = static_cast<TIItemContainer>(m_belt);
 
-    return FreeRoom(belt, pIItem, BeltArray().x, BeltArray().y, IsBeltVertical());
+    return FreeRoom(belt, pIItem, BeltSize(), 1, false); // BeltArray().x, BeltArray().y, IsBeltVertical());
 }
 
-bool CInventory::CanPutInVest(PIItem pIItem) const
-{
-    if (InVest(pIItem))
-        return false;
-    if (!m_bVestUseful)
-        return false;
-    if (!pIItem || !pIItem->Vest())
-        return false;
-    if (!IsAllItemsLoaded())
-        return true;
-    auto vest = static_cast<TIItemContainer>(m_vest);
-
-    return FreeRoom(vest, pIItem, VestArray().x, VestArray().y, IsVestVertical());
-}
 // проверяет можем ли поместить вещь в рюкзак,
 // при этом реально ничего не меняется
 bool CInventory::CanPutInRuck(PIItem pIItem) const
@@ -962,7 +878,6 @@ void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_tr
         if (!for_trade || item->CanTrade())
             items_container.push_back(item);
     }
-
     if (m_bBeltUseful)
     {
         for (const auto& item : m_belt)
@@ -971,16 +886,6 @@ void CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_tr
                 items_container.push_back(item);
         }
     }
-
-    if (m_bVestUseful)
-    {
-        for (const auto& item : m_vest)
-        {
-            if (!for_trade || item->CanTrade())
-                items_container.push_back(item);
-        }
-    }
-
     if (m_bSlotsUseful)
     {
         for (const auto& slot : m_slots)
@@ -1087,9 +992,6 @@ void CInventory::Iterate(bool bSearchRuck, std::function<bool(const PIItem)> cal
     }
     else
     {
-        for (const auto& item : m_vest)
-            if (callback(item))
-                return;
         for (const auto& item : m_belt)
             if (callback(item))
                 return;
@@ -1173,13 +1075,6 @@ PIItem CInventory::GetSame(const PIItem pIItem, bool bSearchRuck) const
     }
     else
     {
-        for (const auto& _item : m_vest)
-        {
-            if ((_item != pIItem) && !xr_strcmp(_item->object().cNameSect(), pIItem->object().cNameSect()))
-            {
-                return _item;
-            }
-        }
         for (const auto& _item : m_belt)
         {
             if ((_item != pIItem) && !xr_strcmp(_item->object().cNameSect(), pIItem->object().cNameSect()))
@@ -1249,32 +1144,12 @@ u32 CInventory::GetSameItemCount(LPCSTR caSection, bool marked_only)
     return l_dwCount;
 }
 
-Ivector2 CInventory::BeltArray() const
+int CInventory::BeltSize() const
 {
-    if (auto warbelt = m_pOwner->GetWarbelt())
-        return warbelt->GetBeltArray();
-    return m_BaseBelt;
-}
+    if (auto outfit = m_pOwner->GetOutfit())
+        return outfit->m_iBeltSize;
+    return m_iMaxBelt;
 
-Ivector2 CInventory::VestArray() const
-{
-    if (auto vest = m_pOwner->GetVest())
-        return vest->GetVestArray();
-    return m_BaseVest;
-}
-
-bool CInventory::IsBeltVertical() const 
-{
-    if (auto warbelt = m_pOwner->GetWarbelt())
-        return warbelt->GetBeltVertical();
-    return m_bBeltVertical;
-}
-
-bool CInventory::IsVestVertical() const
-{
-    if (auto vest = m_pOwner->GetVest())
-        return vest->GetVestVertical();
-    return m_bVestVertical;
 }
 
 bool CInventory::IsAllItemsLoaded() const { return m_bUpdated; }
@@ -1287,14 +1162,6 @@ void CInventory::DropBeltToRuck()
         return;
     while (!m_belt.empty())
         Ruck(m_belt.front());
-}
-
-void CInventory::DropVestToRuck()
-{
-    if (!OwnerIsActor() || !IsAllItemsLoaded())
-        return;
-    while (!m_vest.empty())
-        Ruck(m_vest.front());
 }
 
 void CInventory::DropSlotsToRuck(u32 min_slot, u32 max_slot)
@@ -1338,14 +1205,6 @@ bool CInventory::HasUnlockForSlot(u32 check_slot) const
         if (std::find(unlock_slots.begin(), unlock_slots.end(), check_slot) != unlock_slots.end())
             return true;
     }
-    for (const auto& item : m_vest)
-    {
-        auto unlock_slots = item->GetSlotsUnlocked();
-        if (unlock_slots.empty())
-            continue;
-        if (std::find(unlock_slots.begin(), unlock_slots.end(), check_slot) != unlock_slots.end())
-            return true;
-    }
     for (const auto& item : m_belt)
     {
         auto unlock_slots = item->GetSlotsUnlocked();
@@ -1364,14 +1223,6 @@ bool CInventory::HasLockForSlot(u32 check_slot) const
         auto item = slot.m_pIItem;
         if (!item)
             continue;
-        auto lock_slots = item->GetSlotsLocked();
-        if (lock_slots.empty())
-            continue;
-        if (std::find(lock_slots.begin(), lock_slots.end(), check_slot) != lock_slots.end())
-            return true;
-    }
-    for (const auto& item : m_vest)
-    {
         auto lock_slots = item->GetSlotsLocked();
         if (lock_slots.empty())
             continue;

@@ -4,7 +4,7 @@
 #include "UIIconParams.h"
 
 class CUIXml;
-// belt & vest panel
+// belt panel
 class CUIBeltPanel : public CUIWindow
 {
 public:

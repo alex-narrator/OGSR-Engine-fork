@@ -14,7 +14,6 @@ enum EListType
     iwSlot,
     iwBag,
     iwBelt,
-    iwVest,
     iwMarked,
 };
 

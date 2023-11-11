@@ -27,8 +27,6 @@ class CPurchaseList;
 class CWeapon;
 class CCustomOutfit;
 class CHelmet;
-class CVest;
-class CWarbelt;
 class CInventoryContainer;
 struct SHit;
 
@@ -153,8 +151,6 @@ public:
     virtual CCustomOutfit* GetOutfit() const { return nullptr; };
     virtual CInventoryContainer* GetBackpack() const { return nullptr; };
     virtual CHelmet* GetHelmet() const { return nullptr; };
-    virtual CVest* GetVest() const { return nullptr; };
-    virtual CWarbelt* GetWarbelt() const { return nullptr; };
 
     virtual void HitItemsInRuck(SHit* pHDS){};
 
@@ -198,7 +194,6 @@ public:
     virtual void OnItemBelt(CInventoryItem* inventory_item, EItemPlace previous_place);
     virtual void OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_place);
     virtual void OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place);
-    virtual void OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place);
 
     virtual void OnItemDrop(CInventoryItem* inventory_item, EItemPlace previous_place);
 

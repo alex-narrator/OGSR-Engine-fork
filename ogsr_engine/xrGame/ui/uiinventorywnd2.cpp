@@ -68,7 +68,6 @@ void CUIInventoryWnd::InitInventory()
     //порядок вишиковування елементів драгдропу тепер встановлюємо тут
     //незалежно від XML-конфігу
     m_pUIBeltList->SetVerticalOrder(m_pInv->m_bBeltVertical);
-    m_pUIVestList->SetVerticalOrder(m_pInv->m_bVestVertical);
 
     int bag_scroll = m_pUIBagList->ScrollPos();
 
@@ -162,25 +161,11 @@ void CUIInventoryWnd::InitInventory()
         m_pUIHelmetList->SetItem(itm);
     }
 
-    _itm = m_pInv->m_slots[WARBELT_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIWarBeltList->SetItem(itm);
-    }
-
     _itm = m_pInv->m_slots[BACKPACK_SLOT].m_pIItem;
     if (_itm && show_item(_itm))
     {
         CUICellItem* itm = create_cell_item(_itm);
         m_pUIBackPackList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[VEST_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUITacticalVestList->SetItem(itm);
     }
 
     PIItem _outfit = m_pInv->m_slots[OUTFIT_SLOT].m_pIItem;
@@ -194,16 +179,6 @@ void CUIInventoryWnd::InitInventory()
         {
             CUICellItem* itm = create_cell_item(item);
             m_pUIBeltList->SetItem(itm);
-        }
-    }
-
-    std::sort(m_pInv->m_vest.begin(), m_pInv->m_vest.end(), InventoryUtilities::GreaterRoomInRuck);
-    for (const auto& item : m_pInv->m_vest)
-    {
-        if (show_item(item))
-        {
-            CUICellItem* itm = create_cell_item(item);
-            m_pUIVestList->SetItem(itm);
         }
     }
 
@@ -434,46 +409,6 @@ bool CUIInventoryWnd::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
     return false;
 }
 
-bool CUIInventoryWnd::ToVest(CUICellItem* itm, bool b_use_cursor_pos)
-{
-    PIItem iitem = (PIItem)itm->m_pData;
-
-    if (GetInventory()->CanPutInVest(iitem))
-    {
-        CUIDragDropListEx* old_owner = itm->OwnerList();
-        CUIDragDropListEx* new_owner = NULL;
-        if (b_use_cursor_pos)
-        {
-            new_owner = CUIDragDropListEx::m_drag_item->BackList();
-            VERIFY(new_owner == m_pUIVestList);
-        }
-        else
-            new_owner = m_pUIVestList;
-#ifdef DEBUG
-        bool result =
-#endif
-        GetInventory()->Vest(iitem);
-        PlaySnd(eInvItemToVest);
-        m_b_need_update_stats = true;
-        VERIFY(result);
-        CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
-
-        //.	UIBeltList.RearrangeItems();
-        if (b_use_cursor_pos)
-            new_owner->SetItem(i, old_owner->GetDragItemPosition());
-        else
-            new_owner->SetItem(i);
-
-        TryReinitLists(iitem);
-        
-        if (old_owner == m_pUIMarkedList)
-            OnFromMarked(iitem);
-
-        return true;
-    }
-    return false;
-}
-
 bool CUIInventoryWnd::CanMoveToMarked(PIItem pItem)
 {
     bool can_move_to_marked_list = false;
@@ -551,9 +486,9 @@ bool CUIInventoryWnd::OnItemSelected(CUICellItem* itm)
 {
     SetCurrentItem(itm);
 
-    itm->ColorizeItems({m_pUIBagList, m_pUIBeltList, m_pUIVestList,
+    itm->ColorizeItems({m_pUIBagList, m_pUIBeltList,
                         //
-                        m_pUIOutfitList, m_pUIHelmetList, m_pUIWarBeltList, m_pUIBackPackList, m_pUITacticalVestList,
+                        m_pUIOutfitList, m_pUIHelmetList, m_pUIBackPackList,
                         //
                         m_pUIKnifeList, m_pUIFirstWeaponList, m_pUISecondWeaponList, m_pUIBinocularList,
                         //
@@ -636,9 +571,6 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
         ToBelt(itm, true);
     }
     break;
-    case iwVest: {
-        ToVest(itm, true);
-    }
     case iwMarked: {
         OnToMarked(itm, true);
     }
@@ -664,7 +596,6 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
     {
     case iwSlot:
     case iwBelt:
-    case iwVest:
     case iwMarked: {
         ToBag(itm, false);
     }
@@ -681,8 +612,6 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
             if (ToSlot(itm, false))
                 return true;
         }
-        if (ToVest(itm, false))
-            return true;
         if (ToBelt(itm, false))
             return true;
         if (OnToMarked(itm, false))
@@ -723,13 +652,10 @@ void CUIInventoryWnd::ClearAllLists()
 {
     m_pUIBagList->ClearAll(true);
     m_pUIBeltList->ClearAll(true);
-    m_pUIVestList->ClearAll(true);
     //
     m_pUIOutfitList->ClearAll(true);
     m_pUIHelmetList->ClearAll(true);
-    m_pUIWarBeltList->ClearAll(true);
     m_pUIBackPackList->ClearAll(true);
-    m_pUITacticalVestList->ClearAll(true);
     //
     m_pUIKnifeList->ClearAll(true);
     m_pUIFirstWeaponList->ClearAll(true);
@@ -765,24 +691,6 @@ void CUIInventoryWnd::ReinitBeltList()
     }
 }
 
-void CUIInventoryWnd::ReinitVestList()
-{
-    for (u32 i = 0; i < m_pUIVestList->ItemsCount(); ++i)
-    {
-        auto itm = m_pUIVestList->GetItemIdx(i);
-        PIItem iitem = (PIItem)itm->m_pData;
-        if (!m_pInv->InVest(iitem))
-            AddItemToBag(iitem);
-    }
-    m_pUIVestList->ClearAll(true);
-    std::sort(m_pInv->m_vest.begin(), m_pInv->m_vest.end(), InventoryUtilities::GreaterRoomInRuck);
-    for (const auto& item : m_pInv->m_vest)
-    {
-        CUICellItem* itm = create_cell_item(item);
-        m_pUIVestList->SetItem(itm);
-    }
-}
-
 void CUIInventoryWnd::ReinitMarkedList()
 {
     m_pUIMarkedList->ClearAll(true);
@@ -807,10 +715,8 @@ void CUIInventoryWnd::ReinitSlotList(u32 slot)
         {
             auto itm = slot_list->RemoveItem(slot_list->GetItemIdx(i), false);
             m_pUIBagList->SetItem(itm);
-            if (slot == WARBELT_SLOT)
+            if (slot == OUTFIT_SLOT)
                 ReinitBeltList();
-            if (slot == VEST_SLOT)
-                ReinitVestList();
         }
 
     slot_list->ClearAll(true);

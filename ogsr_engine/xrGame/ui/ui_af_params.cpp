@@ -11,8 +11,6 @@
 #include "Actor.h"
 #include "ActorCondition.h"
 
-#include "Vest.h"
-
 constexpr auto AF_PARAMS = "af_params.xml";
 
 CUIArtefactParams::CUIArtefactParams() { Memory.mem_fill(m_info_items, 0, sizeof(m_info_items)); }

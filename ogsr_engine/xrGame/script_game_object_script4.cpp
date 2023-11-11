@@ -199,5 +199,5 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
 void script_register_game_object4(lua_State* L) { module(L)[def("get_actor_obj", &Actor), def("get_level_id", &get_level_id),
               class_<enum_exporter<EItemPlace>>("item_place")
                   .enum_("item_place")[value("undefined", int(eItemPlaceUndefined)), value("slot", int(eItemPlaceSlot)), value("belt", int(eItemPlaceBelt)),
-                                       value("ruck", int(eItemPlaceRuck)), value("vest", int(eItemPlaceVest))]];
+                                       value("ruck", int(eItemPlaceRuck))]];
 }

@@ -24,8 +24,6 @@ class CActorCondition;
 class CCustomOutfit;
 class CInventoryContainer;
 class CHelmet;
-class CWarbelt;
-class CVest;
 class CTorch;
 class CCustomDetectorSHOC;
 class CCustomDetector;
@@ -205,7 +203,6 @@ public:
     virtual void OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_place);
     virtual void OnItemBelt(CInventoryItem* inventory_item, EItemPlace previous_place);
     virtual void OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place);
-    virtual void OnItemVest(CInventoryItem* inventory_item, EItemPlace previous_place);
 
     virtual void OnItemDrop(CInventoryItem* inventory_item, EItemPlace previous_place);
     virtual void OnItemDropUpdate();
@@ -664,10 +661,8 @@ protected:
 public:
     void SetWeaponHideState(u32 State, bool bSet, bool now = false);
     virtual CCustomOutfit* GetOutfit() const;
-    virtual CWarbelt* GetWarbelt() const;
     virtual CInventoryContainer* GetBackpack() const;
     virtual CHelmet* GetHelmet() const;
-    virtual CVest* GetVest() const;
     virtual CTorch* GetTorch() const;
 
     virtual CCustomDetectorSHOC* GetDetectorSHOC() const;

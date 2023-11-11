@@ -61,7 +61,6 @@ protected:
         eInvSndClose,
         eInvItemToSlot,
         eInvItemToBelt,
-        eInvItemToVest,
         eInvItemToRuck,
         eInvProperties,
         eInvDropItem,
@@ -75,13 +74,10 @@ protected:
 
     CUIDragDropListEx* m_pUIBagList{};
     CUIDragDropListEx* m_pUIBeltList{};
-    CUIDragDropListEx* m_pUIVestList{};
 
     CUIOutfitDragDropList* m_pUIOutfitList{};
     CUIDragDropListEx* m_pUIHelmetList{};
-    CUIDragDropListEx* m_pUIWarBeltList{};
     CUIDragDropListEx* m_pUIBackPackList{};
-    CUIDragDropListEx* m_pUITacticalVestList{};
 
     CUIDragDropListEx* m_pUIKnifeList{};
     CUIDragDropListEx* m_pUIFirstWeaponList{};
@@ -138,7 +134,6 @@ protected:
     bool ToSlot(CUICellItem* itm, bool force_place);
     bool ToBag(CUICellItem* itm, bool b_use_cursor_pos);
     bool ToBelt(CUICellItem* itm, bool b_use_cursor_pos);
-    bool ToVest(CUICellItem* itm, bool b_use_cursor_pos);
 
     bool CanMoveToMarked(PIItem itm);
     bool OnToMarked(CUICellItem* itm, bool b_use_cursor_pos);
@@ -158,7 +153,6 @@ public:
     // обновление отрисовки сетки пояса
     void UpdateCustomDraw();
     void ReinitBeltList();
-    void ReinitVestList();
     void ReinitMarkedList();
     void ReinitSlotList(u32);
     void TryReinitLists(PIItem);

@@ -109,8 +109,6 @@
 #include "ExoOutfit.h"
 
 #include "Helmet.h"
-#include "Warbelt.h"
-#include "Vest.h"
 
 #include "f1.h"
 #include "rgd5.h"
@@ -290,8 +288,6 @@ void CObjectFactory::register_classes()
     ADD(CExoOutfit, CSE_ALifeItemCustomOutfit, CLSID_EQUIPMENT_EXO, "equ_exo");
 
     // equipment
-    ADD(CWarbelt, CSE_ALifeItem, CLSID_WARBELT, "obj_warbelt");
-    ADD(CVest, CSE_ALifeItemVest, CLSID_VEST, "obj_vest");
     ADD(CHelmet, CSE_ALifeItem, CLSID_HELMET, "obj_helmet");
 
     // Grenades
