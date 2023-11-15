@@ -189,8 +189,8 @@ bool CSE_ALifeDynamicObject::redundant() const // { return (false); }
         return false;
     if (m_drop_time + m_stay_after_drop_time_interval > alife().time_manager().game_time())
         return false;
-    Msg("~~ %s TRUE! remove item [%s]|ID[%u]|m_drop_time [%u]|m_stay_after_drop_time_interval [%u]|current time [%u]", 
-        __FUNCTION__, name(), ID, m_drop_time, m_stay_after_drop_time_interval, alife().time_manager().game_time());
+    //Msg("~~ %s TRUE! remove item [%s]|ID[%u]|m_drop_time [%u]|m_stay_after_drop_time_interval [%u]|current time [%u]", 
+    //    __FUNCTION__, name(), ID, m_drop_time, m_stay_after_drop_time_interval, alife().time_manager().game_time());
     return true;
 }
 
