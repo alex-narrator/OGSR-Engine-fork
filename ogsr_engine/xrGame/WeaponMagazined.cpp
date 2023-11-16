@@ -242,7 +242,7 @@ void CWeaponMagazined::FireStart()
                 SwitchState(eFire);
         }
     }
-    else if (IsMisfire() && ParentIsActor())
+    else if (IsMisfire() && ParentIsActor() && !IsGrenadeMode())
     {
         Misfire();            
     }
@@ -1897,9 +1897,14 @@ void CWeaponMagazined::PlayAnimShutter()
 }
 void CWeaponMagazined::PlayAnimShutterMisfire()
 {
-    VERIFY(GetState() == eShutter);
-    AnimationExist("anm_shutter_misfire") ? PlayHUDMotion("anm_shutter_misfire", true, GetState()) : PlayHUDMotion({"anim_draw", "anm_show"}, true, GetState(), false);
-    PlaySound("sndShutterMisfire", get_LastFP());
+    VERIFY(GetState() == eShutter);  
+    if (AnimationExist("anm_shutter_misfire"))
+    {
+        PlayHUDMotion("anm_shutter_misfire", true, GetState());
+        PlaySound("sndShutterMisfire", get_LastFP());
+        return;
+    }
+    PlayAnimShutter();
 }
 
 void CWeaponMagazined::PlayAnimCheckMisfire()

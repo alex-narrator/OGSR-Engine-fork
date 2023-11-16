@@ -888,11 +888,19 @@ void CWeaponMagazinedWGrenade::PlayAnimShutterMisfire()
         inherited::PlayAnimShutterMisfire();
         return;
     }
-    else if (IsGrenadeMode())
-        AnimationExist("anm_shutter_misfire_g") ? PlayHUDMotion("anm_shutter_misfire_g", true, GetState()) : PlayHUDMotion({"anim_draw_g", "anm_show_g"}, true, GetState());
-    else
-        AnimationExist("anm_shutter_misfire_w_gl") ? PlayHUDMotion("anm_shutter_misfire_w_gl", true, GetState()) : PlayHUDMotion({"anim_draw_gl", "anm_show_w_gl"}, true, GetState());
-    PlaySound("sndShutterMisfire", get_LastFP());
+    else if (IsGrenadeMode() && AnimationExist("anm_shutter_misfire_g"))
+    {
+        PlayHUDMotion("anm_shutter_misfire_g", true, GetState());
+        PlaySound("sndShutterMisfire", get_LastFP());
+        return;
+    }
+    else if (!IsGrenadeMode() && AnimationExist("anm_shutter_misfire_w_gl"))
+    {
+        PlayHUDMotion("anm_shutter_misfire_w_gl", true, GetState());
+        PlaySound("sndShutterMisfire", get_LastFP());
+        return;
+    }
+    PlayAnimShutter();
 }
 
 void CWeaponMagazinedWGrenade::UnloadWeaponFull()

@@ -375,8 +375,13 @@ void CWeaponShotgun::PlayAnimShutter()
 void CWeaponShotgun::PlayAnimShutterMisfire()
 {
     VERIFY(GetState() == eShutter);
-    AnimationExist("anm_shutter_misfire") ? PlayHUDMotion("anm_shutter_misfire", true, GetState()) : PlayHUDMotion({"anm_shots"}, true, GetState());
-    PlaySound("sndShutterMisfire", get_LastFP());
+    if (AnimationExist("anm_shutter_misfire"))
+    {
+        PlayHUDMotion("anm_shutter_misfire", true, GetState());
+        PlaySound("sndShutterMisfire", get_LastFP());
+        return;
+    }
+    PlayAnimShutter();
 }
 
 bool CWeaponShotgun::HaveCartridgeInInventory(u8 cnt)
