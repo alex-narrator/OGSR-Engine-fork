@@ -34,7 +34,7 @@
 #include "AI/Monsters/BaseMonster/base_monster.h"
 #include "weaponmagazined.h"
 #include "ai/stalker/ai_stalker.h"
-#include "CustomDetector.h"
+#include "CustomDevice.h"
 #include "customoutfit.h"
 #include "WeaponMagazinedWGrenade.h"
 #include "InventoryContainer.h"
@@ -985,9 +985,9 @@ CScriptGameObject* CScriptGameObject::active_device() const
     auto result = g_player_hud->attached_item(1);
     if (result)
     {
-        auto item = smart_cast<CHudItem*>(result->m_parent_hud_item);
+        auto item = smart_cast<CCustomDevice*>(result->m_parent_hud_item);
         VERIFY(item);
-        return (item->GetHUDmode() ? item->object().lua_game_object() : nullptr);
+        return (item->GetHUDmode() ? item->lua_game_object() : nullptr);
     }
     return nullptr;
 }

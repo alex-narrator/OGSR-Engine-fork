@@ -98,8 +98,7 @@ void CCustomOutfit::OnMoveToSlot(EItemPlace prevPlace)
             else
                 g_player_hud->load_default();
 
-            if (m_bIsHelmetBuiltIn)
-                m_pCurrentInventory->DropSlotsToRuck(HELMET_SLOT);
+            m_pCurrentInventory->DropBeltToRuck();
         }
     }
 }

@@ -679,16 +679,9 @@ void CUIInventoryWnd::ReinitBeltList()
     {
         auto itm = m_pUIBeltList->GetItemIdx(i);
         PIItem iitem = (PIItem)itm->m_pData;
-        if (!m_pInv->InBelt(iitem))
-            AddItemToBag(iitem);
+        AddItemToBag(iitem);
     }
     m_pUIBeltList->ClearAll(true);
-    std::sort(m_pInv->m_belt.begin(), m_pInv->m_belt.end(), InventoryUtilities::GreaterRoomInRuck);
-    for (const auto& item : m_pInv->m_belt)
-    {
-        CUICellItem* itm = create_cell_item(item);
-        m_pUIBeltList->SetItem(itm);
-    }
 }
 
 void CUIInventoryWnd::ReinitMarkedList()
@@ -709,22 +702,13 @@ void CUIInventoryWnd::ReinitSlotList(u32 slot)
     auto slot_list = GetSlotList(slot);
     if (!slot_list)
         return;
-
-    if(!m_pInv->IsSlotAllowed(slot))
-        for (u32 i = 0; i < slot_list->ItemsCount(); ++i)
-        {
-            auto itm = slot_list->RemoveItem(slot_list->GetItemIdx(i), false);
-            m_pUIBagList->SetItem(itm);
-            if (slot == OUTFIT_SLOT)
-                ReinitBeltList();
-        }
-
-    slot_list->ClearAll(true);
-
-    PIItem _itm = m_pInv->m_slots[slot].m_pIItem;
-    if (_itm)
+    if (m_pInv->IsSlotAllowed(slot))
+        return;
+    for (u32 i = 0; i < slot_list->ItemsCount(); ++i)
     {
-        CUICellItem* itm = create_cell_item(_itm);
-        slot_list->SetItem(itm);
+        auto itm = slot_list->GetItemIdx(i);
+        PIItem iitem = (PIItem)itm->m_pData;
+        AddItemToBag(iitem);
     }
+    slot_list->ClearAll(true);
 }

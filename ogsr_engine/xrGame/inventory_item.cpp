@@ -664,8 +664,6 @@ void CInventoryItem::OnMoveToSlot(EItemPlace prevPlace)
         }
         for (const auto slot : m_slots_locked)
             pActor->inventory().DropSlotsToRuck(slot);
-        for (const auto slot : m_slots_unlocked)
-            pActor->inventory().DropSlotsToRuck(slot);
     }
 };
 
@@ -686,8 +684,6 @@ void CInventoryItem::OnMoveToBelt(EItemPlace prevPlace)
             m_highlight_equipped = true;
         }
         for (const auto slot : m_slots_locked)
-            pActor->inventory().DropSlotsToRuck(slot);
-        for (const auto slot : m_slots_unlocked)
             pActor->inventory().DropSlotsToRuck(slot);
     }
 };
@@ -710,8 +706,6 @@ void CInventoryItem::OnMoveToRuck(EItemPlace prevPlace)
         }
         if (prevPlace != eItemPlaceUndefined)
         {
-            for (const auto slot : m_slots_locked)
-                pActor->inventory().DropSlotsToRuck(slot);
             for (const auto slot : m_slots_unlocked)
                 pActor->inventory().DropSlotsToRuck(slot);
         }
