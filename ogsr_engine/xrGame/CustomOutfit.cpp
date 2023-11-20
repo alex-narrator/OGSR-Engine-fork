@@ -92,12 +92,10 @@ void CCustomOutfit::OnMoveToSlot(EItemPlace prevPlace)
             {
                 m_boneProtection->reload(pSettings->r_string(cNameSect(), "bones_koeff_protection"), smart_cast<IKinematics*>(pActor->Visual()));
             }
-
             if (pSettings->line_exist(cNameSect(), "player_hud_section"))
                 g_player_hud->load(pSettings->r_string(cNameSect(), "player_hud_section"));
             else
                 g_player_hud->load_default();
-
             m_pCurrentInventory->DropBeltToRuck();
         }
     }
@@ -120,8 +118,8 @@ void CCustomOutfit::OnMoveToRuck(EItemPlace prevPlace)
                     pActor->ChangeVisual(DefVisual);
                 }
             }
-
             g_player_hud->load_default();
+            m_pCurrentInventory->DropBeltToRuck();
         }
     }
 }
