@@ -876,6 +876,16 @@ void iterate_nearest(const Fvector& pos, float radius, luabind::functor<bool> fu
                 break;
 }
 
+float is_ray_intersect_sphere(Fvector pos, Fvector dir, Fvector C, float R)
+{
+    Fsphere sphere;
+    sphere.P = C;
+    sphere.R = R;
+    dir.normalize_safe();
+    float dist;
+    return sphere.intersect_full(pos, dir, dist) == Fsphere::rpNone ? -1.0f : dist;
+}
+
 #pragma optimize("s", on)
 void CLevel::script_register(lua_State* L)
 {
@@ -990,7 +1000,7 @@ void CLevel::script_register(lua_State* L)
             def("set_blender_mode_main", &set_blender_mode_main), def("get_blender_mode_main", &get_blender_mode_main), def("set_shader_params", &set_shader_params),
             def("get_shader_params", &get_shader_params),
             //--#SM+# End --
-            def("get_cursor_pos", &get_cursor_pos), def("iterate_nearest", &iterate_nearest)
+            def("get_cursor_pos", &get_cursor_pos), def("iterate_nearest", &iterate_nearest), def("is_ray_intersect_sphere", &is_ray_intersect_sphere)
     ],
 
         module(L, "actor_stats")[def("add_points", &add_actor_points), def("add_points_str", &add_actor_points_str), def("get_points", &get_actor_points),
