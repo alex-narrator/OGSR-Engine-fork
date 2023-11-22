@@ -49,7 +49,7 @@ void CExplosiveRocket::Contact(const Fvector& pos, const Fvector& normal)
     {
         if (m_pOwner)
         {
-            Msg("%s for %s Device.fTimeGlobal %u m_destroy_time %u", __FUNCTION__, cNameSect().c_str(), Device.dwTimeGlobal, m_destroy_time);
+            //Msg("%s for %s Device.fTimeGlobal %u m_destroy_time %u", __FUNCTION__, cNameSect().c_str(), Device.dwTimeGlobal, m_destroy_time);
             if (Device.dwTimeGlobal < m_destroy_time)
             {
                 safe_to_explode = false;
