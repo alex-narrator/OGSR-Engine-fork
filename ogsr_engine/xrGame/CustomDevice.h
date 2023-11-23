@@ -50,6 +50,7 @@ public:
     virtual bool CheckCompatibility(CHudItem* itm) override;
 
     virtual void OnMoveToRuck(EItemPlace prevPlace) override;
+    virtual void OnMoveToBelt(EItemPlace prevPlace) override;
 
     bool IsZoomed() const override;
     bool IsAiming() const;

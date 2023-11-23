@@ -357,6 +357,18 @@ void CCustomDevice::OnMoveToRuck(EItemPlace prevPlace)
     StopCurrentAnimWithoutCallback();
 }
 
+void CCustomDevice::OnMoveToBelt(EItemPlace prevPlace)
+{
+    inherited::OnMoveToBelt(prevPlace);
+    if (prevPlace == eItemPlaceSlot)
+    {
+        SwitchState(eHidden);
+        g_player_hud->detach_item(this);
+    }
+    //Switch(false);
+    StopCurrentAnimWithoutCallback();
+}
+
 Fvector CCustomDevice::GetPositionForCollision()
 {
     Fvector det_pos{}, det_dir{};
@@ -397,7 +409,7 @@ bool CCustomDevice::IsBlocked()
     auto actor = smart_cast<CActor*>(H_Parent());
     if (!actor)
         return false;
-    if (actor->inventory().m_bBlockDevice)
+    if (actor->inventory().m_bBlockDevice || !m_pCurrentInventory->InSlot(this))
         return true;
     return false;
 }
