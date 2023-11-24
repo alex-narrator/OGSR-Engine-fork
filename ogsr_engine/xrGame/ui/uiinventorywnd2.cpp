@@ -411,6 +411,8 @@ bool CUIInventoryWnd::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
 
 bool CUIInventoryWnd::CanMoveToMarked(PIItem pItem)
 {
+    if (!pItem || pItem->object().getDestroy() || pItem->GetDropManual())
+        return false;
     bool can_move_to_marked_list = false;
     if (pSettings->line_exist("engine_callbacks", "can_move_to_marked_list"))
     {

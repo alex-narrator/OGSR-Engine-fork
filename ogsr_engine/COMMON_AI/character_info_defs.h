@@ -15,7 +15,7 @@ typedef shared_str CHARACTER_CLASS;
 //до 100 (очень хороший, благородный)
 typedef int CHARACTER_REPUTATION_VALUE;
 #define NO_REPUTATION -type_max(CHARACTER_REPUTATION_VALUE)
-#define NEUTAL_REPUTATION 0
+constexpr auto NEUTRAL_REPUTATION = 0;
 
 //ранг персонажа - величина от 0 (совсем неопытный)
 //до >100 (очень опытный)
