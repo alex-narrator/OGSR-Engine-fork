@@ -254,13 +254,8 @@ CUIWindow* GetTalkWindow()
 }
 CScriptGameObject* GetSecondTalker()
 {
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return nullptr;
-    CUITalkWnd* wnd = pGameSP->TalkMenu;
-    if (wnd == nullptr)
-        return nullptr;
-    return smart_cast<CGameObject*>(wnd->GetSecondTalker())->lua_game_object();
+    auto talk_partner = Actor()->GetTalkPartner();
+    return talk_partner ? smart_cast<CGameObject*>(talk_partner)->lua_game_object() : nullptr;
 }
 CUIWindow* GetPdaWindow()
 {
