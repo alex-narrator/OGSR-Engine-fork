@@ -202,7 +202,8 @@ public:
             pickup_check_overlaped      = 1ull << 20,
             disable_dialog_break        = 1ull << 21,
             no_progress_bar_animation   = 1ull << 22,
-            limited_bolts               = 1ull << 23;
+            limited_bolts               = 1ull << 23,
+            unique_logs                 = 1ull << 24;
     };
 
     void _initialize(LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0);
