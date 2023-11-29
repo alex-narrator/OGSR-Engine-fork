@@ -1003,6 +1003,8 @@ void CLevel::script_register(lua_State* L)
               def("set_pda_params", [](const Fvector& p) { shader_exports.set_pda_params(p); }), def("update_inventory_window", &update_inventory_window),
 
            def("set_dof_params", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_dof_params(p1, p2, p3, p4); }),
+        def("set_pnv_color", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_pnv_color(p1, p2, p3, p4); }),// R|G|B|intensity
+        def("set_pnv_params", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_pnv_params(p1, p2, p3, p4); }), // noise|scanlines|vignette|flickering
 
               class_<enum_exporter<collide::rq_target>>("rq_target")
                   .enum_("rq_target")[value("rqtNone", int(collide::rqtNone)), value("rqtObject", int(collide::rqtObject)), value("rqtStatic", int(collide::rqtStatic)),

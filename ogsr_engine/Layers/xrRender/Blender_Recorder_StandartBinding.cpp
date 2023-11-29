@@ -433,6 +433,24 @@ static class cl_inv_v final : public R_constant_setup
     }
 } binder_inv_v;
 
+static class cl_pnv_color final : public R_constant_setup
+{
+    void setup(R_constant* C) override
+    {
+        const auto& P = shader_exports.get_pnv_color();
+        RCache.set_c(C, P.x, P.y, P.z, P.w);
+    }
+} binder_pnv_color;
+
+static class cl_pnv_params final : public R_constant_setup
+{
+    void setup(R_constant* C) override
+    {
+        const auto& P = shader_exports.get_pnv_params();
+        RCache.set_c(C, P.x, P.y, P.z, P.w);
+    }
+} binder_pnv_params;
+
 // Screen Space Shaders Stuff
 extern float ps_ssfx_wpn_dof_2;
 
@@ -544,6 +562,9 @@ void CBlender_Compile::SetMapping()
 
     r_Constant("ssfx_wpn_dof_1", &ssfx_wpn_dof_1);
     r_Constant("ssfx_wpn_dof_2", &ssfx_wpn_dof_2);
+
+    r_Constant("pnv_color", &binder_pnv_color);
+    r_Constant("pnv_params", &binder_pnv_params);
 
     // other common
     for (const auto& [name, s] : DEV->v_constant_setup)

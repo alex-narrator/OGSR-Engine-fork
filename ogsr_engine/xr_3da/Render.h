@@ -341,6 +341,8 @@ class ShExports final
     Ivector2 detector_params{};
     Fvector pda_params{}, actor_params{};
     Fvector4 dof_params{};
+    Fvector4 pnv_color{};
+    Fvector4 pnv_params{};
 
 public:
     void set_artefact_position(const u32& _i, const Fvector2& _pos) { artefacts_position[_i] = _pos; };
@@ -350,12 +352,18 @@ public:
     void set_actor_params(const Fvector& _pos) { actor_params = _pos; };
     void set_dof_params(float a, float b, float c, float d) { dof_params = {a, b, c, d}; };
 
+    void set_pnv_color(float a, float b, float c, float d) { pnv_color = {a, b, c, d}; };
+    void set_pnv_params(float a, float b, float c, float d) { pnv_params = {a, b, c, d}; };
+
     const Fvector2& get_artefact_position(const u32& _i) { return artefacts_position[_i]; }
     const Fvector2& get_anomaly_position(const u32& _i) { return anomalys_position[_i]; }
     const Ivector2& get_detector_params() const { return detector_params; }
     const Fvector& get_pda_params() const { return pda_params; }
     const Fvector& get_actor_params() const { return actor_params; }
     const Fvector4& get_dof_params() const { return dof_params; }
+
+    const Fvector4& get_pnv_color() const { return pnv_color; };
+    const Fvector4& get_pnv_params() const { return pnv_params; };
 };
 
 ENGINE_API extern ShExports shader_exports;
