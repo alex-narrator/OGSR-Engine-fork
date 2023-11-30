@@ -398,7 +398,7 @@ std::pair<float, float> CBulletManager::ObjectHit(SBullet* bullet, const Fvector
     old_speed = bullet->speed;
 
     //коэффициент уменьшение силы с падением скорости
-    float speed_factor = bullet->speed / bullet->max_speed;
+    float speed_factor = pow(bullet->speed / bullet->max_speed, 2);
     //получить силу хита выстрела с учетом патрона
     float power = bullet->hit_power * speed_factor;
 
