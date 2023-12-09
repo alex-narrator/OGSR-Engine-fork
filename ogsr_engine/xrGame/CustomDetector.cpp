@@ -98,6 +98,8 @@ void CCustomDetector::Switch(bool turn_on)
 
 void CCustomDetector::TryMakeArtefactVisible(CArtefact* artefact)
 {
+    if (artefact->H_Parent())
+        return;
     if (artefact->CanBeInvisible() && GetHUDmode() && (!CanSwitchModes() || IsAfMode()))
     {
         float dist = Position().distance_to(artefact->Position());
