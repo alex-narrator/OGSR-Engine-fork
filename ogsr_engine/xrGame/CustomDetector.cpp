@@ -161,11 +161,7 @@ void CCustomDetector::SwitchMode()
 {
     if (!CanSwitchModes())
         return;
-
     m_bAfMode = !m_bAfMode;
-
-    AnimationExist("anm_switch_mode") ? PlayHUDMotion("anm_switch_mode", true, GetState()) : PlayHUDMotion({"anm_show_fast"}, true, GetState(), false);
-    PlaySound("sndSwitch", Position());
 }
 
 BOOL CAfList::feel_touch_contact(CObject* O)

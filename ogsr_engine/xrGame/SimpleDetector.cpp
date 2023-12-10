@@ -85,10 +85,10 @@ void CSimpleDetector::UpdateZones()
         // current sound frequency
         zone_info.cur_period = item_type->freq.x + (item_type->freq.y - item_type->freq.x) * (fRelPow * fRelPow);
 
-        float min_snd_freq = 0.9f;
-        float max_snd_freq = 1.4f;
+        //float min_snd_freq = 0.9f;
+        //float max_snd_freq = 1.4f;
 
-        float snd_freq = min_snd_freq + (max_snd_freq - min_snd_freq) * (1.0f - fRelPow);
+        //float snd_freq = min_snd_freq + (max_snd_freq - min_snd_freq) * (1.0f - fRelPow);
 
         if (zone_info.snd_time > zone_info.cur_period)
         {
@@ -96,8 +96,8 @@ void CSimpleDetector::UpdateZones()
             PlaySound(item_type->detect_snds, Position());
             if (!CanSwitchModes() || !IsAfMode())
                 ui().Flash(true, fRelPow);
-            if (!item_type->detect_snds.sounds.empty() && item_type->detect_snds.m_activeSnd)
-                item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
+            //if (!item_type->detect_snds.sounds.empty() && item_type->detect_snds.m_activeSnd)
+            //    item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
         }
         else
             zone_info.snd_time += Device.fTimeDelta;
