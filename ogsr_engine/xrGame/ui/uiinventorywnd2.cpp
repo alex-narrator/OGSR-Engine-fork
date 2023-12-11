@@ -182,28 +182,29 @@ void CUIInventoryWnd::InitInventory()
         }
     }
 
-    std::sort(m_pInv->m_ruck.begin(), m_pInv->m_ruck.end(), InventoryUtilities::GreaterRoomInRuck);
-    TIItemContainer marked_items{};
+    TIItemContainer marked_items{}, ruck_items{};
     for (const auto& item : m_pInv->m_ruck)
-    {
-        if (show_item(item))
-        {
-            if (!item->GetMarked() || !pSettings->line_exist("engine_callbacks", "can_move_to_marked_list"))
-            {
-                CUICellItem* itm = create_cell_item(item);
-                m_pUIBagList->SetItem(itm);
-            }
-            else
-                marked_items.push_back(item);
-        }
-    }    
+        item->GetMarked() ? marked_items.push_back(item) : ruck_items.push_back(item);
+
+    u32 start_row = 0;
     std::sort(marked_items.begin(), marked_items.end(), InventoryUtilities::GreaterRoomInRuck);
     for (const auto& item : marked_items)
     {
         if (show_item(item))
         {
             CUICellItem* itm = create_cell_item(item);
-            m_pUIMarkedList->SetItem(itm);
+            m_pUIBagList->SetItem(itm);
+            if (itm->GetGridSize().y > start_row)
+                start_row = itm->GetGridSize().y;
+        }
+    }
+    std::sort(ruck_items.begin(), ruck_items.end(), InventoryUtilities::GreaterRoomInRuck);
+    for (const auto& item : ruck_items)
+    {
+        if (show_item(item))
+        {
+            CUICellItem* itm = create_cell_item(item);
+            m_pUIBagList->SetItem(itm, start_row);
         }
     }
 
@@ -341,31 +342,6 @@ bool CUIInventoryWnd::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
 
         return true;
     }
-    else if (iitem->GetMarked() && itm->OwnerList() == m_pUIMarkedList)
-    {
-        CUIDragDropListEx* old_owner = itm->OwnerList();
-        CUIDragDropListEx* new_owner = NULL;
-        if (b_use_cursor_pos)
-        {
-            new_owner = CUIDragDropListEx::m_drag_item->BackList();
-            VERIFY(new_owner == m_pUIBagList);
-        }
-        else
-            new_owner = m_pUIBagList;
-
-        m_b_need_update_stats = true;
-        VERIFY(result);
-        CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
-
-        if (b_use_cursor_pos)
-            new_owner->SetItem(i, old_owner->GetDragItemPosition());
-        else
-            new_owner->SetItem(i);
-
-        OnFromMarked(iitem);
-
-        return true;
-    }
     return false;
 }
 
@@ -400,77 +376,10 @@ bool CUIInventoryWnd::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
             new_owner->SetItem(i);
 
         TryReinitLists(iitem);
-        
-        if (old_owner == m_pUIMarkedList)
-            OnFromMarked(iitem);
 
         return true;
     }
     return false;
-}
-
-bool CUIInventoryWnd::CanMoveToMarked(PIItem pItem)
-{
-    if (!pItem || pItem->object().getDestroy() || pItem->GetDropManual())
-        return false;
-    bool can_move_to_marked_list = false;
-    if (pSettings->line_exist("engine_callbacks", "can_move_to_marked_list"))
-    {
-        const char* callback = pSettings->r_string("engine_callbacks", "can_move_to_marked_list");
-        if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
-            can_move_to_marked_list = lua_function(pItem->object().lua_game_object());
-    }
-    return can_move_to_marked_list;
-}
-
-bool CUIInventoryWnd::OnToMarked(CUICellItem* itm, bool b_use_cursor_pos)
-{
-    PIItem iitem = (PIItem)itm->m_pData;
-
-    if (CanMoveToMarked(iitem))
-    {
-        if (pSettings->line_exist("engine_callbacks", "on_move_to_marked_list"))
-        {
-            const char* callback = pSettings->r_string("engine_callbacks", "on_move_to_marked_list");
-            if (luabind::functor<void> lua_function; ai().script_engine().functor(callback, lua_function))
-                lua_function(iitem->object().lua_game_object());
-        }
-
-        CUIDragDropListEx* old_owner = itm->OwnerList();
-        CUIDragDropListEx* new_owner = NULL;
-        if (b_use_cursor_pos)
-        {
-            new_owner = CUIDragDropListEx::m_drag_item->BackList();
-            VERIFY(new_owner == m_pUIMarkedList);
-        }
-        else
-            new_owner = m_pUIMarkedList;
-
-#ifdef DEBUG
-        bool result =
-#endif
-        m_b_need_update_stats = true;
-        VERIFY(result);
-        CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
-
-        if (b_use_cursor_pos)
-            new_owner->SetItem(i, old_owner->GetDragItemPosition());
-        else
-            new_owner->SetItem(i);
-
-        return true;
-    }
-    return false;
-}
-
-void CUIInventoryWnd::OnFromMarked(PIItem pItem)
-{
-    if (pSettings->line_exist("engine_callbacks", "on_move_from_marked_list"))
-    {
-        const char* callback = pSettings->r_string("engine_callbacks", "on_move_from_marked_list");
-        if (luabind::functor<void> lua_function; ai().script_engine().functor(callback, lua_function))
-            lua_function(pItem->object().lua_game_object());
-    }
 }
 
 void CUIInventoryWnd::AddItemToBag(PIItem pItem)
@@ -496,9 +405,7 @@ bool CUIInventoryWnd::OnItemSelected(CUICellItem* itm)
                         //
                         m_pUIGrenadeList, m_pUIArtefactList, m_pUIBoltList,
                         //
-                        m_pUIDetectorList, m_pUIOnHeadList, m_pUIPdaList,
-                        //
-                        m_pUIMarkedList});
+                        m_pUIDetectorList, m_pUIOnHeadList, m_pUIPdaList});
     return false;
 }
 
@@ -519,9 +426,6 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
     {
     case iwSlot: {
         auto item = CurrentIItem();
-        ////спробуємо тут атач адонів, заряджання набоїв та тому подібне
-        //if (DropItem(CurrentIItem(), new_owner))
-        //    return true;
 
         bool can_put = false;
         Ivector2 max_size = new_owner->CellSize();
@@ -573,13 +477,7 @@ bool CUIInventoryWnd::OnItemDrop(CUICellItem* itm)
         ToBelt(itm, true);
     }
     break;
-    case iwMarked: {
-        OnToMarked(itm, true);
-    }
-    break;
     };
-
-    //DropItem(CurrentIItem(), new_owner);
 
     return true;
 }
@@ -597,8 +495,7 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
     switch (t_old)
     {
     case iwSlot:
-    case iwBelt:
-    case iwMarked: {
+    case iwBelt: {
         ToBag(itm, false);
     }
     break;
@@ -615,8 +512,6 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
                 return true;
         }
         if (ToBelt(itm, false))
-            return true;
-        if (OnToMarked(itm, false))
             return true;
 
         for (const auto& slot : slots)
@@ -671,8 +566,6 @@ void CUIInventoryWnd::ClearAllLists()
     m_pUIDetectorList->ClearAll(true);
     m_pUIOnHeadList->ClearAll(true);
     m_pUIPdaList->ClearAll(true);
-    //
-    m_pUIMarkedList->ClearAll(true);
 }
 
 void CUIInventoryWnd::ReinitBeltList()
@@ -684,19 +577,6 @@ void CUIInventoryWnd::ReinitBeltList()
         AddItemToBag(iitem);
     }
     m_pUIBeltList->ClearAll(true);
-}
-
-void CUIInventoryWnd::ReinitMarkedList()
-{
-    m_pUIMarkedList->ClearAll(true);
-    for (const auto& item : m_pInv->m_all)
-    {
-        if (item->GetMarked())
-        {
-            CUICellItem* itm = create_cell_item(item);
-            m_pUIMarkedList->SetItem(itm);
-        }
-    }
 }
 
 void CUIInventoryWnd::ReinitSlotList(u32 slot)

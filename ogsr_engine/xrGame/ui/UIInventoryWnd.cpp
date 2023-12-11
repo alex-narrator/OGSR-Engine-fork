@@ -154,12 +154,6 @@ void CUIInventoryWnd::Init()
     xml_init.InitDragDropListEx(uiXml, "dragdrop_pda", 0, m_pUIPdaList);
     BindDragDropListEvents(m_pUIPdaList);
 
-    m_pUIMarkedList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIMarkedList);
-    m_pUIMarkedList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_marked", 0, m_pUIMarkedList);
-    BindDragDropListEvents(m_pUIMarkedList);
-
     for (u8 i = 0; i < SLOTS_TOTAL; i++)
         m_slots_array[i] = NULL;
     m_slots_array[OUTFIT_SLOT] = m_pUIOutfitList;
@@ -207,8 +201,6 @@ EListType CUIInventoryWnd::GetType(CUIDragDropListEx* l)
         return iwBag;
     if (l == m_pUIBeltList)
         return iwBelt;
-    if (l == m_pUIMarkedList)
-        return iwMarked;
 
     for (u8 i = 0; i < SLOTS_TOTAL; i++)
         if (m_slots_array[i] == l)
@@ -264,7 +256,7 @@ void CUIInventoryWnd::Draw() { CUIWindow::Draw(); }
 
 void CUIInventoryWnd::Update()
 {
-    if (m_b_need_reinit/* || m_pInv->StateInvalid()*/)
+    if (m_b_need_reinit || m_pInv->StateInvalid())
         InitInventory();
 
     if (smart_cast<CEntityAlive*>(Level().CurrentEntity()))
@@ -316,7 +308,6 @@ void CUIInventoryWnd::Hide()
 void CUIInventoryWnd::HideSlotsHighlight()
 {
     m_pUIBeltList->enable_highlight(false);
-    m_pUIMarkedList->enable_highlight(false);
     for (const auto& DdList : m_slots_array)
         if (DdList)
             DdList->enable_highlight(false);
@@ -326,9 +317,6 @@ void CUIInventoryWnd::ShowSlotsHighlight(PIItem InvItem)
 {
     if (m_pInv->CanPutInBelt(InvItem))
         m_pUIBeltList->enable_highlight(true);
-
-    if (CanMoveToMarked(InvItem))
-        m_pUIMarkedList->enable_highlight(true);
 
     for (const u8 slot : InvItem->GetSlots())
         if (auto DdList = m_slots_array[slot]; DdList && m_pInv->CanPutInSlot(InvItem, slot))
@@ -475,7 +463,6 @@ void CUIInventoryWnd::TryReinitLists(PIItem iitem)
         ReinitBeltList();
         update_custom_draw = true;
     }
-    ReinitMarkedList();
     if (update_custom_draw)
         UpdateCustomDraw();
 }

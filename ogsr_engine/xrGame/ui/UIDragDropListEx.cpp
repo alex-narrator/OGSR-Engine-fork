@@ -410,14 +410,14 @@ void CUIDragDropListEx::SetScrollPos(int _pos)
     m_vScrollBar->Refresh();
 }
 
-void CUIDragDropListEx::SetItem(CUICellItem* itm) // auto
+void CUIDragDropListEx::SetItem(CUICellItem* itm, u32 start_row) // auto
 {
     if (m_container->AddSimilar(itm))
     {
         return;
     }
 
-    Ivector2 dest_cell_pos = m_container->FindFreeCell(itm->GetGridSize());
+    Ivector2 dest_cell_pos = m_container->FindFreeCell(itm->GetGridSize(), start_row);
 
     SetItem(itm, dest_cell_pos);
 }
@@ -635,7 +635,7 @@ CUICellItem* CUICellContainer::RemoveItem(CUICellItem* itm, bool force_root)
     return itm;
 }
 
-Ivector2 CUICellContainer::FindFreeCell(const Ivector2& _size)
+Ivector2 CUICellContainer::FindFreeCell(const Ivector2& _size, u32 start_row)
 {
     Ivector2 tmp{};
     Ivector2 size = _size;
@@ -644,14 +644,14 @@ Ivector2 CUICellContainer::FindFreeCell(const Ivector2& _size)
 
 	if (m_pParentDragDropList->GetVerticalOrder())
     {
-        for (tmp.x = 0; tmp.x <= m_cellsCapacity.x - size.x; ++tmp.x)
+        for (tmp.x = start_row; tmp.x <= m_cellsCapacity.x - size.x; ++tmp.x)
             for (tmp.y = 0; tmp.y <= m_cellsCapacity.y - size.y; ++tmp.y)
                 if (IsRoomFree(tmp, _size))
                     return tmp;
     }
     else
     {
-        for (tmp.y = 0; tmp.y <= m_cellsCapacity.y - size.y; ++tmp.y)
+        for (tmp.y = start_row; tmp.y <= m_cellsCapacity.y - size.y; ++tmp.y)
             for (tmp.x = 0; tmp.x <= m_cellsCapacity.x - size.x; ++tmp.x)
                 if (IsRoomFree(tmp, _size))
                     return tmp;
