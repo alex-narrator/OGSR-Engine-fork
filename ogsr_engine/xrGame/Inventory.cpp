@@ -587,7 +587,7 @@ void CInventory::UpdateDropItem(PIItem pIItem)
 PIItem CInventory::Same(const PIItem pIItem) const
 {
     for (const auto& item : m_all)
-        if ((item != pIItem) && !xr_strcmp(item->object().cNameSect(), pIItem->object().cNameSect()) && CountAsMarked(item))
+        if ((item != pIItem) && !xr_strcmp(item->object().cNameSect(), pIItem->object().cNameSect()))
             return item;
     return nullptr;
 }
@@ -596,7 +596,7 @@ PIItem CInventory::Same(const PIItem pIItem) const
 PIItem CInventory::SameGrenade(PIItem pIItem) const
 {
     for (const auto& _item : m_ruck)
-        if (_item != pIItem && smart_cast<CGrenade*>(_item) && CountAsMarked(_item))
+        if (_item != pIItem && smart_cast<CGrenade*>(_item))
             return _item;
     return nullptr;
 }
@@ -1004,7 +1004,7 @@ void CInventory::Iterate(bool bSearchRuck, std::function<bool(const PIItem)> cal
 void CInventory::IterateAmmo(std::function<bool(const PIItem)> callback) const
 {
     for (const auto& item : m_all)
-        if (smart_cast<CWeaponAmmo*>(item) && CountAsMarked(item) && callback(item))
+        if (smart_cast<CWeaponAmmo*>(item) && callback(item))
             return;
 }
 
@@ -1133,12 +1133,12 @@ PIItem CInventory::GetSameEatable(const PIItem pIItem, bool bSearchRuck) const
     return item;
 }
 
-u32 CInventory::GetSameItemCount(LPCSTR caSection, bool marked_only)
+u32 CInventory::GetSameItemCount(LPCSTR caSection)
 {
     u32 l_dwCount{};
     for (const auto& item : m_all)
     {
-        if (item && item->Useful() && !xr_strcmp(item->object().cNameSect(), caSection) && (!marked_only || item->GetMarked()))
+        if (item && item->Useful() && !xr_strcmp(item->object().cNameSect(), caSection))
             ++l_dwCount;
     }
     return l_dwCount;
@@ -1241,8 +1241,6 @@ bool CInventory::HasLockForSlot(u32 check_slot) const
 }
 
 TIItemContainer CInventory::GetActiveArtefactPlace() const { return Core.Features.test(xrCore::Feature::artefacts_from_all) ? m_all : m_belt; }
-
-bool CInventory::CountAsMarked(PIItem item) const { return !OwnerIsActor() || HUD().GetUI()->MainInputReceiver() || item->GetMarked(); }
 
 void CInventory::RepackAmmo()
 {

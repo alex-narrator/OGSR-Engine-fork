@@ -251,7 +251,7 @@ bool CGrenade::Action(s32 cmd, u32 flags)
                     for (const auto& item : inv->m_all)
                     {
                         auto pGrenade = smart_cast<CGrenade*>(item);
-                        if (pGrenade && inv->CountAsMarked(item) && (tmp.find(pGrenade->cNameSect()) == tmp.end()))
+                        if (pGrenade && (tmp.find(pGrenade->cNameSect()) == tmp.end()))
                             tmp.insert(mk_pair(pGrenade->cNameSect(), pGrenade));
                     }
                     xr_map<shared_str, CGrenade*>::iterator curr_it = tmp.find(cNameSect());

@@ -99,7 +99,7 @@ void CUIBeltPanel::Draw()
 
         m_st.SetWndPos(pos.x, pos.y);
 
-        auto count = inv.GetSameItemCount(_itm->object().cNameSect().c_str(), false);
+        auto count = inv.GetSameItemCount(_itm->object().cNameSect().c_str());
         if (count > 1)
         {
             float pos_x = m_counter_offset.x + (m_bVertical ? (pos.x + size.x) : pos.x);
@@ -180,7 +180,7 @@ void CUISlotPanel::Draw()
         m_st.SetWndPos(pos.x, pos.y);
 
         bool for_grenade = smart_cast<CGrenade*>(_itm);
-        auto count = inv.GetSameItemCount(_itm->object().cNameSect().c_str(), for_grenade);
+        auto count = inv.GetSameItemCount(_itm->object().cNameSect().c_str());
         if (count > (u8)!for_grenade)
         {
             float pos_x = m_counter_offset.x + (m_bVertical ? (pos.x + size.x) : pos.x);
