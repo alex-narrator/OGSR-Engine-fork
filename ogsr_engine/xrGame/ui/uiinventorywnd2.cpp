@@ -186,7 +186,7 @@ void CUIInventoryWnd::InitInventory()
     for (const auto& item : m_pInv->m_ruck)
         item->GetMarked() ? marked_items.push_back(item) : ruck_items.push_back(item);
 
-    u32 start_row = 0;
+    int start_row = 0;
     std::sort(marked_items.begin(), marked_items.end(), InventoryUtilities::GreaterRoomInRuck);
     for (const auto& item : marked_items)
     {
@@ -486,9 +486,6 @@ bool CUIInventoryWnd::OnItemDbClick(CUICellItem* itm)
 {
     auto __item = (PIItem)itm->m_pData;
     auto old_owner = itm->OwnerList();
-
-    if (TryUseItem(__item))
-        return true;
 
     auto t_old = GetType(old_owner);
 

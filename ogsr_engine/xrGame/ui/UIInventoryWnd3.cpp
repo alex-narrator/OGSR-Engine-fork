@@ -331,18 +331,3 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
         }
     }
 }
-
-bool CUIInventoryWnd::TryUseItem(PIItem itm)
-{
-    if (!itm)
-        return false;
-
-    if (pSettings->line_exist("engine_callbacks", "ui_inventory_try_use_item"))
-    {
-        const char* callback = pSettings->r_string("engine_callbacks", "ui_inventory_try_use_item");
-        if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
-            return lua_function(itm->object().lua_game_object());
-    }
-
-    return false;
-}

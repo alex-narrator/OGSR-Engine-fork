@@ -118,8 +118,6 @@ public:
     CUICellItem* m_pCurrentCellItem;
 
 protected:
-    bool TryUseItem(PIItem itm);
-
     void ProcessPropertiesBoxClicked();
     void ActivatePropertiesBox();
 
