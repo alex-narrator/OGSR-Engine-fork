@@ -56,7 +56,7 @@ protected:
 public:
     CUIStatic* GetPDAOnline() { return &UIPdaOnline; };
     CUIZoneMap* GetUIZoneMap() { return UIZoneMap; }
-    bool m_bShowZoneMap{}, m_bShowActiveItemInfo{}, m_bShowGearInfo{};
+    bool m_bShowZoneMap{};
 
 protected:
     // 5 статиков для отображения иконок:

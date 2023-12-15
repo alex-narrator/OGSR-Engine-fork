@@ -723,8 +723,6 @@ void CUIMainIngameWnd::script_register(lua_State* L)
         class_<CUIMainIngameWnd, CUIWindow>("CUIMainIngameWnd")
             .def("GetStatic", &GetStaticRaw, raw<2>())
             .def_readwrite("show_zone_map", &CUIMainIngameWnd::m_bShowZoneMap)
-            .def_readwrite("show_active_item_info", &CUIMainIngameWnd::m_bShowActiveItemInfo)
-            .def_readwrite("show_gear_info", &CUIMainIngameWnd::m_bShowGearInfo)
         ,
         def("get_main_window", &GetMainIngameWindow) // get_mainingame_window better??
         ,
