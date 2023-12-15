@@ -35,7 +35,6 @@
 
 #include "../string_table.h"
 #include "clsid_game.h"
-//#include "UIPanels.h"
 #include "UIMap.h"
 
 #ifdef DEBUG
@@ -103,9 +102,6 @@ CUIMainIngameWnd::CUIMainIngameWnd()
     m_pActor = nullptr;
     UIZoneMap = xr_new<CUIZoneMap>();
     m_pPickUpItem = nullptr;
-    //m_beltPanel = xr_new<CUIBeltPanel>();
-    //m_slotPanel = xr_new<CUISlotPanel>();
-    //m_boosterPanel = xr_new<CUIBoosterPanel>();
 
     warn_icon_list[ewiWeaponJammed] = &UIWeaponJammedIcon;
     warn_icon_list[ewiArmor] = &UIArmorIcon;
@@ -125,9 +121,6 @@ CUIMainIngameWnd::~CUIMainIngameWnd()
 {
     DestroyFlashingIcons();
     xr_delete(UIZoneMap);
-    //xr_delete(m_beltPanel);
-    //xr_delete(m_slotPanel);
-    //xr_delete(m_boosterPanel);
     HUD_SOUND::DestroySound(m_contactSnd);
     xr_delete(g_MissileForceShape);
 }
@@ -142,23 +135,10 @@ void CUIMainIngameWnd::Init()
 
     Enable(false);
 
-    //AttachChild(&UIWeaponBack);
-    //xml_init.InitStatic(uiXml, "static_weapon", 0, &UIWeaponBack);
-
-    //UIWeaponBack.AttachChild(&UIWeaponSignAmmo);
-    //xml_init.InitStatic(uiXml, "static_ammo", 0, &UIWeaponSignAmmo);
-    //UIWeaponSignAmmo.SetElipsis(CUIStatic::eepEnd, 2);
-    //ammo_icon_scale = uiXml.ReadAttribFlt("static_ammo", 0, "icon_scale", 1.f);
-
-    //UIWeaponBack.AttachChild(&UIWeaponIcon);
-    //xml_init.InitStatic(uiXml, "static_wpn_icon", 0, &UIWeaponIcon);
-    //UIWeaponIcon.SetShader(GetEquipmentIconsShader());
-    //UIWeaponIcon_rect = UIWeaponIcon.GetWndRect();
     //---------------------------------------------------------
     AttachChild(&UIPickUpItemIcon);
     xml_init.InitStatic(uiXml, "pick_up_item", 0, &UIPickUpItemIcon);
     UIPickUpItemIcon.SetShader(GetEquipmentIconsShader());
-    //	UIPickUpItemIcon.ClipperOn	();
     UIPickUpItemIcon.Show(false);
 
     m_iPickUpItemIconWidth = UIPickUpItemIcon.GetWidth();
@@ -167,7 +147,6 @@ void CUIMainIngameWnd::Init()
     m_iPickUpItemIconY = UIPickUpItemIcon.GetWndRect().top;
     //---------------------------------------------------------
 
-    //UIWeaponIcon.Enable(false);
 
     // индикаторы
     UIZoneMap->Init();
@@ -255,15 +234,6 @@ void CUIMainIngameWnd::Init()
     AttachChild(&UIMotionIcon);
     UIMotionIcon.Init();
 
-    //m_beltPanel->InitFromXML(uiXml, "belt_panel", 0);
-    //AttachChild(m_beltPanel);
-
-    //m_slotPanel->InitFromXML(uiXml, "slot_panel", 0);
-    //AttachChild(m_slotPanel);
-
-    //m_boosterPanel->InitFromXML(uiXml, "booster_panel", 0);
-    //AttachChild(m_boosterPanel);
-
     HUD_SOUND::LoadSound("maingame_ui", "snd_new_contact", m_contactSnd, SOUND_TYPE_IDLE);
 }
 
@@ -279,40 +249,6 @@ void CUIMainIngameWnd::Draw()
 
     RenderQuickInfos();
 }
-
-//void CUIMainIngameWnd::SetAmmoIcon(const shared_str& sect_name)
-//{
-//    if (!sect_name.size())
-//    {
-//        UIWeaponIcon.Show(false);
-//        return;
-//    };
-//
-//    UIWeaponIcon.Show(true);
-//    // properties used by inventory menu
-//    CIconParams icon_params(sect_name);
-//
-//    icon_params.set_shader(&UIWeaponIcon);
-//
-//    float iGridWidth = icon_params.grid_width;
-//    float iGridHeight = icon_params.grid_height;
-//
-//    float w = std::clamp(iGridWidth, 1.f, 2.f) * INV_GRID_WIDTH;
-//    float h = iGridHeight * INV_GRID_HEIGHT;
-//    w *= UI()->get_current_kx();
-//
-//    float x = UIWeaponIcon_rect.x1;
-//    if (iGridWidth < 2.f)
-//        x += w / 2.0f;
-//
-//    UIWeaponIcon.SetWndPos(x, UIWeaponIcon_rect.y1);
-//
-//    w *= ammo_icon_scale;
-//    h *= ammo_icon_scale;
-//
-//    UIWeaponIcon.SetWidth(w);
-//    UIWeaponIcon.SetHeight(h);
-//};
 
 void CUIMainIngameWnd::Update()
 {
@@ -358,8 +294,6 @@ void CUIMainIngameWnd::Update()
             //else
             //    TurnOffWarningIcon(ewiOverweight);
         }
-
-        //UpdateActiveItemInfo();
 
         auto cond = &m_pActor->conditions();
 
@@ -445,9 +379,6 @@ void CUIMainIngameWnd::Update()
     UIZoneMap->SetHeading(-h);
 
     UpdatePickUpItem();
-
-    //m_beltPanel->Show(m_bShowGearInfo); // панель поясу та розгрузки
-    //m_slotPanel->Show(m_bShowGearInfo); // панель слотів
 
     UpdateFlashingIcons(); // обновляем состояние мигающих иконок
 
@@ -715,28 +646,6 @@ void CUIMainIngameWnd::UpdatePickUpItem()
 
     UIPickUpItemIcon.Show(true);
 };
-
-//void CUIMainIngameWnd::UpdateActiveItemInfo()
-//{
-//    PIItem item = m_pActor->inventory().ActiveItem();
-//    bool show_info = item && item->NeedBriefInfo() && (m_bShowActiveItemInfo || m_bShowGearInfo);
-//
-//    UIWeaponBack.Show(show_info);
-//    UIWeaponSignAmmo.Show(show_info);
-//
-//    if (show_info)
-//    {
-//        xr_string str_name;
-//        xr_string icon_sect_name;
-//        xr_string str_count;
-//
-//        item->GetBriefInfo(str_name, icon_sect_name, str_count);
-//
-//        UIWeaponBack.SetText(str_name.c_str());
-//        UIWeaponSignAmmo.SetText(str_count.c_str());
-//        SetAmmoIcon(icon_sect_name.c_str());
-//    }
-//}
 
 void CUIMainIngameWnd::OnConnected() { UIZoneMap->SetupCurrentMap(); }
 

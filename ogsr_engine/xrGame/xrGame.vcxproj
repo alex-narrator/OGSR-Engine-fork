@@ -474,7 +474,6 @@
     <ClInclude Include="ui\UIHelper.h" />
     <ClInclude Include="ui\UIIconParams.h" />
     <ClInclude Include="ui\UILoadingScreen.h" />
-    <ClInclude Include="ui\UIPanels.h" />
     <ClInclude Include="ui\UIPdaSpot.h" />
     <ClInclude Include="ui_defs.h" />
     <ClInclude Include="wrapper_abstract.h" />
@@ -1705,7 +1704,6 @@
     <ClCompile Include="ui\UIHelper.cpp" />
     <ClCompile Include="ui\UIIconParams.cpp" />
     <ClCompile Include="ui\UILoadingScreen.cpp" />
-    <ClCompile Include="ui\UIPanels.cpp" />
     <ClCompile Include="ui\UIPdaSpot.cpp" />
     <ClCompile Include="visual_memory_manager.cpp" />
     <ClCompile Include="visual_memory_params.cpp" />

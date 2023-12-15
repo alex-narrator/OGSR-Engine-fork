@@ -740,13 +740,6 @@ void CInventoryItem::BreakItem()
     object().DestroyObject();
 }
 
-//void CInventoryItem::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
-//{
-//    str_name = !!NameShort() ? NameShort() : Name();
-//    str_count = "";
-//    icon_sect_name = m_object->cNameSect().c_str();
-//}
-
 float CInventoryItem::GetHitTypeProtection(int hit_type) const { return m_HitTypeProtection[hit_type] * GetCondition(); }
 
 float CInventoryItem::GetItemEffect(int effect) const

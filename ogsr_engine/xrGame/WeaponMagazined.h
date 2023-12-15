@@ -179,10 +179,6 @@ protected:
     // только разных типов патронов
     bool m_bLockType{};
 
-    //const char* m_str_count_tmpl{};
-
-    //bool m_bShowAmmoCounter{};
-
     // режим выделения рамкой противников
 protected:
     bool m_bVision{};
@@ -200,9 +196,6 @@ public:
     virtual bool HasFireModes() { return m_bHasDifferentFireModes; };
     virtual int GetCurrentFireMode() const { return m_bHasDifferentFireModes ? m_aFireModes[m_iCurFireMode] : 1; };
     virtual LPCSTR GetCurrentFireModeStr() { return m_sCurFireMode; };
-    //virtual shared_str GetAmmoElapsedStr() const;
-
-    //virtual bool ShowAmmoCounter() const;
 
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
@@ -244,7 +237,6 @@ protected:
     virtual void OnDrawUI();
     virtual void net_Relcase(CObject* object);
 
-    //  bool ScopeRespawn( PIItem );
 public:
     // Real Wolf.20.01.15
     virtual bool TryToGetAmmo(u32);
@@ -257,8 +249,6 @@ public:
     virtual bool HasChamber() const { return m_bHasChamber; };
     // разрядить кол-во патронов
     virtual void UnloadAmmo(int unload_count, bool spawn_ammo = true, bool detach_magazine = false);
-    //
-    //u32 GetMagazineCount() const;
     //
     virtual bool IsSingleReloading();
     virtual LPCSTR GetCurrentMagazine_ShortName(bool = false);

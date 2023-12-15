@@ -53,13 +53,6 @@ protected:
     // иконка, показывающая количество активных PDA
     CUIStatic UIPdaOnline;
 
-    // изображение оружия
-    //CUIStatic UIWeaponBack;
-    //CUIStatic UIWeaponSignAmmo;
-    //CUIStatic UIWeaponIcon;
-    //Frect UIWeaponIcon_rect{};
-    //float ammo_icon_scale{};
-
 public:
     CUIStatic* GetPDAOnline() { return &UIPdaOnline; };
     CUIZoneMap* GetUIZoneMap() { return UIZoneMap; }
@@ -84,11 +77,6 @@ protected:
 
     CUIStatic* m_UIIcons{};
     bool b_horz{};
-
-//public:
-//    CUIBeltPanel* m_beltPanel;
-//    CUISlotPanel* m_slotPanel;
-//    CUIBoosterPanel* m_boosterPanel;
 
 public:
     // Енумы соответсвующие предупреждающим иконкам
@@ -135,9 +123,6 @@ protected:
     void InitFlashingIcons(CUIXml* node);
     void DestroyFlashingIcons();
     void UpdateFlashingIcons();
-    //void UpdateActiveItemInfo();
-
-    //void SetAmmoIcon(const shared_str& seсt_name);
 
     // first - иконка, second - анимация
     DEF_MAP(FlashingIcons, EFlashingIcons, CUIStatic*);
