@@ -42,7 +42,7 @@ public:
     void PutNextToSlot();
 
     virtual void Deactivate(bool = false);
-    virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
+    //virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
 
 protected:
     virtual size_t GetWeaponTypeForCollision() const override { return Knife_and_other; }

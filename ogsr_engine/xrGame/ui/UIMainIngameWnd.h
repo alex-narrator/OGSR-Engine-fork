@@ -54,11 +54,11 @@ protected:
     CUIStatic UIPdaOnline;
 
     // изображение оружия
-    CUIStatic UIWeaponBack;
-    CUIStatic UIWeaponSignAmmo;
-    CUIStatic UIWeaponIcon;
-    Frect UIWeaponIcon_rect{};
-    float ammo_icon_scale{};
+    //CUIStatic UIWeaponBack;
+    //CUIStatic UIWeaponSignAmmo;
+    //CUIStatic UIWeaponIcon;
+    //Frect UIWeaponIcon_rect{};
+    //float ammo_icon_scale{};
 
 public:
     CUIStatic* GetPDAOnline() { return &UIPdaOnline; };
@@ -135,9 +135,9 @@ protected:
     void InitFlashingIcons(CUIXml* node);
     void DestroyFlashingIcons();
     void UpdateFlashingIcons();
-    void UpdateActiveItemInfo();
+    //void UpdateActiveItemInfo();
 
-    void SetAmmoIcon(const shared_str& seсt_name);
+    //void SetAmmoIcon(const shared_str& seсt_name);
 
     // first - иконка, second - анимация
     DEF_MAP(FlashingIcons, EFlashingIcons, CUIStatic*);

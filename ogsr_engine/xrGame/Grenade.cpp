@@ -342,20 +342,20 @@ void CGrenade::Contact(CPhysicsShellHolder* obj)
     DestroyObject();
 }
 
-#include "hudmanager.h"
-#include "ui/UIMainIngameWnd.h"
-void CGrenade::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
-{
-    str_name = NameShort();
-    u32 ThisGrenadeCount = m_pCurrentInventory->GetSameItemCount(cNameSect().c_str());
-    string16 stmp{};
-    auto main_wnd = HUD().GetUI()->UIMainIngameWnd;
-
-    if (main_wnd->m_bShowGearInfo)
-        sprintf_s(stmp, "%d", ThisGrenadeCount);
-    else if (main_wnd->m_bShowActiveItemInfo)
-        sprintf_s(stmp, "");
-
-    str_count = stmp;
-    icon_sect_name = cNameSect().c_str();
-}
+//#include "hudmanager.h"
+//#include "ui/UIMainIngameWnd.h"
+//void CGrenade::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
+//{
+//    str_name = NameShort();
+//    u32 ThisGrenadeCount = m_pCurrentInventory->GetSameItemCount(cNameSect().c_str());
+//    string16 stmp{};
+//    auto main_wnd = HUD().GetUI()->UIMainIngameWnd;
+//
+//    if (main_wnd->m_bShowGearInfo)
+//        sprintf_s(stmp, "%d", ThisGrenadeCount);
+//    else if (main_wnd->m_bShowActiveItemInfo)
+//        sprintf_s(stmp, "");
+//
+//    str_count = stmp;
+//    icon_sect_name = cNameSect().c_str();
+//}

@@ -126,7 +126,7 @@ public:
     virtual bool Action(s32 cmd, u32 flags);
     virtual void UnloadMagazine(bool spawn_ammo = true);
 
-    virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
+    //virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
 
     virtual void processing_deactivate() override
     {
@@ -179,9 +179,9 @@ protected:
     // только разных типов патронов
     bool m_bLockType{};
 
-    const char* m_str_count_tmpl{};
+    //const char* m_str_count_tmpl{};
 
-    bool m_bShowAmmoCounter{};
+    //bool m_bShowAmmoCounter{};
 
     // режим выделения рамкой противников
 protected:
@@ -200,9 +200,9 @@ public:
     virtual bool HasFireModes() { return m_bHasDifferentFireModes; };
     virtual int GetCurrentFireMode() const { return m_bHasDifferentFireModes ? m_aFireModes[m_iCurFireMode] : 1; };
     virtual LPCSTR GetCurrentFireModeStr() { return m_sCurFireMode; };
-    virtual shared_str GetAmmoElapsedStr() const;
+    //virtual shared_str GetAmmoElapsedStr() const;
 
-    virtual bool ShowAmmoCounter() const;
+    //virtual bool ShowAmmoCounter() const;
 
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
@@ -258,7 +258,7 @@ public:
     // разрядить кол-во патронов
     virtual void UnloadAmmo(int unload_count, bool spawn_ammo = true, bool detach_magazine = false);
     //
-    u32 GetMagazineCount() const;
+    //u32 GetMagazineCount() const;
     //
     virtual bool IsSingleReloading();
     virtual LPCSTR GetCurrentMagazine_ShortName(bool = false);

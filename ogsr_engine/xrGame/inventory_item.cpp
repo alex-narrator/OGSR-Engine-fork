@@ -124,7 +124,7 @@ void CInventoryItem::Load(LPCSTR section)
 
     m_always_ungroupable = READ_IF_EXISTS(pSettings, r_bool, section, "always_ungroupable", false);
 
-    m_need_brief_info = READ_IF_EXISTS(pSettings, r_bool, section, "show_brief_info", true);
+    //m_need_brief_info = READ_IF_EXISTS(pSettings, r_bool, section, "show_brief_info", true);
 
     b_breakable = READ_IF_EXISTS(pSettings, r_bool, section, "breakable", false);
 
@@ -740,12 +740,12 @@ void CInventoryItem::BreakItem()
     object().DestroyObject();
 }
 
-void CInventoryItem::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
-{
-    str_name = !!NameShort() ? NameShort() : Name();
-    str_count = "";
-    icon_sect_name = m_object->cNameSect().c_str();
-}
+//void CInventoryItem::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
+//{
+//    str_name = !!NameShort() ? NameShort() : Name();
+//    str_count = "";
+//    icon_sect_name = m_object->cNameSect().c_str();
+//}
 
 float CInventoryItem::GetHitTypeProtection(int hit_type) const { return m_HitTypeProtection[hit_type] * GetCondition(); }
 

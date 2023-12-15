@@ -212,11 +212,11 @@ void CWeaponMagazined::Load(LPCSTR section)
 
     m_fire_zoomout_time = READ_IF_EXISTS(pSettings, r_u32, section, "fire_zoomout_time", u32(-1));
 
-    m_str_count_tmpl = READ_IF_EXISTS(pSettings, r_string, "features", "wpn_magazined_str_count_tmpl", "{AE}/{AC}");
+    //m_str_count_tmpl = READ_IF_EXISTS(pSettings, r_string, "features", "wpn_magazined_str_count_tmpl", "{AE}/{AC}");
 
     m_bHasChamber = READ_IF_EXISTS(pSettings, r_bool, section, "has_chamber", true);
 
-    m_bShowAmmoCounter = READ_IF_EXISTS(pSettings, r_bool, section, "ammo_counter", true);
+    //m_bShowAmmoCounter = READ_IF_EXISTS(pSettings, r_bool, section, "ammo_counter", true);
 }
 
 void CWeaponMagazined::FireStart()
@@ -1744,52 +1744,52 @@ float CWeaponMagazined::GetWeaponDeterioration() const
     return (inherited::GetWeaponDeterioration() * m_iShotNum);
 }
 
-#include "ui/UIMainIngameWnd.h"
-void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
-{
-    auto main_wnd = HUD().GetUI()->UIMainIngameWnd;
-    bool b_wpn_info = main_wnd->m_bShowActiveItemInfo;
-    bool b_gear_info = main_wnd->m_bShowGearInfo;
-
-    bool b_use_mags = AddonAttachable(eMagazine) && !IsGrenadeMode();
-
-    const int AE = GetAmmoElapsed(), AC = b_use_mags ? GetMagazineCount() : GetAmmoCurrent();
-
-    if (AE == 0 || m_magazine.empty())
-        icon_sect_name = "";
-    else
-        icon_sect_name = b_use_mags && IsAddonAttached(eMagazine) && (b_gear_info && !b_wpn_info) ? GetAddonName(eMagazine).c_str() : m_magazine.back().m_ammoSect.c_str();
-
-    string256 sItemName;
-    strcpy_s(sItemName, CStringTable().translate(AE > 0 ? pSettings->r_string(icon_sect_name.c_str(), "inv_name_short") : "st_not_loaded").c_str());
-
-    if ((HasFireModes() || IsGrenadeMode()) && b_wpn_info)
-        strcat_s(sItemName, GetCurrentFireModeStr());
-
-    str_name = sItemName;
-
-    // static const std::regex ae_re{ R"(\{AE\})" }, ac_re{ R"(\{AC\})" };
-    // str_count = m_str_count_tmpl;
-    // str_count = std::regex_replace(str_count, ae_re, std::to_string(AE));
-    // str_count = std::regex_replace(str_count, ac_re, unlimited_ammo() ? "--" : std::to_string(b_use_mags ? AC : AC - AE));
-
-    string256 sAmmoInMag{};
-    if (ShowAmmoCounter())
-        sprintf(sAmmoInMag, "%d", AE);
-    else
-        sprintf(sAmmoInMag, "%s", CStringTable().translate(GetAmmoElapsedStr()).c_str());
-
-    if (b_wpn_info && b_gear_info)
-        sprintf_s(sItemName, "[%s]%d", sAmmoInMag, b_use_mags ? AC : AC - AE);
-    else if (b_wpn_info)
-        sprintf_s(sItemName, "[%s]", sAmmoInMag);
-    else if (b_gear_info)
-        sprintf_s(sItemName, "%d", b_use_mags ? AC : AC - AE);
-    else if (unlimited_ammo())
-        sprintf_s(sItemName, "[%s]--", sAmmoInMag);
-
-    str_count = sItemName;
-}
+//#include "ui/UIMainIngameWnd.h"
+//void CWeaponMagazined::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
+//{
+//    auto main_wnd = HUD().GetUI()->UIMainIngameWnd;
+//    bool b_wpn_info = main_wnd->m_bShowActiveItemInfo;
+//    bool b_gear_info = main_wnd->m_bShowGearInfo;
+//
+//    bool b_use_mags = AddonAttachable(eMagazine) && !IsGrenadeMode();
+//
+//    const int AE = GetAmmoElapsed(), AC = b_use_mags ? GetMagazineCount() : GetAmmoCurrent();
+//
+//    if (AE == 0 || m_magazine.empty())
+//        icon_sect_name = "";
+//    else
+//        icon_sect_name = b_use_mags && IsAddonAttached(eMagazine) && (b_gear_info && !b_wpn_info) ? GetAddonName(eMagazine).c_str() : m_magazine.back().m_ammoSect.c_str();
+//
+//    string256 sItemName;
+//    strcpy_s(sItemName, CStringTable().translate(AE > 0 ? pSettings->r_string(icon_sect_name.c_str(), "inv_name_short") : "st_not_loaded").c_str());
+//
+//    if ((HasFireModes() || IsGrenadeMode()) && b_wpn_info)
+//        strcat_s(sItemName, GetCurrentFireModeStr());
+//
+//    str_name = sItemName;
+//
+//    // static const std::regex ae_re{ R"(\{AE\})" }, ac_re{ R"(\{AC\})" };
+//    // str_count = m_str_count_tmpl;
+//    // str_count = std::regex_replace(str_count, ae_re, std::to_string(AE));
+//    // str_count = std::regex_replace(str_count, ac_re, unlimited_ammo() ? "--" : std::to_string(b_use_mags ? AC : AC - AE));
+//
+//    string256 sAmmoInMag{};
+//    if (ShowAmmoCounter())
+//        sprintf(sAmmoInMag, "%d", AE);
+//    else
+//        sprintf(sAmmoInMag, "%s", CStringTable().translate(GetAmmoElapsedStr()).c_str());
+//
+//    if (b_wpn_info && b_gear_info)
+//        sprintf_s(sItemName, "[%s]%d", sAmmoInMag, b_use_mags ? AC : AC - AE);
+//    else if (b_wpn_info)
+//        sprintf_s(sItemName, "[%s]", sAmmoInMag);
+//    else if (b_gear_info)
+//        sprintf_s(sItemName, "%d", b_use_mags ? AC : AC - AE);
+//    else if (unlimited_ammo())
+//        sprintf_s(sItemName, "[%s]--", sAmmoInMag);
+//
+//    str_count = sItemName;
+//}
 
 void CWeaponMagazined::OnDrawUI()
 {
@@ -1968,13 +1968,13 @@ float CWeaponMagazined::GetConditionMisfireProbability() const
     return mis;
 }
 //
-u32 CWeaponMagazined::GetMagazineCount() const
-{
-    u32 iMagazinesCount{};
-    for (const auto& magazine_sect : m_magazines)
-        iMagazinesCount += Actor()->inventory().GetSameItemCount(magazine_sect.c_str());
-    return iMagazinesCount;
-}
+//u32 CWeaponMagazined::GetMagazineCount() const
+//{
+//    u32 iMagazinesCount{};
+//    for (const auto& magazine_sect : m_magazines)
+//        iMagazinesCount += Actor()->inventory().GetSameItemCount(magazine_sect.c_str());
+//    return iMagazinesCount;
+//}
 
 bool CWeaponMagazined::IsSingleReloading()
 {
@@ -2158,29 +2158,29 @@ void CWeaponMagazined::DetachAll()
     inherited::DetachAll();
 }
 
-shared_str CWeaponMagazined::GetAmmoElapsedStr() const
-{
-    if (iAmmoElapsed >= iMagazineSize - HasChamber())
-        return "st_mag_full";
-    else if (iAmmoElapsed == 0)
-        return "st_mag_empty";
-    else if (iAmmoElapsed >= iMagazineSize * 0.75f)
-        return "st_mag_quarter_empty";
-    else if (iAmmoElapsed <= iMagazineSize * 0.25f)
-        return "st_mag_quarter_full";
-    else
-        return "st_mag_half_full";
-}
+//shared_str CWeaponMagazined::GetAmmoElapsedStr() const
+//{
+//    if (iAmmoElapsed >= iMagazineSize - HasChamber())
+//        return "st_mag_full";
+//    else if (iAmmoElapsed == 0)
+//        return "st_mag_empty";
+//    else if (iAmmoElapsed >= iMagazineSize * 0.75f)
+//        return "st_mag_quarter_empty";
+//    else if (iAmmoElapsed <= iMagazineSize * 0.25f)
+//        return "st_mag_quarter_full";
+//    else
+//        return "st_mag_half_full";
+//}
 
-bool CWeaponMagazined::ShowAmmoCounter() const
-{
-    if (AddonAttachable(eMagazine) && IsAddonAttached(eMagazine) && !IsGrenadeMode())
-    {
-        bool res = READ_IF_EXISTS(pSettings, r_bool, GetAddonName(eMagazine), "ammo_counter", false);
-        return res;
-    }
-    return m_bShowAmmoCounter;
-}
+//bool CWeaponMagazined::ShowAmmoCounter() const
+//{
+//    if (AddonAttachable(eMagazine) && IsAddonAttached(eMagazine) && !IsGrenadeMode())
+//    {
+//        bool res = READ_IF_EXISTS(pSettings, r_bool, GetAddonName(eMagazine), "ammo_counter", false);
+//        return res;
+//    }
+//    return m_bShowAmmoCounter;
+//}
 
 #include "player_hud.h"
 void CWeaponMagazined::UpdateMagazineVisibility()
