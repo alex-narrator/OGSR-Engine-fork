@@ -7,7 +7,6 @@
 #include "Actor.h"
 #include "game_cl_base.h"
 #include "Level.h"
-#include "BoneProtections.h"
 #include "..\Include/xrRender/Kinematics.h"
 #include "../Include/xrRender/RenderVisual.h"
 #include "UIGameSP.h"
@@ -15,18 +14,6 @@
 #include "ui/UIInventoryWnd.h"
 #include "player_hud.h"
 #include "xrserver_objects_alife_items.h"
-
-CCustomOutfit::CCustomOutfit()
-{
-    SetSlot(OUTFIT_SLOT);
-    m_flags.set(FUsingCondition, TRUE);
-    m_boneProtection = xr_new<SBoneProtections>();
-}
-
-CCustomOutfit::~CCustomOutfit()
-{
-    xr_delete(m_boneProtection);
-}
 
 void CCustomOutfit::Load(LPCSTR section)
 {
@@ -45,32 +32,10 @@ void CCustomOutfit::Load(LPCSTR section)
 
 float CCustomOutfit::HitThruArmour(SHit* pHDS)
 {
-    float hit_power = pHDS->damage();
     auto actor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner());
     if (!actor || actor->IsHitToHead(pHDS) && !m_bIsHelmetBuiltIn)
-        return hit_power;
-
-    auto hit_type = pHDS->type();
-    float ba = m_boneProtection->getBoneArmour(pHDS->bone()) * !fis_zero(GetCondition());
-
-    //Msg("%s %s take hit power [%.4f], hitted bone %s, bone armor [%.4f], hit AP [%.4f]", __FUNCTION__, Name(), hit_power,
-    //    smart_cast<IKinematics*>(smart_cast<CActor*>(m_pCurrentInventory->GetOwner())->Visual())->LL_BoneName_dbg(pHDS->boneID), ba, pHDS->ap);
-    
-    if (hit_type == ALife::eHitTypeFireWound)
-    {
-        // броню не пробито, хіт тільки від умовного удару в броню
-        if (pHDS->ap < ba)
-        {
-            hit_power *= m_boneProtection->m_fHitFrac;
-            //Msg("%s %s armor is not pierced, result hit power [%.4f]", __FUNCTION__, Name(), hit_power);
-        }
-    }
-    else
-        hit_power *= (1.0f - GetHitTypeProtection(hit_type));
-
-    Hit(pHDS);
-
-    return hit_power;
+        return pHDS->damage();
+    return inherited::HitThruArmour(pHDS);
 };
 
 float CCustomOutfit::GetHitTypeProtection(int hit_type) const { return (hit_type == ALife::eHitTypeFireWound) ? 0.f : inherited::GetHitTypeProtection(hit_type); }
@@ -85,13 +50,7 @@ void CCustomOutfit::OnMoveToSlot(EItemPlace prevPlace)
         if (pActor)
         {
             if (m_ActorVisual.size())
-            {
                 pActor->ChangeVisual(m_ActorVisual);
-            }
-            if (pSettings->line_exist(cNameSect(), "bones_koeff_protection"))
-            {
-                m_boneProtection->reload(pSettings->r_string(cNameSect(), "bones_koeff_protection"), smart_cast<IKinematics*>(pActor->Visual()));
-            }
             if (pSettings->line_exist(cNameSect(), "player_hud_section"))
                 g_player_hud->load(pSettings->r_string(cNameSect(), "player_hud_section"));
             else

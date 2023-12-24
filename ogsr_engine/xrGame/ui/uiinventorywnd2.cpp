@@ -168,9 +168,26 @@ void CUIInventoryWnd::InitInventory()
         m_pUIBackPackList->SetItem(itm);
     }
 
-    PIItem _outfit = m_pInv->m_slots[OUTFIT_SLOT].m_pIItem;
-    CUICellItem* outfit = (_outfit && show_item(_outfit)) ? create_cell_item(_outfit) : NULL;
-    m_pUIOutfitList->SetItem(outfit);
+    _itm = m_pInv->m_slots[OUTFIT_SLOT].m_pIItem;
+    if (_itm && show_item(_itm))
+    {
+        CUICellItem* itm = create_cell_item(_itm);
+        m_pUIOutfitList->SetItem(itm);
+    }
+
+    _itm = m_pInv->m_slots[VEST_SLOT].m_pIItem;
+    if (_itm && show_item(_itm))
+    {
+        CUICellItem* itm = create_cell_item(_itm);
+        m_pUIVestList->SetItem(itm);
+    }
+
+    _itm = m_pInv->m_slots[GASMASK_SLOT].m_pIItem;
+    if (_itm && show_item(_itm))
+    {
+        CUICellItem* itm = create_cell_item(_itm);
+        m_pUIGasmaskList->SetItem(itm);
+    }
 
     std::sort(m_pInv->m_belt.begin(), m_pInv->m_belt.end(), InventoryUtilities::GreaterRoomInRuck);
     for (const auto& item : m_pInv->m_belt)
@@ -405,7 +422,9 @@ bool CUIInventoryWnd::OnItemSelected(CUICellItem* itm)
                         //
                         m_pUIGrenadeList, m_pUIArtefactList, m_pUIBoltList,
                         //
-                        m_pUIDetectorList, m_pUIOnHeadList, m_pUIPdaList});
+                        m_pUIDetectorList, m_pUIOnHeadList, m_pUIPdaList,
+                        //
+                        m_pUIVestList, m_pUIGasmaskList});
     return false;
 }
 
@@ -563,6 +582,9 @@ void CUIInventoryWnd::ClearAllLists()
     m_pUIDetectorList->ClearAll(true);
     m_pUIOnHeadList->ClearAll(true);
     m_pUIPdaList->ClearAll(true);
+    //
+    m_pUIVestList->ClearAll(true);
+    m_pUIGasmaskList->ClearAll(true);
 }
 
 void CUIInventoryWnd::ReinitBeltList()

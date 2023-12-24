@@ -79,7 +79,7 @@ public:
 public:
     virtual BOOL renderable_ShadowReceive() { return TRUE; }
     virtual void Die(CObject* who);
-    virtual void HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element);
+    virtual void HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element, int type);
     virtual void Hit(SHit* pHDS);
     virtual void PHHit(SHit& H);
     virtual void SelectAnimation(const Fvector& _view, const Fvector& _move, float speed);

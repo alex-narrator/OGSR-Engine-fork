@@ -128,7 +128,8 @@ void CInventoryScript::script_register(lua_State* L)
             .property("target", &get_inventory_target)
             .def("is_active_slot_blocked", &CInventory::IsActiveSlotBlocked)
             .def("is_slot_allowed", &CInventory::IsSlotAllowed)
-            .property("prev_active_slot", &CInventory::GetPrevActiveSlot, &CInventory::SetPrevActiveSlot),
+            .property("prev_active_slot", &CInventory::GetPrevActiveSlot, &CInventory::SetPrevActiveSlot)
+            .def_readwrite("max_belt", &CInventory::m_iMaxBelt),
         class_<IInventoryBox>("IInventoryBox")
             .def("object", &IInventoryBox::GetObjectByIndex)
             .def("object", &IInventoryBox::GetObjectByName)

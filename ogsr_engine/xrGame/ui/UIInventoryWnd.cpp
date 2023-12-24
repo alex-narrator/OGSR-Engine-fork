@@ -154,6 +154,18 @@ void CUIInventoryWnd::Init()
     xml_init.InitDragDropListEx(uiXml, "dragdrop_pda", 0, m_pUIPdaList);
     BindDragDropListEvents(m_pUIPdaList);
 
+    m_pUIVestList = xr_new<CUIDragDropListEx>();
+    AttachChild(m_pUIVestList);
+    m_pUIVestList->SetAutoDelete(true);
+    xml_init.InitDragDropListEx(uiXml, "dragdrop_vest", 0, m_pUIVestList);
+    BindDragDropListEvents(m_pUIVestList);
+
+    m_pUIGasmaskList = xr_new<CUIDragDropListEx>();
+    AttachChild(m_pUIGasmaskList);
+    m_pUIGasmaskList->SetAutoDelete(true);
+    xml_init.InitDragDropListEx(uiXml, "dragdrop_gasmask", 0, m_pUIGasmaskList);
+    BindDragDropListEvents(m_pUIGasmaskList);
+
     for (u8 i = 0; i < SLOTS_TOTAL; i++)
         m_slots_array[i] = NULL;
     m_slots_array[OUTFIT_SLOT] = m_pUIOutfitList;
@@ -172,6 +184,9 @@ void CUIInventoryWnd::Init()
     m_slots_array[DETECTOR_SLOT] = m_pUIDetectorList;
     m_slots_array[TORCH_SLOT] = m_pUIOnHeadList;
     m_slots_array[PDA_SLOT] = m_pUIPdaList;
+
+    m_slots_array[VEST_SLOT] = m_pUIVestList;
+    m_slots_array[GASMASK_SLOT] = m_pUIGasmaskList;
     
     // pop-up menu
     AttachChild(&UIPropertiesBox);
@@ -449,20 +464,13 @@ void CUIInventoryWnd::UpdateCustomDraw()
 
 void CUIInventoryWnd::TryReinitLists(PIItem iitem)
 {
-    bool update_custom_draw{};
     if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
     {
         for (const auto& slot : iitem->GetSlotsLocked())
             ReinitSlotList(slot);
         for (const auto& slot : iitem->GetSlotsUnlocked())
             ReinitSlotList(slot);
-        update_custom_draw = true;
-    }
-    if (smart_cast<CCustomOutfit*>(iitem))
-    {
-        ReinitBeltList();
-        update_custom_draw = true;
-    }
-    if (update_custom_draw)
-        UpdateCustomDraw();
+    }       
+    ReinitBeltList();
+    UpdateCustomDraw();
 }

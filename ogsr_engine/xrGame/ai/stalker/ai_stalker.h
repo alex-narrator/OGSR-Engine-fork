@@ -184,7 +184,7 @@ public:
 
     virtual void g_WeaponBones(int& L, int& R1, int& R2);
     virtual void g_fireParams(CHudItem* pHudItem, Fvector& P, Fvector& D, const bool for_cursor = false) override;
-    virtual void HitSignal(float P, Fvector& vLocalDir, CObject* who, s16 element);
+    virtual void HitSignal(float P, Fvector& vLocalDir, CObject* who, s16 element, int type);
     virtual void Die(CObject* who);
 
     virtual void OnEvent(NET_Packet& P, u16 type);

@@ -323,6 +323,7 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("is_antirad", &CScriptGameObject::IsAntirad)
         .def("is_outfit", &CScriptGameObject::IsCustomOutfit)
         .def("is_helmet", &CScriptGameObject::IsHelmet)
+        .def("is_vest", &CScriptGameObject::IsVest)
         .def("is_scope", &CScriptGameObject::IsScope)
         .def("is_silencer", &CScriptGameObject::IsSilencer)
         .def("is_grenade_launcher", &CScriptGameObject::IsGrenadeLauncher)

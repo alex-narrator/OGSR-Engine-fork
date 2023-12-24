@@ -1144,13 +1144,7 @@ u32 CInventory::GetSameItemCount(LPCSTR caSection)
     return l_dwCount;
 }
 
-int CInventory::BeltSize() const
-{
-    if (auto outfit = m_pOwner->GetOutfit())
-        return outfit->m_iBeltSize;
-    return m_iMaxBelt;
-
-}
+int CInventory::BeltSize() const { return m_iMaxBelt; }
 
 bool CInventory::IsAllItemsLoaded() const { return m_bUpdated; }
 

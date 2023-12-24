@@ -1047,3 +1047,13 @@ void CSE_ALifeItemDevice::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherit
 void CSE_ALifeItemDevice::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
 void CSE_ALifeItemDevice::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
 void CSE_ALifeItemDevice::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
+
+////////////////////////////////////////////////////////////////////////////
+// CSE_ALifeItemVest
+////////////////////////////////////////////////////////////////////////////
+CSE_ALifeItemVest::CSE_ALifeItemVest(LPCSTR caSection) : CSE_ALifeItem(caSection) {}
+CSE_ALifeItemVest::~CSE_ALifeItemVest() {}
+void CSE_ALifeItemVest::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited::STATE_Read(tNetPacket, size); }
+void CSE_ALifeItemVest::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
+void CSE_ALifeItemVest::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
+void CSE_ALifeItemVest::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }

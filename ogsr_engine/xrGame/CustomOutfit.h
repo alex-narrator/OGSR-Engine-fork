@@ -2,8 +2,6 @@
 
 #include "inventory_item_object.h"
 
-struct SBoneProtections;
-
 class CCustomOutfit : public CInventoryItemObject
 {
     friend class COutfitScript;
@@ -12,8 +10,8 @@ private:
     typedef CInventoryItemObject inherited;
 
 public:
-    CCustomOutfit(void);
-    virtual ~CCustomOutfit(void);
+    CCustomOutfit(void){};
+    virtual ~CCustomOutfit(void){};
 
     virtual void Load(LPCSTR section);
 
@@ -29,7 +27,6 @@ public:
 private:
     shared_str m_ActorVisual;
     shared_str m_full_icon_name;
-    SBoneProtections* m_boneProtection;
 
     u32 m_ef_equipment_type{};
 

@@ -291,13 +291,13 @@ void CAI_Stalker::Hit(SHit* pHDS)
     inherited::Hit(&HDS);
 }
 
-void CAI_Stalker::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element)
+void CAI_Stalker::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element, int type)
 {
     if (getDestroy())
         return;
 
 	if (g_Alive())
-        memory().hit().add(amount, vLocalDir, who, element);
+        memory().hit().add(amount, vLocalDir, who, element, type);
     else if (!AlreadyDie())
     {
         const auto I = m_bones_body_parts.find(element);

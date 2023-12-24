@@ -30,6 +30,8 @@
 #include "script_callback_ex.h"
 #include "script_game_object.h"
 
+#include "BoneProtections.h"
+
 #ifdef DEBUG
 #include "debug_renderer.h"
 #endif
@@ -51,6 +53,8 @@ CInventoryItem::CInventoryItem()
 
     m_ItemEffect.clear();
     m_ItemEffect.resize(eEffectMax);
+
+    m_boneProtection = xr_new<SBoneProtections>();
 }
 
 CInventoryItem::~CInventoryItem()
@@ -69,6 +73,7 @@ CInventoryItem::~CInventoryItem()
     }
 
     sndBreaking.destroy();
+    xr_delete(m_boneProtection);
 }
 
 void CInventoryItem::Load(LPCSTR section)
@@ -170,6 +175,8 @@ void CInventoryItem::Load(LPCSTR section)
     m_sDetachMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_detach_tip", "st_detach");
 
     m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 0.f);
+
+    bone_protection_sect = READ_IF_EXISTS(pSettings, r_string, section, "bones_koeff_protection", nullptr);
 
     // custom script actions for properties box
     for (u8 i = 0; i < 255; i++)
@@ -282,6 +289,9 @@ void CInventoryItem::Hit(SHit* pHDS)
         if (auto itm = smart_cast<CSE_ALifeInventoryItem*>(object().alife_object()))
             itm->m_fRadiationRestoreSpeed = m_ItemEffect[eRadiationRestoreSpeed];
     }
+
+    object().callback(GameObject::eHit)(object().lua_game_object(), pHDS->damage(), pHDS->direction(), smart_cast<const CGameObject*>(pHDS->who)->lua_game_object(), pHDS->bone(),
+                                        pHDS->type());
 
     if (!m_flags.test(FUsingCondition) || is_rad_hit)
         return;
@@ -664,6 +674,8 @@ void CInventoryItem::OnMoveToSlot(EItemPlace prevPlace)
         }
         for (const auto slot : m_slots_locked)
             pActor->inventory().DropSlotsToRuck(slot);
+        if (bone_protection_sect.size())
+            m_boneProtection->reload(bone_protection_sect, smart_cast<IKinematics*>(pActor->Visual()));
     }
 };
 
@@ -877,3 +889,27 @@ void CInventoryItem::SetDropTime(bool b_set)
 }
 
 float CInventoryItem::GetPowerLoss() { return m_fPowerLoss < 0.f && fis_zero(GetCondition()) ? 0.f : m_fPowerLoss; }
+
+float CInventoryItem::HitThruArmour(SHit* pHDS)
+{
+    float hit_power = pHDS->damage();
+    auto actor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner());
+    if (!actor)
+        return hit_power;
+
+    auto hit_type = pHDS->type();
+    float ba = m_boneProtection->getBoneArmour(pHDS->bone()) * !fis_zero(GetCondition());
+
+    if (hit_type == ALife::eHitTypeFireWound)
+    {
+        // броню не пробито, хіт тільки від умовного удару в броню
+        if (pHDS->ap < ba)
+            hit_power *= m_boneProtection->m_fHitFrac;
+    }
+    else
+        hit_power *= (1.0f - GetHitTypeProtection(hit_type));
+
+        Hit(pHDS);
+
+    return hit_power;
+}

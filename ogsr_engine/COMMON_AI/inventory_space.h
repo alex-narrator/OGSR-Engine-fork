@@ -20,6 +20,8 @@ enum : u32
     HELMET_SLOT,
     // equipment
     BACKPACK_SLOT,
+    VEST_SLOT,
+    GASMASK_SLOT,
     //
     SLOTS_TOTAL,
     NO_ACTIVE_SLOT = 255

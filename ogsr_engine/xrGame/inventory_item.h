@@ -36,6 +36,7 @@ struct SPHNetState;
 class CInventoryOwner;
 
 struct SHit;
+struct SBoneProtections;
 
 class CInventoryItem : public CAttachableItem,
                        public CHitImmunity
@@ -253,9 +254,11 @@ public:
 protected:
     float m_holder_range_modifier;
     float m_holder_fov_modifier;
+    SBoneProtections* m_boneProtection;
 
 public:
     virtual void modify_holder_params(float& range, float& fov) const;
+    shared_str bone_protection_sect{};
 
 protected:
     IC CInventoryOwner& inventory_owner() const;
@@ -338,6 +341,8 @@ public:
         m_bIsMarkedItem = val; 
         m_highlight_equipped = val;
     };
+
+    float HitThruArmour(SHit* pHDS);
 
 protected:
     HitImmunity::HitTypeSVec m_HitTypeProtection;

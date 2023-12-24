@@ -24,6 +24,7 @@ class CActorCondition;
 class CCustomOutfit;
 class CInventoryContainer;
 class CHelmet;
+class CVest;
 class CTorch;
 class CCustomDetectorSHOC;
 class CCustomDetector;
@@ -210,7 +211,7 @@ public:
     virtual void Die(CObject* who);
     virtual void Hit(SHit* pHDS);
     virtual void PHHit(SHit& H);
-    virtual void HitSignal(float P, Fvector& vLocalDir, CObject* who, s16 element);
+    virtual void HitSignal(float P, Fvector& vLocalDir, CObject* who, s16 element, int type);
     void HitSector(CObject* who, CObject* weapon);
     void HitMark(SHit* pHDS);
 
@@ -664,6 +665,7 @@ public:
     virtual CInventoryContainer* GetBackpack() const;
     virtual CHelmet* GetHelmet() const;
     virtual CTorch* GetTorch() const;
+    virtual CVest* GetVest() const;
 
     virtual CCustomDetectorSHOC* GetDetectorSHOC() const;
     virtual CCustomDetector* GetDetector() const;

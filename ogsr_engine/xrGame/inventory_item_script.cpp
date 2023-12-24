@@ -22,6 +22,9 @@ void get_slots(luabind::object O)
     }
 }
 
+LPCSTR get_bone_protection_sect(CInventoryItem* I) { return I->bone_protection_sect.c_str(); }
+void set_bone_protection_sect(CInventoryItem* I, LPCSTR sect) { I->bone_protection_sect = sect; }
+
 void CInventoryItem::script_register(lua_State* L)
 {
     module(L)[class_<CInventoryItem>("CInventoryItem").def(constructor<>())
@@ -37,6 +40,7 @@ void CInventoryItem::script_register(lua_State* L)
                .def("item_effect", (void(CInventoryItem::*)(int, float)) & CInventoryItem::SetItemEffect)
 
                .def_readwrite("power_loss", &CInventoryItem::m_fPowerLoss)
+               .property("bone_protection_sect", &get_bone_protection_sect, &set_bone_protection_sect)
 
                .def_readwrite("inv_name", &CInventoryItem::m_name)
                .def_readwrite("inv_name_short", &CInventoryItem::m_nameShort)

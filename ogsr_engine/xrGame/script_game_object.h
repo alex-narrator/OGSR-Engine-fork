@@ -762,6 +762,7 @@ public:
     _DECLARE_FUNCTION10(IsAntirad, bool);
     _DECLARE_FUNCTION10(IsCustomOutfit, bool);
     _DECLARE_FUNCTION10(IsHelmet, bool);
+    _DECLARE_FUNCTION10(IsVest, bool);
     _DECLARE_FUNCTION10(IsScope, bool);
     _DECLARE_FUNCTION10(IsSilencer, bool);
     _DECLARE_FUNCTION10(IsGrenadeLauncher, bool);

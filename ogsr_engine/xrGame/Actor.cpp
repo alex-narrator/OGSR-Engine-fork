@@ -24,6 +24,7 @@
 #include "CustomOutfit.h"
 #include "Helmet.h"
 #include "Torch.h"
+#include "Vest.h"
 #include "actorcondition.h"
 #include "UIGameCustom.h"
 
@@ -540,7 +541,7 @@ void CActor::HitMark(SHit* pHDS)
     }
 }
 
-void CActor::HitSignal(float perc, Fvector& vLocalDir, CObject* who, s16 element)
+void CActor::HitSignal(float perc, Fvector& vLocalDir, CObject* who, s16 element, int type)
 {
     if (g_Alive())
     {
@@ -570,7 +571,7 @@ void CActor::HitSignal(float perc, Fvector& vLocalDir, CObject* who, s16 element
         clamp(power_factor, 0.f, 1.f);
         VERIFY(motion_ID.valid());
         tpKinematics->PlayFX(motion_ID, power_factor);
-        callback(GameObject::eHit)(lua_game_object(), perc, vLocalDir, smart_cast<const CGameObject*>(who)->lua_game_object(), element);
+        callback(GameObject::eHit)(lua_game_object(), perc, vLocalDir, smart_cast<const CGameObject*>(who)->lua_game_object(), element, type);
     }
 }
 void start_tutorial(LPCSTR name);
@@ -578,36 +579,36 @@ void CActor::Die(CObject* who)
 {
     inherited::Die(who);
 
- 	const auto& slots = inventory().m_slots;
+ 	//const auto& slots = inventory().m_slots;
 
-    for (u32 slot_idx = 0; slot_idx < slots.size(); ++slot_idx)
-    {
-        auto& item = slots[slot_idx].m_pIItem;
+  //  for (u32 slot_idx = 0; slot_idx < slots.size(); ++slot_idx)
+  //  {
+  //      auto& item = slots[slot_idx].m_pIItem;
 
-        if (slot_idx == inventory().GetActiveSlot())
-        {
-            if (item)
-            {
-                item->SetDropManual(TRUE);
-            }
-            continue;
-        }
-        else
-        {
-            if (item == GetOutfit())
-                continue;
-            if (item == GetHelmet())
-                continue;
-            if (item == GetBackpack())
-                continue;
-        }
+  //      if (slot_idx == inventory().GetActiveSlot())
+  //      {
+  //          if (item)
+  //          {
+  //              item->SetDropManual(TRUE);
+  //          }
+  //          continue;
+  //      }
+  //      else
+  //      {
+  //          if (item == GetOutfit())
+  //              continue;
+  //          if (item == GetHelmet())
+  //              continue;
+  //          if (item == GetBackpack())
+  //              continue;
+  //      }
 
-        if (item)
-            inventory().Ruck(item);
-    };
+  //      if (item)
+  //          inventory().Ruck(item);
+  //  };
 
-    ///!!! чистка пояса
-    inventory().DropBeltToRuck();
+  //  ///!!! чистка пояса
+  //  inventory().DropBeltToRuck();
 
     cam_Set(eacFreeLook);
     mstate_wishful &= ~mcAnyMove;
@@ -1364,6 +1365,8 @@ void CActor::UpdateItemsEffect()
         auto outfit = GetOutfit();
         auto helmet = GetHelmet();
         auto backpack = GetBackpack();
+        auto vest = GetVest();
+        auto gasmask = inventory().m_slots[GASMASK_SLOT].m_pIItem;
 
         if (i == eRadiationBoost)
         {
@@ -1379,6 +1382,10 @@ void CActor::UpdateItemsEffect()
                         radiation_restore_speed *= (1.f - backpack->GetHitTypeProtection(ALife::eHitTypeRadiation));
                     if (helmet && inventory().InRuck(item)) // шолом захищає від радіації речей у рюкзаку
                         radiation_restore_speed *= (1.f - helmet->GetHitTypeProtection(ALife::eHitTypeRadiation));
+                    if (vest && inventory().InRuck(item)) // бронік захищає від радіації речей у рюкзаку
+                        radiation_restore_speed *= (1.f - vest->GetHitTypeProtection(ALife::eHitTypeRadiation));
+                    if (gasmask && inventory().InRuck(item)) // протигаз захищає від радіації речей у рюкзаку
+                        radiation_restore_speed *= (1.f - gasmask->GetHitTypeProtection(ALife::eHitTypeRadiation));
                 }
                 m_ActorItemBoostedParam[i] += radiation_restore_speed;
             }
@@ -1396,6 +1403,12 @@ void CActor::UpdateItemsEffect()
             // backpack
             if (backpack && !fis_zero(backpack->GetCondition()))
                 m_ActorItemBoostedParam[i] += backpack->GetItemEffect(i);
+            // vest
+            if (vest && !fis_zero(vest->GetCondition()))
+                m_ActorItemBoostedParam[i] += vest->GetItemEffect(i);
+            // gasmask
+            if (gasmask && !fis_zero(gasmask->GetCondition()))
+                m_ActorItemBoostedParam[i] += gasmask->GetItemEffect(i);
         }
         // apllying boost on actor *_restore conditions
         cond->ApplyRestoreBoost(i, m_ActorItemBoostedParam[i] * f_update_time);
@@ -1563,6 +1576,7 @@ bool CActor::is_on_ground() { return (character_physics_support()->movement()->E
 CCustomOutfit* CActor::GetOutfit() const { return smart_cast<CCustomOutfit*>(inventory().ItemFromSlot(OUTFIT_SLOT)); }
 CInventoryContainer* CActor::GetBackpack() const { return smart_cast<CInventoryContainer*>(inventory().ItemFromSlot(BACKPACK_SLOT)); }
 CHelmet* CActor::GetHelmet() const { return smart_cast<CHelmet*>(inventory().ItemFromSlot(HELMET_SLOT)); }
+CVest* CActor::GetVest() const { return smart_cast<CVest*>(inventory().ItemFromSlot(VEST_SLOT)); };
 CTorch* CActor::GetTorch() const { return smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT)); }
 CCustomDetectorSHOC* CActor::GetDetectorSHOC() const { return smart_cast<CCustomDetectorSHOC*>(inventory().ItemFromSlot(DETECTOR_SLOT)); }
 CCustomDetector* CActor::GetDetector() const { return smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)); }

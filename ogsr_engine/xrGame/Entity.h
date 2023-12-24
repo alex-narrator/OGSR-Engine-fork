@@ -93,7 +93,7 @@ public:
 
     // Health calculations
     virtual void Hit(SHit* pHDS);
-    virtual void HitSignal(float P, Fvector& local_dir, CObject* who, s16 element) = 0;
+    virtual void HitSignal(float P, Fvector& local_dir, CObject* who, s16 element, int type) = 0;
     virtual void HitImpulse(float P, Fvector& vWorldDir, Fvector& vLocalDir) = 0;
 
     virtual void Die(CObject* who);
