@@ -1,33 +1,31 @@
 // Rain.h: interface for the CRain class.
 //
 //////////////////////////////////////////////////////////////////////
-
-#ifndef RainH
-#define RainH
 #pragma once
 
 #include "../xrcdb/xr_collide_defs.h"
 
-static const int max_desired_items = 2500;
+inline const float max_desired_items = std::thread::hardware_concurrency() < 3u ? 1500.f : 2500.f;
+inline const float min_desired_items = max_desired_items / 10.f;
 
-static const float source_radius = 12.5f;
-static const float source_offset = 40.f;
+constexpr float source_radius = 15.f; // 12.5f;
+constexpr float source_offset = 40.f;
 
-static const float max_distance = source_offset * 1.25f;
-static const float sink_offset = -(max_distance - source_offset);
+constexpr float max_distance = source_offset * 1.5f; // 1.25f;
+constexpr float sink_offset = -(max_distance - source_offset);
 
-static const float drop_length = 7.f;
-static const float drop_width = 0.40f;
-static const float drop_angle = 3.0f;
-static const float drop_max_angle = deg2rad(10.f);
-static const float drop_max_wind_vel = 20.0f;
-static const float drop_speed_min = 40.f;
-static const float drop_speed_max = 80.f;
+constexpr float drop_length = 7.f;
+constexpr float drop_width = 0.40f;
+constexpr float drop_angle = deg2rad(15.0f); // 3.0
+constexpr float drop_max_angle = deg2rad(35.f); // 10;
+constexpr float drop_max_wind_vel = 20.0f;
+constexpr float drop_speed_min = 40.f;
+constexpr float drop_speed_max = 80.f;
 
-const int max_particles = 1000;
-const int particles_cache = 400;
+constexpr size_t max_particles = 1000;
+constexpr u32 particles_cache = 400;
 
-const float particles_time = .3f;
+constexpr float particles_time = .3f;
 
 // refs
 class ENGINE_API IRender_DetailModel;
@@ -100,7 +98,7 @@ private:
     void p_free(Particle* P);
 
     // Some methods
-    void Born(Item& dest, float radius);
+    void Born(Item& dest, const float radius, const float speed, const float vel, const Fvector2& offset, const Fvector3& axis);
     void Hit(Fvector& pos);
     BOOL RayPick(const Fvector& s, const Fvector& d, float& range, collide::rq_target tgt);
     void RenewItem(Item& dest, float height, BOOL bHit);
@@ -110,8 +108,7 @@ public:
     ~CEffect_Rain();
 
     void Render();
+    void Calculate();
     void OnFrame();
     void InvalidateState() { state = stIdle; }
 };
-
-#endif // RainH

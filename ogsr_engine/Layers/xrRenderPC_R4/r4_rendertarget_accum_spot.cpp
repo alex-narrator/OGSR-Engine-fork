@@ -110,12 +110,10 @@ void CRenderTarget::accum_spot(light* L)
                                  1.0f};
 
         // compute xforms
-        Fmatrix xf_world;
-        xf_world.invert(Device.mView);
         Fmatrix xf_view = L->X.S.view;
         Fmatrix xf_project;
         xf_project.mul(m_TexelAdjust, L->X.S.project);
-        m_Shadow.mul(xf_view, xf_world);
+        m_Shadow.mul(xf_view, Device.mInvView);
         m_Shadow.mulA_44(xf_project);
 
         // lmap
@@ -141,7 +139,7 @@ void CRenderTarget::accum_spot(light* L)
 
         // compute xforms
         xf_project.mul(m_TexelAdjust2, L->X.S.project);
-        m_Lmap.mul(xf_view, xf_world);
+        m_Lmap.mul(xf_view, Device.mInvView);
         m_Lmap.mulA_44(xf_project);
     }
 
@@ -362,12 +360,10 @@ void CRenderTarget::accum_volumetric(light* L)
                                  1.0f};
 
         // compute xforms
-        Fmatrix xf_world;
-        xf_world.invert(Device.mView);
         Fmatrix xf_view = L->X.S.view;
         Fmatrix xf_project;
         xf_project.mul(m_TexelAdjust, L->X.S.project);
-        m_Shadow.mul(xf_view, xf_world);
+        m_Shadow.mul(xf_view, Device.mInvView);
         m_Shadow.mulA_44(xf_project);
 
         // lmap
@@ -393,7 +389,7 @@ void CRenderTarget::accum_volumetric(light* L)
 
         // compute xforms
         xf_project.mul(m_TexelAdjust2, L->X.S.project);
-        m_Lmap.mul(xf_view, xf_world);
+        m_Lmap.mul(xf_view, Device.mInvView);
         m_Lmap.mulA_44(xf_project);
 
         // Compute light frustum in world space
@@ -536,7 +532,7 @@ void CRenderTarget::accum_volumetric(light* L)
 
         //	Set up user clip planes
         {
-            static shared_str strFrustumClipPlane("FrustumClipPlane");
+            constexpr const char* strFrustumClipPlane = "FrustumClipPlane";
             //	TODO: DX10: Check if it's equivalent to the previouse code.
             // RCache.set_ClipPlanes (TRUE,ClipFrustum.planes,ClipFrustum.p_count);
 

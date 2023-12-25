@@ -96,8 +96,13 @@ LPCSTR get_weather_prev() { return (*g_pGamePersistent->Environment().GetPrevWea
 
 u32 get_weather_last_shift() { return g_pGamePersistent->Environment().GetWeatherLastShift(); }
 
+extern bool s_ScriptWeather;
+
 void set_weather(LPCSTR weather_name, bool forced)
 {
+    if (s_ScriptWeather)
+        return;
+
     // KRodin: ТЧ погоду всегда надо обновлять форсировано, иначе она почему-то не всегда корректно обновляется. А для ЗП погоды так делать нельзя - будут очень резкие переходы!
     if (!g_pGamePersistent->Environment().USED_COP_WEATHER)
         forced = true;
@@ -105,11 +110,29 @@ void set_weather(LPCSTR weather_name, bool forced)
     g_pGamePersistent->Environment().SetWeather(weather_name, forced);
 }
 
-void set_weather_next(LPCSTR weather_name) { g_pGamePersistent->Environment().SetWeatherNext(weather_name); }
+void set_weather_next(LPCSTR weather_name)
+{
+    if (s_ScriptWeather)
+        return;
 
-bool set_weather_fx(LPCSTR weather_name) { return (g_pGamePersistent->Environment().SetWeatherFX(weather_name)); }
+    g_pGamePersistent->Environment().SetWeatherNext(weather_name);
+}
 
-bool start_weather_fx_from_time(LPCSTR weather_name, float time) { return (g_pGamePersistent->Environment().StartWeatherFXFromTime(weather_name, time)); }
+bool set_weather_fx(LPCSTR weather_name)
+{
+    if (s_ScriptWeather)
+        return false;
+
+    return g_pGamePersistent->Environment().SetWeatherFX(weather_name);
+}
+
+bool start_weather_fx_from_time(LPCSTR weather_name, float time)
+{
+    if (s_ScriptWeather)
+        return false;
+
+    return g_pGamePersistent->Environment().StartWeatherFXFromTime(weather_name, time);
+}
 
 bool is_wfx_playing() { return (g_pGamePersistent->Environment().IsWFXPlaying()); }
 
@@ -164,6 +187,21 @@ float cover_in_direction(u32 level_vertex_id, const Fvector& direction)
 
 float rain_factor() { return g_pGamePersistent->Environment().CurrentEnv->rain_density; }
 
+float rain_hemi()
+{
+    CObject* E = g_pGameLevel->CurrentViewEntity();
+    if (E && E->renderable_ROS())
+    {
+        float* hemi_cube = E->renderable_ROS()->get_luminocity_hemi_cube();
+        float hemi_val = _max(hemi_cube[0], hemi_cube[1]);
+        hemi_val = _max(hemi_val, hemi_cube[2]);
+        hemi_val = _max(hemi_val, hemi_cube[3]);
+        hemi_val = _max(hemi_val, hemi_cube[5]);
+        return hemi_val;
+    }
+    return 0.f;
+}
+
 u32 vertex_in_direction(u32 level_vertex_id, Fvector direction, float max_distance)
 {
     direction.normalize_safe();
@@ -193,6 +231,19 @@ void map_add_object_spot_ser(u16 id, LPCSTR spot_type, LPCSTR text)
     ml->SetSerializable(true);
 }
 
+#include "graph_engine.h"
+
+u16 map_add_user_spot(u8 level_id, Fvector position, LPCSTR spot_type, LPCSTR text)
+{
+    shared_str level_name = ai().game_graph().header().level((GameGraph::_LEVEL_ID)level_id).name();
+
+    CMapLocation* ml = Level().MapManager().AddUserLocation(spot_type, level_name, position);
+    if (xr_strlen(text))
+        ml->SetHint(text);
+
+    return ml->ObjectID();
+}
+
 void map_change_spot_hint(u16 id, LPCSTR spot_type, LPCSTR text)
 {
     CMapLocation* ml = Level().MapManager().GetMapLocation(spot_type, id);
@@ -200,6 +251,19 @@ void map_change_spot_hint(u16 id, LPCSTR spot_type, LPCSTR text)
         return;
     ml->SetHint(text);
 }
+
+void map_change_spot_ser(u16 id, LPCSTR spot_type, BOOL v)
+{
+    CMapLocation* ml = Level().MapManager().GetMapLocation(spot_type, id);
+    if (!ml)
+        return;
+    ml->SetSerializable(!!v);
+}
+
+void prefetch_many_sounds( LPCSTR prefix ) {
+  Level().PrefetchManySoundsLater( prefix );
+}
+
 
 void map_remove_object_spot(u16 id, LPCSTR spot_type) { Level().MapManager().RemoveMapLocation(spot_type, id); }
 
@@ -420,8 +484,6 @@ void remove_calls_for_object(const luabind::object& lua_object)
 
 CPHWorld* physics_world() { return ph_world; }
 CEnvironment* environment() { return g_pGamePersistent->pEnvironment; }
-
-CEnvDescriptor* current_environment(CEnvironment* self) { return self->CurrentEnv; }
 
 extern bool g_bDisableAllInput;
 
@@ -846,6 +908,27 @@ void demo_record_set_direct_input(bool f)
 
 CEffectorBobbing* get_effector_bobbing() { return Actor()->GetEffectorBobbing(); }
 
+void iterate_nearest(const Fvector& pos, float radius, luabind::functor<bool> functor)
+{
+    xr_vector<CObject*> m_nearest;
+    Level().ObjectSpace.GetNearest(m_nearest, pos, radius, NULL);
+
+    if (!m_nearest.size())
+        return;
+
+    xr_vector<CObject*>::iterator it = m_nearest.begin();
+    xr_vector<CObject*>::iterator it_e = m_nearest.end();
+    for (; it != it_e; it++)
+    {
+        CGameObject* obj = smart_cast<CGameObject*>(*it);
+        if (!obj)
+            continue;
+        if (functor(obj->lua_game_object()))
+            break;
+    }
+}
+
+
 #pragma optimize("s", on)
 void CLevel::script_register(lua_State* L)
 {
@@ -854,12 +937,14 @@ void CLevel::script_register(lua_State* L)
                   .def_readwrite("fog_distance", &CEnvDescriptor::fog_distance)
                   .def_readwrite("far_plane", &CEnvDescriptor::far_plane)
                   .def_readwrite("sun_dir", &CEnvDescriptor::sun_dir)
-                  .def("load", (void(CEnvDescriptor::*)(float, LPCSTR, CEnvironment&)) & CEnvDescriptor::load_shoc)
+                  .def_readwrite("wind_velocity", &CEnvDescriptor::wind_velocity)
+                  .def_readwrite("wind_direction", &CEnvDescriptor::wind_direction)
+                  .def_readwrite("m_fTreeAmplitudeIntensity", &CEnvDescriptor::m_fTreeAmplitudeIntensity)
+                  .def_readwrite("m_fSunShaftsIntensity", &CEnvDescriptor::m_fSunShaftsIntensity)
+                  .property("m_identifier", [](CEnvDescriptor* self) { return self->m_identifier.c_str(); })
                   .def("set_env_ambient", &CEnvDescriptor::setEnvAmbient),
               class_<CEnvironment>("CEnvironment")
-                  .def("current", current_environment)
-                  .def("ForceReselectEnvs", &CEnvironment::ForceReselectEnvs)
-                  .def("getCurrentWeather", &CEnvironment::getCurrentWeather),
+                  .def("getCurrentWeather", [](CEnvironment* self, const size_t idx) { R_ASSERT(idx < 2); return self->Current[idx]; }),
 
               class_<CPHCall>("CPHCall").def("set_pause", &CPHCall::setPause),
 
@@ -888,13 +973,18 @@ void CLevel::script_register(lua_State* L)
 
             def("get_time_days", &get_time_days), def("get_time_hours", &get_time_hours), def("get_time_minutes", &get_time_minutes),
 
-            def("cover_in_direction", &cover_in_direction), def("vertex_in_direction", &vertex_in_direction), def("rain_factor", &rain_factor),
+            def("cover_in_direction", &cover_in_direction), def("vertex_in_direction", &vertex_in_direction), def("rain_factor", &rain_factor), def("rain_hemi", rain_hemi),
+            def("rain_wetness", [] { return g_pGamePersistent->Environment().wetness_factor; }),
             def("patrol_path_exists", &patrol_path_exists), def("vertex_position", &vertex_position), def("name", &get_name), def("prefetch_sound", &prefetch_sound),
+
+            def("prefetch_sound", prefetch_sound),
+            def("prefetch_many_sounds", prefetch_many_sounds ),
 
             def("client_spawn_manager", &get_client_spawn_manager),
 
             def("map_add_object_spot_ser", &map_add_object_spot_ser), def("map_add_object_spot", &map_add_object_spot), def("map_remove_object_spot", &map_remove_object_spot),
-            def("map_has_object_spot", &map_has_object_spot), def("map_change_spot_hint", &map_change_spot_hint),
+            def("map_has_object_spot", &map_has_object_spot), def("map_change_spot_hint", &map_change_spot_hint), def("map_change_spot_ser", &map_change_spot_ser),
+            def("map_add_user_spot", &map_add_user_spot),
 
             def("start_stop_menu", &start_stop_menu), def("add_dialog_to_render", &add_dialog_to_render), def("remove_dialog_to_render", &remove_dialog_to_render),
             def("main_input_receiver", &main_input_receiver), def("hide_indicators", &hide_indicators), def("show_indicators", &show_indicators),
@@ -948,6 +1038,8 @@ void CLevel::script_register(lua_State* L)
             //
             def("send_event_key_press", &send_event_key_press), def("send_event_key_release", &send_event_key_release), def("send_event_key_hold", &send_event_key_hold),
             def("send_event_mouse_wheel", &send_event_mouse_wheel),
+
+            def("iterate_nearest", &iterate_nearest),
 
             def("change_level", &change_level), def("set_cam_inert", &set_cam_inert), def("set_monster_relation", &set_monster_relation), def("patrol_path_add", &patrol_path_add),
             def("patrol_path_remove", &patrol_path_remove), def("valid_vertex_id", &valid_vertex_id), def("vertex_count", &vertex_count), def("disable_vertex", &disable_vertex),

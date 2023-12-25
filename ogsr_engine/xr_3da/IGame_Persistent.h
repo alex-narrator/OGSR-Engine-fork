@@ -42,14 +42,24 @@ public:
     };
     params m_game_params;
 
-public:
     xr_set<CPS_Instance*> ps_active, ps_destroy;
     xr_vector<CPS_Instance*> ps_needtoplay;
 
-public:
+    void GrassBendersUpdateExplosions();
+    void GrassBendersAddExplosion(const u16 id, const Fvector& position, const Fvector3& dir, const float fade, const float speed, const float intensity, const float radius);
+    void GrassBendersAddShot(const u16 id, const Fvector& position, const Fvector3& dir, const float fade, const float speed, const float intensity, const float radius);
+    void GrassBendersRemoveById(const u16 id);
+    void GrassBendersRemoveByIndex(size_t& idx);
+    void GrassBendersUpdate(const u16 id, size_t& data_idx, u32& data_frame, const Fvector& position);
+    void GrassBendersReset(const size_t idx);
+    void GrassBendersSet(const size_t idx, const u16 id, const Fvector& position, const Fvector3& dir, const float fade, const float speed, const float intensity, const float radius, const bool resetTime);
+
+    bool IsActorInHideout() const;
+    void UpdateHudRaindrops() const;
+    void UpdateRainGloss() const;
+
     void destroy_particles(const bool& all_particles);
 
-public:
     virtual void PreStart(LPCSTR op);
     virtual void Start(LPCSTR op);
     virtual void Disconnect();
@@ -78,9 +88,6 @@ public:
 
     virtual void UpdateGameType(){};
 
-    // KRodin: TODO: Доделать перегрузки если оно надо.
-    virtual void GetCurrentDof(Fvector3& dof) { dof.set(-1.4f, 0.0f, 250.f); };
-    virtual void SetBaseDof(const Fvector3& dof){};
     virtual void OnSectorChanged(int sector){};
 
     virtual void RegisterModel(IRenderVisual* V) = 0;
@@ -95,6 +102,7 @@ public:
     virtual void SetTip() = 0;
 
     virtual bool CanBePaused() { return true; }
+    virtual	void models_savePrefetch();
 };
 
 class IMainMenu
@@ -109,3 +117,4 @@ public:
 
 extern ENGINE_API IGame_Persistent* g_pGamePersistent;
 ENGINE_API extern bool IsMainMenuActive();
+ENGINE_API extern BOOL g_prefetch;

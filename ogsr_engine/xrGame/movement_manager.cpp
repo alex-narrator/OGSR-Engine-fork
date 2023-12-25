@@ -21,12 +21,7 @@
 #include "location_manager.h"
 #include "level_path_builder.h"
 #include "detail_path_builder.h"
-#include "profiler.h"
-#include "mt_config.h"
-//#include "custommonster.h"
-
-// Lain: added
-#include "steering_behaviour.h"
+#include "../xr_3da/IGame_Persistent.h"
 
 using namespace MovementManager;
 
@@ -55,6 +50,7 @@ CMovementManager::CMovementManager(CCustomMonster* object)
     extrapolate_path(false);
 
     m_wait_for_distributed_computation = false;
+    m_wait_for_distributed_computation_2 = false;
 }
 
 CMovementManager::~CMovementManager()
@@ -324,6 +320,9 @@ void CMovementManager::on_frame(CPHMovementControl* movement_control, Fvector& d
         update_path();
 
     move_along_path(movement_control, dest_position, object().client_update_fdelta());
+
+    // Update Grass benders
+    g_pGamePersistent->GrassBendersUpdate(object().ID(), grassbender_id, grassbender_frame, object().Position());
 }
 
 void CMovementManager::on_travel_point_change(const u32& previous_travel_point_index) { detail().on_travel_point_change(previous_travel_point_index); }

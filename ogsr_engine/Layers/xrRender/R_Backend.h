@@ -187,9 +187,6 @@ private:
     CTexture* textures_cs[mtMaxComputeShaderTextures]; // 4 vs
 #endif
 #endif //	USE_DX10
-#ifdef _EDITOR
-    CMatrix* matrices[8]; // matrices are supported only for FFP
-#endif
 
     void Invalidate();
 
@@ -248,7 +245,7 @@ public:
     }
 
 #if defined(USE_DX10) || defined(USE_DX11)
-    IC void get_ConstantDirect(shared_str& n, u32 DataSize, void** pVData, void** pGData, void** pPData);
+    IC void get_ConstantDirect(const char* n, u32 DataSize, void** pVData, void** pGData, void** pPData);
 #else // USE_DX10
     IC R_constant_array& get_ConstantCache_Vertex() { return constants.a_vertex; }
     IC R_constant_array& get_ConstantCache_Pixel() { return constants.a_pixel; }
@@ -273,11 +270,6 @@ public:
 
     void set_Textures(STextureList* T);
     IC void set_Textures(ref_texture_list& T) { set_Textures(&*T); }
-
-#ifdef _EDITOR
-    IC void set_Matrices(SMatrixList* M);
-    IC void set_Matrices(ref_matrix_list& M) { set_Matrices(&*M); }
-#endif
 
     IC void set_Element(ShaderElement* S, u32 pass = 0);
     IC void set_Element(ref_selement& S, u32 pass = 0) { set_Element(&*S, pass); }
@@ -501,10 +493,8 @@ public:
     ICF void Render(D3DPRIMITIVETYPE T, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
     ICF void Render(D3DPRIMITIVETYPE T, u32 startV, u32 PC);
 
-#ifdef USE_DX11
     ICF void Compute(UINT ThreadGroupCountX, UINT ThreadGroupCountY, UINT ThreadGroupCountZ);
-#endif
-
+    
     // Device create / destroy / frame signaling
     void RestoreQuadIBData(); // Igor: is used to test bug with rain, particles corruption
     void CreateQuadIB();
@@ -516,16 +506,12 @@ public:
     // Debug render
     void dbg_DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 pc);
     void dbg_DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32 startV, u32 countV, u32 startI, u32 PC);
-#if defined(USE_DX10) || defined(USE_DX11)
-    //	TODO: DX10: Implement this.
+
     IC void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2) { VERIFY(!"Not implemented"); }
     IC void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value) { VERIFY(!"Not implemented"); }
-#else //	USE_DX10
-    IC void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2) { CHK_DX(HW.pDevice->SetRenderState(p1, p2)); }
-    IC void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value) { CHK_DX(HW.pDevice->SetSamplerState(sampler, type, value)); }
-#endif //	USE_DX10
-    //#ifdef DEBUG
+
     void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt);
+    void dbg_Draw_Near(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt);
     void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt);
     IC void dbg_DrawAABB(Fvector& T, float sx, float sy, float sz, u32 C)
     {
@@ -540,11 +526,10 @@ public:
     void dbg_DrawTRI(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u32 C);
     void dbg_DrawLINE(Fmatrix& T, Fvector& p1, Fvector& p2, u32 C);
     void dbg_DrawEllipse(Fmatrix& T, u32 C);
-    //#endif
+
 
     CBackend() { Invalidate(); };
-
-#if defined(USE_DX10) || defined(USE_DX11)
+    
 private:
     // Debug Draw
     void InitializeDebugDraw();
@@ -561,14 +546,11 @@ private:
     ID3DBlob* m_pInputSignature;
 
     bool m_bChangedRTorZB;
-#endif //	USE_DX10
 };
 #pragma warning(pop)
 
 extern ECORE_API CBackend RCache;
 
-#ifndef _EDITOR
 #include "D3DUtils.h"
-#endif
 
 #endif

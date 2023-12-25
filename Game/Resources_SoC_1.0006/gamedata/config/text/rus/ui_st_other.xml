@@ -236,6 +236,13 @@
 		<text>Вид от третьего лица (freelook)</text>
 	</string>
 
+	<string id="kb_hide_hud">
+		<text>Скрыть HUD</text>
+	</string>
+	<string id="kb_show_hud">
+		<text>Показать HUD</text>
+	</string>
+
 	<string id="inventory_item_use_or_drag">
 		<text>Поднять предмет ($$ACTION_USE$$) \n Перетащить предмет (SHIFT+$$ACTION_USE$$)</text>
 	</string>
@@ -245,6 +252,14 @@
 
 	<string id="st_press_any_key">
 		<text>Нажмите любую клавишу для перехода к игре</text>
+	</string>
+
+	<string id="ui_st_money_descr">
+		<text>РУБ</text>
+	</string>
+
+	<string id="discord_status_mm">
+		<text>В главном меню</text>
 	</string>
 
 </string_table>

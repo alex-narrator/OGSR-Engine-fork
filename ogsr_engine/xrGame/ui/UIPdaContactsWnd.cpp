@@ -56,10 +56,13 @@ void CUIPdaContactsWnd::Init()
     UIRightFrame->AttachChild(UIRightFrameHeader);
     xml_init.InitFrameLine(uiXml, "right_frame_line", 0, UIRightFrameHeader);
 
-    UIAnimation = xr_new<CUIAnimatedStatic>();
-    UIAnimation->SetAutoDelete(true);
-    UIContactsHeader->AttachChild(UIAnimation);
-    xml_init.InitAnimatedStatic(uiXml, "a_static", 0, UIAnimation);
+    if (uiXml.NavigateToNode("a_static"))
+    {
+        UIAnimation = xr_new<CUIAnimatedStatic>();
+        UIAnimation->SetAutoDelete(true);
+        UIContactsHeader->AttachChild(UIAnimation);
+        xml_init.InitAnimatedStatic(uiXml, "a_static", 0, UIAnimation);
+    }
 
     UIListWnd = xr_new<CUIScrollView>();
     UIListWnd->SetAutoDelete(true);
@@ -154,11 +157,22 @@ void CUIPdaContactItem::SetSelected(bool b)
     if (b)
     {
         m_cw->UIDetailsWnd->Clear();
+
         CCharacterInfo chInfo;
         CSE_ALifeTraderAbstract* T = ch_info_get_from_id(UIInfo->OwnerID());
         chInfo.Init(T);
 
-        ADD_TEXT_TO_VIEW2(*(chInfo.Bio()), m_cw->UIDetailsWnd);
+        CUIStatic* pSt = xr_new<CUIStatic>();
+
+        pSt->SetText(*(chInfo.Bio()));
+        pSt->SetTextComplexMode(true);
+        pSt->SetWidth(m_cw->UIDetailsWnd->GetDesiredChildWidth());
+        pSt->AdjustHeightToText();
+
+        if (m_cw->UIDetailsWnd->GetFont())
+            pSt->SetFont(m_cw->UIDetailsWnd->GetFont());
+
+        m_cw->UIDetailsWnd->AddWindow(pSt, true);
 
         g_actor->callback(GameObject::eSelectPdaContact)(UIInfo->OwnerID());
     }

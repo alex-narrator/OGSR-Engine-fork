@@ -259,6 +259,7 @@ public:
     float wind_strength_factor;
     float wind_gust_factor;
     float wetness_factor;
+    Fvector3 wind_anim{};
 
     // wind blast params
     float wind_blast_strength;
@@ -338,9 +339,6 @@ public:
     void OnDeviceCreate();
     void OnDeviceDestroy();
 
-    CEnvDescriptor* getCurrentWeather(size_t idx) const { return CurrentWeather->at(idx); };
-    void ForceReselectEnvs();
-
     bool m_paused;
 
     CInifile* m_ambients_config{};
@@ -350,6 +348,11 @@ public:
     CInifile* m_thunderbolt_collections_config{};
     CInifile* m_thunderbolts_config{};
     bool m_dynamic_sun_movement{};
+
+    void StartCalculateAsync();
+
+    std::future<void> awaiter;
+    bool async_started{};
 
 protected:
     INGAME_EDITOR_VIRTUAL CEnvDescriptor* create_descriptor(shared_str const& identifier, CInifile* config);

@@ -32,6 +32,11 @@ float ps_r_prop_ss_blend = 0.25f; // 0.066f;
 float ps_r_prop_ss_sample_step_phase0 = 0.09f;
 float ps_r_prop_ss_sample_step_phase1 = 0.07f;
 
+float ps_r2_img_exposure = 1.0f;
+float ps_r2_img_gamma = 1.0f;
+float ps_r2_img_saturation = 1.0f;
+Fvector ps_r2_img_cg{0.5f, 0.5f, 0.5f};
+
 u32 ps_Preset = 2;
 constexpr xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {0, 0}};
 
@@ -41,6 +46,9 @@ constexpr xr_token qssao_token[] = {{"st_opt_off", 0},
                                     {"st_opt_medium", 2},
                                     {"st_opt_high", 3},
                                     {0, 0}};
+
+u32 ps_r_ao_mode = AO_MODE_GTAO;
+constexpr xr_token ao_mode_token[] = {{"st_gtao", AO_MODE_GTAO}, {"st_ssdo", AO_MODE_SSDO}, {nullptr, 0}};
 
 u32 ps_r_sun_quality = 1; //	=	0;
 constexpr xr_token qsun_quality_token[] = {{"st_opt_low", 0},
@@ -69,9 +77,6 @@ constexpr xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"a
 extern int psSkeletonUpdate;
 extern float r__dtex_range;
 
-#if RENDER == R_R1
-int ps_r__Supersample = 1;
-#endif
 
 int ps_r__LightSleepFrames = 10;
 
@@ -125,11 +130,10 @@ Flags32 ps_r2_ls_flags = {R2FLAG_SUN
                           | R2FLAG_EXP_DONT_TEST_UNSHADOWED | R2FLAG_USE_NVSTENCIL | R2FLAG_EXP_SPLIT_SCENE | R2FLAG_EXP_MT_CALC | R3FLAG_DYN_WET_SURF |
                           R3FLAG_VOLUMETRIC_SMOKE
                           //| R3FLAG_MSAA
-                          | R3FLAG_MSAA_OPT | R3FLAG_GBUFFER_OPT |  R2FLAG_STEEP_PARALLAX |
-                          R2FLAG_SUN_FOCUS | R2FLAG_SUN_TSM | R2FLAG_TONEMAP | R2FLAG_VOLUMETRIC_LIGHTS}; // r2-only
+                          | R3FLAG_MSAA_OPT | R3FLAG_GBUFFER_OPT |  R2FLAG_STEEP_PARALLAX | R2FLAG_SUN_FOCUS | R2FLAG_SUN_TSM | R2FLAG_TONEMAP | R2FLAG_VOLUMETRIC_LIGHTS |
+                          R2FLAG_EXP_MT_DETAILS | R2FLAG_EXP_MT_RAIN};
 
-Flags32 ps_r2_ls_flags_ext = {
-    R2FLAGEXT_ENABLE_TESSELLATION | R2FLAGEXT_RAIN_DROPS | R2FLAGEXT_RAIN_DROPS_CONTROL | R2FLAGEXT_SSLR | SSFX_HEIGHT_FOG};
+Flags32 ps_r2_ls_flags_ext = {R2FLAGEXT_ENABLE_TESSELLATION | R2FLAGEXT_RAIN_DROPS | R2FLAGEXT_RAIN_DROPS_CONTROL | R2FLAGEXT_SSLR | SSFX_HEIGHT_FOG | SSFX_INTER_GRASS};
 
 BOOL ps_no_scale_on_fade = 0; // Alundaio
 float ps_r2_df_parallax_h = 0.02f;
@@ -181,6 +185,39 @@ float ps_r2_lt_smooth = 1.f; // 1.f
 float ps_r2_slight_fade = 2.0f; // 1.f
 
 // Screen Space Shaders Stuff
+#pragma todo("Убрать в релизе эту команду? Используется только для отладки и экспериментов")
+Fvector4 ps_ssfx_wind{0.0f, 0.0f, 0.0f, 0.0f}; // DBG: X: Intensity Y: North Dir - Z: South Dir, W: enable for bugged trees
+Fvector4 ps_ssfx_wind_gust{1.0f, 0.0f, 0.0f, 0.0f}; // X: Intensity
+
+Fvector4 ps_ssfx_florafixes_1{0.3f, 0.21f, 0.3f, 0.21f}; // Specular value when the grass is dry, Specular value when the grass is wet, Specular when trees and bushes are dry, Specular when trees and bushes are wet
+Fvector4 ps_ssfx_florafixes_2{2.0f, 1.0f, 0.0f, 0.0f}; // Intensity of the flora SubSurface Scattering, How much sun color is added to the flora SubSurface Scattering (1.0 is 100% sun color)
+
+int ps_ssfx_is_underground{};
+
+int ps_ssfx_gloss_method{1};
+Fvector3 ps_ssfx_gloss_minmax{0.6f, 0.9f, 0.0f}; // Minimum value of gloss, Maximum value of gloss, Extra gloss to the weapons HUD elements when raining
+Fvector4 ps_ssfx_lightsetup_1{0.35f, 0.5f, 1.0f, 1.0f}; // intensity of specular lighting, Porcentage of the specular color. ( 0 = 0% | 1 = 100% ), Automatic adjustment of gloss based on wetness (0 or 1), Value to control the maximum value of gloss when full wetness is reached. ( 0 = 0% | 1 = 100% )
+float ps_ssfx_gloss_factor{}; //Управляется из IGame_Persistent::UpdateRainGloss()
+
+Fvector4 ps_ssfx_wetsurfaces_1_cfg{1.5f, 1.4f, 0.7f, 1.25f}; //ripples_size, ripples_speed, ripples_min_speed, ripples_intensity
+Fvector4 ps_ssfx_wetsurfaces_2_cfg{1.2f, 1.5f, 0.2f, 0.7f}; // waterfall_size, waterfall_speed, waterfall_min_speed, waterfall_intensity
+Fvector4 ps_ssfx_wetsurfaces_1{}, ps_ssfx_wetsurfaces_2{}; // Управляется из IGame_Persistent::UpdateRainGloss()
+
+Fvector4 ps_ssfx_hud_drops_1_cfg{3.0f, 1.f, 1.f, 50.f}; // Quantity of drops, Refrelction intensity, Refraction intensity, Speed of the drops animation
+Fvector4 ps_ssfx_hud_drops_2_cfg{50.f, 50.f, 0.75f, 2.f}; // Drops build up speed, Drying speed, Size of the drops, Raindrops gloss intensity
+Fvector4 ps_ssfx_hud_drops_1{}, ps_ssfx_hud_drops_2{}; // Значениями этих векторов управляет IGame_Persistent::UpdateHudRaindrops()
+
+Fvector4 ps_ssfx_blood_decals{0.6f, 0.6f, 0.f, 0.f};
+
+Fvector4 ps_ssfx_rain_1{10.0f, 0.02f, 5.f, 2.f}; // Len, Width, Speed, Quality
+Fvector4 ps_ssfx_rain_2{0.4f, 0.5f, 5.0f, 1.0f}; // Alpha, Brigthness, Refraction, Reflection
+Fvector4 ps_ssfx_rain_3{0.95f, 0.5f, 0.0f, 0.0f}; // Alpha, Refraction ( Splashes )
+
+Fvector3 ps_ssfx_shadow_cascades{20.f, 40.f, 160.f};
+Fvector4 ps_ssfx_grass_shadows = {1.0f, .25f, 20.0f, .0f};
+Fvector4 ps_ssfx_grass_interactive{1.f, static_cast<float>(GRASS_SHADER_DATA_COUNT), 2000.f, 1.0f};
+Fvector3 ps_ssfx_int_grass_params_1{2.0f, 1.0f, 1.0f};
+Fvector4 ps_ssfx_int_grass_params_2{1.0f, 5.0f, 1.0f, 1.0f};
 float ps_ssfx_wpn_dof_2 = 0.5f;
 
 //	x - min (0), y - focus (1.4), z - max (100)
@@ -190,7 +227,7 @@ float ps_r2_dof_kernel_size = 5.0f; //	7.0f
 
 int ps_r3_dyn_wet_surf_opt = 1;
 float ps_r3_dyn_wet_surf_near = 5.f; // 10.0f
-float ps_r3_dyn_wet_surf_far = 20.f; // 30.0f
+float ps_r3_dyn_wet_surf_far = 100.f; // 30.0f
 
 int ps_r3_dyn_wet_surf_sm_res = 1024; // 256
 int ps_r3_dyn_wet_surf_enable_streaks = 0;
@@ -222,7 +259,6 @@ int psTextureLOD = 0;
 
 u32 psCurrentBPP = 32;
 
-#ifndef _EDITOR
 #include "../../xr_3da/xr_ioconsole.h"
 #include "../../xr_3da/xr_ioc_cmd.h"
 
@@ -344,9 +380,6 @@ public:
     CCC_Screenshot(LPCSTR N) : IConsole_Command(N){};
     virtual void Execute(LPCSTR args)
     {
-        if (g_dedicated_server)
-            return;
-
         string_path name;
         name[0] = 0;
         sscanf(args, "%s", name);
@@ -435,7 +468,7 @@ public:
     }
 };
 
-#if RENDER != R_R1
+
 #include "r__pixel_calculator.h"
 class CCC_BuildSSA : public IConsole_Command
 {
@@ -449,129 +482,6 @@ public:
         c.run();
 #endif //	USE_DX10
     }
-};
-#endif
-
-class CCC_DofFar : public CCC_Float
-{
-public:
-    CCC_DofFar(LPCSTR N, float* V, float _min = 0.0f, float _max = 10000.0f) : CCC_Float(N, V, _min, _max) {}
-
-    virtual void Execute(LPCSTR args)
-    {
-        float v = float(atof(args));
-
-        if (v < ps_r2_dof.y + 0.1f)
-        {
-            char pBuf[256];
-            _snprintf(pBuf, sizeof(pBuf) / sizeof(pBuf[0]), "float value greater or equal to r2_dof_focus+0.1");
-            Msg("~ Invalid syntax in call to '%s'", cName);
-            Msg("~ Valid arguments: %s", pBuf);
-            Console->Execute("r2_dof_focus");
-        }
-        else
-        {
-            CCC_Float::Execute(args);
-            if (g_pGamePersistent)
-                g_pGamePersistent->SetBaseDof(ps_r2_dof);
-        }
-    }
-
-    //	CCC_Dof should save all data as well as load from config
-    virtual void Save(IWriter* F) { ; }
-};
-
-class CCC_DofNear : public CCC_Float
-{
-public:
-    CCC_DofNear(LPCSTR N, float* V, float _min = 0.0f, float _max = 10000.0f) : CCC_Float(N, V, _min, _max) {}
-
-    virtual void Execute(LPCSTR args)
-    {
-        float v = float(atof(args));
-
-        if (v > ps_r2_dof.y - 0.1f)
-        {
-            char pBuf[256];
-            _snprintf(pBuf, sizeof(pBuf) / sizeof(pBuf[0]), "float value less or equal to r2_dof_focus-0.1");
-            Msg("~ Invalid syntax in call to '%s'", cName);
-            Msg("~ Valid arguments: %s", pBuf);
-            Console->Execute("r2_dof_focus");
-        }
-        else
-        {
-            CCC_Float::Execute(args);
-            if (g_pGamePersistent)
-                g_pGamePersistent->SetBaseDof(ps_r2_dof);
-        }
-    }
-
-    //	CCC_Dof should save all data as well as load from config
-    virtual void Save(IWriter* F) { ; }
-};
-
-class CCC_DofFocus : public CCC_Float
-{
-public:
-    CCC_DofFocus(LPCSTR N, float* V, float _min = 0.0f, float _max = 10000.0f) : CCC_Float(N, V, _min, _max) {}
-
-    virtual void Execute(LPCSTR args)
-    {
-        float v = float(atof(args));
-
-        if (v > ps_r2_dof.z - 0.1f)
-        {
-            char pBuf[256];
-            _snprintf(pBuf, sizeof(pBuf) / sizeof(pBuf[0]), "float value less or equal to r2_dof_far-0.1");
-            Msg("~ Invalid syntax in call to '%s'", cName);
-            Msg("~ Valid arguments: %s", pBuf);
-            Console->Execute("r2_dof_far");
-        }
-        else if (v < ps_r2_dof.x + 0.1f)
-        {
-            char pBuf[256];
-            _snprintf(pBuf, sizeof(pBuf) / sizeof(pBuf[0]), "float value greater or equal to r2_dof_far-0.1");
-            Msg("~ Invalid syntax in call to '%s'", cName);
-            Msg("~ Valid arguments: %s", pBuf);
-            Console->Execute("r2_dof_near");
-        }
-        else
-        {
-            CCC_Float::Execute(args);
-            if (g_pGamePersistent)
-                g_pGamePersistent->SetBaseDof(ps_r2_dof);
-        }
-    }
-
-    //	CCC_Dof should save all data as well as load from config
-    virtual void Save(IWriter* F) { ; }
-};
-
-class CCC_Dof : public CCC_Vector3
-{
-public:
-    CCC_Dof(LPCSTR N, Fvector* V, const Fvector _min, const Fvector _max) : CCC_Vector3(N, V, _min, _max) { ; }
-
-    virtual void Execute(LPCSTR args)
-    {
-        Fvector v;
-        if (3 != sscanf(args, "%f,%f,%f", &v.x, &v.y, &v.z))
-            InvalidSyntax();
-        else if ((v.x > v.y - 0.1f) || (v.z < v.y + 0.1f))
-        {
-            InvalidSyntax();
-            Msg("x <= y - 0.1");
-            Msg("y <= z - 0.1");
-        }
-        else
-        {
-            CCC_Vector3::Execute(args);
-            if (g_pGamePersistent)
-                g_pGamePersistent->SetBaseDof(ps_r2_dof);
-        }
-    }
-    virtual void Status(TStatus& S) { xr_sprintf(S, "%f,%f,%f", value->x, value->y, value->z); }
-    virtual void Info(TInfo& I) { xr_sprintf(I, "vector3 in range [%f,%f,%f]-[%f,%f,%f]", min.x, min.y, min.z, max.x, max.y, max.z); }
 };
 
 class CCC_DumpResources : public IConsole_Command
@@ -593,7 +503,7 @@ public:
 };
 
 //	Allow real-time fog config reload
-#if (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R4)
 #ifdef DEBUG
 
 #include "../xrRenderDX10/3DFluid/dx103DFluidManager.h"
@@ -605,9 +515,27 @@ public:
     virtual void Execute(LPCSTR args) { FluidManager.UpdateProfiles(); }
 };
 #endif //	DEBUG
-#endif //	(RENDER == R_R3) || (RENDER == R_R4)
+#endif //	(RENDER == R_R4)
 
-//-----------------------------------------------------------------------
+class CCC_ssfx_cascades final: public CCC_Vector3
+{
+    void apply() { RImplementation.init_cacades(); }
+
+public:
+    CCC_ssfx_cascades(LPCSTR N, Fvector3* V, const Fvector3 _min, const Fvector3 _max) : CCC_Vector3(N, V, _min, _max) {}
+    void Execute(LPCSTR args) override
+    {
+        CCC_Vector3::Execute(args);
+        apply();
+    }
+    void Status(TStatus& S) override
+    {
+        CCC_Vector3::Status(S);
+        apply();
+    }
+};
+
+
 void xrRender_initconsole()
 {
     if (!FS.path_exist("$game_weathers$"))
@@ -631,9 +559,9 @@ void xrRender_initconsole()
     //	Igor: just to test bug with rain/particles corruption
     CMD1(CCC_RestoreQuadIBData, "r_restore_quad_ib_data");
 #ifdef DEBUG
-#if RENDER != R_R1
+
     CMD1(CCC_BuildSSA, "build_ssa");
-#endif
+
     CMD4(CCC_Integer, "r__lsleep_frames", &ps_r__LightSleepFrames, 4, 30);
     CMD4(CCC_Float, "r__ssa_glod_start", &ps_r__GLOD_ssa_start, 128, 512);
     CMD4(CCC_Float, "r__ssa_glod_end", &ps_r__GLOD_ssa_end, 16, 96);
@@ -643,17 +571,6 @@ void xrRender_initconsole()
     CMD3(CCC_Token, "vid_bpp", &psCurrentBPP, vid_bpp_token);
 #endif // DEBUG
     CMD4(CCC_Float, "r__wallmark_ttl", &ps_r__WallmarkTTL, 1.0f, 10.f * 60.f);
-
-#if RENDER == R_R1
-    CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 8);
-#endif
-
-    Fvector tw_min, tw_max;
-
-#if RENDER == R_R2
-    // Texture manager
-    CMD4(CCC_Integer, "texture_lod", &psTextureLOD, 0, 4);
-#endif
 
     CMD4(CCC_Float, "r__geometry_lod", &ps_r__LOD, 1.f, 3.f); // AVO: extended from 1.2f to 3.f
     //.	CMD4(CCC_Float,		"r__geometry_lod_pow",	&ps_r__LOD_Power,			0,		2		);
@@ -679,30 +596,9 @@ void xrRender_initconsole()
 
     CMD3(CCC_Mask, "r__actor_shadow", &ps_r2_ls_flags_ext, R2FLAGEXT_ACTOR_SHADOW);
 
-    // R1
-#if RENDER == R_R1
-    CMD4(CCC_Float, "r1_ssa_lod_a", &ps_r1_ssaLOD_A, 16, 96);
-    CMD4(CCC_Float, "r1_ssa_lod_b", &ps_r1_ssaLOD_B, 16, 64);
-    CMD4(CCC_Float, "r1_lmodel_lerp", &ps_r1_lmodel_lerp, 0, 0.333f);
-    CMD3(CCC_Mask, "r1_dlights", &ps_r1_flags, R1FLAG_DLIGHTS);
-    CMD4(CCC_Float, "r1_dlights_clip", &ps_r1_dlights_clip, 10.f, 150.f);
-#endif
+
     CMD4(CCC_Float, "r1_pps_u", &ps_r1_pps_u, -1.f, +1.f);
     CMD4(CCC_Float, "r1_pps_v", &ps_r1_pps_v, -1.f, +1.f);
-
-#if RENDER == R_R1
-    // R1-specific
-    CMD4(CCC_Integer, "r1_glows_per_frame", &ps_r1_GlowsPerFrame, 2, 32);
-    CMD3(CCC_Mask, "r1_detail_textures", &ps_r2_ls_flags, R1FLAG_DETAIL_TEXTURES);
-
-    CMD4(CCC_Float, "r1_fog_luminance", &ps_r1_fog_luminance, 0.2f, 5.f);
-
-    // Software Skinning
-    // 0 - disabled (renderer can override)
-    // 1 - enabled
-    // 2 - forced hardware skinning (renderer can not override)
-    CMD4(CCC_Integer, "r1_software_skinning", &ps_r1_SoftwareSkinning, 0, 2);
-#endif
 
     // R2
     CMD4(CCC_Float, "r2_ssa_lod_a", &ps_r2_ssaLOD_A, 16, 96);
@@ -754,7 +650,7 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "r_mt_texload", &ps_r2_ls_flags_ext, R2FLAGEXT_MT_TEXLOAD);
 
     CMD3(CCC_Mask, "r2_sun", &ps_r2_ls_flags, R2FLAG_SUN);
-    //CMD3(CCC_Mask, "r2_sun_details", &ps_r2_ls_flags, R2FLAG_SUN_DETAILS);
+    CMD3(CCC_Mask, "r2_sun_details", &ps_r2_ls_flags, R2FLAG_SUN_DETAILS);
     CMD3(CCC_Mask, "r2_sun_focus", &ps_r2_ls_flags, R2FLAG_SUN_FOCUS);
     //	CMD3(CCC_Mask,		"r2_sun_static",		&ps_r2_ls_flags,			R2FLAG_SUN_STATIC);
     //	CMD3(CCC_Mask,		"r2_exp_splitscene",	&ps_r2_ls_flags,			R2FLAG_EXP_SPLIT_SCENE);
@@ -768,9 +664,8 @@ void xrRender_initconsole()
     CMD3(CCC_Token, "r__smap_size", &r2_SmapSize, SmapSizeToken);
     CMD4(CCC_Float, "r2_sun_near", &ps_r2_sun_near, 1.f, 100.f /*50.f*/);
 
-#if RENDER != R_R1
     CMD4(CCC_Float, "r2_sun_far", &OLES_SUN_LIMIT_27_01_07, 51.f, 180.f);
-#endif
+
     CMD4(CCC_Float, "r2_sun_near_border", &ps_r2_sun_near_border, .5f, 3.0f);
     CMD4(CCC_Float, "r2_sun_depth_far_scale", &ps_r2_sun_depth_far_scale, 0.5, 1.5);
     CMD4(CCC_Float, "r2_sun_depth_far_bias", &ps_r2_sun_depth_far_bias, -0.5, +0.5);
@@ -811,18 +706,10 @@ void xrRender_initconsole()
 
     CMD4(CCC_Float, "r2_slight_fade", &ps_r2_slight_fade, .2f, 2.f);
 
-    /*/	Igor: Depth of field
-    tw_min.set(-10000, -10000, 0);
-    tw_max.set(10000, 10000, 10000);
-    CMD4(CCC_Dof, "r2_dof", &ps_r2_dof, tw_min, tw_max);
-    CMD4(CCC_DofNear, "r2_dof_near", &ps_r2_dof.x, tw_min.x, tw_max.x);
-    CMD4(CCC_DofFocus, "r2_dof_focus", &ps_r2_dof.y, tw_min.y, tw_max.y);
-    CMD4(CCC_DofFar, "r2_dof_far", &ps_r2_dof.z, tw_min.z, tw_max.z);
+    CMD3(CCC_Mask, "r_mt_details", &ps_r2_ls_flags, R2FLAG_EXP_MT_DETAILS);
+    CMD3(CCC_Mask, "r_mt_sun", &ps_r2_ls_flags, R2FLAG_EXP_MT_SUN);
 
-    CMD4(CCC_Float, "r2_dof_kernel", &ps_r2_dof_kernel_size, .0f, 10.f);
-    CMD4(CCC_Float, "r2_dof_sky", &ps_r2_dof_sky, -10000.f, 10000.f);
-    CMD3(CCC_Mask, "r2_dof_enable", &ps_r2_ls_flags, R2FLAG_DOF);
-    */
+    CMD3(CCC_Mask, "r_mt_rain", &ps_r2_ls_flags, R2FLAG_EXP_MT_RAIN);
 
     CMD3(CCC_Mask, "r2_volumetric_lights", &ps_r2_ls_flags, R2FLAG_VOLUMETRIC_LIGHTS);
 
@@ -838,6 +725,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r_SunShafts_Radius", &ps_r_prop_ss_radius, 0.5f, 2.0f);
     CMD4(CCC_Float, "r_SunShafts_Blend", &ps_r_prop_ss_blend, 0.01f, 1.0f);
 
+    CMD3(CCC_Token, "r_ao_mode", &ps_r_ao_mode, ao_mode_token);
     CMD3(CCC_Token, "r2_ssao", &ps_r_ssao, qssao_token);
 
     CMD3(CCC_Mask, "r4_enable_tessellation", &ps_r2_ls_flags_ext, R2FLAGEXT_ENABLE_TESSELLATION); // Need restart
@@ -865,36 +753,66 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "r__no_scale_on_fade", &ps_no_scale_on_fade, 0, 1); // Alundaio
 
     //	Allow real-time fog config reload
-#if (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R4)
 #ifdef DEBUG
     CMD1(CCC_Fog_Reload, "r3_fog_reload");
 #endif //	DEBUG
-#endif //	(RENDER == R_R3) || (RENDER == R_R4)
+#endif //	(RENDER == R_R4)
 
     CMD3(CCC_Mask, "r3_dynamic_wet_surfaces", &ps_r2_ls_flags, R3FLAG_DYN_WET_SURF);
     CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_sm_res", &ps_r3_dyn_wet_surf_sm_res, 64, 2048);
-    CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_enable_streaks", &ps_r3_dyn_wet_surf_enable_streaks, 0, 1);
+ //   CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_enable_streaks", &ps_r3_dyn_wet_surf_enable_streaks, 0, 1); //Устарело
 
-#if 0 // KRodin: оно странно выглядит, поэтому выключаю. Чтоб нормально выглядело надо уметь настраивать near/far. Но лучше не разрешать это крутить, во избежание. А то накрутят
-      // себе...
-	CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_opt", &ps_r3_dyn_wet_surf_opt, 0, 1);
+//	CMD4(CCC_Integer, "r3_dynamic_wet_surfaces_opt", &ps_r3_dyn_wet_surf_opt, 0, 1);
 	CMD4(CCC_Float, "r3_dynamic_wet_surfaces_near", &ps_r3_dyn_wet_surf_near, 5, 70);
-	CMD4(CCC_Float,		"r3_dynamic_wet_surfaces_far",	&ps_r3_dyn_wet_surf_far,	30,	100		);
-#endif
+	CMD4(CCC_Float, "r3_dynamic_wet_surfaces_far", &ps_r3_dyn_wet_surf_far, 30, 300);
 
     CMD3(CCC_Mask, "r3_volumetric_smoke", &ps_r2_ls_flags, R3FLAG_VOLUMETRIC_SMOKE);
     CMD1(CCC_memory_stats, "render_memory_stats");
 
     // Screen Space Shaders
+    CMD4(CCC_Vector4, "ssfx_wind", &ps_ssfx_wind, (Fvector4{0.0f, -1.0f, -1.0f, 0.0f}), (Fvector4{1.0f, 1.0f, 1.0f, 1.0f}));
+    CMD4(CCC_Vector4, "ssfx_wind_gust", &ps_ssfx_wind_gust, (Fvector4{0.0f, 0.0f, 0.0f, 0.0f}), (Fvector4{10.0f, 10.0f, 10.0f, 10.0f}));
+
+    CMD4(CCC_Vector4, "ssfx_florafixes_1", &ps_ssfx_florafixes_1, (Fvector4{}), (Fvector4{1.0f, 1.0f, 1.0f, 1.0f}));
+    CMD4(CCC_Vector4, "ssfx_florafixes_2", &ps_ssfx_florafixes_2, (Fvector4{}), (Fvector4{10.0f, 1.0f, 1.0f, 1.0f}));
+    
+    CMD4(CCC_Vector4, "ssfx_wetsurfaces_1", &ps_ssfx_wetsurfaces_1_cfg, (Fvector4{0.01f, 0.01f, 0.01f, 0.01f}), (Fvector4{2.0f, 2.0f, 2.0f, 2.0f}));
+    CMD4(CCC_Vector4, "ssfx_wetsurfaces_2", &ps_ssfx_wetsurfaces_2_cfg, (Fvector4{0.01f, 0.01f, 0.01f, 0.01f}), (Fvector4{2.0f, 2.0f, 2.0f, 2.0f}));
+    
+    CMD4(CCC_Integer, "ssfx_is_underground", &ps_ssfx_is_underground, 0, 1);
+
+    CMD4(CCC_Integer, "ssfx_gloss_method", &ps_ssfx_gloss_method, 0, 1);
+    CMD4(CCC_Vector3, "ssfx_gloss_minmax", &ps_ssfx_gloss_minmax, (Fvector3{}), (Fvector3{1.0, 1.0, 1.0}));
+
+    CMD4(CCC_Vector4, "ssfx_lightsetup_1", &ps_ssfx_lightsetup_1, (Fvector4{}), (Fvector4{1.0f, 1.0f, 1.0f, 1.0f}));
+
+    CMD4(CCC_Vector4, "ssfx_hud_drops_1", &ps_ssfx_hud_drops_1_cfg, (Fvector4{}), (Fvector4{100.f, 100.f, 100.f, 100.f}));
+    CMD4(CCC_Vector4, "ssfx_hud_drops_2", &ps_ssfx_hud_drops_2_cfg, (Fvector4{}), (Fvector4{100.f, 100.f, 100.f, 100.f}));
+
+    CMD4(CCC_Vector4, "ssfx_blood_decals", &ps_ssfx_blood_decals, (Fvector4{}), (Fvector4{5.f, 5.f, 0.f, 0.f}));
+
+    CMD4(CCC_Vector4, "ssfx_rain_1", &ps_ssfx_rain_1, (Fvector4{}), (Fvector4{10.f, 5.f, 5.f, 2.f}));
+    CMD4(CCC_Vector4, "ssfx_rain_2", &ps_ssfx_rain_2, (Fvector4{}), (Fvector4{1.f, 10.f, 10.f, 10.f}));
+    CMD4(CCC_Vector4, "ssfx_rain_3", &ps_ssfx_rain_3, (Fvector4{}), (Fvector4{1.f, 10.f, 10.f, 10.f}));
+
+    CMD4(CCC_Vector4, "ssfx_grass_shadows", &ps_ssfx_grass_shadows, Fvector4().set(0, 0, 0, 0), Fvector4().set(3, 1, 100, 100));
+    CMD4(CCC_ssfx_cascades, "ssfx_shadow_cascades", &ps_ssfx_shadow_cascades, (Fvector3{1.0f, 1.0f, 1.0f}), (Fvector3{300.f, 300.f, 300.f}));
     CMD4(CCC_Float, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, 0, 1);
+    CMD4(CCC_Vector4, "ssfx_grass_interactive", &ps_ssfx_grass_interactive, (Fvector4{}), (Fvector4{1.f, static_cast<float>(GRASS_SHADER_DATA_COUNT), 5000.f, 1.f}));
+    CMD4(CCC_Vector3, "ssfx_int_grass_params_1", &ps_ssfx_int_grass_params_1, (Fvector3{}), (Fvector3{5.f, 5.f, 5.f}));
+    CMD4(CCC_Vector4, "ssfx_int_grass_params_2", &ps_ssfx_int_grass_params_2, (Fvector4{}), (Fvector4{5.f, 20.f, 1.f, 5.f}));
 
     CMD3(CCC_Mask, "ssfx_height_fog", &ps_r2_ls_flags_ext, SSFX_HEIGHT_FOG);
     CMD3(CCC_Mask, "ssfx_sky_debanding", &ps_r2_ls_flags_ext, SSFX_SKY_DEBANDING);
     CMD3(CCC_Mask, "ssfx_indirect_light", &ps_r2_ls_flags_ext, SSFX_INDIRECT_LIGHT);
+    CMD3(CCC_Mask, "ssfx_inter_grass", &ps_r2_ls_flags_ext, SSFX_INTER_GRASS);
+    CMD4(CCC_Float, "ssfx_exposure", &ps_r2_img_exposure, 0.5f, 1.5f);
+    CMD4(CCC_Float, "ssfx_gamma", &ps_r2_img_gamma, 0.5f, 1.5f);
+    CMD4(CCC_Float, "ssfx_saturation", &ps_r2_img_saturation, 0.5f, 1.5f);
+    CMD4(CCC_Vector3, "ssfx_color_grading", &ps_r2_img_cg, (Fvector3{}), (Fvector3{1.f, 1.f, 1.f}));
     CMD3(CCC_Mask, "reflections_only_on_terrain", &ps_r2_ls_flags_ext, REFLECTIONS_ONLY_ON_TERRAIN);
     CMD3(CCC_Mask, "reflections_only_on_puddles", &ps_r2_ls_flags_ext, REFLECTIONS_ONLY_ON_PUDDLES);
 
     //	CMD3(CCC_Mask,		"r2_sun_ignore_portals",		&ps_r2_ls_flags,			R2FLAG_SUN_IGNORE_PORTALS);
 }
-
-#endif

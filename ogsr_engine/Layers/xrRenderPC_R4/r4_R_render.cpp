@@ -451,12 +451,16 @@ void CRender::Render()
         PIX_EVENT(DEFER_SUN);
         RImplementation.stats.l_visible++;
         if (!ps_r2_ls_flags_ext.is(R2FLAGEXT_SUN_OLD))
+        {
             render_sun_cascades();
+        }
         else
         {
-            render_sun_near();
-            render_sun();
-            render_sun_filtered();
+            // старое солнце кривое
+
+            //render_sun_near();
+            //render_sun();
+            //render_sun_filtered();
         }
         Target->accum_direct_blend();
     }
@@ -499,6 +503,8 @@ void CRender::Render()
         PIX_EVENT(DEFER_LIGHT_COMBINE);
         Target->phase_combine();
     }
+    if (Details)
+        Details->details_clear();
 
     VERIFY(0 == mapDistort.size());
 }

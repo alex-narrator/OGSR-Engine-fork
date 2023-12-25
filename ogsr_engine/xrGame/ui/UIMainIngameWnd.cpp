@@ -455,35 +455,34 @@ void CUIMainIngameWnd::Update()
 
 bool CUIMainIngameWnd::OnKeyboardPress(int dik)
 {
-    if (Level().IR_GetKeyState(DIK_LSHIFT) || Level().IR_GetKeyState(DIK_RSHIFT))
+    const bool shift = Level().IR_GetKeyState(DIK_LSHIFT) || Level().IR_GetKeyState(DIK_RSHIFT);
+    const auto bind = get_binded_action(dik);
+
+    if (bind == kHIDEHUD)
     {
-        switch (dik)
+        if (shift)
         {
-        case DIK_NUMPADMINUS:
             UIZoneMap->ZoomOut();
-            return true;
-            break;
-        case DIK_NUMPADPLUS:
-            UIZoneMap->ZoomIn();
-            return true;
-            break;
         }
-    }
-    else
-    {
-        switch (dik)
+        else
         {
-        case DIK_NUMPADMINUS:
-            //.HideAll();
             HUD().GetUI()->HideGameIndicators();
-            return true;
-            break;
-        case DIK_NUMPADPLUS:
-            //.ShowAll();
-            HUD().GetUI()->ShowGameIndicators();
-            return true;
-            break;
+            HUD().GetUI()->hud_disabled_by_user = true;
         }
+        return true;
+    }
+    else if (bind == kSHOWHUD)
+    {
+        if (shift)
+        {
+            UIZoneMap->ZoomIn();
+        }
+        else
+        {
+            HUD().GetUI()->ShowGameIndicators();
+            HUD().GetUI()->hud_disabled_by_user = false;
+        }
+        return true;
     }
 
     return false;
@@ -851,8 +850,10 @@ void CUIMainIngameWnd::script_register(lua_State* L)
 {
     module(L)[
 
-        class_<CUIMainIngameWnd, CUIWindow>("CUIMainIngameWnd").def("GetStatic", &GetStaticRaw, raw<2>()),
-        def("get_main_window", &GetMainIngameWindow) // get_mainingame_window better??
-        ,
-        def("setup_game_icon", &SetupGameIcon)];
+        class_<CUIMainIngameWnd, CUIWindow>("CUIMainIngameWnd")
+            .def("GetStatic", &GetStaticRaw, raw<2>()),
+
+        def("get_main_window", &GetMainIngameWindow), // get_mainingame_window better??
+        def("setup_game_icon", &SetupGameIcon)
+    ];
 }

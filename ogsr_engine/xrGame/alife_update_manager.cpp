@@ -22,6 +22,7 @@
 #include "restriction_space.h"
 #include "profiler.h"
 #include "mt_config.h"
+#include "gamepersistent.h"
 
 using namespace ALife;
 
@@ -106,7 +107,7 @@ void CALifeUpdateManager::shedule_Update(u32 dt)
 
     if (!m_first_time && g_mt_config.test(mtALife))
     {
-        Device.seqParallel.push_back(fastdelegate::MakeDelegate(this, &CALifeUpdateManager::update));
+        Device.add_to_seq_parallel(fastdelegate::MakeDelegate(this, &CALifeUpdateManager::update));
         return;
     }
 
@@ -200,6 +201,8 @@ bool CALifeUpdateManager::change_level(NET_Packet& net_packet)
         holder->o_Angle = holder_safe_angles;
     }
 
+    GamePersistent().models_savePrefetch();
+
     return (true);
 }
 
@@ -212,6 +215,8 @@ void CALifeUpdateManager::new_game(LPCSTR save_name)
     unload();
     reload(m_section);
     spawns().load(save_name);
+
+    graph().on_load();
 
     server().PerformIDgen(0x0000);
     time_manager().init(m_section);

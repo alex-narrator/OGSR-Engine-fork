@@ -2,9 +2,9 @@
 #include <psapi.h>
 #include "xrsharedmem.h"
 
-//#ifndef _DEBUG
+#ifndef __SANITIZE_ADDRESS__
 #define USE_MIMALLOC
-//#endif
+#endif
 
 #ifdef USE_MIMALLOC
 #include "..\mimalloc\include\mimalloc-override.h"
@@ -29,8 +29,21 @@ void xrMemory::_initialize()
 {
     stat_calls = 0;
 
+    SProcessMemInfo memCounters;
+    GetProcessMemInfo(memCounters);
+
+    u64 disableMemoryTotalMb = 32000ull;
+    if (char* str = strstr(Core.Params, "-smem_disable_limit "))
+        sscanf(str + 20, "%llu", &disableMemoryTotalMb);
+    bool disableMemoryPool = memCounters.TotalPhysicalMemory > (disableMemoryTotalMb * (1024ull * 1024ull));
+
+    if (disableMemoryPool)
+    {
+        Msg("--[%s] memory pool disabled due to available memory limit: [%u MB]", __FUNCTION__, disableMemoryTotalMb);
+    }
+
     g_pStringContainer = xr_new<str_container>();
-    g_pSharedMemoryContainer = xr_new<smem_container>();
+    g_pSharedMemoryContainer = xr_new<smem_container>(disableMemoryPool);
 }
 
 void xrMemory::_destroy()
@@ -103,7 +116,15 @@ void GetProcessMemInfo(SProcessMemInfo& minfo)
 
     minfo.TotalPhysicalMemory = mem.ullTotalPhys;
     minfo.FreePhysicalMemory = mem.ullAvailPhys;
-    minfo.TotalVirtualMemory = mem.ullTotalVirtual;
+
+    minfo.TotalPageFile = mem.ullTotalPageFile - mem.ullTotalPhys;
+
+    if (minfo.TotalPageFile > 0l)
+    {
+        // эта херня погоду показывает на самом деле. надо найти способ как получить свободный размер файла подкачки
+        minfo.FreePageFile = mem.ullAvailPageFile > mem.ullAvailPhys ? mem.ullAvailPageFile - mem.ullAvailPhys : mem.ullAvailPageFile;
+    }
+
     minfo.MemoryLoad = mem.dwMemoryLoad;
 
     PROCESS_MEMORY_COUNTERS pc;
@@ -111,8 +132,9 @@ void GetProcessMemInfo(SProcessMemInfo& minfo)
     pc.cb = sizeof(pc);
     if (GetProcessMemoryInfo(GetCurrentProcess(), &pc, sizeof(pc)))
     {
-        minfo.PeakWorkingSetSize = pc.PeakWorkingSetSize;
         minfo.WorkingSetSize = pc.WorkingSetSize;
+        minfo.PeakWorkingSetSize = pc.PeakWorkingSetSize;
+
         minfo.PagefileUsage = pc.PagefileUsage;
         minfo.PeakPagefileUsage = pc.PeakPagefileUsage;
     }

@@ -2,8 +2,9 @@
 #pragma hdrstop
 
 #include "ModelPool.h"
+#include <xr_ini.h>
 
-#ifndef _EDITOR
+
 #include "../../xr_3da/IGame_Persistent.h"
 #include "../../xr_3da/fmesh.h"
 #include "fhierrarhyvisual.h"
@@ -15,17 +16,6 @@
 #include "ftreevisual.h"
 #include "ParticleGroup.h"
 #include "ParticleEffect.h"
-#else
-#include "fmesh.h"
-#include "fvisual.h"
-#include "fprogressive.h"
-#include "ParticleEffect.h"
-#include "ParticleGroup.h"
-#include "fskinned.h"
-#include "fhierrarhyvisual.h"
-#include "SkeletonAnimated.h"
-#include "IGame_Persistent.h"
-#endif
 
 dxRender_Visual* CModelPool::Instance_Create(u32 type)
 {
@@ -47,11 +37,10 @@ dxRender_Visual* CModelPool::Instance_Create(u32 type)
     case MT_SKELETON_GEOMDEF_ST: V = xr_new<CSkeletonX_ST>(); break;
     case MT_PARTICLE_EFFECT: V = xr_new<PS::CParticleEffect>(); break;
     case MT_PARTICLE_GROUP: V = xr_new<PS::CParticleGroup>(); break;
-#ifndef _EDITOR
     case MT_LOD: V = xr_new<FLOD>(); break;
     case MT_TREE_ST: V = xr_new<FTreeVisual_ST>(); break;
     case MT_TREE_PM: V = xr_new<FTreeVisual_PM>(); break;
-#endif
+
     default: FATAL("Unknown visual type"); break;
     }
     R_ASSERT(V);
@@ -93,12 +82,7 @@ dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
         if (!FS.exist(fn, "$level$", name))
             if (!FS.exist(fn, "$game_meshes$", name))
             {
-#ifdef _EDITOR
-                Msg("!Can't find model file '%s'.", name);
-                return 0;
-#else
-                Debug.fatal(DEBUG_INFO, "Can't find model file '%s'.", name);
-#endif
+                FATAL("Can't find model file [%s]", name);
             }
     }
     else
@@ -180,6 +164,11 @@ void CModelPool::Destroy()
 
     // cleanup motions container
     g_pMotionsContainer->clean(false);
+
+    if (vis_prefetch_ini)
+        vis_prefetch_ini->save_as();
+
+    m_prefetched.clear();
 }
 
 CModelPool::CModelPool()
@@ -188,12 +177,39 @@ CModelPool::CModelPool()
     bForceDiscard = FALSE;
     bAllowChildrenDuplicate = TRUE;
     g_pMotionsContainer = xr_new<motions_container>();
+
+    string_path fname;
+    FS.update_path(fname, "$app_data_root$", "vis_prefetch.ltx");
+
+    if (IReader* F = FS.r_open(fname))
+    {
+        // Костыль от ситуации когда в редких случаях почему-то у игроков бьётся vis_prefetch.ltx - оказывается набит нулями, в результате чего игра не
+        // запускается. Не понятно почему так происходит, поэтому сделал тут обработку такой ситуации.
+
+        if (F->elapsed() >= sizeof(u8) && F->r_u8() == 0) 
+        {
+            Msg("!![%s] file [%s] broken!", __FUNCTION__, fname);
+
+            FS.r_close(F);
+
+            FS.file_delete(fname);
+
+            F = nullptr;
+        }
+
+        if (F)
+            FS.r_close(F);
+    }
+
+    vis_prefetch_ini = xr_new<CInifile>(fname, FALSE);
+    process_vis_prefetch();
 }
 
 CModelPool::~CModelPool()
 {
     Destroy();
     xr_delete(g_pMotionsContainer);
+    xr_delete(vis_prefetch_ini);
 }
 
 dxRender_Visual* CModelPool::Instance_Find(LPCSTR N)
@@ -213,10 +229,7 @@ dxRender_Visual* CModelPool::Instance_Find(LPCSTR N)
 
 dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
 {
-#ifdef _EDITOR
-    if (!name || !name[0])
-        return 0;
-#endif
+
     string_path low_name;
     VERIFY(xr_strlen(name) < sizeof(low_name));
     xr_strcpy(low_name, name);
@@ -233,6 +246,7 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
         dxRender_Visual* Model = it->second;
         Model->Spawn();
         Pool.erase(it);
+        refresh_prefetch(low_name, Model->IsHudVisual);
         return Model;
     }
     else
@@ -249,15 +263,37 @@ dxRender_Visual* CModelPool::Create(const char* name, IReader* data)
             else
                 Base = Instance_Load(low_name, TRUE);
             bAllowChildrenDuplicate = TRUE;
-#ifdef _EDITOR
-            if (!Base)
-                return 0;
-#endif
         }
+
         // 3. If found - return (cloned) reference
         dxRender_Visual* Model = Instance_Duplicate(Base);
         Registry.insert(mk_pair(Model, low_name));
+
+        refresh_prefetch(low_name, Model->IsHudVisual);
+
         return Model;
+    }
+}
+
+void CModelPool::refresh_prefetch(const char* low_name, const bool is_hud_visual)
+{
+    if (now_prefetch2)
+        return;
+
+    std::string s(low_name);
+    if (m_prefetched.find(s) != m_prefetched.end())
+        return;
+
+    if (now_prefetch1)
+    {
+        m_prefetched.emplace(s, true);
+    }
+    else if (vis_prefetch_ini)
+    {
+        shared_str fname;
+        bool is_global = !!FS.exist("$game_meshes$", *fname.sprintf("%s.ogf", low_name));
+        if (is_global)
+            vis_prefetch_ini->w_fvector2("prefetch", low_name, Fvector2{2.f, is_hud_visual ? 2.f : 1.f});
     }
 }
 
@@ -392,26 +428,85 @@ void CModelPool::Discard(dxRender_Visual*& V, BOOL b_complete)
 void CModelPool::Prefetch()
 {
     Logging(FALSE);
+    begin_prefetch1(true);
     // prefetch visuals
+    CTimer timer;
+    timer.Start();
+    u32 cnt = 0;
+
     string256 section;
     strconcat(sizeof(section), section, "prefetch_visuals_", g_pGamePersistent->m_game_params.m_game_type);
-    CInifile::Sect& sect = pSettings->r_section(section);
-    for (auto I = sect.Data.begin(); I != sect.Data.end(); I++)
+    if (pSettings->section_exist(section))
     {
-        const CInifile::Item& item = *I;
-        dxRender_Visual* V = Create(item.first.c_str());
-        Delete(V, FALSE);
+        const auto& sect = pSettings->r_section(section);
+        for (const auto& pair: sect.Data)
+        {
+            const auto& low_name = pair.first;
+            if (!Instance_Find(low_name.c_str()))
+            {
+                shared_str fname;
+                fname.sprintf("%s.ogf", low_name.c_str());
+                if (FS.exist("$game_meshes$", fname.c_str()))
+                {
+                    dxRender_Visual* V = Create(low_name.c_str());
+                    Delete(V, FALSE);
+                    cnt++;
+                }
+                else
+                    Msg("! [%s]: %s not found in $game_meshes$", __FUNCTION__, fname.c_str());
+            }
+        }
     }
+    begin_prefetch1(false);
+
+    if (!vis_prefetch_ini || !vis_prefetch_ini->section_exist("prefetch"))
+    {
+        Msg("[%s] models prefetching time (%zi): [%.2f s.]", __FUNCTION__, cnt, timer.GetElapsed_sec());
+        return;
+    }
+
+    now_prefetch2 = true;
+    const auto& sect = vis_prefetch_ini->r_section("prefetch");
+    for (const auto& [low_name, val] : sect.Data)
+    {
+        float val1{}, val2{};
+        sscanf(val.c_str(), "%f,%f", &val1, &val2);
+
+        if (!Instance_Find(low_name.c_str()))
+        {
+            shared_str fname;
+            fname.sprintf("%s.ogf", low_name.c_str());
+            if (FS.exist("$game_meshes$", fname.c_str()))
+            {
+                ::Render->hud_loading = val2 == 2.f;
+                //if (::Render->hud_loading)
+                //    Msg("--[%s] loading hud model [%s]", __FUNCTION__, fname.c_str());
+                dxRender_Visual* V = Create(low_name.c_str());
+                ::Render->hud_loading = false;
+                Delete(V, FALSE);
+                cnt++;
+            }
+            else
+                Msg("! [%s]: %s not found in $game_meshes$", __FUNCTION__, fname.c_str());
+        }
+    }
+
+    now_prefetch2 = false;
     Logging(TRUE);
+    Msg("[%s] models prefetching time (%zi): [%.2f s.]", __FUNCTION__, cnt, timer.GetElapsed_sec());
 }
 
 void CModelPool::ClearPool(BOOL b_complete)
 {
-    POOL_IT _I = Pool.begin();
-    POOL_IT _E = Pool.end();
-    for (; _I != _E; _I++)
+    for (auto& I : Pool)
     {
-        Discard(_I->second, b_complete);
+        if (!b_complete && vis_prefetch_ini)
+        {
+            std::string s(I.first.c_str());
+            if (m_prefetched.find(s) == m_prefetched.end() && !vis_prefetch_ini->line_exist("prefetch", I.first.c_str()))
+                b_complete = TRUE;
+        }
+        Discard(I.second, b_complete);
     }
     Pool.clear();
 }
@@ -522,126 +617,38 @@ void CModelPool::memory_stats(u32& vb_mem_video, u32& vb_mem_system, u32& ib_mem
     }
 }
 
-#ifdef _EDITOR
-IC bool _IsBoxVisible(dxRender_Visual* visual, const Fmatrix& transform)
-{
-    Fbox bb;
-    bb.xform(visual->vis.box, transform);
-    return ::Render->occ_visible(bb);
-}
-IC bool _IsValidShader(dxRender_Visual* visual, u32 priority, bool strictB2F)
-{
-    if (visual->shader)
-        return (priority == visual->shader->E[0]->flags.iPriority) && (strictB2F == visual->shader->E[0]->flags.bStrictB2F);
-    return false;
-}
 
-void CModelPool::Render(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, int priority, bool strictB2F, float m_fLOD)
+void CModelPool::save_vis_prefetch()
 {
-    // render visual
-    xr_vector<dxRender_Visual*>::iterator I, E;
-    switch (m_pVisual->Type)
+    if (vis_prefetch_ini)
     {
-    case MT_SKELETON_ANIM:
-    case MT_SKELETON_RIGID: {
-        if (_IsBoxVisible(m_pVisual, mTransform))
-        {
-            CKinematics* pV = dynamic_cast<CKinematics*>(m_pVisual);
-            VERIFY(pV);
-            if (fis_zero(m_fLOD, EPS) && pV->m_lod)
-            {
-                if (_IsValidShader(pV->m_lod, priority, strictB2F))
-                {
-                    RCache.set_Shader(pV->m_lod->shader ? pV->m_lod->shader : EDevice.m_WireShader);
-                    RCache.set_xform_world(mTransform);
-                    pV->m_lod->Render(1.f);
-                }
-            }
-            else
-            {
-                I = pV->children.begin();
-                E = pV->children.end();
-                for (; I != E; I++)
-                {
-                    if (_IsValidShader(*I, priority, strictB2F))
-                    {
-                        RCache.set_Shader((*I)->shader ? (*I)->shader : EDevice.m_WireShader);
-                        RCache.set_xform_world(mTransform);
-                        (*I)->Render(m_fLOD);
-                    }
-                }
-            }
-        }
-    }
-    break;
-    case MT_HIERRARHY: {
-        if (_IsBoxVisible(m_pVisual, mTransform))
-        {
-            FHierrarhyVisual* pV = dynamic_cast<FHierrarhyVisual*>(m_pVisual);
-            VERIFY(pV);
-            I = pV->children.begin();
-            E = pV->children.end();
-            for (; I != E; I++)
-            {
-                if (_IsValidShader(*I, priority, strictB2F))
-                {
-                    RCache.set_Shader((*I)->shader ? (*I)->shader : EDevice.m_WireShader);
-                    RCache.set_xform_world(mTransform);
-                    (*I)->Render(m_fLOD);
-                }
-            }
-        }
-    }
-    break;
-    case MT_PARTICLE_GROUP: {
-        PS::CParticleGroup* pG = dynamic_cast<PS::CParticleGroup*>(m_pVisual);
-        VERIFY(pG);
-        //		if (_IsBoxVisible(m_pVisual,mTransform))
-        {
-            RCache.set_xform_world(mTransform);
-            for (PS::CParticleGroup::SItemVecIt i_it = pG->items.begin(); i_it != pG->items.end(); i_it++)
-            {
-                xr_vector<dxRender_Visual*> visuals;
-                i_it->GetVisuals(visuals);
-                for (xr_vector<dxRender_Visual*>::iterator it = visuals.begin(); it != visuals.end(); it++)
-                    Render(*it, Fidentity, priority, strictB2F, m_fLOD);
-            }
-        }
-    }
-    break;
-    case MT_PARTICLE_EFFECT: {
-        //		if (_IsBoxVisible(m_pVisual,mTransform))
-        {
-            if (_IsValidShader(m_pVisual, priority, strictB2F))
-            {
-                RCache.set_Shader(m_pVisual->shader ? m_pVisual->shader : EDevice.m_WireShader);
-                RCache.set_xform_world(mTransform);
-                m_pVisual->Render(m_fLOD);
-            }
-        }
-    }
-    break;
-    default:
-        if (_IsBoxVisible(m_pVisual, mTransform))
-        {
-            if (_IsValidShader(m_pVisual, priority, strictB2F))
-            {
-                RCache.set_Shader(m_pVisual->shader ? m_pVisual->shader : EDevice.m_WireShader);
-                RCache.set_xform_world(mTransform);
-                m_pVisual->Render(m_fLOD);
-            }
-        }
-        break;
+        process_vis_prefetch();
+        vis_prefetch_ini->save_as();
     }
 }
 
-void CModelPool::RenderSingle(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, float m_fLOD)
+void CModelPool::process_vis_prefetch()
 {
-    for (int p = 0; p < 4; p++)
+    if (!vis_prefetch_ini->section_exist("prefetch"))
+        return;
+    std::vector<const char*> expired;
+    const auto& sect = vis_prefetch_ini->r_section("prefetch");
+    for (const auto& [key, val] : sect.Data)
     {
-        Render(m_pVisual, mTransform, p, false, m_fLOD);
-        Render(m_pVisual, mTransform, p, true, m_fLOD);
+        float val1{}, val2{};
+        sscanf(val.c_str(), "%f,%f", &val1, &val2);
+        //Msg("--[%s] sscanf returns: [%f,%f]", __FUNCTION__, val1, val2);
+        const float need = val1 * 0.8f; // скорость уменьшение популярности визуала
+        // -0.5..+0.5 - добавить случайность, чтобы не было общего выключения
+        const float rnd = Random.randF() - 0.5f;
+        val1 = need + rnd * 0.1f;
+        if (val1 > 0.1f && val2 > 0.f)
+            vis_prefetch_ini->w_fvector2("prefetch", key.c_str(), Fvector2{val1, val2});
+        else
+            expired.emplace_back(key.c_str());
     }
+    for (const char* s : expired)
+        vis_prefetch_ini->remove_line("prefetch", s);
 }
-void CModelPool::OnDeviceDestroy() { Destroy(); }
-#endif
+
+void CModelPool::begin_prefetch1(bool val) { now_prefetch1 = val; }

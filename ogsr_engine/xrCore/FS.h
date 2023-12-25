@@ -4,7 +4,7 @@
 
 #pragma once
 
-static constexpr auto CFS_CompressMark = 1ul << 31ul;
+constexpr auto CFS_CompressMark = 1ul << 31ul;
 
 XRCORE_API void VerifyPath(const std::string_view path);
 
@@ -493,20 +493,31 @@ protected:
     u32 advance_term_string();
 
 public:
-    IC int elapsed() const { return Size - Pos; };
-    IC int tell() const { return Pos; };
+    IC int elapsed() const { return Size - Pos; }
+    IC int tell() const { return Pos; }
     IC void seek(int ptr)
     {
         Pos = ptr;
         R_ASSERT((Pos <= Size) && (Pos >= 0));
-    };
+    }
+
     IC int length() const { return Size; };
     IC void* pointer() const { return &(data[Pos]); };
     IC void advance(int cnt)
     {
         Pos += cnt;
         R_ASSERT((Pos <= Size) && (Pos >= 0));
-    };
+    }
+
+    void close();
+
+    // поиск XR Chunk'ов - возврат - размер или 0
+    IReader* open_chunk(u32 ID);
+
+    // iterators
+    IReader* open_chunk_iterator(u32& ID, IReader* previous = NULL); // NULL=first
+
+    void skip_bom(const char* dbg_name);
 
 public:
     void r(void* p, int cnt);
@@ -653,14 +664,4 @@ public:
         pvDecompress(A, t);
         A.mul(s);
     }
-
-public:
-    void close();
-
-public:
-    // поиск XR Chunk'ов - возврат - размер или 0
-    IReader* open_chunk(u32 ID);
-
-    // iterators
-    IReader* open_chunk_iterator(u32& ID, IReader* previous = NULL); // NULL=first
 };

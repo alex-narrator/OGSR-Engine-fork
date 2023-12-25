@@ -23,13 +23,14 @@ CUILines::CUILines()
     m_dwCursorColor = 0xAAFFFF00;
 
     m_bShowMe = true;
+
     uFlags.zero();
     uFlags.set(flNeedReparse, FALSE);
     uFlags.set(flComplexMode, FALSE);
     uFlags.set(flPasswordMode, FALSE);
     uFlags.set(flColoringMode, TRUE);
-    uFlags.set(flCutWordsMode, FALSE);
     uFlags.set(flRecognizeNewLine, TRUE);
+
     m_pFont = UI()->Font()->pFontLetterica16Russian;
     m_cursor_pos.set(0, 0);
     m_iCursorPos = 0;
@@ -58,8 +59,6 @@ void CUILines::SetPasswordMode(bool mode)
 
 void CUILines::SetColoringMode(bool mode) { uFlags.set(flColoringMode, mode); }
 
-void CUILines::SetCutWordsMode(bool mode) { uFlags.set(flCutWordsMode, mode); }
-
 void CUILines::SetUseNewLineMode(bool mode) { uFlags.set(flRecognizeNewLine, mode); }
 
 void CUILines::Init(float x, float y, float width, float heigt) { CUISimpleWindow::Init(x, y, width, heigt); }
@@ -75,55 +74,98 @@ void CUILines::SetText(LPCSTR text)
             return;
 
         m_text = text;
+        m_text_mask.clear();
+        for (auto it = m_text.cbegin(), it_end = m_text.cend(); it != it_end; ++it)
+        {
+            if (m_pFont->IsMultibyte() && *reinterpret_cast<const unsigned char*>(&*it) > std::numeric_limits<char>::max() &&
+                (it + 1) != it_end) // Костыльный поиск юникодных символов. Но для хрея пойдет, тут в рендере юникодного текста и так костыль на костыле
+            {
+                m_text_mask.emplace_back(true);
+                m_text_mask.emplace_back(true);
+                ++it;
+            }
+            else
+            {
+                m_text_mask.emplace_back(false);
+            }
+        }
 
         uFlags.set(flNeedReparse, TRUE);
     }
     else
     {
         m_text = "";
+        m_text_mask.clear();
+
         Reset();
     }
     MoveCursorToEnd();
 }
 
-void CUILines::AddCharAtCursor(char ch)
+void CUILines::AddCharAtCursor(const u16 ch)
 {
+    if (m_pFont->IsMultibyte() && ch > std::numeric_limits<char>::max())
+    {
+        auto byte = reinterpret_cast<const char*>(&ch);
+        m_text_mask.insert(m_text_mask.begin() + m_iCursorPos, true);
+        m_text.insert(m_text.begin() + (m_iCursorPos++), *byte);
+        m_text_mask.insert(m_text_mask.begin() + m_iCursorPos, true);
+        m_text.insert(m_text.begin() + (m_iCursorPos++), *(++byte));
+    }
+    else
+    {
+        m_text_mask.insert(m_text_mask.begin() + m_iCursorPos, false);
+        m_text.insert(m_text.begin() + (m_iCursorPos++), ch);
+    }
+
     uFlags.set(flNeedReparse, TRUE);
-    m_text.insert(m_text.begin() + m_iCursorPos, ch);
-    IncCursorPos();
 }
 
 void CUILines::MoveCursorToEnd() { m_iCursorPos = (int)m_text.size(); }
 
-void CUILines::DelChar()
-{
-    const int sz = (int)m_text.size();
-    if (m_iCursorPos < sz)
-    {
-        m_text.erase(m_text.begin() + m_iCursorPos);
-        uFlags.set(flNeedReparse, TRUE);
-    }
-}
-
 void CUILines::DelLeftChar()
 {
-    if (m_iCursorPos > 0)
+    if (m_text.empty() || m_iCursorPos <= 0)
+        return;
+
+    if (m_text_mask.at(m_iCursorPos - 1))
     {
-        DecCursorPos();
-        DelChar();
+        m_text.erase(m_text.begin() + m_iCursorPos - 2, m_text.begin() + m_iCursorPos);
+        m_text_mask.erase(m_text_mask.begin() + m_iCursorPos - 2, m_text_mask.begin() + m_iCursorPos);
+        m_iCursorPos -= 2;
     }
+    else
+    {
+        m_text.erase(m_text.begin() + m_iCursorPos - 1);
+        m_text_mask.erase(m_text_mask.begin() + m_iCursorPos - 1);
+        m_iCursorPos -= 1;
+    }
+
+    uFlags.set(flNeedReparse, TRUE);
+}
+
+void CUILines::DelCurrentChar()
+{
+    if (m_text.empty() || m_iCursorPos >= m_text.size())
+        return;
+
+    if (m_text_mask.at(m_iCursorPos))
+    {
+        m_text.erase(m_text.begin() + m_iCursorPos, m_text.begin() + m_iCursorPos + 2);
+        m_text_mask.erase(m_text_mask.begin() + m_iCursorPos, m_text_mask.begin() + m_iCursorPos + 2);
+    }
+    else
+    {
+        m_text.erase(m_text.begin() + m_iCursorPos);
+        m_text_mask.erase(m_text_mask.begin() + m_iCursorPos);
+    }
+
+    uFlags.set(flNeedReparse, TRUE);
 }
 
 LPCSTR CUILines::GetText() { return m_text.c_str(); }
 
 void CUILines::Reset() { m_lines.clear(); }
-
-float get_str_width(CGameFont* pFont, char ch)
-{
-    float ll = pFont->SizeOf_(ch);
-    UI()->ClientToScreenScaledWidth(ll);
-    return ll;
-}
 
 void CUILines::ParseText()
 {
@@ -145,7 +187,7 @@ void CUILines::ParseText()
     if (!m_text.empty() && !m_pFont)
         R_ASSERT2(false, "can't parse text without font");
 
-    CUILine* line = NULL;
+    CUILine* line{};
 
     if (uFlags.test(flColoringMode))
     {
@@ -153,163 +195,204 @@ void CUILines::ParseText()
     }
     else
     {
-        CUISubLine subline;
-        subline.m_text = m_text;
-        subline.m_color = GetTextColor();
-
         line = xr_new<CUILine>();
-        line->AddSubLine(&subline);
+        line->AddSubLine(m_text, GetTextColor());
     }
 
-    BOOL bNewLines = FALSE;
+    bool bNewLines{};
+    static const bool use_new_parse_text = READ_IF_EXISTS(pSettings, r_bool, "features", "use_new_parse_text", true);
 
     if (uFlags.test(flRecognizeNewLine))
-        if (m_pFont->IsMultibyte())
+    {
+        if (!use_new_parse_text && m_pFont->IsMultibyte())
         {
             CUILine* ptmp_line = xr_new<CUILine>();
-            int vsz = line->m_subLines.size();
-            VERIFY(vsz);
-            for (int i = 0; i < vsz; i++)
+
+            for (const auto& subline : line->m_subLines)
             {
-                char* pszTemp = NULL;
-                const u32 tcolor = line->m_subLines[i].m_color;
-                char szTempLine[MAX_MB_CHARS], *pszSearch = NULL;
-                VERIFY(strlen(line->m_subLines[i].m_text.c_str()) < MAX_MB_CHARS);
-                strcpy_s(szTempLine, line->m_subLines[i].m_text.c_str());
-                pszSearch = szTempLine;
-                while ((pszTemp = strstr(pszSearch, "\\n")) != NULL)
+                const u32 tcolor = subline.m_color;
+                xr_string szTempLine = subline.m_text;
+                char* pszSearch = szTempLine.data();
+                while (char* pszTemp = strstr(pszSearch, "\\n"))
                 {
-                    bNewLines = TRUE;
+                    bNewLines = true;
                     *pszTemp = '\0';
-                    ptmp_line->AddSubLine(pszSearch, tcolor);
+                    ptmp_line->AddSubLine(xr_string{pszSearch}, tcolor);
                     pszSearch = pszTemp + 2;
                 }
-                ptmp_line->AddSubLine(pszSearch, tcolor);
+                ptmp_line->AddSubLine(xr_string{pszSearch}, tcolor);
             }
-            line->Clear();
-            xr_free(line);
+            xr_delete(line);
             line = ptmp_line;
         }
         else
+        {
             line->ProcessNewLines(); // process "\n"
-       
-    if (m_pFont->IsMultibyte())
+        }
+    }
+
+    if (!use_new_parse_text && m_pFont->IsMultibyte())
     {
-#define UBUFFER_SIZE 100
-        u16 aMarkers[UBUFFER_SIZE];
-        CUILine tmp_line;
-        char szTempLine[MAX_MB_CHARS];
         float fTargetWidth = 1.0f;
         UI()->ClientToScreenScaledWidth(fTargetWidth);
         VERIFY((m_wndSize.x > 0) && (fTargetWidth > 0));
         fTargetWidth = m_wndSize.x / fTargetWidth;
-        int vsz = line->m_subLines.size();
-        VERIFY(vsz);
-        if ((vsz > 1) && (!bNewLines))
-        { // only colored line, pizdets
-            for (int i = 0; i < vsz; i++)
+
+        if (line->m_subLines.size() > 1 && !bNewLines)
+        {
+            // only colored line, pizdets
+            auto& tmp_line = m_lines.emplace_back();
+            for (const auto& subline : line->m_subLines)
             {
-                const char* pszText = line->m_subLines[i].m_text.c_str();
-                const u32 tcolor = line->m_subLines[i].m_color;
-                VERIFY(pszText);
-                tmp_line.AddSubLine(pszText, tcolor);
+                xr_string pszText = subline.m_text;
+                const u32 tcolor = subline.m_color;
+                tmp_line.AddSubLine(std::move(pszText), tcolor);
             }
-            m_lines.push_back(tmp_line);
-            tmp_line.Clear();
         }
         else
         {
-            for (int i = 0; i < vsz; i++)
+            for (const auto& subline : line->m_subLines)
             {
-                const char* pszText = line->m_subLines[i].m_text.c_str();
-                const u32 tcolor = line->m_subLines[i].m_color;
-                u16 uFrom = 0, uPartLen = 0;
+                const char* pszText = subline.m_text.c_str();
                 VERIFY(pszText);
-                u16 nMarkers = m_pFont->SplitByWidth(aMarkers, UBUFFER_SIZE, fTargetWidth, pszText);
+                const u32 tcolor = subline.m_color;
+
+                u16 aMarkers[1000]{};
+                u16 uFrom{}, uPartLen{};
+                const u16 nMarkers = m_pFont->SplitByWidth(aMarkers, std::size(aMarkers), fTargetWidth, pszText);
                 for (u16 j = 0; j < nMarkers; j++)
                 {
                     uPartLen = aMarkers[j] - uFrom;
-                    VERIFY((uPartLen > 0) && (uPartLen < MAX_MB_CHARS));
-                    strncpy_s(szTempLine, pszText + uFrom, uPartLen);
-                    szTempLine[uPartLen] = '\0';
-                    tmp_line.AddSubLine(szTempLine, tcolor);
-                    m_lines.push_back(tmp_line);
-                    tmp_line.Clear();
+                    VERIFY(uPartLen > 0);
+                    xr_string szTempLine{pszText + uFrom, uPartLen};
+                    auto& tmp_line = m_lines.emplace_back();
+                    tmp_line.AddSubLine(std::move(szTempLine), tcolor);
                     uFrom += uPartLen;
                 }
-                strncpy_s(szTempLine, pszText + uFrom, MAX_MB_CHARS);
-                tmp_line.AddSubLine(szTempLine, tcolor);
-                m_lines.push_back(tmp_line);
-                tmp_line.Clear();
+
+                xr_string szTempLine{pszText + uFrom};
+                auto& tmp_line = m_lines.emplace_back();
+                tmp_line.AddSubLine(std::move(szTempLine), tcolor);
             }
         }
     }
     else
     {
+        constexpr float __eps = 5.f;
 
-    float max_width = m_wndSize.x;
+        const float max_width = m_wndSize.x;
+        float curr_width{};
 
-    CUILine tmp_line;
-    string4096 buff;
-    float curr_width = 0.0f;
+        CUILine tmp_line;
 
-    float __eps = 0.1f;
-
-    u32 sbl_cnt = line->m_subLines.size();
-    for (u32 sbl_idx = 0; sbl_idx < sbl_cnt; ++sbl_idx)
-    {
-        bool b_last_subl = (sbl_idx == sbl_cnt - 1);
-
-        CUISubLine& sbl = line->m_subLines[sbl_idx];
-
-        u32 sub_len = (u32)sbl.m_text.length();
-        u32 curr_w_pos = 0;
-
-        u32 last_space_idx = 0;
-        for (u32 idx = 0; idx < sub_len; ++idx)
+        const size_t sbl_cnt = line->m_subLines.size();
+        for (size_t sbl_idx{}; sbl_idx < sbl_cnt; ++sbl_idx)
         {
-            bool b_last_ch = (idx == sub_len - 1);
+            const bool b_last_subl = sbl_idx == sbl_cnt - 1;
+            CUISubLine& sbl = line->m_subLines[sbl_idx];
+            const size_t sub_len = sbl.m_text.length();
 
-            if (iswspace(sbl.m_text[idx]))
+            size_t curr_w_pos{}, last_space_idx{};
+
+            for (size_t idx{}; idx < sub_len;)
             {
-                last_space_idx = idx;
-            }
+                bool is_wide_char =
+                    m_pFont->IsMultibyte() && *reinterpret_cast<const unsigned char*>(&sbl.m_text[idx]) > std::numeric_limits<char>::max() && (idx + 1) < sub_len;
 
-            float char_width = get_str_width(m_pFont, sbl.m_text[idx]);
-            bool bOver = (curr_width + char_width + __eps > max_width);
+                auto get_str_width = [](CGameFont* pFont, const char ch) {
+                    float fDelta = pFont->SizeOf_(ch);
+                    return fDelta;
+                };
 
-            if (bOver || b_last_ch)
-            {
-                if (last_space_idx && !b_last_ch)
+                auto get_wstr_width = [&](CGameFont* pFont, const char* ch) {
+                    u16 wchar{};
+                    const int wchars_num = MultiByteToWideChar(CP_UTF8, 0, ch, 2, reinterpret_cast<LPWSTR>(&wchar), 1);
+
+                    // Msg("--MultiByteToWideChar returned symbol [%u]", wchar);
+
+                    if (wchars_num < 1) // Такое бывает на неподдерживаемых языках кроме rus/eng, мб ещё в каких то редких случаях
+                    {
+                        // Msg("!!--MultiByteToWideChar returned 0 symbols. Something strange! String: [%s]", ch);
+                        is_wide_char = false;
+                        return get_str_width(pFont, *ch);
+                    }
+
+                    float fDelta = pFont->SizeOf_(wchar);
+                    return fDelta;
+                };
+
+                /*
+                if (is_wide_char)
+                    Msg("--Size of W symbol [%d] is [%f], curr_width: [%f], max_width: [%f]", sbl.m_text[idx], get_Wstr_width(m_pFont, &sbl.m_text[idx]), curr_width, max_width);
+                else
+                    Msg("~~Size of A symbol [%d] is [%f], curr_width: [%f], max_width: [%f]", sbl.m_text[idx], get_str_width(m_pFont, sbl.m_text[idx]), curr_width, max_width);
+                */
+
+                float char_width = is_wide_char ? get_wstr_width(m_pFont, &sbl.m_text[idx])
+                                                : get_str_width(m_pFont, sbl.m_text[idx]);
+
+                UI()->ClientToScreenScaledWidth(char_width);
+
+                if (!is_wide_char && iswspace(sbl.m_text[idx]))
                 {
-                    idx = last_space_idx;
-                    last_space_idx = 0;
+                    last_space_idx = idx;
                 }
 
-                strncpy_s(buff, sbl.m_text.c_str() + curr_w_pos, idx - curr_w_pos + 1);
-                tmp_line.AddSubLine(buff, sbl.m_color);
-                curr_w_pos = idx + 1;
-            }
-            else
-                curr_width += char_width;
+                const bool bOver = curr_width + char_width + __eps > max_width;
+                const bool b_last_ch = idx == sub_len - (is_wide_char ? 2 : 1);
 
-            if (bOver || (b_last_ch && sbl.m_last_in_line))
+                if (bOver || b_last_ch)
+                {
+                    if (last_space_idx && !b_last_ch)
+                    {
+                        idx = last_space_idx;
+                        is_wide_char = false;
+                        last_space_idx = 0;
+                    }
+
+                    xr_string buff{sbl.m_text.c_str() + curr_w_pos, idx - curr_w_pos + (is_wide_char ? 2 : 1)};
+                    tmp_line.AddSubLine(std::move(buff), sbl.m_color);
+                    curr_w_pos = idx + (is_wide_char ? 2 : 1);
+                }
+                else
+                {
+                    curr_width += char_width;
+                }
+
+                if (bOver || b_last_ch && sbl.m_last_in_line)
+                {
+                    m_lines.push_back(tmp_line);
+                    tmp_line.Clear();
+                    curr_width = 0.0f;
+                }
+
+                if (is_wide_char)
+                {
+                    ++idx;
+                    ++idx;
+                }
+                else
+                {
+                    ++idx;
+                }
+            }
+
+            if (b_last_subl && !tmp_line.IsEmpty())
             {
                 m_lines.push_back(tmp_line);
                 tmp_line.Clear();
                 curr_width = 0.0f;
             }
         }
-
-        if (b_last_subl && !tmp_line.IsEmpty())
-        {
-            m_lines.push_back(tmp_line);
-            tmp_line.Clear();
-            curr_width = 0.0f;
-        }
     }
 
-	}
+    if (m_eTextAlign == CGameFont::alJustified)
+    {
+        for (auto& m_line : m_lines)
+        {
+            m_line.ProcessSpaces();
+        }
+    }
 
     xr_delete(line);
     uFlags.set(flNeedReparse, FALSE);
@@ -379,6 +462,7 @@ void CUILines::Draw(float x, float y)
 
         text_pos.x = x + GetIndentByAlign();
         text_pos.y = y + GetVIndentByAlign();
+
         UI()->ClientToScreenScaled(text_pos);
 
         if (uFlags.test(flPasswordMode))
@@ -400,12 +484,14 @@ void CUILines::Draw(float x, float y)
     }
     else
     {
-        // if (uFlags.test(flNeedReparse))
         ParseText();
+
+        const float max_width = m_wndSize.x;
 
         Fvector2 pos;
 
         // get vertical indent
+        pos.x = x + GetIndentByAlign();
         pos.y = y + GetVIndentByAlign();
 
         float height = m_pFont->CurrentHeight_();
@@ -416,9 +502,7 @@ void CUILines::Draw(float x, float y)
         m_pFont->SetAligment((CGameFont::EAligment)m_eTextAlign);
         for (int i = 0; i < (int)size; i++)
         {
-            pos.x = x + GetIndentByAlign();
-
-            m_lines[i].Draw(m_pFont, pos.x, pos.y);
+            m_lines[i].Draw(m_pFont, pos.x, pos.y, max_width);
 
             pos.y += height + m_interval;
         }
@@ -438,9 +522,6 @@ void CUILines::DrawCursor(float x, float y)
 {
     float _h = m_pFont->CurrentHeight_();
     UI()->ClientToScreenScaledHeight(_h);
-
-    Fvector2 outXY;
-    outXY.y = y + (_h + m_interval) * m_cursor_pos.y;
 
     float _w_tmp = 0;
 
@@ -478,12 +559,15 @@ void CUILines::DrawCursor(float x, float y)
         }
 
         buff[m_cursor_pos.x] = 0;
+
         _w_tmp = m_pFont->SizeOf_(buff);
     }
 
     UI()->ClientToScreenScaledWidth(_w_tmp);
 
+    Fvector2 outXY;
     outXY.x = x + _w_tmp;
+    outXY.y = y + (_h + m_interval) * m_cursor_pos.y;
 
     UI()->ClientToScreenScaled(outXY);
 
@@ -505,18 +589,19 @@ float CUILines::GetIndentByAlign() const
     switch (m_eTextAlign)
     {
     case CGameFont::alCenter: {
-        //			GetFont()->SetAligment(CGameFont::alCenter);
-        return (m_wndSize.x /*- length*/) / 2;
+        return (m_wndSize.x) / 2;
     }
     break;
     case CGameFont::alLeft: {
-        //			GetFont()->SetAligment(CGameFont::alLeft);
         return 0;
     }
     break;
     case CGameFont::alRight: {
-        //			GetFont()->SetAligment(CGameFont::alRight);
-        return (m_wndSize.x /*- length*/);
+        return (m_wndSize.x);
+    }
+    break;
+    case CGameFont::alJustified: {
+        return 0;
     }
     break;
     default: NODEFAULT;
@@ -618,7 +703,7 @@ u32 CUILines::GetColorFromText(const xr_string& str) const
     }
     else
     { // necessary comma not contains
-        Msg("!not valid text-color code detected.");
+        Msg("!not valid text-color code detected. [%s]", str.c_str());
         a = 255;
         r = 200;
         g = 200;
@@ -633,13 +718,13 @@ CUILine* CUILines::ParseTextToColoredLine(const xr_string& str)
     CUILine* line = xr_new<CUILine>();
     xr_string tmp(str);
 
-    xr_string entry;
     u32 color;
 
     do
     {
+        xr_string entry;
         CutFirstColoredTextEntry(entry, color, tmp);
-        line->AddSubLine(entry, subst_alpha(color, color_get_A(GetTextColor())));
+        line->AddSubLine(std::move(entry), subst_alpha(color, color_get_A(GetTextColor())));
     } while (!tmp.empty());
 
     return line;
@@ -695,25 +780,24 @@ void CUILines::IncCursorPos()
 {
     const int txt_len = (int)m_text.size();
 
-    if (0 == txt_len)
+    if (0 == txt_len || m_iCursorPos >= txt_len)
         return;
 
-    if (m_iCursorPos < txt_len)
+    if (m_text_mask.at(m_iCursorPos))
+        m_iCursorPos += 2;
+    else
         m_iCursorPos++;
-
-    return;
 }
 
 void CUILines::DecCursorPos()
 {
-    const int txt_len = (int)m_text.size();
-
-    if (0 == txt_len)
+    if (m_text.empty() || m_iCursorPos <= 0)
         return;
 
-    if (m_iCursorPos > 0)
+    if (m_text_mask.at(m_iCursorPos - 1))
+        m_iCursorPos -= 2;
+    else
         m_iCursorPos--;
-    return;
 }
 
 void CUILines::UpdateCursor()

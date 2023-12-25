@@ -14,6 +14,7 @@
 #include "../Include/xrRender/RenderDeviceRender.h"
 #include "xr_object.h"
 #include "SkeletonMotions.h"
+#include "IGame_Persistent.h"
 
 xr_token* vid_quality_token = nullptr;
 
@@ -271,22 +272,25 @@ void CCC_LoadCFG::Execute(LPCSTR args)
     IReader* F = FS.r_open(cfg_full_name);
 
     string1024 str;
-    if (F != NULL)
+    if (F)
     {
         while (!F->eof())
         {
-            if (strstr(cfg_full_name, "user.ltx") && F->tell() == 0)
+            if (F->tell() == 0 && strstr(cfg_full_name, "user.ltx"))
             {
-                if (F->r_u8() == 0) // Костыль от ситуации когда в редких случаях почему-то у игроков бьётся user.ltx - оказывается набит нулями, в результате чего игра не
-                                    // запускается. Не понятно почему так происходит, поэтому сделал тут обработку такой ситуации.
+                // Костыль от ситуации когда в редких случаях почему-то у игроков бьётся user.ltx - оказывается набит нулями, в результате чего игра не
+                // запускается. Не понятно почему так происходит, поэтому сделал тут обработку такой ситуации.
+
+                if (F->elapsed() >= sizeof(u8))
                 {
-                    Msg("!![%s] file [%s] broken!", __FUNCTION__, cfg_full_name);
-                    FS.r_close(F);
-                    FS.file_delete(cfg_full_name);
-                    return;
-                }
-                else
-                {
+                    if (F->r_u8() == 0)
+                    {
+                        Msg("!![%s] file [%s] broken!", __FUNCTION__, cfg_full_name);
+                        FS.r_close(F);
+                        FS.file_delete(cfg_full_name);
+                        return;
+                    }
+
                     F->seek(F->tell() - sizeof(u8));
                 }
             }
@@ -295,6 +299,7 @@ void CCC_LoadCFG::Execute(LPCSTR args)
             if (allow(str))
                 Console->Execute(str);
         }
+
         FS.r_close(F);
         Msg("[%s] successfully loaded.", cfg_full_name);
     }
@@ -677,7 +682,6 @@ void CCC_Register()
     CMD3(CCC_Mask, "rs_detail", &psDeviceFlags, rsDetails);
     // CMD4(CCC_Float,		"r__dtex_range",		&r__dtex_range,		5,		175	);
 
-    //	CMD3(CCC_Mask,		"rs_constant_fps",		&psDeviceFlags,		rsConstantFPS			);
     CMD3(CCC_Mask, "rs_render_statics", &psDeviceFlags, rsDrawStatic);
     CMD3(CCC_Mask, "rs_render_dynamics", &psDeviceFlags, rsDrawDynamic);
 #endif
@@ -698,9 +702,11 @@ void CCC_Register()
     // CMD4(CCC_Integer,	"rs_skeleton_update",	&psSkeletonUpdate,	2,		128	);
 #endif // DEBUG
 
-    CMD2(CCC_Gamma, "rs_c_gamma", &ps_gamma);
-    CMD2(CCC_Gamma, "rs_c_brightness", &ps_brightness);
-    CMD2(CCC_Gamma, "rs_c_contrast", &ps_contrast);
+//Вместо этих настроек теперь используется ES Color Grading
+//    CMD2(CCC_Gamma, "rs_c_gamma", &ps_gamma);
+//    CMD2(CCC_Gamma, "rs_c_brightness", &ps_brightness);
+//    CMD2(CCC_Gamma, "rs_c_contrast", &ps_contrast);
+
     //	CMD4(CCC_Integer,	"rs_vb_size",			&rsDVB_Size,		32,		4096);
     //	CMD4(CCC_Integer,	"rs_ib_size",			&rsDIB_Size,		32,		4096);
 
@@ -717,8 +723,8 @@ void CCC_Register()
     CMD1(CCC_SND_Restart, "snd_restart");
     CMD3(CCC_Mask, "snd_acceleration", &psSoundFlags, ss_Hardware);
     CMD3(CCC_Mask, "snd_efx", &psSoundFlags, ss_EAX);
-    CMD4(CCC_Integer, "snd_targets", &psSoundTargets, 128, 256);
-    CMD4(CCC_Integer, "snd_cache_size", &psSoundCacheSizeMB, 32, 64);
+    CMD4(CCC_Integer, "snd_targets", &psSoundTargets, 128, 1024);
+    CMD4(CCC_Integer, "snd_cache_size", &psSoundCacheSizeMB, 32, 128);
     CMD4(CCC_Float, "snd_linear_fade", &psSoundLinearFadeFactor, 0.1f, 1.f);
 
 #ifdef DEBUG
@@ -771,4 +777,6 @@ void CCC_Register()
 
     CMD4(CCC_Float, "rain_puddles_drying", &puddles_drying, 0.1f, 20.0f);
     CMD4(CCC_Float, "rain_puddles_wetting", &puddles_wetting, 0.1f, 20.0f);
+
+    CMD4(CCC_Integer, "g_prefetch", &g_prefetch, 0, 1);
 };

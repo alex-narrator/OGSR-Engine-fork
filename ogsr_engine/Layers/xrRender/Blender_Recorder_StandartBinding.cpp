@@ -1,10 +1,5 @@
 #include "stdafx.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <d3dx/d3dx9.h>
-#pragma warning(pop)
-
 #include "ResourceManager.h"
 #include "blenders\Blender_Recorder.h"
 #include "blenders\Blender.h"
@@ -434,7 +429,6 @@ static class cl_inv_v final : public R_constant_setup
 } binder_inv_v;
 
 // Screen Space Shaders Stuff
-extern float ps_ssfx_wpn_dof_2;
 
 static class ssfx_wpn_dof_1 final : public R_constant_setup
 {
@@ -452,6 +446,95 @@ static class ssfx_wpn_dof_2 final : public R_constant_setup
         RCache.set_c(C, ps_ssfx_wpn_dof_2, 0, 0, 0);    
     }
 } ssfx_wpn_dof_2;
+
+static class ssfx_blood_decals final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_blood_decals); }
+} ssfx_blood_decals;
+
+static class ssfx_hud_drops_1 final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_hud_drops_1); }
+} ssfx_hud_drops_1;
+
+static class ssfx_hud_drops_2 final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_hud_drops_2); }
+} ssfx_hud_drops_2;
+
+static class ssfx_lightsetup_1 final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_lightsetup_1); }
+} ssfx_lightsetup_1;
+
+static class ssfx_is_underground final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_is_underground ? 1.f : 0.f, 0.f, 0.f, 0.f); }
+} ssfx_is_underground;
+
+static class ssfx_wetsurfaces_1 final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_wetsurfaces_1); }
+} ssfx_wetsurfaces_1;
+
+static class ssfx_wetsurfaces_2 final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_wetsurfaces_2); }
+} ssfx_wetsurfaces_2;
+
+static class ssfx_gloss final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_gloss_minmax.x, ps_ssfx_gloss_minmax.y, ps_ssfx_gloss_factor, 0.f); }
+} ssfx_gloss;
+
+static class ssfx_florafixes_1 final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_florafixes_1); }
+} ssfx_florafixes_1;
+
+static class ssfx_florafixes_2 final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_florafixes_2); }
+} ssfx_florafixes_2;
+
+static class pp_image_corrections final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_r2_img_exposure, ps_r2_img_gamma, ps_r2_img_saturation, 1); }
+} pp_image_corrections;
+
+static class pp_color_grading final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_r2_img_cg.x, ps_r2_img_cg.y, ps_r2_img_cg.z, 1); }
+} pp_color_grading;
+
+static class cl_wind_params final : public R_constant_setup
+{
+    void setup(R_constant* C) override
+    {
+        CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
+        RCache.set_c(C, E.wind_direction, E.wind_velocity, E.m_fTreeAmplitudeIntensity, 0.0f);
+    }
+} binder_wind_params;
+
+static class ssfx_wind final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_wind); }
+} ssfx_wind;
+
+static class ssfx_wind_gust final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_wind_gust); }
+} ssfx_wind_gust;
+
+static class ssfx_wind_anim final : public R_constant_setup
+{
+    void setup(R_constant* C) override
+    {
+        const Fvector3& WindAni = g_pGamePersistent->Environment().wind_anim;
+        RCache.set_c(C, WindAni.x, WindAni.y, WindAni.z, 0.f);
+    }
+} ssfx_wind_anim;
+
 
 // Standart constant-binding
 void CBlender_Compile::SetMapping()
@@ -544,6 +627,23 @@ void CBlender_Compile::SetMapping()
 
     r_Constant("ssfx_wpn_dof_1", &ssfx_wpn_dof_1);
     r_Constant("ssfx_wpn_dof_2", &ssfx_wpn_dof_2);
+    r_Constant("ssfx_blood_decals", &ssfx_blood_decals);
+    r_Constant("ssfx_hud_drops_1", &ssfx_hud_drops_1);
+    r_Constant("ssfx_hud_drops_2", &ssfx_hud_drops_2);
+    r_Constant("ssfx_lightsetup_1", &ssfx_lightsetup_1);
+    r_Constant("ssfx_is_underground", &ssfx_is_underground);
+    r_Constant("ssfx_wetsurfaces_1", &ssfx_wetsurfaces_1);
+    r_Constant("ssfx_wetsurfaces_2", &ssfx_wetsurfaces_2);
+    r_Constant("ssfx_gloss", &ssfx_gloss);
+    r_Constant("ssfx_florafixes_1", &ssfx_florafixes_1);
+    r_Constant("ssfx_florafixes_2", &ssfx_florafixes_2);
+    r_Constant("wind_params", &binder_wind_params);
+    r_Constant("ssfx_wind_anim", &ssfx_wind_anim);
+    r_Constant("ssfx_wind", &ssfx_wind);
+    r_Constant("ssfx_wind_gust", &ssfx_wind_gust);
+
+    r_Constant("pp_img_corrections", &pp_image_corrections);
+    r_Constant("pp_img_cg", &pp_color_grading);
 
     // other common
     for (const auto& [name, s] : DEV->v_constant_setup)

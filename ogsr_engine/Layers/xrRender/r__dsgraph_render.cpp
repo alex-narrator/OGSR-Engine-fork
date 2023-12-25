@@ -182,8 +182,8 @@ IC bool cmp_textures_lexN_mat(mapMatrixTextures::TNode* N1, mapMatrixTextures::T
 IC bool cmp_textures_ssa_nrm(mapNormalTextures::TNode* N1, mapNormalTextures::TNode* N2) { return (N1->val.ssa > N2->val.ssa); }
 IC bool cmp_textures_ssa_mat(mapMatrixTextures::TNode* N1, mapMatrixTextures::TNode* N2) { return (N1->val.ssa > N2->val.ssa); }
 
-void sort_tlist_nrm(xr_vector<mapNormalTextures::TNode*, render_alloc<mapNormalTextures::TNode*>>& lst,
-                    xr_vector<mapNormalTextures::TNode*, render_alloc<mapNormalTextures::TNode*>>& temp, mapNormalTextures& textures, BOOL bSSA)
+void sort_tlist_nrm(xr_vector<mapNormalTextures::TNode*>& lst,
+                    xr_vector<mapNormalTextures::TNode*>& temp, mapNormalTextures& textures, BOOL bSSA)
 {
     int amount = textures.begin()->key->size();
     if (bSSA)
@@ -232,8 +232,8 @@ void sort_tlist_nrm(xr_vector<mapNormalTextures::TNode*, render_alloc<mapNormalT
     }
 }
 
-void sort_tlist_mat(xr_vector<mapMatrixTextures::TNode*, render_alloc<mapMatrixTextures::TNode*>>& lst,
-                    xr_vector<mapMatrixTextures::TNode*, render_alloc<mapMatrixTextures::TNode*>>& temp, mapMatrixTextures& textures, BOOL bSSA)
+void sort_tlist_mat(xr_vector<mapMatrixTextures::TNode*>& lst,
+                    xr_vector<mapMatrixTextures::TNode*>& temp, mapMatrixTextures& textures, BOOL bSSA)
 {
     int amount = textures.begin()->key->size();
     if (bSSA)
@@ -519,7 +519,7 @@ void R_dsgraph_structure::r_dsgraph_render_hud()
     Fmatrix FTold = Device.mFullTransform;
     Fmatrix Vold = Device.mView;
     Device.mView.build_camera_dir(Fvector().set(0.f, 0.f, 0.f), Device.vCameraDirection, Device.vCameraTop);
-    Device.mProject.build_projection(deg2rad(psHUD_FOV < 1.f ? psHUD_FOV * Device.fFOV : psHUD_FOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
+    Device.mProject.build_projection(deg2rad(psHUD_FOV <= 1.f ? psHUD_FOV * Device.fFOV : psHUD_FOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
                                      g_pGamePersistent->Environment().CurrentEnv->far_plane);
 
     Device.mFullTransform.mul(Device.mProject, Device.mView);
@@ -531,10 +531,6 @@ void R_dsgraph_structure::r_dsgraph_render_hud()
     mapHUD.traverseLR(sorted_L1);
     mapHUD.clear();
 
-#if RENDER == R_R1
-    if (g_hud && g_hud->RenderActiveItemUIQuery())
-        r_dsgraph_render_hud_ui(); // hud ui
-#endif
 
     rmNormal();
 
@@ -555,19 +551,19 @@ void R_dsgraph_structure::r_dsgraph_render_hud_ui()
     Fmatrix FTold = Device.mFullTransform;
     Fmatrix Vold = Device.mView;
     Device.mView.build_camera_dir(Fvector().set(0.f, 0.f, 0.f), Device.vCameraDirection, Device.vCameraTop);
-    Device.mProject.build_projection(deg2rad(psHUD_FOV < 1.f ? psHUD_FOV * Device.fFOV : psHUD_FOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
+    Device.mProject.build_projection(deg2rad(psHUD_FOV <= 1.f ? psHUD_FOV * Device.fFOV : psHUD_FOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
                                      g_pGamePersistent->Environment().CurrentEnv->far_plane);
 
     Device.mFullTransform.mul(Device.mProject, Device.mView);
     RCache.set_xform_view(Device.mView);
     RCache.set_xform_project(Device.mProject);
 
-#if RENDER != R_R1
+
     // Targets, use accumulator for temporary storage
     const ref_rt rt_null;
     RCache.set_RT(0, 1);
     RCache.set_RT(0, 2);
-#if (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R4)
     if (!RImplementation.o.dx10_msaa)
     {
         if (RImplementation.o.albedo_wo)
@@ -582,13 +578,8 @@ void R_dsgraph_structure::r_dsgraph_render_hud_ui()
         else
             RImplementation.Target->u_setrt(RImplementation.Target->rt_Color, rt_null, rt_null, RImplementation.Target->rt_MSAADepth->pZRT);
     }
-#else // (RENDER==R_R3) || (RENDER==R_R4)
-    if (RImplementation.o.albedo_wo)
-        RImplementation.Target->u_setrt(RImplementation.Target->rt_Accumulator, rt_null, rt_null, HW.pBaseZB);
-    else
-        RImplementation.Target->u_setrt(RImplementation.Target->rt_Color, rt_null, rt_null, HW.pBaseZB);
-#endif // (RENDER==R_R3) || (RENDER==R_R4)
-#endif // RENDER!=R_R1
+#endif // (RENDER==R_R4)
+
 
     rmNear();
     g_hud->RenderActiveItemUI();
@@ -615,7 +606,7 @@ void R_dsgraph_structure::r_dsgraph_render_sorted()
     Fmatrix FTold = Device.mFullTransform;
     Fmatrix Vold = Device.mView;
     Device.mView.build_camera_dir(Fvector().set(0.f, 0.f, 0.f), Device.vCameraDirection, Device.vCameraTop);
-    Device.mProject.build_projection(deg2rad(psHUD_FOV < 1.f ? psHUD_FOV * Device.fFOV : psHUD_FOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
+    Device.mProject.build_projection(deg2rad(psHUD_FOV <= 1.f ? psHUD_FOV * Device.fFOV : psHUD_FOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
                                      g_pGamePersistent->Environment().CurrentEnv->far_plane);
 
     Device.mFullTransform.mul(Device.mProject, Device.mView);
@@ -640,7 +631,7 @@ void R_dsgraph_structure::r_dsgraph_render_sorted()
 // strict-sorted render
 void R_dsgraph_structure::r_dsgraph_render_emissive()
 {
-#if RENDER != R_R1
+
     // Sorted (back to front)
     mapEmissive.traverseLR(sorted_L1);
     mapEmissive.clear();
@@ -650,7 +641,7 @@ void R_dsgraph_structure::r_dsgraph_render_emissive()
     Fmatrix FTold = Device.mFullTransform;
     Fmatrix Vold = Device.mView;
     Device.mView.build_camera_dir(Fvector().set(0.f, 0.f, 0.f), Device.vCameraDirection, Device.vCameraTop);
-    Device.mProject.build_projection(deg2rad(psHUD_FOV < 1.f ? psHUD_FOV * Device.fFOV : psHUD_FOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
+    Device.mProject.build_projection(deg2rad(psHUD_FOV <= 1.f ? psHUD_FOV * Device.fFOV : psHUD_FOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
                                      g_pGamePersistent->Environment().CurrentEnv->far_plane);
 
     Device.mFullTransform.mul(Device.mProject, Device.mView);
@@ -671,18 +662,16 @@ void R_dsgraph_structure::r_dsgraph_render_emissive()
     Device.mView = Vold;
     RCache.set_xform_view(Device.mView);
     RCache.set_xform_project(Device.mProject);
-#endif
+
 }
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
 void R_dsgraph_structure::r_dsgraph_render_wmarks()
 {
-#if RENDER != R_R1
     // Sorted (back to front)
     mapWmark.traverseLR(sorted_L1);
     mapWmark.clear();
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -719,8 +708,7 @@ void R_dsgraph_structure::r_dsgraph_render_subspace(IRender_Sector* _sector, CFr
         // Check if camera is too near to some portal - if so force DualRender
         Fvector box_radius;
         box_radius.set(EPS_L * 20, EPS_L * 20, EPS_L * 20);
-        RImplementation.Sectors_xrc.box_options(CDB::OPT_FULL_TEST);
-        RImplementation.Sectors_xrc.box_query(RImplementation.rmPortals, _cop, box_radius);
+        RImplementation.Sectors_xrc.box_query(CDB::OPT_FULL_TEST, RImplementation.rmPortals, _cop, box_radius);
         for (int K = 0; K < RImplementation.Sectors_xrc.r_count(); K++)
         {
             CPortal* pPortal = (CPortal*)RImplementation.Portals[RImplementation.rmPortals->get_tris()[RImplementation.Sectors_xrc.r_begin()[K].id].dummy];
@@ -774,10 +762,10 @@ void R_dsgraph_structure::r_dsgraph_render_subspace(IRender_Sector* _sector, CFr
             }
         }
 
-#if RENDER != R_R1
+
         if (g_pGameLevel && phase == RImplementation.PHASE_SMAP && ps_r2_ls_flags_ext.test(R2FLAGEXT_ACTOR_SHADOW))
             g_hud->Render_Actor_Shadow(); // R2 actor Shadow
-#endif
+
     }
 
     // Restore

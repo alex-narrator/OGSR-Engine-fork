@@ -75,26 +75,28 @@ float CAI_Stalker::GetWeaponAccuracy() const
     if (!movement().path_completed())
     {
         if (movement().movement_type() == eMovementTypeWalk)
+        {
             if (movement().body_state() == eBodyStateStand)
                 return m_fDispBase + base * m_disp_walk_stand;
-            else
-                return m_fDispBase + base * m_disp_walk_crouch;
-        else if (movement().movement_type() == eMovementTypeRun)
+            return m_fDispBase + base * m_disp_walk_crouch;
+        }
+        if (movement().movement_type() == eMovementTypeRun)
+        {
             if (movement().body_state() == eBodyStateStand)
                 return m_fDispBase + base * m_disp_run_stand;
-            else
-                return m_fDispBase + base * m_disp_run_crouch;
+            return m_fDispBase + base * m_disp_run_crouch;
+        }
     }
 
     if (movement().body_state() == eBodyStateStand)
+    {
         if (zoom_state())
-            return m_fDispBase + base * m_disp_stand_stand;
-        else
             return m_fDispBase + base * m_disp_stand_stand_zoom;
-    else if (zoom_state())
-        return m_fDispBase + base * m_disp_stand_crouch;
-    else
+        return m_fDispBase + base * m_disp_stand_stand;
+    }
+    if (zoom_state())
         return m_fDispBase + base * m_disp_stand_crouch_zoom;
+    return m_fDispBase + base * m_disp_stand_crouch;
 }
 
 void CAI_Stalker::g_fireParams(CHudItem* pHudItem, Fvector& P, Fvector& D, const bool for_cursor)
@@ -138,6 +140,7 @@ void CAI_Stalker::g_fireParams(CHudItem* pHudItem, Fvector& P, Fvector& D, const
         return;
     }
 
+    /* dsh:
     switch (movement().body_state())
     {
     case eBodyStateStand: {
@@ -173,11 +176,20 @@ void CAI_Stalker::g_fireParams(CHudItem* pHudItem, Fvector& P, Fvector& D, const
     }
     default: NODEFAULT;
     }
+    */
 
 #ifdef DEBUG
     P = weapon->get_LastFP();
     D = weapon->get_LastFD();
     VERIFY(!fis_zero(D.square_magnitude()));
+#else
+
+    P = eye_matrix.c;
+    D = eye_matrix.k;
+    if (weapon_shot_effector().IsActive())
+        D = weapon_shot_effector_direction(D);
+    VERIFY(!fis_zero(D.square_magnitude()));
+
 #endif
 }
 
@@ -239,8 +251,8 @@ void CAI_Stalker::Hit(SHit* pHDS)
         {
             if (is_relation_enemy(entity_alive))
                 sound().play(eStalkerSoundInjuring);
-            //			else
-            //				sound().play		(eStalkerSoundInjuringByFriend);
+            else
+                sound().play(eStalkerSoundInjuringByFriend);
         }
 
         int weapon_type = -1;
@@ -297,6 +309,14 @@ void CAI_Stalker::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 
 
     if (g_Alive())
         memory().hit().add(amount, vLocalDir, who, element);
+    else if (!AlreadyDie())
+    {
+        const auto I = m_bones_body_parts.find(element);
+        if (I != m_bones_body_parts.end() && I->second == critical_wound_type_head)
+            m_headshot = true;
+        else
+            m_headshot = false;
+    }
 }
 
 void CAI_Stalker::OnItemTake(CInventoryItem* inventory_item)
@@ -766,7 +786,6 @@ void CAI_Stalker::on_weapon_shot_start(CWeapon* weapon)
 {
     if (!Core.Features.test(xrCore::Feature::npc_simplified_shooting))
     {
-        weapon_shot_effector().SetRndSeed(m_weapon_shot_random_seed);
         weapon_shot_effector().Shot(weapon->camDispersion + weapon->camDispersionInc * float(weapon->ShotsFired()));
     }
 }

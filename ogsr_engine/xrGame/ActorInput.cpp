@@ -284,8 +284,8 @@ void CActor::IR_OnKeyboardHold(int cmd)
     {
     case kUP:
     case kDOWN: cam_Active()->Move((cmd == kUP) ? kDOWN : kUP, 0, LookFactor); break;
-    case kCAM_ZOOM_IN:
-    case kCAM_ZOOM_OUT: cam_Active()->Move(cmd); break;
+    case kSHOWHUD:
+    case kHIDEHUD: cam_Active()->Move(cmd); break;
     case kLEFT:
     case kRIGHT:
         if (eacFreeLook != cam_active)
@@ -465,7 +465,7 @@ void CActor::ActorUse()
 
         collide::rq_result& RQ = HUD().GetCurrentRayQuery();
         CPhysicsShellHolder* object = smart_cast<CPhysicsShellHolder*>(RQ.O);
-        if (object)
+        if (object && object->getVisible())
         {
             if (Level().IR_GetKeyState(DIK_LSHIFT))
             {
@@ -490,6 +490,10 @@ void CActor::ActorUse()
     }
 
     PickupModeOn();
+
+    /*if (g_Alive())
+        PickupModeUpdate();*/
+
     PickupModeUpdate_COD();
 }
 

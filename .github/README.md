@@ -27,7 +27,8 @@
 
 ### Compilation guide: ###
 * Latest version of Visual Studio 2022 required
-* Open Engine.sln
+* Run `Update_DirectX_Components.cmd`
+* Open `Engine.sln`
 * Set the platform to x64 and the configuration to Release, then select Build -> Build solution
 ### Thanks to: ###
 * [Im-dex](https://github.com/Im-dex)
@@ -42,8 +43,8 @@
 * [S.T.A.L.K.E.R. Anomaly Engine](https://bitbucket.org/anomalymod/xray-monolith)
 * [X-Ray Engine by Alpet & KD](https://github.com/joye-ramone/xray_xp_dev)
 * [CoC-Xray](https://github.com/revolucas/CoC-Xray)
-* [IX-Ray](https://github.com/ixray-team/ixray-1.6-stcop)
-* [ScreenSpaceShaders](https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders)
+* [SCREEN SPACE SHADERS](https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders)
+* [ENHANCED SHADERS AND COLOR GRADING](https://www.moddb.com/mods/stalker-anomaly/addons/enhanced-shaders-and-color-grading-for-151)
 
 And everyone else whose work has been used. If you are not mentioned, send a message and you will be added.
 
@@ -63,7 +64,8 @@ And everyone else whose work has been used. If you are not mentioned, send a mes
 
 ### Инструкции по сборке: ###
 * Требуется актуальная версия Visual Studio 2022
-* Открываете Engine.sln
+* Запускаете `Update_DirectX_Components.cmd`
+* Открываете `Engine.sln`
 * В студии выбираете Сборка -> Собрать решение, предварительно выставив платформу x64 и конфигурацию Release
 ### Благодарим: ###
 * [Im-dex](https://github.com/Im-dex)
@@ -78,7 +80,7 @@ And everyone else whose work has been used. If you are not mentioned, send a mes
 * [S.T.A.L.K.E.R. Anomaly Engine](https://bitbucket.org/anomalymod/xray-monolith)
 * [X-Ray Engine by Alpet & KD](https://github.com/joye-ramone/xray_xp_dev)
 * [CoC-Xray](https://github.com/revolucas/CoC-Xray)
-* [IX-Ray](https://github.com/ixray-team/ixray-1.6-stcop)
-* [ScreenSpaceShaders](https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders)
+* [SCREEN SPACE SHADERS](https://www.moddb.com/mods/stalker-anomaly/addons/screen-space-shaders)
+* [ENHANCED SHADERS AND COLOR GRADING](https://www.moddb.com/mods/stalker-anomaly/addons/enhanced-shaders-and-color-grading-for-151)
 
 И всех остальных, чьи работы я использовал. Пишите, если забыл кого-то, добавлю в список.

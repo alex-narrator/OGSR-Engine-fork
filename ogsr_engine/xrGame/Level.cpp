@@ -49,9 +49,12 @@
 #include "physicobject.h"
 #endif
 
+#include "physicobject.h"
 #include "UIGameSP.h"
 #include "ui/UIPDAWnd.h"
 #include "ui/UIBtnHint.h"
+
+#include "embedded_editor/embedded_editor_main.h"
 
 CPHWorld* ph_world = 0;
 
@@ -182,9 +185,10 @@ CLevel::~CLevel()
         CParticlesObject::Destroy(*p_it);
     m_StaticParticles.clear();
 
-    // Unload sounds
-    // unload prefetched sounds
+	// Unload sounds
+	// unload prefetched sounds
     sound_registry.clear();
+	sound_registry_defer.clear();
 
     // unload static sounds
     for (u32 i = 0; i < static_Sounds.size(); ++i)
@@ -239,9 +243,7 @@ CLevel::~CLevel()
 
 shared_str CLevel::name() const { return (m_name); }
 
-void CLevel::GetLevelInfo(CServerInfo* si) { Server->GetServerInfo(si); }
-
-void CLevel::PrefetchSound(LPCSTR name)
+bool CLevel::PrefetchSound(LPCSTR name)
 {
     // preprocess sound name
     string_path tmp;
@@ -254,7 +256,60 @@ void CLevel::PrefetchSound(LPCSTR name)
     SoundRegistryMapIt it = sound_registry.find(snd_name);
     // if find failed - preload sound
     if (it == sound_registry.end())
+    {
         sound_registry[snd_name].create(snd_name.c_str(), st_Effect, sg_SourceType);
+        return true;
+    }
+    return false;
+}
+
+bool CLevel::PrefetchManySounds(LPCSTR prefix)
+{
+    bool created = false;
+    string_path fn;
+    if (FS.exist(fn, "$game_sounds$", prefix, ".ogg"))
+        created = PrefetchSound(prefix) || created;
+    u32 i = 0;
+    while (true)
+    {
+        string256 name;
+        sprintf_s(name, "%s%d", prefix, i);
+        if (FS.exist(fn, "$game_sounds$", name, ".ogg"))
+            created = PrefetchSound(name) || created;
+        else if (i > 0)
+            break;
+        i++;
+    }
+    return created;
+}
+
+bool CLevel::PrefetchManySoundsLater(LPCSTR prefix)
+{
+    std::string s(prefix);
+    for (const auto& it : sound_registry_defer)
+    {
+        if (it == s)
+            return false;
+    }
+    sound_registry_defer.push_back(s);
+    return true;
+}
+
+void CLevel::PrefetchDeferredSounds()
+{
+    while (!sound_registry_defer.empty())
+    {
+        std::string s = sound_registry_defer.front();
+        sound_registry_defer.pop_front();
+        if (PrefetchManySounds(s.c_str()))
+            break;
+    }
+}
+
+void CLevel::CancelPrefetchManySounds(LPCSTR prefix)
+{
+    std::string s(prefix);
+    sound_registry_defer.erase(std::remove(sound_registry_defer.begin(), sound_registry_defer.end(), s), sound_registry_defer.end());
 }
 
 // Game interface ////////////////////////////////////////////////////
@@ -289,6 +344,7 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
 #ifdef DEBUG
         Msg("* WARNING: c_EVENT[%d] to [%d]: unknown dest", type, dest);
 #endif // DEBUG
+        ProcessGameSpawnsDestroy(dest, type, P);
         return;
     }
     CGameObject* GO = smart_cast<CGameObject*>(O);
@@ -297,42 +353,12 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
         Msg("! ERROR: c_EVENT[%d] : non-game-object", dest);
         return;
     }
-    if (type != GE_DESTROY_REJECT)
-    {
-        if (type == GE_DESTROY)
-            Game().OnDestroy(GO);
-        GO->OnEvent(P, type);
-    }
-    else
-    { // handle GE_DESTROY_REJECT here
-        u32 pos = P.r_tell();
-        u16 id = P.r_u16();
-        P.r_seek(pos);
 
-        bool ok = true;
+    if (type == GE_DESTROY)
+        Game().OnDestroy(GO);
 
-        CObject* D = Objects.net_Find(id);
-        if (0 == D)
-        {
-            Msg("! ERROR: c_EVENT[%d] : unknown dest", id);
-            ok = false;
-        }
-
-        CGameObject* GD = smart_cast<CGameObject*>(D);
-        if (!GD)
-        {
-            Msg("! ERROR: c_EVENT[%d] : non-game-object", id);
-            ok = false;
-        }
-
-        GO->OnEvent(P, GE_OWNERSHIP_REJECT);
-        if (ok)
-        {
-            Game().OnDestroy(GD);
-            GD->OnEvent(P, GE_DESTROY);
-        };
-    }
-};
+    GO->OnEvent(P, type);
+}
 
 void CLevel::ProcessGameEvents()
 {
@@ -372,6 +398,9 @@ void CLevel::ProcessGameEvents()
             }
         }
     }
+
+    if (!is_removing_objects())
+        Device.add_to_seq_parallel(fastdelegate::MakeDelegate(this, &CLevel::ProcessGameSpawns));
 }
 
 void CLevel::OnFrame()
@@ -397,7 +426,12 @@ void CLevel::OnFrame()
     // Inherited update
     inherited::OnFrame();
 
-    g_pGamePersistent->Environment().SetGameTime(GetEnvironmentGameDayTimeSec(), game->GetEnvironmentGameTimeFactor());
+    extern bool s_ScriptTime;
+
+    if (!s_ScriptTime)
+    {
+        g_pGamePersistent->Environment().SetGameTime(GetEnvironmentGameDayTimeSec(), game->GetEnvironmentGameTimeFactor());
+    }
 
     m_ph_commander->update();
     m_ph_commander_scripts->update();
@@ -409,9 +443,13 @@ void CLevel::OnFrame()
 
     // update static sounds
     if (g_mt_config.test(mtLevelSounds))
-        Device.seqParallel.push_back(fastdelegate::MakeDelegate(m_level_sound_manager, &CLevelSoundManager::Update));
+        Device.add_to_seq_parallel(fastdelegate::MakeDelegate(m_level_sound_manager, &CLevelSoundManager::Update));
     else
         m_level_sound_manager->Update();
+
+    if (!sound_registry_defer.empty())
+        Device.add_to_seq_parallel(fastdelegate::MakeDelegate(this, &CLevel::PrefetchDeferredSounds));
+
     //-----------------------------------------------------
     if (pStatGraphR)
     {
@@ -421,15 +459,11 @@ void CLevel::OnFrame()
         pStatGraphR->AppendItem(float(m_dwRPC) * fRPC_Mult, 0xffff0000, 1);
         pStatGraphR->AppendItem(float(m_dwRPS) * fRPS_Mult, 0xff00ff00, 0);
     };
+
+    ShowEditor();
 }
 
-#ifdef DEBUG_PRECISE_PATH
-void test_precise_path();
-#endif
-
-#ifdef DEBUG
 extern Flags32 dbg_net_Draw_Flags;
-#endif
 
 extern void draw_wnds_rects();
 
@@ -502,6 +536,27 @@ void CLevel::OnRender()
             ai().level_graph().render();
     }
 
+    if (dbg_net_Draw_Flags.test(1 << 11)) // draw skeleton
+    {
+        for (u32 I = 0; I < Level().Objects.o_count(); I++)
+        {
+            CObject* _O = Level().Objects.o_get_by_iterator(I);
+
+            CGameObject* pGO = smart_cast<CGameObject*>(_O);
+            if (pGO && pGO != Level().CurrentViewEntity() && !pGO->H_Parent())
+            {
+                if (pGO->Position().distance_to_sqr(Device.vCameraPosition) < 400.0f)
+                {
+                    //CPhysicObject* physic_object = smart_cast<CPhysicObject*>(_O);
+                    //if (physic_object)
+                    //    physic_object->OnRender();
+
+                    pGO->dbg_DrawSkeleton();
+                }
+            }
+        }
+    }
+
 #else
 
     ph_world->OnRender();
@@ -519,37 +574,6 @@ void CLevel::OnRender()
 
     if (bDebug)
     {
-        for (u32 I = 0; I < Level().Objects.o_count(); I++)
-        {
-            CObject* _O = Level().Objects.o_get_by_iterator(I);
-
-            CPhysicObject* physic_object = smart_cast<CPhysicObject*>(_O);
-            if (physic_object)
-                physic_object->OnRender();
-
-            CSpaceRestrictor* space_restrictor = smart_cast<CSpaceRestrictor*>(_O);
-            if (space_restrictor && psActorFlags.test(AF_ZONES_DBG))
-                space_restrictor->OnRender();
-            CClimableObject* climable = smart_cast<CClimableObject*>(_O);
-            if (climable)
-                climable->OnRender();
-
-            if (dbg_net_Draw_Flags.test(1 << 11)) // draw skeleton
-            {
-                CGameObject* pGO = smart_cast<CGameObject*>(_O);
-                if (pGO && pGO != Level().CurrentViewEntity() && !pGO->H_Parent())
-                {
-                    if (pGO->Position().distance_to_sqr(Device.vCameraPosition) < 400.0f)
-                    {
-                        pGO->dbg_DrawSkeleton();
-                    }
-                }
-            };
-        }
-        //  [7/5/2005]
-        if (Server && Server->game)
-            Server->game->OnRender();
-        //  [7/5/2005]
         ObjectSpace.dbgRender();
 
         //---------------------------------------------------------------------

@@ -146,13 +146,12 @@ void dxFontRender::OnRender(CGameFont& owner)
                         v++;
                     }
 
-                    X += scw * owner.vInterval.x;
+                    X += scw * owner.GetInterval().x;
 
                     if (owner.IsMultibyte())
                     {
-                        X -= 2;
-                        if (IsNeedSpaceCharacter(wsStr[1 + j]))
-                            X += owner.fXStep;
+                        if (IsSpaceCharacter(wsStr[1 + j]))
+                            X += owner.GetfXStep() * owner.GetInterval().x * owner.GetWidthScale();
                     }
                 }
             }

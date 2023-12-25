@@ -96,12 +96,7 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
     bDetail_Diffuse = FALSE;
     bDetail_Bump = FALSE;
 
-#ifndef _EDITOR
-#if RENDER == R_R1
-    if (RImplementation.o.no_detail_textures)
-        bDetail = FALSE;
-#endif
-#endif
+
 
     if (bDetail)
     {
@@ -131,15 +126,7 @@ void CBlender_Compile::SetParams(int iPriority, bool bStrictB2F)
     SH->flags.bStrictB2F = bStrictB2F;
     if (bStrictB2F)
     {
-#ifdef _EDITOR
-        if (1 != (SH->flags.iPriority / 2))
-        {
-            Log("!If StrictB2F true then Priority must div 2.");
-            SH->flags.bStrictB2F = FALSE;
-        }
-#else
         VERIFY(1 == (SH->flags.iPriority / 2));
-#endif
     }
     // SH->Flags.bLighting		= FALSE;
 }
@@ -154,43 +141,6 @@ void CBlender_Compile::PassBegin()
     xr_strcpy(pass_ps, "null");
     xr_strcpy(pass_vs, "null");
     dwStage = 0;
-}
-
-void CBlender_Compile::PassEnd()
-{
-    // Last Stage - disable
-    RS.SetTSS(Stage(), D3DTSS_COLOROP, D3DTOP_DISABLE);
-    RS.SetTSS(Stage(), D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-
-    SPass proto;
-    // Create pass
-    proto.state = DEV->_CreateState(RS.GetContainer());
-    proto.ps = DEV->_CreatePS(pass_ps);
-    proto.vs = DEV->_CreateVS(pass_vs);
-    ctable.merge(&proto.ps->constants);
-    ctable.merge(&proto.vs->constants);
-#if defined(USE_DX10) || defined(USE_DX11)
-    proto.gs = DEV->_CreateGS(pass_gs);
-    ctable.merge(&proto.gs->constants);
-#ifdef USE_DX11
-    proto.hs = DEV->_CreateHS(pass_hs);
-    ctable.merge(&proto.hs->constants);
-    proto.ds = DEV->_CreateDS(pass_ds);
-    ctable.merge(&proto.ds->constants);
-    proto.cs = DEV->_CreateCS(pass_cs);
-    ctable.merge(&proto.cs->constants);
-#endif
-#endif //	USE_DX10
-    SetMapping();
-    proto.constants = DEV->_CreateConstantTable(ctable);
-    proto.T = DEV->_CreateTextureList(passTextures);
-#ifdef _EDITOR
-    proto.M = DEV->_CreateMatrixList(passMatrices);
-#endif
-    proto.C = DEV->_CreateConstantList(passConstants);
-
-    ref_pass _pass_ = DEV->_CreatePass(proto);
-    SH->passes.push_back(_pass_);
 }
 
 void CBlender_Compile::PassSET_PS(LPCSTR name)
@@ -275,10 +225,7 @@ void CBlender_Compile::StageSET_Address(u32 adr)
 }
 void CBlender_Compile::StageSET_XForm(u32 tf, u32 tc)
 {
-#ifdef _EDITOR
-    RS.SetTSS(Stage(), D3DTSS_TEXTURETRANSFORMFLAGS, tf);
-    RS.SetTSS(Stage(), D3DTSS_TEXCOORDINDEX, tc);
-#endif
+
 }
 void CBlender_Compile::StageSET_Color(u32 a1, u32 op, u32 a2) { RS.SetColor(Stage(), a1, op, a2); }
 void CBlender_Compile::StageSET_Color3(u32 a1, u32 op, u32 a2, u32 a3) { RS.SetColor3(Stage(), a1, op, a2, a3); }

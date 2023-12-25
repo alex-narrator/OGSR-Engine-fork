@@ -25,7 +25,7 @@ public:
 
     void CreateD3D();
     void DestroyD3D();
-    void CreateDevice(HWND hw, bool move_window);
+    void CreateDevice(HWND hw);
 
     void DestroyDevice();
 
@@ -67,7 +67,6 @@ public:
 
     CHWCaps Caps;
 
-    D3D_DRIVER_TYPE m_DriverType; //	DevT equivalent
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; //	DevPP equivalent
     D3D_FEATURE_LEVEL FeatureLevel;
 #elif defined(USE_DX10)
@@ -115,9 +114,6 @@ public:
     virtual void OnAppActivate();
     virtual void OnAppDeactivate();
 #endif //	USE_DX10
-
-private:
-    bool m_move_window;
 };
 
 extern ECORE_API CHW HW;

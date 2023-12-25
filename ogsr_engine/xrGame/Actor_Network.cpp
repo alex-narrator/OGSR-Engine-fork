@@ -426,6 +426,7 @@ void CActor::load(IReader& input_packet)
 #ifdef DEBUG
 
 extern Flags32 dbg_net_Draw_Flags;
+
 void dbg_draw_piramid(Fvector pos, Fvector dir, float size, float xdir, u32 color)
 {
     Fvector p0, p1, p2, p3, p4;
@@ -527,8 +528,18 @@ bool CActor::InventoryAllowSprint()
     if (pActiveItem && !pActiveItem->IsSprintAllowed())
     {
         return false;
-    };
-    PIItem pOutfitItem = inventory().ItemFromSlot(OUTFIT_SLOT);
+    }
+
+    auto wpn = smart_cast<const CWeapon*>(pActiveItem);
+    if (wpn)
+    {
+        if (Core.Features.test(xrCore::Feature::lock_reload_in_sprint) && wpn->GetState() == CWeapon::eReload)
+        {
+            return false;
+        }
+    }
+
+    const PIItem pOutfitItem = inventory().ItemFromSlot(OUTFIT_SLOT);
     if (pOutfitItem && !pOutfitItem->IsSprintAllowed())
     {
         return false;

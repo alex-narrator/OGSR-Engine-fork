@@ -130,7 +130,7 @@ public:
     virtual BOOL net_Relevant() { return getLocal(); } // send messages only if active and local
     virtual void spatial_move();
     virtual BOOL Ready() { return getReady(); } // update only if active and fully initialized by/for network
-    //	virtual float			renderable_Ambient	();
+
 
     virtual void shedule_Update(u32 dt);
     virtual bool shedule_Needed();
@@ -182,9 +182,7 @@ public:
     virtual void reload(LPCSTR section);
 
 public:
-#ifdef DEBUG
     virtual void dbg_DrawSkeleton();
-#endif
 
     virtual const SRotation Orientation() const
     {
@@ -229,6 +227,7 @@ public:
 
 protected:
     virtual void spawn_supplies();
+    virtual bool load_upgrades(CSE_Abstract* DC) { return false; };
 
 public:
     IC CAI_ObjectLocation& ai_location() const

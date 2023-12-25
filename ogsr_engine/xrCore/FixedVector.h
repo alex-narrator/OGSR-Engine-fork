@@ -14,7 +14,7 @@ public:
     typedef const value_type& const_reference;
 
 private:
-    value_type array[dim];
+    value_type array[dim]{};
     u32 count;
 
 public:
@@ -92,7 +92,7 @@ public:
     }
     IC void assign(iterator p, int c)
     {
-        VERIFY(c > 0 && c < dim);
+        R_ASSERT(c > 0 && c < dim);
         CopyMemory(array, p, c * sizeof(value_type));
         count = c;
     }

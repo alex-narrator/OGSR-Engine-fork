@@ -120,6 +120,7 @@ void CScriptStorage::LogVariable(lua_State* l, const char* name, int level)
         if (m_dumpedObjList.find(obj) != m_dumpedObjList.end())
             return;
         m_dumpedObjList.insert(obj);
+
         auto& r = obj->get_lua_table();
         if (r.is_valid())
         {
@@ -133,7 +134,11 @@ void CScriptStorage::LogVariable(lua_State* l, const char* name, int level)
         {
             // Dump class and element pointer if available
             if (const auto objectClass = obj->crep())
-                xr_sprintf(value, "(%s): %p", objectClass->name(), obj->ptr());
+            {
+                auto cpp_name = objectClass->type()->name();
+
+                xr_sprintf(value, "(%s): %p", cpp_name ? cpp_name : objectClass->name(), obj->ptr());
+            }
             else
                 xr_strcpy(value, "[not available]");
         }
@@ -149,6 +154,9 @@ void CScriptStorage::LogVariable(lua_State* l, const char* name, int level)
 
 static void ScriptCrashHandler(bool dump_lua_locals)
 {
+    if (!Device.OnMainThread())
+        return;
+
     try
     {
         Msg("***************************[ScriptCrashHandler]**********************************");
@@ -255,16 +263,20 @@ bool CScriptStorage::do_file(
     const char* caScriptName,
     const char* caNameSpaceName) // KRodin: эта функция открывает скрипт с диска и оправляет его содержимое в функцию load_buffer, после этого походу запускает скрипт.
 {
-    string_path l_caLuaFileName;
     auto l_tpFileReader = FS.r_open(caScriptName);
     if (!l_tpFileReader)
-    { //заменить на ассерт?
+    {
+        //заменить на ассерт?
         Msg("!![CScriptStorage::do_file] Cannot open file [%s]", caScriptName);
         return false;
     }
+
+    l_tpFileReader->skip_bom(caScriptName);
+
+    string_path l_caLuaFileName;
     strconcat(sizeof(l_caLuaFileName), l_caLuaFileName, "@", caScriptName); // KRodin: приводит путь к виду @f:\games\s.t.a.l.k.e.r\gamedata\scripts\***.script
 
-    bool loaded = load_buffer(lua(), reinterpret_cast<const char*>(l_tpFileReader->pointer()), (size_t)l_tpFileReader->length(), l_caLuaFileName, caNameSpaceName);
+    bool loaded = load_buffer(lua(), reinterpret_cast<const char*>(l_tpFileReader->pointer()), (size_t)l_tpFileReader->elapsed(), l_caLuaFileName, caNameSpaceName);
 
     FS.r_close(l_tpFileReader);
     if (!loaded)

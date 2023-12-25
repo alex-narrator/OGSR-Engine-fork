@@ -254,6 +254,27 @@ IReader* IReader::open_chunk_iterator(u32& ID, IReader* _prev)
     }
 }
 
+constexpr unsigned char boms[]{0xef, 0xbb, 0xbf};
+
+void IReader::skip_bom(const char* dbg_name)
+{
+    if (elapsed() < 3)
+        return;
+
+    for (const auto& bom : boms)
+    {
+        if (static_cast<const unsigned char>(data[Pos]) != bom)
+        {
+            seek(0);
+            return;
+        }
+
+        Pos++;
+    }
+
+    Msg("! Skip BOM for file [%s]", dbg_name);
+}
+
 void IReader::r(void* p, int cnt)
 {
     R_ASSERT(Pos + cnt <= Size);

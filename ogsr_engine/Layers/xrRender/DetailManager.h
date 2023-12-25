@@ -10,20 +10,8 @@
 #include "detailformat.h"
 #include "detailmodel.h"
 
-#ifdef _EDITOR
-//.	#include	"ESceneClassList.h"
-const int dm_max_decompress = 14;
-class CCustomObject;
-typedef u32 ObjClassID;
 
-typedef xr_list<CCustomObject*> ObjectList;
-typedef ObjectList::iterator ObjectIt;
-typedef xr_map<ObjClassID, ObjectList> ObjectMap;
-typedef ObjectMap::iterator ObjectPairIt;
-
-#else
 const int dm_max_decompress = 7;
-#endif
 // const int		dm_size				= 24;								//!
 const int dm_cache1_count = 4; //
 // const int 		dm_cache1_line		= dm_size*2/dm_cache1_count;		//! dm_size*2 must be div dm_cache1_count
@@ -50,6 +38,9 @@ extern float ps_current_detail_density;
 class ECORE_API CDetailManager
 {
 public:
+    float fade_distance = 99999;
+    Fvector light_position;
+    void details_clear();
     struct SlotItem
     { // один кустик
         float scale;
@@ -58,9 +49,8 @@ public:
         u32 vis_ID; // индекс в visibility списке он же тип [не качается, качается1, качается2]
         float c_hemi;
         float c_sun;
-#if RENDER == R_R1
-        Fvector c_rgb;
-#endif
+        float distance;
+        Fvector position;
     };
     DEFINE_VECTOR(SlotItem*, SlotItemVec, SlotItemVecIt);
     struct SlotPart
@@ -144,9 +134,7 @@ public:
     DetailVec objects;
     vis_list m_visibles[3]; // 0=still, 1=Wave1, 2=Wave2
 
-#ifndef _EDITOR
     xrXRC xrc;
-#endif
     CacheSlot1** cache_level1;
     Slot*** cache; // grid-cache itself
     svector<Slot*, dm_max_cache_size> cache_task; // non-unpacked slots
@@ -160,9 +148,6 @@ public:
     void UpdateVisibleS();
 
 public:
-#ifdef _EDITOR
-    virtual ObjectList* GetSnapList() = 0;
-#endif
 
     IC bool UseVS() { return HW.Caps.geometry_major >= 1; }
 
@@ -177,16 +162,9 @@ public:
     u32 hw_BatchSize;
     ID3DVertexBuffer* hw_VB;
     ID3DIndexBuffer* hw_IB;
-    ref_constant hwc_consts;
-    ref_constant hwc_wave;
-    ref_constant hwc_wind;
-    ref_constant hwc_array;
-    ref_constant hwc_s_consts;
-    ref_constant hwc_s_xform;
-    ref_constant hwc_s_array;
+
     void hw_Load();
     void hw_Load_Geom();
-    void hw_Load_Shaders();
     void hw_Unload();
     void hw_Render();
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -218,17 +196,13 @@ public:
 
     /// MT stuff
     xrCriticalSection MT;
-    volatile u32 m_frame_calc;
-    volatile u32 m_frame_rendered;
+    void StartAsync();
+    void WaitAsync();
+
+    std::future<void> awaiter;
+    bool async_started{};
 
     void MT_CALC();
-    ICF void MT_SYNC()
-    {
-        if (m_frame_calc == RDEVICE.dwFrame)
-            return;
-
-        MT_CALC();
-    }
 
     CDetailManager();
     virtual ~CDetailManager();

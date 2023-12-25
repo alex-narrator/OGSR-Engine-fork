@@ -13,6 +13,7 @@
 #include "ai_object_location.h"
 #include "level.h"
 #include "xrServer_Object_Base.h"
+#include "xrServer_Objects_ALife.h"
 
 static float min_deficit_factor = .3f;
 
@@ -55,11 +56,11 @@ void CPurchaseList::process(const CGameObject& owner, const shared_str& name, co
     const Fvector& position = owner.Position();
     const u32& level_vertex_id = owner.ai_location().level_vertex_id();
     const ALife::_OBJECT_ID& id = owner.ID();
-    CRandom random((u32)(CPU::QPC() & u32(-1)));
+
     u32 j = 0;
     for (u32 i = 0; i < count; ++i)
     {
-        if (random.randF() > probability)
+        if (::Random.randF(0.f, 1.f) > probability)
             continue;
 
         ++j;
@@ -68,7 +69,7 @@ void CPurchaseList::process(const CGameObject& owner, const shared_str& name, co
 
         if (lua_function)
         {
-            lua_function(owner.lua_game_object(), _abstract);
+            lua_function(owner.lua_game_object(), smart_cast<CSE_ALifeObject*>(_abstract));
         }
 
         NET_Packet P;

@@ -3,16 +3,13 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#pragma hdrstop
-
-#pragma warning(disable : 4995)
-#include <d3dx/d3dx9.h>
-#pragma warning(default : 4995)
 
 #include "../../xr_3da/fmesh.h"
 #include "fvisual.h"
 
 #include "../xrRenderDX10/dx10BufferUtils.h"
+
+#include <Utilities\FlexibleVertexFormat.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -33,14 +30,13 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
 {
     dxRender_Visual::Load(N, data, dwFlags);
 
-    D3DVERTEXELEMENT9 dcl[MAX_FVF_DECL_SIZE];
+    auto dcl = std::vector<D3DVERTEXELEMENT9>(MAXD3DDECLLENGTH + 1);
     D3DVERTEXELEMENT9* vFormat = 0;
     dwPrimitives = 0;
     BOOL loaded_v = false;
 
     if (data->find_chunk(OGF_GCONTAINER))
     {
-#ifndef _EDITOR
         // verts
         u32 ID = data->r_u32();
         vBase = data->r_u32();
@@ -62,8 +58,8 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         VERIFY(NULL == p_rm_Indices);
         p_rm_Indices = RImplementation.getIB(ID);
         p_rm_Indices->AddRef();
-#endif
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
+
+#if (RENDER == R_R4)
         // check for fast-vertices
         if (data->find_chunk(OGF_FASTPATH))
         {
@@ -97,7 +93,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             // geom
             m_fast->rm_geom.create(fmt, m_fast->p_rm_Vertices, m_fast->p_rm_Indices);
         }
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R4)
     }
 
     // read vertices
@@ -105,8 +101,8 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
     {
         if (data->find_chunk(OGF_VCONTAINER))
         {
-            R_ASSERT2(0, "pls notify andy about this.");
-#ifndef _EDITOR
+            R_ASSERT(0, "pls notify andy about this.");
+
             u32 ID = data->r_u32();
             vBase = data->r_u32();
             vCount = data->r_u32();
@@ -114,17 +110,16 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             p_rm_Vertices = RImplementation.getVB(ID);
             p_rm_Vertices->AddRef();
             vFormat = RImplementation.getVB_Format(ID);
-#endif
         }
         else
         {
             R_ASSERT(data->find_chunk(OGF_VERTICES));
             vBase = 0;
             u32 fvf = data->r_u32();
-            CHK_DX(D3DXDeclaratorFromFVF(fvf, dcl));
-            vFormat = dcl;
+            CHK_DX(FVF::CreateDeclFromFVF(fvf, dcl));
+            vFormat = dcl.data();
             vCount = data->r_u32();
-            u32 vStride = D3DXGetFVFVertexSize(fvf);
+            u32 vStride = FVF::ComputeVertexSize(fvf);
 
 #if defined(USE_DX10) || defined(USE_DX11)
             VERIFY(NULL == p_rm_Vertices);
@@ -150,8 +145,8 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
         dwPrimitives = 0;
         if (data->find_chunk(OGF_ICONTAINER))
         {
-            R_ASSERT2(0, "pls notify andy about this.");
-#ifndef _EDITOR
+            R_ASSERT(0, "pls notify andy about this.");
+
             u32 ID = data->r_u32();
             iBase = data->r_u32();
             iCount = data->r_u32();
@@ -159,7 +154,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             VERIFY(NULL == p_rm_Indices);
             p_rm_Indices = RImplementation.getIB(ID);
             p_rm_Indices->AddRef();
-#endif
+
         }
         else
         {
@@ -204,7 +199,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
 
 void Fvisual::Render(float)
 {
-#if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R4)
     if (m_fast && RImplementation.phase == CRender::PHASE_SMAP && !RCache.is_TessEnabled())
     {
         RCache.set_Geometry(m_fast->rm_geom);
@@ -217,11 +212,7 @@ void Fvisual::Render(float)
         RCache.Render(D3DPT_TRIANGLELIST, vBase, 0, vCount, iBase, dwPrimitives);
         RCache.stat.r.s_static.add(vCount);
     }
-#else // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
-    RCache.set_Geometry(rm_geom);
-    RCache.Render(D3DPT_TRIANGLELIST, vBase, 0, vCount, iBase, dwPrimitives);
-    RCache.stat.r.s_static.add(vCount);
-#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R4)
 }
 
 #define PCOPY(a) a = pFrom->a

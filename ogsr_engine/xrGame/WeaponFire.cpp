@@ -13,40 +13,7 @@
 #include "effectorshot.h"
 
 #include "level_bullet_manager.h"
-
-#define FLAME_TIME 0.05f
-
-float _nrand(float sigma)
-{
-#define ONE_OVER_SIGMA_EXP (1.0f / 0.7975f)
-
-    if (sigma == 0)
-        return 0;
-
-    float y;
-    do
-    {
-        y = -logf(Random.randF());
-    } while (Random.randF() > expf(-_sqr(y - 1.0f) * 0.5f));
-    if (rand() & 0x1)
-        return y * sigma * ONE_OVER_SIGMA_EXP;
-    else
-        return -y * sigma * ONE_OVER_SIGMA_EXP;
-}
-
-void random_dir(Fvector& tgt_dir, const Fvector& src_dir, float dispersion)
-{
-    float sigma = dispersion / 3.f;
-    float alpha = clampr(_nrand(sigma), -dispersion, dispersion);
-    float theta = Random.randF(0, PI);
-    float r = tan(alpha);
-    Fvector U, V, T;
-    Fvector::generate_orthonormal_basis(src_dir, U, V);
-    U.mul(r * _sin(theta));
-    V.mul(r * _cos(theta));
-    T.add(U, V);
-    tgt_dir.add(src_dir, T).normalize();
-}
+#include "../xr_3da/IGame_Persistent.h"
 
 float CWeapon::GetWeaponDeterioration() { return conditionDecreasePerShot; };
 
@@ -89,6 +56,9 @@ void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
     if (m_bLightShotEnabled)
         Light_Start();
 
+    const Fvector ShotPos = Fvector().mad(P, D, 1.5f);
+    g_pGamePersistent->GrassBendersAddShot(cast_game_object()->ID(), ShotPos, D, 3.0f, 20.0f, ps_ssfx_int_grass_params_2.z, ps_ssfx_int_grass_params_2.w);
+
     // Ammo
     m_magazine.pop_back();
     --iAmmoElapsed;
@@ -117,7 +87,8 @@ void CWeapon::StopShooting()
     if (m_pFlameParticles && m_pFlameParticles->IsLooped())
         StopFlameParticles();
 
-    SwitchState(eIdle);
+    if (!dont_interrupt_shot_anm)
+        SwitchState(eIdle);
 
     bWorking = false;
     // if(IsWorking()) FireEnd();

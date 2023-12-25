@@ -63,7 +63,7 @@ void CLevel::ClientReceive()
                 game_events->insert(tmpP);
                 if (g_bDebugEvents)
                     ProcessGameEvents();
-            };
+            }
         }
         break;
         case M_UPDATE: {
@@ -107,7 +107,7 @@ void CLevel::ClientReceive()
         }
         break;
         case M_SAVE_GAME: {
-            ClientSave();
+            //ClientSave();
         }
         break;
         case M_AUTH_CHALLENGE: {

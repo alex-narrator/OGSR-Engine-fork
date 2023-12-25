@@ -57,27 +57,6 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
         SendBroadcast(BroadcastCID, P, MODE);
     }
     break;
-    case GE_INV_ACTION: {
-        xrClientData* CL = ID_to_client(sender);
-        if (CL)
-            CL->net_Ready = TRUE;
-        if (SV_Client)
-            SendTo(SV_Client->ID, P, net_flags(TRUE, TRUE));
-    }
-    break;
-    case GE_RESPAWN: {
-        CSE_Abstract* E = receiver;
-        if (E)
-        {
-            R_ASSERT(E->s_flags.is(M_SPAWN_OBJECT_PHANTOM));
-
-            svs_respawn R;
-            R.timestamp = timestamp + E->RespawnTime * 1000;
-            R.phantom = destination;
-            q_respawn.insert(R);
-        }
-    }
-    break;
     case GE_TRADE_BUY:
     case GE_OWNERSHIP_TAKE:
     case GE_TRANSFER_TAKE: {
@@ -203,8 +182,6 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
         VERIFY(verify_entities());
     }
     break;
-    case GE_ADDON_ATTACH:
-    case GE_ADDON_DETACH:
     case GE_CHANGE_POS: {
         SendTo(SV_Client->ID, P, net_flags(TRUE, TRUE));
     }
@@ -217,10 +194,9 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
 #endif
     }
     break;
-    case GEG_PLAYER_ITEM_SELL: {
-        game->OnPlayer_Sell_Item(sender, P);
+    /*case GEG_PLAYER_ITEM_SELL: {
     }
-    break;
+    break;*/
     case GE_TELEPORT_OBJECT: {
         game->teleport_object(P, destination);
     }

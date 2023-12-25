@@ -62,7 +62,6 @@ public:
 #endif
 
     // MRT-path
-    ref_rt rt_Depth; // Z-buffer like - initial depth
     ref_rt rt_MSAADepth; // z-buffer for MSAA deferred shading
     ref_rt rt_Generic_0_r; // MRT generic 0
     ref_rt rt_Generic_1_r; // MRT generic 1
@@ -115,8 +114,6 @@ public:
 
     ID3DTexture2D* t_noise_surf[TEX_jitter_count];
     ref_texture t_noise[TEX_jitter_count];
-    ID3DTexture2D* t_noise_surf_mipped;
-    ref_texture t_noise_mipped;
 
 private:
     // OCCq

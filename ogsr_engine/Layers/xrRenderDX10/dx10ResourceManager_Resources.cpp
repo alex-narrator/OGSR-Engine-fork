@@ -1,14 +1,6 @@
 #include "stdafx.h"
-#pragma hdrstop
 
-#pragma warning(disable : 4995)
-#include <d3dx/d3dx9.h>
-#ifndef _EDITOR
 #include "../../xr_3da/render.h"
-#endif
-#pragma warning(default : 4995)
-
-#include <d3dx/D3DX10Core.h>
 
 #include "../xrRender/ResourceManager.h"
 #include "../xrRender/tss.h"
@@ -19,6 +11,8 @@
 #include "../xrRenderDX10/dx10ConstantBuffer.h"
 
 #include "../xrRender/ShaderResourceTraits.h"
+
+#include <Utilities\FlexibleVertexFormat.h>
 
 #ifdef USE_DX11
 SHS* CResourceManager::_CreateHS(LPCSTR Name) { return CreateShader<SHS>(Name); }
@@ -33,8 +27,6 @@ SCS* CResourceManager::_CreateCS(LPCSTR Name) { return CreateShader<SCS>(Name); 
 
 void CResourceManager::_DeleteCS(const SCS* CS) { DestroyShader(CS); }
 #endif //	USE_DX10
-
-void fix_texture_name(LPSTR fn);
 
 template <class T>
 BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
@@ -103,9 +95,6 @@ SPass* CResourceManager::_CreatePass(const SPass& proto)
 #endif
     P->constants = proto.constants;
     P->T = proto.T;
-#ifdef _EDITOR
-    P->M = proto.M;
-#endif
     P->C = proto.C;
 
     v_passes.push_back(P);
@@ -167,7 +156,9 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         IReader* file = FS.r_open(cname);
         R_ASSERT2(file, cname);
 
-        const std::string_view strbuf{reinterpret_cast<const char*>(file->pointer()), static_cast<size_t>(file->length())};
+        file->skip_bom(cname);
+
+        const std::string_view strbuf{reinterpret_cast<const char*>(file->pointer()), static_cast<size_t>(file->elapsed())};
 
         // Select target
         LPCSTR c_target = "vs_5_0";
@@ -272,7 +263,9 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
         IReader* file = FS.r_open(cname);
         R_ASSERT2(file, cname);
 
-        const std::string_view strbuf{reinterpret_cast<const char*>(file->pointer()), static_cast<size_t>(file->length())};
+        file->skip_bom(cname);
+
+        const std::string_view strbuf{reinterpret_cast<const char*>(file->pointer()), static_cast<size_t>(file->elapsed())};
 
         // Select target
         LPCSTR c_target = "ps_5_0";
@@ -342,11 +335,13 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
         IReader* file = FS.r_open(cname);
         R_ASSERT2(file, cname);
 
+        file->skip_bom(cname);
+
         // Select target
         LPCSTR c_target = "gs_5_0";
         LPCSTR c_entry = "main";
 
-        HRESULT const _hr = ::Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(), c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_gs);
+        HRESULT const _hr = ::Render->shader_compile(name, (DWORD const*)file->pointer(), file->elapsed(), c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_gs);
 
         FS.r_close(file);
 
@@ -373,8 +368,8 @@ void CResourceManager::_DeleteGS(const SGS* gs)
 static BOOL dcl_equal(D3DVERTEXELEMENT9* a, D3DVERTEXELEMENT9* b)
 {
     // check sizes
-    u32 a_size = D3DXGetDeclLength(a);
-    u32 b_size = D3DXGetDeclLength(b);
+    u32 a_size = FVF::GetDeclLength(a);
+    u32 b_size = FVF::GetDeclLength(b);
     if (a_size != b_size)
         return FALSE;
     return 0 == memcmp(a, b, a_size * sizeof(D3DVERTEXELEMENT9));
@@ -393,7 +388,7 @@ SDeclaration* CResourceManager::_CreateDecl(D3DVERTEXELEMENT9* dcl)
 
     // Create _new
     SDeclaration* D = xr_new<SDeclaration>();
-    u32 dcl_size = D3DXGetDeclLength(dcl) + 1;
+    u32 dcl_size = FVF::GetDeclLength(dcl) + 1;
     //	Don't need it for DirectX 10 here
     // CHK_DX					(HW.pDevice->CreateVertexDeclaration(dcl,&D->dcl));
     D->dcl_code.assign(dcl, dcl + dcl_size);
@@ -518,7 +513,7 @@ void CResourceManager::DBG_VerifyGeoms()
     D3DVERTEXELEMENT9		test	[MAX_FVF_DECL_SIZE];
     u32						size	= 0;
     G->dcl->GetDeclaration			(test,(unsigned int*)&size);
-    u32 vb_stride					= D3DXGetDeclVertexSize	(test,0);
+    u32 vb_stride					= ComputeVertexSize(test,0);
     u32 vb_stride_cached			= G->vb_stride;
     R_ASSERT						(vb_stride == vb_stride_cached);
     }
@@ -530,7 +525,7 @@ SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, ID3DVertexBuffe
     R_ASSERT(decl && vb);
 
     SDeclaration* dcl = _CreateDecl(decl);
-    u32 vb_stride = D3DXGetDeclVertexSize(decl, 0);
+    u32 vb_stride = FVF::ComputeVertexSize(decl, 0);
 
     // ***** first pass - search already loaded shader
     for (u32 it = 0; it < v_geoms.size(); it++)
@@ -551,9 +546,9 @@ SGeometry* CResourceManager::CreateGeom(D3DVERTEXELEMENT9* decl, ID3DVertexBuffe
 }
 SGeometry* CResourceManager::CreateGeom(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
 {
-    D3DVERTEXELEMENT9 dcl[MAX_FVF_DECL_SIZE];
-    CHK_DX(D3DXDeclaratorFromFVF(FVF, dcl));
-    SGeometry* g = CreateGeom(dcl, vb, ib);
+    auto dcl = std::vector<D3DVERTEXELEMENT9>(MAXD3DDECLLENGTH + 1);
+    CHK_DX(FVF::CreateDeclFromFVF(FVF, dcl));
+    SGeometry* g = CreateGeom(dcl.data(), vb, ib);
     return g;
 }
 

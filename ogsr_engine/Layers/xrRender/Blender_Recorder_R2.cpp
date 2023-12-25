@@ -1,13 +1,9 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "ResourceManager.h"
 #include "blenders\Blender_Recorder.h"
 #include "blenders\Blender.h"
-
 #include "dxRenderDeviceRender.h"
-
-void fix_texture_name(LPSTR fn);
 
 void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite, BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
 {
@@ -177,9 +173,6 @@ void CBlender_Compile::r_End()
     dest.state = DEV->_CreateState(RS.GetContainer());
     dest.T = DEV->_CreateTextureList(passTextures);
     dest.C = 0;
-#ifdef _EDITOR
-    dest.M = 0;
-#endif
     SH->passes.push_back(DEV->_CreatePass(dest));
 }
 #endif //	USE_DX10

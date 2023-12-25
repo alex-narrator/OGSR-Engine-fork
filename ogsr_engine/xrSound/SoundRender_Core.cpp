@@ -424,15 +424,12 @@ CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
         // хитрый способ для проверки звуковых зон в 2х направлениях от камеры. но что то он хуже работает. часто не та зона выбираеться. пока убрал
 
         //CDB::COLLIDER geom_DB1;
-        //geom_DB1.ray_options(CDB::OPT_ONLYNEAREST);
-        //geom_DB1.ray_query(geom_ENV, P, dir, 1000.f);
+        //geom_DB1.ray_query(CDB::OPT_ONLYNEAREST, geom_ENV, P, dir, 1000.f);
 
         //CDB::COLLIDER geom_DB2;
-        //geom_DB2.ray_options(CDB::OPT_ONLYNEAREST);
-        //geom_DB2.ray_query(geom_ENV, P, Fvector(dir).invert(), 1000.f);
+        //geom_DB2.ray_query(CDB::OPT_ONLYNEAREST, geom_ENV, P, Fvector(dir).invert(), 1000.f);
 
-        geom_DB.ray_options(CDB::OPT_ONLYNEAREST);
-        geom_DB.ray_query(geom_ENV, P, dir, 1000.f);
+        geom_DB.ray_query(CDB::OPT_ONLYNEAREST, geom_ENV, P, dir, 1000.f);
 
         //if (geom_DB1.r_count() && geom_DB2.r_count())
         if (geom_DB.r_count())
@@ -615,26 +612,6 @@ void CSoundRender_Core::i_eax_listener_set(CSound_environment* _E)
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_ENVIRONMENTDIFFUSION, &ep.flEnvironmentDiffusion, sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_AIRABSORPTIONHF, &ep.flAirAbsorptionHF, sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(DWORD));
-}
-
-void CSoundRender_Core::i_eax_listener_get(CSound_environment* _E)
-{
-    VERIFY(bEAX);
-    CSoundRender_Environment* E = static_cast<CSoundRender_Environment*>(_E);
-    EAXLISTENERPROPERTIES ep;
-    i_eax_get(&DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ALLPARAMETERS, &ep, sizeof(EAXLISTENERPROPERTIES));
-    E->Room = (float)ep.lRoom;
-    E->RoomHF = (float)ep.lRoomHF;
-    E->RoomRolloffFactor = (float)ep.flRoomRolloffFactor;
-    E->DecayTime = (float)ep.flDecayTime;
-    E->DecayHFRatio = (float)ep.flDecayHFRatio;
-    E->Reflections = (float)ep.lReflections;
-    E->ReflectionsDelay = (float)ep.flReflectionsDelay;
-    E->Reverb = (float)ep.lReverb;
-    E->ReverbDelay = (float)ep.flReverbDelay;
-    E->EnvironmentSize = (float)ep.flEnvironmentSize;
-    E->EnvironmentDiffusion = (float)ep.flEnvironmentDiffusion;
-    E->AirAbsorptionHF = (float)ep.flAirAbsorptionHF;
 }
 
 void CSoundRender_Core::i_eax_commit_setting()

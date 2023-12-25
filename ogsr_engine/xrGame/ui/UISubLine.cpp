@@ -95,8 +95,10 @@ const CUISubLine* CUISubLine::Cut2Pos(int i)
     //	xr_delete(m_pTempLine);
     if (!m_pTempLine)
         m_pTempLine = xr_new<CUISubLine>();
+
     m_pTempLine->m_color = m_color;
     m_pTempLine->m_text.assign(m_text, 0, i + 1);
+
     m_text.replace(0, i + 1, "");
 
     return m_pTempLine;
@@ -110,6 +112,7 @@ void CUISubLine::FreeBuffer()
 void CUISubLine::Draw(CGameFont* pFont, float x, float y) const
 {
     pFont->SetColor(m_color);
+
     Fvector2 pos;
     pos.set(x, y);
     UI()->ClientToScreenScaled(pos);

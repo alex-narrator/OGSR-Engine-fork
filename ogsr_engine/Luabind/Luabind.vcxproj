@@ -57,14 +57,14 @@
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <PreprocessorDefinitions>XRCORE_STATIC;_SECURE_SCL=0;_HAS_ITERATOR_DEBUGGING=0;LUABIND_STATIC;NDEBUG;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XRCORE_STATIC;LUABIND_STATIC;NDEBUG;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);..\LuaJIT\src;..\xrCore;</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FloatingPointModel>Fast</FloatingPointModel>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>4251;4577;5037;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4577;5037;4267;4324;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <ExceptionHandling>
@@ -105,14 +105,14 @@
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <PreprocessorDefinitions>XRCORE_STATIC;_SECURE_SCL=0;_HAS_ITERATOR_DEBUGGING=0;LUABIND_STATIC;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XRCORE_STATIC;LUABIND_STATIC;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);..\LuaJIT\src;..\xrCore;</AdditionalIncludeDirectories>
       <StringPooling>false</StringPooling>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <FloatingPointModel>Fast</FloatingPointModel>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>4251;4577;5037;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4577;5037;4267;4324;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ExceptionHandling>

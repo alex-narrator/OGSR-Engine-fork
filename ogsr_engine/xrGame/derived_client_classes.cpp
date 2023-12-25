@@ -132,21 +132,33 @@ LPCSTR get_item_description(CInventoryItem* I) { return I->m_Description.c_str()
 
 void set_item_description(CInventoryItem* item, LPCSTR text) { item->m_Description = CStringTable().translate(text); }
 
-void get_slots(luabind::object O)
+luabind::object get_slots(CInventoryItem* itm)
 {
-    lua_State* L = O.lua_state();
-    CInventoryItem* itm = luabind::object_cast<CInventoryItem*>(O);
-    lua_createtable(L, 0, 0);
-    int tidx = lua_gettop(L);
+    //lua_State* L = ai().script_engine().lua();
+
+    //lua_createtable(L, 0, 0);
+    //int tidx = lua_gettop(L);
+    //if (itm)
+    //{
+    //    for (u32 i = 0; i < itm->GetSlotsCount(); i++)
+    //    {
+    //        lua_pushinteger(L, i + 1); // key
+    //        lua_pushinteger(L, itm->GetSlots()[i]);
+    //        lua_settable(L, tidx);
+    //    }
+    //}
+    
+    auto table = luabind::newtable(ai().script_engine().lua());
+
     if (itm)
     {
         for (u32 i = 0; i < itm->GetSlotsCount(); i++)
         {
-            lua_pushinteger(L, i + 1); // key
-            lua_pushinteger(L, itm->GetSlots()[i]);
-            lua_settable(L, tidx);
+            table[i + 1] = itm->GetSlots()[i];
         }
     }
+
+    return table;
 }
 
 void CInventoryScript::script_register(lua_State* L)
@@ -168,7 +180,7 @@ void CInventoryScript::script_register(lua_State* L)
             .property("inv_name_short", &get_item_name_short, &set_item_name_short)
             .property("cost", &CInventoryItem::Cost, &CInventoryItem::SetCost)
             .property("slot", &CInventoryItem::GetSlot, &CInventoryItem::SetSlot)
-            .property("slots", &get_slots, raw<2>())
+            .property("slots", &get_slots)
             .property("description", &get_item_description, &set_item_description),
         class_<CInventoryItemObject, bases<CInventoryItem, CGameObject>>("CInventoryItemObject"),
 
@@ -261,7 +273,7 @@ SRotation& CWeaponScript::FireDeviation(CWeapon* wpn) { return wpn->constDeviati
 
 luabind::object CWeaponScript::get_fire_modes(CWeaponMagazined* wpn)
 {
-    lua_State* L = wpn->lua_game_object()->lua_state();
+    lua_State* L = ai().script_engine().lua();
     luabind::object t = newtable(L);
     auto& vector = wpn->m_aFireModes;
     int index = 1;
@@ -286,7 +298,7 @@ void CWeaponScript::set_fire_modes(CWeaponMagazined* wpn, luabind::object const&
 
 luabind::object CWeaponScript::get_hit_power(CWeapon* wpn)
 {
-    lua_State* L = wpn->lua_game_object()->lua_state();
+    lua_State* L = ai().script_engine().lua();
     luabind::object t = newtable(L);
     auto& vector = wpn->fvHitPower;
 

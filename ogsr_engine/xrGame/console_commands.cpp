@@ -80,9 +80,8 @@ float adj_delta_rot = 0.05f;
 BOOL g_bCheckTime = FALSE;
 int net_cl_inputupdaterate = 50;
 Flags32 g_mt_config = {mtLevelPath | mtDetailPath | mtObjectHandler | mtSoundPlayer | mtAiVision | mtBullets | mtLUA_GC | mtLevelSounds | mtALife};
-#ifdef DEBUG
+
 Flags32 dbg_net_Draw_Flags = {0};
-#endif
 
 #ifdef DEBUG
 BOOL g_bDebugNode = FALSE;
@@ -98,8 +97,6 @@ int g_AI_inactive_time = 0;
 
 extern int g_dof_zoom_far;
 extern int g_dof_zoom_near;
-
-ENGINE_API extern int g_3dscopes_fps_factor;
 
 void get_files_list(xr_vector<shared_str>& files, LPCSTR dir, LPCSTR file_ext)
 {
@@ -154,10 +151,35 @@ public:
 
         SProcessMemInfo memCounters;
         GetProcessMemInfo(memCounters);
-        Msg("[%I64dMB] physical memory installed, [%I64dMB] available, [%ld] percent of memory in use", memCounters.TotalPhysicalMemory / (1024 * 1024),
-            memCounters.FreePhysicalMemory / (1024 * 1024), memCounters.MemoryLoad);
+        Msg("[%I64dMB] physical memory installed, [%I64dMB] available, [%ld] percent of memory in use", 
+            memCounters.TotalPhysicalMemory / (1024 * 1024),
+            memCounters.FreePhysicalMemory / (1024 * 1024), 
+            memCounters.MemoryLoad);
 
-        Msg("PageFile usage: [%I64dMB], Peak PageFile usage: [%I64dMB]", memCounters.PagefileUsage / (1024 * 1024), memCounters.PeakPagefileUsage / (1024 * 1024));
+        Msg("PageFile total: [%I64dMB], free~ [%I64dMB]", 
+            memCounters.TotalPageFile / (1024 * 1024), memCounters.FreePageFile / (1024 * 1024));
+
+        //PeakWorkingSetSize
+        //
+        //The peak working set size, in bytes.
+        //
+        //WorkingSetSize
+        //
+        //The current working set size, in bytes.
+
+        Msg("Engine memory usage (Working Set): [%I64dMB], peak: [%I64dMB]",
+            memCounters.WorkingSetSize / (1024 * 1024), memCounters.PeakWorkingSetSize / (1024 * 1024));
+
+        //PagefileUsage
+        //
+        //The Commit Charge value in bytes for this process. Commit Charge is the total amount of memory that the memory manager has committed for a running process.
+        //
+        //PeakPagefileUsage
+        //
+        //The peak value in bytes of the Commit Charge during the lifetime of this process.
+
+        Msg("Engine memory usage (Commit Charge): [%I64dMB], peak: [%I64dMB]",
+            memCounters.PagefileUsage / (1024 * 1024), memCounters.PeakPagefileUsage / (1024 * 1024));
 
         Log("--------------------------------------------------------------------------------");
 
@@ -1354,15 +1376,11 @@ void CCC_RegisterCommands()
 {
     CMD1(CCC_MemStats, "stat_memory");
     // game
-    psActorFlags.set(AF_ALWAYSRUN, true);
     CMD3(CCC_Mask, "g_always_run", &psActorFlags, AF_ALWAYSRUN);
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
 
-    //CMD3(CCC_Mask, "g_dof_zoom_old", &psActorFlags, AF_DOF_ZOOM);
-    CMD3(CCC_Mask, "g_dof_zoom", &psActorFlags, AF_DOF_ZOOM_NEW);
+    CMD3(CCC_Mask, "g_dof_zoom", &psActorFlags, AF_DOF_ZOOM);
     CMD3(CCC_Mask, "g_dof_reload", &psActorFlags, AF_DOF_RELOAD);
-    //CMD4(CCC_Integer, "g_dof_zoom_far", &g_dof_zoom_far, 10, 100);
-    //CMD4(CCC_Integer, "g_dof_zoom_near", &g_dof_zoom_near, 10, 100);
 
     CMD3(CCC_Mask, "wpn_aim_toggle", &psActorFlags, AF_WPN_AIM_TOGGLE);
 
@@ -1507,8 +1525,9 @@ void CCC_RegisterCommands()
 
     CMD3(CCC_Mask, "g_mouse_wheel_switch_slot", &psActorFlags, AF_MOUSE_WHEEL_SWITCH_SLOTS);
 
-    psActorFlags.set(AF_3D_PDA, TRUE);
     CMD3(CCC_Mask, "g_3d_pda", &psActorFlags, AF_3D_PDA);
+
+    CMD3(CCC_Mask, "g_first_person_death", &psActorFlags, AF_FIRST_PERSON_DEATH);
 
     CMD1(CCC_TimeFactor, "time_factor")
     CMD1(CCC_SetWeather, "set_weather");
@@ -1528,15 +1547,12 @@ void CCC_RegisterCommands()
 #ifdef DEBUG
     CMD3(CCC_Mask, "dbg_draw_actor_alive", &dbg_net_Draw_Flags, (1 << 0));
     CMD3(CCC_Mask, "dbg_draw_actor_dead", &dbg_net_Draw_Flags, (1 << 1));
-    CMD3(CCC_Mask, "dbg_draw_teamzone", &dbg_net_Draw_Flags, (1 << 3));
     CMD3(CCC_Mask, "dbg_draw_invitem", &dbg_net_Draw_Flags, (1 << 4));
     CMD3(CCC_Mask, "dbg_draw_actor_phys", &dbg_net_Draw_Flags, (1 << 5));
     CMD3(CCC_Mask, "dbg_draw_customdetector", &dbg_net_Draw_Flags, (1 << 6));
     CMD3(CCC_Mask, "dbg_destroy", &dbg_net_Draw_Flags, (1 << 7));
     CMD3(CCC_Mask, "dbg_draw_autopickupbox", &dbg_net_Draw_Flags, (1 << 8));
-    CMD3(CCC_Mask, "dbg_draw_rp", &dbg_net_Draw_Flags, (1 << 9));
     CMD3(CCC_Mask, "dbg_draw_climbable", &dbg_net_Draw_Flags, (1 << 10));
-    CMD3(CCC_Mask, "dbg_draw_skeleton", &dbg_net_Draw_Flags, (1 << 11));
 
     CMD3(CCC_Mask, "dbg_draw_ph_contacts", &ph_dbg_draw_mask, phDbgDrawContacts);
     CMD3(CCC_Mask, "dbg_draw_ph_enabled_aabbs", &ph_dbg_draw_mask, phDbgDrawEnabledAABBS);
@@ -1575,6 +1591,8 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "dbg_draw_ph_hit_anims", &ph_dbg_draw_mask1, phDbgHitAnims);
     CMD3(CCC_Mask, "dbg_draw_ph_ik_limits", &ph_dbg_draw_mask1, phDbgDrawIKLimits);
 #endif
+
+    CMD3(CCC_Mask, "dbg_draw_skeleton", &dbg_net_Draw_Flags, (1 << 11));
 
 #ifdef DEBUG
     CMD4(CCC_Integer, "string_table_error_msg", &CStringTable::m_bWriteErrorsToLog, 0, 1);

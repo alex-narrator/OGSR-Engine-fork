@@ -36,6 +36,8 @@ extern void try_change_current_entity();
 extern void restore_actor();
 #endif
 
+#include "embedded_editor/embedded_editor_main.h"
+
 bool g_bDisableAllInput = false;
 
 extern float g_fTimeFactor;
@@ -44,6 +46,9 @@ extern float g_fTimeFactor;
 
 void CLevel::IR_OnMouseWheel(int direction)
 {
+    if (Editor_MouseWheel(direction))
+        return;
+
     if (g_bDisableAllInput)
         return;
 
@@ -78,6 +83,9 @@ void CLevel::IR_OnMouseHold(int btn) { IR_OnKeyboardHold(mouse_button_2_key[btn]
 
 void CLevel::IR_OnMouseMove(int dx, int dy)
 {
+    if (Editor_MouseMove(dx, dy))
+        return;
+
     if (g_bDisableAllInput)
         return;
     if (pHUD->GetUI()->IR_OnMouseMove(dx, dy))
@@ -96,38 +104,15 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
     }
 }
 
-class vtune_
-{
-    BOOL enabled_;
-
-public:
-    vtune_() { enabled_ = FALSE; }
-    void enable()
-    {
-        if (!enabled_)
-        {
-            Engine.External.tune_resume();
-            enabled_ = TRUE;
-            Msg("vtune : enabled");
-        }
-    }
-    void disable()
-    {
-        if (enabled_)
-        {
-            Engine.External.tune_pause();
-            enabled_ = FALSE;
-            Msg("vtune : disabled");
-        }
-    }
-} vtune;
-
 // Обработка нажатия клавиш
 extern bool g_block_pause;
 extern bool g_block_all_except_movement;
 
 void CLevel::IR_OnKeyboardPress(int key)
 {
+    if (Editor_KeyPress(key))
+        return;
+
     if (GamePersistent().OnKeyboardPress(key))
         return;
 
@@ -146,12 +131,13 @@ void CLevel::IR_OnKeyboardPress(int key)
         return;
 
     case kQUIT: {
-        if (b_ui_exist && HUD().GetUI()->MainInputReceiver() && (MainMenu()->IsActive() || !Device.Paused()))
+        if (b_ui_exist && HUD().GetUI()->MainInputReceiver())
         {
             if (HUD().GetUI()->MainInputReceiver()->IR_OnKeyboardPress(key))
                 return; // special case for mp and main_menu
 
-            HUD().GetUI()->StartStopMenu(HUD().GetUI()->MainInputReceiver(), true);
+            if (MainMenu()->IsActive() || !Device.Paused())
+                HUD().GetUI()->StartStopMenu(HUD().GetUI()->MainInputReceiver(), true);
         }
         else
             Console->Execute("main_menu");
@@ -324,42 +310,6 @@ void CLevel::IR_OnKeyboardPress(int key)
         break;
 #endif
 
-#ifdef DEBUG
-    case DIK_F9: {
-        //		if (!ai().get_alife())
-        //			break;
-        //		const_cast<CALifeSimulatorHeader&>(ai().alife().header()).set_state(ALife::eZoneStateSurge);
-        break;
-    }
-        return;
-//	case DIK_F10:{
-//		ai().level_graph().set_dest_point();
-//		ai().level_graph().build_detail_path();
-//		if (!Objects.FindObjectByName("m_stalker_e0000") || !Objects.FindObjectByName("localhost/dima"))
-//			return;
-//		if (!m_bSynchronization) {
-//			m_bSynchronization	= true;
-//			ai().level_graph().set_start_point();
-//			m_bSynchronization	= false;
-//		}
-//		luabind::functor<void>	functor;
-//		ai().script_engine().functor("alife_test.set_switch_online",functor);
-//		functor(0,false);
-//	}
-//		return;
-//	case DIK_F11:
-//		ai().level_graph().build_detail_path();
-//		if (!Objects.FindObjectByName("m_stalker_e0000") || !Objects.FindObjectByName("localhost/dima"))
-//			return;
-//		if (!m_bSynchronization) {
-//			m_bSynchronization	= true;
-//			ai().level_graph().set_dest_point();
-//			ai().level_graph().select_cover_point();
-//			m_bSynchronization	= false;
-//		}
-//		return;
-#endif // DEBUG
-
     if (bindConsoleCmds.execute(key))
         return;
 
@@ -386,6 +336,9 @@ void CLevel::IR_OnKeyboardPress(int key)
 
 void CLevel::IR_OnKeyboardRelease(int key)
 {
+    if (Editor_KeyRelease(key))
+        return;
+
     if (g_bDisableAllInput)
         return;
 
@@ -424,6 +377,9 @@ void CLevel::IR_OnKeyboardRelease(int key)
 
 void CLevel::IR_OnKeyboardHold(int key)
 {
+    if (Editor_KeyHold(key))
+        return;
+
     if (g_bDisableAllInput)
         return;
 

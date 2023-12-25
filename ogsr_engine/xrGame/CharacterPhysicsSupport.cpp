@@ -29,6 +29,8 @@
 
 //#define USE_SMART_HITS
 #define USE_IK
+constexpr float IK_CALC_DIST = 100.f;
+constexpr float IK_ALWAYS_CALC_DIST = 20.f;
 
 void NodynamicsCollide(bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
 {
@@ -508,7 +510,23 @@ void CCharacterPhysicsSupport::in_UpdateCL()
         m_PhysicMovementControl->DestroyCharacter();
     }
     else if (ik_controller())
-        ik_controller()->Update();
+    {
+        CFrustum& view_frust = ::Render->ViewBase;
+        vis_data& vis = m_EntityAlife.Visual()->getVisData();
+        Fvector p;
+
+        m_EntityAlife.XFORM().transform_tiny(p, vis.sphere.P);
+
+        float dist = Device.vCameraPosition.distance_to(p);
+
+        if (dist < IK_CALC_DIST)
+        {
+            if (view_frust.testSphere_dirty(p, vis.sphere.R) || dist < IK_ALWAYS_CALC_DIST)
+            {
+                ik_controller()->Update();
+            }
+        }
+    }
 
 #ifdef DEBUG
     if (Type() == etStalker && ph_dbg_draw_mask1.test(phDbgHitAnims))
@@ -681,9 +699,8 @@ void CCharacterPhysicsSupport::ActivateShell(CObject* who)
     }
 
 //////////////////////this needs to evaluate object box//////////////////////////////////////////////////////
-#pragma todo("KRodin: V621 Consider inspecting the 'for' operator. It's possible that the loop will be executed incorrectly or won't be executed at all.")
-    for (u16 I = K->LL_BoneCount() - 1; I != u16(-1); --I)
-        K->LL_GetBoneInstance(I).reset_callback();
+    for (u16 I = K->LL_BoneCount(); I > 0;)
+        K->LL_GetBoneInstance(--I).reset_callback();
 
     if (anim_mov_ctrl) // we do not whant to move by long animation in root
         BR.set_callback_overwrite(TRUE);
@@ -917,8 +934,7 @@ void CCharacterPhysicsSupport::TestForWounded()
     position_matrix.mul(mXFORM, CBI.mTransform);
 
     xrXRC xrc;
-    xrc.ray_options(0);
-    xrc.ray_query(Level().ObjectSpace.GetStaticModel(), position_matrix.c, Fvector().set(0.0f, -1.0f, 0.0f), pelvis_factor_low_pose_detect);
+    xrc.ray_query(0, Level().ObjectSpace.GetStaticModel(), position_matrix.c, Fvector().set(0.0f, -1.0f, 0.0f), pelvis_factor_low_pose_detect);
 
     if (xrc.r_count())
     {

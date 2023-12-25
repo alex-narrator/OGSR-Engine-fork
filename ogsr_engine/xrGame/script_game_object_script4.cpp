@@ -45,6 +45,7 @@
 
 #include "xrServer_Objects_ALife.h"
 #include "ai_object_location.h"
+#include "clsid_game.h"
 
 template <typename T>
 T* script_game_object_cast(CScriptGameObject* script_obj)
@@ -119,6 +120,37 @@ bool get_obj_alive(CScriptGameObject* O)
         return false;
 }
 
+bool actor_can_take(CScriptGameObject* O)
+{
+    CGameObject* obj = &O->object();
+
+    if (obj->getDestroy())
+        return false;
+
+    CInventoryItem* pIItem = smart_cast<CInventoryItem*>(obj);
+    if (0 == pIItem)
+        return false;
+
+    if (pIItem->object().H_Parent() != NULL)
+        return false;
+
+    if (!pIItem->CanTake())
+        return false;
+
+    if (pIItem->object().CLS_ID == CLSID_OBJECT_G_RPG7 || pIItem->object().CLS_ID == CLSID_OBJECT_G_FAKE)
+        return false;
+
+    CGrenade* pGrenade = smart_cast<CGrenade*>(obj);
+    if (pGrenade && !pGrenade->Useful())
+        return false;
+
+    CMissile* pMissile = smart_cast<CMissile*>(obj);
+    if (pMissile && !pMissile->Useful())
+        return false;
+
+    return true;
+}
+
 u32 obj_level_id(CScriptGameObject* O) { return get_level_id(O->object().ai_location().game_vertex_id()); }
 
 LPCSTR obj_level_name(CScriptGameObject* O) { return get_level_name_by_id(obj_level_id(O)); }
@@ -147,7 +179,7 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
         .def("get_missile", &script_game_object_cast<CMissile>)
         .def("get_outfit", &script_game_object_cast<CCustomOutfit>)
         .def("get_space_restrictor", &script_game_object_cast<CSpaceRestrictor>)
-        .def("get_torch", &get_torch)
+        .def("get_torch", &script_game_object_cast<CTorch>)
         .def("get_weapon", &script_game_object_cast<CWeapon>)
         .def("get_weapon_m", &script_game_object_cast<CWeaponMagazined>)
         .def("get_weapon_mwg", &script_game_object_cast<CWeaponMagazinedWGrenade>)
@@ -179,6 +211,8 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
 
         .def("setEnabled", &CScriptGameObject::setEnabled)
         .def("setVisible", &CScriptGameObject::setVisible)
+
+        .def("actor_can_take", &actor_can_take)
 
         .property("inventory", &get_obj_inventory)
         .property("immunities", &get_obj_immunities)

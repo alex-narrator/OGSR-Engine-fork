@@ -57,7 +57,7 @@ protected:
     virtual void switch2_Idle();
     virtual void switch2_Fire();
     virtual void switch2_Fire2() {}
-    virtual void switch2_Empty();
+    void switch2_Empty(const bool empty_click_anim_play);
     virtual void switch2_Reload();
     virtual void switch2_Hiding();
     virtual void switch2_Hidden();
@@ -213,4 +213,7 @@ protected:
     virtual void net_Relcase(CObject* object);
 
     bool ScopeRespawn(PIItem);
+
+    virtual void OnMotionMark(u32 state, const motion_marks& M) override;
+    int CheckAmmoBeforeReload(u32& v_ammoType);
 };

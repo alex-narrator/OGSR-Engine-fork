@@ -20,18 +20,7 @@ CInput::CInput(bool bExclusive, int deviceForInit)
 
     Log("Starting INPUT device...");
 
-    pDI = NULL;
-    pMouse = NULL;
-    pKeyboard = NULL;
-
-    //=====================Mouse
     mouse_property.mouse_dt = 25;
-
-    ZeroMemory(mouseState, sizeof(mouseState));
-    ZeroMemory(KBState, sizeof(KBState));
-    ZeroMemory(timeStamp, sizeof(timeStamp));
-    ZeroMemory(timeSave, sizeof(timeSave));
-    ZeroMemory(offs, sizeof(offs));
 
     //===================== Dummy pack
     iCapture(&dummyController);
@@ -198,7 +187,7 @@ void CInput::KeyUpdate()
 
 bool CInput::get_dik_name(int dik, LPSTR dest_str, int dest_sz)
 {
-    DIPROPSTRING keyname{};
+    DIPROPSTRING keyname;
     keyname.diph.dwSize = sizeof(DIPROPSTRING);
     keyname.diph.dwHeaderSize = sizeof(DIPROPHEADER);
     keyname.diph.dwObj = static_cast<DWORD>(dik);
@@ -211,7 +200,9 @@ bool CInput::get_dik_name(int dik, LPSTR dest_str, int dest_sz)
     if (!wcslen(wct))
         return false;
 
-    return WideCharToMultiByte(CP_ACP, 0, keyname.wsz, -1, dest_str, dest_sz, 0, 0) != -1;
+    const size_t cnt = wcstombs(dest_str, wct, dest_sz);
+
+    return cnt != -1;
 }
 
 BOOL CInput::iGetAsyncKeyState(int dik)
@@ -516,7 +507,7 @@ IInputReceiver* CInput::CurrentIR()
         return NULL;
 }
 
-char CInput::DikToChar(int dik)
+u16 CInput::DikToChar(const int dik, const bool utf)
 {
     switch (dik)
     {
@@ -535,7 +526,7 @@ char CInput::DikToChar(int dik)
     case DIK_NUMPADPERIOD: return '.';
     //
     default:
-        u8 State[256] = {};
+        u8 State[256]{};
         if (this->is_exclusive_mode)
         { // GetKeyboardState в данном случае не используем, потому что оно очень глючно работает в эксклюзивном режиме
             if (this->iGetAsyncKeyState(DIK_LSHIFT) || this->iGetAsyncKeyState(DIK_RSHIFT))
@@ -546,17 +537,38 @@ char CInput::DikToChar(int dik)
             if (!GetKeyboardState(State))
                 return 0;
         }
-        u16 symbol;
-        if (this->is_exclusive_mode)
+
+        u16 output{};
+        if (utf)
         {
-            auto layout = GetKeyboardLayout(GetWindowThreadProcessId(gGameWindow, nullptr));
-            if (ToAsciiEx(MapVirtualKeyEx(dik, MAPVK_VSC_TO_VK, layout), dik, State, &symbol, 0, layout) == 1)
-                return static_cast<char>(symbol);
+            WCHAR symbol{};
+            if (this->is_exclusive_mode)
+            {
+                auto layout = GetKeyboardLayout(GetWindowThreadProcessId(gGameWindow, nullptr));
+                if (ToUnicodeEx(MapVirtualKeyEx(dik, MAPVK_VSC_TO_VK, layout), dik, State, &symbol, 1, 0, layout) != 1)
+                    return 0;
+            }
+            else
+            {
+                if (ToUnicode(MapVirtualKey(dik, MAPVK_VSC_TO_VK), dik, State, &symbol, 1, 0) != 1)
+                    return 0;
+            }
+            WideCharToMultiByte(CP_UTF8, 0, &symbol, 1, reinterpret_cast<char*>(&output), sizeof output, nullptr, nullptr);
+            return output;
         }
         else
         {
-            if (ToAscii(MapVirtualKey(dik, MAPVK_VSC_TO_VK), dik, State, &symbol, 0) == 1)
-                return static_cast<char>(symbol);
+            if (this->is_exclusive_mode)
+            {
+                auto layout = GetKeyboardLayout(GetWindowThreadProcessId(gGameWindow, nullptr));
+                if (ToAsciiEx(MapVirtualKeyEx(dik, MAPVK_VSC_TO_VK, layout), dik, State, &output, 0, layout) == 1)
+                    return output;
+            }
+            else
+            {
+                if (ToAscii(MapVirtualKey(dik, MAPVK_VSC_TO_VK), dik, State, &output, 0) == 1)
+                    return output;
+            }
         }
     }
 

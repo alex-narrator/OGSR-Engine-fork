@@ -65,7 +65,7 @@ void CSE_ALifeObject::script_register(lua_State* L)
                   .def("set_position", &cse_obj_set_position) // alpet: для коррекции позиции в оффлайне
                   .def_readwrite("m_level_vertex_id", &CSE_ALifeObject::m_tNodeID)
                   .def_readwrite("m_game_vertex_id", &CSE_ALifeObject::m_tGraphID)
-                  .def_readwrite("m_story_id", &CSE_ALifeObject::m_story_id)
+                  .def_readonly("m_story_id", &CSE_ALifeObject::m_story_id)
                   .property("m_flags", &get_flags_ref)
                   .property("level_id", &se_obj_level_id)
                   .property("level_name", &se_obj_level_name)
@@ -76,7 +76,16 @@ void CSE_ALifeObject::script_register(lua_State* L)
                   .def("get_weapon", &cse_object_cast<CSE_ALifeItemWeapon>)
                   .def("get_weapon_m", &cse_object_cast<CSE_ALifeItemWeaponMagazined>)
                   .def("get_weapon_gl", &cse_object_cast<CSE_ALifeItemWeaponMagazinedWGL>)
-                  .def("get_trader", &cse_object_cast<CSE_ALifeTraderAbstract>)];
+                  .def("get_trader", &cse_object_cast<CSE_ALifeTraderAbstract>)
+                  .def("get_visual", &cse_object_cast<CSE_Visual>)
+
+                  .def("get_object_physic", &cse_object_cast<CSE_ALifeObjectPhysic>)
+                  .def("get_start_zone", &cse_object_cast<CSE_ALifeSmartZone>)
+                  .def("get_anomalous_zone", &cse_object_cast<CSE_ALifeAnomalousZone>)
+                  .def("get_creature", &cse_object_cast<CSE_ALifeCreatureAbstract>)
+                  .def("get_human", &cse_object_cast<CSE_ALifeHumanAbstract>)
+                  .def("get_monster", &cse_object_cast<CSE_ALifeMonsterAbstract>)
+    ];
 }
 
 void CSE_ALifeGroupAbstract::script_register(lua_State* L)

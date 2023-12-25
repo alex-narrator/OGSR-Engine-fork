@@ -9,16 +9,16 @@
 
 #include "dxRenderDeviceRender.h"
 
-float psOSSR = .001f;
-
 void CHOM::MT_RENDER()
 {
     MT.Enter();
-    bool b_main_menu_is_active = (g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive());
+    bool b_main_menu_is_active = (g_pGamePersistent->m_pMainMenu &&
+                                  g_pGamePersistent->m_pMainMenu->IsActive());
     if (MT_frame_rendered != Device.dwFrame && !b_main_menu_is_active)
     {
         CFrustum ViewBase;
-        ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+        ViewBase.CreateFromMatrix(Device.mFullTransform,
+                                  FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
         Enable();
         Render(ViewBase);
     }
@@ -162,8 +162,7 @@ void CHOM::Render_DB(CFrustum& base)
     m_xform_01.mul(m_viewport_01, Device.mFullTransform);
 
     // Query DB
-    xrc.frustum_options(0);
-    xrc.frustum_query(m_pModel, base);
+    xrc.frustum_query(0, m_pModel, base);
     if (0 == xrc.r_count())
         return;
 
@@ -323,34 +322,38 @@ BOOL CHOM::visible(Fbox2& B, float depth)
 
 BOOL CHOM::visible(vis_data& vis)
 {
-    if (Device.dwFrame < vis.hom_frame)
-        return TRUE; // not at this time :)
     if (!bEnabled || ps_r2_ls_flags_ext.test(R2FLAGEXT_DISABLE_HOM))
         return TRUE; // return - everything visible
 
+    if (vis.hom_tested == Device.dwFrame)
+        return vis.hom_frame > vis.hom_tested;
+
+    if (Device.dwFrame < vis.hom_frame)
+        return TRUE; // not at this time :)
+
     // Now, the test time comes
-    // 0. The object was hidden, and we must prove that each frame	- test		| frame-old, tested-new, hom_res = false;
-    // 1. The object was visible, but we must to re-check it		- test		| frame-new, tested-???, hom_res = true;
-    // 2. New object slides into view								- delay test| frame-old, tested-old, hom_res = ???;
+    // 0. The object was hidden, and we must prove that each frame - test |
+    // frame-old, tested-new, hom_res = false;
+    // 1. The object was visible, but we must to re-check it - test | frame-new,
+    // tested-???, hom_res = true;
+    // 2. New object slides into view - delay test| frame-old, tested-old,
+    // hom_res = ???;
     u32 frame_current = Device.dwFrame;
-    // u32	frame_prev		= frame_current-1;
+    // u32 frame_prev = frame_current-1;
 
 #ifdef DEBUG
     Device.Statistic->RenderCALC_HOM.Begin();
 #endif
+
     BOOL result = _visible(vis.box, m_xform_01);
-    u32 delay = 1;
     if (result)
-    {
-        // visible	- delay next test
-        delay = ::Random.randI(5 * 2, 5 * 5);
-    }
+        // visible - delay next test
+        vis.hom_frame = frame_current + ::Random.randI(5 * 2, 5 * 5);
     else
-    {
-        // hidden	- shedule to next frame
-    }
-    vis.hom_frame = frame_current + delay;
+        // hidden - shedule to next frame
+        vis.hom_frame = frame_current;
     vis.hom_tested = frame_current;
+
 #ifdef DEBUG
     Device.Statistic->RenderCALC_HOM.End();
 #endif

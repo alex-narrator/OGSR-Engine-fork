@@ -231,14 +231,6 @@ protected:
     ref_sound m_HeavyBreathSnd;
     ref_sound m_BloodSnd;
 
-protected:
-    // Sleep params
-    //время когда актера надо разбудить
-    ALife::_TIME_ID m_dwWakeUpTime;
-    float m_fOldTimeFactor;
-    float m_fOldOnlineRadius;
-    float m_fSleepTimeFactor;
-
     /////////////////////////////////////////////////////////////////
     // misc properties
 protected:
@@ -261,11 +253,6 @@ protected:
     BOOL b_DropActivated;
     float f_DropPower;
 
-    // random seed для Zoom mode
-    s32 m_ZoomRndSeed;
-    // random seed для Weapon Effector Shot
-    s32 m_ShotRndSeed;
-
     bool m_bOutBorder;
     //сохраняет счетчик объектов в feel_touch, для которых необходимо обновлять размер колижена с актером
     u32 m_feel_touch_characters;
@@ -276,14 +263,6 @@ protected:
 
 private:
     void SwitchOutBorder(bool new_border_state);
-
-public:
-    ////////////////////////////////////////////////////////
-    void SetZoomRndSeed(s32 Seed = 0);
-    s32 GetZoomRndSeed() { return m_ZoomRndSeed; };
-    ////////////////////////////////////////////////////////
-    void SetShotRndSeed(s32 Seed = 0);
-    s32 GetShotRndSeed() { return m_ShotRndSeed; };
 
 public:
     void detach_Vehicle();
@@ -432,8 +411,9 @@ protected:
     //расстояние подсветки предметов
     float m_fPickupInfoRadius;
 
-    void PickupModeUpdate();
     void PickupInfoDraw(CObject* object);
+
+    void PickupModeUpdate();
     void PickupModeUpdate_COD();
 
 public:
@@ -642,15 +622,10 @@ protected:
 
     shared_str m_DefaultVisualOutfit;
 
-    LPCSTR invincibility_fire_shield_3rd;
-    LPCSTR invincibility_fire_shield_1st;
-    shared_str m_sHeadShotParticle;
     u32 last_hit_frame;
 #ifdef DEBUG
     friend class CLevelGraph;
 #endif
-    Fvector m_AutoPickUp_AABB;
-    Fvector m_AutoPickUp_AABB_Offset;
 
 public:
     void SetWeaponHideState(u32 State, bool bSet, bool now = false);

@@ -26,7 +26,7 @@
 // NOTE_4: The rotation sequence is ZXY
 
 template <class T>
-struct _matrix
+struct alignas(16) _matrix
 {
 public:
     typedef T TYPE;
@@ -909,7 +909,6 @@ public:
 };
 
 typedef _matrix<float> Fmatrix;
-typedef _matrix<double> Dmatrix;
 
 template <class T>
 BOOL _valid(const _matrix<T>& m)
@@ -918,4 +917,3 @@ BOOL _valid(const _matrix<T>& m)
 }
 
 extern XRCORE_API Fmatrix Fidentity;
-extern XRCORE_API Dmatrix Didentity;

@@ -8,15 +8,6 @@
 
 #include "ftreevisual.h"
 
-shared_str m_xform;
-shared_str m_xform_v;
-shared_str c_consts;
-shared_str c_wave;
-shared_str c_wind;
-shared_str c_c_bias;
-shared_str c_c_scale;
-shared_str c_c_sun;
-
 FTreeVisual::FTreeVisual(void) {}
 
 FTreeVisual::~FTreeVisual(void) {}
@@ -72,16 +63,6 @@ void FTreeVisual::Load(const char* N, IReader* data, u32 dwFlags)
 
     // Geom
     rm_geom.create(vFormat, p_rm_Vertices, p_rm_Indices);
-
-    // Get constants
-    m_xform = "m_xform";
-    m_xform_v = "m_xform_v";
-    c_consts = "consts";
-    c_wave = "wave";
-    c_wind = "wind";
-    c_c_bias = "c_bias";
-    c_c_scale = "c_scale";
-    c_c_sun = "c_sun";
 }
 
 struct FTreeVisual_setup
@@ -103,7 +84,7 @@ struct FTreeVisual_setup
         wind.set(_sin(tm_rot), 0, _cos(tm_rot), 0);
         wind.normalize();
         wind.mul(env.m_fTreeAmplitudeIntensity); // dir1*amplitude
-        scale = 1.f / float(FTreeVisual_quant);
+        scale = 1.f / FTreeVisual_quant;
 
         // setup constants
         wave.set(ps_r__Tree_Wave.x, ps_r__Tree_Wave.y, ps_r__Tree_Wave.z, Device.fTimeGlobal * ps_r__Tree_w_speed); // wave
@@ -117,26 +98,49 @@ void FTreeVisual::Render(float LOD)
     if (tvs.dwFrame != Device.dwFrame)
         tvs.calculate();
         // setup constants
-#if RENDER != R_R1
+
     Fmatrix xform_v;
     xform_v.mul_43(RCache.get_xform_view(), xform);
     RCache.tree.set_m_xform_v(xform_v); // matrix
-#endif
+
     float s = ps_r__Tree_SBC;
     RCache.tree.set_m_xform(xform); // matrix
     RCache.tree.set_consts(tvs.scale, tvs.scale, 0, 0); // consts/scale
     RCache.tree.set_wave(tvs.wave); // wave
     RCache.tree.set_wind(tvs.wind); // wind
-#if RENDER != R_R1
+
     s *= 1.3333f;
     RCache.tree.set_c_scale(s * c_scale.rgb.x, s * c_scale.rgb.y, s * c_scale.rgb.z, s * c_scale.hemi); // scale
     RCache.tree.set_c_bias(s * c_bias.rgb.x, s * c_bias.rgb.y, s * c_bias.rgb.z, s * c_bias.hemi); // bias
-#else
-    CEnvDescriptor& desc = *g_pGamePersistent->Environment().CurrentEnv;
-    RCache.tree.set_c_scale(s * c_scale.rgb.x, s * c_scale.rgb.y, s * c_scale.rgb.z, s * c_scale.hemi); // scale
-    RCache.tree.set_c_bias(s * c_bias.rgb.x + desc.ambient.x, s * c_bias.rgb.y + desc.ambient.y, s * c_bias.rgb.z + desc.ambient.z, s * c_bias.hemi); // bias
-#endif
+
     RCache.tree.set_c_sun(s * c_scale.sun, s * c_bias.sun, 0, 0); // sun
+
+    constexpr const char* strBendersPos{"benders_pos"};
+    constexpr const char* strBendersSetup{"benders_setup"};
+
+    RCache.set_c(strBendersSetup, Fvector4{ps_ssfx_int_grass_params_1.x, ps_ssfx_int_grass_params_1.y, ps_ssfx_int_grass_params_1.z, ps_r2_ls_flags_ext.test(SSFX_INTER_GRASS) ? ps_ssfx_grass_interactive.y : 0.f});
+
+    if (ps_r2_ls_flags_ext.test(SSFX_INTER_GRASS))
+    {
+        Fvector4* c_grass{};
+        RCache.get_ConstantDirect(strBendersPos, sizeof grass_shader_data.pos + sizeof grass_shader_data.dir, reinterpret_cast<void**>(&c_grass), nullptr, nullptr);
+        if (c_grass)
+        {
+            std::memcpy(c_grass, &grass_shader_data.pos, sizeof grass_shader_data.pos);
+            std::memcpy(c_grass + std::size(grass_shader_data.pos), &grass_shader_data.dir, sizeof grass_shader_data.dir);
+        }
+    }
+
+    bool is_bugged_flora{};
+    if (const R_constant* C = &*RCache.get_c(CRender::c_sbase))
+    {
+        if (const CTexture* T = RCache.get_ActiveTexture(u32(C->samp.index)))
+        {
+            const char* tex = T->cName.c_str();
+            is_bugged_flora = ps_ssfx_wind.w == 0.f && (strstr(tex, "trees\\trees_elka") || strstr(tex, "trees\\trees_kamysh"));
+        }
+    }
+    RCache.set_c("is_bugged_flora", static_cast<float>(is_bugged_flora));
 }
 
 #define PCOPY(a) a = pFrom->a

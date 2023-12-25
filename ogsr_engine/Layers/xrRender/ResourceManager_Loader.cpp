@@ -44,9 +44,7 @@ void CResourceManager::OnDeviceDestroy(BOOL)
     m_td.clear();
 
     // scripting
-#ifndef _EDITOR
     LS_Unload();
-#endif
 }
 
 void CResourceManager::OnDeviceCreate()
@@ -54,10 +52,8 @@ void CResourceManager::OnDeviceCreate()
     if (!RDEVICE.b_is_Ready)
         return;
 
-#ifndef _EDITOR
     // scripting
     LS_Load();
-#endif
 
     FS_FileSet flist;
     FS.file_list(flist, _game_data_, FS_ListFiles | FS_RootOnly, "*shaders*.xr");
@@ -129,14 +125,14 @@ void CResourceManager::LoadSharedFile(LPCSTR fname)
         {
             CBlender_DESC desc;
             chunk->r(&desc, sizeof(desc));
-#if RENDER != R_R1
+
             if (desc.CLS == B_SHADOW_WORLD)
             {
                 chunk->close();
                 chunk_id += 1;
                 continue;
             }
-#endif
+
             IBlender* B = IBlender::Create(desc.CLS);
             if (0 == B)
             {
@@ -155,7 +151,7 @@ void CResourceManager::LoadSharedFile(LPCSTR fname)
                 //Msg("Loading shader: [%s]", desc.cName);
 
                 std::pair<map_BlenderIt, bool> I = m_blenders.insert_or_assign(xr_strdup(desc.cName), B);
-                R_ASSERT2(I.second, "CResourceManager::LoadSharedFile - found shader name [%s]", desc.cName);
+                ASSERT_FMT(I.second, "CResourceManager::LoadSharedFile - found shader name [%s]", desc.cName);
             }
             chunk->close();
             chunk_id += 1;

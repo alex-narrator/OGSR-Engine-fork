@@ -27,7 +27,7 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-ENGINE_API float psVisDistance = 1.f;
+ENGINE_API float psVisDistance = 1.1f;
 static const float MAX_NOISE_FREQ = 0.03f;
 
 //#define WEATHER_LOGGING
@@ -413,17 +413,6 @@ void CEnvironment::SelectEnvs(float gt)
     }
 }
 
-int get_ref_count(IUnknown* ii)
-{
-    if (ii)
-    {
-        ii->AddRef();
-        return ii->Release();
-    }
-    else
-        return 0;
-}
-
 void CEnvironment::lerp(float& current_weight)
 {
     if (bWFX && (wfx_time <= 0.f))
@@ -448,6 +437,11 @@ void CEnvironment::lerp(float& current_weight)
     for (xr_vector<CEnvModifier>::iterator mit = Modifiers.begin(); mit != Modifiers.end(); mit++)
         mpower += EM.sum(*mit, view);
 
+    extern bool s_ScriptNoMixer;
+
+    if (s_ScriptNoMixer)
+        current_weight = 0;
+
     // final lerp
     CurrentEnv->lerp(this, *Current[0], *Current[1], current_weight, EM, mpower);
 }
@@ -456,6 +450,20 @@ void CEnvironment::OnFrame()
 {
     if (!g_pGameLevel)
         return;
+
+    // Limit min at 200 to avoid slow-mo at extremly low speed.
+    float WindVel = std::max(CurrentEnv->wind_velocity, 200.f) * 0.001f;
+
+    extern Fvector4 ps_ssfx_wind; // DEBUG
+    if (ps_ssfx_wind.x > 0) // DEBUG
+         WindVel = ps_ssfx_wind.x;
+
+    const float WindDir = -CurrentEnv->wind_direction + PI_DIV_2;
+    const Fvector2 WDir{_cos(WindDir), _sin(WindDir)};
+    wind_anim.x += WindVel * WDir.x * Device.fTimeDelta;
+    wind_anim.y += WindVel * WDir.y * Device.fTimeDelta;
+    wind_anim.z += clampr(WindVel * 1.33f, 0.0f, 1.0f) * Device.fTimeDelta;
+
     float current_weight;
     lerp(current_weight);
 
@@ -630,20 +638,6 @@ CLensFlareDescriptor* CEnvironment::add_flare(xr_vector<CLensFlareDescriptor*>& 
 
     collection.push_back(result);
     return result;
-}
-
-void CEnvironment::ForceReselectEnvs()
-{
-    CEnvDescriptor** current_env_desc0 = &(*CurrentWeather)[0];
-    CEnvDescriptor** current_env_desc1 = &(*CurrentWeather)[1];
-    if ((*current_env_desc0)->exec_time > (*current_env_desc1)->exec_time)
-    {
-        CEnvDescriptor* tmp_desc = *current_env_desc0;
-        *current_env_desc0 = *current_env_desc1;
-        *current_env_desc1 = tmp_desc;
-    }
-    SelectEnvs(CurrentWeather, Current[0], Current[1], fGameTime);
-    // eff_Rain->InvalidateState(); //Тоже самое делается в CEnvironment::Invalidate, здесь не нужно.
 }
 
 void CEnvironment::SetWeatherNext(shared_str name)

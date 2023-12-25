@@ -26,6 +26,7 @@ public:
     BOOL bDetail_Bump;
     BOOL bUseSteepParallax;
     int iElement;
+    bool HudElement{};
 
 public:
     CSimulator RS;
@@ -85,7 +86,6 @@ public:
     void PassSET_LightFog(BOOL bLight, BOOL bFog);
     void PassSET_PS(LPCSTR name);
     void PassSET_VS(LPCSTR name);
-    void PassEnd();
 
     void StageBegin();
     u32 Stage() { return dwStage; }

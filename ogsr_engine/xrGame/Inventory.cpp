@@ -107,6 +107,7 @@ CInventory::~CInventory() {}
 
 void CInventory::Clear()
 {
+    m_allMap.clear();
     m_all.clear();
     m_ruck.clear();
     m_belt.clear();
@@ -144,6 +145,7 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
     pIItem->SetDropManual(FALSE);
 
     m_all.push_back(pIItem);
+    m_allMap.emplace(pIItem->object().cNameSect(), pIItem);
 
     if (!strict_placement)
         pIItem->m_eItemPlace = eItemPlaceUndefined;
@@ -288,12 +290,29 @@ bool CInventory::DropItem(CGameObject* pObj)
     }
     break;
     default: NODEFAULT;
-    };
+    }
 
-    TIItemContainer::iterator it = std::find(m_all.begin(), m_all.end(), pIItem);
-    if (it != m_all.end())
-        m_all.erase(it);
-    else
+    bool removed = false;
+   
+    const auto map_pair = m_allMap.equal_range(pIItem->object().cNameSect());
+
+    for (auto it2 = map_pair.first; it2 != map_pair.second; ++it2)
+    {
+        if (it2->second == pIItem)
+        {
+            m_allMap.erase(it2);
+
+            const auto it = std::find(m_all.begin(), m_all.end(), pIItem);
+            if (it != m_all.end())
+            {
+                m_all.erase(it);
+            }
+            removed = true;
+            break;
+        }
+    }
+
+    if (!removed)
         Msg("! CInventory::Drop item not found in inventory!!!");
 
     pIItem->m_pCurrentInventory = NULL;
@@ -558,40 +577,8 @@ PIItem CInventory::ItemFromSlot(u32 slot) const
     return m_slots[slot].m_pIItem;
 }
 
-void CInventory::SendActionEvent(s32 cmd, u32 flags)
-{
-    CActor* pActor = smart_cast<CActor*>(m_pOwner);
-    if (!pActor)
-        return;
-
-    NET_Packet P;
-    pActor->u_EventGen(P, GE_INV_ACTION, pActor->ID());
-    P.w_s32(cmd);
-    P.w_u32(flags);
-    P.w_s32(pActor->GetZoomRndSeed());
-    P.w_s32(pActor->GetShotRndSeed());
-    pActor->u_EventSend(P, net_flags(TRUE, TRUE, FALSE, TRUE));
-};
-
 bool CInventory::Action(s32 cmd, u32 flags)
 {
-    CActor* pActor = smart_cast<CActor*>(m_pOwner);
-
-    if (pActor)
-    {
-        switch (cmd)
-        {
-        case kWPN_FIRE: {
-            pActor->SetShotRndSeed();
-        }
-        break;
-        case kWPN_ZOOM: {
-            pActor->SetZoomRndSeed();
-        }
-        break;
-        };
-    };
-
     if (m_iActiveSlot < m_slots.size() && m_slots[m_iActiveSlot].m_pIItem && m_slots[m_iActiveSlot].m_pIItem->Action(cmd, flags))
         return true;
     bool b_send_event = false;
@@ -1021,9 +1008,11 @@ CInventoryItem* CInventory::tpfGetObjectByIndex(int iIndex)
 
 CInventoryItem* CInventory::GetItemFromInventory(LPCSTR SectName)
 {
-    auto It = std::find_if(m_all.begin(), m_all.end(), [SectName](const auto* pInvItm) { return pInvItm->object().cNameSect() == SectName; });
-    if (It != m_all.end())
-        return *It;
+    if (const auto It = m_allMap.find(SectName); It != m_allMap.end())
+    {
+        CInventoryItem* inventory_item = It->second;
+        return inventory_item;
+    }
 
     return nullptr;
 }

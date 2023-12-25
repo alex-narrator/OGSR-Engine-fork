@@ -35,7 +35,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 
     // Common calc for quad-rendering
     u32 Offset;
-    u32 C = color_rgba(255, 255, 255, 255);
+    constexpr u32 C = color_rgba(255, 255, 255, 255);
     float _w = float(Device.dwWidth);
     float _h = float(Device.dwHeight);
     Fvector2 p0, p1;
@@ -152,15 +152,13 @@ void CRenderTarget::accum_direct(u32 sub_phase)
 
         // compute xforms
         FPU::m64r();
-        Fmatrix xf_invview;
-        xf_invview.invert(Device.mView);
 
         // shadow xform
         Fmatrix m_shadow;
         {
             Fmatrix xf_project;
             xf_project.mul(m_TexelAdjust, fuckingsun->X.D.combine);
-            m_shadow.mul(xf_project, xf_invview);
+            m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias
             if ((SE_SUN_FAR == sub_phase) && (RImplementation.o.HW_smap))
@@ -181,17 +179,18 @@ void CRenderTarget::accum_direct(u32 sub_phase)
             Fmatrix m_xform;
             Fvector direction = fuckingsun->direction;
             float w_dir = g_pGamePersistent->Environment().CurrentEnv->wind_direction;
-            // float	w_speed				= g_pGamePersistent->Environment().CurrentEnv->wind_velocity	;
+            float w_speed = g_pGamePersistent->Environment().CurrentEnv->wind_velocity * 0.001f;
+            clamp(w_speed, 0.1f, 1.0f);
             Fvector normal;
-            normal.setHP(w_dir, 0);
-            w_shift += 0.003f * Device.fTimeDelta;
+            normal.setHP(-w_dir, 0);
+            w_shift -= 0.005f * w_speed * Device.fTimeDelta;
             Fvector position;
             position.set(0, 0, 0);
             m_xform.build_camera_dir(position, direction, normal);
             Fvector localnormal;
             m_xform.transform_dir(localnormal, normal);
             localnormal.normalize();
-            m_clouds_shadow.mul(m_xform, xf_invview);
+            m_clouds_shadow.mul(m_xform, Device.mInvView);
             m_xform.scale(0.002f, 0.002f, 1.f);
             m_clouds_shadow.mulA_44(m_xform);
             m_xform.translate(localnormal.mul(w_shift));
@@ -327,7 +326,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
 
     // Common calc for quad-rendering
     u32 Offset;
-    u32 C = color_rgba(255, 255, 255, 255);
+    constexpr u32 C = color_rgba(255, 255, 255, 255);
     float _w = float(Device.dwWidth);
     float _h = float(Device.dwHeight);
     Fvector2 p0, p1;
@@ -444,15 +443,13 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
 
         // compute xforms
         FPU::m64r();
-        Fmatrix xf_invview;
-        xf_invview.invert(Device.mView);
 
         // shadow xform
         Fmatrix m_shadow;
         {
             Fmatrix xf_project;
             xf_project.mul(m_TexelAdjust, fuckingsun->X.D.combine);
-            m_shadow.mul(xf_project, xf_invview);
+            m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias
             if ((SE_SUN_FAR == sub_phase) && (RImplementation.o.HW_smap))
@@ -473,17 +470,18 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             Fmatrix m_xform;
             Fvector direction = fuckingsun->direction;
             float w_dir = g_pGamePersistent->Environment().CurrentEnv->wind_direction;
-            // float	w_speed				= g_pGamePersistent->Environment().CurrentEnv->wind_velocity	;
+            float w_speed = g_pGamePersistent->Environment().CurrentEnv->wind_velocity * 0.001f;
+            clamp(w_speed, 0.1f, 1.0f);
             Fvector normal;
-            normal.setHP(w_dir, 0);
-            w_shift += 0.003f * Device.fTimeDelta;
+            normal.setHP(-w_dir, 0);
+            w_shift -= 0.005f * w_speed * Device.fTimeDelta;
             Fvector position;
             position.set(0, 0, 0);
             m_xform.build_camera_dir(position, direction, normal);
             Fvector localnormal;
             m_xform.transform_dir(localnormal, normal);
             localnormal.normalize();
-            m_clouds_shadow.mul(m_xform, xf_invview);
+            m_clouds_shadow.mul(m_xform, Device.mInvView);
             m_xform.scale(0.002f, 0.002f, 1.f);
             m_clouds_shadow.mulA_44(m_xform);
             m_xform.translate(localnormal.mul(w_shift));
@@ -878,11 +876,9 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         Fmatrix m_shadow;
         {
             FPU::m64r();
-            Fmatrix xf_invview;
-            xf_invview.invert(Device.mView);
             Fmatrix xf_project;
             xf_project.mul(m_TexelAdjust, fuckingsun->X.D.combine);
-            m_shadow.mul(xf_project, xf_invview);
+            m_shadow.mul(xf_project, Device.mInvView);
 
             // tsm-bias
             if (SE_SUN_FAR == sub_phase)

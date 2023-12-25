@@ -13,12 +13,11 @@
 #include "xr_ioconsole.h"
 #include "x_ray.h"
 #include "std_classes.h"
-#include "GameFont.h"
-#include "resource.h"
 #include "LightAnimLibrary.h"
 #include "../xrcdb/ispatial.h"
 #include "ILoadingScreen.h"
 #include "DiscordRPC.hpp"
+#include "splash.h"
 
 #define CORE_FEATURE_SET(feature, section) Core.Features.set(xrCore::Feature::feature, READ_IF_EXISTS(pSettings, r_bool, section, #feature, false))
 
@@ -225,25 +224,6 @@ void Startup()
     destroyEngine();
 }
 
-static INT_PTR CALLBACK logDlgProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
-{
-    switch (msg)
-    {
-    case WM_INITDIALOG:
-        if (auto hBMP = LoadImage(nullptr, "splash.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE))
-            SendDlgItemMessage(hw, IDC_STATIC, STM_SETIMAGE, IMAGE_BITMAP, reinterpret_cast<LPARAM>(hBMP));
-        break;
-    case WM_DESTROY: break;
-    case WM_CLOSE: DestroyWindow(hw); break;
-    case WM_COMMAND:
-        if (LOWORD(wp) == IDCANCEL)
-            DestroyWindow(hw);
-        break;
-    default: return FALSE;
-    }
-    return TRUE;
-}
-
 constexpr auto dwStickyKeysStructSize = sizeof(STICKYKEYS);
 constexpr auto dwFilterKeysStructSize = sizeof(FILTERKEYS);
 constexpr auto dwToggleKeysStructSize = sizeof(TOGGLEKEYS);
@@ -346,8 +326,6 @@ struct damn_keys_filter
     }
 };
 
-#include "xr_ioc_cmd.h"
-
 int APIENTRY WinMain_impl(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLine, int nCmdShow)
 {
     HANDLE hCheckPresenceMutex = INVALID_HANDLE_VALUE;
@@ -374,11 +352,10 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lp
     // SetThreadAffinityMask		(GetCurrentThread(),1);
 
     // Title window
-    logoWindow = CreateDialog(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDD_STARTUP), nullptr, logDlgProc);
-    HWND logoInsertPos = IsDebuggerPresent() ? HWND_NOTOPMOST : HWND_TOPMOST;
 
-    // mmccxvii: захардкорил размер битмапа, чтобы не было бага, связанного с увеличенным масштабом интерфейса винды
-    SetWindowPos(logoWindow, logoInsertPos, 0, 0, 798, 530, SWP_NOMOVE | SWP_SHOWWINDOW);
+    DisableProcessWindowsGhosting();
+
+    logoWindow = ShowSplash(hInstance, nCmdShow);
 
     LPCSTR fsgame_ltx_name = "-fsltx ";
     string_path fsgame = "";
@@ -426,30 +403,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lpCmdLi
     ExitFromWinMain = true;
 
     return 0;
-}
-
-LPCSTR _GetFontTexName(LPCSTR section)
-{
-    constexpr const char* tex_names[] = {"texture800", "texture", "texture1600"};
-    int def_idx = 1; // default 1024x768
-    int idx = def_idx;
-
-    u32 h = Device.dwHeight;
-
-    if (h <= 600)
-        idx = 0;
-    else if (h <= 900)
-        idx = 1;
-    else
-        idx = 2;
-
-    while (idx >= 0)
-    {
-        if (pSettings->line_exist(section, tex_names[idx]))
-            return pSettings->r_string(section, tex_names[idx]);
-        --idx;
-    }
-    return pSettings->r_string(section, tex_names[def_idx]);
 }
 
 CApplication::CApplication() : loadingScreen(nullptr)
@@ -671,6 +624,29 @@ void CApplication::Level_Scan()
 #endif
 }
 
+// Taken from OpenXray/xray-16 and refactored
+void generate_logo_path(string_path& path, pcstr level_name, int num = -1)
+{
+    strconcat(sizeof(path), path, "intro\\intro_", level_name);
+
+    if (num < 0)
+        return;
+
+    string16 buff;
+    xr_strcat(path, sizeof(path), "_");
+    xr_strcat(path, sizeof(path), itoa(num + 1, buff, 10));
+}
+
+// Taken from OpenXray/xray-16 and refactored
+// Return true if logo exists
+// Always sets the path even if logo doesn't exist
+bool validate_logo_path(string_path& path, pcstr level_name, int num = -1)
+{
+    generate_logo_path(path, level_name, num);
+    string_path temp;
+    return FS.exist(temp, "$game_textures$", path, ".dds") || FS.exist(temp, "$level$", path, ".dds");
+}
+
 void CApplication::Level_Set(u32 L)
 {
     if (L >= Levels.size())
@@ -679,13 +655,37 @@ void CApplication::Level_Set(u32 L)
     Level_Current = L;
     FS.get_path("$level$")->_set(Levels[L].folder);
 
-    string_path temp, temp2;
-    strconcat(sizeof(temp), temp, "intro\\intro_", Levels[L].folder);
-    temp[xr_strlen(temp) - 1] = 0;
-    if (FS.exist(temp2, "$game_textures$", temp, ".dds"))
-        loadingScreen->SetLevelLogo(temp);
-    else
-        loadingScreen->SetLevelLogo("intro\\intro_no_start_picture");
+    std::string temp = Levels[L].folder;
+    temp.pop_back();
+    const char* level_name = temp.c_str();
+
+    static string_path path;
+    path[0] = 0;
+    
+    int count = 0;
+    while (true)
+    {
+        if (validate_logo_path(path, level_name, count))
+            count++;
+        else
+            break;
+    }
+
+    if (count)
+    {
+        const int curr = ::Random.randI(count);
+        generate_logo_path(path, level_name, curr);
+    }
+    else if (!validate_logo_path(path, level_name))
+    {
+        if (!validate_logo_path(path, "no_start_picture"))
+            path[0] = 0;
+    }
+
+    if (path[0])
+        loadingScreen->SetLevelLogo(path);
+
+    loadingScreen->SetLevelText(level_name);
 }
 
 int CApplication::Level_ID(LPCSTR name)

@@ -13,7 +13,6 @@ extern xr_token* vid_quality_token;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-void __cdecl dummy(void){};
 CEngineAPI::CEngineAPI()
 {
     hGame = 0;
@@ -21,8 +20,6 @@ CEngineAPI::CEngineAPI()
     hTuner = 0;
     pCreate = 0;
     pDestroy = 0;
-    tune_pause = dummy;
-    tune_resume = dummy;
 }
 
 CEngineAPI::~CEngineAPI()
@@ -45,13 +42,13 @@ extern u32 renderer_value; // con cmd
 
 ENGINE_API int g_current_renderer = 0;
 
-ENGINE_API bool is_enough_address_space_available()
-{
-    SYSTEM_INFO system_info;
-    GetSystemInfo(&system_info);
-
-    return (*(size_t*)&system_info.lpMaximumApplicationAddress) > 0x90000000ull;
-}
+//ENGINE_API bool is_enough_address_space_available()
+//{
+//    SYSTEM_INFO system_info;
+//    GetSystemInfo(&system_info);
+//
+//    return (*(size_t*)&system_info.lpMaximumApplicationAddress) > 0x90000000ull;
+//}
 
 #ifdef XRGAME_STATIC
 extern "C" {

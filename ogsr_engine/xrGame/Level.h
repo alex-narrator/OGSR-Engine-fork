@@ -53,8 +53,6 @@ public:
 
 class CLevel : public IGame_Level, public IPureClient
 {
-    void ClearAllObjects();
-
 private:
 #ifdef DEBUG
     bool m_bSynchronization;
@@ -146,9 +144,14 @@ private:
     // preload sounds registry
     DEFINE_MAP(shared_str, ref_sound, SoundRegistryMap, SoundRegistryMapIt);
     SoundRegistryMap sound_registry;
+    std::deque<std::string> sound_registry_defer;
 
 public:
-    void PrefetchSound(LPCSTR name);
+    bool PrefetchSound(LPCSTR name);
+    bool PrefetchManySounds(LPCSTR prefix);
+    bool PrefetchManySoundsLater(LPCSTR prefix);
+    void PrefetchDeferredSounds();
+    void CancelPrefetchManySounds(LPCSTR prefix);
 
 protected:
     BOOL net_start_result_total;
@@ -200,6 +203,7 @@ public:
     void cl_Process_Spawn(NET_Packet& P);
     void ProcessGameEvents();
     void ProcessGameSpawns();
+    void ProcessGameSpawnsDestroy(u16 dest, u16 type, NET_Packet& P);
 
     // Input
     virtual void IR_OnKeyboardPress(int btn);
@@ -220,14 +224,11 @@ public:
     void ClientReceive();
     void ClientSend();
     void ClientSave();
-    u32 Objects_net_Save(NET_Packet* _Packet, u32 start, u32 count);
+    
     virtual void Send(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
 
     void g_cl_Spawn(LPCSTR name, u8 rp, u16 flags, Fvector pos); // only ask server
     void g_sv_Spawn(CSE_Abstract* E); // server reply/command spawning
-
-    // Save/Load/State
-    void SLS_Default(); // Default/Editor Load
 
     IC CSpaceRestrictionManager& space_restriction_manager();
     IC CSeniorityHierarchyHolder& seniority_holder();
@@ -243,7 +244,6 @@ public:
 
     //названияе текущего уровня
     virtual shared_str name() const;
-    virtual void GetLevelInfo(CServerInfo* si);
 
     // gets the time from the game simulation
 

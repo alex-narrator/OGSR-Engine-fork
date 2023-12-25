@@ -107,7 +107,8 @@ CCustomMonster::~CCustomMonster()
     Msg("dumping client spawn manager stuff for object with id %d", ID());
     Level().client_spawn_manager().dump(ID());
 #endif // DEBUG
-    Level().client_spawn_manager().clear(ID());
+	if ( g_pGameLevel )
+	  Level().client_spawn_manager().clear(ID());
 }
 
 void CCustomMonster::Load(LPCSTR section)
@@ -281,11 +282,11 @@ void CCustomMonster::shedule_Update(u32 DT)
     {
         if (g_mt_config.test(mtAiVision))
 #ifndef DEBUG
-            Device.seqParallel.push_back(fastdelegate::MakeDelegate(this, &CCustomMonster::Exec_Visibility));
+            Device.add_to_seq_parallel(fastdelegate::MakeDelegate(this, &CCustomMonster::Exec_Visibility));
 #else // DEBUG
         {
             if (!psAI_Flags.test(aiStalker) || !!smart_cast<CActor*>(Level().CurrentEntity()))
-                Device.seqParallel.push_back(fastdelegate::MakeDelegate(this, &CCustomMonster::Exec_Visibility));
+                Device.add_to_seq_parallel(fastdelegate::MakeDelegate(this, &CCustomMonster::Exec_Visibility));
             else
                 Exec_Visibility();
         }
@@ -398,7 +399,7 @@ void CCustomMonster::UpdateCL()
     */
 
     if (g_mt_config.test(mtSoundPlayer))
-        Device.seqParallel.push_back(fastdelegate::MakeDelegate(this, &CCustomMonster::update_sound_player));
+        Device.add_to_seq_parallel(fastdelegate::MakeDelegate(this, &CCustomMonster::update_sound_player));
     else
     {
         START_PROFILE("CustomMonster/client_update/sound_player")
@@ -548,11 +549,7 @@ void CCustomMonster::eye_pp_s1()
     float new_range = eye_range, new_fov = eye_fov;
     if (g_Alive())
     {
-#ifndef USE_STALKER_VISION_FOR_MONSTERS
-        update_range_fov(new_range, new_fov, human_being() ? memory().visual().current_state().m_max_view_distance * eye_range : eye_range, eye_fov);
-#else
         update_range_fov(new_range, new_fov, memory().visual().current_state().m_max_view_distance * eye_range, eye_fov);
-#endif
     }
     // Standart visibility
     Device.Statistic->AI_Vis_Query.Begin();

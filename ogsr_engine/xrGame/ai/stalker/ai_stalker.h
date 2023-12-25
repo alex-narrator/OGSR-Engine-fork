@@ -136,7 +136,8 @@ public:
     CCharacterPhysicsSupport* m_pPhysics_support;
 
 public:
-    bool m_wounded;
+    bool m_wounded{};
+    bool m_headshot{};
 
 public:
     CAI_Stalker();
@@ -377,7 +378,6 @@ public:
 
 private:
     CWeaponShotEffector* m_weapon_shot_effector;
-    s32 m_weapon_shot_random_seed;
 
 public:
     virtual void on_weapon_shot_start(CWeapon* weapon);

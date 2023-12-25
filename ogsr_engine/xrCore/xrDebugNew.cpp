@@ -5,10 +5,6 @@
 #include <new.h> // for _set_new_mode
 #include <signal.h> // for signals
 
-#include <d3dx/dxerr.h>
-#pragma comment(lib, "dxerr.lib")
-int(WINAPIV* __vsnprintf)(char*, size_t, const char*, va_list) = _vsnprintf;
-
 XRCORE_API xrDebug Debug;
 XRCORE_API HWND gGameWindow = nullptr;
 XRCORE_API bool ExitFromWinMain = false;
@@ -22,17 +18,22 @@ static bool error_after_dialog = false;
 
 static void ShowErrorMessage(const char* msg, const bool show_msg = false)
 {
-    ShowWindow(gGameWindow, SW_HIDE);
+    const bool on_ttapi_thread = (TTAPI && TTAPI->is_pool_thread());
 
-    while (ShowCursor(TRUE) < 0)
-        ;
+    if (!on_ttapi_thread)
+    {
+        ShowWindow(gGameWindow, SW_HIDE);
+
+        while (ShowCursor(TRUE) < 0)
+            ;
+    }
 
     if (!IsDebuggerPresent())
     {
-        if (show_msg)
+        if (show_msg && !on_ttapi_thread)
             MessageBox(gGameWindow, msg, "FATAL ERROR", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
         else
-            ShellExecute(gGameWindow, "open", logFName, nullptr, nullptr, SW_SHOW);
+            ShellExecute(nullptr, "open", logFName, nullptr, nullptr, SW_SHOW);
     }
 }
 
@@ -201,12 +202,7 @@ void xrDebug::backend(const char* expression, const char* description, const cha
         DEBUG_INVOKE;
 }
 
-const char* xrDebug::DXerror2string(const HRESULT code) const
-{
-    static string1024 desc_storage;
-    std::snprintf(desc_storage, sizeof(desc_storage), "Error Code: [%d], Error Name: [%s], Error Text: [%s]", code, DXGetErrorString(code), DXGetErrorDescription(code));
-    return desc_storage;
-}
+const char* xrDebug::DXerror2string(const HRESULT code) const { return error2string(code); }
 
 const char* xrDebug::error2string(const DWORD code) const
 {
@@ -244,6 +240,16 @@ void __cdecl xrDebug::fatal(const char* file, int line, const char* function, co
     va_end(args);
 
     backend("FATAL ERROR", strBuf, nullptr, nullptr, file, line, function);
+}
+
+void xrDebug::on_exception_in_thread()
+{
+    if (!IsDebuggerPresent())
+    {
+        ShellExecute(nullptr, "open", logFName, nullptr, nullptr, SW_SHOW);
+
+        quick_exit(EXIT_SUCCESS);
+    }
 }
 
 static int out_of_memory_handler(size_t size)

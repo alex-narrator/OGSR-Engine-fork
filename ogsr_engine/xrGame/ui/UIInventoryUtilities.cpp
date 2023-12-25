@@ -67,23 +67,28 @@ bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
                 // if (!xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()))
                 if (class1 == class2)
                 {
-                    const auto* ammo1 = smart_cast<CWeaponAmmo*>(item1);
-                    const auto* ammo2 = smart_cast<CWeaponAmmo*>(item2);
-
-                    if (ammo1 && ammo2)
+                    if (!xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()))
                     {
-                        if (ammo1->m_boxCurr == ammo2->m_boxCurr)
+                        const auto* ammo1 = smart_cast<CWeaponAmmo*>(item1);
+                        const auto* ammo2 = smart_cast<CWeaponAmmo*>(item2);
+
+                        if (ammo1 && ammo2)
+                        {
+                            if (ammo1->m_boxCurr == ammo2->m_boxCurr)
+                                // return (item1->object().ID() < item2->object().ID());
+                                return xr_strcmp(item1->Name(), item2->Name()) < 0;
+
+                            return (ammo1->m_boxCurr > ammo2->m_boxCurr);
+                        }
+
+                        if (fsimilar(item1->GetCondition(), item2->GetCondition(), 0.01f))
                             // return (item1->object().ID() < item2->object().ID());
                             return xr_strcmp(item1->Name(), item2->Name()) < 0;
 
-                        return (ammo1->m_boxCurr > ammo2->m_boxCurr);
+                        return (item1->GetCondition() > item2->GetCondition());
                     }
-
-                    if (fsimilar(item1->GetCondition(), item2->GetCondition(), 0.01f))
-                        // return (item1->object().ID() < item2->object().ID());
-                        return xr_strcmp(item1->Name(), item2->Name()) < 0;
-
-                    return (item1->GetCondition() > item2->GetCondition());
+                    else
+                        return xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()) < 0;
                 }
                 else
                     // return xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()) < 0;
@@ -156,7 +161,7 @@ bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _ite
                 }
             }
         }
-/*
+
         //разместить элемент на найденном месте
         if (found_place)
         {
@@ -168,8 +173,8 @@ bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _ite
                 }
             }
         }
-*/
     }
+
     // remove
     item_list.erase(std::remove(item_list.begin(), item_list.end(), _item), item_list.end());
 

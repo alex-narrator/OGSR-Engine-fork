@@ -47,7 +47,16 @@ private:
     BOOL bForceDiscard;
     BOOL bAllowChildrenDuplicate;
 
+    string_unordered_map<std::string, bool> m_prefetched;
+
     void Destroy();
+    void refresh_prefetch(const char* low_name, const bool is_hud_visual);
+    void process_vis_prefetch();
+
+    CInifile* vis_prefetch_ini = nullptr;
+
+    bool now_prefetch1 = false;
+    bool now_prefetch2 = false;
 
 public:
     CModelPool();
@@ -76,10 +85,8 @@ public:
     void dump();
 
     void memory_stats(u32& vb_mem_video, u32& vb_mem_system, u32& ib_mem_video, u32& ib_mem_system);
-#ifdef _EDITOR
-    void OnDeviceDestroy();
-    void Render(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, int priority, bool strictB2F, float m_fLOD);
-    void RenderSingle(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, float m_fLOD);
-#endif
+
+	void save_vis_prefetch();
+	void begin_prefetch1( bool val );
 };
 #endif // ModelPoolH

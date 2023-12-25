@@ -113,6 +113,7 @@ public:
     } stats;
 
 public:
+    bool is_sun();
     // Sector detection and visibility
     CSector* pLastSector;
     Fvector vLastCameraPos;
@@ -146,10 +147,10 @@ public:
     SMAP_Allocator LP_smap_pool;
     light_Package LP_normal;
 
-    xr_vector<Fbox3, render_alloc<Fbox3>> main_coarse_structure;
+    xr_vector<Fbox3> main_coarse_structure;
 
-    shared_str c_sbase;
-    shared_str c_lmaterial;
+    static constexpr const char* c_sbase = "s_base";
+
     float o_hemi;
     float o_hemi_cube[CROS_impl::NUM_FACES];
     float o_sun;
@@ -158,14 +159,18 @@ public:
 
     bool m_bMakeAsyncSS;
     bool m_bFirstFrameAfterReset; // Determines weather the frame is the first after resetting device.
+
     xr_vector<sun::cascade> m_sun_cascades;
+
+    bool need_to_render_sunshafts{false};
+    bool last_cascade_chain_mode{false};
+
 
 private:
     // Loading / Unloading
     void LoadBuffers(CStreamReader* fs, BOOL _alternative);
     void LoadVisuals(IReader* fs);
     void LoadLights(IReader* fs);
-    void LoadPortals(IReader* fs);
     void LoadSectors(IReader* fs);
     void LoadSWIs(CStreamReader* fs);
     void Load3DFluid();
@@ -176,21 +181,23 @@ private:
     void add_leafs_Static(dxRender_Visual* pVisual); // if detected node's full visibility
 
 public:
-    IRender_Sector* rimp_detectSector(Fvector& P, Fvector& D);
     void render_main(Fmatrix& mCombined, bool _fportals);
     void render_forward();
-    void render_smap_direct(Fmatrix& mCombined);
     void render_indirect(light* L);
     void render_lights(light_Package& LP);
-    void render_sun();
-    void render_sun_near();
-    void render_sun_filtered();
     void render_menu();
     void render_rain();
 
-    void render_sun_cascade(u32 cascade_ind);
     void init_cacades();
     void render_sun_cascades();
+    void render_sun_cascade(u32 cascade_ind);
+
+    void calculate_sun();
+    void calculate_sun(sun::cascade& cascade);
+
+    void calculate_sun_async();
+
+    std::future<void> calculate_sun_awaiter;
 
 public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
@@ -222,7 +229,7 @@ public:
         o_hemi = 0.75f * LT.get_hemi();
         // o_hemi						= 0.5f*LT.get_hemi			()	;
         o_sun = 0.75f * LT.get_sun();
-        CopyMemory(o_hemi_cube, LT.get_hemi_cube(), CROS_impl::NUM_FACES * sizeof(float));
+        CopyMemory(o_hemi_cube, LT.get_hemi_cube(), sizeof o_hemi_cube);
     }
     IC void apply_lmaterial()
     {
@@ -310,6 +317,8 @@ public:
     virtual void model_Logging(BOOL bEnable) { Models->Logging(bEnable); }
     virtual void models_Prefetch();
     virtual void models_Clear(BOOL b_complete);
+    virtual void models_savePrefetch();
+    virtual void models_begin_prefetch1(bool val);
 
     // Occlusion culling
     virtual BOOL occ_visible(vis_data& V);
@@ -320,9 +329,6 @@ public:
     virtual void Calculate();
     virtual void Render();
     virtual void Screenshot(ScreenshotMode mode = SM_NORMAL, LPCSTR name = 0);
-    virtual void Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer);
-    virtual void ScreenshotAsyncBegin();
-    virtual void ScreenshotAsyncEnd(CMemoryWriter& memory_writer);
     virtual void _BCL OnFrame();
     virtual void BeforeWorldRender(); //--#SM+#-- +SecondVP+ Вызывается перед началом рендера мира и пост-эффектов
     virtual void AfterWorldRender(const bool save_bb_before_ui); //--#SM+#-- +SecondVP+ Вызывается после рендера мира и перед UI
@@ -348,5 +354,7 @@ private:
 protected:
     virtual void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer);
 };
+
+void fix_texture_name(const char* fn);
 
 extern CRender RImplementation;

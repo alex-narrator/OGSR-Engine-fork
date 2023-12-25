@@ -26,7 +26,7 @@ LPCSTR CScriptIniFile::update(LPCSTR file_name)
 
 bool CScriptIniFile::line_exist(LPCSTR S, LPCSTR L) { return (!!inherited::line_exist(S, L)); }
 
-bool CScriptIniFile::section_exist(LPCSTR S) { return (!!inherited::section_exist(S)); }
+bool CScriptIniFile::section_exist_script(LPCSTR S) { return (!!inherited::section_exist(S)); }
 
 int CScriptIniFile::r_clsid(LPCSTR S, LPCSTR L) { return (object_factory().script_clsid(inherited::r_clsid(S, L))); }
 
@@ -73,4 +73,18 @@ Fvector CScriptIniFile::r_fvector3(LPCSTR S, LPCSTR L)
     THROW3(inherited::section_exist(S), "Cannot find section", S);
     THROW3(inherited::line_exist(S, L), "Cannot find line", L);
     return (inherited::r_fvector3(S, L));
+}
+
+Fvector2 CScriptIniFile::r_fvector2(LPCSTR S, LPCSTR L)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    return (inherited::r_fvector2(S, L));
+}
+
+Fvector4 CScriptIniFile::r_fvector4(LPCSTR S, LPCSTR L)
+{
+    THROW3(inherited::section_exist(S), "Cannot find section", S);
+    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
+    return (inherited::r_fvector4(S, L));
 }

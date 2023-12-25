@@ -87,7 +87,7 @@ static Fbox bbCrouchBox;
 static Fvector vFootCenter;
 static Fvector vFootExt;
 
-Flags32 psActorFlags = {AF_3D_SCOPES | AF_KEYPRESS_ON_START | AF_CAM_COLLISION | AF_AI_VOLUMETRIC_LIGHTS | AF_DOF_RELOAD};
+Flags32 psActorFlags = {AF_3D_SCOPES | AF_KEYPRESS_ON_START | AF_CAM_COLLISION | AF_AI_VOLUMETRIC_LIGHTS | AF_DOF_RELOAD | AF_3D_PDA | AF_ALWAYSRUN | AF_FIRST_PERSON_DEATH};
 
 static bool updated;
 
@@ -364,7 +364,6 @@ void CActor::Load(LPCSTR section)
     character_physics_support()->movement()->SetAirControlParam(AirControlParam);
 
     m_fPickupInfoRadius = pSettings->r_float(section, "pickup_info_radius");
-    m_fSleepTimeFactor = pSettings->r_float(section, "sleep_time_factor");
 
     character_physics_support()->in_Load(section);
 
@@ -428,16 +427,7 @@ void CActor::Load(LPCSTR section)
     LPCSTR default_outfit = READ_IF_EXISTS(pSettings, r_string, section, "default_outfit", 0);
     SetDefaultVisualOutfit(default_outfit);
 
-    invincibility_fire_shield_1st = READ_IF_EXISTS(pSettings, r_string, section, "Invincibility_Shield_1st", 0);
-    invincibility_fire_shield_3rd = READ_IF_EXISTS(pSettings, r_string, section, "Invincibility_Shield_3rd", 0);
     //-----------------------------------------
-    m_AutoPickUp_AABB = READ_IF_EXISTS(pSettings, r_fvector3, section, "AutoPickUp_AABB", Fvector().set(0.02f, 0.02f, 0.02f));
-    m_AutoPickUp_AABB_Offset = READ_IF_EXISTS(pSettings, r_fvector3, section, "AutoPickUp_AABB_offs", Fvector().set(0, 0, 0));
-
-    CStringTable string_table;
-    //---------------------------------------------------------------------
-    m_sHeadShotParticle = READ_IF_EXISTS(pSettings, r_string, section, "HeadShotParticle", 0);
-
     if (pSettings->line_exist(section, "lookout_angle"))
     {
         m_fLookoutAngle = pSettings->r_float(section, "lookout_angle");
@@ -691,7 +681,10 @@ void CActor::Die(CObject* who)
             inventory().Ruck(l_blist.front());
     }
 
-    cam_Set(eacFreeLook);
+    if (!psActorFlags.test(AF_FIRST_PERSON_DEATH))
+    {
+        cam_Set(eacFreeLook);
+    }
     mstate_wishful &= ~mcAnyMove;
     mstate_real &= ~mcAnyMove;
 
@@ -922,6 +915,18 @@ void CActor::UpdateCL()
             wpn_cond = wpn->GetCondition();
         shader_exports.set_actor_params(Fvector{this->conditions().GetHealth(), outfit_cond, wpn_cond});
     }
+
+    // Обновление позиции актора для коллизии с травой/кустами
+    if (ps_ssfx_grass_interactive.x > 0.f)
+    {
+        // Не знаю что лучше использовать - позицию камеры или актора. Вроде для травы с позицией актора получше выглядит. Для кустов - не понятно, что лучше.
+        // grass_shader_data.pos[0].set(Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, -1);
+        const auto& pos = Position();
+        grass_shader_data.pos[0].set(pos.x, pos.y, pos.z, -1.f);
+    }
+    else
+        grass_shader_data.pos[0].set(0.f, 0.f, 0.f, -1.f);
+    grass_shader_data.dir[0].set(0.0f, -99.0f, 0.0f, 1.0f);
 }
 
 constexpr u32 TASKS_UPDATE_TIME = 1u;
@@ -1351,6 +1356,7 @@ void CActor::ForceTransform(const Fmatrix& m)
 
     if (character_physics_support()->movement()->CharacterExist())
         character_physics_support()->movement()->EnableCharacter();
+
     character_physics_support()->set_movement_position(m.c);
     character_physics_support()->movement()->SetVelocity(0, 0, 0);
 }
@@ -1662,22 +1668,6 @@ float CActor::HitArtefactsOnBelt(float hit_power, ALife::EHitType hit_type, bool
 
     return res_hit_power_k > 0 ? res_hit_power_k * hit_power : 0;
 }
-
-void CActor::SetZoomRndSeed(s32 Seed)
-{
-    if (0 != Seed)
-        m_ZoomRndSeed = Seed;
-    else
-        m_ZoomRndSeed = s32(Level().timeServer_Async());
-};
-
-void CActor::SetShotRndSeed(s32 Seed)
-{
-    if (0 != Seed)
-        m_ShotRndSeed = Seed;
-    else
-        m_ShotRndSeed = s32(Level().timeServer_Async());
-};
 
 Fvector CActor::GetMissileOffset() const { return m_vMissileOffset; }
 

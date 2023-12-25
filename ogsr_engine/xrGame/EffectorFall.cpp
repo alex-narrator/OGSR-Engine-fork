@@ -3,7 +3,7 @@
 #include "CameraEffector.h"
 #include "GamePersistent.h"
 
-#define FALL_SPEED 2.f
+#define FALL_SPEED 4.5f
 #define FALL_MAXDIST 0.3f
 
 CEffectorFall::CEffectorFall(float power, float life_time) : CEffectorCam(eCEFall, life_time)
@@ -20,21 +20,5 @@ BOOL CEffectorFall::ProcessCam(SCamEffectorInfo& info)
         info.p.y -= FALL_MAXDIST * fPower * _sin(M_PI * fPhase + M_PI);
     else
         fLifeTime = -1;
-    return TRUE;
-}
-
-CEffectorDOF::CEffectorDOF(const Fvector4& dof) : CEffectorCam(eCEDOF, 100000)
-{
-    GamePersistent().SetEffectorDOF(Fvector().set(dof.x, dof.y, dof.z));
-    m_fPhase = Device.fTimeGlobal + dof.w;
-}
-
-BOOL CEffectorDOF::ProcessCam(SCamEffectorInfo& info)
-{
-    if (m_fPhase < Device.fTimeGlobal)
-    {
-        GamePersistent().RestoreEffectorDOF();
-        fLifeTime = -1;
-    }
     return TRUE;
 }

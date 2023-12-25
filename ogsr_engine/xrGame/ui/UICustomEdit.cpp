@@ -14,7 +14,6 @@ CUICustomEdit::CUICustomEdit()
 
     m_lines.SetVTextAlignment(valCenter);
     m_lines.SetColoringMode(false);
-    m_lines.SetCutWordsMode(true);
     m_lines.SetUseNewLineMode(false);
     SetText("");
     m_textPos.set(3, 0);
@@ -119,11 +118,16 @@ bool CUICustomEdit::OnKeyboard(int dik, EUIMessages keyboard_action)
 
 bool CUICustomEdit::KeyPressed(int dik)
 {
-    char out_me = 0;
     bool bChanged = false;
 
     switch (dik)
     {
+    case DIK_TAB: {
+        // Табы нельзя добавлять здесь, такого символа в шрифтах нет, он не отображается в игре.
+        // А проблемы доставить может при получении введенного текста через GetText() в скрипте,
+        // когда полученный текст будет отличаться от отображаемого из-за наличия в нём табов.
+        return true;
+    }
     case DIK_LEFT:
     case DIKEYBOARD_LEFT: m_lines.DecCursorPos(); break;
     case DIK_RIGHT:
@@ -154,18 +158,18 @@ bool CUICustomEdit::KeyPressed(int dik)
         break;
     case DIK_DELETE:
     case DIKEYBOARD_DELETE:
-        m_lines.DelChar();
+        m_lines.DelCurrentChar();
         bChanged = true;
         break;
-    default: out_me = pInput->DikToChar(dik);
-    }
-
-    if (out_me)
-    {
-        if (!m_bNumbersOnly || (out_me >= '0' && out_me <= '9') || (m_bFloatNumbers && out_me == '.' && !strchr(m_lines.GetText(), '.')))
+    default:
+        const u16 out_me = pInput->DikToChar(dik, m_lines.GetFont()->IsMultibyte());
+        if (out_me)
         {
-            AddChar(out_me);
-            bChanged = true;
+            if (!m_bNumbersOnly || (out_me >= '0' && out_me <= '9') || (m_bFloatNumbers && out_me == '.' && !strchr(m_lines.GetText(), '.')))
+            {
+                AddChar(out_me);
+                bChanged = true;
+            }
         }
     }
 
@@ -175,15 +179,16 @@ bool CUICustomEdit::KeyPressed(int dik)
     return true;
 }
 
-void CUICustomEdit::AddChar(char c)
+void CUICustomEdit::AddChar(const u16 c)
 {
     if (xr_strlen(m_lines.GetText()) >= m_max_symb_count)
         return;
 
-    float text_length = m_lines.GetFont()->SizeOf_(m_lines.GetText()) + m_lines.GetFont()->SizeOf_(c) + m_textPos.x;
-    UI()->ClientToScreenScaledWidth(text_length);
+    float text_width = m_lines.GetFont()->SizeOf_(m_lines.GetText()) + m_lines.GetFont()->SizeOf_(c);
 
-    if (!m_lines.GetTextComplexMode() && (text_length > m_lines.GetWidth() - 1))
+    UI()->ClientToScreenScaledWidth(text_width);
+
+    if (!m_lines.GetTextComplexMode() && text_width > m_lines.GetWidth() - m_textPos.x - 0.5f) // учитываем смещения текста по ширине
         return;
 
     m_lines.AddCharAtCursor(c);

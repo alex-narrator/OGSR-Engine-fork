@@ -141,6 +141,7 @@ public:
 
 private:
     VisMask vis_mask;
+    SpinLock elements_lock;
     ElementVec elements;
 
     u32 dwFrame{}; // The model itself
@@ -155,13 +156,12 @@ public:
     virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
     bool _ElementCenter(u16 elem_id, Fvector& e_center);
     const ElementVec& _GetElements() { return elements; }
-#ifdef DEBUG
+
     void _dbg_refresh()
     {
         BuildTopLevel();
         BuildState();
     }
-#endif
 };
 
 class ENGINE_API CCF_EventBox : public ICollisionForm

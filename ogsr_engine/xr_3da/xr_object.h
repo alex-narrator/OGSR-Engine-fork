@@ -105,7 +105,6 @@ public:
     }
     ICF Fmatrix& XFORM() { return renderable.xform; }
     virtual void spatial_register();
-    virtual void spatial_unregister();
     virtual void spatial_move();
     void spatial_update(float eps_P, float eps_R);
 
@@ -161,6 +160,7 @@ public:
     virtual ~CObject();
 
     virtual void Load(LPCSTR section);
+    virtual void reload(LPCSTR section) {};
 
     // Update
     virtual void shedule_Update(u32 dt); // Called by sheduler

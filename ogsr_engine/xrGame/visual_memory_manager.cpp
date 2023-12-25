@@ -42,14 +42,12 @@ struct SRemoveOfflinePredicate
 {
     bool operator()(const CVisibleObject& object) const
     {
-        VERIFY(object.m_object);
-        return (!!object.m_object->getDestroy() || object.m_object->H_Parent());
+        return (!object.m_object || !!object.m_object->getDestroy() || object.m_object->H_Parent());
     }
 
     bool operator()(const CNotYetVisibleObject& object) const
     {
-        VERIFY(object.m_object);
-        return (!!object.m_object->getDestroy() || object.m_object->H_Parent());
+        return (!object.m_object || !!object.m_object->getDestroy() || object.m_object->H_Parent());
     }
 };
 
@@ -356,10 +354,6 @@ bool CVisualMemoryManager::visible(const CGameObject* game_object, float time_de
     if (game_object->getDestroy())
         return (false);
 
-#ifndef USE_STALKER_VISION_FOR_MONSTERS
-    if (!m_stalker && !m_client)
-        return (true);
-#endif
 
     float object_distance, distance = object_visible_distance(game_object, object_distance);
 
@@ -381,10 +375,12 @@ bool CVisualMemoryManager::visible(const CGameObject* game_object, float time_de
 
     float luminocity = object_luminocity(game_object);
     float trans;
-    if (current_state().m_transparency_factor > 0 && smart_cast<const CActor*>(game_object))
+    if (current_state().m_transparency_factor > 0.f && smart_cast<const CActor*>(game_object))
     {
         trans = visible_transparency_threshold(game_object);
-        trans = trans < 0.f ? 1.f : (trans * current_state().m_transparency_factor);
+        if (trans < 1.f)
+            trans = trans < 0.f ? 1.f : (trans * current_state().m_transparency_factor);
+
         clamp(trans, 0.f, 1.f);
     }
     else
@@ -645,6 +641,8 @@ void CVisualMemoryManager::update(float time_delta)
         xr_vector<CObject*>::const_iterator E = m_visible_objects.end();
         for (; I != E; ++I)
             add_visible_object(*I, time_delta);
+
+        m_visible_objects.clear();
     }
     STOP_PROFILE
 

@@ -12,10 +12,9 @@
 #include "../UI.h"
 #include "uiabstract.h"
 
-class CUILines : public IUITextControl, public CUISimpleWindow, public CDeviceResetNotifier
+class CUILines : public IUITextControl, public CUISimpleWindow//, public CDeviceResetNotifier
 {
     friend class CUICustomEdit;
-    friend class CUICDkey;
 
 public:
     CUILines();
@@ -36,16 +35,15 @@ public:
 
     // additional
     void SetCursorColor(u32 color) { m_dwCursorColor = color; }
-    void AddCharAtCursor(TCHAR ch);
-    void DelChar();
+    void AddCharAtCursor(const u16 ch);
     void DelLeftChar();
+    void DelCurrentChar();
     void MoveCursorToEnd();
 
     void SetTextComplexMode(bool mode = true);
     bool GetTextComplexMode() const;
     void SetPasswordMode(bool mode = true);
     void SetColoringMode(bool mode);
-    void SetCutWordsMode(bool mode);
     void SetUseNewLineMode(bool mode);
 
     // IUISimpleWindow methods
@@ -88,6 +86,7 @@ protected:
     bool m_bDrawCursor;
 
     Text m_text;
+    std::vector<bool> m_text_mask;
 
     ETextAlignment m_eTextAlign;
     EVTextAlignment m_eVTextAlign;
@@ -102,7 +101,6 @@ protected:
         flComplexMode = (1 << 1),
         flPasswordMode = (1 << 2),
         flColoringMode = (1 << 3),
-        flCutWordsMode = (1 << 4),
         flRecognizeNewLine = (1 << 5)
     };
 
