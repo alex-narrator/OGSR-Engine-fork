@@ -1948,9 +1948,6 @@
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\CharacterInfo">
       <UniqueIdentifier>{59d4df16-9683-48b3-a413-3354099116c2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\UI\Common\ItemInfo">
-      <UniqueIdentifier>{8e7229ba-4bb3-4b1d-b0d1-5855c9d74615}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\OutfitInfo">
       <UniqueIdentifier>{cc430822-3497-44cc-88af-2f02a3eb44d5}</UniqueIdentifier>
     </Filter>
@@ -5253,9 +5250,6 @@
     <ClInclude Include="ui\UIInventoryWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIOutfitSlot.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UITradeWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\TradeWnd</Filter>
     </ClInclude>
@@ -5378,12 +5372,6 @@
     </ClInclude>
     <ClInclude Include="ui\UICharacterInfo.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\CharacterInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\ui_af_params.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIItemInfo.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIOutfitInfo.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\OutfitInfo</Filter>
@@ -6049,12 +6037,6 @@
     </ClInclude>
     <ClInclude Include="Helmet.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIArmorParams.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIEatableParams.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClInclude>
     <ClInclude Include="CustomDevice.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
@@ -8353,9 +8335,6 @@
     <ClCompile Include="ui\UIInventoryWnd3.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UIOutfitSlot.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UITradeWnd.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\TradeWnd</Filter>
     </ClCompile>
@@ -8475,12 +8454,6 @@
     </ClCompile>
     <ClCompile Include="ui\UICharacterInfo.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\CharacterInfo</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\ui_af_params.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIItemInfo.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIOutfitInfo.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\OutfitInfo</Filter>
@@ -8833,12 +8806,6 @@
     </ClCompile>
     <ClCompile Include="Helmet.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIArmorParams.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIEatableParams.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
     </ClCompile>
     <ClCompile Include="inventory_item_script.cpp">
       <Filter>Core\Client\Objects\inventory\InventoryItem</Filter>

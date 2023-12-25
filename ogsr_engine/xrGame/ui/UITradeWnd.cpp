@@ -22,7 +22,6 @@
 #include "../character_info.h"
 #include "UIMultiTextStatic.h"
 #include "UI3tButton.h"
-#include "UIItemInfo.h"
 
 #include "UICharacterInfo.h"
 #include "UIDragDropListEx.h"

@@ -469,8 +469,6 @@
     <ClInclude Include="steering_behaviour_separation.h" />
     <ClInclude Include="trajectories.h" />
     <ClInclude Include="ui\ArtefactDetectorUI.h" />
-    <ClInclude Include="ui\UIArmorParams.h" />
-    <ClInclude Include="ui\UIEatableParams.h" />
     <ClInclude Include="ui\UIHelper.h" />
     <ClInclude Include="ui\UIIconParams.h" />
     <ClInclude Include="ui\UILoadingScreen.h" />
@@ -1529,7 +1527,6 @@
     <ClInclude Include="ui_base.h" />
     <ClInclude Include="UIDialogHolder.h" />
     <ClInclude Include="ui\UIInventoryWnd.h" />
-    <ClInclude Include="ui\UIOutfitSlot.h" />
     <ClInclude Include="ui\UITradeWnd.h" />
     <ClInclude Include="ui\UIPdaAux.h" />
     <ClInclude Include="ui\UIPdaContactsWnd.h" />
@@ -1571,8 +1568,6 @@
     <ClInclude Include="ui\UIEditKeyBind.h" />
     <ClInclude Include="ui\UIKeyBinding.h" />
     <ClInclude Include="ui\UICharacterInfo.h" />
-    <ClInclude Include="ui\ui_af_params.h" />
-    <ClInclude Include="ui\UIItemInfo.h" />
     <ClInclude Include="ui\UIOutfitInfo.h" />
     <ClInclude Include="ui\UIInventoryUtilities.h" />
     <ClInclude Include="callback_info.h" />
@@ -1700,8 +1695,6 @@
     <ClCompile Include="steering_behaviour.cpp" />
     <ClCompile Include="trajectories.cpp" />
     <ClCompile Include="ui\ArtefactDetectorUI.cpp" />
-    <ClCompile Include="ui\UIArmorParams.cpp" />
-    <ClCompile Include="ui\UIEatableParams.cpp" />
     <ClCompile Include="ui\UIHelper.cpp" />
     <ClCompile Include="ui\UIIconParams.cpp" />
     <ClCompile Include="ui\UILoadingScreen.cpp" />
@@ -2465,7 +2458,6 @@
     <ClCompile Include="ui\UIInventoryWnd.cpp" />
     <ClCompile Include="ui\uiinventorywnd2.cpp" />
     <ClCompile Include="ui\UIInventoryWnd3.cpp" />
-    <ClCompile Include="ui\UIOutfitSlot.cpp" />
     <ClCompile Include="ui\UITradeWnd.cpp" />
     <ClCompile Include="ui\UIPdaAux.cpp" />
     <ClCompile Include="ui\UIPdaContactsWnd.cpp" />
@@ -2506,8 +2498,6 @@
     <ClCompile Include="ui\UIEditKeyBind.cpp" />
     <ClCompile Include="ui\UIKeyBinding.cpp" />
     <ClCompile Include="ui\UICharacterInfo.cpp" />
-    <ClCompile Include="ui\ui_af_params.cpp" />
-    <ClCompile Include="ui\UIItemInfo.cpp" />
     <ClCompile Include="ui\UIOutfitInfo.cpp" />
     <ClCompile Include="ui\UIInventoryUtilities.cpp" />
     <ClCompile Include="ui\UIBtnHint.cpp" />

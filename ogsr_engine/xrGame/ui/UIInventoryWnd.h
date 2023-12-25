@@ -5,13 +5,13 @@ class CInventory;
 #include "UIDialogWnd.h"
 #include "UIStatic.h"
 
+#include "UIDragDropListEx.h"
+
 #include "UIProgressBar.h"
 
 #include "UIPropertiesBox.h"
-#include "UIOutfitSlot.h"
 
 #include "UIOutfitInfo.h"
-#include "UIItemInfo.h"
 #include "../inventory_space.h"
 #include "../actor_flags.h"
 
@@ -75,7 +75,7 @@ protected:
     CUIDragDropListEx* m_pUIBagList{};
     CUIDragDropListEx* m_pUIBeltList{};
 
-    CUIOutfitDragDropList* m_pUIOutfitList{};
+    CUIDragDropListEx* m_pUIOutfitList{};
     CUIDragDropListEx* m_pUIHelmetList{};
     CUIDragDropListEx* m_pUIBackPackList{};
 

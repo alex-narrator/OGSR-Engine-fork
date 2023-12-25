@@ -30,7 +30,6 @@ using namespace InventoryUtilities;
 #include "../game_cl_base.h"
 #include "../ActorCondition.h"
 #include "UIDragDropListEx.h"
-#include "UIOutfitSlot.h"
 #include "UI3tButton.h"
 
 constexpr auto INVENTORY_ITEM_XML = "inventory_item.xml";
@@ -76,7 +75,7 @@ void CUIInventoryWnd::Init()
     xml_init.InitDragDropListEx(uiXml, "dragdrop_belt", 0, m_pUIBeltList);
     BindDragDropListEvents(m_pUIBeltList);
 
-    m_pUIOutfitList = xr_new<CUIOutfitDragDropList>();
+    m_pUIOutfitList = xr_new<CUIDragDropListEx>();
     AttachChild(m_pUIOutfitList);
     m_pUIOutfitList->SetAutoDelete(true);
     xml_init.InitDragDropListEx(uiXml, "dragdrop_outfit", 0, m_pUIOutfitList);

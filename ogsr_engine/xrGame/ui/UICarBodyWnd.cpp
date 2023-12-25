@@ -7,7 +7,6 @@
 #include "UICharacterInfo.h"
 #include "UIDragDropListEx.h"
 #include "UIFrameWindow.h"
-#include "UIItemInfo.h"
 #include "UIPropertiesBox.h"
 #include "../ai/monsters/BaseMonster/base_monster.h"
 #include "../inventory.h"

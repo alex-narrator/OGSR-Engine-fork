@@ -91,7 +91,6 @@ void InitConsole()
     CORE_FEATURE_SET(gd_master_only, "features");
     CORE_FEATURE_SET(scope_textures_autoresize, "features");
     CORE_FEATURE_SET(wpn_cost_include_addons, "features");
-    CORE_FEATURE_SET(old_outfit_slot_style, "features");
     CORE_FEATURE_SET(npc_simplified_shooting, "features");
     CORE_FEATURE_SET(use_trade_deficit_factor, "features");
     CORE_FEATURE_SET(show_objectives_ondemand, "features");
