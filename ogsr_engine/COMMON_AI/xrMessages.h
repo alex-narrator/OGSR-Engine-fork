@@ -45,7 +45,6 @@ enum
 
 enum
 {
-    GE_RESPAWN,
     GE_OWNERSHIP_TAKE, // DUAL: Client request for ownership of an item
     GE_OWNERSHIP_REJECT, // DUAL: Client request ownership rejection
     GE_HIT, //
