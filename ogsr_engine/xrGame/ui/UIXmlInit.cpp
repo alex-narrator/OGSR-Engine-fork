@@ -1104,9 +1104,25 @@ bool CUIXmlInit::InitAnimatedStatic(CUIXml& xml_doc, const char* path, int index
 bool CUIXmlInit::InitTexture(CUIXml& xml_doc, const char* path, int index, IUIMultiTextureOwner* pWnd)
 {
     string256 buf;
-    shared_str texture, shader;
-
+    shared_str texture;
     strconcat(sizeof(buf), buf, path, ":texture");
+    if (xml_doc.NavigateToNode(buf))
+        texture = xml_doc.Read(buf, index, NULL);
+    if (!!texture)
+    {
+        pWnd->InitTexture(*texture);
+        return true;
+    }
+    return false;
+}
+
+bool CUIXmlInit::InitTexture(CUIXml& xml_doc, const char* path, int index, IUISingleTextureOwner* pWnd)
+{
+    string256 buf;
+    shared_str texture;
+    shared_str shader;
+    strconcat(sizeof(buf), buf, path, ":texture");
+
     if (xml_doc.NavigateToNode(buf))
     {
         texture = xml_doc.Read(buf, index, NULL);
@@ -1116,36 +1132,21 @@ bool CUIXmlInit::InitTexture(CUIXml& xml_doc, const char* path, int index, IUIMu
     if (!!texture)
     {
         if (!!shader)
-            smart_cast<IUISingleTextureOwner*>(pWnd)->InitTextureEx(texture.c_str(), shader.c_str());
+            pWnd->InitTextureEx(*texture, *shader);
         else
-            pWnd->InitTexture(texture.c_str());
-        return true;
+            pWnd->InitTexture(*texture);
     }
 
-    return false;
-}
-
-bool CUIXmlInit::InitTexture(CUIXml& xml_doc, const char* path, int index, IUISingleTextureOwner* pWnd)
-{
-    string256 buf;
-    InitTexture(xml_doc, path, index, (IUIMultiTextureOwner*)pWnd);
-    strconcat(sizeof(buf), buf, path, ":texture");
-
     Frect rect;
-
     rect.x1 = xml_doc.ReadAttribFlt(buf, index, "x", 0);
     rect.y1 = xml_doc.ReadAttribFlt(buf, index, "y", 0);
     rect.x2 = rect.x1 + xml_doc.ReadAttribFlt(buf, index, "width", 0);
     rect.y2 = rect.y1 + xml_doc.ReadAttribFlt(buf, index, "height", 0);
-
     pWnd->SetStretchTexture(!!xml_doc.ReadAttribInt(path, index, "stretch"));
-
     u32 color = GetColor(xml_doc, buf, index, 0xff);
     pWnd->SetTextureColor(color);
-
     if (rect.width() != 0 && rect.height() != 0)
         pWnd->SetOriginalRect(rect);
-
     return true;
 }
 

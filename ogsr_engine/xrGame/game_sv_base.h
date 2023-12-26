@@ -73,8 +73,6 @@ public:
     virtual void OnPlayerEnteredGame(ClientID id_who){};
     virtual void OnPlayerConnectFinished(ClientID id_who){};
 
-    virtual void OnPlayer_Sell_Item(ClientID id_who, NET_Packet& P){};
-
     virtual void OnRoundStart(); // старт раунда
     virtual void OnRoundEnd(); //	round_end_reason			// конец раунда
 

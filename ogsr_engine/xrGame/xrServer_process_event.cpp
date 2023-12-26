@@ -172,10 +172,6 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
         SendTo(SV_Client->ID, P, net_flags(TRUE, TRUE));
     }
     break;
-    case GEG_PLAYER_ITEM_SELL: {
-        game->OnPlayer_Sell_Item(sender, P);
-    }
-    break;
     case GE_TELEPORT_OBJECT: {
         game->teleport_object(P, destination);
     }
@@ -192,12 +188,6 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
         game->remove_all_restrictions(P, destination);
     }
     break;
-    //case GE_MONEY: {
-    //    CSE_Abstract* e_dest = receiver;
-    //    CSE_ALifeTraderAbstract* pTa = smart_cast<CSE_ALifeTraderAbstract*>(e_dest);
-    //    pTa->m_dwMoney = P.r_u32();
-    //}
-    //break;
     case GE_FREEZE_OBJECT: break;
     default: R_ASSERT2(0, "Game Event not implemented!!!"); break;
     }

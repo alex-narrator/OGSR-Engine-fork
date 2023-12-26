@@ -122,7 +122,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
             mstate_wishful ^= mcCrouch;
     }
     break;
-    case kSPRINT_TOGGLE: {
+    case kSPRINT: {
         if (IsZoomAimingMode())
         {
             if (auto pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem()))

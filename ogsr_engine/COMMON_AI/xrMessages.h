@@ -64,7 +64,6 @@ enum
     GE_TRADE_SELL,
     GE_TRADE_BUY,
 
-    GE_WPN_AMMO_ADD,
     GE_WPN_STATE_CHANGE,
 
     GE_GRENADE_EXPLODE,
@@ -74,8 +73,6 @@ enum
     GE_CHANGE_POS,
 
     GE_CHANGE_VISUAL,
-
-    GEG_PLAYER_ITEM_SELL,
     
     //-------------------------------------
     GE_KILL_SOMEONE,
