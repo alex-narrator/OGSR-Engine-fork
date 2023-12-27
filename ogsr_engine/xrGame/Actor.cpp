@@ -365,18 +365,7 @@ void CActor::Load(LPCSTR section)
     m_fDispCrouchFactor = pSettings->r_float(section, "disp_crouch_factor");
     m_fDispCrouchNoAccelFactor = pSettings->r_float(section, "disp_crouch_no_acc_factor");
 
-    LPCSTR default_outfit = READ_IF_EXISTS(pSettings, r_string, section, "default_outfit", 0);
-    SetDefaultVisualOutfit(default_outfit);
-
-    invincibility_fire_shield_1st = READ_IF_EXISTS(pSettings, r_string, section, "Invincibility_Shield_1st", 0);
-    invincibility_fire_shield_3rd = READ_IF_EXISTS(pSettings, r_string, section, "Invincibility_Shield_3rd", 0);
-    //-----------------------------------------
-    m_AutoPickUp_AABB = READ_IF_EXISTS(pSettings, r_fvector3, section, "AutoPickUp_AABB", Fvector().set(0.02f, 0.02f, 0.02f));
-    m_AutoPickUp_AABB_Offset = READ_IF_EXISTS(pSettings, r_fvector3, section, "AutoPickUp_AABB_offs", Fvector().set(0, 0, 0));
-
-    CStringTable string_table;
-    //---------------------------------------------------------------------
-    m_sHeadShotParticle = READ_IF_EXISTS(pSettings, r_string, section, "HeadShotParticle", 0);
+    SetDefaultVisualOutfit(READ_IF_EXISTS(pSettings, r_string, section, "default_outfit", 0));
 
     if (pSettings->line_exist(section, "lookout_angle"))
     {
@@ -578,37 +567,6 @@ void start_tutorial(LPCSTR name);
 void CActor::Die(CObject* who)
 {
     inherited::Die(who);
-
- 	//const auto& slots = inventory().m_slots;
-
-  //  for (u32 slot_idx = 0; slot_idx < slots.size(); ++slot_idx)
-  //  {
-  //      auto& item = slots[slot_idx].m_pIItem;
-
-  //      if (slot_idx == inventory().GetActiveSlot())
-  //      {
-  //          if (item)
-  //          {
-  //              item->SetDropManual(TRUE);
-  //          }
-  //          continue;
-  //      }
-  //      else
-  //      {
-  //          if (item == GetOutfit())
-  //              continue;
-  //          if (item == GetHelmet())
-  //              continue;
-  //          if (item == GetBackpack())
-  //              continue;
-  //      }
-
-  //      if (item)
-  //          inventory().Ruck(item);
-  //  };
-
-  //  ///!!! чистка пояса
-  //  inventory().DropBeltToRuck();
 
     cam_Set(eacFreeLook);
     mstate_wishful &= ~mcAnyMove;

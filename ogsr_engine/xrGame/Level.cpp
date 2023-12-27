@@ -352,55 +352,9 @@ void CLevel::cl_Process_Event(u16 dest, u16 type, NET_Packet& P)
         Msg("! ERROR: c_EVENT[%d] : non-game-object", dest);
         return;
     }
-    if (type != GE_DESTROY_REJECT)
-    {
-        bool skip_event = false;
-        if (type == GE_DESTROY)
-            Game().OnDestroy(GO);
-        else if (type == GE_OWNERSHIP_REJECT)
-        {
-            u32 pos = P.r_tell();
-            u16 id = P.r_u16();
-            P.r_seek(pos);
-            CObject* D = Objects.net_Find(id);
-            if (!D && MaybeJustDestroyedObject(id))
-            {
-                Msg("* [%s]: skip GE_OWNERSHIP_REJECT for just destroyed ID[%u] from %s[%u]", __FUNCTION__, id, O->cName().c_str(), O->ID());
-                skip_event = true;
-            }
-        }
-        if (!skip_event)
-            GO->OnEvent(P, type);
-    }
-    else
-    { // handle GE_DESTROY_REJECT here
-        u32 pos = P.r_tell();
-        u16 id = P.r_u16();
-        P.r_seek(pos);
-
-        bool ok = true;
-
-        CObject* D = Objects.net_Find(id);
-        if (0 == D)
-        {
-            Msg("! ERROR: c_EVENT[%d] : unknown dest", id);
-            ok = false;
-        }
-
-        CGameObject* GD = smart_cast<CGameObject*>(D);
-        if (!GD)
-        {
-            Msg("! ERROR: c_EVENT[%d] : non-game-object", id);
-            ok = false;
-        }
-
-        GO->OnEvent(P, GE_OWNERSHIP_REJECT);
-        if (ok)
-        {
-            Game().OnDestroy(GD);
-            GD->OnEvent(P, GE_DESTROY);
-        };
-    }
+    if (type == GE_DESTROY)
+        Game().OnDestroy(GO);
+    GO->OnEvent(P, type);
 };
 
 void CLevel::ProcessGameEvents()

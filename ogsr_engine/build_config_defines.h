@@ -22,10 +22,10 @@
 //#define USE_MEMORY_VALIDATOR
 //****************************************************************************************************
 
-#define FSLTX "fsgame.ltx"
+constexpr auto FSLTX = "fsgame.ltx";
 
 // Сколько последних сообщений показывать в истории ПДА
-#define NEWS_TO_SHOW 500
+constexpr auto NEWS_TO_SHOW = 500;
 
 // В этом режиме удаление поршня, в котором указаны <article>, удалит и эти
 // статьи.
