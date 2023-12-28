@@ -3,9 +3,7 @@
 
 #include "../xrRender/ResourceManager.h"
 
-#ifndef _EDITOR
 #include "../../xr_3da/render.h"
-#endif
 
 #include "../../xr_3da/tntQAVI.h"
 #include "../../xr_3da/xrTheora_Surface.h"
@@ -14,9 +12,9 @@
 
 #include "StateManager/dx10ShaderResourceStateCache.h"
 
-#define PRIORITY_HIGH 12
-#define PRIORITY_NORMAL 8
-#define PRIORITY_LOW 4
+constexpr auto PRIORITY_HIGH = 12;
+constexpr auto PRIORITY_NORMAL = 8;
+constexpr auto PRIORITY_LOW = 4;
 
 void resptrcode_texture::create(LPCSTR _name) { _set(DEV->_CreateTexture(_name)); }
 

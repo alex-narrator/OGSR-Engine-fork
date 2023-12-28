@@ -729,12 +729,7 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
             {
                 if (!FS.exist(fn, "$game_meshes$", nm))
                 {
-#ifdef _EDITOR
-                    Msg("!Can't find motion file '%s'.", nm);
-                    return;
-#else
                     Debug.fatal(DEBUG_INFO, "Can't find motion file '%s'.", nm);
-#endif
                 }
             }
             // Check compatibility
@@ -847,7 +842,6 @@ void CKinematicsAnimated::LL_BoneMatrixBuild(CBoneInstance& bi, const Fmatrix* p
     RES.mk_xform(Result.Q, Result.T);
     bi.mTransform.mul_43(*parent, RES);
 #ifdef DEBUG
-#ifndef _EDITOR
     if (!check_scale(RES))
     {
         VERIFY(check_scale(bi.mTransform));
@@ -864,7 +858,6 @@ void CKinematicsAnimated::LL_BoneMatrixBuild(CBoneInstance& bi, const Fmatrix* p
     //	Msg("bone %s",*bd->name)	;
     // }
     // BONE_INST.mPrevTransform.set(RES);
-#endif
 #endif
 }
 

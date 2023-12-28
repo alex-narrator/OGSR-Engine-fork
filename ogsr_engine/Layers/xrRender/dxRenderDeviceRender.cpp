@@ -127,8 +127,6 @@ void dxRenderDeviceRender::OnDeviceCreate(LPCSTR shName)
     ::Render->create();
     Device.Statistic->OnDeviceCreate();
 
-    //#ifndef DEDICATED_SERVER
-    if (!g_dedicated_server)
     {
         m_WireShader.create("editor\\wire");
         m_SelectionShader.create("editor\\selection");

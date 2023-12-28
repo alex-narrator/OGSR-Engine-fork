@@ -65,12 +65,7 @@ private:
 public:
     virtual void OnCalculateBones();
 
-public:
-#ifdef _EDITOR
-public:
-#else
 private:
-#endif
     u32 Update_LastTime;
 
     CBlendInstance* blend_instances;
