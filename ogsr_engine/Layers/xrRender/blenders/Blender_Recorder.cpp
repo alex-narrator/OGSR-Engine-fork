@@ -96,11 +96,6 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
     bDetail_Diffuse = FALSE;
     bDetail_Bump = FALSE;
 
-#if RENDER == R_R1
-    if (RImplementation.o.no_detail_textures)
-        bDetail = FALSE;
-#endif
-
     if (bDetail)
     {
         DEV->m_textures_description.GetTextureUsage(base, bDetail_Diffuse, bDetail_Bump);

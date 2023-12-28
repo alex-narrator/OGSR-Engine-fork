@@ -46,12 +46,6 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
         return;
     pVisual->vis.marker = RI.marker;
 
-#if RENDER == R_R1
-    if (RI.o.vis_intersect && (pVisual->vis.accept_frame != Device.dwFrame))
-        return;
-    pVisual->vis.accept_frame = Device.dwFrame;
-#endif
-
     float distSQ;
     float SSA;
     if (!RI.val_bHUD)
@@ -93,7 +87,6 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
     {
         if (sh->flags.bStrictB2F)
         {
-#if RENDER != R_R1
             if (sh->flags.bEmissive)
             {
                 mapSorted_Node* N = mapHUDEmissive.insertInAnyWay(distSQ);
@@ -103,7 +96,6 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
                 N->val.Matrix = *RI.val_pTransform;
                 N->val.se = &*pVisual->shader->E[4]; // 4=L_special
             }
-#endif // RENDER!=R_R1
             mapSorted_Node* N = mapHUDSorted.insertInAnyWay(distSQ);
             N->val.ssa = SSA;
             N->val.pObject = RI.val_pObject;
@@ -120,7 +112,6 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
             N->val.pVisual = pVisual;
             N->val.Matrix = *RI.val_pTransform;
             N->val.se = sh;
-#if RENDER != R_R1
             if (sh->flags.bEmissive)
             {
                 mapSorted_Node* N = mapHUDEmissive.insertInAnyWay(distSQ);
@@ -130,15 +121,11 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
                 N->val.Matrix = *RI.val_pTransform;
                 N->val.se = &*pVisual->shader->E[4]; // 4=L_special
             }
-#endif //	RENDER!=R_R1
             return;
         }
     }
 
     // Shadows registering
-#if RENDER == R_R1
-    RI.L_Shadows->add_element(item);
-#endif
     if (RI.val_bInvisible)
         return;
 
@@ -154,7 +141,6 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
         return;
     }
 
-#if RENDER != R_R1
     // Emissive geometry should be marked and R2 special-cases it
     // a) Allow to skeep already lit pixels
     // b) Allow to make them 100% lit and really bright
@@ -179,7 +165,6 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fve
         N->val.se = sh;
         return;
     }
-#endif
 
     for (u32 iPass = 0; iPass < sh->passes.size(); ++iPass)
     {
@@ -288,12 +273,6 @@ void R_dsgraph_structure::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     if (pVisual->vis.marker == RI.marker)
         return;
     pVisual->vis.marker = RI.marker;
-
-#if RENDER == R_R1
-    if (RI.o.vis_intersect && (pVisual->vis.accept_frame != Device.dwFrame))
-        return;
-    pVisual->vis.accept_frame = Device.dwFrame;
-#endif
 
     float distSQ;
     float SSA = CalcSSA(distSQ, pVisual->vis.sphere.P, pVisual);

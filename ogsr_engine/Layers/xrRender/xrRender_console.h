@@ -24,9 +24,6 @@ extern ECORE_API u32 ps_r3_msaa_atest; //=	0;
 
 extern ECORE_API u32 ps_r3_minmax_sm; //	=	0;
 
-#if RENDER == R_R1
-extern ECORE_API int ps_r__Supersample;
-#endif
 extern ECORE_API int ps_r__LightSleepFrames;
 
 extern ECORE_API float ps_r__Detail_l_ambient;
@@ -178,9 +175,6 @@ enum
     R2FLAG_VOLUMETRIC_LIGHTS = (1 << 21),
     R2FLAG_STEEP_PARALLAX = (1 << 22),
     R2FLAG_DOF = (1 << 23),
-#if RENDER == R_R1
-    R1FLAG_DETAIL_TEXTURES = (1 << 24),
-#endif
     // = 1 << 25,
 
     R3FLAG_DYN_WET_SURF = (1 << 26),
