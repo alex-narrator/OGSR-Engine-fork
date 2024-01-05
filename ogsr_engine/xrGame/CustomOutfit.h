@@ -26,14 +26,11 @@ public:
 
 private:
     shared_str m_ActorVisual;
-    shared_str m_full_icon_name;
 
     u32 m_ef_equipment_type{};
 
 public:
     virtual u32 ef_equipment_type() const;
-    const shared_str& GetFullIconName() const { return m_full_icon_name; };
 
     bool m_bIsHelmetBuiltIn{};
-    int m_iBeltSize{};
 };

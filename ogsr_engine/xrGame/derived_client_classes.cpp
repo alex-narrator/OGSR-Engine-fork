@@ -175,7 +175,6 @@ void COutfitScript::script_register(lua_State* L)
 {
     module(L)[class_<CCustomOutfit, CInventoryItemObject>("CCustomOutfit")
                   .def_readwrite("power_loss", &CCustomOutfit::m_fPowerLoss)
-                  .def_readwrite("belt_size", &CCustomOutfit::m_iBeltSize)
                   .property("burn_protection", &get_protection<ALife::eHitTypeBurn>, &set_protection<ALife::eHitTypeBurn>)
                   .property("strike_protection", &get_protection<ALife::eHitTypeStrike>, &set_protection<ALife::eHitTypeStrike>)
                   .property("shock_protection", &get_protection<ALife::eHitTypeShock>, &set_protection<ALife::eHitTypeShock>)

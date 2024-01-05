@@ -23,11 +23,7 @@ void CCustomOutfit::Load(LPCSTR section)
 
     m_ef_equipment_type = pSettings->r_u32(section, "ef_equipment_type");
 
-    m_full_icon_name = pSettings->r_string(section, "full_icon_name");
-
     m_bIsHelmetBuiltIn = std::find(m_slots_locked.begin(), m_slots_locked.end(), HELMET_SLOT) != m_slots_locked.end();
-
-    m_iBeltSize = READ_IF_EXISTS(pSettings, r_u32, section, "belt_size", 0);
 }
 
 float CCustomOutfit::HitThruArmour(SHit* pHDS)
