@@ -83,8 +83,6 @@ public:
     virtual void OnActiveItem();
     virtual void OnHiddenItem();
 
-    virtual void OnMoveToRuck(EItemPlace prevPlace);
-
     //////////////////////////////////////////////////////////////////////////
     //  Network
     //////////////////////////////////////////////////////////////////////////
@@ -425,12 +423,6 @@ public:
     float camDispertionFrac;
     float camMaxAngleHorz;
     float camStepAngleHorz;
-
-    float dof_transition_time{};
-    float dof_reload_effect{}, dof_zoom_effect{};
-    Fvector4 dof_params_zoom{}, dof_params_reload{};
-    void UpdateDofReload();
-    void UpdateDofAim();
 
 protected:
     // фактор увеличения дисперсии при максимальной изношености

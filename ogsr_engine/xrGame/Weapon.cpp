@@ -561,10 +561,6 @@ void CWeapon::Load(LPCSTR section)
         strconcat(sizeof(temp), temp, "hit_probability_", get_token_name(difficulty_type_token, i));
         m_hit_probability[i] = READ_IF_EXISTS(pSettings, r_float, section, temp, 1.f);
     }
-
-    dof_transition_time = READ_IF_EXISTS(pSettings, r_float, section, "dof_transition_time", 0.6f);
-    dof_params_zoom = (READ_IF_EXISTS(pSettings, r_fvector4, section, "dof_zoom_params", (Fvector4{0, 0, 0, 1.6}))); //(Fvector4{0.1, 0.4, 0, 1.6})
-    dof_params_reload = (READ_IF_EXISTS(pSettings, r_fvector4, section, "dof_reload_params", (Fvector4{0, 0, 1, 0})));
 }
 
 void CWeapon::LoadFireParams(LPCSTR section, LPCSTR prefix)
@@ -811,9 +807,6 @@ void CWeapon::OnH_B_Independent(bool just_before_destroy)
     m_strapped_mode = false;
     OnZoomOut();
     m_fZoomRotationFactor = 0.f;
-    dof_reload_effect = 0.f;
-    dof_zoom_effect = 0.f;
-    //shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
     UpdateXForm();
 }
 
@@ -885,7 +878,6 @@ void CWeapon::UpdateCL()
 
     VERIFY(smart_cast<IKinematics*>(Visual()));
 
-    bool actor = ParentIsActor();
     if (GetState() == eIdle)
     {
         auto state = idle_state();
@@ -899,79 +891,16 @@ void CWeapon::UpdateCL()
         }
     }
     else
-    {
         m_idle_state = eIdle;
-    }
-
-    if (actor)
-    {
-        if (!HUD().GetUI()->MainInputReceiver())
-        {
-            UpdateDofAim();
-            UpdateDofReload();
-        }
-    }
-}
-
-void CWeapon::UpdateDofReload()
-{
-    if (!psActorFlags.test(AF_DOF_RELOAD))
-        return;
-    bool b_increase = GetState() == eReload;
-    if (b_increase)
-        dof_reload_effect += Device.fTimeDelta / dof_transition_time;
-    else
-        dof_reload_effect -= Device.fTimeDelta / dof_transition_time;
-    bool b_set_dof = b_increase && dof_reload_effect <= 1.f || !b_increase && dof_reload_effect > 0.f;
-    if (!b_set_dof)
-        return;
-    clamp(dof_reload_effect, 0.f, 1.f);
-    shader_exports.set_dof_params(
-        dof_params_reload.x * dof_reload_effect, 
-        dof_params_reload.y * dof_reload_effect, 
-        dof_params_reload.z * dof_reload_effect,
-        dof_params_reload.w * dof_reload_effect);
-}
-
-void CWeapon::UpdateDofAim() 
-{ 
-    if (!psActorFlags.test(AF_DOF_ZOOM_NEW))
-        return;
-    bool b_increase = IsZoomed();
-    bool b_set_dof = b_increase && dof_zoom_effect <= 1.f || !b_increase && dof_zoom_effect > 0.f;
-    if (!b_set_dof)
-        return;
-    if (b_increase)
-        dof_zoom_effect += Device.fTimeDelta / dof_transition_time;
-    else
-        dof_zoom_effect -= Device.fTimeDelta / dof_transition_time;
-    clamp(dof_zoom_effect, 0.f, 1.f);
-    shader_exports.set_dof_params(
-        dof_params_zoom.x * dof_zoom_effect, 
-        dof_params_zoom.y * dof_zoom_effect, 
-        dof_params_zoom.z * dof_zoom_effect, 
-        dof_params_zoom.w * dof_zoom_effect);
-}
-
-void CWeapon::OnMoveToRuck(EItemPlace prevPlace)
-{
-    inherited::OnMoveToRuck(prevPlace);
-    if (ParentIsActor() && prevPlace == eItemPlaceSlot)
-        shader_exports.set_dof_params(0.f, 0.f, 0.f, 0.f);
 }
 
 void CWeapon::renderable_Render()
 {
     UpdateXForm();
-
     // нарисовать подсветку
     RenderLight();
-
     // если мы в режиме снайперки, то сам HUD рисовать не надо
-    if (IsZoomed() && !IsRotatingToZoom() && ZoomTexture())
-        RenderHud(FALSE);
-    else
-        RenderHud(TRUE);
+    RenderHud(IsZoomed() && !IsRotatingToZoom() && ZoomTexture());
 
     inherited::renderable_Render();
 }
@@ -1469,8 +1398,6 @@ void CWeapon::OnZoomIn()
     }
     else if (!m_bZoomInertionAllow)
         AllowHudInertion(FALSE);
-    if (GetHUDmode())
-        GamePersistent().SetPickableEffectorDOF(true);
     if (auto pActor = smart_cast<CActor*>(H_Parent()))
         pActor->callback(GameObject::eOnActorWeaponZoomIn)(lua_game_object());
 }
@@ -1487,8 +1414,6 @@ void CWeapon::OnZoomOut(bool rezoom)
         }
     }
     AllowHudInertion(TRUE);
-    if (GetHUDmode())
-        GamePersistent().SetPickableEffectorDOF(false);
     ResetSubStateTime();
 }
 

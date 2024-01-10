@@ -96,9 +96,6 @@ extern BOOL b_death_anim_velocity;
 #endif
 int g_AI_inactive_time = 0;
 
-extern int g_dof_zoom_far;
-extern int g_dof_zoom_near;
-
 ENGINE_API extern int g_3dscopes_fps_factor;
 
 extern float g_fForceGrowSpeed;
@@ -1392,12 +1389,6 @@ void CCC_RegisterCommands()
     psActorFlags.set(AF_ALWAYSRUN, true);
     CMD3(CCC_Mask, "g_always_run", &psActorFlags, AF_ALWAYSRUN);
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
-
-    //CMD3(CCC_Mask, "g_dof_zoom_old", &psActorFlags, AF_DOF_ZOOM);
-    CMD3(CCC_Mask, "g_dof_zoom", &psActorFlags, AF_DOF_ZOOM_NEW);
-    CMD3(CCC_Mask, "g_dof_reload", &psActorFlags, AF_DOF_RELOAD);
-    //CMD4(CCC_Integer, "g_dof_zoom_far", &g_dof_zoom_far, 10, 100);
-    //CMD4(CCC_Integer, "g_dof_zoom_near", &g_dof_zoom_near, 10, 100);
 
     CMD3(CCC_Mask, "g_hold_to_aim", &psActorFlags, AF_HOLD_TO_AIM);
     CMD3(CCC_Mask, "g_hold_to_crouch", &psActorFlags, AF_HOLD_TO_CROUCH);
