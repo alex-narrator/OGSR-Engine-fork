@@ -89,7 +89,6 @@ void InitConsole()
     CORE_FEATURE_SET(corpses_collision, "features");
     CORE_FEATURE_SET(keep_inprogress_tasks_only, "features");
     CORE_FEATURE_SET(gd_master_only, "features");
-    CORE_FEATURE_SET(scope_textures_autoresize, "features");
     CORE_FEATURE_SET(wpn_cost_include_addons, "features");
     CORE_FEATURE_SET(npc_simplified_shooting, "features");
     CORE_FEATURE_SET(use_trade_deficit_factor, "features");

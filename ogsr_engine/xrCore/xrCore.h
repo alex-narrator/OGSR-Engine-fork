@@ -189,20 +189,19 @@ public:
             corpses_collision           = 1ull << 7,
             keep_inprogress_tasks_only  = 1ull << 8,
             gd_master_only              = 1ull << 9,
-            scope_textures_autoresize   = 1ull << 10,
-            wpn_cost_include_addons     = 1ull << 11,
-            use_luminocity              = 1ull << 12,
-            colorize_ammo               = 1ull << 13,
-            colorize_untradable         = 1ull << 14,
-            select_mode_1342            = 1ull << 15,
-            npc_simplified_shooting     = 1ull << 16,
-            use_trade_deficit_factor    = 1ull << 17,
-            show_objectives_ondemand    = 1ull << 18,
-            pickup_check_overlaped      = 1ull << 19,
-            disable_dialog_break        = 1ull << 20,
-            no_progress_bar_animation   = 1ull << 21,
-            limited_bolts               = 1ull << 22,
-            unique_logs                 = 1ull << 23;
+            wpn_cost_include_addons     = 1ull << 10,
+            use_luminocity              = 1ull << 11,
+            colorize_ammo               = 1ull << 12,
+            colorize_untradable         = 1ull << 13,
+            select_mode_1342            = 1ull << 14,
+            npc_simplified_shooting     = 1ull << 15,
+            use_trade_deficit_factor    = 1ull << 16,
+            show_objectives_ondemand    = 1ull << 17,
+            pickup_check_overlaped      = 1ull << 18,
+            disable_dialog_break        = 1ull << 19,
+            no_progress_bar_animation   = 1ull << 20,
+            limited_bolts               = 1ull << 21,
+            unique_logs                 = 1ull << 22;
     };
 
     void _initialize(LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0);

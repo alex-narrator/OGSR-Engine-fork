@@ -1063,53 +1063,17 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
     m_fIronSightZoomFactor = READ_IF_EXISTS(pSettings, r_float, section, "ironsight_zoom_factor", 1.0f);
     m_fScopeInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "scope_inertion_factor", GetControlInertionFactor());
 
-    if (m_UIScope)
-        xr_delete(m_UIScope);
-
-    if (m_UIScopeSecond)
-        xr_delete(m_UIScopeSecond);
-
-    LPCSTR scope_texture_name{}, shader_name{Core.Features.test(xrCore::Feature::scope_textures_autoresize) ? "hud\\scope" : "hud\\default"};
-
     // second scope mode
-    m_bHasScopeSecond = READ_IF_EXISTS(pSettings, r_bool, section, "scope_second", false);
+    m_bHasScopeSecond = READ_IF_EXISTS(pSettings, r_bool, section, "scope_second", false) && !READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "ignore_scope_second", false);
     if (m_bHasScopeSecond)
-    {
         m_fScopeZoomFactorSecond = READ_IF_EXISTS(pSettings, r_float, section, "scope_zoom_factor_second", 1.0f);
 
-        scope_texture_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture_second", nullptr);
-        if (scope_texture_name && !m_bIgnoreScopeTexture)
-        {
-            m_UIScopeSecond = xr_new<CUIStaticItem>();
-            m_UIScopeSecond->Init(scope_texture_name, shader_name, 0, 0, alNone);
-        }
-    }
-
-    if (!IsAddonAttached(eScope) || IsScopeBroken() && !m_bIgnoreScopeTexture)
+    if (!IsAddonAttached(eScope) || IsScopeBroken())
     {
         m_bScopeDynamicZoom = m_bVision = false;
 
         if (IsScopeBroken())
-        {
             m_fScopeZoomFactor = m_fIronSightZoomFactor;
-
-            if (m_bIgnoreScopeTexture)
-                return;
-
-            scope_texture_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture_broken", nullptr);
-            if (scope_texture_name)
-            {
-                m_UIScope = xr_new<CUIStaticItem>();
-                m_UIScope->Init(scope_texture_name, shader_name, 0, 0, alNone);
-            }
-
-            scope_texture_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture_second_broken", nullptr);
-            if (scope_texture_name)
-            {
-                m_UIScopeSecond = xr_new<CUIStaticItem>();
-                m_UIScopeSecond->Init(scope_texture_name, shader_name, 0, 0, alNone);
-            }
-        }
 
         return;
     }
@@ -1140,19 +1104,12 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
             m_bScopeDynamicZoom = true;
 
             m_sounds.StopSound("sndZoomChange");
-            //HUD_SOUND::DestroySound(sndZoomChange);
 
             if (pSettings->line_exist(section, "snd_zoom_change"))
                 m_sounds.LoadSound(section, "snd_zoom_change", "sndZoomChange", SOUND_TYPE_ITEM_USING);
         }
         m_uZoomStepCount = _count > 2 ? atoi(_GetItem(scope_zoom_line, 2, tmp)) : 2;
     }
-
-    scope_texture_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture", nullptr);
-    if (!scope_texture_name || m_bIgnoreScopeTexture)
-        return;
-    m_UIScope = xr_new<CUIStaticItem>();
-    m_UIScope->Init(scope_texture_name, shader_name, 0, 0, alNone);
 }
 
 void CWeaponMagazined::ApplySilencerParams()

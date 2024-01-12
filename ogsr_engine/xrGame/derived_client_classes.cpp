@@ -329,7 +329,7 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("get_fire_point2", &CWeapon::get_CurrentFirePoint2)
                   .def("get_fire_direction", &CWeapon::get_LastFD)
                   .def("ready_to_kill", &CWeapon::ready_to_kill)
-                  .def("UseScopeTexture", &CWeapon::UseScopeTexture),
+                  .def("scope_mode_second", &CWeapon::IsSecondScopeMode),
               class_<CWeaponMagazined, CWeapon>("CWeaponMagazined")
                   .def_readonly("shot_num", &CWeaponMagazined::m_iShotNum)
                   .def_readwrite("queue_size", &CWeaponMagazined::m_iQueueSize)

@@ -229,10 +229,10 @@ bool CWeaponMagazinedWGrenade::SwitchMode()
 
 void CWeaponMagazinedWGrenade::PerformSwitchGL()
 {
+    SetGrenadeMode(!IsGrenadeMode());
+
     if (IsZoomed())
         OnZoomOut(true);
-
-    SetGrenadeMode(!IsGrenadeMode());
 
     m_fZoomFactor = CurrentZoomFactor();
 
@@ -611,13 +611,6 @@ void CWeaponMagazinedWGrenade::InitAddons()
         conditionDecreasePerShotGL = READ_IF_EXISTS(pSettings, r_float, param_sect, "condition_shot_dec_gl", 0.0f);
     }
     callback(GameObject::eOnAddonInit)(2);
-}
-
-bool CWeaponMagazinedWGrenade::UseScopeTexture()
-{
-    if (IsAddonAttached(eLauncher) && IsGrenadeMode())
-        return false;
-    return inherited::UseScopeTexture();
 }
 
 float CWeaponMagazinedWGrenade::CurrentZoomFactor()

@@ -58,7 +58,6 @@ public:
     virtual void shedule_Update(u32 dt);
 
     virtual void renderable_Render();
-    virtual void OnDrawUI();
     virtual bool need_renderable();
 
     virtual void OnH_B_Chield();
@@ -154,8 +153,6 @@ public:
 
     virtual bool IsGrenadeMode() const { return m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponGrenadeMode; };
 
-    virtual bool UseScopeTexture();
-
     // обновление видимости для косточек аддонов
     void UpdateAddonsVisibility();
     void UpdateHUDAddonsVisibility();
@@ -219,10 +216,6 @@ protected:
     bool m_bZoomEnabled;
     // текущий фактор приближения
     float m_fZoomFactor{1.f};
-    // текстура для снайперского прицела, в режиме приближения
-    CUIStaticItem* m_UIScope{};
-    // текстура для другого приціла, у режимі прицілювання
-    CUIStaticItem* m_UIScopeSecond{};
     // коэффициент увеличения прицеливания
     float m_fIronSightZoomFactor{1.f};
     // коэффициент увеличения прицела
@@ -245,14 +238,10 @@ protected:
 
     bool m_bHasScopeSecond{};
     bool m_bScopeSecondMode{};
-    bool m_bIgnoreScopeSecond{};
 
     bool m_bUseScopeZoom{};
     bool m_bUseScopeGrenadeZoom{};
-    bool m_bUseScopeDOF{};
-    bool m_bForceScopeDOF{};
     bool m_bScopeShowIndicators{true};
-    bool m_bIgnoreScopeTexture{};
 
     float m_fMinZoomK = def_min_zoom_k;
     float m_fZoomStepCount = def_zoom_step_count;
@@ -272,15 +261,8 @@ public:
     virtual void OnZoomOut(bool = false);
     bool IsZoomed() const override { return m_bZoomMode; }
     bool IsAiming() const;
-    CUIStaticItem* ZoomTexture();
-    bool ZoomHideCrosshair()
-    {
-        auto* pA = smart_cast<CActor*>(H_Parent());
-        if (pA && pA->active_cam() == eacLookAt)
-            return false;
 
-        return m_bHideCrosshairInZoom || ZoomTexture();
-    }
+    bool ZoomHideCrosshair();
 
     virtual void OnZoomChanged() {}
 
