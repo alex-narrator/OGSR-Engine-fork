@@ -314,8 +314,6 @@ void CWeapon::Load(LPCSTR section)
     m_eForendStatus             = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "forend_status", 0);
 
     m_bZoomEnabled          = READ_IF_EXISTS(pSettings, r_bool, section, "zoom_enabled", true);
-    m_bUseScopeZoom         = READ_IF_EXISTS(pSettings, r_bool, section, "use_scope_zoom", false);
-    m_bUseScopeGrenadeZoom  = READ_IF_EXISTS(pSettings, r_bool, section, "use_scope_grenade_zoom", false);
     m_bScopeShowIndicators  = READ_IF_EXISTS(pSettings, r_bool, section, "scope_show_indicators", true);
 
     m_fZoomFactor = CurrentZoomFactor();
@@ -1552,29 +1550,27 @@ u8 CWeapon::GetCurrentHudOffsetIdx() const
 {
     if (IsAiming())
     {
-        const bool has_gl = AddonAttachable(eLauncher) && IsAddonAttached(eLauncher);
+        //const bool has_gl = AddonAttachable(eLauncher) && IsAddonAttached(eLauncher);
         const bool has_scope = AddonAttachable(eScope) && IsAddonAttached(eScope);
 
         if (IsSecondScopeMode())
-            return hud_item_measures::m_hands_offset_type_aim_alt;
+        {
+            if (has_scope)
+                return hud_item_measures::m_hands_offset_type_aim_alt_scope;
+            else
+                return hud_item_measures::m_hands_offset_type_aim_alt;
+        }
 
         if (IsGrenadeMode())
         {
-            if (m_bUseScopeGrenadeZoom && has_scope)
+            if (has_scope)
                 return hud_item_measures::m_hands_offset_type_gl_scope;
             else
                 return hud_item_measures::m_hands_offset_type_gl;
         }
-        else if (has_gl)
-        {
-            if (m_bUseScopeZoom && has_scope)
-                return hud_item_measures::m_hands_offset_type_gl_normal_scope;
-            else
-                return hud_item_measures::m_hands_offset_type_aim_gl_normal;
-        }
         else
         {
-            if (m_bUseScopeZoom && has_scope)
+            if (has_scope)
                 return hud_item_measures::m_hands_offset_type_aim_scope;
             else
                 return hud_item_measures::m_hands_offset_type_aim;

@@ -75,14 +75,11 @@ struct hud_item_measures
     {
         m_hands_offset_type_normal, // Не прицеливаемся
         m_hands_offset_type_aim, // Смотрим в механический прицел
-        m_hands_offset_type_aim_alt, // Дивимося у другий приціл
+        m_hands_offset_type_aim_alt, // Дивимося у альтернативний приціл
+        m_hands_offset_type_aim_alt_scope, // Дивимося у альтернативний приціл коли приєднано оптичний приціл
+        m_hands_offset_type_aim_scope, // Смотрим в присоединяемый прицел
         m_hands_offset_type_gl, // Смотрим в механический прицел в режиме ПГ
-        m_hands_offset_type_aim_scope, // Смотрим в присоединяемый нетекстурный прицел (будь то 3д прицел или колиматор) если включен "use_scope_zoom"
-        m_hands_offset_type_gl_scope, // Смотрим в присоединяемый нетекстурный прицел (будь то 3д прицел или колиматор) в режиме ПГ если включен "use_scope_grenade_zoom" - мне вот
-                                      // щас не понятно зачем это надо, но это как-то используют.
-        m_hands_offset_type_aim_gl_normal, // Смотрим в механический прицел если гранатомет присоединен
-        m_hands_offset_type_gl_normal_scope, // Смотрим в присоединяемый нетекстурный прицел (будь то 3д прицел или колиматор) если включен "use_scope_zoom" и гранатомет
-                                             // присоединен
+        m_hands_offset_type_gl_scope, // Дивимось у приціл ПГ із приєднаним оптичним прицілом (сам приціл може заважати прицілюванню з ПГ)
         m_hands_offset_type_size
     };
     Fvector m_hands_offset[m_hands_offset_size][m_hands_offset_type_size]{};

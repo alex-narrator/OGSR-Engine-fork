@@ -239,8 +239,6 @@ protected:
     bool m_bHasScopeSecond{};
     bool m_bScopeSecondMode{};
 
-    bool m_bUseScopeZoom{};
-    bool m_bUseScopeGrenadeZoom{};
     bool m_bScopeShowIndicators{true};
 
     float m_fMinZoomK = def_min_zoom_k;

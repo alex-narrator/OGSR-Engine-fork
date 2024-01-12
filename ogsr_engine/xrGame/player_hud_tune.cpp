@@ -296,12 +296,12 @@ void player_hud::DumpParamsToLog()
             Msg("aim_alt_hud_offset_rot%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
-        else if (idx == hud_item_measures::m_hands_offset_type_gl)
+        else if (idx == hud_item_measures::m_hands_offset_type_aim_alt_scope)
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("gl_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("gl_hud_offset_rot%s	 = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+            Msg("aim_alt_scope_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+            Msg("aim_alt_scope_hud_offset_rot%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
         else if (idx == hud_item_measures::m_hands_offset_type_aim_scope)
@@ -312,31 +312,20 @@ void player_hud::DumpParamsToLog()
             Msg("aim_scope_hud_offset_rot%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
+        else if (idx == hud_item_measures::m_hands_offset_type_gl)
+        {
+            Log("####################################");
+            Msg("[%s]", hud_sect);
+            Msg("gl_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+            Msg("gl_hud_offset_rot%s	 = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+            Log("####################################");
+        }
         else if (idx == hud_item_measures::m_hands_offset_type_gl_scope)
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("scope_grenade_zoom_offset%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("scope_grenade_zoom_rotate_x%s = %f", is_16x9 ? "_16x9" : "", rot_.x);
-            Msg("scope_grenade_zoom_rotate_y%s = %f", is_16x9 ? "_16x9" : "", rot_.y);
-            Log("####################################");
-        }
-        else if (idx == hud_item_measures::m_hands_offset_type_aim_gl_normal)
-        {
-            Log("####################################");
-            Msg("[%s]", hud_sect);
-            Msg("grenade_normal_zoom_offset%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("grenade_normal_zoom_rotate_x%s = %f", is_16x9 ? "_16x9" : "", rot_.x);
-            Msg("grenade_normal_zoom_rotate_y%s = %f", is_16x9 ? "_16x9" : "", rot_.y);
-            Log("####################################");
-        }
-        else if (idx == hud_item_measures::m_hands_offset_type_gl_normal_scope)
-        {
-            Log("####################################");
-            Msg("[%s]", hud_sect);
-            Msg("scope_grenade_normal_zoom_offset%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("scope_grenade_normal_zoom_rotate_x%s = %f", is_16x9 ? "_16x9" : "", rot_.x);
-            Msg("scope_grenade_normal_zoom_rotate_y%s = %f", is_16x9 ? "_16x9" : "", rot_.y);
+            Msg("gl_scope_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+            Msg("gl_scope_hud_offset_rot%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
     }
