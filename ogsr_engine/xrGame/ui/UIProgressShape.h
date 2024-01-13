@@ -11,7 +11,7 @@ class CUIProgressShape : public CUIWindow
 public:
     CUIProgressShape();
     virtual ~CUIProgressShape();
-    void SetPos(int pos, int max);
+    void SetPosWMax(int pos, int max);
     void SetPos(float pos);
     void SetTextVisible(bool b);
 

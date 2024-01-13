@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "UIProgressBar.h"
+#include "UIProgressShape.h"
 
 using namespace luabind;
 
@@ -12,7 +13,12 @@ void CUIProgressBar::script_register(lua_State* L)
                   .def("GetProgressPos", &CUIProgressBar::GetProgressPos)
 
                   .def("GetRange_min", &CUIProgressBar::GetRange_min)
-                  .def("GetRange_max", &CUIProgressBar::GetRange_max)
+                  .def("GetRange_max", &CUIProgressBar::GetRange_max),
+
+            class_<CUIProgressShape, CUIWindow>("CUIProgressShape")
+                  .def(constructor<>())
+                  .def("SetPos", &CUIProgressShape::SetPos)
+                  .def("SetPosWMax", &CUIProgressShape::SetPosWMax)
 
     ];
 }

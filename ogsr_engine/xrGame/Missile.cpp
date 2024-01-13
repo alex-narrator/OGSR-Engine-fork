@@ -27,26 +27,6 @@
 
 float g_fForceGrowSpeed{25.f};
 
-CUIProgressShape* g_MissileForceShape{};
-
-constexpr auto GRENADE_PROGRESS = "grenade.xml";
-
-void create_force_progress()
-{
-    VERIFY(!g_MissileForceShape);
-    CUIXml uiXml;
-    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, GRENADE_PROGRESS);
-    R_ASSERT3(xml_result, "xml file not found: grenade.xml", GRENADE_PROGRESS);
-
-    CUIXmlInit xml_init;
-    g_MissileForceShape = xr_new<CUIProgressShape>();
-    xml_init.InitProgressShape(uiXml, "progress", 0, g_MissileForceShape);
-}
-
-CMissile::CMissile(void) {}
-
-CMissile::~CMissile(void) {}
-
 void CMissile::reinit()
 {
     inherited::reinit();
@@ -695,22 +675,6 @@ u32 CMissile::ef_weapon_type() const
 {
     VERIFY(m_ef_weapon_type != u32(-1));
     return (m_ef_weapon_type);
-}
-
-void CMissile::OnDrawUI()
-{
-    if (GetState() == eReady && !m_throw)
-    {
-        CActor* actor = smart_cast<CActor*>(H_Parent());
-        if (actor)
-        {
-            if (!g_MissileForceShape)
-                create_force_progress();
-            float k = (m_fThrowForce - m_fMinForce) / (GetMaxForce() - m_fMinForce);
-            g_MissileForceShape->SetPos(k);
-            g_MissileForceShape->Draw();
-        }
-    }
 }
 
 void CMissile::ExitContactCallback(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)

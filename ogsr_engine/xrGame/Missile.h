@@ -11,11 +11,10 @@ class CMissile : public CHudItemObject
     typedef CHudItemObject inherited;
 
 public:
-    CMissile();
-    virtual ~CMissile();
+    CMissile(){};
+    virtual ~CMissile(){};
 
     virtual BOOL AlwaysTheCrow() { return TRUE; }
-    virtual void OnDrawUI();
 
     virtual void reinit();
     virtual CMissile* cast_missile() { return this; }

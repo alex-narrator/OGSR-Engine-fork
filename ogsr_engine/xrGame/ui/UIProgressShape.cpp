@@ -25,7 +25,7 @@ CUIProgressShape::~CUIProgressShape()
 
 void CUIProgressShape::SetPos(float pos) { m_stage = pos; }
 
-void CUIProgressShape::SetPos(int pos, int max)
+void CUIProgressShape::SetPosWMax(int pos, int max)
 {
     m_stage = float(pos) / float(max);
     if (m_bText)

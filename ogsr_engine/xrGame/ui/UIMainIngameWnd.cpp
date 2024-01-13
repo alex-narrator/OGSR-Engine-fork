@@ -114,15 +114,11 @@ CUIMainIngameWnd::CUIMainIngameWnd()
     warn_icon_list[ewiOverweight] = &UIOverweightIcon;
 }
 
-#include "UIProgressShape.h"
-extern CUIProgressShape* g_MissileForceShape;
-
 CUIMainIngameWnd::~CUIMainIngameWnd()
 {
     DestroyFlashingIcons();
     xr_delete(UIZoneMap);
     HUD_SOUND::DestroySound(m_contactSnd);
-    xr_delete(g_MissileForceShape);
 }
 
 void CUIMainIngameWnd::Init()
