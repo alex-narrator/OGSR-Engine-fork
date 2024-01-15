@@ -692,6 +692,21 @@ bool CScriptGameObject::addon_IsActorHideout() const
     return actorInhideout;
 }
 
+float CScriptGameObject::get_luminocity()
+{
+    float res = 0.f;
+    if (!g_pGameLevel)
+    {
+        Msg("CScriptGameObject::get_luminocity : Game Level Doesn't Exist.");
+        return res;
+    }
+    auto o = smart_cast<CGameObject*>(&object());
+    if (!o || !o->renderable_ROS())
+        return res;
+    res = o->renderable_ROS()->get_luminocity();
+    return res;
+}
+
 float CScriptGameObject::GetActorJumpSpeed() const
 {
     const CActor* act = smart_cast<CActor*>(&object());

@@ -923,11 +923,6 @@ void CActor::shedule_Update(u32 DT)
         R_ASSERT(0);
     }
 
-    if (this == Level().CurrentViewEntity() && !m_holder)
-    {
-        UpdateMotionIcon(mstate_real);
-    };
-
     NET_Jump = 0;
 
     inherited::shedule_Update(DT);
@@ -1429,33 +1424,26 @@ void CActor::AnimTorsoPlayCallBack(CBlend* B)
 
 void CActor::SetActorVisibility(u16 who, float value)
 {
-    CUIMotionIcon& motion_icon = HUD().GetUI()->UIMainIngameWnd->MotionIcon();
-    motion_icon.SetActorVisibility(who, value);
-}
+    xr_vector<_npc_visibility>::iterator it = std::find(m_npc_visibility.begin(), m_npc_visibility.end(), who);
 
-void CActor::UpdateMotionIcon(u32 mstate_rl)
-{
-    CUIMotionIcon& motion_icon = HUD().GetUI()->UIMainIngameWnd->MotionIcon();
-    if (mstate_rl & mcClimb)
+    if (it == m_npc_visibility.end() && value != 0)
     {
-        motion_icon.ShowState(CUIMotionIcon::stClimb);
+        m_npc_visibility.resize(m_npc_visibility.size() + 1);
+        _npc_visibility& v = m_npc_visibility.back();
+        v.id = who;
+        v.value = value;
+    }
+    else if (fis_zero(value))
+    {
+        if (it != m_npc_visibility.end())
+            m_npc_visibility.erase(it);
     }
     else
     {
-        if (mstate_rl & mcCrouch)
-        {
-            if (!isActorAccelerated(mstate_rl, IsZoomAimingMode()))
-                motion_icon.ShowState(CUIMotionIcon::stCreep);
-            else
-                motion_icon.ShowState(CUIMotionIcon::stCrouch);
-        }
-        else if (mstate_rl & mcSprint)
-            motion_icon.ShowState(CUIMotionIcon::stSprint);
-        else if (!isActorAccelerated(mstate_rl, IsZoomAimingMode()))
-            motion_icon.ShowState(CUIMotionIcon::stRun);
-        else
-            motion_icon.ShowState(CUIMotionIcon::stNormal);
+        (*it).value = value;
     }
+
+    std::sort(m_npc_visibility.begin(), m_npc_visibility.end());
 }
 
 CPHDestroyable* CActor::ph_destroyable() { return smart_cast<CPHDestroyable*>(character_physics_support()); }
@@ -1586,7 +1574,7 @@ bool CActor::is_actor_running() const
 
 bool CActor::is_actor_sprinting() const
 {
-    return mstate_real & (mcJump | mcFall | mcLanding | mcLanding2 | mcLookout | mcCrouch | mcAccel | mcClimb | mcLStrafe | mcRStrafe) ? false :
+    return mstate_real & (mcJump | mcFall | mcLanding | mcLanding2 | mcLookout | mcCrouch | mcAccel | mcClimb /*| mcLStrafe | mcRStrafe*/) ? false :
         (mstate_real & mcFwd && mstate_real & mcSprint)                                                                                ? true :
                                                                                                                                          false;
 }
@@ -1700,3 +1688,6 @@ bool CActor::IsFreeHands() const
         return false;
     return true;
 }
+
+float CActor::GetVisibility() { return m_npc_visibility.size() ? m_npc_visibility.back().value : 0.f; }
+void CActor::ResetVisibility() { m_npc_visibility.clear(); };

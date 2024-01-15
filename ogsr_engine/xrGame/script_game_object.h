@@ -660,6 +660,8 @@ public:
 
     bool addon_IsActorHideout() const; // проверка что актор под каким либо укрытием
 
+    float get_luminocity();
+
     // KD
     // functions for CInventoryOwner class
     CScriptGameObject* ItemOnBelt(u32 item_id) const;

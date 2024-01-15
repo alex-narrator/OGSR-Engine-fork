@@ -453,7 +453,6 @@ public:
     void g_cl_Orientate(u32 mstate_rl, float dt);
     void g_Orientate(u32 mstate_rl, float dt);
     bool g_LadderOrient();
-    void UpdateMotionIcon(u32 mstate_rl);
 
     bool CanAccelerate();
     bool CanJump(float weight);
@@ -797,8 +796,20 @@ public:
     bool m_bHideCrosshair{};
     bool m_bHardCrosshair{true};
 
+    float GetVisibility();
+    void ResetVisibility();
+
 protected:
     svector<float, eRestoreBoostMax> m_ActorItemBoostedParam;
+
+    struct _npc_visibility
+    {
+        u16 id;
+        float value;
+        bool operator==(const u16& _id) { return id == _id; }
+        bool operator<(const _npc_visibility& m) const { return (value < m.value); }
+    };
+    xr_vector<_npc_visibility> m_npc_visibility{};
 };
 
 extern bool isActorAccelerated(u32 mstate, bool ZoomMode);

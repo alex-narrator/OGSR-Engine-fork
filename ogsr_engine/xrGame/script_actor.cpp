@@ -199,7 +199,12 @@ void CScriptActor::script_register(lua_State* L)
 
                .def_readwrite("clear_crouch", &CActor::b_ClearCrouch)
 
-               .def("IsDetectorActive", &CActor::IsDetectorActive),
+               .def("IsDetectorActive", &CActor::IsDetectorActive)
+               .def_readonly("sound_noise", &CActor::m_snd_noise)
+               .def("is_accelerated", &isActorAccelerated)
+
+               .def("get_visibility", &CActor::GetVisibility)
+               .def("reset_visibility", &CActor::ResetVisibility),
                 //move commands
               class_<enum_exporter<EMoveCommand>>("move_command")
                .enum_("commands")[

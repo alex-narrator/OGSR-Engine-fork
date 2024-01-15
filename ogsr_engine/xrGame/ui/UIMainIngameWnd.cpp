@@ -227,9 +227,6 @@ void CUIMainIngameWnd::Init()
 
     uiXml.SetLocalRoot(uiXml.GetRoot());
 
-    AttachChild(&UIMotionIcon);
-    UIMotionIcon.Init();
-
     HUD_SOUND::LoadSound("maingame_ui", "snd_new_contact", m_contactSnd, SOUND_TYPE_IDLE);
 }
 
@@ -649,7 +646,6 @@ void CUIMainIngameWnd::reset_ui()
 {
     m_pActor = NULL;
     m_pPickUpItem = NULL;
-    UIMotionIcon.ResetVisibility();
 }
 
 #include "../xr_3da/XR_IOConsole.h"

@@ -10,7 +10,6 @@
 #include "../alife_space.h"
 
 #include "UICarPanel.h"
-#include "UIMotionIcon.h"
 #include "../hudsound.h"
 #include "../script_export_space.h"
 #include "../inventory.h"
@@ -47,7 +46,6 @@ public:
 
 protected:
     CUIStatic UIStaticQuickHelp;
-    CUIMotionIcon UIMotionIcon;
     CUIZoneMap* UIZoneMap;
 
     // иконка, показывающая количество активных PDA
@@ -135,7 +133,6 @@ protected:
     void RenderQuickInfos();
 
 public:
-    CUIMotionIcon& MotionIcon() { return UIMotionIcon; }
     void OnConnected();
     void reset_ui();
 
