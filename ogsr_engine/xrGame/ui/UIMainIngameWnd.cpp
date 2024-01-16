@@ -8,13 +8,10 @@
 #include "../actor.h"
 #include "../HUDManager.h"
 #include "../PDA.h"
-#include "CustomOutfit.h"
+#include "WeaponMagazined.h"
 #include "../character_info.h"
 #include "../inventory.h"
 #include "../UIGameSP.h"
-#include "../weaponmagazined.h"
-#include "../missile.h"
-#include "../Grenade.h"
 #include "../xrServer_objects_ALife.h"
 #include "../alife_simulator.h"
 #include "../alife_object_registry.h"
@@ -42,12 +39,9 @@
 #include "..\..\xr_3da\xr_input.h"
 #endif
 
-#include "UIScrollView.h"
 #include "map_hint.h"
 #include "UIColorAnimatorWrapper.h"
 #include "../game_news.h"
-
-#include "CustomDetector.h"
 
 using namespace InventoryUtilities;
 

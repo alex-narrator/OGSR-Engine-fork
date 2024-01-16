@@ -19,14 +19,7 @@ struct GAME_NEWS_DATA;
 class CUIPdaMsgListItem;
 class CLAItem;
 class CUIZoneMap;
-class CUIBeltPanel;
-class CUISlotPanel;
-class CUIBoosterPanel;
-class CUIScrollView;
 class CActor;
-class CWeapon;
-class CMissile;
-class CInventoryItem;
 
 class CUIXml;
 class CUIStatic;
