@@ -65,53 +65,11 @@ static CUIMainIngameWnd* GetMainIngameWindow()
     return nullptr;
 }
 
-static CUIStatic* warn_icon_list[CUIMainIngameWnd::ewiMax]{};
-
-// alpet: для возможности внешнего контроля иконок (используется в NLC6 вместо типичных индикаторов). Никак не влияет на игру для остальных модов.
-static bool external_icon_ctrl = false;
-
-// позволяет расцветить иконку или изменить её размер
-static bool SetupGameIcon(CUIMainIngameWnd::EWarningIcons icon, u32 cl, float width, float height)
-{
-    auto window = GetMainIngameWindow();
-    if (!window)
-    {
-        Msg("!![SetupGameIcon] failed due GetMainIngameWindow() returned NULL");
-        return false;
-    }
-
-    R_ASSERT(icon > 0 && icon < std::size(warn_icon_list), "!!Invalid first arg for setup_game_icon!");
-
-    CUIStatic* sIcon = warn_icon_list[icon];
-
-    if (width > 0 && height > 0)
-    {
-        sIcon->SetWidth(width);
-        sIcon->SetHeight(height);
-        sIcon->SetStretchTexture(cl > 0);
-    }
-    else
-        window->SetWarningIconColor(icon, cl);
-
-    external_icon_ctrl = true;
-    return true;
-}
-
 CUIMainIngameWnd::CUIMainIngameWnd()
 {
     m_pActor = nullptr;
     UIZoneMap = xr_new<CUIZoneMap>();
     m_pPickUpItem = nullptr;
-
-    warn_icon_list[ewiWeaponJammed] = &UIWeaponJammedIcon;
-    warn_icon_list[ewiArmor] = &UIArmorIcon;
-    warn_icon_list[ewiRadiation] = &UIRadiaitionIcon;
-    warn_icon_list[ewiWound] = &UIWoundIcon;
-    warn_icon_list[ewiStarvation] = &UIStarvationIcon;
-    warn_icon_list[ewiPsyHealth] = &UIPsyHealthIcon;
-    warn_icon_list[ewiSafehouse] = &UISafehouseIcon;
-    warn_icon_list[ewiInvincible] = &UIInvincibleIcon;
-    warn_icon_list[ewiOverweight] = &UIOverweightIcon;
 }
 
 CUIMainIngameWnd::~CUIMainIngameWnd()
@@ -156,70 +114,6 @@ void CUIMainIngameWnd::Init()
     xml_init.InitStatic(uiXml, "quick_info", 0, &UIStaticQuickHelp);
 
     uiXml.SetLocalRoot(uiXml.GetRoot());
-
-    m_UIIcons = xr_new<CUIStatic>();
-    m_UIIcons->SetAutoDelete(true);
-    xml_init.InitStatic(uiXml, "icons_back", 0, m_UIIcons);
-    b_horz = uiXml.ReadAttrib("icons_back", 0, "horz", 0);
-    AttachChild(m_UIIcons);
-
-    // Загружаем иконки
-    xml_init.InitStatic(uiXml, "starvation_static", 0, &UIStarvationIcon);
-    UIStarvationIcon.Show(false);
-
-    xml_init.InitStatic(uiXml, "psy_health_static", 0, &UIPsyHealthIcon);
-    UIPsyHealthIcon.Show(false);
-
-    xml_init.InitStatic(uiXml, "weapon_jammed_static", 0, &UIWeaponJammedIcon);
-    UIWeaponJammedIcon.Show(false);
-
-    xml_init.InitStatic(uiXml, "armor_static", 0, &UIArmorIcon);
-    UIArmorIcon.Show(false);
-
-    xml_init.InitStatic(uiXml, "radiation_static", 0, &UIRadiaitionIcon);
-    UIRadiaitionIcon.Show(false);
-
-    xml_init.InitStatic(uiXml, "wound_static", 0, &UIWoundIcon);
-    UIWoundIcon.Show(false);
-
-    xml_init.InitStatic(uiXml, "safehouse_static", 0, &UISafehouseIcon);
-    UISafehouseIcon.Show(false);
-
-    xml_init.InitStatic(uiXml, "invincible_static", 0, &UIInvincibleIcon);
-    UIInvincibleIcon.Show(false);
-
-    xml_init.InitStatic(uiXml, "overweight_static", 0, &UIOverweightIcon);
-    UIOverweightIcon.Show(false);
-
-    constexpr const char* warningStrings[] = {
-        "jammed",
-        "armor",
-        "radiation", 
-        "wounds", 
-        "starvation", 
-        "psy",
-        "overweight",
-        //"invincible",
-        //"safehouse",
-    };
-
-    // Загружаем пороговые значения для индикаторов
-    for (int i = 0; i < ewiThresholdMax; ++i)
-    {
-        // Читаем данные порогов для каждого индикатора
-        const char* cfgRecord = pSettings->r_string("main_ingame_indicators_thresholds", warningStrings[i]);
-        u32 count = _GetItemCount(cfgRecord);
-
-        char singleThreshold[5];
-        float f{};
-        for (u32 k = 0; k < count; ++k)
-        {
-            _GetItem(cfgRecord, k, singleThreshold);
-            sscanf(singleThreshold, "%f", &f);
-
-            m_Thresholds[(EWarningIcons)i].push_back(f);
-        }
-    }
 
     // Flashing icons initialize
     uiXml.SetLocalRoot(uiXml.NavigateToNode("flashing_icons"));
@@ -267,104 +161,6 @@ void CUIMainIngameWnd::Update()
             UIPdaOnline.SetText("");
         }
     };
-
-    if (!(Device.dwFrame % 5))
-    {
-        //if (!(Device.dwFrame % 30))
-        {
-            if (GodMode())
-                SetWarningIconColor(ewiInvincible, 0xffffffff);
-            else if (!external_icon_ctrl)
-                TurnOffWarningIcon(ewiInvincible);
-
-            if (m_pActor->HasInfo("safehouse"))
-                SetWarningIconColor(ewiSafehouse, 0xffffffff);
-            else
-                TurnOffWarningIcon(ewiSafehouse);
-
-            //if (m_pActor->GetCarryWeight() > m_pActor->MaxCarryWeight())
-            //    SetWarningIconColor(ewiOverweight, 0xffffffff);
-            //else
-            //    TurnOffWarningIcon(ewiOverweight);
-        }
-
-        auto cond = &m_pActor->conditions();
-
-        for (int i = 0; i < ewiThresholdMax && !external_icon_ctrl; ++i)
-        {
-            float value{};
-            switch (i)
-            {
-            case ewiRadiation: 
-                value = cond->GetRadiation();
-                break;
-            case ewiWound: 
-                value = cond->BleedingSpeed(); 
-                break;
-            case ewiWeaponJammed:
-                if (auto act_item = m_pActor->inventory().ActiveItem())
-                    value = 1.f - act_item->GetCondition();
-                break;
-            case ewiArmor:
-                if (auto outfit = m_pActor->GetOutfit())
-                    value = 1.f - outfit->GetCondition();
-                break;
-            case ewiStarvation: 
-                value = 1 - cond->GetSatiety(); 
-                break;
-            case ewiPsyHealth: 
-                value = 1 - cond->GetPsyHealth(); 
-                break;
-            case ewiOverweight: 
-                value = m_pActor->GetCarryWeight() / m_pActor->MaxCarryWeight(); 
-                break;
-            default: R_ASSERT(!"Unknown type of warning icon");
-            }
-
-            auto icon = (EWarningIcons)i;
-            auto& threshold = m_Thresholds[icon];
-            // Минимальное и максимальное значения границы
-            float min = threshold.front();
-            float max = threshold.back();
-
-            if (threshold.size() > 1)
-            {
-                xr_vector<float>::reverse_iterator rit;
-
-                // Сначала проверяем на точное соответсвие
-                rit = std::find(threshold.rbegin(), threshold.rend(), value);
-
-                // Если его нет, то берем последнее меньшее значение ()
-                if (rit == threshold.rend())
-                    rit = std::find_if(threshold.rbegin(), threshold.rend(), std::bind(std::less<float>(), std::placeholders::_1, value));
-
-                if (rit != threshold.rend())
-                {
-                    float v = *rit;
-                    SetWarningIconColor(icon,
-                                        color_argb(0xFF, clampr<u32>(static_cast<u32>(255 * ((v - min) / (max - min) * 2)), 0, 255),
-                                                   clampr<u32>(static_cast<u32>(255 * (2.0f - (v - min) / (max - min) * 2)), 0, 255), 0));
-                }
-                else
-                    TurnOffWarningIcon(icon);
-            }
-            else
-            {
-                float val = 1 - value;
-                float treshold = 1 - min;
-                clamp<float>(treshold, 0.01, 1.f);
-
-                if (val <= treshold)
-                {
-                    float v = val / treshold;
-                    clamp<float>(v, 0.f, 1.f);
-                    SetWarningIconColor(icon, color_argb(0xFF, 255, clampr<u32>(static_cast<u32>(255 * v), 0, 255), 0));
-                }
-                else
-                    TurnOffWarningIcon(icon);
-            }
-        }
-    }
 
     UIZoneMap->UpdateRadar(Device.vCameraPosition);
     float h, p;
@@ -444,64 +240,6 @@ void CUIMainIngameWnd::ReceiveNews(GAME_NEWS_DATA* news)
     if (pda && pda->IsPowerOn() || !m_pActor->g_Alive())
         HUD().GetUI()->m_pMessagesWnd->AddIconedPdaMessage(*(news->texture_name), news->tex_rect, news->SingleLineText(), news->show_time);
 }
-
-void CUIMainIngameWnd::SetWarningIconColor(CUIStatic* s, const u32 cl)
-{
-    int bOn = (cl >> 24);
-    bool bIsShown = s->IsShown();
-
-    if (bOn)
-        s->SetColor(cl);
-
-    if (bOn && !bIsShown)
-    {
-        //m_UIIcons->AddWindow(s, false);
-        m_UIIcons->AttachChild(s);
-        s->Show(true);
-    }
-
-    if (!bOn && bIsShown)
-    {
-        //m_UIIcons->RemoveWindow(s);
-        m_UIIcons->DetachChild(s);
-        s->Show(false);
-    }
-}
-
-void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
-{
-    // Задаем цвет требуемой иконки
-    switch (icon)
-    {
-    case ewiWeaponJammed: SetWarningIconColor(&UIWeaponJammedIcon, cl); break;
-    case ewiArmor: SetWarningIconColor(&UIArmorIcon, cl); break;
-    case ewiRadiation: SetWarningIconColor(&UIRadiaitionIcon, cl); break;
-    case ewiWound: SetWarningIconColor(&UIWoundIcon, cl); break;
-    case ewiStarvation: SetWarningIconColor(&UIStarvationIcon, cl); break;
-    case ewiPsyHealth: SetWarningIconColor(&UIPsyHealthIcon, cl); break;
-    case ewiSafehouse: SetWarningIconColor(&UISafehouseIcon, cl); break;
-    case ewiInvincible: SetWarningIconColor(&UIInvincibleIcon, cl); break;
-    case ewiOverweight: SetWarningIconColor(&UIOverweightIcon, cl); break;
-
-    default: R_ASSERT(!"Unknown warning icon type"); break;
-    }
-
-    Fvector2 pos{};
-    for (int i = 0; i < icon; ++i)
-    {
-        auto icon = warn_icon_list[i];
-        if (icon->IsShown())
-        {
-            if (b_horz)
-                pos.x += icon->GetWidth();
-            else
-                pos.y += icon->GetHeight();
-        }
-    }
-    warn_icon_list[icon]->SetWndPos(pos);
-}
-
-void CUIMainIngameWnd::TurnOffWarningIcon(EWarningIcons icon) { SetWarningIconColor(icon, 0x00ffffff); }
 
 void CUIMainIngameWnd::SetFlashIconState_(EFlashingIcons type, bool enable)
 {
@@ -711,12 +449,9 @@ using namespace luabind;
 void CUIMainIngameWnd::script_register(lua_State* L)
 {
     module(L)[
-
         class_<CUIMainIngameWnd, CUIWindow>("CUIMainIngameWnd")
             .def("GetStatic", &GetStaticRaw, raw<2>())
-            .def_readwrite("show_zone_map", &CUIMainIngameWnd::m_bShowZoneMap)
-        ,
+            .def_readwrite("show_zone_map", &CUIMainIngameWnd::m_bShowZoneMap),
         def("get_main_window", &GetMainIngameWindow) // get_mainingame_window better??
-        ,
-        def("setup_game_icon", &SetupGameIcon)];
+    ];
 }

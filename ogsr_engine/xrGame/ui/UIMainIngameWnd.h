@@ -56,52 +56,6 @@ public:
     CUIZoneMap* GetUIZoneMap() { return UIZoneMap; }
     bool m_bShowZoneMap{};
 
-protected:
-    // 5 статиков для отображения иконок:
-    // - сломанного оружия
-    // - радиации
-    // - ранения
-    // - голода
-    // - усталости
-    CUIStatic UIWeaponJammedIcon;
-    CUIStatic UIArmorIcon;
-    CUIStatic UIRadiaitionIcon;
-    CUIStatic UIWoundIcon;
-    CUIStatic UIStarvationIcon;
-    CUIStatic UIPsyHealthIcon;
-    CUIStatic UIInvincibleIcon;
-    CUIStatic UISafehouseIcon;
-    CUIStatic UIOverweightIcon;
-
-    CUIStatic* m_UIIcons{};
-    bool b_horz{};
-
-public:
-    // Енумы соответсвующие предупреждающим иконкам
-    enum EWarningIcons
-    {
-        ewiWeaponJammed,
-        ewiArmor,
-        ewiRadiation,
-        ewiWound,
-        ewiStarvation,
-        ewiPsyHealth,
-        ewiOverweight,
-        ewiThresholdMax,
-        ewiInvincible = ewiThresholdMax,
-        ewiSafehouse,
-        ewiMax,
-    };
-
-    // Задаем цвет соответствующей иконке
-    void SetWarningIconColor(EWarningIcons icon, const u32 cl);
-    void TurnOffWarningIcon(EWarningIcons icon);
-
-    // Пороги изменения цвета индикаторов, загружаемые из system.ltx
-    typedef xr_map<EWarningIcons, xr_vector<float>> Thresholds;
-    typedef Thresholds::iterator Thresholds_it;
-    Thresholds m_Thresholds;
-
     // Енум перечисления возможных мигающих иконок
     enum EFlashingIcons
     {
@@ -117,7 +71,6 @@ public:
     void ReceiveNews(GAME_NEWS_DATA* news);
 
 protected:
-    void SetWarningIconColor(CUIStatic* s, const u32 cl);
     void InitFlashingIcons(CUIXml* node);
     void DestroyFlashingIcons();
     void UpdateFlashingIcons();
