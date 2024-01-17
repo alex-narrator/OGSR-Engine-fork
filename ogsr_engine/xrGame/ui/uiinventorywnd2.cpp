@@ -587,18 +587,7 @@ void CUIInventoryWnd::ClearAllLists()
     m_pUIGasmaskList->ClearAll(true);
 }
 
-void CUIInventoryWnd::ReinitBeltList()
-{
-    for (u32 i = 0; i < m_pUIBeltList->ItemsCount(); ++i)
-    {
-        auto itm = m_pUIBeltList->GetItemIdx(i);
-        PIItem iitem = (PIItem)itm->m_pData;
-        AddItemToBag(iitem);
-    }
-    m_pUIBeltList->ClearAll(true);
-}
-
-void CUIInventoryWnd::ReinitSlotList(u32 slot)
+void CUIInventoryWnd::ClearSlotList(u32 slot)
 {
     auto slot_list = GetSlotList(slot);
     if (!slot_list)

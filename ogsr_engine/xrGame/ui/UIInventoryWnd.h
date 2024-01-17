@@ -145,7 +145,6 @@ public:
     PIItem CurrentIItem();
     // обновление отрисовки сетки пояса
     void UpdateCustomDraw();
-    void ReinitBeltList();
-    void ReinitSlotList(u32);
+    void ClearSlotList(u32);
     void TryReinitLists(PIItem);
 };

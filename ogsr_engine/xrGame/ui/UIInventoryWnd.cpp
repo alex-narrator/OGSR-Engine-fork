@@ -466,10 +466,9 @@ void CUIInventoryWnd::TryReinitLists(PIItem iitem)
     if (!iitem->GetSlotsLocked().empty() || !!iitem->GetSlotsUnlocked().empty())
     {
         for (const auto& slot : iitem->GetSlotsLocked())
-            ReinitSlotList(slot);
+            ClearSlotList(slot);
         for (const auto& slot : iitem->GetSlotsUnlocked())
-            ReinitSlotList(slot);
-    }       
-    ReinitBeltList();
+            ClearSlotList(slot);
+    }
     UpdateCustomDraw();
 }
