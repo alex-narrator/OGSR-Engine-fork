@@ -84,109 +84,17 @@ void CUIInventoryWnd::InitInventory()
     };
 
     // Slots
-    PIItem _itm = m_pInv->m_slots[KNIFE_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
+    for (u8 i = 0; i < SLOTS_TOTAL; i++)
     {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIKnifeList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[FIRST_WEAPON_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIFirstWeaponList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[SECOND_WEAPON_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUISecondWeaponList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[APPARATUS_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIBinocularList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[GRENADE_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIGrenadeList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[ARTEFACT_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIArtefactList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[BOLT_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIBoltList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[DETECTOR_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIDetectorList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[TORCH_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIOnHeadList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[PDA_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIPdaList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[HELMET_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIHelmetList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[BACKPACK_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIBackPackList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[OUTFIT_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIOutfitList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[VEST_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIVestList->SetItem(itm);
-    }
-
-    _itm = m_pInv->m_slots[GASMASK_SLOT].m_pIItem;
-    if (_itm && show_item(_itm))
-    {
-        CUICellItem* itm = create_cell_item(_itm);
-        m_pUIGasmaskList->SetItem(itm);
+        auto slot_ddlist = m_slots_array[i];
+        if (!slot_ddlist)
+            continue;
+        auto _itm = m_pInv->m_slots[i].m_pIItem;
+        if (_itm && show_item(_itm))
+        {
+            CUICellItem* itm = create_cell_item(_itm);
+            slot_ddlist->SetItem(itm);
+        }
     }
 
     std::sort(m_pInv->m_belt.begin(), m_pInv->m_belt.end(), InventoryUtilities::GreaterRoomInRuck);
@@ -413,18 +321,11 @@ bool CUIInventoryWnd::OnItemStartDrag(CUICellItem* itm)
 bool CUIInventoryWnd::OnItemSelected(CUICellItem* itm)
 {
     SetCurrentItem(itm);
-
-    itm->ColorizeItems({m_pUIBagList, m_pUIBeltList,
-                        //
-                        m_pUIOutfitList, m_pUIHelmetList, m_pUIBackPackList,
-                        //
-                        m_pUIKnifeList, m_pUIFirstWeaponList, m_pUISecondWeaponList, m_pUIBinocularList,
-                        //
-                        m_pUIGrenadeList, m_pUIArtefactList, m_pUIBoltList,
-                        //
-                        m_pUIDetectorList, m_pUIOnHeadList, m_pUIPdaList,
-                        //
-                        m_pUIVestList, m_pUIGasmaskList});
+    xr_vector<CUIDragDropListEx*> list{m_pUIBagList, m_pUIBeltList};
+    for (const auto& ddlist : m_slots_array)
+        if (ddlist)
+            list.push_back(ddlist);
+    itm->ColorizeItems(list);
     return false;
 }
 
@@ -566,25 +467,9 @@ void CUIInventoryWnd::ClearAllLists()
     m_pUIBagList->ClearAll(true);
     m_pUIBeltList->ClearAll(true);
     //
-    m_pUIOutfitList->ClearAll(true);
-    m_pUIHelmetList->ClearAll(true);
-    m_pUIBackPackList->ClearAll(true);
-    //
-    m_pUIKnifeList->ClearAll(true);
-    m_pUIFirstWeaponList->ClearAll(true);
-    m_pUISecondWeaponList->ClearAll(true);
-    m_pUIBinocularList->ClearAll(true);
-    //
-    m_pUIGrenadeList->ClearAll(true);
-    m_pUIArtefactList->ClearAll(true);
-    m_pUIBoltList->ClearAll(true);
-    //
-    m_pUIDetectorList->ClearAll(true);
-    m_pUIOnHeadList->ClearAll(true);
-    m_pUIPdaList->ClearAll(true);
-    //
-    m_pUIVestList->ClearAll(true);
-    m_pUIGasmaskList->ClearAll(true);
+    for (const auto& ddlist : m_slots_array)
+        if (ddlist)
+            ddlist->ClearAll(true);
 }
 
 void CUIInventoryWnd::ClearSlotList(u32 slot)

@@ -438,19 +438,12 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
     xr_strconcat(val_name, "aim_hud_offset_pos", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
         xr_strcpy(val_name, "aim_hud_offset_pos");
-    if (!pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, "zoom_offset"))
-        m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim] = pSettings->r_fvector3(sect_name, "zoom_offset");
-    else
-        m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
+    m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
 
     xr_strconcat(val_name, "aim_hud_offset_rot", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
         xr_strcpy(val_name, "aim_hud_offset_rot");
-    if (!pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, "zoom_rotate_x") && pSettings->line_exist(sect_name, "zoom_rotate_y"))
-        m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim] =
-            Fvector().set(pSettings->r_float(sect_name, "zoom_rotate_x"), pSettings->r_float(sect_name, "zoom_rotate_y"), 0.f);
-    else
-        m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
+    m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
 
     auto aim_pos = m_hands_offset[m_hands_offset_pos];
     auto aim_rot = m_hands_offset[m_hands_offset_rot];

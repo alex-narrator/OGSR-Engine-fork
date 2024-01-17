@@ -75,28 +75,8 @@ protected:
     CUIDragDropListEx* m_pUIBagList{};
     CUIDragDropListEx* m_pUIBeltList{};
 
-    CUIDragDropListEx* m_pUIOutfitList{};
-    CUIDragDropListEx* m_pUIHelmetList{};
-    CUIDragDropListEx* m_pUIBackPackList{};
-
-    CUIDragDropListEx* m_pUIKnifeList{};
-    CUIDragDropListEx* m_pUIFirstWeaponList{};
-    CUIDragDropListEx* m_pUISecondWeaponList{};
-    CUIDragDropListEx* m_pUIBinocularList{};
-
-    CUIDragDropListEx* m_pUIGrenadeList{};
-    CUIDragDropListEx* m_pUIArtefactList{};
-    CUIDragDropListEx* m_pUIBoltList{};
-
-    CUIDragDropListEx* m_pUIDetectorList{};
-    CUIDragDropListEx* m_pUIOnHeadList{};
-    CUIDragDropListEx* m_pUIPdaList{};
-
-    CUIDragDropListEx* m_pUIVestList{};
-    CUIDragDropListEx* m_pUIGasmaskList{};
-
     // alpet: для индексированного доступа
-    CUIDragDropListEx* m_slots_array[SLOTS_TOTAL];
+    CUIDragDropListEx* m_slots_array[SLOTS_TOTAL]{};
 
     void ClearAllLists();
     void BindDragDropListEvents(CUIDragDropListEx* lst);

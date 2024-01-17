@@ -277,7 +277,7 @@ void CUICellItem::Update()
     }
 }
 
-void CUICellItem::ColorizeItems(std::initializer_list<CUIDragDropListEx*> args)
+void CUICellItem::ColorizeItems(xr_vector<CUIDragDropListEx*> args)
 {
     auto inventoryitem = reinterpret_cast<CInventoryItem*>(this->m_pData);
     if (!inventoryitem)

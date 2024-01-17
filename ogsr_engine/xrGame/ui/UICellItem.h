@@ -64,7 +64,7 @@ public:
     int m_index;
     bool m_b_already_drawn;
     bool m_b_destroy_childs;
-    void ColorizeItems(std::initializer_list<CUIDragDropListEx*>);
+    void ColorizeItems(xr_vector<CUIDragDropListEx*>);
     bool m_selected;
     bool m_select_armament;
     bool m_select_equipped;

@@ -75,117 +75,19 @@ void CUIInventoryWnd::Init()
     xml_init.InitDragDropListEx(uiXml, "dragdrop_belt", 0, m_pUIBeltList);
     BindDragDropListEvents(m_pUIBeltList);
 
-    m_pUIOutfitList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIOutfitList);
-    m_pUIOutfitList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_outfit", 0, m_pUIOutfitList);
-    BindDragDropListEvents(m_pUIOutfitList);
-
-    m_pUIHelmetList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIHelmetList);
-    m_pUIHelmetList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_helmet", 0, m_pUIHelmetList);
-    BindDragDropListEvents(m_pUIHelmetList);
-
-    m_pUIBackPackList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIBackPackList);
-    m_pUIBackPackList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_backpack", 0, m_pUIBackPackList);
-    BindDragDropListEvents(m_pUIBackPackList);
-
-    m_pUIKnifeList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIKnifeList);
-    m_pUIKnifeList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_knife", 0, m_pUIKnifeList);
-    BindDragDropListEvents(m_pUIKnifeList);
-
-    m_pUIFirstWeaponList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIFirstWeaponList);
-    m_pUIFirstWeaponList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_first_weapon", 0, m_pUIFirstWeaponList);
-    BindDragDropListEvents(m_pUIFirstWeaponList);
-
-    m_pUISecondWeaponList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUISecondWeaponList);
-    m_pUISecondWeaponList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_second_weapon", 0, m_pUISecondWeaponList);
-    BindDragDropListEvents(m_pUISecondWeaponList);
-
-    m_pUIBinocularList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIBinocularList);
-    m_pUIBinocularList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_binocular", 0, m_pUIBinocularList);
-    BindDragDropListEvents(m_pUIBinocularList);
-
-    m_pUIGrenadeList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIGrenadeList);
-    m_pUIGrenadeList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_grenade", 0, m_pUIGrenadeList);
-    BindDragDropListEvents(m_pUIGrenadeList);
-
-    m_pUIArtefactList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIArtefactList);
-    m_pUIArtefactList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_artefact", 0, m_pUIArtefactList);
-    BindDragDropListEvents(m_pUIArtefactList);
-
-    m_pUIBoltList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIBoltList);
-    m_pUIBoltList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_bolt", 0, m_pUIBoltList);
-    BindDragDropListEvents(m_pUIBoltList);
-
-    m_pUIDetectorList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIDetectorList);
-    m_pUIDetectorList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_detector", 0, m_pUIDetectorList);
-    BindDragDropListEvents(m_pUIDetectorList);
-
-    m_pUIOnHeadList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIOnHeadList);
-    m_pUIOnHeadList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_torch", 0, m_pUIOnHeadList);
-    BindDragDropListEvents(m_pUIOnHeadList);
-
-    m_pUIPdaList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIPdaList);
-    m_pUIPdaList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_pda", 0, m_pUIPdaList);
-    BindDragDropListEvents(m_pUIPdaList);
-
-    m_pUIVestList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIVestList);
-    m_pUIVestList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_vest", 0, m_pUIVestList);
-    BindDragDropListEvents(m_pUIVestList);
-
-    m_pUIGasmaskList = xr_new<CUIDragDropListEx>();
-    AttachChild(m_pUIGasmaskList);
-    m_pUIGasmaskList->SetAutoDelete(true);
-    xml_init.InitDragDropListEx(uiXml, "dragdrop_gasmask", 0, m_pUIGasmaskList);
-    BindDragDropListEvents(m_pUIGasmaskList);
-
+    string256 temp;
     for (u8 i = 0; i < SLOTS_TOTAL; i++)
-        m_slots_array[i] = NULL;
-    m_slots_array[OUTFIT_SLOT] = m_pUIOutfitList;
-    m_slots_array[HELMET_SLOT] = m_pUIHelmetList;
-    m_slots_array[BACKPACK_SLOT] = m_pUIBackPackList;
-
-    m_slots_array[KNIFE_SLOT] = m_pUIKnifeList;
-    m_slots_array[FIRST_WEAPON_SLOT] = m_pUIFirstWeaponList;
-    m_slots_array[SECOND_WEAPON_SLOT] = m_pUISecondWeaponList;
-    m_slots_array[APPARATUS_SLOT] = m_pUIBinocularList;
-
-    m_slots_array[GRENADE_SLOT] = m_pUIGrenadeList;
-    m_slots_array[ARTEFACT_SLOT] = m_pUIArtefactList;
-    m_slots_array[BOLT_SLOT] = m_pUIBoltList;
-
-    m_slots_array[DETECTOR_SLOT] = m_pUIDetectorList;
-    m_slots_array[TORCH_SLOT] = m_pUIOnHeadList;
-    m_slots_array[PDA_SLOT] = m_pUIPdaList;
-
-    m_slots_array[VEST_SLOT] = m_pUIVestList;
-    m_slots_array[GASMASK_SLOT] = m_pUIGasmaskList;
+    {
+        sprintf_s(temp, "slot_persistent_%d", i);
+        if (READ_IF_EXISTS(pSettings, r_bool, "inventory", temp, false))
+            continue;
+        m_slots_array[i] = xr_new<CUIDragDropListEx>();
+        AttachChild(m_slots_array[i]);
+        m_slots_array[i]->SetAutoDelete(true);
+        BindDragDropListEvents(m_slots_array[i]);
+        sprintf_s(temp, "dragdrop_slot_%d", i);
+        xml_init.InitDragDropListEx(uiXml, temp, 0, m_slots_array[i]);
+    }
     
     // pop-up menu
     AttachChild(&UIPropertiesBox);
