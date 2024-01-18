@@ -55,13 +55,22 @@ bool CUIInventoryCellItem::EqualTo(CUICellItem* itm)
     if (fl1.test(CInventoryItem::FIUngroupable) || fl2.test(CInventoryItem::FIUngroupable))
         return false;
 
+    bool b_script_equal{true};
+    if (pSettings->line_exist("engine_callbacks", "is_cell_items_equal"))
+    {
+        const char* callback = pSettings->r_string("engine_callbacks", "is_cell_items_equal");
+        if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
+            b_script_equal = lua_function(item1->object().lua_game_object(), item2->object().lua_game_object());
+    }
+
     return (fsimilar(object()->GetCondition(), ci->object()->GetCondition(), 0.01f) && 
             fsimilar(object()->Weight(), ci->object()->Weight(), 0.01f) &&
             fsimilar(object()->GetItemEffect(CInventoryItem::eRadiationRestoreSpeed), ci->object()->GetItemEffect(CInventoryItem::eRadiationRestoreSpeed), 0.01f) &&
             object()->object().cNameSect() == ci->object()->object().cNameSect() && 
             object()->m_eItemPlace == ci->object()->m_eItemPlace &&
             object()->Cost() == ci->object()->Cost() && 
-            object()->GetMarked() == ci->object()->GetMarked()
+            object()->GetMarked() == ci->object()->GetMarked() && 
+            b_script_equal
         );
 }
 

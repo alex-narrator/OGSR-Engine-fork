@@ -272,7 +272,7 @@ void CUICellItem::Update()
     {
         PIItem itm = (PIItem)m_pData;
         const char* callback = pSettings->r_string("engine_callbacks", "on_cell_item_update");
-        if (luabind::functor<LPCSTR> lua_function; ai().script_engine().functor(callback, lua_function))
+        if (luabind::functor<void> lua_function; ai().script_engine().functor(callback, lua_function))
             lua_function(itm->object().lua_game_object(), (CUIWindow*)this);
     }
 }
