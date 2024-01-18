@@ -92,7 +92,7 @@ bool CCustomDevice::CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate)
     if (bres)
     {
         if (CWeapon* W = smart_cast<CWeapon*>(itm))
-            bres = bres && (W->GetState() != CHUDState::eBore) && (W->GetState() != CWeapon::eReload) && (W->GetState() != CWeapon::eSwitch);
+            bres = bres && (W->GetState() != CHUDState::eBore) && (W->GetState() != CWeapon::eReload) && (W->GetState() != CWeapon::eSwitch) && (W->GetState() != CWeapon::eShutter);
     }
 
     return bres;
@@ -302,7 +302,7 @@ void CCustomDevice::UpdateVisibility()
                     else if (!IsZoomed() && GetState() == eIdleZoom)
                         SwitchState(eIdleZoomOut);
                 }
-                if (state == eReload || state == eSwitch)
+                if (state == eReload || state == eSwitch || state == eShutter)
                 {
                     if (GetState() == eThrowStart || GetState() == eThrow)
                         SwitchState(eIdle);
