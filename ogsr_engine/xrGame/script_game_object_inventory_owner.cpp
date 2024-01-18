@@ -987,7 +987,7 @@ CScriptGameObject* CScriptGameObject::active_device() const
     {
         auto item = smart_cast<CCustomDevice*>(result->m_parent_hud_item);
         VERIFY(item);
-        return (item->GetHUDmode() ? item->lua_game_object() : nullptr);
+        return (item->GetHUDmode() && !item->IsHidden() ? item->lua_game_object() : nullptr);
     }
     return nullptr;
 }
