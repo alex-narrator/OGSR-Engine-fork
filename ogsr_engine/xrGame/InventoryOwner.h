@@ -27,7 +27,6 @@ class CPurchaseList;
 class CWeapon;
 class CCustomOutfit;
 class CHelmet;
-class CVest;
 class CInventoryContainer;
 struct SHit;
 
@@ -152,7 +151,6 @@ public:
     virtual CCustomOutfit* GetOutfit() const { return nullptr; };
     virtual CInventoryContainer* GetBackpack() const { return nullptr; };
     virtual CHelmet* GetHelmet() const { return nullptr; };
-    virtual CVest* GetVest() const { return nullptr; };
 
     virtual void HitItemsInRuck(SHit* pHDS){};
 

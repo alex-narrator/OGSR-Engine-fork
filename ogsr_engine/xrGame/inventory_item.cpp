@@ -222,6 +222,18 @@ void CInventoryItem::Load(LPCSTR section)
             m_slots_unlocked.push_back(atoi(_GetItem(str, i, item_section)));
         }
     }
+
+    // covered bones
+    auto covered_bones_sect = READ_IF_EXISTS(pSettings, r_string, section, "covered_bones_sect", nullptr);
+    if (covered_bones_sect && pSettings->section_exist(covered_bones_sect))
+    {
+        for (int i = 0, count = pSettings->line_count(covered_bones_sect); i < count; ++i)
+        {
+            LPCSTR name, value;
+            pSettings->r_line(covered_bones_sect, i, &name, &value);
+            m_covered_bones.push_back(name);
+        }
+    }
 }
 
 void CInventoryItem::ChangeCondition(float fDeltaCondition)
@@ -897,19 +909,31 @@ float CInventoryItem::HitThruArmour(SHit* pHDS)
     if (!actor)
         return hit_power;
 
+    bool b_to_covered_bone{m_covered_bones.empty() || pHDS->boneID == BI_NONE};
+    if (!b_to_covered_bone)
+        for (const auto& bone : m_covered_bones)
+            if (!xr_strcmp(smart_cast<IKinematics*>(actor->Visual())->LL_BoneName_dbg(pHDS->boneID), bone))
+            {
+                b_to_covered_bone = true;
+                break;
+            }
+
+    if (!b_to_covered_bone)
+        return hit_power;
+
     auto hit_type = pHDS->type();
-    float ba = m_boneProtection->getBoneArmour(pHDS->bone()) * !fis_zero(GetCondition());
 
     if (hit_type == ALife::eHitTypeFireWound)
     {
         // броню не пробито, хіт тільки від умовного удару в броню
+        float ba = m_boneProtection->getBoneArmour(pHDS->bone()) * !fis_zero(GetCondition());
         if (pHDS->ap < ba)
             hit_power *= m_boneProtection->m_fHitFrac;
     }
     else
         hit_power *= (1.0f - GetHitTypeProtection(hit_type));
 
-        Hit(pHDS);
+    Hit(pHDS);
 
     return hit_power;
 }

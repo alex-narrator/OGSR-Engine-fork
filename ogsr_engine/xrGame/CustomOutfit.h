@@ -15,8 +15,6 @@ public:
 
     virtual void Load(LPCSTR section);
 
-    float HitThruArmour(SHit* pHDS);
-
     virtual float GetHitTypeProtection(int) const override;
 
     virtual void OnMoveToSlot(EItemPlace prevPlace) override;
@@ -31,6 +29,4 @@ private:
 
 public:
     virtual u32 ef_equipment_type() const;
-
-    bool m_bIsHelmetBuiltIn{};
 };

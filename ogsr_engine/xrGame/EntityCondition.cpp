@@ -4,7 +4,6 @@
 #include "customoutfit.h"
 #include "InventoryContainer.h"
 #include "Helmet.h"
-#include "Vest.h"
 #include "inventory.h"
 #include "wound.h"
 #include "level.h"
@@ -277,9 +276,6 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
     else
         pInvOwner->HitItemsInRuck(&calc_hit);
 
-    if (auto vest = pInvOwner->GetVest())
-        calc_hit.power = vest->HitThruArmour(&calc_hit);
-
     if (auto outfit = pInvOwner->GetOutfit())
         calc_hit.power = outfit->HitThruArmour(&calc_hit);
 
@@ -303,11 +299,8 @@ float CEntityCondition::HitPowerEffect(float power_loss)
     if (auto pHelmet = pInvOwner->GetHelmet())
         res += base_power_loss * pHelmet->GetPowerLoss();
 
-    if (auto pVest = pInvOwner->GetVest())
-        res += base_power_loss * pVest->GetPowerLoss();
-
-    if (auto pGasmask = pInvOwner->inventory().m_slots[GASMASK_SLOT].m_pIItem)
-        res += base_power_loss * pGasmask->GetPowerLoss();
+    if (auto pBackpack = pInvOwner->GetBackpack())
+        res += base_power_loss * pBackpack->GetPowerLoss();
 
     return res;
 }

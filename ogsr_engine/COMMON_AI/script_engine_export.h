@@ -129,7 +129,6 @@
 #include "RGD5.h"
 #include "Addons.h"
 #include "StalkerOutfit.h"
-#include "Vest.h"
 #include "Torch.h"
 #include "InfoDocument.h"
 #include "script_actor.h"

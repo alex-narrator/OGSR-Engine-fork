@@ -6041,9 +6041,6 @@
     <ClInclude Include="Flashlight.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices\Flashlight</Filter>
     </ClInclude>
-    <ClInclude Include="Vest.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -8815,9 +8812,6 @@
     </ClCompile>
     <ClCompile Include="flashlight_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices\Flashlight</Filter>
-    </ClCompile>
-    <ClCompile Include="Vest.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

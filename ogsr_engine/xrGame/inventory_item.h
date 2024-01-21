@@ -255,6 +255,7 @@ protected:
     float m_holder_range_modifier;
     float m_holder_fov_modifier;
     SBoneProtections* m_boneProtection;
+    xr_vector<shared_str> m_covered_bones{};
 
 public:
     virtual void modify_holder_params(float& range, float& fov) const;

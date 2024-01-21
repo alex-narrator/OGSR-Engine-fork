@@ -24,7 +24,6 @@ class CActorCondition;
 class CCustomOutfit;
 class CInventoryContainer;
 class CHelmet;
-class CVest;
 class CTorch;
 class CCustomDetectorSHOC;
 class CCustomDetector;
@@ -659,7 +658,6 @@ public:
     virtual CInventoryContainer* GetBackpack() const;
     virtual CHelmet* GetHelmet() const;
     virtual CTorch* GetTorch() const;
-    virtual CVest* GetVest() const;
 
     virtual CCustomDetectorSHOC* GetDetectorSHOC() const;
     virtual CCustomDetector* GetDetector() const;

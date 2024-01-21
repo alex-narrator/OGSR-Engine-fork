@@ -25,8 +25,6 @@ void CSE_ALifeItemBolt::script_register(lua_State* L) { module(L)[luabind_class_
 
 void CSE_ALifeItemCustomOutfit::script_register(lua_State* L) { module(L)[luabind_class_item1(CSE_ALifeItemCustomOutfit, "cse_alife_item_custom_outfit", CSE_ALifeItem)]; }
 
-void CSE_ALifeItemVest::script_register(lua_State* L) { module(L)[luabind_class_item1(CSE_ALifeItemVest, "cse_alife_item_vest", CSE_ALifeItem)]; }
-
 void CSE_ALifeItemWeaponMagazined::script_register(lua_State* L)
 {
     module(L)[luabind_class_item1(CSE_ALifeItemWeaponMagazined, "cse_alife_item_weapon_magazined", CSE_ALifeItemWeapon)];

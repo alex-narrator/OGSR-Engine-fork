@@ -22,17 +22,7 @@ void CCustomOutfit::Load(LPCSTR section)
     m_ActorVisual = READ_IF_EXISTS(pSettings, r_string, section, "actor_visual", nullptr);
 
     m_ef_equipment_type = pSettings->r_u32(section, "ef_equipment_type");
-
-    m_bIsHelmetBuiltIn = std::find(m_slots_locked.begin(), m_slots_locked.end(), HELMET_SLOT) != m_slots_locked.end();
 }
-
-float CCustomOutfit::HitThruArmour(SHit* pHDS)
-{
-    auto actor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner());
-    if (!actor || actor->IsHitToHead(pHDS) && !m_bIsHelmetBuiltIn)
-        return pHDS->damage();
-    return inherited::HitThruArmour(pHDS);
-};
 
 float CCustomOutfit::GetHitTypeProtection(int hit_type) const { return (hit_type == ALife::eHitTypeFireWound) ? 0.f : inherited::GetHitTypeProtection(hit_type); }
 
@@ -51,7 +41,6 @@ void CCustomOutfit::OnMoveToSlot(EItemPlace prevPlace)
                 g_player_hud->load(pSettings->r_string(cNameSect(), "player_hud_section"));
             else
                 g_player_hud->load_default();
-            m_pCurrentInventory->DropBeltToRuck();
         }
     }
 }
@@ -74,7 +63,6 @@ void CCustomOutfit::OnMoveToRuck(EItemPlace prevPlace)
                 }
             }
             g_player_hud->load_default();
-            m_pCurrentInventory->DropBeltToRuck();
         }
     }
 }

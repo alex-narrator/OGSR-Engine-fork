@@ -240,7 +240,6 @@ bool CScriptGameObject::IsInvBoxEmpty()
 #include "actor.h"
 #include "customoutfit.h"
 #include "Helmet.h"
-#include "Vest.h"
 #include "customzone.h"
 #include "ai\monsters\basemonster\base_monster.h"
 #include "Artifact.h"
@@ -282,7 +281,6 @@ TEST_OBJECT_CLASS(CScriptGameObject::IsEatableItem, CEatableItem)
 TEST_OBJECT_CLASS(CScriptGameObject::IsAntirad, CAntirad)
 TEST_OBJECT_CLASS(CScriptGameObject::IsCustomOutfit, CCustomOutfit)
 TEST_OBJECT_CLASS(CScriptGameObject::IsHelmet, CHelmet)
-TEST_OBJECT_CLASS(CScriptGameObject::IsVest, CVest)
 TEST_OBJECT_CLASS(CScriptGameObject::IsScope, CScope)
 TEST_OBJECT_CLASS(CScriptGameObject::IsSilencer, CSilencer)
 TEST_OBJECT_CLASS(CScriptGameObject::IsGrenadeLauncher, CGrenadeLauncher)

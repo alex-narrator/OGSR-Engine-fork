@@ -24,7 +24,6 @@
 #include "CustomOutfit.h"
 #include "Helmet.h"
 #include "Torch.h"
-#include "Vest.h"
 #include "actorcondition.h"
 #include "UIGameCustom.h"
 
@@ -1318,8 +1317,6 @@ void CActor::UpdateItemsEffect()
         auto outfit = GetOutfit();
         auto helmet = GetHelmet();
         auto backpack = GetBackpack();
-        auto vest = GetVest();
-        auto gasmask = inventory().m_slots[GASMASK_SLOT].m_pIItem;
 
         if (i == eRadiationBoost)
         {
@@ -1335,10 +1332,6 @@ void CActor::UpdateItemsEffect()
                         radiation_restore_speed *= (1.f - backpack->GetHitTypeProtection(ALife::eHitTypeRadiation));
                     if (helmet && inventory().InRuck(item)) // шолом захищає від радіації речей у рюкзаку
                         radiation_restore_speed *= (1.f - helmet->GetHitTypeProtection(ALife::eHitTypeRadiation));
-                    if (vest && inventory().InRuck(item)) // бронік захищає від радіації речей у рюкзаку
-                        radiation_restore_speed *= (1.f - vest->GetHitTypeProtection(ALife::eHitTypeRadiation));
-                    if (gasmask && inventory().InRuck(item)) // протигаз захищає від радіації речей у рюкзаку
-                        radiation_restore_speed *= (1.f - gasmask->GetHitTypeProtection(ALife::eHitTypeRadiation));
                 }
                 m_ActorItemBoostedParam[i] += radiation_restore_speed;
             }
@@ -1356,12 +1349,6 @@ void CActor::UpdateItemsEffect()
             // backpack
             if (backpack && !fis_zero(backpack->GetCondition()))
                 m_ActorItemBoostedParam[i] += backpack->GetItemEffect(i);
-            // vest
-            if (vest && !fis_zero(vest->GetCondition()))
-                m_ActorItemBoostedParam[i] += vest->GetItemEffect(i);
-            // gasmask
-            if (gasmask && !fis_zero(gasmask->GetCondition()))
-                m_ActorItemBoostedParam[i] += gasmask->GetItemEffect(i);
         }
         // apllying boost on actor *_restore conditions
         cond->ApplyRestoreBoost(i, m_ActorItemBoostedParam[i] * f_update_time);
@@ -1522,7 +1509,6 @@ bool CActor::is_on_ground() { return (character_physics_support()->movement()->E
 CCustomOutfit* CActor::GetOutfit() const { return smart_cast<CCustomOutfit*>(inventory().ItemFromSlot(OUTFIT_SLOT)); }
 CInventoryContainer* CActor::GetBackpack() const { return smart_cast<CInventoryContainer*>(inventory().ItemFromSlot(BACKPACK_SLOT)); }
 CHelmet* CActor::GetHelmet() const { return smart_cast<CHelmet*>(inventory().ItemFromSlot(HELMET_SLOT)); }
-CVest* CActor::GetVest() const { return smart_cast<CVest*>(inventory().ItemFromSlot(VEST_SLOT)); };
 CTorch* CActor::GetTorch() const { return smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT)); }
 CCustomDetectorSHOC* CActor::GetDetectorSHOC() const { return smart_cast<CCustomDetectorSHOC*>(inventory().ItemFromSlot(DETECTOR_SLOT)); }
 CCustomDetector* CActor::GetDetector() const { return smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)); }

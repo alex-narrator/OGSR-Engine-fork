@@ -9,8 +9,6 @@ public:
     CHelmet(){};
     virtual ~CHelmet(){};
 
-    float HitThruArmour(SHit* pHDS);
-
     virtual float GetHitTypeProtection(int) const override;
 
     virtual bool can_be_attached() const override;
