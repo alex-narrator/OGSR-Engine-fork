@@ -464,3 +464,21 @@ bool CWeaponAmmo::IsDirectReload(CWeaponAmmo* ammo_to_load)
 
     return true;
 }
+
+#include "script_game_object.h"
+
+bool CWeaponAmmo::UsefulForReload() const
+{
+    const CInventoryOwner* owner = smart_cast<const CInventoryOwner*>(H_Parent());
+    if (!owner || !smart_cast<const CActor*>(owner))
+        return true;
+
+    bool useful{true};
+    if (pSettings->line_exist("engine_callbacks", "is_ammo_for_reload"))
+    {
+        const char* callback = pSettings->r_string("engine_callbacks", "is_ammo_for_reload");
+        if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
+            useful = lua_function(lua_game_object());
+    }
+    return useful;
+};

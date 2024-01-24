@@ -84,6 +84,8 @@ public:
 public:
     virtual CInventoryItem* can_make_killing(const CInventory* inventory) const;
 
+    bool UsefulForReload() const;
+
 protected:
     ref_sound sndLoad;
     ref_sound sndUnload;

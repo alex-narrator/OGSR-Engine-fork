@@ -31,15 +31,12 @@ public:
     virtual void Throw();
     virtual void Destroy();
 
-    virtual bool Action(s32 cmd, u32 flags);
     virtual bool Useful() const;
     virtual void State(u32 state, u32 oldState);
 
     virtual void OnH_B_Chield() { inherited::OnH_B_Chield(); }
 
     virtual void Hit(SHit* pHDS);
-
-    void PutNextToSlot();
 
     virtual void Deactivate(bool = false);
 

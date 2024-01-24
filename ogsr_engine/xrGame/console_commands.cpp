@@ -426,7 +426,7 @@ public:
             Msg("cannot make saved game because actor is dead :(");
             return;
         }
-        bool save_allowed = true;
+        bool save_allowed{true};
         if (pSettings->line_exist("engine_callbacks", "can_save_game"))
         {
             const char* callback = pSettings->r_string("engine_callbacks", "can_save_game");

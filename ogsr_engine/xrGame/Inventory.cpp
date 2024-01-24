@@ -1019,7 +1019,7 @@ PIItem CInventory::GetAmmoByLimit(const char* sect, bool limit_max, xr_vector<sh
     auto callback = [&](const auto pIItem) -> bool {
         const auto* ammo = smart_cast<CWeaponAmmo*>(pIItem);
         
-        if (!ammo->m_boxCurr || mags.size() && (!ammo->IsBoxReloadable() || std::find(mags.begin(), mags.end(), ammo->cNameSect()) == mags.end()))
+        if (!ammo->UsefulForReload() || !ammo->m_boxCurr || mags.size() && (!ammo->IsBoxReloadable() || std::find(mags.begin(), mags.end(), ammo->cNameSect()) == mags.end()))
             return false;
 
         shared_str sect_to_compare = mags.size() ? ammo->m_ammoSect : ammo->cNameSect();

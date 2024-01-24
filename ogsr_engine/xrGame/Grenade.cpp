@@ -115,9 +115,6 @@ void CGrenade::State(u32 state, u32 oldState)
             xr_delete(m_pPhysicsShell);
             m_dwDestroyTime = 0xffffffff;
 
-            if (H_Parent())
-                PutNextToSlot();
-
             if (Local())
             {
 #ifdef DEBUG
@@ -191,30 +188,6 @@ void CGrenade::OnEvent(NET_Packet& P, u16 type)
     CExplosive::OnEvent(P, type);
 }
 
-void CGrenade::PutNextToSlot()
-{
-    VERIFY(!getDestroy());
-
-	// выкинуть гранату из инвентаря
-    if (const auto inv = m_pCurrentInventory)
-    {
-        auto _grenade_slot = GetSlot();
-        inv->Ruck(this);
-        auto pNext = smart_cast<CGrenade*>(inv->Same(this));
-        if (!pNext)
-            pNext = smart_cast<CGrenade*>(inv->SameGrenade(this));
-
-        if (pNext)
-        {
-            pNext->SetSlot(_grenade_slot);
-            inv->SetActiveSlot(NO_ACTIVE_SLOT);
-            inv->Slot(pNext);
-        }
-
-        VERIFY(pNext != this);
-    }
-}
-
 void CGrenade::OnAnimationEnd(u32 state)
 {
     switch (state)
@@ -228,51 +201,6 @@ void CGrenade::UpdateCL()
 {
     inherited::UpdateCL();
     CExplosive::UpdateCL();
-}
-
-bool CGrenade::Action(s32 cmd, u32 flags)
-{
-    if (inherited::Action(cmd, flags))
-        return true;
-
-    switch (cmd)
-    {
-    // переключение типа гранаты
-    case kWPN_NEXT: {
-        if (flags & CMD_START)
-        {
-            const u32 state = GetState();
-            if (state == eHidden || state == eIdle || state == eBore)
-            {
-                if (const auto inv = m_pCurrentInventory)
-                {
-                    xr_map<shared_str, CGrenade*> tmp;
-                    tmp.insert(mk_pair(cNameSect(), this));
-                    for (const auto& item : inv->m_all)
-                    {
-                        auto pGrenade = smart_cast<CGrenade*>(item);
-                        if (pGrenade && (tmp.find(pGrenade->cNameSect()) == tmp.end()))
-                            tmp.insert(mk_pair(pGrenade->cNameSect(), pGrenade));
-                    }
-                    xr_map<shared_str, CGrenade*>::iterator curr_it = tmp.find(cNameSect());
-                    curr_it++;
-                    CGrenade* tgt;
-                    if (curr_it != tmp.end())
-                        tgt = curr_it->second;
-                    else
-                        tgt = tmp.begin()->second;
-                    tgt->SetSlot(GetSlot()); // новій гранаті призначимо той самий слот що й в тої, яку ховаємо
-                    inv->Ruck(this);
-                    inv->SetActiveSlot(NO_ACTIVE_SLOT);
-                    inv->Slot(tgt);
-                    g_actor->callback(GameObject::eOnGrenadeTypeSwitch)(lua_game_object(), tgt->lua_game_object());
-                }
-            }
-        }
-        return true;
-    }
-    }
-    return false;
 }
 
 BOOL CGrenade::UsedAI_Locations()

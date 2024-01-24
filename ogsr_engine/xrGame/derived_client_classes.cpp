@@ -246,6 +246,7 @@ void CWeaponScript::set_hit_power(CWeapon* wpn, luabind::object const& t)
 }
 
 LPCSTR get_addon_name(CWeapon* I, u32 addon) { return I->GetAddonName(addon).c_str(); }
+LPCSTR get_ammo_sect(CWeapon* I, u32 addon) { return !I->m_magazine.empty() ? I->m_magazine.back().m_ammoSect.c_str() : nullptr; }
 
 void CWeaponScript::script_register(lua_State* L)
 {
@@ -308,6 +309,8 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("addon_attachable", &CWeapon::AddonAttachable)
                   .def("get_addon_name", &get_addon_name)
                   .def("get_addon_offset", &CWeapon::GetAddonOffset)
+
+                  .def("get_ammo_sect", &get_ammo_sect)
 
                   .def_readwrite("scope_inertion_factor", &CWeapon::m_fScopeInertionFactor)
 
