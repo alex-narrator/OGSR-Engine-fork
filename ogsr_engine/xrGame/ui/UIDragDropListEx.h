@@ -153,7 +153,7 @@ public:
 
 public:
     // items management
-    virtual void SetItem(CUICellItem* itm, u32 = 0); // auto
+    virtual void SetItem(CUICellItem* itm); // auto
     virtual void SetItem(CUICellItem* itm, Fvector2 abs_pos); // start at cursor pos
     virtual void SetItem(CUICellItem* itm, Ivector2 cell_pos); // start at cell
     bool CanSetItem(CUICellItem* itm);
@@ -227,7 +227,7 @@ public:
 
 protected:
     Ivector2 GetItemPos(CUICellItem* itm);
-    Ivector2 FindFreeCell(const Ivector2& size, u32 = 0);
+    Ivector2 FindFreeCell(const Ivector2& size);
     bool HasFreeSpace(const Ivector2& size);
     bool IsRoomFree(const Ivector2& pos, const Ivector2& size);
 

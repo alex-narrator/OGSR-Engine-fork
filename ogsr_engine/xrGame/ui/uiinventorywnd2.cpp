@@ -111,7 +111,6 @@ void CUIInventoryWnd::InitInventory()
     for (const auto& item : m_pInv->m_ruck)
         item->GetMarked() ? marked_items.push_back(item) : ruck_items.push_back(item);
 
-    int start_row = 0;
     std::sort(marked_items.begin(), marked_items.end(), InventoryUtilities::GreaterRoomInRuck);
     for (const auto& item : marked_items)
     {
@@ -119,8 +118,6 @@ void CUIInventoryWnd::InitInventory()
         {
             CUICellItem* itm = create_cell_item(item);
             m_pUIBagList->SetItem(itm);
-            if (itm->GetGridSize().y > start_row)
-                start_row = itm->GetGridSize().y;
         }
     }
     std::sort(ruck_items.begin(), ruck_items.end(), InventoryUtilities::GreaterRoomInRuck);
@@ -129,7 +126,7 @@ void CUIInventoryWnd::InitInventory()
         if (show_item(item))
         {
             CUICellItem* itm = create_cell_item(item);
-            m_pUIBagList->SetItem(itm, start_row);
+            m_pUIBagList->SetItem(itm);
         }
     }
 
