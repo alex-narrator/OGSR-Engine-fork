@@ -533,8 +533,8 @@ protected:
 
 protected:
     virtual size_t GetWeaponTypeForCollision() const override { return CWeaponBase; }
-    virtual Fvector GetPositionForCollision() override { return get_LastShootPoint(); }
-    virtual Fvector GetDirectionForCollision() override { return get_LastFD(); }
+    virtual Fvector GetPositionForCollision() override;
+    virtual Fvector GetDirectionForCollision() override;
 
 public:
     virtual void modify_holder_params(float& range, float& fov) const;

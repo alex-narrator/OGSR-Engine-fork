@@ -2016,3 +2016,6 @@ bool CWeapon::ZoomHideCrosshair()
         return false;
     return m_bHideCrosshairInZoom;
 }
+
+Fvector CWeapon::GetPositionForCollision() { return psHUD_Flags.test(HUD_CROSSHAIR_HARD) ? get_LastShootPoint() : inherited::GetPositionForCollision(); }
+Fvector CWeapon::GetDirectionForCollision() { return psHUD_Flags.test(HUD_CROSSHAIR_HARD) ? get_LastFD() : inherited::GetDirectionForCollision(); }
