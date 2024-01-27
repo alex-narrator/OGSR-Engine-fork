@@ -178,17 +178,6 @@ void CInventoryItem::Load(LPCSTR section)
 
     bone_protection_sect = READ_IF_EXISTS(pSettings, r_string, section, "bones_koeff_protection", nullptr);
 
-    // custom script actions for properties box
-    for (u8 i = 0; i < 255; i++)
-    {
-        if (pSettings->line_exist(section, shared_str().sprintf("script_action_%i", i)))
-            if (shared_str i_cust = pSettings->r_string(section, shared_str().sprintf("script_action_%i", i).c_str()); i_cust.size())
-            {
-                string128 str{};
-                xr_vector<shared_str> vect{_GetItem(i_cust.c_str(), 1, str), _GetItem(i_cust.c_str(), 2, str)};
-                m_script_actions_map.emplace(std::move(_GetItem(i_cust.c_str(), 0, str)), std::move(vect));
-            }
-    }
     //custom highlight
     if (pSettings->line_exist(section, "highlight_item"))
     {

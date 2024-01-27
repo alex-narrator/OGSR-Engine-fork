@@ -267,25 +267,7 @@ void CUITradeWnd::ActivatePropertiesBox()
             b_show = true;
         }
 
-        for (const auto& action : CurrentIItem()->m_script_actions_map)
-        {
-            if (luabind::functor<bool> m_functorHasAction; ai().script_engine().functor(action.second[0].c_str(), m_functorHasAction))
-            {
-                if (m_functorHasAction(CurrentIItem()->object().lua_game_object()))
-                {
-                    LPCSTR tip_text{};
-                    if (luabind::functor<LPCSTR> tip_func; ai().script_engine().functor(action.first.c_str(), tip_func))
-                        tip_text = tip_func(CurrentIItem()->object().lua_game_object());
-                    else
-                        tip_text = CStringTable().translate(action.first).c_str();
-
-                    m_pUIPropertiesBox->AddItem(tip_text, (void*)action.first.c_str(), INVENTORY_SCRIPT_ACTION);
-                    b_show = true;
-                }
-            }
-            else
-                Msg("!Item-action-condition function [%s] not exist.", action.second[0].c_str());
-        }
+        m_pUIPropertiesBox->CheckCustomActions(CurrentIItem()->object().lua_game_object());
 
         if (!CurrentIItem()->IsQuestItem())
         {
@@ -385,12 +367,8 @@ void CUITradeWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
                 MoveItems(itm, for_all);
             }
             break;
-            case INVENTORY_SCRIPT_ACTION: {
-                auto it = CurrentIItem()->m_script_actions_map.find((LPCSTR)m_pUIPropertiesBox->GetClickedItem()->GetData());
-                if (luabind::functor<void> m_functorDoAction; ai().script_engine().functor(it->second[1].c_str(), m_functorDoAction))
-                    m_functorDoAction(CurrentIItem()->object().lua_game_object());
-                else
-                    Msg("!Item-action function [%s] not exist.", it->second[1].c_str());
+            case INVENTORY_CUSTOM_ACTION: {
+                m_pUIPropertiesBox->ProcessCustomActions(CurrentIItem()->object().lua_game_object());
             }
             break;
             }

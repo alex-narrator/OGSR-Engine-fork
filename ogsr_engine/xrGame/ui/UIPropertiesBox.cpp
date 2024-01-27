@@ -5,6 +5,8 @@
 #include "UIListBoxItem.h"
 #include "UIXmlInit.h"
 
+#include "string_table.h"
+
 constexpr auto OFFSET_X = 5;
 constexpr auto OFFSET_Y = 5;
 constexpr auto FRAME_BORDER_WIDTH = 20;
@@ -16,6 +18,21 @@ CUIPropertiesBox::CUIPropertiesBox()
 {
     SetFont(HUD().Font().pFontArial14);
     m_UIListWnd.SetImmediateSelection(true);
+
+    // custom script actions for properties box
+    constexpr LPCSTR custom_action_sect = "custom_properties_box_action";
+    if (pSettings->section_exist(custom_action_sect))
+    {
+        u32 action_count = pSettings->line_count(custom_action_sect);
+        LPCSTR name, value;
+        string128 str{};
+        for (u32 i = 0; i < action_count; ++i)
+        {
+            pSettings->r_line(custom_action_sect, i, &name, &value);
+            xr_vector<shared_str> vect{_GetItem(value, 1, str), _GetItem(value, 2, str)};
+            m_custom_actions_map.emplace(std::move(_GetItem(value, 0, str)), std::move(vect));
+        }
+    }
 }
 
 CUIPropertiesBox::~CUIPropertiesBox() {}
@@ -142,4 +159,38 @@ bool CUIPropertiesBox::OnKeyboard(int dik, EUIMessages keyboard_action)
     if (dik != get_action_dik(kADDITIONAL_ACTION))
         Hide();
     return true;
+}
+
+bool CUIPropertiesBox::CheckCustomActions(CScriptGameObject* obj)
+{
+    bool res{};
+    for (const auto& action : m_custom_actions_map)
+    {
+        if (luabind::functor<bool> m_functorHasAction; ai().script_engine().functor(action.second[0].c_str(), m_functorHasAction))
+        {
+            if (m_functorHasAction(obj))
+            {
+                LPCSTR tip_text{};
+                if (luabind::functor<LPCSTR> tip_func; ai().script_engine().functor(action.first.c_str(), tip_func))
+                    tip_text = tip_func(obj);
+                else
+                    tip_text = CStringTable().translate(action.first).c_str();
+
+                AddItem(tip_text, (void*)action.first.c_str(), INVENTORY_CUSTOM_ACTION);
+                res = true;
+            }
+        }
+        else
+            Msg("!Item-action-condition function [%s] not exist.", action.second[0].c_str());
+    }
+    return res;
+}
+
+void CUIPropertiesBox::ProcessCustomActions(CScriptGameObject* obj)
+{
+    auto it = m_custom_actions_map.find((LPCSTR)GetClickedItem()->GetData());
+    if (luabind::functor<void> m_functorDoAction; ai().script_engine().functor(it->second[1].c_str(), m_functorDoAction))
+        m_functorDoAction(obj);
+    else
+        Msg("!Item-action function [%s] not exist.", it->second[1].c_str());
 }
