@@ -286,14 +286,6 @@ void CUICellItem::ColorizeItems(xr_vector<CUIDragDropListEx*> args)
     static const bool colorize_ammo = Core.Features.test(xrCore::Feature::colorize_ammo);
     static const u32 Color = READ_IF_EXISTS(pSettings, r_color, "dragdrop", "color_ammo", color_argb(255, 0, 128, 0));
 
-    auto ProcessColorize = [](CUICellItem* Itm, u32 Clr) {
-        Itm->SetTextureColor(Clr);
-        if (auto WpnCell = smart_cast<CUIWeaponCellItem*>(Itm))
-            for (auto* Child : WpnCell->m_addons)
-                if (Child)
-                    Child->SetTextureColor(Clr);
-    };
-
     for (auto* DdListEx : args)
     {
         if (!DdListEx)
@@ -307,11 +299,11 @@ void CUICellItem::ColorizeItems(xr_vector<CUIDragDropListEx*> args)
             if (CellItem->GetTextureColor() == Color)
             {
                 if (CellItem->m_select_untradable)
-                    ProcessColorize(CellItem, reinterpret_cast<CInventoryItem*>(CellItem->m_pData)->ClrUntradable);
+                    CellItem->SetTextureColor(reinterpret_cast<CInventoryItem*>(CellItem->m_pData)->ClrUntradable);
                 else if (CellItem->m_select_equipped)
-                    ProcessColorize(CellItem, reinterpret_cast<CInventoryItem*>(CellItem->m_pData)->ClrEquipped);
+                    CellItem->SetTextureColor(reinterpret_cast<CInventoryItem*>(CellItem->m_pData)->ClrEquipped);
                 else
-                    ProcessColorize(CellItem, 0xffffffff);
+                    CellItem->SetTextureColor(0xffffffff);
             }
         }
     }
@@ -355,7 +347,7 @@ void CUICellItem::ColorizeItems(xr_vector<CUIDragDropListEx*> args)
                 {
                     CellItem->m_select_armament = true;
                     if (colorize_ammo)
-                        ProcessColorize(CellItem, Color);
+                        CellItem->SetTextureColor(Color);
                 }
             }
         }
@@ -377,7 +369,7 @@ void CUICellItem::ColorizeItems(xr_vector<CUIDragDropListEx*> args)
                     {
                         CellItem->m_select_armament = true;
                         if (colorize_ammo)
-                            ProcessColorize(CellItem, Color);
+                            CellItem->SetTextureColor(Color);
                     }
                 }
             }
@@ -386,7 +378,7 @@ void CUICellItem::ColorizeItems(xr_vector<CUIDragDropListEx*> args)
 
     // Подкраска выбранного предмета
     if (colorize_ammo && this->m_select_armament)
-        ProcessColorize(this, Color);
+        SetTextureColor(Color);
 
     // if (auto Wpn = smart_cast<CWeaponMagazined*>(inventoryitem)) {
     //  WpnScanner(Wpn);

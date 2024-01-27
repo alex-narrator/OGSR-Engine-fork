@@ -8,10 +8,6 @@ CUICellItem* create_cell_item(CInventoryItem* itm)
     if (pAmmo)
         return xr_new<CUIAmmoCellItem>(pAmmo);
 
-    auto pWeaponRPG = smart_cast<CWeaponRPG7*>(itm);
-    if (pWeaponRPG)
-        return xr_new<CUIWeaponRGP7CellItem>(pWeaponRPG);
-
     auto pWeapon = smart_cast<CWeapon*>(itm);
     if (pWeapon)
         return xr_new<CUIWeaponCellItem>(pWeapon);

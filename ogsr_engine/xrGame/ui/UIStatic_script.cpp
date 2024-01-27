@@ -44,6 +44,7 @@ void CUIStatic::script_register(lua_State* L)
                   .def("SetHeading", &CUIStatic::SetHeading)
                   .def("GetHeading", &CUIStatic::GetHeading)
                   .def("EnableHeading", &CUIStatic::EnableHeading)
+                  .def("SetHeadingPivot", &CUIStatic::SetHeadingPivot)
 
                   .def("ClipperOn", &CUIStatic::ClipperOn)
                   .def("ClipperOff", (void(CUIStatic::*)(void)) & CUIStatic::ClipperOff)
