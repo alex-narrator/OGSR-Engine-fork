@@ -18,7 +18,7 @@ CUIPropertiesBox::CUIPropertiesBox()
 {
     SetFont(HUD().Font().pFontArial14);
     m_UIListWnd.SetImmediateSelection(true);
-
+    SetWindowName("property_box");
     // custom script actions for properties box
     constexpr LPCSTR custom_action_sect = "custom_properties_box_action";
     if (pSettings->section_exist(custom_action_sect))

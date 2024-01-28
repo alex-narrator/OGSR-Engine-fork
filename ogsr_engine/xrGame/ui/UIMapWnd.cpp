@@ -235,7 +235,6 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
     m_UIPropertiesBox->Init(0, 0, 300, 300);
     AttachChild(m_UIPropertiesBox);
     m_UIPropertiesBox->Hide();
-    m_UIPropertiesBox->SetWindowName("property_box");
 
     m_UserSpotWnd = xr_new<CUIPdaSpot>();
     m_UserSpotWnd->SetAutoDelete(true);

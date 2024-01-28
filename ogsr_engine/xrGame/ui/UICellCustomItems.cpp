@@ -192,7 +192,7 @@ bool CUIAmmoCellItem::EqualTo(CUICellItem* itm)
     if (!ci)
         return false;
 
-    return object()->m_ammoSect == ci->object()->m_ammoSect;
+    return object()->m_ammoSect == ci->object()->m_ammoSect || !object()->m_boxCurr && !ci->object()->m_boxCurr;
 }
 
 void CUIAmmoCellItem::Update()
