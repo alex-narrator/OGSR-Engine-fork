@@ -87,8 +87,7 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("on_cell_item_focus", int(GameObject::eCellItemFocus)), value("on_cell_item_select", int(GameObject::eCellItemSelect)),
                     value("on_cell_item_focus_lost", int(GameObject::eCellItemFocusLost)), value("on_cell_item_mouse", int(GameObject::eOnCellItemMouse)),
                     value("on_before_save", int(GameObject::eBeforeSave)), value("on_after_save", int(GameObject::ePostSave)),
-                    value("on_level_map_click", int(GameObject::eUIMapClick)), value("on_pickup_item_showing", int(GameObject::eUIPickUpItemShowing)),
-                    value("on_group_items", int(GameObject::eUIGroupItems)), 
+                    value("on_level_map_click", int(GameObject::eUIMapClick)), value("on_group_items", int(GameObject::eUIGroupItems)), 
                     
                     value("on_weapon_shell_drop", int(GameObject::eOnWpnShellDrop)), 
                     value("on_actor_weapon_zoom_in", int(GameObject::eOnActorWeaponZoomIn)),

@@ -85,7 +85,6 @@ enum ECallbackType
 
     eUIMapClick,
 
-    eUIPickUpItemShowing,
     eUIGroupItems,
     eOnWpnShellDrop,
     eOnThrowGrenade,

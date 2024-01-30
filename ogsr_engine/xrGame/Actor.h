@@ -797,6 +797,8 @@ public:
     float GetVisibility();
     void ResetVisibility();
 
+    void SetPickUpItem(CInventoryItem* pickup_item);
+
 protected:
     svector<float, eRestoreBoostMax> m_ActorItemBoostedParam;
 

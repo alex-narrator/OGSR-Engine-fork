@@ -1677,3 +1677,13 @@ bool CActor::IsFreeHands() const
 
 float CActor::GetVisibility() { return m_npc_visibility.size() ? m_npc_visibility.back().value : 0.f; }
 void CActor::ResetVisibility() { m_npc_visibility.clear(); };
+
+void CActor::SetPickUpItem(CInventoryItem* pickup_item)
+{
+    if (pSettings->line_exist("engine_callbacks", "on_pickup_item_set"))
+    {
+        const char* callback = pSettings->r_string("engine_callbacks", "on_pickup_item_set");
+        if (luabind::functor<void> lua_function; ai().script_engine().functor(callback, lua_function))
+            lua_function(pickup_item ? pickup_item->object().lua_game_object() : nullptr);
+    }
+}

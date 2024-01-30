@@ -63,7 +63,6 @@ CUIMainIngameWnd::CUIMainIngameWnd()
 {
     m_pActor = nullptr;
     UIZoneMap = xr_new<CUIZoneMap>();
-    m_pPickUpItem = nullptr;
 }
 
 CUIMainIngameWnd::~CUIMainIngameWnd()
@@ -82,19 +81,6 @@ void CUIMainIngameWnd::Init()
     CUIWindow::Init(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
 
     Enable(false);
-
-    //---------------------------------------------------------
-    AttachChild(&UIPickUpItemIcon);
-    xml_init.InitStatic(uiXml, "pick_up_item", 0, &UIPickUpItemIcon);
-    UIPickUpItemIcon.SetShader(GetEquipmentIconsShader());
-    UIPickUpItemIcon.Show(false);
-
-    m_iPickUpItemIconWidth = UIPickUpItemIcon.GetWidth();
-    m_iPickUpItemIconHeight = UIPickUpItemIcon.GetHeight();
-    m_iPickUpItemIconX = UIPickUpItemIcon.GetWndRect().left;
-    m_iPickUpItemIconY = UIPickUpItemIcon.GetWndRect().top;
-    //---------------------------------------------------------
-
 
     // индикаторы
     UIZoneMap->Init();
@@ -160,8 +146,6 @@ void CUIMainIngameWnd::Update()
     float h, p;
     Device.vCameraDirection.getHP(h, p);
     UIZoneMap->SetHeading(-h);
-
-    UpdatePickUpItem();
 
     UpdateFlashingIcons(); // обновляем состояние мигающих иконок
 
@@ -311,74 +295,9 @@ void CUIMainIngameWnd::AnimateContacts(bool b_snd)
         HUD_SOUND::PlaySound(m_contactSnd, Fvector().set(0, 0, 0), 0, true);
 }
 
-void CUIMainIngameWnd::SetPickUpItem(CInventoryItem* PickUpItem)
-{
-    //	m_pPickUpItem = PickUpItem;
-    if (m_pPickUpItem != PickUpItem)
-    {
-        m_pPickUpItem = PickUpItem;
-        UIPickUpItemIcon.Show(false);
-        UIPickUpItemIcon.DetachAll();
-    }
-};
-
-#include "../game_object_space.h"
-#include "../script_callback_ex.h"
-#include "../script_game_object.h"
-#include "../Actor.h"
-
-void CUIMainIngameWnd::UpdatePickUpItem()
-{
-    if (!m_pPickUpItem || !Level().CurrentViewEntity() || Level().CurrentViewEntity()->CLS_ID != CLSID_OBJECT_ACTOR)
-    {
-        if (UIPickUpItemIcon.IsShown())
-        {
-            UIPickUpItemIcon.Show(false);
-        }
-
-        return;
-    };
-    if (UIPickUpItemIcon.IsShown())
-        return;
-
-    // properties used by inventory menu
-    CIconParams& params = m_pPickUpItem->m_icon_params;
-    Frect rect = params.original_rect();
-
-    float scale_x = m_iPickUpItemIconWidth / rect.width();
-
-    float scale_y = m_iPickUpItemIconHeight / rect.height();
-
-    scale_x = (scale_x > 1) ? 1.0f : scale_x;
-    scale_y = (scale_y > 1) ? 1.0f : scale_y;
-
-    float scale = scale_x < scale_y ? scale_x : scale_y;
-
-    params.set_shader(&UIPickUpItemIcon);
-
-    UIPickUpItemIcon.SetWidth(rect.width() * scale * UI()->get_current_kx());
-    UIPickUpItemIcon.SetHeight(rect.height() * scale);
-
-    UIPickUpItemIcon.SetWndPos(m_iPickUpItemIconX + (m_iPickUpItemIconWidth - UIPickUpItemIcon.GetWidth()) / 2,
-                               m_iPickUpItemIconY + (m_iPickUpItemIconHeight - UIPickUpItemIcon.GetHeight()) / 2);
-
-    UIPickUpItemIcon.SetColor(color_rgba(255, 255, 255, 192));
-
-    TryAttachIcons(&UIPickUpItemIcon, m_pPickUpItem, scale);
-
-    // Real Wolf: Колбек для скриптового добавления своих иконок. 10.08.2014.
-    g_actor->callback(GameObject::eUIPickUpItemShowing)(m_pPickUpItem->object().lua_game_object(), &UIPickUpItemIcon);
-
-    UIPickUpItemIcon.Show(true);
-};
-
 void CUIMainIngameWnd::OnConnected() { UIZoneMap->SetupCurrentMap(); }
 
-void CUIMainIngameWnd::reset_ui()
-{
-    m_pActor = NULL;
-    m_pPickUpItem = NULL;
-}
+void CUIMainIngameWnd::reset_ui() { m_pActor = nullptr; }
 
 #include "../xr_3da/XR_IOConsole.h"
 bool CUIMainIngameWnd::OnKeyboardHold(int cmd)
