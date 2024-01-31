@@ -47,7 +47,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
 
     string1024 temp;
 
-    bool b_show = false;
     bool b_many = CurrentItem()->ChildsCount();
     LPCSTR _many = b_many ? "•" : "";
     LPCSTR _addon_name{};
@@ -67,7 +66,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
                     string128 full_action_text;
                     strconcat(sizeof(full_action_text), full_action_text, "st_move_to_slot_", std::to_string(slot).c_str());
                     UIPropertiesBox.AddItem(full_action_text, (void*)(__int64)slot, INVENTORY_TO_SLOT_ACTION);
-                    b_show = true;
                 }
             }
         }
@@ -76,7 +74,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
     if (CurrentIItem()->Belt() && inv->CanPutInBelt(CurrentIItem()))
     {
         UIPropertiesBox.AddItem("st_move_on_belt", NULL, INVENTORY_TO_BELT_ACTION);
-        b_show = true;
     }
 
     if (CurrentIItem()->Ruck() && inv->CanPutInRuck(CurrentIItem()) && (CurrentIItem()->GetSlot() == NO_ACTIVE_SLOT || !inv->m_slots[CurrentIItem()->GetSlot()].m_bPersistent))
@@ -84,13 +81,11 @@ void CUIInventoryWnd::ActivatePropertiesBox()
         UIPropertiesBox.AddItem(b_wearable ? "st_undress_outfit" : "st_move_to_bag", NULL, INVENTORY_TO_BAG_ACTION);
 
         bAlreadyDressed = true;
-        b_show = true;
     }
 
     if (b_wearable && !bAlreadyDressed)
     {
         UIPropertiesBox.AddItem("st_dress_outfit", NULL, INVENTORY_TO_SLOT_ACTION);
-        b_show = true;
     }
 
     const char* _addon_sect{};
@@ -109,7 +104,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
                 sprintf(temp, "%s%s %s", _many, CStringTable().translate(_str).c_str(),
                         CStringTable().translate(pSettings->r_string(type, "inv_name_short")).c_str());
                 UIPropertiesBox.AddItem(temp, (void*)type.c_str(), INVENTORY_RELOAD_AMMO_BOX);
-                b_show = true;
             }
         }
         // unload AmmoBox
@@ -117,7 +111,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
         {
             sprintf(temp, "%s%s", _many, CStringTable().translate("st_unload_magazine").c_str());
             UIPropertiesBox.AddItem(temp, NULL, INVENTORY_UNLOAD_AMMO_BOX);
-            b_show = true;
         }
     }
 
@@ -133,7 +126,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
                     auto ammo_sect = pSettings->r_string(pWeapon->m_ammoTypes[i].c_str(), "inv_name_short");
                     sprintf(temp, "%s %s", CStringTable().translate("st_load_ammo_type").c_str(), CStringTable().translate(ammo_sect).c_str());
                     UIPropertiesBox.AddItem(temp, (void*)(__int64)i, INVENTORY_RELOAD_MAGAZINE);
-                    b_show = true;
                 }
             }
         }
@@ -146,7 +138,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
                 _addon_name = pSettings->r_string(_addon_sect, "inv_name_short");
                 sprintf(temp, "%s%s %s", _many, CStringTable().translate(detach_tip).c_str(), CStringTable().translate(_addon_name).c_str());
                 UIPropertiesBox.AddItem(temp, (void*)_addon_sect, INVENTORY_DETACH_ADDON);
-                b_show = true;
             }
         }
         //
@@ -172,7 +163,6 @@ void CUIInventoryWnd::ActivatePropertiesBox()
             {
                 sprintf(temp, "%s%s", _many, CStringTable().translate("st_unload_magazine").c_str());
                 UIPropertiesBox.AddItem(temp, NULL, INVENTORY_UNLOAD_MAGAZINE);
-                b_show = true;
             }
         }
     }
@@ -186,26 +176,23 @@ void CUIInventoryWnd::ActivatePropertiesBox()
         {
             sprintf(temp, "%s %s", CStringTable().translate(CurrentIItem()->GetAttachMenuTip()).c_str(), tgt->NameShort());
             UIPropertiesBox.AddItem(temp, (void*)tgt, INVENTORY_ATTACH_ADDON);
-            b_show = true;
         }
     }
 
     if (pEatableItem)
     {
         UIPropertiesBox.AddItem(pEatableItem->GetUseMenuTip(), NULL, INVENTORY_EAT_ACTION);
-        b_show = true;
     }
 
-    UIPropertiesBox.CheckCustomActions(CurrentIItem()->object().lua_game_object());
+    UIPropertiesBox.CheckCustomActionsItem(CurrentIItem()->object().lua_game_object());
 
     if (!CurrentIItem()->IsQuestItem())
     {
         sprintf(temp, "%s%s", _many, CStringTable().translate("st_drop").c_str());
         UIPropertiesBox.AddItem(temp, NULL, INVENTORY_DROP_ACTION);
-        b_show = true;
     }
 
-    if (b_show)
+    if (UIPropertiesBox.GetItemsCount() > 0)
     {
         UIPropertiesBox.AutoUpdateSize();
         UIPropertiesBox.BringAllToTop();
@@ -303,7 +290,7 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
         }
         break;
         case INVENTORY_CUSTOM_ACTION: {
-            UIPropertiesBox.ProcessCustomActions(CurrentIItem()->object().lua_game_object());
+            UIPropertiesBox.ProcessCustomActionsItem(CurrentIItem()->object().lua_game_object());
         }
         break;
         }

@@ -530,6 +530,11 @@ void CUIMapWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             m_cur_location = nullptr;
             break;
         }
+        // Click on the custom actions
+        case MAP_SPOT_CUSTOM_ACTION: {
+            m_UIPropertiesBox->ProcessCustomActionsMapSpot(m_cur_location->ObjectID(), m_cur_location->GetType(), m_cur_location->LevelName().c_str(), m_cur_location->GetLastPosition());
+            break;
+        }
         }
     }
 }
@@ -803,6 +808,8 @@ void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
         m_UIPropertiesBox->AddItem("st_pda_change_spot_hint", w, MAP_CHANGE_SPOT_HINT_ACT);
         m_UIPropertiesBox->AddItem("st_pda_delete_spot", w, MAP_REMOVE_SPOT_ACT);
     }
+
+    m_UIPropertiesBox->CheckCustomActionsMapSpot(m_cur_location->ObjectID(), m_cur_location->GetType(), m_cur_location->LevelName().c_str(), m_cur_location->GetLastPosition());
 
     if (m_UIPropertiesBox->GetItemsCount() > 0)
     {

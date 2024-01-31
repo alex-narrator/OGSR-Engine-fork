@@ -172,7 +172,6 @@ void CUITradeWnd::ActivatePropertiesBox()
 
     string1024 temp;
 
-    bool b_show = false;
     bool b_many = CurrentItem()->ChildsCount();
     LPCSTR _many = b_many ? "•" : "";
     LPCSTR _addon_name{};
@@ -194,7 +193,6 @@ void CUITradeWnd::ActivatePropertiesBox()
                     auto _str = (type == pAmmo->m_ammoSect || !pAmmo->m_boxCurr) ? "st_load_ammo_type" : "st_reload_ammo_type";
                     sprintf(temp, "%s%s %s", _many, CStringTable().translate(_str).c_str(), CStringTable().translate(pSettings->r_string(type, "inv_name_short")).c_str());
                     m_pUIPropertiesBox->AddItem(temp, (void*)type.c_str(), INVENTORY_RELOAD_AMMO_BOX);
-                    b_show = true;
                 }
             }
             // unload AmmoBox
@@ -202,7 +200,6 @@ void CUITradeWnd::ActivatePropertiesBox()
             {
                 sprintf(temp, "%s%s", _many, CStringTable().translate("st_unload_magazine").c_str());
                 m_pUIPropertiesBox->AddItem(temp, NULL, INVENTORY_UNLOAD_AMMO_BOX);
-                b_show = true;
             }
         }
 
@@ -217,7 +214,6 @@ void CUITradeWnd::ActivatePropertiesBox()
                         auto ammo_sect = pSettings->r_string(pWeapon->m_ammoTypes[i].c_str(), "inv_name_short");
                         sprintf(temp, "%s %s", CStringTable().translate("st_load_ammo_type").c_str(), CStringTable().translate(ammo_sect).c_str());
                         m_pUIPropertiesBox->AddItem(temp, (void*)(__int64)i, INVENTORY_RELOAD_MAGAZINE);
-                        b_show = true;
                     }
                 }
             }
@@ -230,7 +226,6 @@ void CUITradeWnd::ActivatePropertiesBox()
                     _addon_name = pSettings->r_string(_addon_sect, "inv_name_short");
                     sprintf(temp, "%s%s %s", _many, CStringTable().translate(detach_tip).c_str(), CStringTable().translate(_addon_name).c_str());
                     m_pUIPropertiesBox->AddItem(temp, (void*)_addon_sect, INVENTORY_DETACH_ADDON);
-                    b_show = true;
                 }
             }
             //
@@ -256,7 +251,6 @@ void CUITradeWnd::ActivatePropertiesBox()
                 {
                     sprintf(temp, "%s%s", _many, CStringTable().translate("st_unload_magazine").c_str());
                     m_pUIPropertiesBox->AddItem(temp, NULL, INVENTORY_UNLOAD_MAGAZINE);
-                    b_show = true;
                 }
             }
         }
@@ -264,16 +258,14 @@ void CUITradeWnd::ActivatePropertiesBox()
         if (pEatableItem)
         {
             m_pUIPropertiesBox->AddItem(pEatableItem->GetUseMenuTip(), NULL, INVENTORY_EAT_ACTION);
-            b_show = true;
         }
 
-        m_pUIPropertiesBox->CheckCustomActions(CurrentIItem()->object().lua_game_object());
+        m_pUIPropertiesBox->CheckCustomActionsItem(CurrentIItem()->object().lua_game_object());
 
         if (!CurrentIItem()->IsQuestItem())
         {
             sprintf(temp, "%s%s", _many, CStringTable().translate("st_drop").c_str());
             m_pUIPropertiesBox->AddItem(temp, NULL, INVENTORY_DROP_ACTION);
-            b_show = true;
         }
     }
 
@@ -281,12 +273,9 @@ void CUITradeWnd::ActivatePropertiesBox()
     {
         sprintf(temp, "%s%s", _many, CStringTable().translate("st_move").c_str());
         m_pUIPropertiesBox->AddItem(temp, NULL, INVENTORY_MOVE_ACTION);
-        b_show = true;
     }
 
-    b_show = true;
-
-    if (b_show)
+    if (m_pUIPropertiesBox->GetItemsCount() > 0)
     {
         m_pUIPropertiesBox->AutoUpdateSize();
         m_pUIPropertiesBox->BringAllToTop();
@@ -368,7 +357,7 @@ void CUITradeWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             }
             break;
             case INVENTORY_CUSTOM_ACTION: {
-                m_pUIPropertiesBox->ProcessCustomActions(CurrentIItem()->object().lua_game_object());
+                m_pUIPropertiesBox->ProcessCustomActionsItem(CurrentIItem()->object().lua_game_object());
             }
             break;
             }

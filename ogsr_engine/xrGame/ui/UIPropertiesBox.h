@@ -37,9 +37,12 @@ public:
 
     void AutoUpdateSize();
     
-    string_unordered_map<shared_str, xr_vector<shared_str>> m_custom_actions_map;
-    bool CheckCustomActions(CScriptGameObject* obj);
-    void ProcessCustomActions(CScriptGameObject* obj);
+    string_unordered_map<shared_str, xr_vector<shared_str>> m_custom_actions_item;
+    string_unordered_map<shared_str, xr_vector<shared_str>> m_custom_actions_map_spot;
+    void CheckCustomActionsItem(CScriptGameObject* obj);
+    void ProcessCustomActionsItem(CScriptGameObject* obj);
+    void CheckCustomActionsMapSpot(u16 id, LPCSTR spot_type, LPCSTR location_name, Fvector pos);
+    void ProcessCustomActionsMapSpot(u16 id, LPCSTR spot_type, LPCSTR location_name, Fvector pos);
 
 protected:
     CUIListBox m_UIListWnd;
