@@ -589,6 +589,25 @@ void CUIStatic::OnFocusLost()
         GetMessageTarget()->SendMessage(this, STATIC_FOCUS_LOST, NULL);
 }
 
+void CUIStatic::OnMouseMove() 
+{
+    if (GetMessageTarget())
+        GetMessageTarget()->SendMessage(this, WINDOW_MOUSE_MOVE, NULL);
+}
+
+bool CUIStatic::OnMouseDown(int mouse_btn) 
+{ 
+    if (GetMessageTarget() && (mouse_btn == MOUSE_1 || mouse_btn == MOUSE_2))
+        GetMessageTarget()->SendMessage(this, mouse_btn == MOUSE_1 ? WINDOW_LBUTTON_DOWN : WINDOW_RBUTTON_DOWN, NULL);
+    return inherited::OnMouseDown(mouse_btn);
+}
+
+void CUIStatic::OnMouseUp(int mouse_btn) 
+{
+    if (GetMessageTarget() && (mouse_btn == MOUSE_1 || mouse_btn == MOUSE_2))
+        GetMessageTarget()->SendMessage(this, mouse_btn == MOUSE_1 ? WINDOW_LBUTTON_UP : WINDOW_RBUTTON_UP, NULL);
+}
+
 void CUIStatic::AdjustHeightToText()
 {
     m_pLines->SetWidth(GetWidth());

@@ -98,6 +98,10 @@ public:
     virtual void OnFocusReceive();
     virtual void OnFocusLost();
 
+    virtual void OnMouseMove();
+    virtual bool OnMouseDown(int mouse_btn);
+    virtual void OnMouseUp(int mouse_btn);
+
     // IUITextControl
     virtual void SetText(LPCSTR str);
     void SetTextST(LPCSTR str_id);

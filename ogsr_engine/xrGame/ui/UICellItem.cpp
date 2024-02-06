@@ -380,14 +380,6 @@ void CUICellItem::ColorizeItems(xr_vector<CUIDragDropListEx*> args)
     if (colorize_ammo && this->m_select_armament)
         SetTextureColor(Color);
 
-    // if (auto Wpn = smart_cast<CWeaponMagazined*>(inventoryitem)) {
-    //  WpnScanner(Wpn);
-    //  ColorizeAmmoAddons();
-    //}
-    // else { //Надо подумать, какое условие тут сделать. Аддоны например, могут быть не именно аддонами, а фейк-предметами, например. Лушчше наверно вообще без каких-либо условий.
-    // ColorizeWeapons(inventoryitem->object().cNameSect());
-    //}
-
     Scanner(inventoryitem);
     ColorizeAmmoAddons();
     ColorizeWeapons(inventoryitem->object().cNameSect());
