@@ -18,9 +18,6 @@
 #include "CustomDevice.h"
 #include "player_hud.h"
 
-#include "WeaponMagazined.h"
-#include "WeaponMagazinedWGrenade.h"
-
 CUICellItem* CUIInventoryWnd::CurrentItem() { return m_pCurrentCellItem; }
 
 PIItem CUIInventoryWnd::CurrentIItem() { return (m_pCurrentCellItem) ? (PIItem)m_pCurrentCellItem->m_pData : NULL; }
@@ -30,8 +27,6 @@ void CUIInventoryWnd::SetCurrentItem(CUICellItem* itm)
     if (m_pCurrentCellItem == itm)
         return;
     m_pCurrentCellItem = itm;
-
-    //UIItemInfo.InitItem(CurrentIItem());
 
     if (m_pCurrentCellItem)
     {

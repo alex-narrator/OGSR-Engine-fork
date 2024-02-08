@@ -75,7 +75,7 @@ void CInventoryOwner::reload(LPCSTR section)
 
     m_money = 0;
     m_bTalking = false;
-    m_pTalkPartner = NULL;
+    m_pTalkPartner = nullptr;
 
     CAttachmentOwner::reload(section);
 }

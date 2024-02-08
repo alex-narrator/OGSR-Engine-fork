@@ -100,7 +100,7 @@ protected:
     // торговля
     CTrade* m_pTrade{};
     bool m_bTalking;
-    CInventoryOwner* m_pTalkPartner;
+    CInventoryOwner* m_pTalkPartner{};
 
     bool m_bAllowTalk;
     bool m_bAllowTrade;

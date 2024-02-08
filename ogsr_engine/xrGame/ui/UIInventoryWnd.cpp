@@ -32,17 +32,12 @@ using namespace InventoryUtilities;
 #include "UIDragDropListEx.h"
 #include "UI3tButton.h"
 
-constexpr auto INVENTORY_ITEM_XML = "inventory_item.xml";
 constexpr auto INVENTORY_XML = "inventory_new.xml";
-
-CUIInventoryWnd* g_pInvWnd = NULL;
 
 CUIInventoryWnd::CUIInventoryWnd()
 {
     Init();
     SetCurrentItem(NULL);
-
-    g_pInvWnd = this;
     Hide();
 }
 
