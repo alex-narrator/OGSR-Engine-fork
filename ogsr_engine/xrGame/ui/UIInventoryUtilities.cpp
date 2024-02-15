@@ -19,6 +19,7 @@
 #include "game_base_space.h"
 #include "actor.h"
 #include "string_table.h"
+#include "script_game_object.h"
 
 constexpr auto EQUIPMENT_ICONS = "ui\\ui_icon_equipment";
 
@@ -93,6 +94,29 @@ bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
         return false;
     }
     return false;
+}
+
+bool InventoryUtilities::CustomSort(PIItem item1, PIItem item2)
+{
+    if (pSettings->line_exist("engine_callbacks", "ui_inv_custom_sort"))
+    {
+        const char* callback = pSettings->r_string("engine_callbacks", "ui_inv_custom_sort");
+        if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
+            return lua_function(item1->object().lua_game_object(), item2->object().lua_game_object());
+    }
+    return GreaterRoomInRuck(item1, item2);
+}
+
+int InventoryUtilities::GetType(PIItem item)
+{
+    int res{};
+    if (pSettings->line_exist("engine_callbacks", "ui_inv_get_item_type"))
+    {
+        const char* callback = pSettings->r_string("engine_callbacks", "ui_inv_get_item_type");
+        if (luabind::functor<int> lua_function; ai().script_engine().functor(callback, lua_function))
+            res = lua_function(item->object().lua_game_object());
+    }
+    return res;
 }
 
 bool InventoryUtilities::FreeRoom(TIItemContainer& item_list, PIItem _item, int width, int height, bool vertical)

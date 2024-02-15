@@ -57,15 +57,20 @@ private:
         flVerticalOrder = (1 << 6),
         flHighlightCellSp = (1 << 7),
         flHighlightAllCells = (1 << 8),
+        flGroupByType = (1 << 9),
     };
     Flags16 m_flags;
     CUICellItem* m_selected_item;
     Ivector2 m_orig_cell_capacity;
     Ivector2 m_virtual_cells_alignment;
-    bool m_bConditionProgBarVisible;
 
 public:
     CUICellContainer* m_container;
+
+    int m_iLastType{-1};
+    int m_iLastTypeRow{-1};
+    int m_iCurType{-1};
+    int m_iRowEnd{-1};
 
 protected:
     CUIScrollBar* m_vScrollBar;
@@ -148,8 +153,8 @@ public:
     bool GetVerticalOrder();
     void SetVerticalOrder(bool b);
 
-    bool GetConditionProgBarVisibility() { return m_bConditionProgBarVisible; };
-    void SetConditionProgBarVisibility(bool b) { m_bConditionProgBarVisible = b; };
+    bool GetGroupByType();
+    void SetGroupByType(bool b);
 
 public:
     // items management

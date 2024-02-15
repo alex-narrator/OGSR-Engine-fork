@@ -485,7 +485,7 @@ bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, const char* path, int index
     tmp = xml_doc.ReadAttribInt(path, index, "group_similar", 0); // gp... ?
     pWnd->SetGrouping(tmp != 0);
 
-    tmp = xml_doc.ReadAttribInt(path, index, "custom_placement", 1); // cp...?
+    tmp = xml_doc.ReadAttribInt(path, index, "custom_placement", 0); // cp...?
     pWnd->SetCustomPlacement(tmp != 0);
 
     tmp = xml_doc.ReadAttribInt(path, index, "vertical_placement", 0); // thorn
@@ -493,9 +493,6 @@ bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, const char* path, int index
 
     tmp = xml_doc.ReadAttribInt(path, index, "always_show_scroll", 0);
     pWnd->SetAlwaysShowScroll(tmp != 0);
-
-    tmp = xml_doc.ReadAttribInt(path, index, "condition_progress_bar", 0);
-    pWnd->SetConditionProgBarVisibility(tmp != 0);
 
     tmp = xml_doc.ReadAttribInt(path, index, "virtual_cells", 0);
     pWnd->SetVirtualCells(tmp != 0);
@@ -522,6 +519,9 @@ bool CUIXmlInit::InitDragDropListEx(CUIXml& xml_doc, const char* path, int index
     // вишиковувати іконки у драгдроп лістах зверху вниз по колонкам
     //tmp = xml_doc.ReadAttribInt(path, index, "vertical_order", 0);
     //pWnd->SetVerticalOrder(tmp != 0);
+    
+    tmp = xml_doc.ReadAttribInt(path, index, "group_by_type", 0);
+    pWnd->SetGroupByType(tmp != 0);
 
     pWnd->back_color = GetColor(xml_doc, path, index, 0xFFFFFFFF);
 

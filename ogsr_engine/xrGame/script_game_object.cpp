@@ -457,6 +457,17 @@ void CScriptGameObject::SetMarked(bool val)
     inventory_item->SetMarked(val);
 }
 //
+bool CScriptGameObject::CanTrade() const
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
+    if (!inventory_item)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member GetMarked!");
+        return false;
+    }
+    return inventory_item->CanTrade();
+}
+//
  #include "Torch.h"
 void CScriptGameObject::SwitchTorch(bool on)
 {

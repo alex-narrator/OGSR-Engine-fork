@@ -4,6 +4,9 @@
 #include "../object_broker.h"
 #include "UICellItem.h"
 
+#include "inventory_item.h"
+#include "UIInventoryUtilities.h"
+
 #include "UIInventoryWnd.h"
 #include "UITradeWnd.h"
 #include "UICarBodyWnd.h"
@@ -27,7 +30,6 @@ CUIDragDropListEx::CUIDragDropListEx()
     m_vScrollBar = xr_new<CUIScrollBar>();
     m_vScrollBar->SetAutoDelete(true);
     m_selected_item = NULL;
-    m_bConditionProgBarVisible = false;
 
     SetCellSize(Ivector2().set(50, 50));
     SetCellsCapacity(Ivector2().set(0, 0));
@@ -86,6 +88,10 @@ bool CUIDragDropListEx::GetHighlightAllCells() { return !!m_flags.test(flHighlig
 void CUIDragDropListEx::SetVerticalOrder(bool b) { m_flags.set(flVerticalOrder, b); }
 
 bool CUIDragDropListEx::GetVerticalOrder() { return !!m_flags.test(flVerticalOrder); }
+
+void CUIDragDropListEx::SetGroupByType(bool b) { m_flags.set(flGroupByType, b); }
+
+bool CUIDragDropListEx::GetGroupByType() { return !!m_flags.test(flGroupByType); }
 
 void CUIDragDropListEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 
@@ -270,6 +276,10 @@ void CUIDragDropListEx::ClearAll(bool bDestroy)
     m_selected_item = NULL;
     m_container->SetWndPos(0, 0);
     ResetCellsCapacity();
+    m_iLastType = -1;
+    m_iLastTypeRow = -1;
+    m_iCurType = -1;
+    m_iRowEnd = -1;
 }
 
 void CUIDragDropListEx::Compact()
@@ -417,9 +427,14 @@ void CUIDragDropListEx::SetItem(CUICellItem* itm) // auto
         return;
     }
 
+    m_iCurType = InventoryUtilities::GetType((PIItem)itm->m_pData);
     Ivector2 dest_cell_pos = m_container->FindFreeCell(itm->GetGridSize());
 
     SetItem(itm, dest_cell_pos);
+
+    int row_end = dest_cell_pos.y + itm->GetGridSize().y - 1;
+    if (row_end > m_iRowEnd)
+        m_iRowEnd = row_end;
 }
 
 void CUIDragDropListEx::SetItem(CUICellItem* itm, Fvector2 abs_pos) // start at cursor pos
@@ -642,6 +657,16 @@ Ivector2 CUICellContainer::FindFreeCell(const Ivector2& _size)
     if (m_pParentDragDropList->GetVerticalPlacement())
         std::swap(size.x, size.y);
 
+    if (m_pParentDragDropList->GetGroupByType())
+    {
+        if (m_pParentDragDropList->m_iLastType != m_pParentDragDropList->m_iCurType)
+        {
+            m_pParentDragDropList->m_iLastType = m_pParentDragDropList->m_iCurType;
+            m_pParentDragDropList->m_iLastTypeRow = m_pParentDragDropList->m_iRowEnd + 1;
+        }
+    }
+    int row = m_pParentDragDropList->GetGroupByType() ? m_pParentDragDropList->m_iLastTypeRow : 0;
+
 	if (m_pParentDragDropList->GetVerticalOrder())
     {
         for (tmp.x = 0; tmp.x <= m_cellsCapacity.x - size.x; ++tmp.x)
@@ -651,7 +676,7 @@ Ivector2 CUICellContainer::FindFreeCell(const Ivector2& _size)
     }
     else
     {
-        for (tmp.y = 0; tmp.y <= m_cellsCapacity.y - size.y; ++tmp.y)
+        for (tmp.y = row; tmp.y <= m_cellsCapacity.y - size.y; ++tmp.y)
             for (tmp.x = 0; tmp.x <= m_cellsCapacity.x - size.x; ++tmp.x)
                 if (IsRoomFree(tmp, _size))
                     return tmp;
@@ -697,8 +722,8 @@ bool CUICellContainer::IsRoomFree(const Ivector2& pos, const Ivector2& _size)
     Ivector2 size = _size;
     if (m_pParentDragDropList->GetVerticalPlacement())
         std::swap(size.x, size.y);
-    for (tmp.x = pos.x; tmp.x < pos.x + size.x; ++tmp.x)
-        for (tmp.y = pos.y; tmp.y < pos.y + size.y; ++tmp.y)
+    for (tmp.y = pos.y; tmp.y < pos.y + size.y; ++tmp.y)
+        for (tmp.x = pos.x; tmp.x < pos.x + size.x; ++tmp.x)
         {
             if (!ValidCell(tmp))
                 return false;

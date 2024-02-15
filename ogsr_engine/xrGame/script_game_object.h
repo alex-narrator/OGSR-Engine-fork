@@ -180,6 +180,8 @@ public:
     bool GetMarked() const;
     void SetMarked(bool val);
 
+    bool CanTrade() const;
+
     // CEntity
     _DECLARE_FUNCTION10(DeathTime, u32);
     _DECLARE_FUNCTION10(MaxHealth, float);

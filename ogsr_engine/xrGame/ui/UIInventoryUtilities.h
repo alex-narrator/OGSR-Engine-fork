@@ -29,6 +29,10 @@ namespace InventoryUtilities
 // сравнивает элементы по пространству занимаемому ими в рюкзаке
 // для сортировки
 bool GreaterRoomInRuck(PIItem item1, PIItem item2);
+
+bool CustomSort(PIItem item1, PIItem item2);
+int GetType(PIItem item);
+
 // для проверки свободного места
 bool FreeRoom(TIItemContainer& item_list, PIItem item, int width, int height, bool vertical);
 bool FreeRoom_byRows(TIItemContainer& item_list, PIItem item, int width, int height);

@@ -102,21 +102,8 @@ void CUIInventoryWnd::InitInventory()
         }
     }
 
-    TIItemContainer marked_items{}, ruck_items{};
+    std::sort(m_pInv->m_ruck.begin(), m_pInv->m_ruck.end(), InventoryUtilities::CustomSort);
     for (const auto& item : m_pInv->m_ruck)
-        item->GetMarked() ? marked_items.push_back(item) : ruck_items.push_back(item);
-
-    std::sort(marked_items.begin(), marked_items.end(), InventoryUtilities::GreaterRoomInRuck);
-    for (const auto& item : marked_items)
-    {
-        if (show_item(item))
-        {
-            CUICellItem* itm = create_cell_item(item);
-            m_pUIBagList->SetItem(itm);
-        }
-    }
-    std::sort(ruck_items.begin(), ruck_items.end(), InventoryUtilities::GreaterRoomInRuck);
-    for (const auto& item : ruck_items)
     {
         if (show_item(item))
         {
