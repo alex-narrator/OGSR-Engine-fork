@@ -209,8 +209,6 @@ protected:
     xr_vector<u8> m_slots_locked{};
     xr_vector<u8> m_slots_unlocked{};
 
-    bool m_bIsMarkedItem{};
-
     ////////// network //////////////////////////////////////////////////
 public:
     virtual void net_Export(CSE_Abstract* E);
@@ -334,13 +332,6 @@ public:
 
     virtual void Drop();
     void Transfer(u16 from_id, u16 to_id = u16(-1));
-
-    bool GetMarked() { return m_bIsMarkedItem; };
-    void SetMarked(bool val) 
-    {
-        m_bIsMarkedItem = val; 
-        m_highlight_equipped = val;
-    };
 
     float HitThruArmour(SHit* pHDS);
 

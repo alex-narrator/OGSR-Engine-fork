@@ -177,9 +177,6 @@ public:
     void SetCondition(float val);
     void ChangeCondition(float val);
 
-    bool GetMarked() const;
-    void SetMarked(bool val);
-
     bool CanTrade() const;
 
     // CEntity

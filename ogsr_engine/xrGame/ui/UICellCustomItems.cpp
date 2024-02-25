@@ -31,7 +31,7 @@ CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
 
 bool CUIInventoryCellItem::EqualTo(CUICellItem* itm)
 {
-    CUIInventoryCellItem* ci = smart_cast<CUIInventoryCellItem*>(itm);
+    //CUIInventoryCellItem* ci = smart_cast<CUIInventoryCellItem*>(itm);
     if (!itm)
         return false;
 
@@ -63,15 +63,15 @@ bool CUIInventoryCellItem::EqualTo(CUICellItem* itm)
             b_script_equal = lua_function(item1->object().lua_game_object(), item2->object().lua_game_object());
     }
 
-    return (fsimilar(object()->GetCondition(), ci->object()->GetCondition(), 0.01f) && 
-            fsimilar(object()->Weight(), ci->object()->Weight(), 0.01f) &&
-            fsimilar(object()->GetItemEffect(CInventoryItem::eRadiationRestoreSpeed), ci->object()->GetItemEffect(CInventoryItem::eRadiationRestoreSpeed), 0.01f) &&
-            object()->object().cNameSect() == ci->object()->object().cNameSect() && 
-            object()->m_eItemPlace == ci->object()->m_eItemPlace &&
-            object()->Cost() == ci->object()->Cost() && 
-            object()->GetMarked() == ci->object()->GetMarked() && 
-            b_script_equal
-        );
+    //return (fsimilar(object()->GetCondition(), ci->object()->GetCondition(), 0.01f) && 
+    //        fsimilar(object()->Weight(), ci->object()->Weight(), 0.01f) &&
+    //        fsimilar(object()->GetItemEffect(CInventoryItem::eRadiationRestoreSpeed), ci->object()->GetItemEffect(CInventoryItem::eRadiationRestoreSpeed), 0.01f) &&
+    //        object()->object().cNameSect() == ci->object()->object().cNameSect() && 
+    //        object()->m_eItemPlace == ci->object()->m_eItemPlace &&
+    //        object()->Cost() == ci->object()->Cost() && 
+    //        b_script_equal
+    //    );
+    return b_script_equal;
 }
 
 CUIInventoryCellItem::~CUIInventoryCellItem()
@@ -183,17 +183,17 @@ void CUIInventoryCellItem::Update()
 
 CUIAmmoCellItem::CUIAmmoCellItem(CWeaponAmmo* itm) : inherited(itm) {}
 
-bool CUIAmmoCellItem::EqualTo(CUICellItem* itm)
-{
-    if (!inherited::EqualTo(itm))
-        return false;
-
-    CUIAmmoCellItem* ci = smart_cast<CUIAmmoCellItem*>(itm);
-    if (!ci)
-        return false;
-
-    return object()->m_ammoSect == ci->object()->m_ammoSect || !object()->m_boxCurr && !ci->object()->m_boxCurr;
-}
+//bool CUIAmmoCellItem::EqualTo(CUICellItem* itm)
+//{
+//    if (!inherited::EqualTo(itm))
+//        return false;
+//
+//    CUIAmmoCellItem* ci = smart_cast<CUIAmmoCellItem*>(itm);
+//    if (!ci)
+//        return false;
+//
+//    return object()->m_ammoSect == ci->object()->m_ammoSect || !object()->m_boxCurr && !ci->object()->m_boxCurr;
+//}
 
 void CUIAmmoCellItem::Update()
 {
@@ -230,45 +230,45 @@ void CUIAmmoCellItem::UpdateItemText()
 
 CUIEatableCellItem::CUIEatableCellItem(CEatableItem* itm) : inherited(itm) {}
 
-bool CUIEatableCellItem::EqualTo(CUICellItem* itm)
-{
-    if (!inherited::EqualTo(itm))
-        return false;
-
-    CUIEatableCellItem* ci = smart_cast<CUIEatableCellItem*>(itm);
-    if (!ci)
-        return false;
-
-    return object()->GetPortionsNum() == ci->object()->GetPortionsNum();
-}
+//bool CUIEatableCellItem::EqualTo(CUICellItem* itm)
+//{
+//    if (!inherited::EqualTo(itm))
+//        return false;
+//
+//    CUIEatableCellItem* ci = smart_cast<CUIEatableCellItem*>(itm);
+//    if (!ci)
+//        return false;
+//
+//    return object()->GetPortionsNum() == ci->object()->GetPortionsNum();
+//}
 
 CUIArtefactCellItem::CUIArtefactCellItem(CArtefact* itm) : inherited(itm) {}
 
-bool CUIArtefactCellItem::EqualTo(CUICellItem* itm)
-{
-    if (!inherited::EqualTo(itm))
-        return false;
-
-    CUIArtefactCellItem* ci = smart_cast<CUIArtefactCellItem*>(itm);
-    if (!ci)
-        return false;
-
-    return fsimilar(object()->GetRandomKoef(), ci->object()->GetRandomKoef(), 0.01f);
-}
+//bool CUIArtefactCellItem::EqualTo(CUICellItem* itm)
+//{
+//    if (!inherited::EqualTo(itm))
+//        return false;
+//
+//    CUIArtefactCellItem* ci = smart_cast<CUIArtefactCellItem*>(itm);
+//    if (!ci)
+//        return false;
+//
+//    return fsimilar(object()->GetRandomKoef(), ci->object()->GetRandomKoef(), 0.01f);
+//}
 
 CUIWeaponCellItem::CUIWeaponCellItem(CWeapon* itm) : inherited(itm) { b_auto_drag_childs = false; }
 
-bool CUIWeaponCellItem::EqualTo(CUICellItem* itm)
-{
-    if (!inherited::EqualTo(itm))
-        return false;
-
-    CUIWeaponCellItem* ci = smart_cast<CUIWeaponCellItem*>(itm);
-    if (!ci)
-        return false;
-
-    bool b_addons = ((object()->GetAddonsState() == ci->object()->GetAddonsState()));
-    bool b_place = ((object()->m_eItemPlace == ci->object()->m_eItemPlace));
-
-    return b_addons && b_place;
-}
+//bool CUIWeaponCellItem::EqualTo(CUICellItem* itm)
+//{
+//    if (!inherited::EqualTo(itm))
+//        return false;
+//
+//    CUIWeaponCellItem* ci = smart_cast<CUIWeaponCellItem*>(itm);
+//    if (!ci)
+//        return false;
+//
+//    bool b_addons = ((object()->GetAddonsState() == ci->object()->GetAddonsState()));
+//    bool b_place = ((object()->m_eItemPlace == ci->object()->m_eItemPlace));
+//
+//    return b_addons && b_place;
+//}

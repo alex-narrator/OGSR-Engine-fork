@@ -85,7 +85,6 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .def("condition", &CScriptGameObject::GetCondition)
         .def("set_condition", &CScriptGameObject::SetCondition)
         .def("change_condition", &CScriptGameObject::ChangeCondition)
-        .property("marked", &CScriptGameObject::GetMarked, &CScriptGameObject::SetMarked)
         //
         .def("death_time", &CScriptGameObject::DeathTime)
         //		.def("armor",						&CScriptGameObject::Armor)

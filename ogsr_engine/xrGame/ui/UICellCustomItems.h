@@ -33,7 +33,7 @@ class CUIEatableCellItem : public CUIInventoryCellItem
 
 public:
     CUIEatableCellItem(CEatableItem* itm);
-    virtual bool EqualTo(CUICellItem* itm);
+    //virtual bool EqualTo(CUICellItem* itm);
     CEatableItem* object() { return (CEatableItem*)m_pData; }
 };
 
@@ -43,7 +43,7 @@ class CUIArtefactCellItem : public CUIInventoryCellItem
 
 public:
     CUIArtefactCellItem(CArtefact* itm);
-    virtual bool EqualTo(CUICellItem* itm);
+    //virtual bool EqualTo(CUICellItem* itm);
     CArtefact* object() { return (CArtefact*)m_pData; }
 };
 
@@ -56,7 +56,7 @@ protected:
 
 public:
     CUIAmmoCellItem(CWeaponAmmo* itm);
-    virtual bool EqualTo(CUICellItem* itm);
+    //virtual bool EqualTo(CUICellItem* itm);
     CWeaponAmmo* object() { return (CWeaponAmmo*)m_pData; }
     virtual void Update();
 };
@@ -69,5 +69,5 @@ public:
     CUIWeaponCellItem(CWeapon* itm);
     virtual ~CUIWeaponCellItem(){};
     CWeapon* object() { return (CWeapon*)m_pData; }
-    virtual bool EqualTo(CUICellItem* itm);
+    //virtual bool EqualTo(CUICellItem* itm);
 };
