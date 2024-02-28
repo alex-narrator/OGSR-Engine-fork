@@ -180,6 +180,13 @@ s32 CActorStatisticMgr::GetSectionPoints(const shared_str& key)
     }
 }
 
+s32 CActorStatisticMgr::GetSectionKeyPoints(const shared_str& key, const shared_str& detail_key) 
+{ 
+    SStatSectionData& sect = GetSection(key);
+    SStatDetailBData& d = sect.GetData(detail_key);
+    return d.int_points;
+}
+
 s32 CActorStatisticMgr::GetSectionCounts(const shared_str& key)
 {
     if (key != "total")
