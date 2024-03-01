@@ -1324,16 +1324,20 @@ void CActor::UpdateItemsEffect()
             for (const auto& item : inventory().m_all)
             {
                 float radiation_restore_speed = item->GetItemEffect(i);
+                auto active_place = inventory().GetActiveArtefactPlace();
+                bool affect = radiation_restore_speed > 0.f || std::find(active_place.begin(), active_place.end(), item) != active_place.end();
+                float res_rrs = affect ? radiation_restore_speed : 0.f;
+
                 if (item != inventory().ActiveItem())
                 { // що взяте в руки те випромінює на повну
                     if (outfit) // костюм захищає від радіації речей
-                        radiation_restore_speed *= (1.f - outfit->GetHitTypeProtection(ALife::eHitTypeRadiation));
+                        res_rrs *= (1.f - outfit->GetHitTypeProtection(ALife::eHitTypeRadiation));
                     if (backpack && inventory().InRuck(item)) // рюкзак захищає від радіації речей у рюкзаку
-                        radiation_restore_speed *= (1.f - backpack->GetHitTypeProtection(ALife::eHitTypeRadiation));
+                        res_rrs *= (1.f - backpack->GetHitTypeProtection(ALife::eHitTypeRadiation));
                     if (helmet && inventory().InRuck(item)) // шолом захищає від радіації речей у рюкзаку
-                        radiation_restore_speed *= (1.f - helmet->GetHitTypeProtection(ALife::eHitTypeRadiation));
+                        res_rrs *= (1.f - helmet->GetHitTypeProtection(ALife::eHitTypeRadiation));
                 }
-                m_ActorItemBoostedParam[i] += radiation_restore_speed;
+                m_ActorItemBoostedParam[i] += res_rrs;
             }
         }
         else
