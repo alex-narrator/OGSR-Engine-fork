@@ -28,6 +28,16 @@
 
 ENGINE_API extern float psHUD_FOV_def;
 
+// Загрузка параметров инерции --#SM+# Begin--
+constexpr float PITCH_OFFSET_R = 0.0f; // Насколько сильно ствол смещается вбок (влево) при вертикальных поворотах камеры
+constexpr float PITCH_OFFSET_N = 0.0f; // Насколько сильно ствол поднимается\опускается при вертикальных поворотах камеры
+constexpr float PITCH_OFFSET_D = 0.02f; // Насколько сильно ствол приближается\отдаляется при вертикальных поворотах камеры
+constexpr float PITCH_LOW_LIMIT = -PI; // Минимальное значение pitch при использовании совместно с PITCH_OFFSET_N
+constexpr float ORIGIN_OFFSET = -0.05f; // Фактор влияния инерции на положение ствола (чем меньше, тем масштабней инерция)
+constexpr float ORIGIN_OFFSET_AIM = -0.01f; // (Для прицеливания)
+constexpr float TENDTO_SPEED = 5.f; // Скорость нормализации положения ствола
+constexpr float TENDTO_SPEED_AIM = 8.f; // (Для прицеливания)
+
 CHudItem::CHudItem()
 {
     m_huditem_flags.zero();
@@ -159,16 +169,6 @@ void CHudItem::Load(LPCSTR section)
                             0.f); // aim-GL
 
     ////////////////////////////////////////////
-
-    //Загрузка параметров инерции --#SM+# Begin--
-    constexpr float PITCH_OFFSET_R = 0.0f; // Насколько сильно ствол смещается вбок (влево) при вертикальных поворотах камеры
-    constexpr float PITCH_OFFSET_N = 0.0f; // Насколько сильно ствол поднимается\опускается при вертикальных поворотах камеры
-    constexpr float PITCH_OFFSET_D = 0.02f; // Насколько сильно ствол приближается\отдаляется при вертикальных поворотах камеры
-    constexpr float PITCH_LOW_LIMIT = -PI; // Минимальное значение pitch при использовании совместно с PITCH_OFFSET_N
-    constexpr float ORIGIN_OFFSET = -0.05f; // Фактор влияния инерции на положение ствола (чем меньше, тем масштабней инерция)
-    constexpr float ORIGIN_OFFSET_AIM = -0.01f; // (Для прицеливания)
-    constexpr float TENDTO_SPEED = 5.f; // Скорость нормализации положения ствола
-    constexpr float TENDTO_SPEED_AIM = 8.f; // (Для прицеливания)
 
     inertion_data.m_pitch_offset_r = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_right", PITCH_OFFSET_R);
     inertion_data.m_pitch_offset_n = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_up", PITCH_OFFSET_N);
@@ -1043,8 +1043,8 @@ void CHudItem::UpdateHudAdditional(Fmatrix& trans, const bool need_update_collis
     attachable_hud_item* hi = HudItemData();
     u8 idx = GetCurrentHudOffsetIdx();
     const bool b_aiming = idx != hud_item_measures::m_hands_offset_type_normal;
-    Fvector zr_offs = hi->m_measures.m_hands_offset[hud_item_measures::m_hands_offset_pos][idx];
-    Fvector zr_rot = hi->m_measures.m_hands_offset[hud_item_measures::m_hands_offset_rot][idx];
+    Fvector zr_offs = hi->hands_offset_pos(); // m_measures.m_hands_offset[hud_item_measures::m_hands_offset_pos][idx];
+    Fvector zr_rot = hi->hands_offset_rot(); // m_measures.m_hands_offset[hud_item_measures::m_hands_offset_rot][idx];
 
     //============ Поворот ствола во время аима ===========//
     if (b_aiming)
@@ -1584,4 +1584,35 @@ void CHudItem::SetToScreenCenter(Fvector& dir, Fvector& pos, float distance)
     dir = pActor->Cameras().Direction();
     pos = pActor->Cameras().Position();
     pos.mad(pos, dir, distance);
+}
+
+void CHudItem::SetHudSection(shared_str sect) 
+{ 
+    if (!xr_strcmp(hud_sect, sect))
+        return;
+    hud_sect = sect;
+
+    if (pSettings->line_exist(hud_sect, "allow_inertion"))
+        EnableHudInertion(pSettings->r_bool(hud_sect, "allow_inertion"));
+
+    if (pSettings->line_exist(hud_sect, "allow_bobbing"))
+        allow_bobbing = pSettings->r_bool(hud_sect, "allow_bobbing");
+
+    hud_recalc_koef = READ_IF_EXISTS(pSettings, r_float, hud_sect, "hud_recalc_koef",
+                                     1.35f); // На калаше при 1.35 вроде норм смотрится, другим стволам возможно придется подбирать другие значения.
+
+    inertion_data.m_pitch_offset_r = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_right", PITCH_OFFSET_R);
+    inertion_data.m_pitch_offset_n = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_up", PITCH_OFFSET_N);
+    inertion_data.m_pitch_offset_d = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_forward", PITCH_OFFSET_D);
+    inertion_data.m_pitch_low_limit = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_up_low_limit", PITCH_LOW_LIMIT);
+
+    inertion_data.m_origin_offset = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_origin_offset", ORIGIN_OFFSET);
+    inertion_data.m_origin_offset_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_origin_offset", ORIGIN_OFFSET_AIM);
+    inertion_data.m_tendto_speed = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_tendto_speed", TENDTO_SPEED);
+    inertion_data.m_tendto_speed_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_tendto_speed", TENDTO_SPEED_AIM);
+
+    auto hi = HudItemData();
+    if (hi)
+        hi->load(sect);
+    on_a_hud_attach();
 }

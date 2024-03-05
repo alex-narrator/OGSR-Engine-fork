@@ -707,6 +707,10 @@ public:
     void SetAmmoBoxSize(u16);
 
     const char* GetVisualName() const;
+    void SetVisualName(LPCSTR);
+
+    const char* GetHudSect() const;
+    void SetHudSect(LPCSTR);
 
     CScriptIniFile* GetVisIni();
     void SetBoneVisible(LPCSTR _bone_name, BOOL _visible);

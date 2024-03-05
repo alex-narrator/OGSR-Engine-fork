@@ -1192,7 +1192,22 @@ void CWeapon::UpdateHUDAddonsVisibility()
     auto pWeaponVisual = smart_cast<IKinematics*>(Visual());
 
     if (AddonAttachable(eScope))
+    {
+        LPCSTR scope_hud_sect{};
+        if (IsAddonAttached(eScope))
+        {
+            string1024 res_sect{};
+            sprintf(res_sect, "%s_hud_sect", GetAddonName(eScope).c_str());
+            scope_hud_sect = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+        }
+        else
+            scope_hud_sect = READ_IF_EXISTS(pSettings, r_string, cNameSect(), "hud", nullptr);
+
+        if (scope_hud_sect && xr_strcmp(HudSection().c_str(), scope_hud_sect) != 0)
+            SetHudSection(scope_hud_sect);
+
         HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, IsAddonAttached(eScope), TRUE);
+    }
 
     if (m_eScopeStatus == ALife::eAddonDisabled)
         HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, FALSE, TRUE);
@@ -1245,6 +1260,22 @@ void CWeapon::UpdateAddonsVisibility()
     VERIFY(pWeaponVisual);
 
     UpdateHUDAddonsVisibility();
+
+    if (AddonAttachable(eScope))
+    {
+        LPCSTR scope_visual{};
+        if (IsAddonAttached(eScope))
+        {
+            string1024 res_sect{};
+            sprintf(res_sect, "%s_visual", GetAddonName(eScope).c_str());
+            scope_visual = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+        }
+        else
+            scope_visual = READ_IF_EXISTS(pSettings, r_string, cNameSect(), "visual", nullptr);
+
+        if (scope_visual && xr_strcmp(cNameVisual().c_str(), scope_visual) != 0)
+            cNameVisual_set(scope_visual);
+    }
 
     ///////////////////////////////////////////////////////////////////
     u16 bone_id{};

@@ -373,8 +373,12 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("get_shape_radius", &CScriptGameObject::GetShapeRadius)
 
         .def("get_visual_name", &CScriptGameObject::GetVisualName)
+        .def("set_visual_name", &CScriptGameObject::SetVisualName)
         .def("get_visual_ini", &CScriptGameObject::GetVisIni)
 
+        .def("get_hud_sect", &CScriptGameObject::GetHudSect)
+        .def("set_hud_sect", &CScriptGameObject::SetHudSect)
+            
         .def("set_bone_visible", &CScriptGameObject::SetBoneVisible)
         .def("set_hud_bone_visible", &CScriptGameObject::SetHudBoneVisible)
         .def("get_bone_visible", &CScriptGameObject::GetBoneVisible)

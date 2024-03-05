@@ -1154,6 +1154,30 @@ const char* CScriptGameObject::GetVisualName() const
     return *object().cNameVisual();
 }
 
+void CScriptGameObject::SetVisualName(LPCSTR vis_name) { object().cNameVisual_set(vis_name); }
+
+const char* CScriptGameObject::GetHudSect() const 
+{ 
+    auto hud_item = smart_cast<CHudItem*>(&object());
+    if (!hud_item)
+    {
+        Msg("Error! CScriptGameObject::GetHudSect : %s is not a HudItem", object().cName().c_str());
+        return "";
+    }
+    return hud_item->HudSection().c_str();
+}
+
+void CScriptGameObject::SetHudSect(LPCSTR hud_sect) 
+{ 
+    auto hud_item = smart_cast<CHudItem*>(&object());
+    if (!hud_item)
+    {
+        Msg("Error! CScriptGameObject::SetHudSect : %s is not a HudItem", object().cName().c_str());
+        return;
+    }
+    hud_item->SetHudSection(hud_sect);
+}
+
 const CCoverPoint* CScriptGameObject::angle_cover(const Fvector& position, float radius, const Fvector& enemy_position, float min_enemy_distance, float max_enemy_distance,
                                                   u32 enemy_vertex_id)
 {

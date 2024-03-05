@@ -189,6 +189,7 @@ public:
     virtual void on_a_hud_attach();
     virtual void on_b_hud_detach();
     const shared_str& HudSection() const { return hud_sect; }
+    void SetHudSection(shared_str sect);
 
     BOOL GetHUDmode();
     IC void SetPending(BOOL H) { m_huditem_flags.set(fl_pending, H); }
