@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#pragma hdrstop
+
 
 #include "render.h"
 
@@ -453,10 +453,6 @@ void CEnvironment::OnFrame()
 
     // Limit min at 200 to avoid slow-mo at extremly low speed.
     float WindVel = std::max(CurrentEnv->wind_velocity, 200.f) * 0.001f;
-
-    extern Fvector4 ps_ssfx_wind; // DEBUG
-    if (ps_ssfx_wind.x > 0) // DEBUG
-         WindVel = ps_ssfx_wind.x;
 
     const float WindDir = -CurrentEnv->wind_direction + PI_DIV_2;
     const Fvector2 WDir{_cos(WindDir), _sin(WindDir)};

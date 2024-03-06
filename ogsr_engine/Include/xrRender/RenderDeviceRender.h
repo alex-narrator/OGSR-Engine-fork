@@ -24,7 +24,6 @@ public:
 
     //	Destroy
     virtual void OnDeviceDestroy(BOOL bKeepTextures) = 0;
-    virtual void ValidateHW() = 0;
     virtual void DestroyHW() = 0;
     virtual void Reset(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2) = 0;
     //	Init
@@ -40,8 +39,6 @@ public:
     virtual void DeferredLoad(BOOL E) = 0;
     virtual void ResourcesDeferredUpload() = 0;
     virtual void ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps) = 0;
-    virtual void ResourcesDestroyNecessaryTextures() = 0;
-    virtual void ResourcesStoreNecessaryTextures() = 0;
     virtual void ResourcesDumpMemoryUsage() = 0;
 
     //	HWSupport

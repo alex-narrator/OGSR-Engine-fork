@@ -57,16 +57,7 @@ static class cl_texgen final : public R_constant_setup
     void setup(R_constant* C) override
     {
         Fmatrix mTexgen;
-
-#if defined(USE_DX10) || defined(USE_DX11)
         Fmatrix mTexelAdjust = {0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f};
-#else //	USE_DX10
-        float _w = float(RDEVICE.dwWidth);
-        float _h = float(RDEVICE.dwHeight);
-        float o_w = (.5f / _w);
-        float o_h = (.5f / _h);
-        Fmatrix mTexelAdjust = {0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f};
-#endif //	USE_DX10
 
         mTexgen.mul(mTexelAdjust, RCache.xforms.m_wvp);
 
@@ -79,16 +70,7 @@ static class cl_VPtexgen final : public R_constant_setup
     void setup(R_constant* C) override
     {
         Fmatrix mTexgen;
-
-#if defined(USE_DX10) || defined(USE_DX11)
         Fmatrix mTexelAdjust = {0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f};
-#else //	USE_DX10
-        float _w = float(RDEVICE.dwWidth);
-        float _h = float(RDEVICE.dwHeight);
-        float o_w = (.5f / _w);
-        float o_h = (.5f / _h);
-        Fmatrix mTexelAdjust = {0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f};
-#endif //	USE_DX10
 
         mTexgen.mul(mTexelAdjust, RCache.xforms.m_vp);
 
@@ -516,15 +498,15 @@ static class cl_wind_params final : public R_constant_setup
     }
 } binder_wind_params;
 
-static class ssfx_wind final : public R_constant_setup
+static class ssfx_wind_grass final : public R_constant_setup
 {
-    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_wind); }
-} ssfx_wind;
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_wind_grass); }
+} ssfx_wind_grass;
 
-static class ssfx_wind_gust final : public R_constant_setup
+static class ssfx_wind_trees final : public R_constant_setup
 {
-    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_wind_gust); }
-} ssfx_wind_gust;
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_wind_trees); }
+} ssfx_wind_trees;
 
 static class ssfx_wind_anim final : public R_constant_setup
 {
@@ -534,6 +516,16 @@ static class ssfx_wind_anim final : public R_constant_setup
         RCache.set_c(C, WindAni.x, WindAni.y, WindAni.z, 0.f);
     }
 } ssfx_wind_anim;
+
+static class ssfx_lut final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_lut); }
+} ssfx_lut;
+
+static class ssfx_shadow_bias final : public R_constant_setup
+{
+    void setup(R_constant* C) override { RCache.set_c(C, ps_ssfx_shadow_bias.x, ps_ssfx_shadow_bias.y, 0.f, 0.f); }
+} ssfx_shadow_bias;
 
 
 // Standart constant-binding
@@ -639,8 +631,10 @@ void CBlender_Compile::SetMapping()
     r_Constant("ssfx_florafixes_2", &ssfx_florafixes_2);
     r_Constant("wind_params", &binder_wind_params);
     r_Constant("ssfx_wind_anim", &ssfx_wind_anim);
-    r_Constant("ssfx_wind", &ssfx_wind);
-    r_Constant("ssfx_wind_gust", &ssfx_wind_gust);
+    r_Constant("ssfx_wsetup_grass", &ssfx_wind_grass);
+    r_Constant("ssfx_wsetup_trees", &ssfx_wind_trees);
+    r_Constant("ssfx_lut", &ssfx_lut);
+    r_Constant("ssfx_shadow_bias", &ssfx_shadow_bias);
 
     r_Constant("pp_img_corrections", &pp_image_corrections);
     r_Constant("pp_img_cg", &pp_color_grading);

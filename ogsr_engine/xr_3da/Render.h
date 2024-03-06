@@ -45,6 +45,7 @@ public:
 
 public:
     virtual void set_type(LT type) = 0;
+    virtual u32 get_type() const = 0;
     virtual void set_active(bool) = 0;
     virtual bool get_active() = 0;
     virtual void set_shadow(bool) = 0;
@@ -67,6 +68,9 @@ public:
 
     virtual void set_hud_mode(bool b) = 0;
     virtual bool get_hud_mode() = 0;
+
+    virtual void set_moveable(bool) = 0;
+
     virtual ~IRender_Light();
 };
 struct ENGINE_API resptrcode_light : public resptr_base<IRender_Light>
@@ -211,7 +215,6 @@ public:
     virtual void level_Load(IReader*) = 0;
     virtual void level_Unload() = 0;
 
-    // virtual IDirect3DBaseTexture9*	texture_load			(LPCSTR	fname, u32& msize)					= 0;
     void shader_option_skinning(s32 mode) { m_skinning = mode; }
     virtual HRESULT shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcDataLen, LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags, void*& result) = 0;
 

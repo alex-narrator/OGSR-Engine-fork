@@ -1,11 +1,13 @@
 #include "stdafx.h"
 
 #include "../../xr_3da/Render.h"
+
 #include "../xrRender/ResourceManager.h"
 #include "../xrRender/tss.h"
 #include "../xrRender/blenders/blender.h"
 #include "../xrRender/blenders/blender_recorder.h"
 #include "../xrRender/dxRenderDeviceRender.h"
+
 #include <format>
 
 class adopt_dx10options
@@ -71,7 +73,7 @@ class adopt_compiler
     CBlender_Compile* C;
     bool& m_bFirstPass;
 
-    void TryEndPass()
+    void TryEndPass() const
     {
         if (!m_bFirstPass)
             C->r_End();
@@ -201,6 +203,7 @@ public:
 #include "../../xr_3da/ai_script_space.h"
 
 lua_State* LSVM = nullptr;
+
 constexpr const char* GlobalNamespace = "_G";
 static constexpr const char* FILE_HEADER =
     "\
@@ -454,10 +457,10 @@ static void* __cdecl luabind_allocator(luabind::memory_allocation_function_param
     }
 
     if (!pointer)
-        return Memory.mem_alloc(size);
+        return xr_malloc(size);
 
     void* non_const_pointer = const_cast<LPVOID>(pointer);
-    return Memory.mem_realloc(non_const_pointer, size);
+    return xr_realloc(non_const_pointer, size);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////

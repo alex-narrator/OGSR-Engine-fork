@@ -79,6 +79,9 @@ float adj_delta_rot = 0.05f;
 
 BOOL g_bCheckTime = FALSE;
 int net_cl_inputupdaterate = 50;
+
+extern BOOL g_enable_memory_debug;
+
 Flags32 g_mt_config = {mtLevelPath | mtDetailPath | mtObjectHandler | mtSoundPlayer | mtAiVision | mtBullets | mtLUA_GC | mtLevelSounds | mtALife};
 
 Flags32 dbg_net_Draw_Flags = {0};
@@ -137,10 +140,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         Memory.mem_compact();
-        size_t _process_heap = mem_usage_impl(nullptr, nullptr);
-        u32 _render = ::Render->memory_usage();
-        u32 _eco_strings = g_pStringContainer->stat_economy();
-        u32 _eco_smem = g_pSharedMemoryContainer->stat_economy();
+
         u32 m_base = 0, c_base = 0, m_lmaps = 0, c_lmaps = 0;
 
         //	Resource check moved to m_pRender
@@ -183,6 +183,12 @@ public:
 
         Log("--------------------------------------------------------------------------------");
 
+        const size_t _process_heap = mem_usage_impl(nullptr, nullptr);
+        const u32 _render = ::Render->memory_usage();
+        const u32 _eco_strings = g_pStringContainer->stat_economy();
+        const u32 _eco_smem = g_pSharedMemoryContainer->stat_economy();
+
+        Msg("* [ D3D ]: textures count [%d]", (c_base + c_lmaps));
         Msg("* [ D3D ]: textures[%d K]", (m_base + m_lmaps) / 1024);
         Msg("* [x-ray]: process heap[%d K], render[%d K]", _process_heap / 1024, _render / 1024);
         Msg("* [x-ray]: economy: strings[%d K], smem[%d K]", _eco_strings / 1024, _eco_smem);
@@ -1372,6 +1378,44 @@ public:
     }
 };
 
+#ifdef USE_MEMORY_VALIDATOR
+
+class CCC_DbgMemoryDump : public IConsole_Command
+{
+public:
+    CCC_DbgMemoryDump(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; }
+
+    virtual void Execute(LPCSTR args)
+    {
+        float thresholdInKb = 1.f;
+
+        if (strlen(args) > 0)
+        {
+            thresholdInKb = atof(args);
+        }
+
+        PointerRegistryDump(thresholdInKb);
+    }
+};
+
+class CCC_DbgMemoryClear : public IConsole_Command
+{
+public:
+    CCC_DbgMemoryClear(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; }
+
+    virtual void Execute(LPCSTR args) { PointerRegistryClear(); }
+};
+
+class CCC_DbgMemoryInfo : public IConsole_Command
+{
+public:
+    CCC_DbgMemoryInfo(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; }
+
+    virtual void Execute(LPCSTR args) { PointerRegistryInfo(); }
+};
+
+#endif
+
 void CCC_RegisterCommands()
 {
     CMD1(CCC_MemStats, "stat_memory");
@@ -1594,13 +1638,12 @@ void CCC_RegisterCommands()
 
     CMD3(CCC_Mask, "dbg_draw_skeleton", &dbg_net_Draw_Flags, (1 << 11));
 
-#ifdef DEBUG
-    CMD4(CCC_Integer, "string_table_error_msg", &CStringTable::m_bWriteErrorsToLog, 0, 1);
+    CMD4(CCC_Integer, "dbg_string_table_error_msg", &CStringTable::WriteErrorsToLog, 0, 1);
 
+#ifdef DEBUG
     CMD1(CCC_DumpInfos, "dump_infos");
     CMD1(CCC_DumpMap, "dump_map");
     CMD1(CCC_DumpCreatures, "dump_creatures");
-
 #endif
 
     CMD3(CCC_Mask, "cl_dynamiccrosshair", &psHUD_Flags, HUD_CROSSHAIR_DYNAMIC);
@@ -1636,4 +1679,13 @@ void CCC_RegisterCommands()
 
     CMD4(CCC_Float, "g_cam_height_speed", &cam_HeightInterpolationSpeed, 4.0f, 16.0f);
     CMD4(CCC_Float, "g_cam_lookout_speed", &cam_LookoutSpeed, 1.0f, 4.0f);
+
+#ifdef USE_MEMORY_VALIDATOR
+    CMD4(CCC_Integer, "g_enable_memory_debug", &g_enable_memory_debug, 0, 1);
+    CMD1(CCC_DbgMemoryDump, "dbg_memory_dump");
+    CMD1(CCC_DbgMemoryInfo, "dbg_memory_info");
+    CMD1(CCC_DbgMemoryClear, "dbg_memory_clear");
+    if (!g_enable_memory_debug)
+        PointerRegistryClear();
+#endif
 }

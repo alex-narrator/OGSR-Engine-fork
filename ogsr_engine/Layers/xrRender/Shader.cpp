@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#pragma hdrstop
+
 
 #include "Shader.h"
 #include "ResourceManager.h"
@@ -12,11 +12,17 @@
 
 //
 STextureList::~STextureList() { DEV->_DeleteTextureList(this); }
+
 SMatrixList::~SMatrixList() { DEV->_DeleteMatrixList(this); }
+
 SConstantList::~SConstantList() { DEV->_DeleteConstantList(this); }
+
 SPass::~SPass() { DEV->_DeletePass(this); }
+
 ShaderElement::~ShaderElement() { DEV->_DeleteElement(this); }
+
 SGeometry::~SGeometry() { DEV->DeleteGeom(this); }
+
 Shader::~Shader() { DEV->Delete(this); }
 
 //////////////////////////////////////////////////////////////////////////
@@ -41,21 +47,16 @@ BOOL SPass::equal(const SPass& other)
         return FALSE;
     if (vs != other.vs)
         return FALSE;
-#if defined(USE_DX10) || defined(USE_DX11)
     if (gs != other.gs)
         return FALSE;
-#ifdef USE_DX11
     if (hs != other.hs)
         return FALSE;
     if (ds != other.ds)
         return FALSE;
     if (cs != other.cs)
         return FALSE;
-#endif
-#endif //	USE_DX10
     if (constants != other.constants)
         return FALSE; // is this nessesary??? (ps+vs already combines)
-
     if (T != other.T)
         return FALSE;
     if (C != other.C)

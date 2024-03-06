@@ -16,7 +16,7 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
     // VERIFY(_desc);
     // ID3D10ShaderReflectionConstantBuffer *pTable = (ID3D10ShaderReflectionConstantBuffer *)_desc;
     VERIFY(pTable);
-    D3D_SHADER_BUFFER_DESC TableDesc;
+    D3D_SHADER_BUFFER_DESC TableDesc{};
     CHK_DX(pTable->GetDesc(&TableDesc));
 
     // D3DXSHADER_CONSTANTTABLE* desc	= (D3DXSHADER_CONSTANTTABLE*) _desc;
@@ -26,9 +26,9 @@ BOOL R_constant_table::parseConstants(ID3DShaderReflectionConstantBuffer* pTable
     for (u32 i = 0; i < TableDesc.Variables; ++i)
     {
         ID3DShaderReflectionVariable* pVar;
-        D3D_SHADER_VARIABLE_DESC VarDesc;
+        D3D_SHADER_VARIABLE_DESC VarDesc{};
         ID3DShaderReflectionType* pType;
-        D3D_SHADER_TYPE_DESC TypeDesc;
+        D3D_SHADER_TYPE_DESC TypeDesc{};
 
         pVar = pTable->GetVariableByIndex(i);
         VERIFY(pVar);
@@ -191,7 +191,7 @@ BOOL R_constant_table::parseResources(ID3DShaderReflection* pReflection, int Res
 {
     for (int i = 0; i < ResNum; ++i)
     {
-        D3D_SHADER_INPUT_BIND_DESC ResDesc;
+        D3D_SHADER_INPUT_BIND_DESC ResDesc{};
         pReflection->GetResourceBindingDesc(i, &ResDesc);
 
         u16 type = 0;
@@ -269,14 +269,10 @@ IC u32 dest_to_shift_value(u32 destination)
     {
     case RC_dest_vertex: return RC_dest_vertex_cb_index_shift;
     case RC_dest_pixel: return RC_dest_pixel_cb_index_shift;
-#if defined(USE_DX10) || defined(USE_DX11)
     case RC_dest_geometry: return RC_dest_geometry_cb_index_shift;
-#ifdef USE_DX11
     case RC_dest_hull: return RC_dest_hull_cb_index_shift;
     case RC_dest_domain: return RC_dest_domain_cb_index_shift;
     case RC_dest_compute: return RC_dest_compute_cb_index_shift;
-#endif
-#endif
     default: FATAL("invalid enumeration for shader");
     }
     return 0;
@@ -288,14 +284,10 @@ IC u32 dest_to_cbuf_type(u32 destination)
     {
     case RC_dest_vertex: return CB_BufferVertexShader;
     case RC_dest_pixel: return CB_BufferPixelShader;
-#if defined(USE_DX10) || defined(USE_DX11)
     case RC_dest_geometry: return CB_BufferGeometryShader;
-#ifdef USE_DX11
     case RC_dest_hull: return CB_BufferHullShader;
     case RC_dest_domain: return CB_BufferDomainShader;
     case RC_dest_compute: return CB_BufferComputeShader;
-#endif
-#endif
     default: FATAL("invalid enumeration for shader");
     }
     return 0;
@@ -305,7 +297,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
 {
     ID3DShaderReflection* pReflection = (ID3DShaderReflection*)_desc;
 
-    D3D_SHADER_DESC ShaderDesc;
+    D3D_SHADER_DESC ShaderDesc{};
     pReflection->GetDesc(&ShaderDesc);
 
     if (ShaderDesc.ConstantBuffers)

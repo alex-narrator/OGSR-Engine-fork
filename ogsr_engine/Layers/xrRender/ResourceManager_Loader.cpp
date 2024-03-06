@@ -1,47 +1,24 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "ResourceManager.h"
 #include "blenders\blender.h"
+
+BOOL bShadersXrExport{};
 
 void CResourceManager::OnDeviceDestroy(BOOL)
 {
     if (RDEVICE.b_is_Ready)
         return;
+
     m_textures_description.UnLoad();
-
-    // Matrices
-    for (map_Matrix::iterator m = m_matrices.begin(); m != m_matrices.end(); m++)
-    {
-        R_ASSERT(1 == m->second->dwReference);
-        xr_delete(m->second);
-    }
-    m_matrices.clear();
-
-    // Constants
-    for (map_Constant::iterator c = m_constants.begin(); c != m_constants.end(); c++)
-    {
-        R_ASSERT(1 == c->second->dwReference);
-        xr_delete(c->second);
-    }
-    m_constants.clear();
 
     // Release blenders
     for (map_BlenderIt b = m_blenders.begin(); b != m_blenders.end(); b++)
     {
         xr_free((char*&)b->first);
-        IBlender::Destroy(b->second);
+        IBlenderXr::Destroy(b->second);
     }
     m_blenders.clear();
-
-    // destroy TD
-    for (map_TDIt _t = m_td.begin(); _t != m_td.end(); _t++)
-    {
-        xr_free((char*&)_t->first);
-        xr_free((char*&)_t->second.T);
-        xr_delete(_t->second.cs);
-    }
-    m_td.clear();
 
     // scripting
     LS_Unload();
@@ -55,70 +32,57 @@ void CResourceManager::OnDeviceCreate()
     // scripting
     LS_Load();
 
-    FS_FileSet flist;
-    FS.file_list(flist, _game_data_, FS_ListFiles | FS_RootOnly, "*shaders*.xr");
-    Msg("[%s] count of *shaders*.xr files: [%u]", __FUNCTION__, flist.size());
-
-    for (const auto& file : flist)
+    string_path fname;
+    if (FS.exist(fname, _game_data_, "shaders.ltx"))
     {
-        string_path fname;
-        FS.update_path(fname, "$game_data$", file.name.c_str());
+        Msg("Loading shader file: [%s]", fname);
+        LoadShaderLtxFile(fname);
+    }
+    else
+    {
+        if (FS.exist(fname, _game_data_, "shaders.xr"))
+        {
+            Msg("Loading shader file: [%s]", fname);
+            LoadShaderFile(fname);
+        }
 
-        //Msg("Loading shader file: [%s]", fname);
-
-        LoadSharedFile(fname);
+        if (FS.exist(fname, _game_data_, "shaders_cop.xr"))
+        {
+            Msg("Loading shader file: [%s]", fname);
+            LoadShaderFile(fname);
+        }
     }
 
     m_textures_description.Load();
 }
 
-void CResourceManager::LoadSharedFile(LPCSTR fname)
+void CResourceManager::LoadShaderFile(LPCSTR fname)
 {
     // Check if file is compressed already
     string32 ID = "shENGINE";
+
     string32 id;
     IReader* F = FS.r_open(fname);
     R_ASSERT2(F, fname);
     F->r(&id, 8);
+
     if (0 == strncmp(id, ID, 8))
     {
         FATAL("Unsupported blender library. Compressed?");
-    }
-    
-    string256 name;
+    }    
 
-    IReader* fs = 0;
-    // Load constants
-    fs = F->open_chunk(0);
-    if (fs)
-    {
-        while (!fs->eof())
-        {
-            fs->r_stringZ(name, sizeof(name));
-            CConstant* C = _CreateConstant(name); // create or return
-            C->Load(fs);
-        }
-        fs->close();
-    }
+    string_path ini_path;
+    strcpy_s(ini_path, fname);
+    if (strext(ini_path))
+        *strext(ini_path) = 0;
+    strcat_s(ini_path, ".ltx");
 
-    // Load matrices
-    fs = F->open_chunk(1);
-    if (fs)
-    {
-        while (!fs->eof())
-        {
-            fs->r_stringZ(name, sizeof(name));
-            CMatrix* M = _CreateMatrix(name); // create or return
-            M->Load(fs);
-        }
-        fs->close();
-    }
+    CInifile ini(ini_path, 0, 1, bShadersXrExport);
 
     // Load blenders
-    fs = F->open_chunk(2);
-    if (fs)
+    if (IReader* fs = F->open_chunk(2))
     {
-        IReader* chunk = NULL;
+        IReader* chunk;
         int chunk_id = 0;
 
         while ((chunk = fs->open_chunk(chunk_id)) != nullptr)
@@ -126,33 +90,39 @@ void CResourceManager::LoadSharedFile(LPCSTR fname)
             CBlender_DESC desc;
             chunk->r(&desc, sizeof(desc));
 
-            if (desc.CLS == B_SHADOW_WORLD)
-            {
-                chunk->close();
-                chunk_id += 1;
-                continue;
-            }
-
-            IBlender* B = IBlender::Create(desc.CLS);
-            if (0 == B)
+            IBlenderXr* B = IBlenderXr::Create(desc.CLS);
+            if (!B)
             {
                 Msg("! Renderer doesn't support blender '%s'", desc.cName);
             }
             else
             {
-                if (B->getDescription().version != desc.version)
+                if (B->getDescription().version < desc.version)
                 {
                     Msg("! Version conflict in shader '%s'", desc.cName);
                 }
 
                 chunk->seek(0);
+
                 B->Load(*chunk, desc.version);
+
+                // для конвертации в ltx
+                if (bShadersXrExport)
+                {
+                    if (ini.section_exist(desc.cName))
+                    {
+                        Msg("~~Found existing section [%s] in [%s]. Replacing!", desc.cName, ini_path);
+                        ini.remove_section(desc.cName);
+                    }
+                    B->SaveIni(&ini, desc.cName);
+                }
 
                 //Msg("Loading shader: [%s]", desc.cName);
 
                 std::pair<map_BlenderIt, bool> I = m_blenders.insert_or_assign(xr_strdup(desc.cName), B);
                 ASSERT_FMT(I.second, "CResourceManager::LoadSharedFile - found shader name [%s]", desc.cName);
             }
+
             chunk->close();
             chunk_id += 1;
         }
@@ -162,26 +132,38 @@ void CResourceManager::LoadSharedFile(LPCSTR fname)
     FS.r_close(F);
 }
 
-void CResourceManager::StoreNecessaryTextures()
+void CResourceManager::LoadShaderLtxFile(LPCSTR fname)
 {
-    if (!m_necessary.empty())
-        return;
+    string_path ini_path;
+    strcpy_s(ini_path, fname);
 
-    map_TextureIt it = m_textures.begin();
-    map_TextureIt it_e = m_textures.end();
+    CInifile ini(ini_path);
 
-    for (; it != it_e; ++it)
+    for (const auto& it : ini.sections())
     {
-        LPCSTR texture_name = it->first;
-        if (strstr(texture_name, "\\levels\\"))
-            continue;
-        if (!strchr(texture_name, '\\'))
-            continue;
+        auto& name = it.first;
 
-        ref_texture T;
-        T.create(texture_name);
-        m_necessary.push_back(T);
+        const CLASS_ID cls = ini.r_clsid(name, "class");
+        const u16 version = ini.r_u16(name, "version");
+
+        IBlenderXr* B = IBlenderXr::Create(cls);
+        if (!B)
+        {
+            Msg("! Renderer doesn't support blender '%s'", name.c_str());
+        }
+        else
+        {
+            if (B->getDescription().version < version)
+            {
+                Msg("! Version conflict in shader '%s'", name.c_str());
+            }
+
+            B->LoadIni(&ini, name.c_str());
+
+            // Msg("Loading shader: [%s]", desc.cName);
+
+            std::pair<map_BlenderIt, bool> I = m_blenders.insert_or_assign(xr_strdup(name.c_str()), B);
+            ASSERT_FMT(I.second, "CResourceManager::LoadSharedFile - found shader name [%s]", name.c_str());
+        }
     }
 }
-
-void CResourceManager::DestroyNecessaryTextures() { m_necessary.clear(); }

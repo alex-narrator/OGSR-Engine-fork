@@ -43,7 +43,7 @@ protected:
 
     Sect* Current{}; // for use during load only
 
-    void Load(IReader*, LPCSTR, BOOL, const CInifile*, bool root_level);
+    void Load(IReader*, LPCSTR, BOOL, const CInifile*, bool root_level, LPCSTR current_file);
 
 public:
     bool bReadOnly;
@@ -52,7 +52,7 @@ public:
 
 public:
     CInifile(IReader*, LPCSTR = 0);
-    CInifile(LPCSTR, BOOL = TRUE, BOOL = TRUE, BOOL = TRUE);
+    CInifile(LPCSTR, BOOL ReadOnly = TRUE, BOOL bLoad = TRUE, BOOL SaveAtEnd = TRUE);
 
     virtual ~CInifile();
 
@@ -141,6 +141,7 @@ public:
     BOOL r_line(LPCSTR, int, LPCSTR*, LPCSTR*);
     BOOL r_line(const shared_str&, int, LPCSTR*, LPCSTR*);
 
+    void w_clsid(LPCSTR, LPCSTR, CLASS_ID);
     void w_string(LPCSTR, LPCSTR, LPCSTR);
     void w_u8(LPCSTR, LPCSTR, u8);
     void w_u16(LPCSTR, LPCSTR, u16);

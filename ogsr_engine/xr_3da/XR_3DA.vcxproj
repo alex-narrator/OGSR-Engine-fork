@@ -120,7 +120,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <DisableSpecificWarnings>4456;4457;4458;4995;4652;4577;4267;4324;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4456;4457;4458;4995;4652;4577;4267;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
@@ -192,7 +192,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <DisableSpecificWarnings>4456;4457;4458;4995;4652;4577;4267;4324;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4456;4457;4458;4995;4652;4577;4267;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -267,7 +267,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>4456;4457;4458;4995;4577;4315;4267;4267;4324;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4456;4457;4458;4995;4577;4315;4267;4267;</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -335,7 +335,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>4456;4457;4458;4995;4577;4315;4267;4267;4324;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4456;4457;4458;4995;4577;4315;4267;4267;</DisableSpecificWarnings>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
@@ -371,6 +371,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="IPhysicsDefinitions.h" />
     <ClInclude Include="bone.h" />
     <ClInclude Include="cl_intersect.h" />
     <ClInclude Include="..\xrParticles\psystem.h" />
@@ -442,7 +443,6 @@
     <ClInclude Include="Stats.h" />
     <ClInclude Include="WaveForm.h" />
     <ClInclude Include="tntQAVI.h" />
-    <ClInclude Include="xrImage_Resampler.h" />
     <ClInclude Include="xrTheora_Stream.h" />
     <ClInclude Include="xrTheora_Surface.h" />
     <ClInclude Include="Properties.h" />
@@ -530,7 +530,6 @@
     <ClCompile Include="StatGraph.cpp" />
     <ClCompile Include="Stats.cpp" />
     <ClCompile Include="tntQAVI.cpp" />
-    <ClCompile Include="xrImage_Resampler.cpp" />
     <ClCompile Include="xrTheora_Stream.cpp" />
     <ClCompile Include="xrTheora_Surface.cpp" />
     <ClCompile Include="pure.cpp" />

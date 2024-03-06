@@ -25,9 +25,6 @@
     <Filter Include="Shading templates\R1">
       <UniqueIdentifier>{13bd57cd-3a32-4b8c-8f28-e69ec0bd0f1e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shading templates\3dFluid">
-      <UniqueIdentifier>{704b0610-2386-40c1-a4e6-7ad54b1261fd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shading templates\DX10 Rain">
       <UniqueIdentifier>{878dd200-583a-4bab-a0d2-21e4b867c58a}</UniqueIdentifier>
     </Filter>
@@ -222,9 +219,6 @@
     <ClInclude Include="..\xrRender\r__occlusion.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\r__pixel_calculator.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\r_sun_cascades.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -294,12 +288,6 @@
     <ClInclude Include="blender_deffer_model.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\Blender_Editor_Selection.h">
-      <Filter>Shading templates</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRender\Blender_Editor_Wire.h">
-      <Filter>Shading templates</Filter>
-    </ClInclude>
     <ClInclude Include="blender_light_direct.h">
       <Filter>Shading templates</Filter>
     </ClInclude>
@@ -345,17 +333,11 @@
     <ClInclude Include="..\xrRender\Blender_tree.h">
       <Filter>Shading templates\R1</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.h">
-      <Filter>Shading templates\3dFluid</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.h">
       <Filter>Shading templates\DX10 Rain</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\ModelPool.h">
       <Filter>Models</Filter>
-    </ClInclude>
-    <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidVolume.h">
-      <Filter>Models\Visuals</Filter>
     </ClInclude>
     <ClInclude Include="..\xrRender\FLOD.h">
       <Filter>Models\Visuals</Filter>
@@ -735,6 +717,15 @@
     <ClInclude Include="..\xrRenderDX10\imgui_impl_dx11.h">
       <Filter>imgui_render</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrRender\ParticleEffectActions.h">
+      <Filter>Models\Visuals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.h">
+      <Filter>3DFluid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrRenderDX10\3DFluid\dx103DFluidVolume.h">
+      <Filter>3DFluid</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -795,9 +786,6 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\r__occlusion.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\r__pixel_calculator.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\r__screenshot.cpp">
@@ -887,12 +875,6 @@
     <ClCompile Include="blender_deffer_model.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\Blender_Editor_Selection.cpp">
-      <Filter>Shading templates</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\Blender_Editor_Wire.cpp">
-      <Filter>Shading templates</Filter>
-    </ClCompile>
     <ClCompile Include="blender_light_direct.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
@@ -938,17 +920,11 @@
     <ClCompile Include="..\xrRender\Blender_tree.cpp">
       <Filter>Shading templates\R1</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.cpp">
-      <Filter>Shading templates\3dFluid</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRenderDX10\DX10 Rain\dx10RainBlender.cpp">
       <Filter>Shading templates\DX10 Rain</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\ModelPool.cpp">
       <Filter>Models</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidVolume.cpp">
-      <Filter>Models\Visuals</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\FLOD.cpp">
       <Filter>Models\Visuals</Filter>
@@ -1316,9 +1292,6 @@
     <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidRenderer.cpp">
       <Filter>3DFluid</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrRender\Debug\dxPixEventWrapper.cpp">
-      <Filter>Debug</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrRender\RenderTargetPhaseRainDrops.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
@@ -1345,6 +1318,18 @@
     </ClCompile>
     <ClCompile Include="..\xrRenderDX10\imgui_impl_dx11.cpp">
       <Filter>imgui_render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\rendertarget_phase_lut.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRender\ParticleEffectActions.cpp">
+      <Filter>Models\Visuals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.cpp">
+      <Filter>3DFluid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidVolume.cpp">
+      <Filter>3DFluid</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

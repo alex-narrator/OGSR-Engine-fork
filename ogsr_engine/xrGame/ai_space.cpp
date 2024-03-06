@@ -54,7 +54,12 @@ void CAI_Space::init()
 
 CAI_Space::~CAI_Space()
 {
-    unload();
+    xr_delete(m_graph_engine);
+    xr_delete(m_level_graph);
+
+    script_engine().unload();
+
+    xr_delete(m_patrol_path_storage);
 
     xr_delete(m_patrol_path_storage);
     xr_delete(m_ef_storage);
@@ -63,7 +68,6 @@ CAI_Space::~CAI_Space()
     VERIFY(!m_game_graph);
 
     xr_delete(m_script_engine);
-
     xr_delete(m_cover_manager);
 }
 
@@ -71,7 +75,7 @@ void CAI_Space::load(LPCSTR level_name)
 {
     VERIFY(m_game_graph);
 
-    unload(true);
+    unload(true); // перезагрузка на одной и тоже локации !!!
 
 #ifdef DEBUG
     Memory.mem_compact();
@@ -110,12 +114,21 @@ void CAI_Space::load(LPCSTR level_name)
 
 void CAI_Space::unload(bool reload)
 {
-    script_engine().unload();
     xr_delete(m_graph_engine);
     xr_delete(m_level_graph);
-    
-    if (!reload && m_game_graph)
-        m_graph_engine = xr_new<CGraphEngine>(game_graph().header().vertex_count());
+
+    if (!reload)
+    {
+        script_engine().unload();
+        script_engine().init();
+
+        xr_delete(m_patrol_path_storage);
+        m_cover_manager->clear();
+    }
+
+    // ???
+    /*if (!reload && m_game_graph)
+        m_graph_engine = xr_new<CGraphEngine>(game_graph().header().vertex_count());*/
 }
 
 #ifdef DEBUG
@@ -155,6 +168,7 @@ void CAI_Space::patrol_path_storage(IReader& stream)
 {
     xr_delete(m_patrol_path_storage);
     m_patrol_path_storage = xr_new<CPatrolPathStorage>();
+
     m_patrol_path_storage->load(stream);
 }
 
@@ -168,5 +182,6 @@ void CAI_Space::set_alife(CALifeSimulator* alife_simulator)
     VERIFY(!alife_simulator || !m_game_graph);
     if (alife_simulator)
         return;
+
     set_game_graph(nullptr);
 }

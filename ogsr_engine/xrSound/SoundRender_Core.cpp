@@ -10,6 +10,7 @@
 #include <eax.h>
 #pragma warning(pop)
 
+BOOL bSenvironmentXrExport{};
 int psSoundTargets = 256; // 512; //--#SM+#-- //32;
 Flags32 psSoundFlags = {ss_Hardware};
 float psSoundOcclusionScale = 0.5f;
@@ -52,7 +53,7 @@ CSoundRender_Core::CSoundRender_Core()
     s_targets_pu = 0;
     s_emitters_u = 0;
     e_current.set_identity();
-    e_target.set_identity();
+    e_target = get_environment_def();
     bListenerMoved = FALSE;
     bReady = FALSE;
     bLocked = FALSE;
@@ -134,17 +135,36 @@ int CSoundRender_Core::pause_emitters(bool val)
     return m_iPauseCounter;
 }
 
+#define SNDENV_FILENAME_XR "senvironment.xr"
+#define SNDENV_FILENAME_LTX "senvironment.ltx"
+
 void CSoundRender_Core::env_load()
 {
     // Load environment
     string_path fn;
-    if (FS.exist(fn, "$game_data$", SNDENV_FILENAME))
+    if (FS.exist(fn, "$game_data$", SNDENV_FILENAME_LTX))
     {
-        Msg("Loading of [%s]", SNDENV_FILENAME);
+        Msg("Loading of [%s]", SNDENV_FILENAME_LTX);
 
-        s_environment = xr_new<SoundEnvironment_LIB>();
+        if (!s_environment)
+            s_environment = xr_new<SoundEnvironment_LIB>();
+
+        CInifile inifile{fn, 1, 1, 0};
+
+        s_environment->LoadIni(&inifile);
+    }
+    else if (FS.exist(fn, "$game_data$", SNDENV_FILENAME_XR))
+    {
+        Msg("Loading of [%s]", SNDENV_FILENAME_XR);
+
+        if (!s_environment)
+            s_environment = xr_new<SoundEnvironment_LIB>();
+
         s_environment->Load(fn);
+    }
 
+    if (s_environment)
+    {
         for (u32 chunk = 0; chunk < s_environment->Library().size(); chunk++)
         {
             shared_str name = s_environment->Library()[chunk]->name;
@@ -162,10 +182,28 @@ void CSoundRender_Core::env_unload()
 {
     // Unload
     if (s_environment)
+    {
+        if (bSenvironmentXrExport)
+        {
+            env_save_all();
+        }
+
         s_environment->Unload();
+    }
+
     xr_delete(s_environment);
 
     // Unload geometry
+}
+
+void CSoundRender_Core::env_save_all() const
+{
+    string_path fn;
+    FS.update_path(fn, "$game_data$", SNDENV_FILENAME_LTX);
+
+    CInifile inifile{fn, 0, 1, 1};
+
+    s_environment->SaveIni(&inifile);
 }
 
 void CSoundRender_Core::_restart()
@@ -413,32 +451,37 @@ void CSoundRender_Core::_destroy_data(ref_sound_data& S)
     S.handle = NULL;
 }
 
-CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
+CSoundRender_Environment* CSoundRender_Core::get_environment_def()
 {
     static CSoundRender_Environment identity;
+    identity.set_identity();
+    return &identity;
+}
 
+CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
+{
     if (geom_ENV)
     {
         Fvector dir = {0, -1, 0};
 
         // хитрый способ для проверки звуковых зон в 2х направлениях от камеры. но что то он хуже работает. часто не та зона выбираеться. пока убрал
 
-        //CDB::COLLIDER geom_DB1;
-        //geom_DB1.ray_query(CDB::OPT_ONLYNEAREST, geom_ENV, P, dir, 1000.f);
+        // CDB::COLLIDER geom_DB1;
+        // geom_DB1.ray_query(CDB::OPT_ONLYNEAREST, geom_ENV, P, dir, 1000.f);
 
-        //CDB::COLLIDER geom_DB2;
-        //geom_DB2.ray_query(CDB::OPT_ONLYNEAREST, geom_ENV, P, Fvector(dir).invert(), 1000.f);
+        // CDB::COLLIDER geom_DB2;
+        // geom_DB2.ray_query(CDB::OPT_ONLYNEAREST, geom_ENV, P, Fvector(dir).invert(), 1000.f);
 
         geom_DB.ray_query(CDB::OPT_ONLYNEAREST, geom_ENV, P, dir, 1000.f);
 
-        //if (geom_DB1.r_count() && geom_DB2.r_count())
+        // if (geom_DB1.r_count() && geom_DB2.r_count())
         if (geom_DB.r_count())
         {
-            //CDB::RESULT* r = geom_DB1.r_begin();
-            //CDB::RESULT* r2 = geom_DB2.r_begin();
+            // CDB::RESULT* r = geom_DB1.r_begin();
+            // CDB::RESULT* r2 = geom_DB2.r_begin();
 
-            //if (r2->range < r->range)
-            //    r = r2;
+            // if (r2->range < r->range)
+            //     r = r2;
 
             CDB::RESULT* r = geom_DB.r_begin();
 
@@ -464,8 +507,7 @@ CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
         }
     }
 
-    identity.set_identity();
-    return &identity;
+    return get_environment_def();
 }
 
 void CSoundRender_Core::env_apply()
@@ -592,8 +634,8 @@ void CSoundRender_Core::i_eax_listener_set(CSound_environment* _E)
     ep.flReflectionsDelay = E->ReflectionsDelay; // initial reflection delay time
     ep.lReverb = iFloor(E->Reverb); // late reverberation level relative to room effect
     ep.flReverbDelay = E->ReverbDelay; // late reverberation delay time relative to initial reflection
-    ep.dwEnvironment = EAXLISTENER_DEFAULTENVIRONMENT; // sets all listener properties
-    ep.flEnvironmentSize = E->EnvironmentSize; // environment size in meters
+    //ep.dwEnvironment = EAXLISTENER_DEFAULTENVIRONMENT; // sets all listener properties
+    //ep.flEnvironmentSize = E->EnvironmentSize; // environment size in meters
     ep.flEnvironmentDiffusion = E->EnvironmentDiffusion; // environment diffusion
     ep.flAirAbsorptionHF = E->AirAbsorptionHF; // change in level per meter at 5 kHz
     ep.dwFlags = EAXLISTENER_DEFAULTFLAGS; // modifies the behavior of properties

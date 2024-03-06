@@ -7,7 +7,7 @@ CXml::~CXml() { ClearInternal(); }
 
 void CXml::ClearInternal() { m_Doc.Clear(); }
 
-void ParseFile(LPCSTR path, CMemoryWriter& W, IReader* F, CXml* xml)
+void ParseFile(LPCSTR path, CMemoryWriter& W, IReader* F, CXml* xml, LPCSTR current_xml_filename)
 {
     xr_string str;
 
@@ -36,7 +36,7 @@ void ParseFile(LPCSTR path, CMemoryWriter& W, IReader* F, CXml* xml)
 
         I->skip_bom(file_name);
 
-        ParseFile(path, W, I, xml);
+        ParseFile(path, W, I, xml, file_name);
         FS.r_close(I);
     };
 
@@ -56,6 +56,9 @@ void ParseFile(LPCSTR path, CMemoryWriter& W, IReader* F, CXml* xml)
                     for (FS_FileSet::iterator it = fset.begin(); it != fset.end(); it++)
                     {
                         LPCSTR file_name = it->name.c_str();
+
+                        if (strcmp(current_xml_filename, file_name) == 0)
+                            continue;
 
                         loadFile(file_name);
                     }
@@ -94,7 +97,7 @@ bool CXml::Init(LPCSTR path, LPCSTR xml_filename)
     F->skip_bom(xml_filename);
 
     CMemoryWriter W;
-    ParseFile(path, W, F, this);
+    ParseFile(path, W, F, this, xml_filename);
     W.w_stringZ("");
     FS.r_close(F);
 
@@ -111,7 +114,7 @@ bool CXml::Init(LPCSTR path, LPCSTR xml_filename)
     return true;
 }
 
-XML_NODE* CXml::NavigateToNode(XML_NODE* start_node, LPCSTR path, int node_index)
+XML_NODE* CXml::NavigateToNode(XML_NODE* start_node, LPCSTR path, int index)
 {
     R_ASSERT(start_node && path, "NavigateToNode failed in XML file ", m_xml_file_name);
     XML_NODE* node = NULL;
@@ -131,7 +134,7 @@ XML_NODE* CXml::NavigateToNode(XML_NODE* start_node, LPCSTR path, int node_index
     {
         node = start_node->FirstChild(token);
 
-        while (tmp++ < node_index && node)
+        while (tmp++ < index && node)
         {
             node = start_node->IterateChildren(token, node);
         }
@@ -153,7 +156,7 @@ XML_NODE* CXml::NavigateToNode(XML_NODE* start_node, LPCSTR path, int node_index
     return node;
 }
 
-XML_NODE* CXml::NavigateToNode(LPCSTR path, int node_index) { return NavigateToNode(GetLocalRoot() ? GetLocalRoot() : GetRoot(), path, node_index); }
+XML_NODE* CXml::NavigateToNode(LPCSTR path, int index) { return NavigateToNode(GetLocalRoot() ? GetLocalRoot() : GetRoot(), path, index); }
 
 XML_NODE* CXml::NavigateToNodeWithAttribute(LPCSTR tag_name, LPCSTR attrib_name, LPCSTR attrib_value)
 {
@@ -169,6 +172,19 @@ XML_NODE* CXml::NavigateToNodeWithAttribute(LPCSTR tag_name, LPCSTR attrib_name,
         }
     }
     return NULL;
+}
+
+bool CXml::HasNode(LPCSTR path, int index)
+{
+    const XML_NODE* node = NavigateToNode(path, index);
+    return !!node;
+}
+
+bool CXml::HasNodeAttribute(LPCSTR path, int index, LPCSTR attrib)
+{
+    XML_NODE* node = NavigateToNode(path, index);
+    const LPCSTR result = ReadAttrib(node, attrib, NULL);
+    return !!result;
 }
 
 LPCSTR CXml::Read(LPCSTR path, int index, LPCSTR default_str_val)

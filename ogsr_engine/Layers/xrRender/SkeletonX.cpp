@@ -10,6 +10,9 @@
 #include "../../xr_3da/fmesh.h"
 #include "../../xr_3da/xrSkinXW.hpp"
 
+//Для экспериментов
+//#define QUATERNION_SKINNING
+
 constexpr const char* s_bones_array_const = "sbones_array";
 
 //////////////////////////////////////////////////////////////////////
@@ -38,9 +41,7 @@ void CSkeletonX::_Copy(CSkeletonX* B)
     RMS_boneid = B->RMS_boneid;
     RMS_bonecount = B->RMS_bonecount;
 
-#if defined(USE_DX10) || defined(USE_DX11)
     m_Indices = B->m_Indices;
-#endif //	USE_DX10
 }
 //////////////////////////////////////////////////////////////////////
 void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
@@ -66,15 +67,42 @@ void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
     case RM_SKINNING_3B:
     case RM_SKINNING_4B: {
         // transfer matrices
-        ref_constant array = RCache.get_c(s_bones_array_const);
-        u32 count = RMS_bonecount;
-        for (u32 mid = 0; mid < count; mid++)
+#ifdef QUATERNION_SKINNING
+        const u32 c_bones_array_size = RMS_bonecount * sizeof(Fvector4) * 2;
+#else
+        const u32 c_bones_array_size = RMS_bonecount * sizeof(Fvector4) * 3;
+#endif
+        Fvector4* c_bones_array{};
+        RCache.get_ConstantDirect(s_bones_array_const, c_bones_array_size, reinterpret_cast<void**>(&c_bones_array), nullptr, nullptr);
+        if (c_bones_array)
         {
-            Fmatrix& M = Parent->LL_GetTransform_R(u16(mid));
-            u32 id = mid * 3;
-            RCache.set_ca(&*array, id + 0, M._11, M._21, M._31, M._41);
-            RCache.set_ca(&*array, id + 1, M._12, M._22, M._32, M._42);
-            RCache.set_ca(&*array, id + 2, M._13, M._23, M._33, M._43);
+            for (u32 mid = 0; mid < RMS_bonecount; mid++)
+            {
+                const Fmatrix& M = Parent->LL_GetTransform_R(u16(mid));
+#ifdef QUATERNION_SKINNING
+                using namespace DirectX;
+                XMVECTOR scale;
+                XMMatrixDecompose(&scale, reinterpret_cast<XMVECTOR*>(c_bones_array), reinterpret_cast<XMVECTOR*>(c_bones_array + 1), *reinterpret_cast<FXMMATRIX*>(&M));
+                c_bones_array += 2;
+#else
+                c_bones_array->set(M._11, M._21, M._31, M._41);
+                c_bones_array++;
+                c_bones_array->set(M._12, M._22, M._32, M._42);
+                c_bones_array++;
+                c_bones_array->set(M._13, M._23, M._33, M._43);
+                c_bones_array++;
+#endif
+            }
+        }
+        else
+        {
+            static bool logged{}; //чтоб не спамить в лог по сто раз за кадр.
+            if (!logged)
+            {
+                logged = true;
+                Msg("!![%s] Can't get/create sbones_array for model [%s] vith [%u] bones. Most likely, an incorrect shader is assigned there.", __FUNCTION__,
+                    this->Parent->dbg_name.c_str(), RMS_bonecount);
+            }
         }
 
         // render
@@ -157,7 +185,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 
     // u16			hw_bones_cnt		= u16((HW.Caps.geometry.dwRegisters-22)/3);
     //	Igor: some shaders in r1 need more free constant registers
-    u16 hw_bones_cnt = u16((HW.Caps.geometry.dwRegisters - 22 - 3) / 3);
+    u16 hw_bones_cnt = HW.Caps.geometry.dwRegisters;
 
     u16 sw_bones_cnt = 0;
 
@@ -586,7 +614,6 @@ void CSkeletonX::_FillVerticesSoft4W(const Fmatrix& view, CSkeletonWallmark& wm,
     }
 }
 
-#if defined(USE_DX10) || defined(USE_DX11)
 void CSkeletonX::_DuplicateIndices(const char* N, IReader* data)
 {
     //	We will have trouble with container since don't know were to take readable indices
@@ -600,4 +627,3 @@ void CSkeletonX::_DuplicateIndices(const char* N, IReader* data)
     //u32 crc = crc32(data->pointer(), size);
     m_Indices.create(iCount, (u16*)data->pointer());
 }
-#endif //	USE_DX10

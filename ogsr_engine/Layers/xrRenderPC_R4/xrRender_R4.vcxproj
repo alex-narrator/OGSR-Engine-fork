@@ -72,7 +72,7 @@
       <Optimization>Disabled</Optimization>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>./;$(SolutionDir)\3rd_party\Src\d3dx;..\..\xrCore;..\..\Luabind;..\..\LuaJIT\src;$(SolutionDir)\3rd_party\Src\imgui;$(SolutionDir)\3rd_party\Src\DirectXMesh\DirectXMesh;$(SolutionDir)\3rd_party\Src\DirectXTex\DirectXTex\DirectXTex;$(SolutionDir)\3rd_party\Src\DirectXMath\DirectXMath\Inc</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USE_DX11;WIN32;_WINDOWS;_USRDLL;XRENGINE_STATIC;XRCORE_STATIC;XRCDB_STATIC;XR_PARTICLES_STATIC;LUABIND_STATIC;XRRENDER_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;XRENGINE_STATIC;XRCORE_STATIC;XRCDB_STATIC;XR_PARTICLES_STATIC;LUABIND_STATIC;XRRENDER_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -83,7 +83,7 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
-      <DisableSpecificWarnings>4456;4457;4458;4459;4315;4267;4324;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4456;4457;4458;4459;4315;4267;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies>xrEngine.lib;d3d11.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;</AdditionalDependencies>
@@ -99,7 +99,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <PreprocessorDefinitions>USE_DX11;WIN32;_WINDOWS;_USRDLL;XRENGINE_STATIC;XRCORE_STATIC;XRCDB_STATIC;XR_PARTICLES_STATIC;LUABIND_STATIC;XRRENDER_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;XRENGINE_STATIC;XRCORE_STATIC;XRCDB_STATIC;XR_PARTICLES_STATIC;LUABIND_STATIC;XRRENDER_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -110,7 +110,7 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
-      <DisableSpecificWarnings>4456;4457;4458;4459;4315;4267;4324;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4456;4457;4458;4459;4315;4267;</DisableSpecificWarnings>
       <StringPooling>false</StringPooling>
       <AdditionalIncludeDirectories>./;$(SolutionDir)\3rd_party\Src\d3dx;..\..\xrCore;..\..\Luabind;..\..\LuaJIT\src;$(SolutionDir)\3rd_party\Src\imgui;$(SolutionDir)\3rd_party\Src\DirectXMesh\DirectXMesh;$(SolutionDir)\3rd_party\Src\DirectXTex\DirectXTex\DirectXTex;$(SolutionDir)\3rd_party\Src\DirectXMath\DirectXMath\Inc</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -138,7 +138,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>./;$(SolutionDir)\3rd_party\Src\d3dx;..\..\xrCore;..\..\Luabind;..\..\LuaJIT\src;$(SolutionDir)\3rd_party\Src\imgui;$(SolutionDir)\3rd_party\Src\DirectXMesh\DirectXMesh;$(SolutionDir)\3rd_party\Src\DirectXTex\DirectXTex\DirectXTex;$(SolutionDir)\3rd_party\Src\DirectXMath\DirectXMath\Inc</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USE_DX11;WIN32;NDEBUG;_WINDOWS;_USRDLL;XRENGINE_STATIC;XRCORE_STATIC;XRCDB_STATIC;XR_PARTICLES_STATIC;LUABIND_STATIC;XRRENDER_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XRENGINE_STATIC;XRCORE_STATIC;XRCDB_STATIC;XR_PARTICLES_STATIC;LUABIND_STATIC;XRRENDER_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -172,7 +172,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>./;$(SolutionDir)\3rd_party\Src\d3dx;..\..\xrCore;..\..\Luabind;..\..\LuaJIT\src;$(SolutionDir)\3rd_party\Src\imgui;$(SolutionDir)\3rd_party\Src\DirectXMesh\DirectXMesh;$(SolutionDir)\3rd_party\Src\DirectXTex\DirectXTex\DirectXTex;$(SolutionDir)\3rd_party\Src\DirectXMath\DirectXMath\Inc</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>USE_DX11;WIN32;NDEBUG;_WINDOWS;_USRDLL;XRENGINE_STATIC;XRCORE_STATIC;XRCDB_STATIC;XR_PARTICLES_STATIC;LUABIND_STATIC;XRRENDER_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XRENGINE_STATIC;XRCORE_STATIC;XRCDB_STATIC;XR_PARTICLES_STATIC;LUABIND_STATIC;XRRENDER_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>
       </ExceptionHandling>
@@ -187,7 +187,7 @@
       </AssemblerOutput>
       <WarningLevel>Level4</WarningLevel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>4456;4457;4458;4995;4577;4315;4267;4324;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4456;4457;4458;4995;4577;4315;4267;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies>xrEngine.lib;d3d11.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;</AdditionalDependencies>
@@ -216,6 +216,7 @@
     <ClInclude Include="..\..\Include\xrRender\LensFlareRender.h" />
     <ClInclude Include="..\..\Include\xrRender\ObjectSpaceRender.h" />
     <ClInclude Include="..\..\Include\xrRender\ParticleCustom.h" />
+    <ClInclude Include="..\xrRender\ParticleEffectActions.h" />
     <ClInclude Include="..\..\Include\xrRender\RainRender.h" />
     <ClInclude Include="..\..\Include\xrRender\RenderDetailModel.h" />
     <ClInclude Include="..\..\Include\xrRender\RenderDeviceRender.h" />
@@ -260,8 +261,6 @@
     <ClInclude Include="..\xrRender\blenders\Blender_Recorder.h" />
     <ClInclude Include="..\xrRender\Blender_BmmD.h" />
     <ClInclude Include="..\xrRender\Blender_detail_still.h" />
-    <ClInclude Include="..\xrRender\Blender_Editor_Selection.h" />
-    <ClInclude Include="..\xrRender\Blender_Editor_Wire.h" />
     <ClInclude Include="..\xrRender\Blender_Lm(EbB).h" />
     <ClInclude Include="..\xrRender\Blender_Model_EbB.h" />
     <ClInclude Include="..\xrRender\Blender_Particle.h" />
@@ -333,7 +332,6 @@
     <ClInclude Include="..\xrRender\r__dsgraph_structure.h" />
     <ClInclude Include="..\xrRender\r__dsgraph_types.h" />
     <ClInclude Include="..\xrRender\r__occlusion.h" />
-    <ClInclude Include="..\xrRender\r__pixel_calculator.h" />
     <ClInclude Include="..\xrRender\r__sector.h" />
     <ClInclude Include="..\xrRender\Shader.h" />
     <ClInclude Include="..\xrRender\ShaderResourceTraits.h" />
@@ -390,6 +388,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\xrRender\ParticleEffectActions.cpp" />
     <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidBlenders.cpp" />
     <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidData.cpp" />
     <ClCompile Include="..\xrRenderDX10\3DFluid\dx103DFluidEmitters.cpp" />
@@ -426,8 +425,6 @@
     <ClCompile Include="..\xrRender\blenders\Blender_Recorder.cpp" />
     <ClCompile Include="..\xrRender\Blender_BmmD.cpp" />
     <ClCompile Include="..\xrRender\Blender_detail_still.cpp" />
-    <ClCompile Include="..\xrRender\Blender_Editor_Selection.cpp" />
-    <ClCompile Include="..\xrRender\Blender_Editor_Wire.cpp" />
     <ClCompile Include="..\xrRender\Blender_Lm(EbB).cpp" />
     <ClCompile Include="..\xrRender\Blender_Model_EbB.cpp" />
     <ClCompile Include="..\xrRender\Blender_Particle.cpp" />
@@ -437,7 +434,6 @@
     <ClCompile Include="..\xrRender\Blender_tree.cpp" />
     <ClCompile Include="..\xrRender\ColorMapManager.cpp" />
     <ClCompile Include="..\xrRender\D3DUtils.cpp" />
-    <ClCompile Include="..\xrRender\Debug\dxPixEventWrapper.cpp" />
     <ClCompile Include="..\xrRender\DetailManager.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_CACHE.cpp" />
     <ClCompile Include="..\xrRender\DetailManager_Decompress.cpp" />
@@ -496,6 +492,7 @@
     <ClCompile Include="..\xrRender\RenderTargetPhaseRainDrops.cpp" />
     <ClCompile Include="..\xrRender\RenderTargetPhaseAA.cpp" />
     <ClCompile Include="..\xrRender\RenderTargetPhaseSSSS.cpp" />
+    <ClCompile Include="..\xrRender\rendertarget_phase_lut.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager_Loader.cpp" />
     <ClCompile Include="..\xrRender\ResourceManager_Reset.cpp" />
@@ -511,7 +508,6 @@
     <ClCompile Include="..\xrRender\r__dsgraph_render.cpp" />
     <ClCompile Include="..\xrRender\r__dsgraph_render_lods.cpp" />
     <ClCompile Include="..\xrRender\r__occlusion.cpp" />
-    <ClCompile Include="..\xrRender\r__pixel_calculator.cpp" />
     <ClCompile Include="..\xrRender\r__screenshot.cpp" />
     <ClCompile Include="..\xrRender\r__sector.cpp" />
     <ClCompile Include="..\xrRender\r__sector_traversal.cpp" />

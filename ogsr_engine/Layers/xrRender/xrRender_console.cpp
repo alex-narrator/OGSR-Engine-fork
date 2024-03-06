@@ -54,10 +54,9 @@ u32 ps_r_sun_quality = 1; //	=	0;
 constexpr xr_token qsun_quality_token[] = {{"st_opt_low", 0},
                                            {"st_opt_medium", 1},
                                            {"st_opt_high", 2},
-#if defined(USE_DX10) || defined(USE_DX11)
                                            {"st_opt_ultra", 3},
                                            {"st_opt_extreme", 4},
-#endif //	USE_DX10
+
                                            {0, 0}};
 
 u32 ps_r3_msaa = 0; //	=	0;
@@ -156,8 +155,10 @@ int ps_r2_GI_photons = 16; // 8..64
 float ps_r2_GI_clip = EPS_L; // EPS
 float ps_r2_GI_refl = .9f; // .9f
 float ps_r2_ls_depth_scale = 1.00001f; // 1.00001f
-float ps_r2_ls_depth_bias = -0.0003f; // -0.0001f
-float ps_r2_ls_squality = 1.0f; // 1.00f
+
+float ps_r2_ls_depth_bias = -0.00005f; // SSS19 Edited
+float ps_r2_ls_squality = 1.0f; // Base shadow map quality. The higher the value the higher the base shadow resolution and resolution through distance.
+
 float ps_r2_sun_tsm_projection = 0.3f; // 0.18f
 float ps_r2_sun_tsm_bias = -0.01f; //
 float ps_r2_sun_near = 20.f; // 12.0f
@@ -180,14 +181,15 @@ float ps_r2_dhemi_light_scale = 0.2f;
 float ps_r2_dhemi_light_flow = 0.1f;
 int ps_r2_dhemi_count = 5; // 5
 int ps_r2_wait_sleep = 0;
+int ps_lens_flare{};
 
 float ps_r2_lt_smooth = 1.f; // 1.f
 float ps_r2_slight_fade = 2.0f; // 1.f
 
 // Screen Space Shaders Stuff
-#pragma todo("Убрать в релизе эту команду? Используется только для отладки и экспериментов")
-Fvector4 ps_ssfx_wind{0.0f, 0.0f, 0.0f, 0.0f}; // DBG: X: Intensity Y: North Dir - Z: South Dir, W: enable for bugged trees
-Fvector4 ps_ssfx_wind_gust{1.0f, 0.0f, 0.0f, 0.0f}; // X: Intensity
+Fvector4 ps_ssfx_wind_grass{9.5f, 1.4f, 1.5f, 0.4f}; // Anim Speed, Turbulence, Push, Wave
+Fvector4 ps_ssfx_wind_trees{11.0f, 0.15f, 0.5f, 0.1f}; // Branches Speed, Trunk Speed, Bending, Min Wind Speed
+int ps_ssfx_wind_bugged_flora_enable{1}; //Включать ли ветер на багованых елках, камышах олд тч-стайл. Оставлено как костыль для OGSR GA потому что там локи уже правиться не будут, а в новых модах лучше править саму флору, и не использовать этот костыль.
 
 Fvector4 ps_ssfx_florafixes_1{0.3f, 0.21f, 0.3f, 0.21f}; // Specular value when the grass is dry, Specular value when the grass is wet, Specular when trees and bushes are dry, Specular when trees and bushes are wet
 Fvector4 ps_ssfx_florafixes_2{2.0f, 1.0f, 0.0f, 0.0f}; // Intensity of the flora SubSurface Scattering, How much sun color is added to the flora SubSurface Scattering (1.0 is 100% sun color)
@@ -219,6 +221,13 @@ Fvector4 ps_ssfx_grass_interactive{1.f, static_cast<float>(GRASS_SHADER_DATA_COU
 Fvector3 ps_ssfx_int_grass_params_1{2.0f, 1.0f, 1.0f};
 Fvector4 ps_ssfx_int_grass_params_2{1.0f, 5.0f, 1.0f, 1.0f};
 float ps_ssfx_wpn_dof_2 = 0.5f;
+
+Fvector4 ps_ssfx_lut{}; //x - интенсивность, y - номер эффекта
+Fvector3 ps_ssfx_shadows{256.f, 1536.f, 0.0f}; // x - Minimum shadow map resolution. When lights are away from the player the resolution of shadows drop to improve performance ( at the cost of image quality ), y - Maximum shadow map resolution. When lights are closer, the resolution increases to improve the image quality of shadows ( at the cost of performance ).
+Fvector3 ps_ssfx_shadow_bias{0.4f, 0.03f, 0.0f};
+
+Fvector3 ps_ssfx_volumetric_limits{100.f, 1.0f, 5.f}; //{1.f, 0.1f, 1.5f} //Ограничения для настроек объемного света. Настройки источников света будут ограничиваться сверху до этих значений. volumetric_distance, volumetric_intensity, volumetric_quality.
+int ps_ssfx_use_new_volumetric_method{0};
 
 //	x - min (0), y - focus (1.4), z - max (100)
 Fvector3 ps_r2_dof = Fvector3().set(-1.25f, 1.4f, 600.f);
@@ -262,9 +271,7 @@ u32 psCurrentBPP = 32;
 #include "../../xr_3da/xr_ioconsole.h"
 #include "../../xr_3da/xr_ioc_cmd.h"
 
-#if defined(USE_DX10) || defined(USE_DX11)
 #include "../xrRenderDX10/StateManager/dx10SamplerStateCache.h"
-#endif //	USE_DX10
 
 //-----------------------------------------------------------------------
 class CCC_detail_radius : public CCC_Integer
@@ -296,12 +303,7 @@ public:
             return;
         int val = *value;
         clamp(val, 1, 16);
-#if defined(USE_DX10) || defined(USE_DX11)
         SSManager.SetMaxAnisotropy(val);
-#else //	USE_DX10
-        for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
-            CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MAXANISOTROPY, val));
-#endif //	USE_DX10
     }
     CCC_tf_Aniso(LPCSTR N, int* v) : CCC_Integer(N, v, 1, 16){};
     virtual void Execute(LPCSTR args)
@@ -323,14 +325,9 @@ public:
         if (0 == HW.pDevice)
             return;
 
-#if defined(USE_DX10) || defined(USE_DX11)
         //	TODO: DX10: Implement mip bias control
         // VERIFY(!"apply not implmemented.");
         SSManager.SetMipLODBias(*value);
-#else //	USE_DX10
-        for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
-            CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD)value)));
-#endif //	USE_DX10
     }
 
     CCC_tf_MipBias(LPCSTR N, float* v) : CCC_Float(N, v, -3.f, +3.f){};
@@ -428,59 +425,42 @@ public:
     }
 };
 
-class CCC_memory_stats : public IConsole_Command
+class CCC_VideoMemoryStats : public IConsole_Command
 {
 protected:
 public:
-    CCC_memory_stats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
+    CCC_VideoMemoryStats(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
 
     virtual void Execute(LPCSTR args)
     {
+        Msg("memory usage  mb \t \t video    \t managed      \t system");
+
+        float vb_video = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex][D3DPOOL_DEFAULT] / 1024 / 1024;
+        float vb_managed = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex][D3DPOOL_MANAGED] / 1024 / 1024;
+        float vb_system = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex][D3DPOOL_SYSTEMMEM] / 1024 / 1024;
+        Msg("vertex buffer\t \t %f \t %f \t %f ", vb_video, vb_managed, vb_system);
+
+        float ib_video = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_index][D3DPOOL_DEFAULT] / 1024 / 1024;
+        float ib_managed = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_index][D3DPOOL_MANAGED] / 1024 / 1024;
+        float ib_system = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_index][D3DPOOL_SYSTEMMEM] / 1024 / 1024;
+        Msg("index buffer\t \t %f \t %f \t %f ", ib_video, ib_managed, ib_system);
+
+        float rt_video = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget][D3DPOOL_DEFAULT] / 1024 / 1024;
+        float rt_managed = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget][D3DPOOL_MANAGED] / 1024 / 1024;
+        float rt_system = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget][D3DPOOL_SYSTEMMEM] / 1024 / 1024;
+        Msg("rtarget\t \t %f \t %f \t %f ", rt_video, rt_managed, rt_system);
+
+        Msg("total\t \t %f \t %f \t %f \n", vb_video + ib_video + rt_video, vb_managed + ib_managed + rt_managed, vb_system + ib_system + rt_system);
+
         u32 m_base = 0;
         u32 c_base = 0;
         u32 m_lmaps = 0;
         u32 c_lmaps = 0;
 
         dxRenderDeviceRender::Instance().ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
+        Msg("textures loaded size %f MB (%f bytes)", (float)(m_base + m_lmaps) / 1024 / 1024, (float)(m_base + m_lmaps));
 
-        Msg("memory usage  mb \t \t video    \t managed      \t system \n");
-
-        float vb_video = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex][D3DPOOL_DEFAULT] / 1024 / 1024;
-        float vb_managed = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex][D3DPOOL_MANAGED] / 1024 / 1024;
-        float vb_system = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex][D3DPOOL_SYSTEMMEM] / 1024 / 1024;
-        Msg("vertex buffer      \t \t %f \t %f \t %f ", vb_video, vb_managed, vb_system);
-
-        float ib_video = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_index][D3DPOOL_DEFAULT] / 1024 / 1024;
-        float ib_managed = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_index][D3DPOOL_MANAGED] / 1024 / 1024;
-        float ib_system = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_index][D3DPOOL_SYSTEMMEM] / 1024 / 1024;
-        Msg("index buffer      \t \t %f \t %f \t %f ", ib_video, ib_managed, ib_system);
-
-        float textures_managed = (float)(m_base + m_lmaps) / 1024 / 1024;
-        Msg("textures          \t \t %f \t %f \t %f ", 0.f, textures_managed, 0.f);
-
-        float rt_video = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget][D3DPOOL_DEFAULT] / 1024 / 1024;
-        float rt_managed = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget][D3DPOOL_MANAGED] / 1024 / 1024;
-        float rt_system = (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget][D3DPOOL_SYSTEMMEM] / 1024 / 1024;
-        Msg("R-Targets         \t \t %f \t %f \t %f ", rt_video, rt_managed, rt_system);
-
-        Msg("\nTotal             \t \t %f \t %f \t %f ", vb_video + ib_video + rt_video, textures_managed + vb_managed + ib_managed + rt_managed,
-            vb_system + ib_system + rt_system);
-    }
-};
-
-
-#include "r__pixel_calculator.h"
-class CCC_BuildSSA : public IConsole_Command
-{
-public:
-    CCC_BuildSSA(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args)
-    {
-#if !defined(USE_DX10) && !defined(USE_DX11)
-        //	TODO: DX10: Implement pixel calculator
-        r_pixel_calculator c;
-        c.run();
-#endif //	USE_DX10
+        HW.DumpVideoMemoryUsage();
     }
 };
 
@@ -532,6 +512,48 @@ public:
     {
         CCC_Vector3::Status(S);
         apply();
+    }
+};
+
+class CCC_PART_Export : public IConsole_Command
+{
+public:
+    CCC_PART_Export(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
+
+    virtual void Execute(LPCSTR args)
+    {
+        if (g_pGameLevel)
+        {
+            Log("Error: Unload level first!");
+            return;
+        }
+
+        Msg("Exporting particles...");
+        RImplementation.PSLibrary.Reload();
+        RImplementation.PSLibrary.Save2(0 == xr_strcmp(args, "1"));
+        Msg("Exporting particles Done!");
+    }
+};
+
+class CCC_PART_Import : public IConsole_Command
+{
+public:
+    CCC_PART_Import(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
+
+    virtual void Execute(LPCSTR args)
+    {
+        if (g_pGameLevel)
+        {
+            Log("Error: Unload level first!");
+            return;
+        }
+
+        Msg("Importing particles...");
+        RImplementation.PSLibrary.OnDestroy();
+        RImplementation.PSLibrary.Load2();
+        RImplementation.PSLibrary.ExportAllAsNew();
+        RImplementation.PSLibrary.OnCreate();
+        Msg("Importing particles Done!");
     }
 };
 
@@ -620,7 +642,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_ls_dsm_kernel", &ps_r2_ls_dsm_kernel, .1f, 3.f);
     CMD4(CCC_Float, "r2_ls_psm_kernel", &ps_r2_ls_psm_kernel, .1f, 3.f);
     CMD4(CCC_Float, "r2_ls_ssm_kernel", &ps_r2_ls_ssm_kernel, .1f, 3.f);
-    CMD4(CCC_Float, "r2_ls_squality", &ps_r2_ls_squality, .5f, 1.f);
+    CMD4(CCC_Float, "r2_ls_squality", &ps_r2_ls_squality, .5f, 3.f);
 
     CMD3(CCC_Mask, "r2_zfill", &ps_r2_ls_flags, R2FLAG_ZFILL);
     CMD4(CCC_Float, "r2_zfill_depth", &ps_r2_zfill, .001f, .5f);
@@ -768,12 +790,19 @@ void xrRender_initconsole()
 	CMD4(CCC_Float, "r3_dynamic_wet_surfaces_far", &ps_r3_dyn_wet_surf_far, 30, 300);
 
     CMD3(CCC_Mask, "r3_volumetric_smoke", &ps_r2_ls_flags, R3FLAG_VOLUMETRIC_SMOKE);
-    CMD1(CCC_memory_stats, "render_memory_stats");
+    CMD1(CCC_VideoMemoryStats, "video_memory_stats");
 
     // Screen Space Shaders
-    CMD4(CCC_Vector4, "ssfx_wind", &ps_ssfx_wind, (Fvector4{0.0f, -1.0f, -1.0f, 0.0f}), (Fvector4{1.0f, 1.0f, 1.0f, 1.0f}));
-    CMD4(CCC_Vector4, "ssfx_wind_gust", &ps_ssfx_wind_gust, (Fvector4{0.0f, 0.0f, 0.0f, 0.0f}), (Fvector4{10.0f, 10.0f, 10.0f, 10.0f}));
+    CMD4(CCC_Vector4, "ssfx_wind_grass", &ps_ssfx_wind_grass, (Fvector4{}), (Fvector4{20.0f, 5.0f, 5.0f, 5.0f}));
+    CMD4(CCC_Vector4, "ssfx_wind_trees", &ps_ssfx_wind_trees, (Fvector4{}), (Fvector4{20.0f, 5.0f, 5.0f, 1.0f}));
+    CMD4(CCC_Integer, "ssfx_wind_bugged_trees_enable", &ps_ssfx_wind_bugged_flora_enable, 0, 1);
 
+    CMD4(CCC_Vector4, "ssfx_lut", &ps_ssfx_lut, (Fvector4{}), (Fvector4{100.f, 100.f, 100.f, 100.f}));
+    CMD4(CCC_Vector3, "ssfx_shadows", &ps_ssfx_shadows, (Fvector3{128.f, 1536.f, 0.f}), (Fvector3{1536.f, 4096.f, 0.f}));
+    CMD4(CCC_Vector3, "ssfx_shadow_bias", &ps_ssfx_shadow_bias, (Fvector3{}), (Fvector3{1.0f, 1.0f, 1.0f}));
+    CMD4(CCC_Vector3, "ssfx_volumetric_limits", &ps_ssfx_volumetric_limits, (Fvector3{0.f, 0.f, 1.0f}), (Fvector3{100.0f, 1.0f, 5.0f}));
+    CMD4(CCC_Integer, "ssfx_use_new_volumetric_method", &ps_ssfx_use_new_volumetric_method, 0, 1);
+    
     CMD4(CCC_Vector4, "ssfx_florafixes_1", &ps_ssfx_florafixes_1, (Fvector4{}), (Fvector4{1.0f, 1.0f, 1.0f, 1.0f}));
     CMD4(CCC_Vector4, "ssfx_florafixes_2", &ps_ssfx_florafixes_2, (Fvector4{}), (Fvector4{10.0f, 1.0f, 1.0f, 1.0f}));
     
@@ -815,4 +844,15 @@ void xrRender_initconsole()
     CMD3(CCC_Mask, "reflections_only_on_puddles", &ps_r2_ls_flags_ext, REFLECTIONS_ONLY_ON_PUDDLES);
 
     //	CMD3(CCC_Mask,		"r2_sun_ignore_portals",		&ps_r2_ls_flags,			R2FLAG_SUN_IGNORE_PORTALS);
+
+    CMD1(CCC_PART_Export, "particles_export");
+    CMD1(CCC_PART_Import, "particles_import");
+
+    extern BOOL bShadersXrExport;
+    CMD4(CCC_Integer, "shaders_xr_export", &bShadersXrExport, FALSE, TRUE);
+
+    extern BOOL bSenvironmentXrExport;
+    CMD4(CCC_Integer, "senvironment_xr_export", &bSenvironmentXrExport, FALSE, TRUE);
+
+    CMD4(CCC_Integer, "r_lens_flare", &ps_lens_flare, FALSE, TRUE);
 }

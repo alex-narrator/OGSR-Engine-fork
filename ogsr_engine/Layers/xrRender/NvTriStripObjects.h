@@ -69,12 +69,13 @@ public:
     }
 
     // ref and unref
-    void Unref()
+    bool Unref()
     {
         if (--m_refCount == 0)
         {
-            Memory.mem_free(this);
+            return true;
         }
+        return false;
     }
 
     // data members are left public

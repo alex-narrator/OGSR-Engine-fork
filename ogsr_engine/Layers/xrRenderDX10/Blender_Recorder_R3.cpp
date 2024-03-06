@@ -146,6 +146,12 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
         i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
     }
 
+    else if (0 == xr_strcmp(ResourceName, "smp_point"))
+    {
+        i_dx10Address(stage, D3DTADDRESS_WRAP);
+        i_dx10Filter(stage, D3DTEXF_POINT, D3DTEXF_POINT, D3DTEXF_POINT);
+    }
+
     //	Use D3DTADDRESS_WRAP,	D3DTEXF_ANISOTROPIC, 	D3DTEXF_LINEAR,	D3DTEXF_ANISOTROPIC
     else if (0 == xr_strcmp(ResourceName, "smp_base"))
     {
@@ -200,10 +206,10 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     dest.ps = ps;
     dest.vs = vs;
     dest.gs = gs;
-#ifdef USE_DX11
     dest.hs = DEV->_CreateHS("null");
     dest.ds = DEV->_CreateDS("null");
-#endif
+    dest.cs = DEV->_CreateCS("null");
+
     ctable.merge(&ps->constants);
     ctable.merge(&vs->constants);
     ctable.merge(&gs->constants);
@@ -216,7 +222,6 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     }
 }
 
-#ifdef USE_DX11
 void CBlender_Compile::r_TessPass(LPCSTR vs, LPCSTR hs, LPCSTR ds, LPCSTR gs, LPCSTR ps, bool bFog, BOOL bZtest, BOOL bZwrite, BOOL bABlend, D3DBLEND abSRC, D3DBLEND abDST,
                                   BOOL aTest, u32 aRef)
 {
@@ -235,7 +240,6 @@ void CBlender_Compile::r_ComputePass(LPCSTR cs)
 
     ctable.merge(&dest.cs->constants);
 }
-#endif
 
 void CBlender_Compile::r_End()
 {

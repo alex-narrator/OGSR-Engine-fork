@@ -109,7 +109,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4100;4456;4457;4458;4459;4091;4589;4995;4577;5037;4267;4324;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4456;4457;4458;4459;4091;4589;4995;4577;5037;4267;</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>.\;..\COMMON_AI;..\COMMON_AI\PATH;..\COMMON_AI\GRAPH;..\COMMON_AI\ALGORITHMS;..\xrCore;$(SolutionDir)\3rd_party\Src\ode;..\LuaJIT\src;..\Luabind;$(SolutionDir)\3rd_party\Src\d3dx\include;$(SolutionDir)\3rd_party\Src\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild>false</MinimalRebuild>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -172,7 +172,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4100;4456;4457;4458;4459;4091;4589;4995;4577;5037;4267;4324;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4456;4457;4458;4459;4091;4589;4995;4577;5037;4267;</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>.\;..\COMMON_AI;..\COMMON_AI\PATH;..\COMMON_AI\GRAPH;..\COMMON_AI\ALGORITHMS;..\xrCore;$(SolutionDir)\3rd_party\Src\ode;..\LuaJIT\src;..\Luabind;$(SolutionDir)\3rd_party\Src\d3dx\include;$(SolutionDir)\3rd_party\Src\imgui%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild>false</MinimalRebuild>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -237,7 +237,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4100;4456;4457;4458;4459;4091;4589;4995;4577;5037;4315;4267;4267;4324;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4456;4457;4458;4459;4091;4589;4995;4577;5037;4315;4267;4267;</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>.\;..\COMMON_AI;..\COMMON_AI\PATH;..\COMMON_AI\GRAPH;..\COMMON_AI\ALGORITHMS;..\xrCore;$(SolutionDir)\3rd_party\Src\ode;..\LuaJIT\src;..\Luabind;$(SolutionDir)\3rd_party\Src\d3dx\include;$(SolutionDir)\3rd_party\Src\imgui%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -296,7 +296,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4100;4456;4457;4458;4459;4091;4589;4995;4577;5037;4315;4267;4267;4324;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4100;4456;4457;4458;4459;4091;4589;4995;4577;5037;4315;4267;4267;</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>.\;..\COMMON_AI;..\COMMON_AI\PATH;..\COMMON_AI\GRAPH;..\COMMON_AI\ALGORITHMS;..\xrCore;$(SolutionDir)\3rd_party\Src\ode;..\LuaJIT\src;..\Luabind;$(SolutionDir)\3rd_party\Src\d3dx\include;$(SolutionDir)\3rd_party\Src\imgui%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -406,6 +406,7 @@
     <ClInclude Include="embedded_editor\embedded_editor_hud.h" />
     <ClInclude Include="embedded_editor\embedded_editor_main.h" />
     <ClInclude Include="embedded_editor\embedded_editor_pos_informer.h" />
+    <ClInclude Include="embedded_editor\embedded_editor_sound_env.h" />
     <ClInclude Include="embedded_editor\embedded_editor_weather.h" />
     <ClInclude Include="ai\monsters\group_states\group_state_attack.h" />
     <ClInclude Include="ai\monsters\group_states\group_state_attack_inline.h" />
@@ -454,6 +455,7 @@
     <ClInclude Include="mt_config.h" />
     <ClInclude Include="damage_manager.h" />
     <ClInclude Include="DamageSource.h" />
+    <ClInclude Include="physics_shell_animated.h" />
     <ClInclude Include="player_hud.h" />
     <ClInclude Include="pose_extrapolation.h" />
     <ClInclude Include="script_actor.h" />
@@ -1658,6 +1660,7 @@
     <ClCompile Include="embedded_editor\embedded_editor_hud.cpp" />
     <ClCompile Include="embedded_editor\embedded_editor_main.cpp" />
     <ClCompile Include="embedded_editor\embedded_editor_pos_informer.cpp" />
+    <ClCompile Include="embedded_editor\embedded_editor_sound_env.cpp" />
     <ClCompile Include="embedded_editor\embedded_editor_weather.cpp" />
     <ClCompile Include="ai\monsters\anti_aim_ability.cpp" />
     <ClCompile Include="ai\monsters\monster_aura.cpp" />
@@ -1672,6 +1675,7 @@
     <ClCompile Include="ik_limb_state.cpp" />
     <ClCompile Include="ik_object_shift.cpp" />
     <ClCompile Include="InventoryContainer.cpp" />
+    <ClCompile Include="physics_shell_animated.cpp" />
     <ClCompile Include="player_hud.cpp" />
     <ClCompile Include="player_hud_tune.cpp" />
     <ClCompile Include="pose_extrapolation.cpp" />

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#pragma hdrstop
+
 
 #include "Blender_Screen_SET.h"
 
@@ -31,11 +31,12 @@ CBlender_Screen_SET::~CBlender_Screen_SET() {}
 
 void CBlender_Screen_SET::Save(IWriter& fs)
 {
-    IBlender::Save(fs);
+    IBlenderXr::Save(fs);
 
     // Blend mode
-    xrP_TOKEN::Item I;
     xrPWRITE_PROP(fs, "Blending", xrPID_TOKEN, oBlend);
+
+    xrP_TOKEN::Item I;
     I.ID = 0;
     xr_strcpy(I.str, "SET");
     fs.w(&I, sizeof(I));
@@ -78,7 +79,7 @@ void CBlender_Screen_SET::Save(IWriter& fs)
 
 void CBlender_Screen_SET::Load(IReader& fs, u16 version)
 {
-    IBlender::Load(fs, version);
+    IBlenderXr::Load(fs, version);
 
     switch (version)
     {
@@ -114,7 +115,33 @@ void CBlender_Screen_SET::Load(IReader& fs, u16 version)
     }
 }
 
-#if defined(USE_DX10) || defined(USE_DX11)
+void CBlender_Screen_SET::SaveIni(CInifile* ini_file, LPCSTR section)
+{
+    IBlenderXr::SaveIni(ini_file, section);
+
+    WriteToken(ini_file, section, "blending", oBlend);
+
+    WriteBool(ini_file, section, "texture_clamp", oClamp);
+    WriteInteger(ini_file, section, "alpha_ref", oAREF);
+    WriteBool(ini_file, section, "z_test", oZTest);
+    WriteBool(ini_file, section, "z_write", oZWrite);
+    WriteBool(ini_file, section, "lighting", oLighting);
+    WriteBool(ini_file, section, "fog", oFog);
+}
+
+void CBlender_Screen_SET::LoadIni(CInifile* ini_file, LPCSTR section)
+{
+    IBlenderXr::LoadIni(ini_file, section);
+
+    ReadToken(ini_file, section, "blending", oBlend);
+
+    ReadBool(ini_file, section, "texture_clamp", oClamp);
+    ReadInteger(ini_file, section, "alpha_ref", oAREF);
+    ReadBool(ini_file, section, "z_test", oZTest);
+    ReadBool(ini_file, section, "z_write", oZWrite);
+    ReadBool(ini_file, section, "lighting", oLighting);
+    ReadBool(ini_file, section, "fog", oFog);
+}
 
 void CBlender_Screen_SET::Compile(CBlender_Compile& C)
 {
@@ -208,103 +235,3 @@ void CBlender_Screen_SET::Compile(CBlender_Compile& C)
 
     C.r_End();
 }
-
-#else //	USE_DX10
-
-void CBlender_Screen_SET::Compile(CBlender_Compile& C)
-{
-    IBlender::Compile(C);
-    C.PassBegin();
-    {
-        C.PassSET_ZB(oZTest.value, oZWrite.value);
-        switch (oBlend.IDselected)
-        {
-        case 0: // SET
-            C.PassSET_Blend(FALSE, D3DBLEND_ONE, D3DBLEND_ZERO, FALSE, 0);
-            break;
-        case 1: // BLEND
-            C.PassSET_Blend(TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
-            break;
-        case 2: // ADD
-            C.PassSET_Blend(TRUE, D3DBLEND_ONE, D3DBLEND_ONE, FALSE, oAREF.value);
-            break;
-        case 3: // MUL
-            C.PassSET_Blend(TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_ZERO, FALSE, oAREF.value);
-            break;
-        case 4: // MUL_2X
-            C.PassSET_Blend(TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_SRCCOLOR, FALSE, oAREF.value);
-            break;
-        case 5: // ALPHA-ADD
-            C.PassSET_Blend(TRUE, D3DBLEND_SRCALPHA, D3DBLEND_ONE, TRUE, oAREF.value);
-            break;
-        case 6: // MUL_2X + A-test
-            C.PassSET_Blend(TRUE, D3DBLEND_DESTCOLOR, D3DBLEND_SRCCOLOR, FALSE, oAREF.value);
-            break;
-        case 7: // SET (2r)
-            C.PassSET_Blend(TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, 0);
-            break;
-        case 8: // BLEND (2r)
-            C.PassSET_Blend(TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
-            break;
-        case 9: // BLEND (2r)
-            C.PassSET_Blend(TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
-            break;
-        }
-        C.PassSET_LightFog(oLighting.value, oFog.value);
-        // C.PassSET_LightFog	(FALSE,FALSE);
-
-        if (oBlend.IDselected == 6)
-        {
-            // Usually for wallmarks
-            C.StageBegin();
-            C.StageSET_Address(oClamp.value ? D3DTADDRESS_CLAMP : D3DTADDRESS_WRAP);
-            C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-            C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-            C.Stage_Texture(oT_Name);
-            C.Stage_Matrix("$null", 0);
-            C.Stage_Constant("$null");
-            C.StageEnd();
-
-            C.StageBegin();
-            C.StageSET_Address(oClamp.value ? D3DTADDRESS_CLAMP : D3DTADDRESS_WRAP);
-            C.StageSET_Color(D3DTA_DIFFUSE, D3DTOP_BLENDDIFFUSEALPHA, D3DTA_CURRENT);
-            C.StageSET_Alpha(D3DTA_DIFFUSE, D3DTOP_MODULATE, D3DTA_CURRENT);
-            C.Stage_Texture("$null");
-            C.Stage_Matrix("$null", 0);
-            C.Stage_Constant("$null");
-            C.StageEnd();
-        }
-        else
-        {
-            C.StageBegin();
-            C.StageSET_Address(oClamp.value ? D3DTADDRESS_CLAMP : D3DTADDRESS_WRAP);
-            if (9 == oBlend.IDselected)
-            {
-                // 4x R
-                C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE4X, D3DTA_DIFFUSE);
-                C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-            }
-            else
-            {
-                if ((7 == oBlend.IDselected) || (8 == oBlend.IDselected))
-                {
-                    // 2x R
-                    C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE2X, D3DTA_DIFFUSE);
-                    C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_SELECTARG1, D3DTA_DIFFUSE);
-                }
-                else
-                {
-                    // 1x R
-                    C.StageSET_Color(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-                    C.StageSET_Alpha(D3DTA_TEXTURE, D3DTOP_MODULATE, D3DTA_DIFFUSE);
-                }
-            }
-            C.Stage_Texture(oT_Name);
-            C.Stage_Matrix(oT_xform, 0);
-            C.Stage_Constant("$null");
-            C.StageEnd();
-        }
-    }
-    C.PassEnd();
-}
-#endif //	USE_DX10

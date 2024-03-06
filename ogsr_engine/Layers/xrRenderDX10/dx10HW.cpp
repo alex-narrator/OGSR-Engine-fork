@@ -19,9 +19,6 @@
 void fill_vid_mode_list(CHW* _hw);
 void free_vid_mode_list();
 
-void fill_render_mode_list();
-void free_render_mode_list();
-
 CHW HW;
 
 CHW::CHW()
@@ -45,21 +42,18 @@ CHW::~CHW()
 //////////////////////////////////////////////////////////////////////
 void CHW::CreateD3D()
 {
-#ifdef USE_DX11
     // Минимально поддерживаемая версия Windows => Windows Vista SP2 или Windows 7.
     R_CHK(CreateDXGIFactory1(IID_PPV_ARGS(&pFactory)));
 
-    
     UINT i = 0;
     while (pFactory->EnumAdapters1(i, &m_pAdapter) != DXGI_ERROR_NOT_FOUND)
     {
-        DXGI_ADAPTER_DESC desc;
+        DXGI_ADAPTER_DESC desc{};
         m_pAdapter->GetDesc(&desc);
 
         Msg("* Avail GPU [vendor:%X]-[device:%X]: %S", desc.VendorId, desc.DeviceId, desc.Description);
 
-        m_pAdapter->Release();
-        m_pAdapter = 0;
+        _RELEASE(m_pAdapter);
         ++i;
     }
 
@@ -81,14 +75,15 @@ void CHW::CreateD3D()
 
         pFactory->EnumAdapters1(0, &m_pAdapter);
     }
-#else
-    R_CHK(CreateDXGIFactory(IID_PPV_ARGS(&pFactory)));
-    pFactory->EnumAdapters(0, &m_pAdapter);
-#endif
+
+    m_pAdapter->QueryInterface(&m_pAdapter3);
 }
 
 void CHW::DestroyD3D()
 {
+    _SHOW_REF("refCount:m_pAdapter3", m_pAdapter3);
+    _RELEASE(m_pAdapter3);
+
     _SHOW_REF("refCount:m_pAdapter", m_pAdapter);
     _RELEASE(m_pAdapter);
 
@@ -104,13 +99,11 @@ void CHW::CreateDevice(HWND m_hWnd)
     BOOL bWindowed = !psDeviceFlags.is(rsFullscreen);
 
     // Display the name of video board
-#ifdef USE_DX11
-    DXGI_ADAPTER_DESC1 Desc;
+    DXGI_ADAPTER_DESC1 Desc{};
     R_CHK(m_pAdapter->GetDesc1(&Desc));
-#else
-    DXGI_ADAPTER_DESC Desc;
-    R_CHK(m_pAdapter->GetDesc(&Desc));
-#endif
+
+    DumpVideoMemoryUsage();
+
     //	Warning: Desc.Description is wide string
     Msg("* Selected GPU [vendor:%X]-[device:%X]: %S", Desc.VendorId, Desc.DeviceId, Desc.Description);
 
@@ -180,7 +173,6 @@ void CHW::CreateDevice(HWND m_hWnd)
         createDeviceFlags |= D3D_CREATE_DEVICE_DEBUG;
 #endif
 
-#ifdef USE_DX11
     const auto createDevice = [&](const D3D_FEATURE_LEVEL* level, const u32 levels) {
         return D3D11CreateDevice(m_pAdapter, D3D_DRIVER_TYPE_UNKNOWN, // Если мы выбираем конкретный адаптер, то мы обязаны использовать D3D_DRIVER_TYPE_UNKNOWN.
                                  nullptr, createDeviceFlags, level, levels, D3D11_SDK_VERSION, &pDevice, &FeatureLevel, &pContext);
@@ -197,26 +189,7 @@ void CHW::CreateDevice(HWND m_hWnd)
     R_CHK(pDevice->QueryInterface(IID_PPV_ARGS(&pDeviceDXGI)));
     R_CHK(pDeviceDXGI->SetMaximumFrameLatency(1));
     _RELEASE(pDeviceDXGI);
-#else
-    HRESULT R = D3DX10CreateDeviceAndSwapChain(m_pAdapter, m_DriverType, NULL, createDeviceFlags, &sd, &m_pSwapChain, &pDevice);
 
-    pContext = pDevice;
-    FeatureLevel = D3D_FEATURE_LEVEL_10_0;
-    if (!FAILED(R))
-    {
-        D3DX10GetFeatureLevel1(pDevice, &pDevice1);
-        FeatureLevel = D3D_FEATURE_LEVEL_10_1;
-    }
-    pContext1 = pDevice1;
-
-    if (FAILED(R))
-    {
-        // Fatal error! Cannot create rendering device AT STARTUP !!!
-        Msg("Failed to initialize graphics hardware.\nPlease try to restart the game.\nCreateDevice returned 0x%08x", R);
-        CHECK_OR_EXIT(!FAILED(R), "Failed to initialize graphics hardware.\nPlease try to restart the game.");
-    }
-    R_CHK(R);
-#endif
 
     _SHOW_REF("* CREATE: DeviceREF:", HW.pDevice);
 
@@ -230,6 +203,8 @@ void CHW::CreateDevice(HWND m_hWnd)
     fill_vid_mode_list(this);
 
     ImGui_ImplDX11_Init(m_hWnd, pDevice, pContext);
+
+    pContext->QueryInterface(IID_PPV_ARGS(&pAnnotation));
 }
 
 void CHW::DestroyDevice()
@@ -246,6 +221,8 @@ void CHW::DestroyDevice()
     _SHOW_REF("refCount:pBaseZB", pBaseZB);
     _RELEASE(pBaseZB);
 
+    _RELEASE(pAnnotation);
+
     _SHOW_REF("refCount:pBaseRT", pBaseRT);
     _RELEASE(pBaseRT);
     //#ifdef DEBUG
@@ -259,13 +236,9 @@ void CHW::DestroyDevice()
     _SHOW_REF("refCount:m_pSwapChain", m_pSwapChain);
     _RELEASE(m_pSwapChain);
 
-#ifdef USE_DX11
-    _RELEASE(pContext);
-#endif
 
-#ifndef USE_DX11
-    _RELEASE(HW.pDevice1);
-#endif
+    _RELEASE(pContext);
+
     _SHOW_REF("DeviceREF:", HW.pDevice);
     _RELEASE(HW.pDevice);
 
@@ -430,6 +403,28 @@ BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
     else			return TRUE;
     */
     return TRUE;
+}
+
+void CHW::DumpVideoMemoryUsage() const
+{
+    DXGI_ADAPTER_DESC1 Desc{};
+    R_CHK(m_pAdapter->GetDesc1(&Desc));
+
+    DXGI_QUERY_VIDEO_MEMORY_INFO videoMemoryInfo{};
+
+    if (m_pAdapter3 && SUCCEEDED(m_pAdapter3->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &videoMemoryInfo)))
+    {
+        Msg("\n\tDedicated VRAM: %zu MB (%zu bytes)\n\tDedicated Memory: %zu MB (%zu bytes)\n\tShared Memory: %zu MB (%zu bytes)\n\tCurrentUsage: %zu MB (%zu bytes)\n\tBudget: "
+            "%zu MB (%zu bytes)",
+            Desc.DedicatedVideoMemory / 1024 / 1024, Desc.DedicatedVideoMemory, Desc.DedicatedSystemMemory / 1024 / 1024, Desc.DedicatedSystemMemory,
+            Desc.SharedSystemMemory / 1024 / 1024, Desc.SharedSystemMemory, videoMemoryInfo.CurrentUsage / 1024 / 1024, videoMemoryInfo.CurrentUsage,
+            videoMemoryInfo.Budget / 1024 / 1024, videoMemoryInfo.Budget);
+    }
+    else
+    {
+        Msg("\n\tDedicated VRAM: %zu MB (%zu bytes)\n\tDedicated Memory: %zu MB (%zu bytes)\n\tShared Memory: %zu MB (%zu bytes)", Desc.DedicatedVideoMemory / 1024 / 1024,
+            Desc.DedicatedVideoMemory, Desc.DedicatedSystemMemory / 1024 / 1024, Desc.DedicatedSystemMemory, Desc.SharedSystemMemory / 1024 / 1024, Desc.SharedSystemMemory);
+    }
 }
 
 void CHW::updateWindowProps(HWND m_hWnd)
@@ -599,7 +594,7 @@ void CHW::UpdateViews()
     //	HACK: DX10: hard depth buffer format
     // R_CHK	(pDevice->GetDepthStencilSurface	(&pBaseZB));
     ID3DTexture2D* pDepthStencil = NULL;
-    D3D_TEXTURE2D_DESC descDepth;
+    D3D_TEXTURE2D_DESC descDepth{};
     descDepth.Width = sd.BufferDesc.Width;
     descDepth.Height = sd.BufferDesc.Height;
     descDepth.MipLevels = 1;

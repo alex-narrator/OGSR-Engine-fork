@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#pragma hdrstop
+
 #include "TextureDescrManager.h"
 #include "ETextureParams.h"
 
@@ -140,10 +140,11 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
 
                 desc.m_assoc = xr_new<texture_assoc>();
                 desc.m_assoc->detail_name = tp.detail_name;
+
                 if (dts)
                     dts->scale = tp.detail_scale;
                 else
-                    /*desc.m_assoc->cs*/ dts = xr_new<cl_dt_scaler>(tp.detail_scale);
+                    dts = xr_new<cl_dt_scaler>(tp.detail_scale);
 
                 desc.m_assoc->usage = 0;
 

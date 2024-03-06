@@ -149,6 +149,11 @@ public:
     }
 };
 
+// string(char)
+using xr_string = std::basic_string<char, std::char_traits<char>, xr_allocator<char>>;
+
+DEFINE_VECTOR(xr_string, SStringVec, SStringVecIt);
+
 // externally visible standart functionality
 IC void swap(shared_str& lhs, shared_str& rhs) { lhs.swap(rhs); }
 
@@ -199,16 +204,53 @@ struct transparent_string_equal
     [[nodiscard]] bool operator()(const char* lhs, const char* rhs) const { return !strcmp(lhs, rhs); }
 };
 
-template <typename Key, typename Value, class _Alloc = std::allocator<std::pair<const Key, Value>>>
+template <typename Key, typename Value, class _Alloc = xr_allocator<std::pair<const Key, Value>>>
 using string_unordered_map = std::unordered_map<Key, Value, transparent_string_hash, transparent_string_equal, _Alloc>;
 
-inline bool SplitFilename(std::string& str)
+namespace xr_string_utils
+{
+
+template <typename T>
+inline bool SplitFilename(T& str)
 {
     size_t found = str.find_last_of("/\\");
-    if (found != std::string::npos)
+    if (found != T::npos)
     {
         str.erase(found);
         return true;
     }
     return false;
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// https://stackoverflow.com/questions/216823/how-to-trim-an-stdstring
+// trim from start (in place)
+template <typename T>
+inline void ltrim(T& s)
+{
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+}
+
+// trim from end (in place)
+template <typename T>
+inline void rtrim(T& s)
+{
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
+}
+
+// trim from both ends (in place)
+template <typename T>
+inline void trim(T& s)
+{
+    rtrim(s);
+    ltrim(s);
+}
+////////////////////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+inline void strlwr(T& data)
+{
+    std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c) { return std::tolower(c); });
+}
+
+} // namespace xr_string_utils

@@ -26,7 +26,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
     }
     else
     {
-        D3D_DEPTH_STENCIL_VIEW_DESC desc;
+        D3D_DEPTH_STENCIL_VIEW_DESC desc{};
         zb->GetDesc(&desc);
 
         if (!RImplementation.o.dx10_msaa)
@@ -38,7 +38,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
 
         ID3DTexture2D* pTex = (ID3DTexture2D*)pRes;
 
-        D3D_TEXTURE2D_DESC TexDesc;
+        D3D_TEXTURE2D_DESC TexDesc{};
 
         pTex->GetDesc(&TexDesc);
 
@@ -73,7 +73,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencil
     }
     else
     {
-        D3D_DEPTH_STENCIL_VIEW_DESC desc;
+        D3D_DEPTH_STENCIL_VIEW_DESC desc{};
         zb->GetDesc(&desc);
         if (!RImplementation.o.dx10_msaa)
             VERIFY(desc.ViewDimension == D3D_DSV_DIMENSION_TEXTURE2D);
@@ -84,7 +84,7 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, ID3DDepthStencil
 
         ID3DTexture2D* pTex = (ID3DTexture2D*)pRes;
 
-        D3D_TEXTURE2D_DESC TexDesc;
+        D3D_TEXTURE2D_DESC TexDesc{};
 
         pTex->GetDesc(&TexDesc);
 
@@ -183,64 +183,7 @@ void CRenderTarget::u_compute_texgen_jitter(Fmatrix& m_Texgen_J)
     m_Texgen_J.mulA_44(m_TexelAdjust);
 }
 
-u8 fpack(float v)
-{
-    s32 _v = iFloor(((v + 1) * .5f) * 255.f + .5f);
-    clamp(_v, 0, 255);
-    return u8(_v);
-}
-u8 fpackZ(float v)
-{
-    s32 _v = iFloor(_abs(v) * 255.f + .5f);
-    clamp(_v, 0, 255);
-    return u8(_v);
-}
-Fvector vunpack(s32 x, s32 y, s32 z)
-{
-    Fvector pck;
-    pck.x = (float(x) / 255.f - .5f) * 2.f;
-    pck.y = (float(y) / 255.f - .5f) * 2.f;
-    pck.z = -float(z) / 255.f;
-    return pck;
-}
-Fvector vunpack(Ivector src) { return vunpack(src.x, src.y, src.z); }
-Ivector vpack(Fvector src)
-{
-    Fvector _v;
-    int bx = fpack(src.x);
-    int by = fpack(src.y);
-    int bz = fpackZ(src.z);
-    // dumb test
-    float e_best = flt_max;
-    int r = bx, g = by, b = bz;
-#ifdef DEBUG
-    int d = 0;
-#else
-    int d = 3;
-#endif
-    for (int x = _max(bx - d, 0); x <= _min(bx + d, 255); x++)
-        for (int y = _max(by - d, 0); y <= _min(by + d, 255); y++)
-            for (int z = _max(bz - d, 0); z <= _min(bz + d, 255); z++)
-            {
-                _v = vunpack(x, y, z);
-                float m = _v.magnitude();
-                float me = _abs(m - 1.f);
-                if (me > 0.03f)
-                    continue;
-                _v.div(m);
-                float e = _abs(src.dotproduct(_v) - 1.f);
-                if (e < e_best)
-                {
-                    e_best = e;
-                    r = x, g = y, b = z;
-                }
-            }
-    Ivector ipck;
-    ipck.set(r, g, b);
-    return ipck;
-}
-
-void generate_jitter(DWORD* dest, u32 elem_count)
+static void generate_jitter(DWORD* dest, u32 elem_count)
 {
     const int cmax = 8;
     svector<Ivector2, cmax> samples;
@@ -264,27 +207,6 @@ void generate_jitter(DWORD* dest, u32 elem_count)
     for (u32 it = 0; it < elem_count; it++, dest++)
         *dest = color_rgba(samples[2 * it].x, samples[2 * it].y, samples[2 * it + 1].y, samples[2 * it + 1].x);
 }
-
-#if _MSC_FULL_VER >= 191100000 && _MSC_FULL_VER <= 191225830
-// из-за строки: fs = powf(ls*1.01f, 128.f); возникает ICE
-// fatal error C1001 : An internal error has occurred in the compiler.
-// (compiler file 'f:\dd\vctools\compiler\utc\src\p2\main.c', line 256)
-// 15.5.1 - ошибка так и не исправлена
-// для исправления отключаю оптимизацию
-#define POW_128_BUG
-#elif _MSC_VER == 1911 || _MSC_VER == 1912
-#define stringize(s) _stringize(s)
-#define _stringize(s) #s
-#pragma message("_MSC_FULL_VER=" stringize(_MSC_FULL_VER))
-#undef _stringize
-#undef stringize
-#endif
-
-#ifdef POW_128_BUG
-#pragma optimize("", off)
-float pow128(float arg) { return powf(arg, 128.f); }
-#pragma optimize("", on)
-#endif
 
 CRenderTarget::CRenderTarget()
 {
@@ -456,15 +378,13 @@ CRenderTarget::CRenderTarget()
     s_blur.create(b_blur, "r2\\blur");
     s_dof.create(b_dof, "r2\\dof");
 
+    s_lut.create("ogsr_lut");
+
     // DIRECT (spot)
     D3DFORMAT depth_format = (D3DFORMAT)RImplementation.o.HW_smap_FORMAT;
 
     if (RImplementation.o.HW_smap)
     {
-        D3DFORMAT nullrt = D3DFMT_R5G6B5;
-        if (RImplementation.o.nullrt)
-            nullrt = (D3DFORMAT)MAKEFOURCC('N', 'U', 'L', 'L');
-
         u32 size = RImplementation.o.smapsize;
         rt_smap_depth.create(r2_RT_smap_depth, size, size, depth_format);
 
@@ -475,8 +395,6 @@ CRenderTarget::CRenderTarget()
             s_create_minmax_sm.create(&TempBlender, "null");
         }
 
-        // rt_smap_surf.create			(r2_RT_smap_surf,			size,size,nullrt		);
-        // rt_smap_ZB					= NULL;
         s_accum_mask.create(b_accum_mask, "r3\\accum_mask");
         s_accum_direct.create(b_accum_direct, "r3\\accum_direct");
 
@@ -708,145 +626,12 @@ CRenderTarget::CRenderTarget()
 
     // Build textures
     {
-        // Testure for async sreenshots
-        {
-            D3D_TEXTURE2D_DESC desc;
-            desc.Width = Device.dwWidth;
-            desc.Height = Device.dwHeight;
-            desc.MipLevels = 1;
-            desc.ArraySize = 1;
-            desc.SampleDesc.Count = 1;
-            desc.SampleDesc.Quality = 0;
-            desc.Format = DXGI_FORMAT_R8G8B8A8_SNORM;
-            desc.Usage = D3D_USAGE_STAGING;
-            desc.BindFlags = 0;
-            desc.CPUAccessFlags = D3D_CPU_ACCESS_READ;
-            desc.MiscFlags = 0;
-
-            R_CHK(HW.pDevice->CreateTexture2D(&desc, 0, &t_ss_async));
-        }
-        // Build material(s)
-        {
-            //	Create immutable texture.
-            //	So we need to init data _before_ the creation.
-            // Surface
-            // R_CHK						(D3DXCreateVolumeTexture(HW.pDevice,TEX_material_LdotN,TEX_material_LdotH,4,1,0,D3DFMT_A8L8,D3DPOOL_MANAGED,&t_material_surf));
-            // t_material					= dxRenderDeviceRender::Instance().Resources->_CreateTexture(r2_material);
-            // t_material->surface_set		(t_material_surf);
-            //	Use DXGI_FORMAT_R8G8_UNORM
-
-            constexpr u16 tempData[TEX_material_LdotN * TEX_material_LdotH * TEX_material_Count]{};
-
-            D3D_TEXTURE3D_DESC desc;
-            desc.Width = TEX_material_LdotN;
-            desc.Height = TEX_material_LdotH;
-            desc.Depth = TEX_material_Count;
-            desc.MipLevels = 1;
-            desc.Format = DXGI_FORMAT_R8G8_UNORM;
-            desc.Usage = D3D_USAGE_IMMUTABLE;
-            desc.BindFlags = D3D_BIND_SHADER_RESOURCE;
-            desc.CPUAccessFlags = 0;
-            desc.MiscFlags = 0;
-
-            D3D_SUBRESOURCE_DATA subData;
-
-            subData.pSysMem = tempData;
-            subData.SysMemPitch = desc.Width * 2;
-            subData.SysMemSlicePitch = desc.Height * subData.SysMemPitch;
-
-            // Fill it (addr: x=dot(L,N),y=dot(L,H))
-            // D3DLOCKED_BOX				R;
-            // R_CHK						(t_material_surf->LockBox	(0,&R,0,0));
-            for (u32 slice = 0; slice < TEX_material_Count; slice++)
-            {
-                for (u32 y = 0; y < TEX_material_LdotH; y++)
-                {
-                    for (u32 x = 0; x < TEX_material_LdotN; x++)
-                    {
-                        u16* p = (u16*)(LPBYTE(subData.pSysMem) + slice * subData.SysMemSlicePitch + y * subData.SysMemPitch + x * 2);
-                        float ld = float(x) / float(TEX_material_LdotN - 1);
-                        float ls = float(y) / float(TEX_material_LdotH - 1) + EPS_S;
-                        ls *= powf(ld, 1 / 32.f);
-                        float fd, fs;
-
-                        switch (slice)
-                        {
-                        case 0: { // looks like OrenNayar
-                            fd = powf(ld, 0.75f); // 0.75
-                            fs = powf(ls, 16.f) * .5f;
-                        }
-                        break;
-                        case 1: { // looks like Blinn
-                            fd = powf(ld, 0.90f); // 0.90
-                            fs = powf(ls, 24.f);
-                        }
-                        break;
-                        case 2: { // looks like Phong
-                            fd = ld; // 1.0
-#ifdef POW_128_BUG
-                            fs = pow128(ls * 1.01f);
-#else
-                            fs = powf(ls * 1.01f, 128.f);
-#endif
-                        }
-                        break;
-                        case 3: { // looks like Metal
-                            float s0 = _abs(1 - _abs(0.05f * _sin(33.f * ld) + ld - ls));
-                            float s1 = _abs(1 - _abs(0.05f * _cos(33.f * ld * ls) + ld - ls));
-                            float s2 = _abs(1 - _abs(ld - ls));
-                            fd = ld; // 1.0
-                            fs = powf(_max(_max(s0, s1), s2), 24.f);
-                            fs *= powf(ld, 1 / 7.f);
-                        }
-                        break;
-                        default: fd = fs = 0;
-                        }
-                        s32 _d = clampr(iFloor(fd * 255.5f), 0, 255);
-                        s32 _s = clampr(iFloor(fs * 255.5f), 0, 255);
-                        if ((y == (TEX_material_LdotH - 1)) && (x == (TEX_material_LdotN - 1)))
-                        {
-                            _d = 255;
-                            _s = 255;
-                        }
-                        *p = u16(_s * 256 + _d);
-                    }
-                }
-            }
-            // R_CHK		(t_material_surf->UnlockBox	(0));
-
-            R_CHK(HW.pDevice->CreateTexture3D(&desc, &subData, &t_material_surf));
-            t_material = dxRenderDeviceRender::Instance().Resources->_CreateTexture(r2_material);
-            t_material->surface_set(t_material_surf);
-            // R_CHK						(D3DXCreateVolumeTexture(HW.pDevice,TEX_material_LdotN,TEX_material_LdotH,4,1,0,D3DFMT_A8L8,D3DPOOL_MANAGED,&t_material_surf));
-            // t_material					= dxRenderDeviceRender::Instance().Resources->_CreateTexture(r2_material);
-            // t_material->surface_set		(t_material_surf);
-
-            // #ifdef DEBUG
-            // R_CHK	(D3DXSaveTextureToFile	("x:\\r2_material.dds",D3DXIFF_DDS,t_material_surf,0));
-            // #endif
-        }
-
         // Build noise table
-        if (1)
         {
-            // Surfaces
-            // D3DLOCKED_RECT				R[TEX_jitter_count];
+            constexpr u32 sampleSize = 4;
+            constexpr u32 tempData[TEX_jitter_count][TEX_jitter * TEX_jitter]{};
 
-            // for (int it=0; it<TEX_jitter_count; it++)
-            //{
-            //	string_path					name;
-            //	xr_sprintf						(name,"%s%d",r2_jitter,it);
-            //	R_CHK	(D3DXCreateTexture	(HW.pDevice,TEX_jitter,TEX_jitter,1,0,D3DFMT_Q8W8V8U8,D3DPOOL_MANAGED,&t_noise_surf[it]));
-            //	t_noise[it]					= dxRenderDeviceRender::Instance().Resources->_CreateTexture	(name);
-            //	t_noise[it]->surface_set	(t_noise_surf[it]);
-            //	R_CHK						(t_noise_surf[it]->LockRect	(0,&R[it],0,0));
-            // }
-            //	Use DXGI_FORMAT_R8G8B8A8_SNORM
-
-            static const int sampleSize = 4;
-            u32 tempData[TEX_jitter_count][TEX_jitter * TEX_jitter];
-
-            D3D_TEXTURE2D_DESC desc;
+            D3D_TEXTURE2D_DESC desc{};
             desc.Width = TEX_jitter;
             desc.Height = TEX_jitter;
             desc.MipLevels = 1;
@@ -860,9 +645,9 @@ CRenderTarget::CRenderTarget()
             desc.CPUAccessFlags = 0;
             desc.MiscFlags = 0;
 
-            D3D_SUBRESOURCE_DATA subData[TEX_jitter_count];
+            D3D_SUBRESOURCE_DATA subData[TEX_jitter_count]{};
 
-            for (int it = 0; it < TEX_jitter_count - 1; it++)
+            for (u32 it{}; it < TEX_jitter_count; it++)
             {
                 subData[it].pSysMem = tempData[it];
                 subData[it].SysMemPitch = desc.Width * sampleSize;
@@ -873,9 +658,9 @@ CRenderTarget::CRenderTarget()
             {
                 for (u32 x = 0; x < TEX_jitter; x++)
                 {
-                    DWORD data[TEX_jitter_count - 1];
-                    generate_jitter(data, TEX_jitter_count - 1);
-                    for (u32 it = 0; it < TEX_jitter_count - 1; it++)
+                    DWORD data[TEX_jitter_count];
+                    generate_jitter(data, TEX_jitter_count);
+                    for (u32 it = 0; it < TEX_jitter_count; it++)
                     {
                         u32* p = (u32*)(LPBYTE(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4);
 
@@ -884,74 +669,14 @@ CRenderTarget::CRenderTarget()
                 }
             }
 
-            // for (int it=0; it<TEX_jitter_count; it++)	{
-            //	R_CHK						(t_noise_surf[it]->UnlockRect(0));
-            // }
-
-            int it = 0;
-
-            for (; it < TEX_jitter_count - 1; it++)
+            for (u32 it{}; it < TEX_jitter_count; it++)
             {
                 string_path name;
                 xr_sprintf(name, "%s%d", r2_jitter, it);
-                // R_CHK	(D3DXCreateTexture	(HW.pDevice,TEX_jitter,TEX_jitter,1,0,D3DFMT_Q8W8V8U8,D3DPOOL_MANAGED,&t_noise_surf[it]));
                 R_CHK(HW.pDevice->CreateTexture2D(&desc, &subData[it], &t_noise_surf[it]));
                 t_noise[it] = dxRenderDeviceRender::Instance().Resources->_CreateTexture(name);
                 t_noise[it]->surface_set(t_noise_surf[it]);
-                // R_CHK						(t_noise_surf[it]->LockRect	(0,&R[it],0,0));
             }
-
-            float tempDataHBAO[TEX_jitter * TEX_jitter * 4];
-
-            // generate HBAO jitter texture (last)
-            D3D_TEXTURE2D_DESC descHBAO;
-            descHBAO.Width = TEX_jitter;
-            descHBAO.Height = TEX_jitter;
-            descHBAO.MipLevels = 1;
-            descHBAO.ArraySize = 1;
-            descHBAO.SampleDesc.Count = 1;
-            descHBAO.SampleDesc.Quality = 0;
-            descHBAO.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-            // desc.Usage = D3D_USAGE_IMMUTABLE;
-            descHBAO.Usage = D3D_USAGE_DEFAULT;
-            descHBAO.BindFlags = D3D_BIND_SHADER_RESOURCE;
-            descHBAO.CPUAccessFlags = 0;
-            descHBAO.MiscFlags = 0;
-
-            it = TEX_jitter_count - 1;
-            subData[it].pSysMem = tempDataHBAO;
-            subData[it].SysMemPitch = descHBAO.Width * sampleSize * sizeof(float);
-
-            // Fill it,
-            for (u32 y = 0; y < TEX_jitter; y++)
-            {
-                for (u32 x = 0; x < TEX_jitter; x++)
-                {
-                    float numDir = 1.0f;
-                    switch (ps_r_ssao)
-                    {
-                    case 1: numDir = 4.0f; break;
-                    case 2: numDir = 6.0f; break;
-                    case 3: numDir = 8.0f; break;
-                    case 4: numDir = 8.0f; break;
-                    }
-                    float angle = 2 * PI * ::Random.randF(0.0f, 1.0f) / numDir;
-                    float dist = ::Random.randF(0.0f, 1.0f);
-
-                    float* p = (float*)(LPBYTE(subData[it].pSysMem) + y * subData[it].SysMemPitch + x * 4 * sizeof(float));
-                    *p = (float)(_cos(angle));
-                    *(p + 1) = (float)(_sin(angle));
-                    *(p + 2) = (float)(dist);
-                    *(p + 3) = 0;
-                }
-            }
-
-            string_path name;
-            xr_sprintf(name, "%s%d", r2_jitter, it);
-            // R_CHK	(D3DXCreateTexture	(HW.pDevice,TEX_jitter,TEX_jitter,1,0,D3DFMT_Q8W8V8U8,D3DPOOL_MANAGED,&t_noise_surf[it]));
-            R_CHK(HW.pDevice->CreateTexture2D(&descHBAO, &subData[it], &t_noise_surf[it]));
-            t_noise[it] = dxRenderDeviceRender::Instance().Resources->_CreateTexture(name);
-            t_noise[it]->surface_set(t_noise_surf[it]);
         }
     }
 
@@ -970,16 +695,7 @@ CRenderTarget::CRenderTarget()
 
 CRenderTarget::~CRenderTarget()
 {
-    _RELEASE(t_ss_async);
-
     // Textures
-    t_material->surface_set(NULL);
-
-#ifdef DEBUG
-    _SHOW_REF("t_material_surf", t_material_surf);
-#endif // DEBUG
-    _RELEASE(t_material_surf);
-
     t_LUM_src->surface_set(NULL);
     t_LUM_dest->surface_set(NULL);
 
@@ -987,13 +703,9 @@ CRenderTarget::~CRenderTarget()
     ID3DBaseTexture* pSurf = 0;
 
     pSurf = t_envmap_0->surface_get();
-    if (pSurf)
-        pSurf->Release();
     _SHOW_REF("t_envmap_0 - #small", pSurf);
 
     pSurf = t_envmap_1->surface_get();
-    if (pSurf)
-        pSurf->Release();
     _SHOW_REF("t_envmap_1 - #small", pSurf);
     //_SHOW_REF("t_envmap_0 - #small",t_envmap_0->pSurface);
     //_SHOW_REF("t_envmap_1 - #small",t_envmap_1->pSurface);
@@ -1035,6 +747,9 @@ CRenderTarget::~CRenderTarget()
 
     if (RImplementation.o.dx10_msaa)
     {
+        xr_delete(b_bloom_msaa);
+        xr_delete(b_postprocess_msaa);
+
         int bound = RImplementation.o.dx10_msaa_samples;
 
         if (RImplementation.o.dx10_msaa_opt)

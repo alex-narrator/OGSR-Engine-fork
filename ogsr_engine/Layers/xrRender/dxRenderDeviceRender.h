@@ -26,7 +26,6 @@ public:
 
     //	Destroy
     virtual void OnDeviceDestroy(BOOL bKeepTextures);
-    virtual void ValidateHW();
     virtual void DestroyHW();
     virtual void Reset(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth_2, float& fHeight_2);
     //	Init
@@ -42,8 +41,6 @@ public:
     virtual void DeferredLoad(BOOL E);
     virtual void ResourcesDeferredUpload();
     virtual void ResourcesGetMemoryUsage(u32& m_base, u32& c_base, u32& m_lmaps, u32& c_lmaps);
-    virtual void ResourcesDestroyNecessaryTextures();
-    virtual void ResourcesStoreNecessaryTextures();
     virtual void ResourcesDumpMemoryUsage();
 
     //	HWSupport
@@ -64,6 +61,7 @@ public:
 
 public:
     CResourceManager* Resources;
+
     ref_shader m_WireShader;
     ref_shader m_SelectionShader;
 

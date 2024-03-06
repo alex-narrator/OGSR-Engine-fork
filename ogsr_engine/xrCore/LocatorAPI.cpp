@@ -550,18 +550,28 @@ void CLocatorAPI::_initialize(u32 flags, LPCSTR target_folder, LPCSTR fs_name)
 
         if (!pFSltx)
         {
-            string_path tmpAppPath{};
-            strcpy_s(tmpAppPath, Core.ApplicationPath);
-            if (xr_strlen(tmpAppPath))
+            if (strstr(Core.Params, "-use-work-dir"))
             {
-                tmpAppPath[xr_strlen(tmpAppPath) - 1] = 0;
-                if (strrchr(tmpAppPath, '\\'))
-                    *(strrchr(tmpAppPath, '\\') + 1) = 0;
-
-                append_path("$fs_root$", tmpAppPath, 0, FALSE);
+                string_path currentDir;
+                GetCurrentDirectory(std::size(currentDir) - 1, currentDir);
+                currentDir[std::size(currentDir) - 1] = '\0';
+                append_path("$fs_root$", currentDir, 0, FALSE);
             }
             else
-                append_path("$fs_root$", "", 0, FALSE);
+            {
+                string_path tmpAppPath{};
+                strcpy_s(tmpAppPath, Core.ApplicationPath);
+                if (xr_strlen(tmpAppPath))
+                {
+                    tmpAppPath[xr_strlen(tmpAppPath) - 1] = 0;
+                    if (strrchr(tmpAppPath, '\\'))
+                        *(strrchr(tmpAppPath, '\\') + 1) = 0;
+
+                    append_path("$fs_root$", tmpAppPath, 0, FALSE);
+                }
+                else
+                    append_path("$fs_root$", "", 0, FALSE);
+            }
 
             pFSltx = r_open("$fs_root$", fs_ltx);
         }
@@ -913,6 +923,7 @@ void CLocatorAPI::file_from_archive(IReader*& R, LPCSTR fname, const file& desc)
 {
     // Archived one
     archive& A = archives[desc.vfs];
+
     u32 start = (desc.ptr / dwAllocGranularity) * dwAllocGranularity;
     u32 end = (desc.ptr + desc.size_compressed) / dwAllocGranularity;
     if ((desc.ptr + desc.size_compressed) % dwAllocGranularity)
@@ -920,13 +931,15 @@ void CLocatorAPI::file_from_archive(IReader*& R, LPCSTR fname, const file& desc)
     end *= dwAllocGranularity;
     if (end > A.size)
         end = A.size;
-    u32 sz = (end - start);
+    u32 sz = end - start;
+
     u8* ptr = (u8*)MapViewOfFile(A.hSrcMap, FILE_MAP_READ, 0, start, sz);
     VERIFY3(ptr, "cannot create file mapping on file", fname);
 
+#ifdef DEBUG
     string512 temp;
     sprintf_s(temp, "%s:%s", *A.path, fname);
-#ifdef DEBUG
+
     register_file_mapping(ptr, sz, temp);
 #endif // DEBUG
 
@@ -939,9 +952,12 @@ void CLocatorAPI::file_from_archive(IReader*& R, LPCSTR fname, const file& desc)
 
     // Compressed
     u8* dest = xr_alloc<u8>(desc.size_real);
+
     rtc_decompress(dest, desc.size_real, ptr + ptr_offs, desc.size_compressed);
+
     R = xr_new<CTempReader>(dest, desc.size_real, 0);
     UnmapViewOfFile(ptr);
+
 #ifdef DEBUG
     unregister_file_mapping(ptr, sz);
 #endif // DEBUG
