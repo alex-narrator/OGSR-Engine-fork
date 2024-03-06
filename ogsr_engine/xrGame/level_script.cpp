@@ -211,6 +211,8 @@ LPCSTR get_name() { return (*Level().name()); }
 
 void prefetch_sound(LPCSTR name) { Level().PrefetchSound(name); }
 
+void prefetch_many_sounds(LPCSTR prefix) { Level().PrefetchManySoundsLater(prefix); }
+
 CClientSpawnManager& get_client_spawn_manager() { return (Level().client_spawn_manager()); }
 
 void start_stop_menu(CUIDialogWnd* pDialog, bool bDoHideIndicators) { HUD().GetUI()->StartStopMenu(pDialog, bDoHideIndicators); }
@@ -917,7 +919,10 @@ void CLevel::script_register(lua_State* L)
             def("get_time_days", &get_time_days), def("get_time_hours", &get_time_hours), def("get_time_minutes", &get_time_minutes),
 
             def("cover_in_direction", &cover_in_direction), def("vertex_in_direction", &vertex_in_direction), def("rain_factor", &rain_factor),
-            def("patrol_path_exists", &patrol_path_exists), def("vertex_position", &vertex_position), def("name", &get_name), def("prefetch_sound", &prefetch_sound),
+            def("patrol_path_exists", &patrol_path_exists), def("vertex_position", &vertex_position), def("name", &get_name), 
+
+            def("prefetch_sound", &prefetch_sound),
+            def("prefetch_many_sounds", prefetch_many_sounds),
 
             def("client_spawn_manager", &get_client_spawn_manager),
 
