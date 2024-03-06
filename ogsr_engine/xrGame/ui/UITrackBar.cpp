@@ -6,12 +6,12 @@
 #include "UITextureMaster.h"
 #include "..\..\xr_3da\xr_input.h"
 
-#define DEF_CONTROL_HEIGHT 21
-#define FRAME_LINE_TEXTURE "ui_slider_e"
-#define FRAME_LINE_TEXTURE_D "ui_slider_d"
-#define SLIDER_TEXTURE "ui_slider_button"
+constexpr auto DEF_CONTROL_HEIGHT = 21;
+constexpr auto FRAME_LINE_TEXTURE = "ui_slider_e";
+constexpr auto FRAME_LINE_TEXTURE_D = "ui_slider_d";
+constexpr auto SLIDER_TEXTURE = "ui_slider_button";
 
-CUITrackBar::CUITrackBar() : m_f_min(0), m_f_max(1), m_f_val(0), m_f_back_up(0), m_f_step(0.01f), m_b_is_float(true), m_b_invert(false)
+CUITrackBar::CUITrackBar()
 {
     m_pFrameLine = xr_new<CUIFrameLineWnd>();
     AttachChild(m_pFrameLine);
@@ -68,7 +68,8 @@ void CUITrackBar::SetCurrentValue()
 {
     if (m_b_is_float)
     {
-        GetOptFloatValue(m_f_val, m_f_min, m_f_max);
+        if (IsOptionsItem())
+            GetOptFloatValue(m_f_val, m_f_min, m_f_max);
 
         if (!fis_zero(m_f_min_xml) && m_f_min_xml > m_f_min)
             m_f_min = m_f_min_xml;
@@ -78,7 +79,8 @@ void CUITrackBar::SetCurrentValue()
     }
     else
     {
-        GetOptIntegerValue(m_i_val, m_i_min, m_i_max);
+        if (IsOptionsItem())
+            GetOptIntegerValue(m_i_val, m_i_min, m_i_max);
 
         if (!fis_zero(m_f_min_xml) && m_f_min_xml > m_i_min)
             m_i_min = iFloor(m_f_min_xml);
@@ -95,12 +97,14 @@ void CUITrackBar::Draw() { CUIWindow::Draw(); }
 
 void CUITrackBar::SaveValue()
 {
-    CUIOptionsItem::SaveValue();
+    if (IsOptionsItem())
+        CUIOptionsItem::SaveValue();
 
     string128 buf;
     if (m_b_is_float)
     {
-        SaveOptFloatValue(m_f_val);
+        if (IsOptionsItem())
+            SaveOptFloatValue(m_f_val);
         if (m_f_step >= 1)
             sprintf_s(buf, "%2.0f", m_f_val);
         else if (m_f_step >= 0.1)
@@ -110,25 +114,17 @@ void CUITrackBar::SaveValue()
     }
     else
     {
-        SaveOptIntegerValue(m_i_val);
+        if (IsOptionsItem())
+            SaveOptIntegerValue(m_i_val);
         sprintf_s(buf, "%d", m_i_val);
     }
 
-    m_pSlider->SetText(buf);
+    if (show_val_on_slider)
+        m_pSlider->SetText(buf);
     GetMessageTarget()->SendMessage(this, TRACKBAR_CHANGED);
 }
 
-float CUITrackBar::GetTrackValue()
-{
-    if (m_b_is_float)
-    {
-        return (m_f_val);
-    }
-    else
-    {
-        return float(m_i_val);
-    }
-}
+float CUITrackBar::GetTrackValue() { return m_b_is_float ? m_f_val : float(m_i_val); }
 
 bool CUITrackBar::IsChanged()
 {

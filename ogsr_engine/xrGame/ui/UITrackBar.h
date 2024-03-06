@@ -36,6 +36,11 @@ public:
     void SetMin(float v) { m_f_min_xml = v; }
     void SetMax(float v) { m_f_max_xml = v; }
 
+    void SetOptionsItem(bool val) { is_options_item = val; };
+    bool IsOptionsItem() { return is_options_item; };
+
+    void SetShowValOnSlider(bool val) { show_val_on_slider = val; };
+
 protected:
     void UpdatePos();
     void UpdatePosRelativeToMouse();
@@ -43,29 +48,24 @@ protected:
     CUI3tButton* m_pSlider;
     CUIFrameLineWnd* m_pFrameLine;
     CUIFrameLineWnd* m_pFrameLine_d;
-    bool m_b_invert;
-    bool m_b_is_float;
+    bool m_b_invert{};
+    bool m_b_is_float{true};
 
-    float m_f_max_xml = 0.f;
-    float m_f_min_xml = 0.f;
+    float m_f_max_xml{};
+    float m_f_min_xml{};
 
-    union
-    {
-        struct
-        {
-            float m_f_val;
-            float m_f_max;
-            float m_f_min;
-            float m_f_step;
-            float m_f_back_up;
-        };
-        struct
-        {
-            int m_i_val;
-            int m_i_max;
-            int m_i_min;
-            int m_i_step;
-            int m_i_back_up;
-        };
-    };
+    bool is_options_item{};
+    bool show_val_on_slider{};
+
+    float m_f_val{};
+    float m_f_max{1.f};
+    float m_f_min{};
+    float m_f_step{0.1f};
+    float m_f_back_up{};
+
+    int m_i_val{};
+    int m_i_max{1};
+    int m_i_min{};
+    int m_i_step{1};
+    int m_i_back_up{};
 };

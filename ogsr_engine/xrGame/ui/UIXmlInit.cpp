@@ -1430,7 +1430,8 @@ bool CUIXmlInit::InitTrackBar(CUIXml& xml_doc, const char* path, int index, CUIT
 
     int is_integer = xml_doc.ReadAttribInt(path, index, "is_integer", 0);
     pWnd->SetType(!is_integer);
-    InitOptionsItem(xml_doc, path, 0, pWnd);
+
+    pWnd->SetOptionsItem(InitOptionsItem(xml_doc, path, 0, pWnd));
 
     int invert = xml_doc.ReadAttribInt(path, index, "invert", 0);
     pWnd->SetInvert(!!invert);
@@ -1443,6 +1444,9 @@ bool CUIXmlInit::InitTrackBar(CUIXml& xml_doc, const char* path, int index, CUIT
 
     float max_xml = xml_doc.ReadAttribFlt(path, index, "max", 0.0f);
     pWnd->SetMax(max_xml);
+
+    int val_on_slider = xml_doc.ReadAttribInt(path, index, "val_on_slider", 1);
+    pWnd->SetShowValOnSlider(!!val_on_slider);
 
     return true;
 }
