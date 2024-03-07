@@ -532,6 +532,10 @@ void CWeapon::Load(LPCSTR section)
     else
         hud_hidden_bones = hidden_bones;
 
+    //addon meshes
+    LoadAddonMeshes(section);
+    LoadAddonMeshesHud();
+
     InitAddons();
 
     m_bHideCrosshairInZoom = READ_IF_EXISTS(pSettings, r_bool, hud_sect, "zoom_hide_crosshair", true);
@@ -1193,18 +1197,20 @@ void CWeapon::UpdateHUDAddonsVisibility()
 
     if (AddonAttachable(eScope))
     {
-        LPCSTR scope_hud_sect{};
+        LPCSTR scope_hud_sect = READ_IF_EXISTS(pSettings, r_string, cNameSect(), "hud", nullptr);
         if (IsAddonAttached(eScope))
         {
-            string1024 res_sect{};
-            sprintf(res_sect, "%s_hud_sect", GetAddonName(eScope).c_str());
-            scope_hud_sect = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+            string1024 _res{};
+            sprintf(_res, "%s_hud_sect", GetAddonName(eScope).c_str());
+            if (pSettings->line_exist(cNameSect(), _res))
+                scope_hud_sect = pSettings->r_string(cNameSect(), _res);
         }
-        else
-            scope_hud_sect = READ_IF_EXISTS(pSettings, r_string, cNameSect(), "hud", nullptr);
 
-        if (scope_hud_sect && xr_strcmp(HudSection().c_str(), scope_hud_sect) != 0)
+        if (scope_hud_sect && xr_strcmp(hud_sect.c_str(), scope_hud_sect) != 0)
+        {
             SetHudSection(scope_hud_sect);
+            LoadAddonMeshesHud();
+        }
 
         HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, IsAddonAttached(eScope), TRUE);
     }
@@ -1251,6 +1257,21 @@ void CWeapon::UpdateHUDAddonsVisibility()
     for (const shared_str& bone_name : hud_hidden_bones)
         HudItemData()->set_bone_visible(bone_name, FALSE, TRUE);
 
+    // addon meshes
+    for (const auto& mesh_idx : m_scope_meshes_hud)
+        HudItemData()->m_model->SetRFlag(mesh_idx, IsAddonAttached(eScope));
+    for (const auto& mesh_idx : m_silencer_meshes_hud)
+        HudItemData()->m_model->SetRFlag(mesh_idx, IsAddonAttached(eSilencer));
+    for (const auto& mesh_idx : m_launcher_meshes_hud)
+        HudItemData()->m_model->SetRFlag(mesh_idx, IsAddonAttached(eLauncher));
+    for (const auto& mesh_idx : m_laser_meshes_hud)
+        HudItemData()->m_model->SetRFlag(mesh_idx, IsAddonAttached(eLaser));
+    for (const auto& mesh_idx : m_flashlight_meshes_hud)
+        HudItemData()->m_model->SetRFlag(mesh_idx, IsAddonAttached(eFlashlight));
+    for (const auto& mesh_idx : m_stock_meshes_hud)
+        HudItemData()->m_model->SetRFlag(mesh_idx, IsAddonAttached(eStock));
+    //
+
     callback(GameObject::eOnUpdateHUDAddonsVisibiility)();
 }
 
@@ -1294,6 +1315,7 @@ void CWeapon::UpdateAddonsVisibility()
         else if (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonPermanent && bone_id != BI_NONE && !pWeaponVisual->LL_GetBoneVisible(bone_id))
             pWeaponVisual->LL_SetBoneVisible(bone_id, TRUE, TRUE);
     }
+
     ///////////////////////////////////////////////////////////////////
 
     bone_id = pWeaponVisual->LL_BoneID(m_sWpn_silencer_bone);
@@ -1361,6 +1383,21 @@ void CWeapon::UpdateAddonsVisibility()
     }
 
     ///////////////////////////////////////////////////////////////////
+
+    //addon meshes
+    for (const auto& mesh_idx : m_scope_meshes)
+        pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eScope));
+    for (const auto& mesh_idx : m_silencer_meshes)
+        pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eSilencer));
+    for (const auto& mesh_idx : m_launcher_meshes)
+        pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eLauncher));
+    for (const auto& mesh_idx : m_laser_meshes)
+        pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eLaser));
+    for (const auto& mesh_idx : m_flashlight_meshes)
+        pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eFlashlight));
+    for (const auto& mesh_idx : m_stock_meshes)
+        pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eStock));
+    //
 
     callback(GameObject::eOnUpdateAddonsVisibiility)();
 
@@ -2050,3 +2087,123 @@ bool CWeapon::ZoomHideCrosshair()
 
 Fvector CWeapon::GetPositionForCollision() { return psHUD_Flags.test(HUD_CROSSHAIR_HARD) ? get_LastShootPoint() : inherited::GetPositionForCollision(); }
 Fvector CWeapon::GetDirectionForCollision() { return psHUD_Flags.test(HUD_CROSSHAIR_HARD) ? get_LastFD() : inherited::GetDirectionForCollision(); }
+
+void CWeapon::LoadAddonMeshes(LPCSTR section) 
+{
+    LPCSTR str = READ_IF_EXISTS(pSettings, r_string, section, "scope_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_scope_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+    str = READ_IF_EXISTS(pSettings, r_string, section, "silencer_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_silencer_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+    str = READ_IF_EXISTS(pSettings, r_string, section, "launcher_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_launcher_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+    str = READ_IF_EXISTS(pSettings, r_string, section, "laser_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_laser_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+    str = READ_IF_EXISTS(pSettings, r_string, section, "flashlight_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_flashlight_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+    str = READ_IF_EXISTS(pSettings, r_string, section, "magazine_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_magazine_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+    str = READ_IF_EXISTS(pSettings, r_string, section, "stock_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_stock_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+}
+
+void CWeapon::LoadAddonMeshesHud() 
+{
+    LPCSTR str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "scope_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_scope_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "silencer_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_silencer_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "launcher_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_launcher_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "laser_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_laser_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "flashlight_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_flashlight_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "magazine_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_magazine_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "stock_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_stock_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
+}

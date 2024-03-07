@@ -327,7 +327,7 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
     bool is_16x9 = UI()->is_widescreen();
     string64 _prefix;
     xr_sprintf(_prefix, "%s", is_16x9 ? "_16x9" : "");
-    string128 val_name, val_name2;
+    string128 val_name;
 
     xr_strconcat(val_name, "hands_position", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))

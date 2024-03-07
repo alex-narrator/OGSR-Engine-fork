@@ -229,6 +229,7 @@ public:
 
 protected:
     virtual void spawn_supplies();
+    xr_vector<u8> m_hidden_meshes{};
 
 public:
     IC CAI_ObjectLocation& ai_location() const

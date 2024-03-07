@@ -183,6 +183,22 @@ public:
     shared_str m_sHud_wpn_magazine_bone;
     shared_str m_sHud_wpn_stock_bone;
 
+    xr_vector<u8> m_scope_meshes{};
+    xr_vector<u8> m_silencer_meshes{};
+    xr_vector<u8> m_launcher_meshes{};
+    xr_vector<u8> m_laser_meshes{};
+    xr_vector<u8> m_flashlight_meshes{};
+    xr_vector<u8> m_magazine_meshes{};
+    xr_vector<u8> m_stock_meshes{};
+
+    xr_vector<u8> m_scope_meshes_hud{};
+    xr_vector<u8> m_silencer_meshes_hud{};
+    xr_vector<u8> m_launcher_meshes_hud{};
+    xr_vector<u8> m_laser_meshes_hud{};
+    xr_vector<u8> m_flashlight_meshes_hud{};
+    xr_vector<u8> m_magazine_meshes_hud{};
+    xr_vector<u8> m_stock_meshes_hud{};
+
 private:
     xr_vector<shared_str> hidden_bones;
     xr_vector<shared_str> hud_hidden_bones;
@@ -634,4 +650,7 @@ public:
     }
     void SaveAttachableParams() override;
     void ParseCurrentItem(CGameFont* F) override;
+
+    void LoadAddonMeshes(LPCSTR);
+    void LoadAddonMeshesHud();
 };

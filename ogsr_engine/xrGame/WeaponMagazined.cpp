@@ -2069,13 +2069,15 @@ void CWeaponMagazined::UpdateMagazineVisibility()
             u16 bone_id = pWeaponVisual->LL_BoneID(m_sWpn_magazine_bone);
             pWeaponVisual->LL_SetBoneVisible(bone_id, show, TRUE);
         }
+        for (const auto& mesh_idx : m_magazine_meshes)
+            pWeaponVisual->SetRFlag(mesh_idx, show);
     }
     if (GetHUDmode())
     {
         if (m_sHud_wpn_magazine_bone.size())
-        {
             HudItemData()->set_bone_visible(m_sHud_wpn_magazine_bone, show);
-        }
+        for (const auto& mesh_idx : m_magazine_meshes_hud)
+            HudItemData()->m_model->SetRFlag(mesh_idx, show);
     }
 }
 

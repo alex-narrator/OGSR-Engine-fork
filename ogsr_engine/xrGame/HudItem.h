@@ -109,6 +109,8 @@ protected: //чтоб нельзя было вызвать на прямую
     Fvector script_ui_offset[2]{}; // pos, rot
     Fmatrix script_ui_matrix{};
 
+    xr_vector<u8> m_hidden_meshes_hud{};
+
 public:
     virtual void Load(LPCSTR section);
     virtual CHudItem* cast_hud_item() { return this; }

@@ -93,6 +93,15 @@ void CGameObject::Load(LPCSTR section)
         // self->spatial.type	|=	STYPE_VISIBLEFORAI;
         self->spatial.type &= ~STYPE_REACTTOSOUND;
     }
+
+    LPCSTR str = READ_IF_EXISTS(pSettings, r_string, section, "hidden_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_hidden_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
 }
 
 void CGameObject::reinit()
@@ -271,6 +280,10 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
             ISpatial* self = smart_cast<ISpatial*>(this);
             self->spatial.type |= STYPE_OBSTACLE;
         }
+
+        auto K = smart_cast<IKinematics*>(Visual());
+        for (const auto& mesh_idx : m_hidden_meshes)
+            K->SetRFlag(mesh_idx, false);
     }
 
     // XForm

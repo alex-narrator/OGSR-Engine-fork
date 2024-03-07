@@ -78,6 +78,15 @@ void CHudItem::Load(LPCSTR section)
 
         hud_recalc_koef = READ_IF_EXISTS(pSettings, r_float, hud_sect, "hud_recalc_koef",
                                          1.35f); //На калаше при 1.35 вроде норм смотрится, другим стволам возможно придется подбирать другие значения.
+
+        LPCSTR str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "hidden_meshes", nullptr);
+        if (str)
+            for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+            {
+                string128 mesh_num;
+                _GetItem(str, i, mesh_num);
+                m_hidden_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+            }
     }
 
     m_animation_slot = pSettings->r_u32(section, "animation_slot");
@@ -365,6 +374,12 @@ void CHudItem::UpdateCL()
         }
         if (script_ui)
             script_ui->Update();
+
+        auto hi = HudItemData();
+        if (hi)
+            for (const auto& mesh_idx : m_hidden_meshes_hud)
+                if (hi->m_model->GetRFlag(mesh_idx))
+                    hi->m_model->SetRFlag(mesh_idx, false);
     }
 }
 
@@ -1610,6 +1625,16 @@ void CHudItem::SetHudSection(shared_str sect)
     inertion_data.m_origin_offset_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_origin_offset", ORIGIN_OFFSET_AIM);
     inertion_data.m_tendto_speed = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_tendto_speed", TENDTO_SPEED);
     inertion_data.m_tendto_speed_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_tendto_speed", TENDTO_SPEED_AIM);
+
+    m_hidden_meshes_hud.clear();
+    LPCSTR str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "hidden_meshes", nullptr);
+    if (str)
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 mesh_num;
+            _GetItem(str, i, mesh_num);
+            m_hidden_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+        }
 
     auto hi = HudItemData();
     if (hi)
