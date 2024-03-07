@@ -1025,7 +1025,7 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
 
 void CWeaponMagazined::InitAddons()
 {
-    //////////////////////////////////////////////////////////////////////////
+    m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME);
     // Приціл
     LPCSTR sect = IsAddonAttached(eScope) && AddonAttachable(eScope) ? GetAddonName(eScope).c_str() : cNameSect().c_str();
     LoadScopeParams(sect);
@@ -1044,7 +1044,6 @@ void CWeaponMagazined::InitAddons()
         LoadFlashlightParams(sect);
     }
     // до цих параметрів можуть додаватися коефіцієнти у функціях нижче
-    m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME);
     m_fAimControlInertionK = 0.f;
     m_fAimInertionK = 0.f;
     // приклад
@@ -1080,6 +1079,13 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
 
     m_sounds.StopSound("sndZoomIn");
     m_sounds.StopSound("sndZoomOut");
+
+    if (AddonAttachable(eScope) && IsAddonAttached(eScope))
+    {
+        float ZR_k = READ_IF_EXISTS(pSettings, r_float, GetAddonName(eScope), "zoom_rotate_time_k", 0.f);
+        if (!fis_zero(ZR_k))
+            m_fZoomRotateTime += m_fZoomRotateTime * ZR_k;
+    }
 
     if (pSettings->line_exist(section, "snd_zoomin"))
         m_sounds.LoadSound(section, "snd_zoomin", "sndZoomIn", SOUND_TYPE_ITEM_USING);
