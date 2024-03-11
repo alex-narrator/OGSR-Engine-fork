@@ -292,6 +292,7 @@ public:
     //передача порции информации InventoryOwner
     bool GiveInfoPortion(LPCSTR info_id);
     bool DisableInfoPortion(LPCSTR info_id);
+    void GetKnownInfo(luabind::object O);
 
     //предикаты наличия/отсутствия порции информации у персонажа
     bool HasInfo(LPCSTR info_id);

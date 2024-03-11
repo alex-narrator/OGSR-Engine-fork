@@ -95,20 +95,23 @@ void CInventoryItem::Load(LPCSTR section)
     m_cost = pSettings->r_u32(section, "cost");
 
     m_slots_sect = READ_IF_EXISTS(pSettings, r_string, section, "slot", "");
+    m_slots.clear();
+    SetSlot(NO_ACTIVE_SLOT);
+    if (m_slots_sect)
     {
         char buf[16];
         const int count = _GetItemCount(m_slots_sect);
         if (count)
-            m_slots.clear(); // full override!
-        for (int i = 0; i < count; ++i)
         {
-            u8 slot = u8(atoi(_GetItem(m_slots_sect, i, buf)));
-            // вместо std::find(m_slots.begin(), m_slots.end(), slot) == m_slots.end() используется !IsPlaceable
-            if (slot < SLOTS_TOTAL && !IsPlaceable(slot, slot))
-                m_slots.push_back(slot);
-        }
-        if (count)
+            for (int i = 0; i < count; ++i)
+            {
+                u8 slot = u8(atoi(_GetItem(m_slots_sect, i, buf)));
+                // вместо std::find(m_slots.begin(), m_slots.end(), slot) == m_slots.end() используется !IsPlaceable
+                if (slot < SLOTS_TOTAL && !IsPlaceable(slot, slot))
+                    m_slots.push_back(slot);
+            }
             SetSlot(m_slots[0]);
+        }
     }
 
     // Description

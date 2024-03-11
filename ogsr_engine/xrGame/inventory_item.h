@@ -194,8 +194,8 @@ public:
     virtual void SetDropTime(bool);
 
 protected:
-    xr_vector<u8> m_slots;
-    LPCSTR m_slots_sect;
+    xr_vector<u8> m_slots{};
+    LPCSTR m_slots_sect{};
     float m_fCondition{1.f};
 
     float m_fControlInertionFactor;

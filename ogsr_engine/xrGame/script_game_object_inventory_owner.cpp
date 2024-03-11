@@ -60,6 +60,25 @@ bool CScriptGameObject::DisableInfoPortion(LPCSTR info_id)
     return true;
 }
 
+void CScriptGameObject::GetKnownInfo(luabind::object O)
+{
+    lua_State* L = O.lua_state();
+    lua_createtable(L, 0, 0);
+    CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
+    if (!pInventoryOwner)
+        return;
+    KNOWN_INFO_VECTOR& known_info = pInventoryOwner->m_known_info_registry->registry().objects();
+    u32 i = 1;
+    int tidx = lua_gettop(L);
+    for (const auto& info : known_info)
+    {
+        lua_pushinteger(L, i); // key
+        lua_pushstring(L, info.info_id.c_str());
+        lua_settable(L, tidx);
+        i += 1;
+    }
+}
+
 void AddIconedTalkMessage(CScriptGameObject*, LPCSTR text, LPCSTR texture_name, const Frect& tex_rect, LPCSTR templ_name)
 {
     CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
