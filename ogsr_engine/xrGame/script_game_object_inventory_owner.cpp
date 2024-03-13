@@ -1012,6 +1012,7 @@ CScriptGameObject* CScriptGameObject::active_device() const
 }
 
 void CScriptGameObject::GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExisting) { Actor()->GameTaskManager().GiveGameTaskToActor(t, dt, bCheckExisting); }
+void CScriptGameObject::SetTaskSelected(const shared_str& id, u16 idx, const bool safe) { Actor()->GameTaskManager().SetActiveTask(id, idx, safe); };
 
 u32 CScriptGameObject::active_slot()
 {
