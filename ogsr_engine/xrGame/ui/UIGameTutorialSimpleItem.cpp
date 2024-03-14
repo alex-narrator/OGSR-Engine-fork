@@ -13,6 +13,9 @@
 #include "UIInventoryWnd.h"
 #include "UITalkWnd.h"
 #include "UICarBodyWnd.h"
+#include "Actor.h"
+#include "Inventory.h"
+#include "PDA.h"
 
 extern ENGINE_API BOOL bShowPauseString;
 
@@ -65,6 +68,8 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     m_desired_cursor_pos.y = xml->ReadAttribFlt("cursor_pos", 0, "y", cur_pos.y);
 
     strcpy_s(m_pda_section, xml->Read("pda_section", 0, ""));
+
+    zoom_3d_pda = !!xml->ReadInt("zoom_3d_pda", 0, 1);
 
     LPCSTR str = xml->Read("pause_state", 0, "ignore");
     m_flags.set(etiNeedPauseOn, 0 == _stricmp(str, "on"));
@@ -247,6 +252,16 @@ void CUISequenceSimpleItem::Start()
         }
         if (ui_game_sp)
         {
+            if (auto Pda = Actor()->GetPDA(); Pda && Pda->Is3DPDA() && psActorFlags.test(AF_3D_PDA))
+            {
+                auto& inv = Actor()->inventory();
+                auto active_slot = inv.GetActiveSlot();
+                if (active_slot != PDA_SLOT && bShowPda)
+                    inv.Activate(PDA_SLOT);
+                else if (active_slot == PDA_SLOT && !bShowPda)
+                    inv.Activate(NO_ACTIVE_SLOT);
+                Pda->m_bZoomed = zoom_3d_pda;
+            }
             if ((!ui_game_sp->PdaMenu->IsShown() && bShowPda) || (ui_game_sp->PdaMenu->IsShown() && !bShowPda))
                 HUD().GetUI()->StartStopMenu(ui_game_sp->PdaMenu, true);
         }
