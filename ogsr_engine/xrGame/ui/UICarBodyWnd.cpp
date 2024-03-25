@@ -436,7 +436,7 @@ void CUICarBodyWnd::UpdateLists(EListType mode)
         m_pActorInventoryOwner->inventory().RepackAmmo();
 
         ruck_list.clear();
-        m_pActorInventoryOwner->inventory().AddAvailableItems(ruck_list, true);
+        m_pActorInventoryOwner->inventory().AddAvailableItems(ruck_list, false);
         std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::CustomSort);
         // Наш рюкзак
         for (const auto& inv_item : ruck_list)
@@ -464,7 +464,7 @@ void CUICarBodyWnd::UpdateLists(EListType mode)
             m_pOtherInventoryBox->RepackAmmo();
         ruck_list.clear();
         if (m_pOtherInventoryOwner)
-            m_pOtherInventoryOwner->inventory().AddAvailableItems(ruck_list, true);
+            m_pOtherInventoryOwner->inventory().AddAvailableItems(ruck_list, false);
         else
             m_pOtherInventoryBox->AddAvailableItems(ruck_list);
         std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::CustomSort);
