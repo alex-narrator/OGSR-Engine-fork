@@ -44,8 +44,8 @@ protected:
     CUIStatic* m_captionStatic;
     CUIStatic* m_captionTime;
     CUIStatic* m_remTimeStatic;
-    CUI3tButton* m_switchDescriptionBtn;
-    bool m_curr_descr_mode;
+    //CUI3tButton* m_switchDescriptionBtn;
+    //bool m_curr_descr_mode;
     void Init();
 
 public:

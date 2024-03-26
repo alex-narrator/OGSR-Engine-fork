@@ -20,13 +20,16 @@
 #include "../alife_registry_wrappers.h"
 #include "../encyclopedia_article.h"
 
+#include "UIGameSP.h"
+#include "UIPdaWnd.h"
+
 constexpr auto EVENTS = "pda_events.xml";
 
 CUIEventsWnd::CUIEventsWnd() { m_flags.zero(); }
 
 CUIEventsWnd::~CUIEventsWnd()
 {
-    delete_data(m_UIMapWnd);
+    //delete_data(m_UIMapWnd);
     delete_data(m_UITaskInfoWnd);
 }
 
@@ -61,13 +64,14 @@ void CUIEventsWnd::Init()
     AttachChild(m_UIRightWnd);
     xml_init.InitWindow(uiXml, "main_wnd:right_frame", 0, m_UIRightWnd);
 
-    m_UIMapWnd = xr_new<CUIMapWnd>();
-    m_UIMapWnd->SetAutoDelete(false);
-    m_UIMapWnd->Init("pda_events.xml", "main_wnd:right_frame:map_wnd");
+    //m_UIMapWnd = xr_new<CUIMapWnd>();
+    //m_UIMapWnd->SetAutoDelete(false);
+    //m_UIMapWnd->Init("pda_events.xml", "main_wnd:right_frame:map_wnd");
 
     m_UITaskInfoWnd = xr_new<CUITaskDescrWnd>();
     m_UITaskInfoWnd->SetAutoDelete(false);
     m_UITaskInfoWnd->Init(&uiXml, "main_wnd:right_frame:task_descr_view");
+    m_UIRightWnd->AttachChild(m_UITaskInfoWnd);
 
     m_ListWnd = xr_new<CUIScrollView>();
     m_ListWnd->SetAutoDelete(true);
@@ -83,7 +87,7 @@ void CUIEventsWnd::Init()
     AddCallback("filter_tab", TAB_CHANGED, fastdelegate::MakeDelegate(this, &CUIEventsWnd::OnFilterChanged));
 
     m_currFilter = eActiveTask;
-    SetDescriptionMode(true);
+    //SetDescriptionMode(true);
 
     m_ui_task_item_xml.Init(CONFIG_PATH, UI_PATH, "job_item.xml");
 }
@@ -106,8 +110,8 @@ void CUIEventsWnd::OnFilterChanged(CUIWindow* w, void*)
 {
     m_currFilter = (ETaskFilters)m_TaskFilter->GetActiveIndex();
     ReloadList(false);
-    if (!GetDescriptionMode())
-        SetDescriptionMode(true);
+    //if (!GetDescriptionMode())
+    //    SetDescriptionMode(true);
 }
 
 void CUIEventsWnd::Reload() { m_flags.set(flNeedReload, TRUE); }
@@ -188,8 +192,15 @@ void CUIEventsWnd::ReloadList(bool bClearOnly)
 void CUIEventsWnd::Show(bool status)
 {
     inherited::Show(status);
-    m_UIMapWnd->Show(status);
+    //m_UIMapWnd->Show(status);
     m_UITaskInfoWnd->Show(status);
+
+    if (auto& tm = Actor()->GameTaskManager(); tm.ActiveTask())
+    {
+        auto objective = tm.ActiveObjective();
+        auto idx = objective && objective->article_id.size() ? objective->idx : 0;
+        ShowDescription(tm.ActiveTask(), idx);
+    }
 
     ReloadList(status == false);
 }
@@ -210,11 +221,11 @@ void CUIEventsWnd::SetDescriptionMode(bool bMap)
     if (bMap)
     {
         m_UIRightWnd->DetachChild(m_UITaskInfoWnd);
-        m_UIRightWnd->AttachChild(m_UIMapWnd);
+        //m_UIRightWnd->AttachChild(m_UIMapWnd);
     }
     else
     {
-        m_UIRightWnd->DetachChild(m_UIMapWnd);
+        //m_UIRightWnd->DetachChild(m_UIMapWnd);
         m_UIRightWnd->AttachChild(m_UITaskInfoWnd);
     }
     m_flags.set(flMapMode, bMap);
@@ -224,13 +235,14 @@ bool CUIEventsWnd::GetDescriptionMode() { return !!m_flags.test(flMapMode); }
 
 void CUIEventsWnd::ShowDescription(CGameTask* t, int idx)
 {
-    if (GetDescriptionMode())
-    { // map
+    //if (GetDescriptionMode())
+    //{ // map
         SGameTaskObjective& o = t->Objective(idx);
         CMapLocation* ml = o.LinkedMapLocation();
 
         if (ml && ml->SpotEnabled())
-            m_UIMapWnd->SetTargetMap(ml->LevelName(), ml->Position(), true);
+            // m_UIMapWnd->SetTargetMap(ml->LevelName(), ml->Position(), true);
+            smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame())->PdaMenu->UIMapWnd->SetTargetMap(ml->LevelName(), ml->Position(), true);
 
         int sz = m_ListWnd->GetSize();
 
@@ -243,10 +255,10 @@ void CUIEventsWnd::ShowDescription(CGameTask* t, int idx)
             else
                 itm->MarkSelected(false);
         }
-    }
-    else
-    { // articles
-        SGameTaskObjective& o = t->Objective(0);
+    //}
+    //else
+    //{ // articles
+        //SGameTaskObjective& o = t->Objective(0);
 
         m_UITaskInfoWnd->ClearAll();
 
@@ -272,7 +284,7 @@ void CUIEventsWnd::ShowDescription(CGameTask* t, int idx)
                 }
             }
         }
-    }
+    //}
 }
 
 bool CUIEventsWnd::ItemHasDescription(CUITaskItem* itm)

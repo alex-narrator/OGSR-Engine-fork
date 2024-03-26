@@ -36,7 +36,7 @@ class CUIEventsWnd : public CUIWindow, public CUIWndCallback
     CUIWindow* m_UIRightWnd;
     CUIFrameLineWnd* m_UILeftHeader;
     CUIAnimatedStatic* m_UIAnimation;
-    CUIMapWnd* m_UIMapWnd;
+    //CUIMapWnd* m_UIMapWnd;
     CUITaskDescrWnd* m_UITaskInfoWnd;
     CUIScrollView* m_ListWnd;
     CUITabControl* m_TaskFilter;
