@@ -28,6 +28,10 @@
 #include <dinput.h> //remove me !!!
 #include "..\..\xr_3da\xr_input.h" //remove me !!!
 
+#include "Actor.h"
+#include "GametaskManager.h"
+#include "GameTask.h"
+
 const int SCROLLBARS_SHIFT = 5;
 const int VSCROLLBAR_STEP = 20; // В пикселях
 const int HSCROLLBAR_STEP = 20; // В пикселях
@@ -803,11 +807,33 @@ void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
     if (!m_cur_location)
         return;
 
-    if (sp->MapLocation()->IsUserDefined())
+    if (m_cur_location->IsUserDefined())
     {
         m_UIPropertiesBox->AddItem("st_pda_change_spot_hint", w, MAP_CHANGE_SPOT_HINT_ACT);
         m_UIPropertiesBox->AddItem("st_pda_delete_spot", w, MAP_REMOVE_SPOT_ACT);
     }
+    else
+    {
+        auto& tm = Actor()->GameTaskManager();
+        for (const auto& task : tm.GameTasks())
+        {
+            auto gametask = tm.HasGameTask(task.task_id);
+            if (gametask && gametask->HasInProgressObjective() && gametask->HasLinkedMapLocations())
+            {
+                for (int i = 1; i < gametask->GetObjectiveSize_script(); ++i)
+                {
+                    auto& objective = gametask->Objective(i);
+                    auto map_location = objective.LinkedMapLocation();
+                    if (map_location && !map_location->PointerEnabled() && map_location->ObjectID() == m_cur_location->ObjectID())
+                    {
+                        tm.SetActiveTask(task.task_id, objective.idx);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
 
     m_UIPropertiesBox->CheckCustomActionsMapSpot(m_cur_location->ObjectID(), m_cur_location->GetType(), m_cur_location->LevelName().c_str(), m_cur_location->GetLastPosition());
 
