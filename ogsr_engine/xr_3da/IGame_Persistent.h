@@ -93,6 +93,7 @@ public:
     virtual void SetTip() = 0;
 
     virtual bool CanBePaused() { return true; }
+    virtual void models_savePrefetch();
 };
 
 class IMainMenu
@@ -107,3 +108,4 @@ public:
 
 extern ENGINE_API IGame_Persistent* g_pGamePersistent;
 ENGINE_API extern bool IsMainMenuActive();
+ENGINE_API extern BOOL g_prefetch;

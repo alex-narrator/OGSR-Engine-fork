@@ -47,7 +47,16 @@ private:
     BOOL bForceDiscard;
     BOOL bAllowChildrenDuplicate;
 
+    string_unordered_map<std::string, bool> m_prefetched;
+
     void Destroy();
+    void refresh_prefetch(LPCSTR low_name);
+    void process_vis_prefetch();
+
+    CInifile* vis_prefetch_ini = nullptr;
+
+    bool now_prefetch1 = false;
+    bool now_prefetch2 = false;
 
 public:
     CModelPool();
@@ -76,5 +85,7 @@ public:
     void dump();
 
     void memory_stats(u32& vb_mem_video, u32& vb_mem_system, u32& ib_mem_video, u32& ib_mem_system);
+    void save_vis_prefetch();
+    void begin_prefetch1(bool val);
 };
 #endif // ModelPoolH
