@@ -240,8 +240,8 @@ void CAI_Stalker::Hit(SHit* pHDS)
         {
             if (is_relation_enemy(entity_alive))
                 sound().play(eStalkerSoundInjuring);
-            //			else
-            //				sound().play		(eStalkerSoundInjuringByFriend);
+            else
+                sound().play(eStalkerSoundInjuringByFriend);
         }
 
         int weapon_type = -1;
