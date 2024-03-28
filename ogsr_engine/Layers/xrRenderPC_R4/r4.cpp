@@ -503,10 +503,10 @@ void CRender::OnFrame()
     if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
     {
         // MT-details (@front)
-        Device.seqParallel.insert(Device.seqParallel.begin(), fastdelegate::MakeDelegate(Details, &CDetailManager::MT_CALC));
+        Device.add_to_seq_parallel(fastdelegate::MakeDelegate(Details, &CDetailManager::MT_CALC));
 
         // MT-HOM (@front)
-        Device.seqParallel.insert(Device.seqParallel.begin(), fastdelegate::MakeDelegate(&HOM, &CHOM::MT_RENDER));
+        Device.add_to_seq_parallel(fastdelegate::MakeDelegate(&HOM, &CHOM::MT_RENDER));
     }
 }
 

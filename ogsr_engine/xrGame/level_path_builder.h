@@ -33,8 +33,8 @@ public:
         VERIFY(ai().level_graph().valid_vertex_id(dest_vertex_id));
         m_dest_vertex_id = dest_vertex_id;
 
-        m_object->m_wait_for_distributed_computation = true;
-        Device.seqParallel.push_back(fastdelegate::MakeDelegate(this, &CLevelPathBuilder::process));
+        m_object->m_wait_for_distributed_computation_2 = true;
+        Device.add_to_seq_parallel(fastdelegate::MakeDelegate(this, &CLevelPathBuilder::process_level));
     }
 
     void process()
@@ -48,11 +48,16 @@ public:
             m_object->m_path_state = CMovementManager::ePathStateContinueLevelPath;
     }
 
+    void process_level()
+    {
+        m_object->m_wait_for_distributed_computation_2 = false;
+        process();
+    }
+
     IC void remove()
     {
-        if (m_object->m_wait_for_distributed_computation)
-            m_object->m_wait_for_distributed_computation = false;
+        m_object->m_wait_for_distributed_computation_2 = false;
 
-        Device.remove_from_seq_parallel(fastdelegate::MakeDelegate(this, &CLevelPathBuilder::process));
+        Device.remove_from_seq_parallel(fastdelegate::MakeDelegate(this, &CLevelPathBuilder::process_level));
     }
 };
