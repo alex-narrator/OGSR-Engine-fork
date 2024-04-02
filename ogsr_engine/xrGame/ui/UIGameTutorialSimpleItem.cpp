@@ -69,7 +69,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
 
     strcpy_s(m_pda_section, xml->Read("pda_section", 0, ""));
 
-    zoom_3d_pda = !!xml->ReadInt("zoom_3d_pda", 0, 1);
+    zoom_3d_pda = !!xml->ReadInt("zoom_3d_pda", 0, 0);
 
     LPCSTR str = xml->Read("pause_state", 0, "ignore");
     m_flags.set(etiNeedPauseOn, 0 == _stricmp(str, "on"));
