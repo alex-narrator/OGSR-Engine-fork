@@ -263,6 +263,7 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("marked_dropped", &CScriptGameObject::MarkedDropped)
         .def("unload_magazine", &CScriptGameObject::UnloadMagazine)
         .def("is_direct_reload", &CScriptGameObject::IsDirectReload)
+        .def("unload_weapon_full", &CScriptGameObject::UnloadWeaponFull)
 
         .def("sight_params", &CScriptGameObject::sight_params)
 

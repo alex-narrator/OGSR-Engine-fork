@@ -298,6 +298,7 @@ void CScriptGameObject::UnloadMagazine(bool spawn_ammo, bool unload_gl)
         return;
 
     weapon_magazined->UnloadMagazine(spawn_ammo);
+    weapon_magazined->ShutterAction();
     if (unload_gl)
     {
         auto WpnMagazWgl = smart_cast<CWeaponMagazinedWGrenade*>(weapon_magazined);
@@ -324,6 +325,18 @@ bool CScriptGameObject::IsDirectReload(CScriptGameObject* pItem)
 
 
     return weapon ? weapon->IsDirectReload(ammo_to_load) : ammo->IsDirectReload(ammo_to_load);
+}
+
+void CScriptGameObject::UnloadWeaponFull()
+{
+    auto weapon_magazined = smart_cast<CWeaponMagazined*>(&object());
+    if (!weapon_magazined)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject::UnloadWeaponFull non-CWeaponMagazined object !!!");
+        return;
+    }
+
+    weapon_magazined->UnloadWeaponFull();
 }
 
 void CScriptGameObject::DropItem(CScriptGameObject* pItem)
