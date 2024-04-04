@@ -298,6 +298,19 @@ void CCustomZone::Load(LPCSTR section)
     m_ef_weapon_type = pSettings->r_u32(section, "ef_weapon_type");
 
     DestroyAfterBlowout = READ_IF_EXISTS(pSettings, r_bool, section, "DestroyAfterBlowout", false);
+
+    // custom highlight
+    if (pSettings->line_exist(section, "ignored_sects"))
+    {
+        LPCSTR str = pSettings->r_string(section, "ignored_sects");
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 _section;
+            _GetItem(str, i, _section);
+            ASSERT_FMT(pSettings->section_exist(_section), "ignored_sects section [%s] not found!", _section);
+            m_ignored_sects.push_back(_section);
+        }
+    }
 }
 
 BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
@@ -606,13 +619,13 @@ void CCustomZone::feel_touch_new(CObject* O)
     else
         object_info.nonalive_object = true;
 
-    if (pGameObject->Radius() < SMALL_OBJECT_RADIUS)
+    if (pGameObject->Radius() < SMALL_OBJECT_RADIUS || pGameObject->spawn_ini() && pGameObject->spawn_ini()->line_exist("collide", "small_object"))
         object_info.small_object = true;
     else
         object_info.small_object = false;
 
     if (m_zone_flags.test(eIgnoreAny) || (object_info.small_object && m_zone_flags.test(eIgnoreSmall)) || (object_info.nonalive_object && m_zone_flags.test(eIgnoreNonAlive)) ||
-        (pArtefact && m_zone_flags.test(eIgnoreArtefact)))
+        (pArtefact && m_zone_flags.test(eIgnoreArtefact)) || std::find(m_ignored_sects.begin(), m_ignored_sects.end(), pGameObject->cNameSect()) != m_ignored_sects.end())
         object_info.zone_ignore = true;
     else
         object_info.zone_ignore = false;

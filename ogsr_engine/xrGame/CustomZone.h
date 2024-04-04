@@ -90,6 +90,8 @@ public:
         eZoneStateMax
     } EZoneState;
 
+    xr_vector<shared_str> m_ignored_sects{};
+
 protected:
     enum EZoneFlags
     {
