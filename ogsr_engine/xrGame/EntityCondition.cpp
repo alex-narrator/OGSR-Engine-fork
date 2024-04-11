@@ -273,8 +273,6 @@ float CEntityCondition::HitOutfitEffect(SHit* pHDS)
 
     if (auto backpack = pInvOwner->GetBackpack())
         calc_hit.power = backpack->HitThruArmour(&calc_hit);
-    else
-        pInvOwner->HitItemsInRuck(&calc_hit);
 
     if (auto outfit = pInvOwner->GetOutfit())
         calc_hit.power = outfit->HitThruArmour(&calc_hit);

@@ -1618,31 +1618,6 @@ bool CActor::IsHitToHead(SHit* pHDS) const
     return is_bone_head(*pK, pHDS->bone());
 }
 
-void CActor::HitItemsInRuck(SHit* pHDS)
-{
-    TIItemContainer ruck = inventory().m_ruck;
-    if (ruck.empty())
-        return;
-
-    switch (pHDS->type())
-    {
-    case ALife::eHitTypeFireWound:
-    case ALife::eHitTypeWound:
-    case ALife::eHitTypeWound_2: {
-        u32 random_item = ::Random.randI(0, ruck.size());
-        auto item = ruck[random_item];
-        if (item)
-            item->Hit(pHDS);
-    }
-    break;
-    default: {
-        for (const auto& item : ruck)
-            item->Hit(pHDS);
-    }
-    break;
-    }
-}
-
 bool CActor::HasDetectorWorkable()
 {
     auto item_in_det_slot = inventory().ItemFromSlot(DETECTOR_SLOT);

@@ -779,8 +779,6 @@ public:
     virtual bool IsHitToBackPack(SHit* pHDS) const;
     virtual bool IsHitToHead(SHit* pHDS) const;
 
-    virtual void HitItemsInRuck(SHit* pHDS);
-
     bool HasDetectorWorkable();
 
 protected:

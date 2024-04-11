@@ -217,7 +217,6 @@ void CScriptActor::script_register(lua_State* L)
                    value("mcTurn", int(mcTurn)), 
                    value("mcJump", int(mcJump)), 
                    value("mcTurn", int(mcTurn)),
-                   value("mcJump", int(mcJump)), 
                    value("mcFall", int(mcFall)), 
                    value("mcLanding", int(mcLanding)), 
                    value("mcLanding2", int(mcLanding2)),

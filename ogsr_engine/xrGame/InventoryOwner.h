@@ -152,8 +152,6 @@ public:
     virtual CInventoryContainer* GetBackpack() const { return nullptr; };
     virtual CHelmet* GetHelmet() const { return nullptr; };
 
-    virtual void HitItemsInRuck(SHit* pHDS){};
-
     //////////////////////////////////////////////////////////////////////////
     //игровые характеристики персонажа
 public:
