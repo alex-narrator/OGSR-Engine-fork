@@ -195,13 +195,12 @@ public:
             colorize_untradable         = 1ull << 13,
             select_mode_1342            = 1ull << 14,
             npc_simplified_shooting     = 1ull << 15,
-            use_trade_deficit_factor    = 1ull << 16,
-            show_objectives_ondemand    = 1ull << 17,
-            pickup_check_overlaped      = 1ull << 18,
-            disable_dialog_break        = 1ull << 19,
-            no_progress_bar_animation   = 1ull << 20,
-            limited_bolts               = 1ull << 21,
-            unique_logs                 = 1ull << 22;
+            show_objectives_ondemand    = 1ull << 16,
+            pickup_check_overlaped      = 1ull << 17,
+            disable_dialog_break        = 1ull << 18,
+            no_progress_bar_animation   = 1ull << 19,
+            limited_bolts               = 1ull << 20,
+            unique_logs                 = 1ull << 21;
     };
 
     void _initialize(LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0);

@@ -14,13 +14,9 @@
 #include "level.h"
 #include "xrServer_Object_Base.h"
 
-static float min_deficit_factor = .3f;
-
 void CPurchaseList::process(CInifile& ini_file, LPCSTR section, CInventoryOwner& owner)
 {
     owner.sell_useless_items();
-
-    m_deficits.clear();
 
     luabind::functor<void> lua_function;
 
@@ -76,7 +72,4 @@ void CPurchaseList::process(const CGameObject& owner, const shared_str& name, co
         Level().Send(P, net_flags(TRUE));
         F_entity_Destroy(_abstract);
     }
-
-    VERIFY3(m_deficits.find(name) == m_deficits.end(), "Duplicate section in the purchase list", *name);
-    m_deficits.insert(std::make_pair(name, (float)count * probability / _max((float)j, min_deficit_factor)));
 }

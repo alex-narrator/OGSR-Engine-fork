@@ -462,14 +462,6 @@ LPCSTR CInventoryOwner::trade_section() const
     return (READ_IF_EXISTS(pSettings, r_string, game_object->cNameSect(), "trade_section", "trade"));
 }
 
-float CInventoryOwner::deficit_factor(const shared_str& section) const
-{
-    if (!m_purchase_list)
-        return (1.f);
-
-    return (m_purchase_list->deficit(section));
-}
-
 void CInventoryOwner::buy_supplies(CInifile& ini_file, LPCSTR section)
 {
     if (!m_purchase_list)

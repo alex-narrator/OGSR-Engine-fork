@@ -1266,7 +1266,6 @@
     <ClInclude Include="trade_parameters.h" />
     <ClInclude Include="trade_parameters_inline.h" />
     <ClInclude Include="purchase_list.h" />
-    <ClInclude Include="purchase_list_inline.h" />
     <ClInclude Include="physic_item.h" />
     <ClInclude Include="ShootingObject.h" />
     <ClInclude Include="Weapon.h" />

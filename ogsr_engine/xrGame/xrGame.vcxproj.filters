@@ -4485,9 +4485,6 @@
     <ClInclude Include="purchase_list.h">
       <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\purchase_list</Filter>
     </ClInclude>
-    <ClInclude Include="purchase_list_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\purchase_list</Filter>
-    </ClInclude>
     <ClInclude Include="physic_item.h">
       <Filter>Core\Client\Objects\inventory\PhysicItem</Filter>
     </ClInclude>

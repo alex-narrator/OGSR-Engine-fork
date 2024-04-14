@@ -186,19 +186,8 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 
     clamp(action_factor, _min(trade_factors.enemy_factor(), trade_factors.friend_factor()), _max(trade_factors.enemy_factor(), trade_factors.friend_factor()));
 
-    // computing deficit_factor
-    float deficit_factor = 1.f;
-    if (Core.Features.test(xrCore::Feature::use_trade_deficit_factor))
-    {
-        deficit_factor = pThis.inv_owner->deficit_factor(pItem->object().cNameSect());
-
-        clamp(deficit_factor, READ_IF_EXISTS(pSettings, r_float, "trade", "min_deficit_factor", 1), READ_IF_EXISTS(pSettings, r_float, "trade", "max_deficit_factor", 1));
-    }
-
-    const float original_result = base_cost * condition_factor * action_factor;
-
     // total price calculation
-    float result = original_result * deficit_factor;
+    float result = base_cost * condition_factor * action_factor;
 
     const char* price_callback = b_buying ? "trade_get_buy_price" : "trade_get_sell_price";
 
@@ -210,9 +199,7 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying)
         {
             result = lua_function(smart_cast<const CGameObject*>(pThis.inv_owner)->lua_game_object(), // trader
                                   pItem->object().cNameSect().c_str(), // item section
-                                  result, // total price calculated by engine
-                                  original_result, // price without deficit_factor
-                                  deficit_factor // current deficit_factor
+                                  result // total price calculated by engine
             );
         }
     }

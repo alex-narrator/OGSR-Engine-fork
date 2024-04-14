@@ -230,7 +230,6 @@ private:
 public:
     IC CTradeParameters& trade_parameters() const;
     virtual LPCSTR trade_section() const;
-    float deficit_factor(const shared_str& section) const;
     void buy_supplies(CInifile& ini_file, LPCSTR section);
     void sell_useless_items();
     virtual void on_before_sell(CInventoryItem* item) {}
