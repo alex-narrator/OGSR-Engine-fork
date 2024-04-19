@@ -460,3 +460,5 @@ void CShootingObject::StartShotParticles()
     CParticlesObject* pSmokeParticles = NULL;
     StartParticles(pSmokeParticles, *m_sShotParticles, m_vCurrentShootPos, m_vCurrentShootDir, true);
 }
+
+bool CShootingObject::ParentIsActor() const { return Actor()->ID() == m_iCurrentParentID; }
