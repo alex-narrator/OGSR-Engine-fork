@@ -127,6 +127,7 @@ public:
     float m_fAlcoholSatietyIntens{1.f}; // коэфф. для рассчета интенсивности постэффекта опьянения от голода
     //
     float m_fStressFactor{1.f}; // фактор физнагрузки - множитель для коэффициента нагрузки актора при спринте и прыжке
+    float m_fMinRegenK{}; // мінімальне значення фактору регенерації
 
     //float m_fBleedingHealthMaxDecrease{};
 

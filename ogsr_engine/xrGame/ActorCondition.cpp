@@ -70,6 +70,7 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     m_fMinPowerWalkJump = READ_IF_EXISTS(pSettings, r_float, section, "min_power_walk_jump", 1.0f);
     m_fAlcoholSatietyIntens = READ_IF_EXISTS(pSettings, r_float, section, "satiety_to_alcohol_effector_intensity", 1.0f);
     m_fStressFactor = READ_IF_EXISTS(pSettings, r_float, section, "stress_factor", 1.0f);
+    m_fMinRegenK = READ_IF_EXISTS(pSettings, r_float, section, "min_regen_k", 0.f);
 }
 
 // вычисление параметров с ходом времени
@@ -315,7 +316,12 @@ float CActorCondition::HitSlowmo(SHit* pHDS)
     return ret;
 }
 
-float CActorCondition::GetRegenK() { return (1.0f - GetRadiation()) * GetSatiety(); }
+float CActorCondition::GetRegenK() 
+{ 
+    float res = (1.0f - GetRadiation()) * GetSatiety();
+    clamp(res, m_fMinRegenK, 1.f);
+    return res; 
+}
 
 float CActorCondition::GetSmoothOwerweightKoef()
 {
