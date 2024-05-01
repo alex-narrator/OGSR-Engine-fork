@@ -29,6 +29,9 @@
 #include "CustomOutfit.h"
 #include "InventoryContainer.h"
 
+#include "game_object_space.h"
+#include "script_game_object.h"
+
 static const float s_fLandingTime1 = 0.1f; // через сколько снять флаг Landing1 (т.е. включить следующую анимацию)
 static const float s_fLandingTime2 = 0.3f; // через сколько снять флаг Landing2 (т.е. включить следующую анимацию)
 static const float s_fJumpTime = 0.3f;
@@ -92,6 +95,7 @@ void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
                     mstate_real |= mcLanding2;
                 }
             }
+            this->callback(GameObject::eOnActorLand)(this->lua_game_object(), character_physics_support()->movement()->GetContactSpeed());
         }
         m_bJumpKeyPressed = TRUE;
         m_fJumpTime = s_fJumpTime;
@@ -269,6 +273,8 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
 
                 Jump = jump_speed;
                 m_fJumpTime = s_fJumpTime;
+
+                this->callback(GameObject::eOnActorJump)(this->lua_game_object());
 
                 // уменьшить силу игрока из-за выполненого прыжка
                 if (!GodMode())

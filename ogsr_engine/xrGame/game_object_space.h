@@ -103,6 +103,10 @@ enum ECallbackType
 
     eSelectPdaContact,
 
+    eOnActorFootStep,
+    eOnActorLand,
+    eOnActorJump,
+
     eBoosterEnable,
     eBoosterDisable,
 
