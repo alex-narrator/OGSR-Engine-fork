@@ -1295,7 +1295,11 @@ void CWeapon::UpdateAddonsVisibility()
             scope_visual = READ_IF_EXISTS(pSettings, r_string, cNameSect(), "visual", nullptr);
 
         if (scope_visual && xr_strcmp(cNameVisual().c_str(), scope_visual) != 0)
+        {
             cNameVisual_set(scope_visual);
+            //візуал змінився, його треба отримати заново для подальших маніпуляцій з видимістю кісток
+            pWeaponVisual = smart_cast<IKinematics*>(Visual());
+        }
     }
 
     ///////////////////////////////////////////////////////////////////
