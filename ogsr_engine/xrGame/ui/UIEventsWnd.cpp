@@ -241,8 +241,12 @@ void CUIEventsWnd::ShowDescription(CGameTask* t, int idx)
         CMapLocation* ml = o.LinkedMapLocation();
 
         if (ml && ml->SpotEnabled())
-            // m_UIMapWnd->SetTargetMap(ml->LevelName(), ml->Position(), true);
-            smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame())->PdaMenu->UIMapWnd->SetTargetMap(ml->LevelName(), ml->Position(), true);
+        {
+        // m_UIMapWnd->SetTargetMap(ml->LevelName(), ml->Position(), true);
+            auto pda_menu = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame())->PdaMenu;
+            pda_menu->UIMapWnd->SetTargetMap(ml->LevelName(), ml->Position(), true);
+            pda_menu->SetActiveSubdialog(eptMap);
+        }
 
         int sz = m_ListWnd->GetSize();
 
