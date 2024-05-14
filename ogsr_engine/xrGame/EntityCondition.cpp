@@ -628,7 +628,9 @@ void CEntityCondition::script_register(lua_State* L)
                   .def_readwrite("min_wound_size", &CEntityCondition::m_fMinWoundSize)
                   .def_readonly("is_bleeding", &CEntityCondition::m_bIsBleeding)
                   //.def_readwrite("health_hit_part", &CEntityCondition::m_fHealthHitPart)
-                  .def_readwrite("power_hit_part", &CEntityCondition::m_fPowerHitPart),
+                  .def_readwrite("power_hit_part", &CEntityCondition::m_fPowerHitPart)
+                  .def("get_boosted_params", &CEntityCondition::GetBoostedParams)
+                  .def("get_boosted_time", &CEntityCondition::GetBoostedTime),
 
               class_<SBooster>("SBooster")
                   .def(constructor<>())

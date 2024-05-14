@@ -1948,9 +1948,6 @@
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\CharacterInfo">
       <UniqueIdentifier>{59d4df16-9683-48b3-a413-3354099116c2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\UI\Common\OutfitInfo">
-      <UniqueIdentifier>{cc430822-3497-44cc-88af-2f02a3eb44d5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\InventoryUtilities">
       <UniqueIdentifier>{f576b05e-c597-48bd-b39c-03bbc578a094}</UniqueIdentifier>
     </Filter>
@@ -5367,9 +5364,6 @@
     <ClInclude Include="ui\UICharacterInfo.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\CharacterInfo</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIOutfitInfo.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\OutfitInfo</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIInventoryUtilities.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryUtilities</Filter>
     </ClInclude>
@@ -8442,9 +8436,6 @@
     </ClCompile>
     <ClCompile Include="ui\UICharacterInfo.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\CharacterInfo</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIOutfitInfo.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\OutfitInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIInventoryUtilities.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryUtilities</Filter>

@@ -51,10 +51,6 @@ void CUIInventoryWnd::Init()
 
     xml_init.InitWindow(uiXml, "main", 0, this);
 
-    AttachChild(&UIOutfitInfo);
-    UIOutfitInfo.InitFromXml(uiXml);
-    //.	xml_init.InitStatic					(uiXml, "outfit_info_window",0, &UIOutfitInfo);
-
     // Элементы автоматического добавления
     xml_init.InitAutoStatic(uiXml, "auto_static", this);
 
@@ -175,7 +171,6 @@ void CUIInventoryWnd::Update()
         if (m_b_need_update_stats)
         {
             // update outfit parameters
-            UIOutfitInfo.Update();
             m_b_need_update_stats = false;
         }
     }

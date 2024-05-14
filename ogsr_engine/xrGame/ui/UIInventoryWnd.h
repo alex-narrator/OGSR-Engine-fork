@@ -11,7 +11,6 @@ class CInventory;
 
 #include "UIPropertiesBox.h"
 
-#include "UIOutfitInfo.h"
 #include "../inventory_space.h"
 #include "../actor_flags.h"
 
@@ -91,9 +90,6 @@ protected:
     bool OnItemRButtonClick(CUICellItem* itm);
 
     CUIPropertiesBox UIPropertiesBox;
-
-    // информация о персонаже
-    CUIOutfitInfo UIOutfitInfo;
 
     CInventory* m_pInv;
 

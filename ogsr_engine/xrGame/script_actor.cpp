@@ -204,7 +204,11 @@ void CScriptActor::script_register(lua_State* L)
                .def("is_accelerated", &isActorAccelerated)
 
                .def("get_visibility", &CActor::GetVisibility)
-               .def("reset_visibility", &CActor::ResetVisibility),
+               .def("reset_visibility", &CActor::ResetVisibility)
+
+               .def("get_artefacts_effect", &CActor::GetTotalArtefactsEffect)
+               .def("get_artefacts_protection", &CActor::GetArtefactsProtection)
+               .def("get_items_effect", &CActor::GetItemBoostedParams),
                 //move commands
               class_<enum_exporter<EMoveCommand>>("move_command")
                .enum_("commands")[

@@ -1565,7 +1565,6 @@
     <ClInclude Include="ui\UIEditKeyBind.h" />
     <ClInclude Include="ui\UIKeyBinding.h" />
     <ClInclude Include="ui\UICharacterInfo.h" />
-    <ClInclude Include="ui\UIOutfitInfo.h" />
     <ClInclude Include="ui\UIInventoryUtilities.h" />
     <ClInclude Include="callback_info.h" />
     <ClInclude Include="ui\uiabstract.h" />
@@ -2493,7 +2492,6 @@
     <ClCompile Include="ui\UIEditKeyBind.cpp" />
     <ClCompile Include="ui\UIKeyBinding.cpp" />
     <ClCompile Include="ui\UICharacterInfo.cpp" />
-    <ClCompile Include="ui\UIOutfitInfo.cpp" />
     <ClCompile Include="ui\UIInventoryUtilities.cpp" />
     <ClCompile Include="ui\UIBtnHint.cpp" />
     <ClCompile Include="ui\UIWndCallback.cpp" />
