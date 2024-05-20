@@ -48,7 +48,6 @@ void CUIZoneMap::Init()
     m_activeMap->SetAutoDelete(true);
 
     m_activeMap->EnableHeading(true);
-    xml_init.InitStatic(uiXml, "minimap:compass", 0, &m_compass);
     m_activeMap->SetWindowName("minimap");
 
     //	m_background.AttachChild(&m_compass);
@@ -65,14 +64,9 @@ void CUIZoneMap::Render()
     if (!pda || !pda->IsPowerOn())
         return;
     m_clipFrame.Draw();
-    m_compass.Draw();
 }
 
-void CUIZoneMap::SetHeading(float angle)
-{
-    m_activeMap->SetHeading(angle);
-    m_compass.SetHeading(angle);
-};
+void CUIZoneMap::SetHeading(float angle) { m_activeMap->SetHeading(angle); };
 
 void CUIZoneMap::UpdateRadar(Fvector pos)
 {
@@ -84,7 +78,7 @@ void CUIZoneMap::UpdateRadar(Fvector pos)
     if (m_activeMap->GetPointerDistance() > 0.5f && pda && pda->IsPowerOn())
     {
         string64 str;
-        sprintf_s(str, "%.1f m.", m_activeMap->GetPointerDistance());
+        sprintf_s(str, "%.1f m", m_activeMap->GetPointerDistance());
         m_pointerDistanceText.SetText(str);
     }
     else
@@ -127,9 +121,9 @@ void CUIZoneMap::SetupCurrentMap()
     m_clipFrame.AttachChild(m_activeMap);
     m_activeMap->SetAutoDelete(true);
     m_activeMap->EnableHeading(true);
-    m_activeMap->SetWindowName("minimap");
 
     m_activeMap->Init(Level().name(), *pLtx, "hud\\default");
+    m_activeMap->SetWindowName("minimap");
 
     Frect r;
     m_clipFrame.GetAbsoluteRect(r);

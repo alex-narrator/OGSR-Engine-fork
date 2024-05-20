@@ -336,11 +336,6 @@ void GetStaticRaw(CUIMainIngameWnd* wnd, lua_State* L)
             src = &wnd->GetUIZoneMap()->ClipFrame();
             child = src->FindChild(name, 5);
         }
-        if (!child)
-        {
-            src = &wnd->GetUIZoneMap()->Compass();
-            child = src->FindChild(name, 5);
-        }
     }
 
     if (child)

@@ -13,7 +13,6 @@ class CUIZoneMap
 
     CUIStatic m_background;
     CUIStatic m_center;
-    CUIStatic m_compass;
     CUIStatic m_clipFrame;
     CUIStatic m_pointerDistanceText;
 
@@ -37,7 +36,6 @@ public:
 
     CUIStatic& Background() { return m_background; };
     CUIStatic& ClipFrame() { return m_clipFrame; }; // alpet: для экспорта в скрипты
-    CUIStatic& Compass() { return m_compass; }; // alpet: для экспорта в скрипты
 
     void SetupCurrentMap();
 };
