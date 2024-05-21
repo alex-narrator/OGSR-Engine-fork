@@ -1,5 +1,35 @@
 #include "stdafx.h"
 #include "UIStatic.h"
+#include "UIMap.h"
+
+void UIMiniMapZoom(CUIMiniMap* wnd, float scale)
+{
+    Fvector2 wnd_size;
+    float zoom_factor = float(wnd->GetParent()->GetWndRect().width()) / 100.0f;
+    wnd_size.x = wnd->BoundRect().width() * zoom_factor * scale /*m_fScale*/;
+    wnd_size.y = wnd->BoundRect().height() * zoom_factor * scale /*m_fScale*/;
+    wnd->SetWndSize(wnd_size);
+}
+
+#include "Level.h"
+void UIMiniMapInit(CUIMiniMap* wnd)
+{
+    CUIWindow* parent = wnd->GetParent();
+
+    CInifile* pLtx = pGameIni;
+
+    if (!pLtx->section_exist(Level().name()))
+        pLtx = Level().pLevel;
+
+    wnd->Init(Level().name(), *pLtx, "hud\\default");
+
+    Frect r;
+    parent->GetAbsoluteRect(r);
+    wnd->SetClipRect(r);
+    wnd->WorkingArea().set(r);
+
+    UIMiniMapZoom(wnd, 1.f);
+}
 
 void CUIStatic__set_color_a(CUIStatic* self, u8 alpha) { self->SetColor(subst_alpha(self->GetColor(), alpha)); }
 
@@ -56,5 +86,14 @@ void CUIStatic::script_register(lua_State* L)
                   .def("AdjustWidthToText", &CUIStatic::AdjustWidthToText)
                   .def("AdjustHeightToText", &CUIStatic::AdjustHeightToText)
                   .def("SetVTextAlign", &CUIStatic::SetVTextAlignment)
-                  .def("SetTextPos", &CUIStatic::SetTextPos)];
+                  .def("SetTextPos", &CUIStatic::SetTextPos),
+
+            class_<CUIMiniMap, CUIStatic>("CUIMiniMap")
+                  .def(constructor<>())
+                  .def("SetRounded", &CUIMiniMap::SetRounded)
+                  .def("SetLocked", &CUIMiniMap::SetLocked)
+                  .def("Init", &UIMiniMapInit)
+                  .def("Zoom", &UIMiniMapZoom)
+                  .def("SetActivePoint", &CUIMiniMap::SetActivePoint)
+    ];
 }
