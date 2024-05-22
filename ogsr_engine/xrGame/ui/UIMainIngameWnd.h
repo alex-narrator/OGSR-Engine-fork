@@ -41,11 +41,7 @@ protected:
     CUIStatic UIStaticQuickHelp;
     CUIZoneMap* UIZoneMap;
 
-    // иконка, показывающая количество активных PDA
-    CUIStatic UIPdaOnline;
-
 public:
-    CUIStatic* GetPDAOnline() { return &UIPdaOnline; };
     CUIZoneMap* GetUIZoneMap() { return UIZoneMap; }
     bool m_bShowZoneMap{};
 
@@ -57,9 +53,6 @@ public:
     };
 
     void SetFlashIconState_(EFlashingIcons type, bool enable);
-
-    void AnimateContacts(bool b_snd);
-    HUD_SOUND m_contactSnd;
 
     void ReceiveNews(GAME_NEWS_DATA* news);
 

@@ -69,7 +69,6 @@ CUIMainIngameWnd::~CUIMainIngameWnd()
 {
     DestroyFlashingIcons();
     xr_delete(UIZoneMap);
-    HUD_SOUND::DestroySound(m_contactSnd);
 }
 
 void CUIMainIngameWnd::Init()
@@ -86,9 +85,6 @@ void CUIMainIngameWnd::Init()
     UIZoneMap->Init();
     UIZoneMap->SetScale(DEFAULT_MAP_SCALE);
 
-    xml_init.InitStatic(uiXml, "static_pda_online", 0, &UIPdaOnline);
-    UIZoneMap->Background()->AttachChild(&UIPdaOnline);
-
     // Подсказки, которые возникают при наведении прицела на объект
     AttachChild(&UIStaticQuickHelp);
     xml_init.InitStatic(uiXml, "quick_info", 0, &UIStaticQuickHelp);
@@ -98,10 +94,6 @@ void CUIMainIngameWnd::Init()
     // Flashing icons initialize
     uiXml.SetLocalRoot(uiXml.NavigateToNode("flashing_icons"));
     InitFlashingIcons(&uiXml);
-
-    uiXml.SetLocalRoot(uiXml.GetRoot());
-
-    HUD_SOUND::LoadSound("maingame_ui", "snd_new_contact", m_contactSnd, SOUND_TYPE_IDLE);
 }
 
 void CUIMainIngameWnd::Draw()
@@ -125,22 +117,6 @@ void CUIMainIngameWnd::Update()
         CUIWindow::Update();
         return;
     }
-
-    if (!(Device.dwFrame % 30))
-    {
-        string256 text_str;
-        auto pda = m_pActor->GetPDA();
-        u32 _cn = 0;
-        if (pda && pda->IsPowerOn() && 0 != (_cn = pda->ActiveContactsNum()))
-        {
-            sprintf_s(text_str, "%d", _cn);
-            UIPdaOnline.SetText(text_str);
-        }
-        else
-        {
-            UIPdaOnline.SetText("");
-        }
-    };
 
     UIZoneMap->UpdateRadar(Device.vCameraPosition);
     float h, p;
@@ -282,17 +258,6 @@ void CUIMainIngameWnd::UpdateFlashingIcons()
         else
             it->second->Show(false);
     }
-}
-
-void CUIMainIngameWnd::AnimateContacts(bool b_snd)
-{
-    if (!m_pActor->GetPDA() || !m_pActor->GetPDA()->IsPowerOn())
-        return;
-
-    UIPdaOnline.ResetClrAnimation();
-
-    if (b_snd)
-        HUD_SOUND::PlaySound(m_contactSnd, Fvector().set(0, 0, 0), 0, true);
 }
 
 void CUIMainIngameWnd::OnConnected() { UIZoneMap->SetupCurrentMap(); }

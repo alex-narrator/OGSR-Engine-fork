@@ -352,7 +352,6 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
 
         auto position_on_map = map->ConvertRealToLocal(position, !map->IsRounded());
         sp->SetWndPos(position_on_map);
-
         Frect wnd_rect = sp->GetWndRect();
 
         // позиция для отрисовки
@@ -468,7 +467,7 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
                 Frect r;
                 r.set(position_on_map.x, position_on_map.y, position_on_map.x + 10, position_on_map.y + 10);
 
-                // if (map->NeedShowPointer(r)) // так можно отсекать стрелку если точка уже видна на карте, но надо по хорошему найти Spot для этого lc
+                if (map->NeedShowPointer(r)) // так можно отсекать стрелку если точка уже видна на карте, но надо по хорошему найти Spot для этого lc
                 {
                     UpdateSpotPointer(map, GetSpotPointer(sp), position);
                 }
@@ -477,7 +476,7 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
     }
 }
 
-void CMapLocation::UpdateSpotPointer(CUICustomMap* map, CMapSpotPointer* sp, Fvector2 position_on_map)
+void CMapLocation::UpdateSpotPointer(CUICustomMap* map, CMapSpotPointer* sp, const Fvector2& position_on_map)
 {
     if (sp->GetParent())
         return; // already is child
