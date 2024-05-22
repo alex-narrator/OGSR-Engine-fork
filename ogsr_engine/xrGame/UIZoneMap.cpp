@@ -25,7 +25,6 @@ constexpr auto ZONE_MAP = "zone_map.xml";
 CUIZoneMap::CUIZoneMap() 
 {
     m_background = xr_new<CUIStatic>();
-    m_pointerDistanceText = xr_new<CUIStatic>();
     m_clipFrame = xr_new<CUIStatic>();
     m_center = xr_new<CUIStatic>();
     m_activeMap = xr_new<CUIMiniMap>();
@@ -48,11 +47,6 @@ void CUIZoneMap::Init()
     CUIXmlInit xml_init;
 
     xml_init.InitStatic(uiXml, "minimap:background", 0, m_background);
-    // m_background->SetAutoDelete(true);
-
-    xml_init.InitStatic(uiXml, "minimap:background:dist_text", 0, m_pointerDistanceText);
-    m_background->AttachChild(m_pointerDistanceText);
-    m_pointerDistanceText->SetAutoDelete(true);
 
     xml_init.InitStatic(uiXml, "minimap:level_frame", 0, m_clipFrame);
 
@@ -91,18 +85,6 @@ void CUIZoneMap::UpdateRadar(Fvector pos) const
     m_clipFrame->Update();
     m_background->Update();
     m_activeMap->SetActivePoint(pos);
-
-    auto pda = Actor()->GetPDA();
-    if (m_activeMap->GetPointerDistance() > 0.5f && pda && pda->IsPowerOn())
-    {
-        string64 str;
-        sprintf_s(str, "%.1f m", m_activeMap->GetPointerDistance());
-        m_pointerDistanceText->SetText(str);
-    }
-    else
-    {
-        m_pointerDistanceText->SetText("");
-    }
 }
 
 bool CUIZoneMap::ZoomIn() 

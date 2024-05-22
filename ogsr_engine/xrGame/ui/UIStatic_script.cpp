@@ -95,5 +95,6 @@ void CUIStatic::script_register(lua_State* L)
                   .def("Init", &UIMiniMapInit)
                   .def("Zoom", &UIMiniMapZoom)
                   .def("SetActivePoint", &CUIMiniMap::SetActivePoint)
+                  .def("GetActivePointDist", &CUIMiniMap::GetPointerDistance)
     ];
 }

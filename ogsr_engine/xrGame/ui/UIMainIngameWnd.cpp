@@ -341,6 +341,8 @@ void GetStaticRaw(CUIMainIngameWnd* wnd, lua_State* L)
     if (child)
     {
         // if (test_push_window<CUIMotionIcon>  (L, child)) return;
+        if (test_push_window<CUIMiniMap>(L, child))
+            return;
         if (test_push_window<CUIProgressBar>(L, child))
             return;
         if (test_push_window<CUIStatic>(L, child))

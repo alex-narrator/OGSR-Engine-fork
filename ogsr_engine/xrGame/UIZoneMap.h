@@ -14,7 +14,6 @@ class CUIZoneMap
     CUIStatic* m_background{};
     CUIStatic* m_center{};
     CUIStatic* m_clipFrame{};
-    CUIStatic* m_pointerDistanceText{};
 
     bool m_rounded{};
     u32 m_alpha{};
