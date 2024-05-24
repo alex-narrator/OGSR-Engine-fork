@@ -145,7 +145,8 @@ float CInventoryContainer::GetContainmentArtefactEffect(int effect) const
     for (const auto& item_id : m_items)
     {
         PIItem itm = smart_cast<PIItem>(Level().Objects.net_Find(item_id));
-        if (itm && smart_cast<CArtefact*>(itm))
+        auto art = smart_cast<CArtefact*>(itm);
+        if (art && art->CanAffect())
         {
             res += itm->GetItemEffect(effect);
         }

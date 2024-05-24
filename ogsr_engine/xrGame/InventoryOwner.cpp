@@ -306,11 +306,10 @@ float CInventoryOwner::MaxCarryWeight() const
 
     if (inventory().OwnerIsActor())
     {
-        auto placement = inventory().GetActiveArtefactPlace();
-        for (const auto& item : placement)
+        for (const auto& item : inventory().m_all)
         {
             auto artefact = smart_cast<CArtefact*>(item);
-            if (artefact && !fis_zero(artefact->GetCondition()))
+            if (artefact && artefact->CanAffect())
                 res += (base_weight * artefact->GetItemEffect(CInventoryItem::eAdditionalWeight));
             auto container = smart_cast<CInventoryContainer*>(item);
             if (container)

@@ -60,6 +60,8 @@ public:
     // for smart_cast
     virtual CArtefact* cast_artefact() { return this; }
 
+    virtual bool CanAffect();
+
 protected:
     virtual void UpdateCLChild(){};
 

@@ -16,6 +16,7 @@
 #include "ai_space.h"
 #include "actor.h"
 #include "patrol_path_storage.h"
+#include "script_game_object.h"
 
 constexpr auto FASTMODE_DISTANCE = (50.f); // distance to camera from sphere, when zone switches to fast update sequence;
 
@@ -499,6 +500,18 @@ void CArtefact::SwitchAfParticles(bool bOn)
 float CArtefact::GetHitTypeProtection(int hit_type) const { return inherited::GetHitTypeProtection(hit_type) * GetRandomKoef(); }
 
 float CArtefact::GetItemEffect(int effect) const { return m_ItemEffect[effect] * GetRandomKoef(); }
+
+bool CArtefact::CanAffect()
+{ 
+    bool res{true};
+    if (pSettings->line_exist("engine_callbacks", "can_artefact_affect"))
+    {
+        const char* callback = pSettings->r_string("engine_callbacks", "can_artefact_affect");
+        if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
+            res = lua_function(lua_game_object());
+    }
+    return res;
+}
 
 //---SArtefactActivation----
 SArtefactActivation::SArtefactActivation(CArtefact* af, u32 owner_id)

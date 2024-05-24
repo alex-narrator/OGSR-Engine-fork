@@ -1234,8 +1234,6 @@ bool CInventory::HasLockForSlot(u32 check_slot) const
     return false;
 }
 
-TIItemContainer CInventory::GetActiveArtefactPlace() const { return Core.Features.test(xrCore::Feature::artefacts_from_all) ? m_all : m_belt; }
-
 void CInventory::RepackAmmo()
 {
     xr_vector<CWeaponAmmo*> _ammo;

@@ -247,11 +247,10 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
 
                 jump_speed += m_fJumpSpeed * conditions().GetBoostedParams(eAdditionalJumpBoost);
 
-                auto placement = inventory().GetActiveArtefactPlace();
-                for (const auto& item : placement)
+                for (const auto& item : inventory().m_all)
                 {
                     auto artefact = smart_cast<CArtefact*>(item);
-                    if (artefact && !fis_zero(artefact->GetCondition()))
+                    if (artefact && artefact->CanAffect())
                         jump_speed += m_fJumpSpeed * artefact->GetItemEffect(CInventoryItem::eAdditionalJump);
                     auto container = smart_cast<CInventoryContainer*>(item);
                     if (container)
@@ -413,11 +412,10 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                 // custom sprint factor
                 float sprint_k{m_fSprintFactor};
                 sprint_k += m_fSprintFactor * conditions().GetBoostedParams(eAdditionalSprintBoost);
-                auto placement = inventory().GetActiveArtefactPlace();
-                for (const auto& item : placement)
+                for (const auto& item : inventory().m_all)
                 {
                     auto artefact = smart_cast<CArtefact*>(item);
-                    if (artefact && !fis_zero(artefact->GetCondition()))
+                    if (artefact && artefact->CanAffect())
                         sprint_k += m_fSprintFactor * artefact->GetItemEffect(CInventoryItem::eAdditionalSprint);
                     auto container = smart_cast<CInventoryContainer*>(item);
                     if (container)

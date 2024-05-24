@@ -1324,8 +1324,8 @@ void CActor::UpdateItemsEffect()
             for (const auto& item : inventory().m_all)
             {
                 float radiation_restore_speed = item->GetItemEffect(i);
-                auto active_place = inventory().GetActiveArtefactPlace();
-                bool affect = radiation_restore_speed > 0.f || std::find(active_place.begin(), active_place.end(), item) != active_place.end();
+                auto art = smart_cast<CArtefact*>(item);
+                bool affect = radiation_restore_speed > 0.f || art && art->CanAffect();
                 float res_rrs = affect ? radiation_restore_speed : 0.f;
 
                 if (item != inventory().ActiveItem())
@@ -1364,11 +1364,10 @@ void CActor::UpdateItemsEffect()
 float CActor::GetArtefactsProtection(int hit_type)
 {
     float res{};
-    auto placement = inventory().GetActiveArtefactPlace();
-    for (const auto& item : placement)
+    for (const auto& item : inventory().m_all)
     {
         auto artefact = smart_cast<CArtefact*>(item);
-        if (artefact && !fis_zero(artefact->GetHitTypeProtection(hit_type)) && !fis_zero(artefact->GetCondition()))
+        if (artefact && artefact->CanAffect() && !fis_zero(artefact->GetHitTypeProtection(hit_type)))
         {
             res += artefact->GetHitTypeProtection(hit_type);
         }
@@ -1629,11 +1628,10 @@ float CActor::GetItemBoostedParams(int type) { return m_ActorItemBoostedParam[ty
 float CActor::GetTotalArtefactsEffect(int i)
 {
     float res{};
-    auto placement = inventory().GetActiveArtefactPlace();
-    for (const auto& item : placement)
+    for (const auto& item : inventory().m_all)
     {
         auto artefact = smart_cast<CArtefact*>(item);
-        if (artefact && !fis_zero(artefact->GetCondition()))
+        if (artefact && artefact->CanAffect())
         {
             res += artefact->GetItemEffect(i);
         }
