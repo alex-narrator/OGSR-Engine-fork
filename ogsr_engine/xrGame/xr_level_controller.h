@@ -50,7 +50,6 @@ enum EGameActions
     kPAUSE,
     kDROP,
     kUSE,
-    kSCORES,
     kSCREENSHOT,
     kQUIT,
     kCONSOLE,

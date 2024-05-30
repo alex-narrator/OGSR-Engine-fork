@@ -149,16 +149,6 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
         }
     }
     break;
-
-    case kSCORES: {
-        SDrawStaticStruct* ss = AddCustomStatic("main_task", true);
-        SGameTaskObjective* o = pActor->GameTaskManager().ActiveObjective();
-        if (!o)
-            ss->m_static->SetTextST("st_no_active_task");
-        else
-            ss->m_static->SetTextST(*(o->description));
-    }
-    break;
     }
     return false;
 }
@@ -167,9 +157,6 @@ bool CUIGameSP::IR_OnKeyboardRelease(int dik)
 {
     if (inherited::IR_OnKeyboardRelease(dik))
         return true;
-
-    if (is_binded(kSCORES, dik))
-        RemoveCustomStatic("main_task");
 
     return false;
 }

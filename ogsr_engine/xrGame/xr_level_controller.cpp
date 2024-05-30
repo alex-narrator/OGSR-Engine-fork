@@ -58,7 +58,6 @@ xr_vector<_action> actions = {
 	DEF_ACTION("pause", kPAUSE)
 	DEF_ACTION("drop", kDROP)
 	DEF_ACTION("use", kUSE)
-	DEF_ACTION("scores", kSCORES)
 	DEF_ACTION("screenshot", kSCREENSHOT)
 	DEF_ACTION("quit", kQUIT)
 	DEF_ACTION("console", kCONSOLE)
