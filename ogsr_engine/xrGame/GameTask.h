@@ -81,6 +81,8 @@ public:
     void SetObjectID_script(u16 id);
 
     void SetIconName_script(LPCSTR _str);
+    LPCSTR GetIconName_script() { return icon_texture_name.c_str(); };
+    Frect GetIconRect_script() { return icon_rect; };
 
     void AddCompleteInfo_script(LPCSTR _str);
     void AddFailInfo_script(LPCSTR _str);

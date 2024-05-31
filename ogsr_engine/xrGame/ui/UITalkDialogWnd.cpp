@@ -115,7 +115,7 @@ void CUITalkDialogWnd::AddQuestion(LPCSTR str, LPCSTR value, int number)
     if (number <= 10)
     {
         string16 buff;
-        sprintf_s(buff, "%d.", (number == 10) ? 0 : number);
+        sprintf_s(buff, "[%d]", (number == 10) ? 0 : number);
         itm->m_num_text->SetText(buff);
         itm->m_text->SetAccelerator(DIK_ESCAPE + number, 0);
     }

@@ -18,6 +18,8 @@ void CGameTask::script_register(lua_State* L)
                   .def("set_map_location", &SGameTaskObjective::SetMapLocation_script)
                   .def("set_object_id", &SGameTaskObjective::SetObjectID_script)
                   .def("set_icon_name", &SGameTaskObjective::SetIconName_script)
+                  .def("get_icon_name", &SGameTaskObjective::GetIconName_script)
+                  .def("get_icon_rect", &SGameTaskObjective::GetIconRect_script)
                   .def_readwrite("def_ml_enabled", &SGameTaskObjective::def_location_enabled)
 
                   .def("add_complete_info", &SGameTaskObjective::AddCompleteInfo_script)
