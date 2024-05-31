@@ -154,7 +154,7 @@ void CUIMMShniaga::CreateList(xr_vector<CUIStatic*>& lst, CUIXml& xml_doc, LPCST
         st->SetTextColor(color);
         st->SetTextAlignment(CGameFont::alCenter);
         //		st->SetTextAlignment(CGameFont::alLeft);
-        st->SetVTextAlignment(valCenter);
+        st->SetVTextAlignment(CGameFont::valCenter);
         st->SetWindowName(xml_doc.ReadAttrib("btn", i, "name"));
         st->SetMessageTarget(this);
 

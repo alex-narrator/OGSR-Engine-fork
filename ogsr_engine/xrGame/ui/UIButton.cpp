@@ -31,7 +31,7 @@ CUIButton::CUIButton()
 
     SetTextComplexMode(false);
     SetTextAlignment(CGameFont::alCenter); // this will create class instance for m_pLines
-    SetVTextAlignment(valCenter);
+    SetVTextAlignment(CGameFont::valCenter);
     m_bClickable = true;
 }
 

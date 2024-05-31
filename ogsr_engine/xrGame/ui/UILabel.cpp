@@ -6,7 +6,7 @@
 CUILabel::CUILabel()
 {
     m_textPos.set(0, 0);
-    m_lines.SetVTextAlignment(valCenter);
+    m_lines.SetVTextAlignment(CGameFont::valCenter);
     m_lainm_start_time = -1.0f;
     m_lanim = NULL;
 }

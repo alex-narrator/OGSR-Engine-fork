@@ -6,6 +6,7 @@
 #include "../ui_base.h"
 
 typedef CGameFont::EAligment ETextAlignment;
+typedef CGameFont::EVAlignment EVTextAlignment;
 
 class IUIFontControl
 {
@@ -18,13 +19,6 @@ public:
     virtual void SetTextAlignment(ETextAlignment alignment) = 0;
     virtual ETextAlignment GetTextAlignment() = 0;
 };
-
-typedef enum
-{
-    valTop = 0,
-    valCenter,
-    valBotton
-} EVTextAlignment;
 
 class IUITextControl : public IUIFontControl
 {

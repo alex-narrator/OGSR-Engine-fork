@@ -12,7 +12,7 @@ CUICustomEdit::CUICustomEdit()
     m_iKeyPressAndHold = 0;
     m_bHoldWaitMode = false;
 
-    m_lines.SetVTextAlignment(valCenter);
+    m_lines.SetVTextAlignment(CGameFont::valCenter);
     m_lines.SetColoringMode(false);
     m_lines.SetCutWordsMode(true);
     m_lines.SetUseNewLineMode(false);

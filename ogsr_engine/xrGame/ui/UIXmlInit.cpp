@@ -256,11 +256,11 @@ bool CUIXmlInit::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pW
     InitText(xml_doc, path, index, (IUITextControl*)pWnd);
     shared_str al = xml_doc.ReadAttrib(path, index, "vert_align", "");
     if (0 == xr_strcmp(al, "c"))
-        pWnd->SetVTextAlignment(valCenter);
+        pWnd->SetVTextAlignment(CGameFont::valCenter);
     else if (0 == xr_strcmp(al, "b"))
-        pWnd->SetVTextAlignment(valBotton);
+        pWnd->SetVTextAlignment(CGameFont::valBotton);
     else if (0 == xr_strcmp(al, "t"))
-        pWnd->SetVTextAlignment(valTop);
+        pWnd->SetVTextAlignment(CGameFont::valTop);
 
     pWnd->SetTextComplexMode(xml_doc.ReadAttribInt(path, index, "complex_mode", 0) ? true : false);
 

@@ -18,6 +18,13 @@ public:
         alCenter
     };
 
+    enum EVAlignment
+    {
+        valTop = 0,
+        valCenter,
+        valBotton
+    };
+
 private:
     struct String
     {

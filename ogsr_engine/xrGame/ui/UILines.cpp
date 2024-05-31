@@ -18,7 +18,7 @@ CUILines::CUILines()
     m_pFont = NULL;
     m_interval = 0.0f;
     m_eTextAlign = CGameFont::alLeft;
-    m_eVTextAlign = valTop;
+    m_eVTextAlign = CGameFont::valTop;
     m_dwTextColor = 0xffffffff;
     m_dwCursorColor = 0xAAFFFF00;
 
@@ -532,13 +532,13 @@ float CUILines::GetVIndentByAlign()
 
     switch (m_eVTextAlign)
     {
-    case valTop: {
+    case CGameFont::valTop: {
         float delta_h = m_pFont->ScaleHeightDelta();
         UI()->ClientToScreenScaledHeight(delta_h);
         return delta_h * -1;
     }
-    case valCenter: r = (m_wndSize.y - GetVisibleHeight()) / 2; break;
-    case valBotton: r = m_wndSize.y - GetVisibleHeight(); break;
+    case CGameFont::valCenter: r = (m_wndSize.y - GetVisibleHeight()) / 2; break;
+    case CGameFont::valBotton: r = m_wndSize.y - GetVisibleHeight(); break;
     default: NODEFAULT;
     }
 
