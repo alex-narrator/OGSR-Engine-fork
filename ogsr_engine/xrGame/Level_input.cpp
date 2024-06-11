@@ -199,28 +199,6 @@ void CLevel::IR_OnKeyboardPress(int key)
     if (game && Game().IR_OnKeyboardPress(key))
         return;
 
-    if (_curr == kQUICK_SAVE)
-    {
-        Console->Execute("save");
-        return;
-    }
-    else if (_curr == kQUICK_LOAD)
-    {
-#ifdef DEBUG
-        FS.get_path("$game_config$")->m_Flags.set(FS_Path::flNeedRescan, TRUE);
-        FS.get_path("$game_scripts$")->m_Flags.set(FS_Path::flNeedRescan, TRUE);
-        FS.rescan_pathes();
-#endif // DEBUG
-        string_path saved_game, command;
-        strconcat(sizeof(saved_game), saved_game, Core.UserName, "_", "quicksave");
-        if (!CSavedGameWrapper::valid_saved_game(saved_game))
-            return;
-
-        strconcat(sizeof(command), command, "load ", saved_game);
-        Console->Execute(command);
-        return;
-    }
-
 #ifdef DEBUG
     case DIK_RETURN:
     case DIK_NUMPADENTER: bDebug = !bDebug; return;

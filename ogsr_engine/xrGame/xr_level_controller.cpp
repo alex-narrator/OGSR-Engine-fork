@@ -70,9 +70,6 @@ xr_vector<_action> actions = {
 	DEF_ACTION("next_slot", kNEXT_SLOT)
 	DEF_ACTION("prev_slot", kPREV_SLOT)
 
-    DEF_ACTION("quick_save", kQUICK_SAVE) 
-    DEF_ACTION("quick_load", kQUICK_LOAD)
-
 	DEF_ACTION("additional_action", kADDITIONAL_ACTION)
 };
 

@@ -62,9 +62,6 @@ enum EGameActions
     kNEXT_SLOT,
     kPREV_SLOT,
 
-    kQUICK_SAVE,
-    kQUICK_LOAD,
-
     kADDITIONAL_ACTION,
 
     kLASTACTION = u32(-3),
