@@ -86,10 +86,6 @@ public:
 
     bool UsefulForReload() const;
 
-protected:
-    ref_sound sndLoad;
-    ref_sound sndUnload;
-
 public:
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };

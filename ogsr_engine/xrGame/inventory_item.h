@@ -13,8 +13,6 @@
 #include "attachable_item.h"
 #include "ui\UIIconParams.h"
 
-class CUIInventoryCellItem;
-
 enum EHandDependence
 {
     hdNone = 0,
@@ -82,7 +80,6 @@ public:
     virtual LPCSTR Name();
     virtual LPCSTR NameShort();
     //.	virtual LPCSTR				NameComplex			();
-    shared_str ItemDescription() { return m_Description; }
 
     virtual void OnEvent(NET_Packet& P, u16 type);
 
@@ -138,8 +135,6 @@ public:
 
     u32 m_cost;
     float m_weight;
-    shared_str m_Description{};
-    CUIInventoryCellItem* m_cell_item{};
 
     shared_str m_name{};
     shared_str m_nameShort{};
@@ -282,8 +277,6 @@ public:
 
     virtual void BreakItem();
 
-    xr_vector<shared_str> m_highlight_items{};
-
 protected:
     // партікли знищення
     shared_str m_sBreakParticles;
@@ -320,9 +313,6 @@ public:
     virtual void Switch();
     virtual bool IsPowerOn() const;
 
-    LPCSTR GetAttachMenuTip() const { return m_sAttachMenuTip; };
-    LPCSTR GetDetachMenuTip() const { return m_sDetachMenuTip; };
-
     virtual LPCSTR GetBoneName(int);
     virtual float GetArmorByBone(int);
     virtual float GetArmorHitFraction();
@@ -339,9 +329,6 @@ protected:
     HitImmunity::HitTypeSVec m_HitTypeProtection;
 
     svector<float, eEffectMax> m_ItemEffect;
-
-    LPCSTR m_sAttachMenuTip{};
-    LPCSTR m_sDetachMenuTip{};
 
     float m_fPowerLoss{};
 

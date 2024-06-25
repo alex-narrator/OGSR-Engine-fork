@@ -385,27 +385,6 @@ float CScriptGameObject::GetCamFOV() { return g_fov; }
 
 void CScriptGameObject::SetCamFOV(float _fov) { g_fov = _fov; }
 
-#include "HudManager.h"
-#include "UIGameSP.h"
-void CScriptGameObject::StartCarbody(CScriptGameObject* obj)
-{
-    CInventoryOwner* e = smart_cast<CInventoryOwner*>(&object());
-    IInventoryBox* inv_box = smart_cast<IInventoryBox*>(&(obj->object()));
-    CInventoryOwner* inv_owner = smart_cast<CInventoryOwner*>(&(obj->object()));
-    if (!e || (!inv_box && !inv_owner))
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member StartCarbody!");
-        return;
-    }
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (pGameSP)
-    {
-        if (inv_box)
-            pGameSP->StartCarBody(e, inv_box);
-        else
-            pGameSP->StartCarBody(e, inv_owner);
-    }
-}
 
 #include "script_ini_file.h"
 CScriptIniFile* CScriptGameObject::GetVisIni()

@@ -81,7 +81,7 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .def("parent", &CScriptGameObject::Parent)
         .def("mass", &CScriptGameObject::Mass)
         .def("cost", &CScriptGameObject::Cost)
-        .def("can_trade", &CScriptGameObject::Cost)
+        .def("can_trade", &CScriptGameObject::CanTrade)
         .def("condition", &CScriptGameObject::GetCondition)
         .def("set_condition", &CScriptGameObject::SetCondition)
         .def("change_condition", &CScriptGameObject::ChangeCondition)
@@ -254,6 +254,8 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .def("max_ignore_monster_distance", &CScriptGameObject::max_ignore_monster_distance)
 
         .def("eat", &CScriptGameObject::eat)
+
+        .def("repack_ammo", &CScriptGameObject::repack_ammo)
 
         .def("extrapolate_length", (float(CScriptGameObject::*)() const)(&CScriptGameObject::extrapolate_length))
         .def("extrapolate_length", (void(CScriptGameObject::*)(float))(&CScriptGameObject::extrapolate_length))

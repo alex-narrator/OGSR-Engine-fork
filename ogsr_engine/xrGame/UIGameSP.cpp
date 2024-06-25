@@ -12,30 +12,23 @@
 #include "GameTask.h"
 #include "PDA.h"
 
-#include "ui/UIInventoryWnd.h"
-#include "ui/UITradeWnd.h"
 #include "ui/UIPdaWnd.h"
 #include "ui/UITalkWnd.h"
-#include "ui/UICarBodyWnd.h"
 #include "ui/UIMessageBox.h"
 
 CUIGameSP::CUIGameSP()
 {
     m_game = NULL;
 
-    InventoryMenu = xr_new<CUIInventoryWnd>();
     PdaMenu = xr_new<CUIPdaWnd>();
     TalkMenu = xr_new<CUITalkWnd>();
-    UICarBodyMenu = xr_new<CUICarBodyWnd>();
     UIChangeLevelWnd = xr_new<CChangeLevelWnd>();
 }
 
 CUIGameSP::~CUIGameSP()
 {
-    delete_data(InventoryMenu);
     delete_data(PdaMenu);
     delete_data(TalkMenu);
-    delete_data(UICarBodyMenu);
     delete_data(UIChangeLevelWnd);
 }
 
@@ -69,7 +62,7 @@ void CUIGameSP::SetClGame(game_cl_GameState* g)
 bool CUIGameSP::IsDialogsShown() 
 {
     CUIDialogWnd* mir = MainInputReceiver();
-    return mir && (mir == InventoryMenu || mir == PdaMenu || mir == TalkMenu || mir == UICarBodyMenu);
+    return mir && (mir == PdaMenu || mir == TalkMenu);
 }
 
 extern bool attach_adjust_mode_keyb(int dik);
@@ -98,7 +91,7 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
         return true;
 
     auto bind = get_binded_action(dik);
-    if (!pActor->GetPDA() && bind != kINVENTORY)
+    if (!pActor->GetPDA()/* && bind != kINVENTORY*/)
         return false;
 
     if (pActor->m_blocked_actions.find(bind) != pActor->m_blocked_actions.end())
@@ -106,18 +99,6 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
 
     switch (bind)
     {
-    case kINVENTORY:
-        if (!MainInputReceiver() || MainInputReceiver() == InventoryMenu)
-        {
-            auto Pda = pActor->GetPDA();
-            if (!Pda || !Pda->Is3DPDA() || !psActorFlags.test(AF_3D_PDA) || !PdaMenu->IsShown())
-            {
-                m_game->StartStopMenu(InventoryMenu, true);
-                return true;
-            }
-        }
-        break;
-
     case kACTIVE_JOBS:
     case kMAP:
     case kCONTACTS: {
@@ -170,33 +151,6 @@ void CUIGameSP::Render()
 
 void CUIGameSP::StartTalk() { m_game->StartStopMenu(TalkMenu, true); }
 
-void CUIGameSP::StartCarBody(CInventoryOwner* pOurInv, CInventoryOwner* pOthers)
-{
-    if (MainInputReceiver())
-        return;
-    UICarBodyMenu->InitCarBody(pOurInv, pOthers);
-    m_game->StartStopMenu(UICarBodyMenu, true);
-}
-void CUIGameSP::StartCarBody(CInventoryOwner* pOurInv, IInventoryBox* pBox)
-{
-    if (MainInputReceiver())
-        return;
-    UICarBodyMenu->InitCarBody(pOurInv, pBox);
-    m_game->StartStopMenu(UICarBodyMenu, true);
-}
-
-void CUIGameSP::ReInitShownUI()
-{
-    if (InventoryMenu->IsShown())
-        InventoryMenu->InitInventory_delayed();
-    else if (UICarBodyMenu->IsShown())
-        UICarBodyMenu->UpdateLists_delayed();
-    else if (TalkMenu->IsShown())
-        for (const auto child : TalkMenu->GetChildWndList())
-            if (auto trade_menu = smart_cast<CUITradeWnd*>(child); trade_menu && trade_menu->IsShown())
-                trade_menu->UpdateLists_delayed();
-};
-
 extern ENGINE_API BOOL bShowPauseString;
 
 void CUIGameSP::ChangeLevel(GameGraph::_GRAPH_ID game_vert_id, u32 level_vert_id, Fvector pos, Fvector ang, Fvector pos2, Fvector ang2, bool b)
@@ -217,10 +171,8 @@ void CUIGameSP::ChangeLevel(GameGraph::_GRAPH_ID game_vert_id, u32 level_vert_id
 void CUIGameSP::reset_ui()
 {
     inherited::reset_ui();
-    InventoryMenu->Reset();
     PdaMenu->Reset();
     TalkMenu->Reset();
-    UICarBodyMenu->Reset();
     UIChangeLevelWnd->Reset();
 }
 

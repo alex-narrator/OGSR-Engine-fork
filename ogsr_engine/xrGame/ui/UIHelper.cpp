@@ -16,7 +16,6 @@
 #include "UICheckButton.h"
 #include "UIScrollView.h"
 #include "UIEditBox.h"
-#include "UIDragDropListEx.h"
 
 CUIWindow* UIHelper::CreateNormalWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical /*= true*/)
 {
@@ -150,18 +149,5 @@ CUICheckButton* UIHelper::CreateCheck(CUIXml& xml, LPCSTR ui_path, CUIWindow* pa
     parent->AttachChild(ui);
     ui->SetAutoDelete(true);
     CUIXmlInit::InitCheck(xml, ui_path, 0, ui);
-    return ui;
-}
-
-CUIDragDropListEx* UIHelper::CreateDragDropListEx(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical)
-{
-    // If it's not critical element, then don't crash if it doesn't exist
-    if (!critical && !xml.NavigateToNode(ui_path, 0))
-        return nullptr;
-
-    auto ui = xr_new<CUIDragDropListEx>();
-    parent->AttachChild(ui);
-    ui->SetAutoDelete(true);
-    CUIXmlInit::InitDragDropListEx(xml, ui_path, 0, ui);
     return ui;
 }

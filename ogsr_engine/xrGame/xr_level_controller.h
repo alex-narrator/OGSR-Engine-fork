@@ -53,7 +53,7 @@ enum EGameActions
     kSCREENSHOT,
     kQUIT,
     kCONSOLE,
-    kINVENTORY,
+    //kINVENTORY,
     kACTIVE_JOBS,
     kMAP,
     kCONTACTS,

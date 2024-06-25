@@ -61,7 +61,7 @@ xr_vector<_action> actions = {
 	DEF_ACTION("screenshot", kSCREENSHOT)
 	DEF_ACTION("quit", kQUIT)
 	DEF_ACTION("console", kCONSOLE)
-	DEF_ACTION("inventory", kINVENTORY)
+	//DEF_ACTION("inventory", kINVENTORY)
 	DEF_ACTION("active_jobs", kACTIVE_JOBS)
 	DEF_ACTION("map", kMAP)
 	DEF_ACTION("contacts", kCONTACTS)

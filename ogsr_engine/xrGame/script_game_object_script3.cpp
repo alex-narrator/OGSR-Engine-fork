@@ -160,8 +160,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("money", &CScriptGameObject::Money)
         .def("set_money", &CScriptGameObject::SetMoney)
 
-        .def("switch_to_trade", &CScriptGameObject::SwitchToTrade)
-        .def("switch_to_talk", &CScriptGameObject::SwitchToTalk)
         .def("run_talk_dialog", &CScriptGameObject::RunTalkDialog)
 
         .def("hide_weapon", &CScriptGameObject::HideWeapon)
@@ -198,7 +196,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("get_default_character_icon", &CScriptGameObject::GetDefaultCharacterIcon)
             
         .def("infinitive_money", &CScriptGameObject::InfinitiveMoney)
-        .def("perform_trade", &CScriptGameObject::PerformTrade)
 
         .def("get_actor_relation_flags", &CScriptGameObject::get_actor_relation_flags)
         .def("set_actor_relation_flags", &CScriptGameObject::set_actor_relation_flags)
@@ -265,7 +262,7 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("marked_dropped", &CScriptGameObject::MarkedDropped)
         .def("unload_magazine", &CScriptGameObject::UnloadMagazine)
         .def("is_direct_reload", &CScriptGameObject::IsDirectReload)
-        .def("unload_weapon_full", &CScriptGameObject::UnloadWeaponFull)
+        .def("unload_magazine_full", &CScriptGameObject::UnloadMagazineFull)
 
         .def("sight_params", &CScriptGameObject::sight_params)
 
@@ -365,7 +362,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("add_wounds", &CScriptGameObject::AddWound)
         .def("get_weight", &CScriptGameObject::GetItemWeight)
         .def("inv_box_count", &CScriptGameObject::InvBoxCount)
-        .def("start_carbody", &CScriptGameObject::StartCarbody)
         .def("object_from_inv_box", &CScriptGameObject::ObjectFromInvBox)
         .def("get_camera_fov", &CScriptGameObject::GetCamFOV)
         .def("set_camera_fov", &CScriptGameObject::SetCamFOV)
@@ -419,7 +415,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         // KD
 
         // by Real Wolf 11.07.2014
-        .def("get_cell_item", &CScriptGameObject::GetCellItem)
         .def("get_bone_name", &CScriptGameObject::GetBoneName)
 
         .def("get_hud_item_state", &CScriptGameObject::GetHudItemState)

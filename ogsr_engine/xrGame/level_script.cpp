@@ -260,29 +260,12 @@ void remove_dialog_to_render(CUIDialogWnd* pDialog) { HUD().GetUI()->RemoveDialo
 CUIDialogWnd* main_input_receiver() { return HUD().GetUI()->MainInputReceiver(); }
 
 #include "UIGameCustom.h"
-#include "ui/UIInventoryWnd.h"
-#include "ui/UITradeWnd.h"
 #include "ui/UITalkWnd.h"
-#include "ui/UICarBodyWnd.h"
 #include "UIGameSP.h"
 #include "HUDManager.h"
 #include "HUDTarget.h"
 #include "InventoryBox.h"
 
-CUIWindow* GetInventoryWindow()
-{
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return nullptr;
-    return (CUIWindow*)pGameSP->InventoryMenu;
-}
-CUIWindow* GetTradeWindow()
-{
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return nullptr;
-    return (CUIWindow*)pGameSP->TalkMenu->GetTradeWnd();
-}
 CUIWindow* GetTalkWindow()
 {
     CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
@@ -301,25 +284,6 @@ CUIWindow* GetPdaWindow()
     if (!pGameSP)
         return nullptr;
     return (CUIWindow*)pGameSP->PdaMenu;
-}
-CUIWindow* GetCarBodyWindow()
-{
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return nullptr;
-    return (CUIWindow*)pGameSP->UICarBodyMenu;
-}
-CScriptGameObject* GetCarBodyTarget()
-{
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return nullptr;
-    CUICarBodyWnd* wnd = pGameSP->UICarBodyMenu;
-    if (wnd == nullptr)
-        return nullptr;
-    if (wnd->m_pOtherGO != nullptr)
-        return wnd->m_pOtherGO->lua_game_object();
-    return nullptr;
 }
 
 CUIWindow* GetUIChangeLevelWnd()
@@ -722,8 +686,6 @@ u32 vertex_id(u32 node, const Fvector& vec) { return ai().level_graph().vertex(n
 
 u32 nearest_vertex_id(const Fvector& vec) { return ai().level_graph().vertex(vec); }
 
-void update_inventory_window() { HUD().GetUI()->UIGame()->ReInitShownUI(); }
-
 void change_level(GameGraph::_GRAPH_ID game_vertex_id, u32 level_vertex_id, Fvector pos, Fvector dir)
 {
     NET_Packet p;
@@ -1004,9 +966,7 @@ void CLevel::script_register(lua_State* L)
 
             def("game_id", &GameID), def("set_ignore_game_state_update", &set_ignore_game_state_update),
 
-            def("get_inventory_wnd", &GetInventoryWindow), def("get_talk_wnd", &GetTalkWindow), def("get_trade_wnd", &GetTradeWindow), def("get_pda_wnd", &GetPdaWindow),
-            def("get_car_body_wnd", &GetCarBodyWindow), def("get_second_talker", &GetSecondTalker), def("get_car_body_target", &GetCarBodyTarget),
-            def("get_change_level_wnd", &GetUIChangeLevelWnd),
+            def("get_talk_wnd", &GetTalkWindow), def("get_pda_wnd", &GetPdaWindow), def("get_second_talker", &GetSecondTalker), def("get_change_level_wnd", &GetUIChangeLevelWnd),
 
             def("ray_query", &PerformRayQuery),
 
@@ -1047,7 +1007,7 @@ void CLevel::script_register(lua_State* L)
                                    def("clear_personal_goodwill", &g_clear_personal_goodwill), def("clear_personal_relations", &g_clear_personal_relations)];
     //установка параметров для шейдеров из скриптов
     module(L)[def("set_artefact_slot", &g_set_artefact_position), def("set_anomaly_slot", &g_set_anomaly_position), def("set_detector_mode", &g_set_detector_params),
-              def("set_pda_params", [](const Fvector& p) { shader_exports.set_pda_params(p); }), def("update_inventory_window", &update_inventory_window),
+              def("set_pda_params", [](const Fvector& p) { shader_exports.set_pda_params(p); }),
 
            def("set_dof_params", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_dof_params(p1, p2, p3, p4); }),
         def("set_pnv_color", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_pnv_color(p1, p2, p3, p4); }),// R|G|B|intensity

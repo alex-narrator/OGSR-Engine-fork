@@ -75,11 +75,6 @@ enum ECallbackType
     eOnActorWeaponZoomIn,
     eOnActorWeaponZoomOut,
 
-    eCellItemFocus,
-    eCellItemFocusLost,
-    eCellItemSelect,
-    eOnCellItemMouse,
-
     eBeforeSave,
     ePostSave,
 

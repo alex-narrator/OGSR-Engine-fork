@@ -35,6 +35,7 @@
 #include "ui/UIPDAWnd.h"
 
 #include "InventoryContainer.h"
+#include "Script_Game_Object.h"
 
 extern int g_bHudAdjustMode;
 
@@ -454,11 +455,6 @@ void CActor::ActorUse()
             PickupModeUpdate_COD();
             return;
         }
-        // если контейнер открыт
-        CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-        if (pGameSP)
-            pGameSP->StartCarBody(this, m_pInvBoxWeLookingAt);
-        return;
     }
 
     else if (!m_pUsableObject || m_pUsableObject->nonscript_usable())
@@ -470,15 +466,6 @@ void CActor::ActorUse()
             if (pEntityAliveWeLookingAt->g_Alive())
             {
                 TryToTalk();
-                return;
-            }
-            // обыск трупа
-            else if (!is_add_act)
-            {
-                // только если находимся в режиме single
-                CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-                if (pGameSP)
-                    pGameSP->StartCarBody(this, m_pPersonWeLookingAt);
                 return;
             }
         }

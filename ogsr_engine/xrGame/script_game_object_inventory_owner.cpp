@@ -28,7 +28,6 @@
 #include "level_graph.h"
 #include "huditem.h"
 #include "ui/UItalkWnd.h"
-#include "ui/UITradeWnd.h"
 #include "inventory.h"
 #include "infoportion.h"
 #include "AI/Monsters/BaseMonster/base_monster.h"
@@ -287,9 +286,17 @@ bool CScriptGameObject::MarkedDropped(CScriptGameObject* item)
 void CScriptGameObject::UnloadMagazine(bool spawn_ammo, bool unload_gl)
 {
     auto weapon_magazined = smart_cast<CWeaponMagazined*>(&object());
-    if (!weapon_magazined)
+    auto ammo_magazine = smart_cast<CWeaponAmmo*>(&object());
+
+    if (!weapon_magazined && !ammo_magazine)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject::UnloadMagazine non-CWeaponMagazined object !!!");
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject::UnloadMagazine non-CWeaponMagazined and non-CWeaponAmmo object !!!");
+        return;
+    }
+
+    if (ammo_magazine && ammo_magazine->IsBoxReloadable())
+    {
+        ammo_magazine->UnloadBox();
         return;
     }
 
@@ -327,12 +334,21 @@ bool CScriptGameObject::IsDirectReload(CScriptGameObject* pItem)
     return weapon ? weapon->IsDirectReload(ammo_to_load) : ammo->IsDirectReload(ammo_to_load);
 }
 
-void CScriptGameObject::UnloadWeaponFull()
+void CScriptGameObject::UnloadMagazineFull()
 {
     auto weapon_magazined = smart_cast<CWeaponMagazined*>(&object());
-    if (!weapon_magazined)
+    auto ammo_magazine = smart_cast<CWeaponAmmo*>(&object());
+
+    if (!weapon_magazined && !ammo_magazine)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject::UnloadWeaponFull non-CWeaponMagazined object !!!");
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject::UnloadWeaponFull non-CWeaponMagazined and non-CWeaponAmmo object !!!");
+        return;
+    }
+
+    if (ammo_magazine)
+    {
+        if (ammo_magazine->IsBoxReloadable())
+            ammo_magazine->UnloadBox();
         return;
     }
 
@@ -718,49 +734,6 @@ void CScriptGameObject::SetGameTaskState(ETaskState state, LPCSTR task_id, int o
 }
 
 //////////////////////////////////////////////////////////////////////////
-
-void CScriptGameObject::SwitchToTrade()
-{
-    CActor* pActor = smart_cast<CActor*>(&object());
-    if (!pActor)
-        return;
-
-    //только если находимся в режиме single
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return;
-
-    if (pGameSP->TalkMenu->IsShown())
-        pGameSP->TalkMenu->SwitchToTrade();
-}
-void CScriptGameObject::SwitchToTalk() //{ R_ASSERT("switch_to_talk called ;)"); }
-{
-    CActor* pActor = smart_cast<CActor*>(&object());
-    if (!pActor)
-        return;
-
-    // только если находимся в режиме single
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return;
-
-    if (pGameSP->TalkMenu->GetTradeWnd()->IsShown())
-        pGameSP->TalkMenu->GetTradeWnd()->SwitchToTalk();
-}
-void CScriptGameObject::PerformTrade()
-{
-    CActor* pActor = smart_cast<CActor*>(&object());
-    if (!pActor)
-        return;
-
-    // только если находимся в режиме single
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return;
-
-    if (pGameSP->TalkMenu->GetTradeWnd()->IsShown())
-        pGameSP->TalkMenu->GetTradeWnd()->PerformTrade();
-}
 
 void CScriptGameObject::RunTalkDialog(CScriptGameObject* pToWho)
 {

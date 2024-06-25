@@ -30,6 +30,7 @@ public:
     virtual void Update();
     virtual bool OnKeyboard(int dik, EUIMessages keyboard_action);
     virtual bool Dispatch(int cmd, int param) { return true; }
+    virtual bool StopAnyMove() { return true; }
 
     template <typename T>
     IC T* GetControl(LPCSTR name);

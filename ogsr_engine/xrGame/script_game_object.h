@@ -325,7 +325,7 @@ public:
     bool MarkedDropped(CScriptGameObject* item);
     void UnloadMagazine(bool spawn_ammo = false, bool unload_gl = false);
     bool IsDirectReload(CScriptGameObject* pItem);
-    void UnloadWeaponFull();
+    void UnloadMagazineFull();
 
     void DropItem(CScriptGameObject* pItem);
     void DropItemAndTeleport(CScriptGameObject* pItem, Fvector position);
@@ -349,9 +349,6 @@ public:
     void GetStartDialog();
     void RestoreDefaultStartDialog();
 
-    void SwitchToTrade();
-    void PerformTrade();
-    void SwitchToTalk();
     void RunTalkDialog(CScriptGameObject* pToWho);
 
     void HideWeapon(bool = false);
@@ -589,6 +586,7 @@ public:
     void eat(CScriptGameObject* item);
     bool inside(const Fvector& position, float epsilon) const;
     bool inside(const Fvector& position) const;
+    void repack_ammo();
 
     Fvector head_orientation() const;
     u32 vertex_in_direction(u32 level_vertex_id, Fvector direction, float max_distance) const;
@@ -694,7 +692,6 @@ public:
     float GetItemWeight();
     u32 InvBoxCount();
     CScriptGameObject* ObjectFromInvBox(int _i);
-    void StartCarbody(CScriptGameObject* object);
     float GetCamFOV();
     void SetCamFOV(float _fov);
 
@@ -811,7 +808,6 @@ public:
     // KD
 
     // Real Wolf 07.07.2014.
-    CUIStatic* GetCellItem() const;
     LPCSTR GetBoneName(u16) const;
 
     // alpet: visual functions for CWeapon descedants

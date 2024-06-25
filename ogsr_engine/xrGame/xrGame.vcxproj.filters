@@ -1915,9 +1915,6 @@
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\TalkWnd">
       <UniqueIdentifier>{9e2f6e22-a582-42f9-8a2f-1941a0b49b94}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\UI\Common\CarBodyWnd">
-      <UniqueIdentifier>{11b5e050-1d4f-49c4-ad8d-173bbd79f774}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\Diary">
       <UniqueIdentifier>{0b6df3fd-5eae-4f7a-9296-fa08c6f20f19}</UniqueIdentifier>
     </Filter>
@@ -2013,9 +2010,6 @@
     </Filter>
     <Filter Include="AI\AScript\ScriptClasses\UI\UIWindows\VideoPlayer">
       <UniqueIdentifier>{af336b58-cab8-4ea3-b02a-af6f254fa2cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2">
-      <UniqueIdentifier>{7f7d03f4-df9c-461f-a6d2-f56882941676}</UniqueIdentifier>
     </Filter>
     <Filter Include="AI\AScript\ScriptClasses\UI\UIWindows\Label">
       <UniqueIdentifier>{5c1c88a3-ccf1-43b4-b988-d5a6e66d4b45}</UniqueIdentifier>
@@ -5241,12 +5235,6 @@
     <ClInclude Include="UIDialogHolder.h">
       <Filter>AI\AScript\ScriptClasses\UI</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIInventoryWnd.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UITradeWnd.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\TradeWnd</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIPdaAux.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
     </ClInclude>
@@ -5282,9 +5270,6 @@
     </ClInclude>
     <ClInclude Include="ui\UITalkWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\TalkWnd</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UICarBodyWnd.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\CarBodyWnd</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIDiaryWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Diary</Filter>
@@ -5516,18 +5501,6 @@
     </ClInclude>
     <ClInclude Include="ui\UIVideoPlayerWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\UIWindows\VideoPlayer</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UICellCustomItems.h">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UICellItem.h">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UICellItemFactory.h">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIDragDropListEx.h">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
     </ClInclude>
     <ClInclude Include="ui\UILabel.h">
       <Filter>AI\AScript\ScriptClasses\UI\UIWindows\Label</Filter>
@@ -8311,18 +8284,6 @@
     <ClCompile Include="UIDialogHolder.cpp">
       <Filter>AI\AScript\ScriptClasses\UI</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UIInventoryWnd.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\uiinventorywnd2.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIInventoryWnd3.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UITradeWnd.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\TradeWnd</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UIPdaAux.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
     </ClCompile>
@@ -8355,9 +8316,6 @@
     </ClCompile>
     <ClCompile Include="ui\UITalkWnd.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\TalkWnd</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UICarBodyWnd.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\CarBodyWnd</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIDiaryWnd2.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Diary</Filter>
@@ -8598,18 +8556,6 @@
     </ClCompile>
     <ClCompile Include="ui\UISubLine.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\UIWindows\Lines</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UICellCustomItems.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UICellItem.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UICellItemFactory.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIDragDropListEx.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
     </ClCompile>
     <ClCompile Include="ui\UILabel.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\UIWindows\Label</Filter>

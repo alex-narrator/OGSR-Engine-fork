@@ -10,9 +10,7 @@
 #include "../HUDManager.h"
 #include "../level.h"
 #include "UIPdaWnd.h"
-#include "UIInventoryWnd.h"
 #include "UITalkWnd.h"
-#include "UICarBodyWnd.h"
 #include "Actor.h"
 #include "Inventory.h"
 #include "PDA.h"
@@ -175,8 +173,7 @@ void CUISequenceSimpleItem::Update()
         if (ui_game_sp)
         {
             if (!m_pda_section || 0 == xr_strlen(m_pda_section))
-                if (ui_game_sp->PdaMenu->IsShown() || ui_game_sp->InventoryMenu->IsShown() || ui_game_sp->TalkMenu->IsShown() || ui_game_sp->UICarBodyMenu->IsShown() ||
-                    ui_game_sp->UIChangeLevelWnd->IsShown())
+                if (ui_game_sp->PdaMenu->IsShown() || ui_game_sp->TalkMenu->IsShown() || ui_game_sp->UIChangeLevelWnd->IsShown())
                     m_UIWindow->Show(false);
                 else
                     m_UIWindow->Show(true);

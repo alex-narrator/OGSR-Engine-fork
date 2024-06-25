@@ -13,7 +13,6 @@
 #include "exported_classes_def.h"
 #include "script_game_object.h"
 #include "ui/UIDialogWnd.h"
-#include "ui/UIInventoryWnd.h"
 
 /* Декларация о стиле экспорта свойств и методов:
      * Свойства объектов экспортируются по возможности так, как они выглядят в файлах конфигурации (*.ltx), а не так как они названы в исходниках движка
@@ -100,18 +99,6 @@ CScriptGameObject* item_lua_object(PIItem itm)
 }
 
 CScriptGameObject* inventory_active_item(CInventory* I) { return item_lua_object(I->ActiveItem()); }
-CScriptGameObject* inventory_selected_item(CInventory* I)
-{
-    CUIDialogWnd* IR = HUD().GetUI()->MainInputReceiver();
-    if (!IR)
-        return NULL;
-    CUIInventoryWnd* wnd = smart_cast<CUIInventoryWnd*>(IR);
-    if (!wnd)
-        return NULL;
-    if (wnd->GetInventory() != I)
-        return NULL;
-    return item_lua_object(wnd->CurrentIItem());
-}
 
 CScriptGameObject* get_inventory_target(CInventory* I) { return item_lua_object(I->m_pTarget); }
 
@@ -124,7 +111,6 @@ void CInventoryScript::script_register(lua_State* L)
             .def_readwrite("take_dist", &CInventory::m_fTakeDist)
             .def_readonly("total_weight", &CInventory::m_fTotalWeight)
             .property("active_item", &inventory_active_item)
-            .property("selected_item", &inventory_selected_item)
             .property("target", &get_inventory_target)
             .def("is_active_slot_blocked", &CInventory::IsActiveSlotBlocked)
             .def("is_slot_allowed", &CInventory::IsSlotAllowed)
@@ -134,7 +120,8 @@ void CInventoryScript::script_register(lua_State* L)
             .def("object", &IInventoryBox::GetObjectByIndex)
             .def("object", &IInventoryBox::GetObjectByName)
             .def("object_count", &IInventoryBox::GetSize)
-            .def("empty", &IInventoryBox::IsEmpty),
+            .def("empty", &IInventoryBox::IsEmpty)
+            .def_readwrite("in_use", &IInventoryBox::m_in_use),
         class_<CInventoryContainer, bases<IInventoryBox, CInventoryItemObject>>("CInventoryContainer"),
 
         class_<CInventoryOwner>("CInventoryOwner")

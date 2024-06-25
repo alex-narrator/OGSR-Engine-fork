@@ -16,6 +16,7 @@
 #include "helicopter.h"
 #include "holder_custom.h"
 #include "inventoryowner.h"
+#include "InventoryBox.h"
 #include "movement_manager.h"
 #include "entity_alive.h"
 #include "weaponmagazined.h"
@@ -506,6 +507,14 @@ void CScriptGameObject::eat(CScriptGameObject* item)
     inventory_owner->inventory().Eat(inventory_item);
 }
 
+void CScriptGameObject::repack_ammo()
+{
+    if (auto inv_owner = smart_cast<CInventoryOwner*>(&object()))
+        inv_owner->inventory().RepackAmmo();
+    if (auto inv_box = smart_cast<IInventoryBox*>(&object()))
+        inv_box->RepackAmmo();
+}
+
 bool CScriptGameObject::inside(const Fvector& position, float epsilon) const
 {
     CSpaceRestrictor* space_restrictor = smart_cast<CSpaceRestrictor*>(&object());
@@ -756,12 +765,6 @@ void CScriptGameObject::SetActorExoFactor(float _factor)
         return;
     }
     act->SetExoFactor(_factor);
-}
-CUIStatic* CScriptGameObject::GetCellItem() const
-{
-    if (auto obj = smart_cast<CInventoryItem*>(&object()))
-        return (CUIStatic*)obj->m_cell_item;
-    return NULL;
 }
 
 LPCSTR CScriptGameObject::GetBoneName(u16 id) const

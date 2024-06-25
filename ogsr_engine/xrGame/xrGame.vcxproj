@@ -1524,8 +1524,6 @@
     <ClInclude Include="UI.h" />
     <ClInclude Include="ui_base.h" />
     <ClInclude Include="UIDialogHolder.h" />
-    <ClInclude Include="ui\UIInventoryWnd.h" />
-    <ClInclude Include="ui\UITradeWnd.h" />
     <ClInclude Include="ui\UIPdaAux.h" />
     <ClInclude Include="ui\UIPdaContactsWnd.h" />
     <ClInclude Include="ui\UIPdaListItem.h" />
@@ -1538,7 +1536,6 @@
     <ClInclude Include="ui\UIMapWndActionsSpace.h" />
     <ClInclude Include="ui\UITalkDialogWnd.h" />
     <ClInclude Include="ui\UITalkWnd.h" />
-    <ClInclude Include="ui\UICarBodyWnd.h" />
     <ClInclude Include="ui\UIDiaryWnd.h" />
     <ClInclude Include="ui\UIEncyclopediaArticleWnd.h" />
     <ClInclude Include="ui\UIEncyclopediaWnd.h" />
@@ -1616,10 +1613,6 @@
     <ClInclude Include="ui\uilinestd.h" />
     <ClInclude Include="ui\UISubLine.h" />
     <ClInclude Include="ui\UIVideoPlayerWnd.h" />
-    <ClInclude Include="ui\UICellCustomItems.h" />
-    <ClInclude Include="ui\UICellItem.h" />
-    <ClInclude Include="ui\UICellItemFactory.h" />
-    <ClInclude Include="ui\UIDragDropListEx.h" />
     <ClInclude Include="ui\UILabel.h" />
     <ClInclude Include="ui\UIScrollBar.h" />
     <ClInclude Include="ui\UIScrollBox.h" />
@@ -2450,10 +2443,6 @@
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="ui_base.cpp" />
     <ClCompile Include="UIDialogHolder.cpp" />
-    <ClCompile Include="ui\UIInventoryWnd.cpp" />
-    <ClCompile Include="ui\uiinventorywnd2.cpp" />
-    <ClCompile Include="ui\UIInventoryWnd3.cpp" />
-    <ClCompile Include="ui\UITradeWnd.cpp" />
     <ClCompile Include="ui\UIPdaAux.cpp" />
     <ClCompile Include="ui\UIPdaContactsWnd.cpp" />
     <ClCompile Include="ui\UIPdaListItem.cpp" />
@@ -2465,7 +2454,6 @@
     <ClCompile Include="ui\UIMapWndActions.cpp" />
     <ClCompile Include="ui\UITalkDialogWnd.cpp" />
     <ClCompile Include="ui\UITalkWnd.cpp" />
-    <ClCompile Include="ui\UICarBodyWnd.cpp" />
     <ClCompile Include="ui\UIDiaryWnd2.cpp" />
     <ClCompile Include="ui\UIEncyclopediaArticleWnd.cpp" />
     <ClCompile Include="ui\UIEncyclopediaWnd.cpp" />
@@ -2546,10 +2534,6 @@
     <ClCompile Include="ui\UILine.cpp" />
     <ClCompile Include="ui\UILines.cpp" />
     <ClCompile Include="ui\UISubLine.cpp" />
-    <ClCompile Include="ui\UICellCustomItems.cpp" />
-    <ClCompile Include="ui\UICellItem.cpp" />
-    <ClCompile Include="ui\UICellItemFactory.cpp" />
-    <ClCompile Include="ui\UIDragDropListEx.cpp" />
     <ClCompile Include="ui\UILabel.cpp" />
     <ClCompile Include="ui\UIScrollBar.cpp" />
     <ClCompile Include="ui\UIScrollBox.cpp" />

@@ -114,10 +114,6 @@ void CInventoryItem::Load(LPCSTR section)
         }
     }
 
-    // Description
-    if (pSettings->line_exist(section, "description"))
-        m_Description = CStringTable().translate(pSettings->r_string(section, "description"));
-
     m_flags.set(Fbelt, READ_IF_EXISTS(pSettings, r_bool, section, "belt", FALSE));
     m_flags.set(FRuckDefault, READ_IF_EXISTS(pSettings, r_bool, section, "default_to_ruck", FALSE));
     m_flags.set(FCanTake, READ_IF_EXISTS(pSettings, r_bool, section, "can_take", TRUE));
@@ -174,25 +170,9 @@ void CInventoryItem::Load(LPCSTR section)
     eHandDependence = EHandDependence(READ_IF_EXISTS(pSettings, r_u32, section, "hand_dependence", hdNone));
     m_bIsSingleHanded = READ_IF_EXISTS(pSettings, r_bool, section, "single_handed", TRUE);
 
-    m_sAttachMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_attach_tip", "st_attach");
-    m_sDetachMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_detach_tip", "st_detach");
-
     m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 0.f);
 
     bone_protection_sect = READ_IF_EXISTS(pSettings, r_string, section, "bones_koeff_protection", nullptr);
-
-    //custom highlight
-    if (pSettings->line_exist(section, "highlight_item"))
-    {
-        LPCSTR str = pSettings->r_string(section, "highlight_item");
-        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-        {
-            string128 item_section;
-            _GetItem(str, i, item_section);
-            ASSERT_FMT(pSettings->section_exist(item_section), "highlight_item section [%s] not found!", item_section);
-            m_highlight_items.push_back(item_section);
-        }
-    }
 
     if (pSettings->line_exist(section, "slots_locked"))
     {

@@ -12,6 +12,9 @@ struct CWrapperBase : public T, public luabind::wrap_base
     virtual void Update() { luabind::call_member<void>(this, "Update"); }
     static void Update_static(inherited* ptr) { ptr->self_type::inherited::Update(); }
 
+    virtual bool StopAnyMove() { return luabind::call_member<bool>(this, "StopAnyMove"); }
+    static bool StopAnyMove_static(inherited* ptr) { return ptr->self_type::inherited::StopAnyMove(); }
+
     virtual bool Dispatch(int cmd, int param) { return luabind::call_member<bool>(this, "Dispatch", cmd, param); }
     static bool Dispatch_static(inherited* ptr, int cmd, int param) { return ptr->self_type::inherited::Dispatch(cmd, param); }
 };

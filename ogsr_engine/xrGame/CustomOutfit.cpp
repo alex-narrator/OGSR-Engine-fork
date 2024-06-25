@@ -11,7 +11,6 @@
 #include "../Include/xrRender/RenderVisual.h"
 #include "UIGameSP.h"
 #include "HudManager.h"
-#include "ui/UIInventoryWnd.h"
 #include "player_hud.h"
 #include "xrserver_objects_alife_items.h"
 

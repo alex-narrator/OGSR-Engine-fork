@@ -116,11 +116,6 @@ void CWeaponAmmo::Load(LPCSTR section)
         m_InvShortName = CStringTable().translate(pSettings->r_string(m_ammoSect, "inv_name_short"));
         //
         m_misfireProbabilityBox = READ_IF_EXISTS(pSettings, r_float, section, "misfire_probability_box", 0.0f);
-
-        if (pSettings->line_exist(section, "load_sound"))
-            sndLoad.create(pSettings->r_string(section, "load_sound"), st_Effect, sg_SourceType);
-        if (pSettings->line_exist(section, "unload_sound"))
-            sndUnload.create(pSettings->r_string(section, "unload_sound"), st_Effect, sg_SourceType);
         //
         return;
     }
@@ -330,13 +325,6 @@ void CWeaponAmmo::UnloadBox()
 
     m_cur_ammo_type = 0;
     m_ammoSect = m_ammoTypes[m_cur_ammo_type];
-
-    if (pSettings->line_exist(cNameSect(), "unload_sound"))
-    {
-        if (sndUnload._feedback())
-            sndUnload.stop();
-        sndUnload.play_at_pos(H_Parent(), H_Parent()->Position());
-    }
 }
 
 void CWeaponAmmo::ReloadBox(LPCSTR ammo_sect)
@@ -365,13 +353,6 @@ void CWeaponAmmo::ReloadBox(LPCSTR ammo_sect)
     m_cur_ammo_type = type;
     m_ammoSect = m_ammoTypes[m_cur_ammo_type];
     m_InvShortName = CStringTable().translate(pSettings->r_string(m_ammoSect, "inv_name_short"));
-
-    if (pSettings->line_exist(cNameSect(), "load_sound"))
-    {
-        if (sndLoad._feedback())
-            sndLoad.stop();
-        sndLoad.play_at_pos(H_Parent(), H_Parent()->Position());
-    }
 }
 
 #include "clsid_game.h"
@@ -453,14 +434,6 @@ bool CWeaponAmmo::IsDirectReload(CWeaponAmmo* ammo_to_load)
     m_cur_ammo_type = (u32)std::distance(m_ammoTypes.begin(), it);
     m_ammoSect = m_ammoTypes[m_cur_ammo_type];
     m_InvShortName = CStringTable().translate(pSettings->r_string(m_ammoSect, "inv_name_short"));
-
-
-    if (pSettings->line_exist(cNameSect(), "load_sound"))
-    {
-        if (sndLoad._feedback())
-            sndLoad.stop();
-        sndLoad.play_at_pos(H_Parent(), H_Parent()->Position());
-    }
 
     return true;
 }

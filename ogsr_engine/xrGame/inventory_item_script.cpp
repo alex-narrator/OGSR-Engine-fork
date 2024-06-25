@@ -47,7 +47,6 @@ void CInventoryItem::script_register(lua_State* L)
                .property("cost", &CInventoryItem::Cost, &CInventoryItem::SetCost)
                .property("slot", &CInventoryItem::GetSlot, &CInventoryItem::SetSlot)
                .property("slots", &get_slots, raw<2>())
-               .def_readwrite("description", &CInventoryItem::m_Description)
 
                .def("can_trade", &CInventoryItem::CanTrade)
 
