@@ -24,7 +24,8 @@ void CUIButton::script_register(lua_State* L)
                           .def("GetPushOffsetX",			&CUIButton::GetPushOffsetX)
                           .def("GetPushOffsetY",			&CUIButton::GetPushOffsetY)
                   */
-                  .def("SetAccelerator", &CUIButton::SetAccelerator),
+                  .def("SetAccelerator", &CUIButton::SetAccelerator)
+                  .def("GetAccelerator", &CUIButton::GetAccelerator),
 
               class_<CUI3tButton, CUIButton>("CUI3tButton").def(constructor<>())
               //.		.def("Init",					(void(CUI3tButton::*)(float,float,float,float))CUI3tButton::Init)
