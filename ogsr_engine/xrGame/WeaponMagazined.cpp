@@ -670,7 +670,6 @@ void CWeaponMagazined::UpdateCL()
         m_binoc_vision->Update();
 
     UpdateSounds();
-    TimeLockAnimation();
 }
 
 void CWeaponMagazined::UpdateSounds()
@@ -814,6 +813,8 @@ void CWeaponMagazined::OnShot()
     //дым из ствола
     ForceUpdateFireParticles();
     StartSmokeParticles(get_LastFP(), vel);
+
+    update_visual_bullet_textures();
 }
 
 void CWeaponMagazined::OnEmptyClick()
@@ -837,7 +838,11 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
         break; // End of reload animation
     case eHiding: SwitchState(eHidden); break; // End of Hide
     case eIdle: switch2_Idle(); break; // Keep showing idle
-    case eShowing:
+    case eShowing: {
+        update_visual_bullet_textures(true);
+        SwitchState(eIdle);
+        break;
+    }
     case eMisfire:
     case eDeviceSwitch:
     case eFire:
@@ -1380,7 +1385,7 @@ void CWeaponMagazined::PlayAnimHide()
 void CWeaponMagazined::PlayAnimReload()
 {
     if (IsMisfire())
-        PlayHUDMotion({iAmmoElapsed == 1 ? "anm_reload_jammed_last" : "anm_reload_jammed", "anm_reload_empty", "anim_reload", "anm_reload"}, true, GetState());
+        PlayHUDMotion({iAmmoElapsed == 1 ? "anm_reload_jammed_last" : "anm_reload_jammed", "anm_reload_jammed", "anm_reload_empty", "anim_reload", "anm_reload"}, true, GetState());
     else if (IsPartlyReloading())
         PlayHUDMotion({"anim_reload_partly", "anm_reload_partly", "anim_reload", "anm_reload"}, true, GetState());
     else

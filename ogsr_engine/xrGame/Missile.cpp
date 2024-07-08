@@ -197,8 +197,6 @@ void CMissile::UpdateCL()
 {
     inherited::UpdateCL();
 
-    TimeLockAnimation();
-
     if (!Core.Features.test(xrCore::Feature::stop_anim_playing))
     {
         CActor* pActor = smart_cast<CActor*>(H_Parent());
@@ -524,8 +522,6 @@ void CMissile::Throw()
         m_fake_missile->m_fThrowForce = m_constpower ? m_fConstForce : m_fThrowForce;
     else
         m_fake_missile->m_fThrowForce = inventory_owner->missile_throw_force();
-
-    m_fThrowForce = m_fMinForce;
 
     if (Local() && H_Parent())
     {

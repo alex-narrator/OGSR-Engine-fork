@@ -21,6 +21,7 @@ protected:
     CUIScrollBar* m_VScrollBar;
     CUIWindow* m_pad;
 
+    float m_targetScrollPosition{};
     float m_rightIndent;
     float m_leftIndent;
     float m_upIndent;
@@ -63,10 +64,13 @@ public:
     virtual void SetSelected(CUIWindow*);
     CUIWindow* GetSelected();
     void ForceUpdate();
+    void ForceScrollPosition();
     int GetMinScrollPos();
     int GetMaxScrollPos();
     int GetCurrentScrollPos();
-    void SetScrollPos(int value);
+    virtual void SetWndSize(const Fvector2& size) override;
+    virtual void SetHeight(float height) override;
+    void SetScrollPos(int position);
     void SetScrollBarProfile(LPCSTR profile);
     IC bool NeedShowScrollBar(); // no comment
     float GetHorizIndent(); // left + right indent

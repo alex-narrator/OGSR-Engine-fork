@@ -81,7 +81,6 @@ int ps_r__LightSleepFrames = 10;
 
 float ps_r__Detail_l_ambient = 0.9f;
 float ps_r__Detail_l_aniso = 0.25f;
-float ps_r__Detail_density = 0.3f;
 float ps_r__Detail_rainbow_hemi = 0.75f;
 
 float ps_r__Tree_w_rot = 10.0f;
@@ -132,7 +131,8 @@ Flags32 ps_r2_ls_flags = {R2FLAG_SUN
                           | R3FLAG_MSAA_OPT | R3FLAG_GBUFFER_OPT |  R2FLAG_STEEP_PARALLAX | R2FLAG_SUN_FOCUS | R2FLAG_SUN_TSM | R2FLAG_TONEMAP | R2FLAG_VOLUMETRIC_LIGHTS |
                           R2FLAG_EXP_MT_DETAILS | R2FLAG_EXP_MT_RAIN};
 
-Flags32 ps_r2_ls_flags_ext = {R2FLAGEXT_ENABLE_TESSELLATION | R2FLAGEXT_RAIN_DROPS | R2FLAGEXT_RAIN_DROPS_CONTROL | R2FLAGEXT_SSLR | SSFX_HEIGHT_FOG | SSFX_INTER_GRASS};
+Flags32 ps_r2_ls_flags_ext = {R2FLAGEXT_ENABLE_TESSELLATION | R2FLAGEXT_RAIN_DROPS | R2FLAGEXT_RAIN_DROPS_CONTROL | R2FLAGEXT_SSLR | SSFX_HEIGHT_FOG | SSFX_INTER_GRASS |
+                              R2FLAGEXT_FONT_SHADOWS};
 
 BOOL ps_no_scale_on_fade = 0; // Alundaio
 float ps_r2_df_parallax_h = 0.02f;
@@ -218,7 +218,7 @@ Fvector4 ps_ssfx_rain_3{0.95f, 0.5f, 0.0f, 0.0f}; // Alpha, Refraction ( Splashe
 Fvector3 ps_ssfx_shadow_cascades{20.f, 40.f, 160.f};
 Fvector4 ps_ssfx_grass_shadows = {1.0f, .25f, 20.0f, .0f};
 Fvector4 ps_ssfx_grass_interactive{1.f, static_cast<float>(GRASS_SHADER_DATA_COUNT), 2000.f, 1.0f};
-Fvector3 ps_ssfx_int_grass_params_1{2.0f, 1.0f, 1.0f};
+Fvector4 ps_ssfx_int_grass_params_1{2.0f, 1.0f, 1.0f, 25.f};
 Fvector4 ps_ssfx_int_grass_params_2{1.0f, 5.0f, 1.0f, 1.0f};
 float ps_ssfx_wpn_dof_2 = 0.5f;
 
@@ -273,6 +273,8 @@ u32 psCurrentBPP = 32;
 
 #include "../xrRenderDX10/StateManager/dx10SamplerStateCache.h"
 
+float ps_particle_update_coeff = 0.3f;
+
 //-----------------------------------------------------------------------
 class CCC_detail_radius : public CCC_Integer
 {
@@ -292,6 +294,24 @@ public:
         apply();
     }
     virtual void Status(TStatus& S) { CCC_Integer::Status(S); }
+};
+
+class CCC_detail_reset : public CCC_Float
+{
+public:
+    void apply()
+    {
+        if (RImplementation.Details)
+            RImplementation.Details->need_init = true;
+    }
+
+    CCC_detail_reset(LPCSTR N, float* V, float _min = 0, float _max = 1) : CCC_Float(N, V, _min, _max) {}
+    virtual void Execute(LPCSTR args)
+    {
+        CCC_Float::Execute(args);
+        apply();
+    }
+    virtual void Status(TStatus& S) { CCC_Float::Status(S); }
 };
 
 class CCC_tf_Aniso : public CCC_Integer
@@ -597,8 +617,8 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r__geometry_lod", &ps_r__LOD, 1.f, 3.f); // AVO: extended from 1.2f to 3.f
     //.	CMD4(CCC_Float,		"r__geometry_lod_pow",	&ps_r__LOD_Power,			0,		2		);
 
-    CMD4(CCC_Float, "r__detail_density", &ps_current_detail_density, 0.06f /*0.2f*/, 1.0f);
-    CMD4(CCC_Float, "r__detail_scale", &ps_current_detail_scale, 0.2f, 3.0f);
+    CMD4(CCC_detail_reset, "r__detail_density", &ps_current_detail_density, 0.06f /*0.2f*/, 1.0f);
+    CMD4(CCC_detail_reset, "r__detail_scale", &ps_current_detail_scale, 0.2f, 3.0f);
 
 #ifdef DEBUG
     CMD4(CCC_Float, "r__detail_l_ambient", &ps_r__Detail_l_ambient, .5f, .95f);
@@ -670,6 +690,7 @@ void xrRender_initconsole()
 
     CMD3(CCC_Mask, "r_terrain_parallax_enable", &ps_r2_ls_flags_ext, R2FLAGEXT_TERRAIN_PARALLAX);
     CMD3(CCC_Mask, "r_mt_texload", &ps_r2_ls_flags_ext, R2FLAGEXT_MT_TEXLOAD);
+    CMD3(CCC_Mask, "r_font_shadows", &ps_r2_ls_flags_ext, R2FLAGEXT_FONT_SHADOWS);
 
     CMD3(CCC_Mask, "r2_sun", &ps_r2_ls_flags, R2FLAG_SUN);
     CMD3(CCC_Mask, "r2_sun_details", &ps_r2_ls_flags, R2FLAG_SUN_DETAILS);
@@ -829,7 +850,7 @@ void xrRender_initconsole()
     CMD4(CCC_ssfx_cascades, "ssfx_shadow_cascades", &ps_ssfx_shadow_cascades, (Fvector3{1.0f, 1.0f, 1.0f}), (Fvector3{300.f, 300.f, 300.f}));
     CMD4(CCC_Float, "ssfx_wpn_dof_2", &ps_ssfx_wpn_dof_2, 0, 1);
     CMD4(CCC_Vector4, "ssfx_grass_interactive", &ps_ssfx_grass_interactive, (Fvector4{}), (Fvector4{1.f, static_cast<float>(GRASS_SHADER_DATA_COUNT), 5000.f, 1.f}));
-    CMD4(CCC_Vector3, "ssfx_int_grass_params_1", &ps_ssfx_int_grass_params_1, (Fvector3{}), (Fvector3{5.f, 5.f, 5.f}));
+    CMD4(CCC_Vector4, "ssfx_int_grass_params_1", &ps_ssfx_int_grass_params_1, (Fvector4{}), (Fvector4{5.f, 5.f, 5.f, 60.f}));
     CMD4(CCC_Vector4, "ssfx_int_grass_params_2", &ps_ssfx_int_grass_params_2, (Fvector4{}), (Fvector4{5.f, 20.f, 1.f, 5.f}));
 
     CMD3(CCC_Mask, "ssfx_height_fog", &ps_r2_ls_flags_ext, SSFX_HEIGHT_FOG);
@@ -855,4 +876,6 @@ void xrRender_initconsole()
     CMD4(CCC_Integer, "senvironment_xr_export", &bSenvironmentXrExport, FALSE, TRUE);
 
     CMD4(CCC_Integer, "r_lens_flare", &ps_lens_flare, FALSE, TRUE);
+
+    CMD4(CCC_Float, "particle_update_mod", &ps_particle_update_coeff, 0.04f, 10.f);
 }

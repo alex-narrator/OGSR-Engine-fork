@@ -36,7 +36,6 @@ extern ECORE_API int ps_r__LightSleepFrames;
 
 extern ECORE_API float ps_r__Detail_l_ambient;
 extern ECORE_API float ps_r__Detail_l_aniso;
-extern ECORE_API float ps_r__Detail_density;
 
 extern ECORE_API float ps_r__Tree_w_rot;
 extern ECORE_API float ps_r__Tree_w_speed;
@@ -154,7 +153,7 @@ extern ECORE_API float ps_r2_visor_refl_radius;
 
 extern ECORE_API float ps_ssfx_wpn_dof_2;
 extern Fvector4 ps_ssfx_blood_decals;
-extern Fvector3 ps_ssfx_int_grass_params_1;
+extern Fvector4 ps_ssfx_int_grass_params_1;
 extern ECORE_API Fvector4 ps_ssfx_grass_shadows;
 extern Fvector3 ps_ssfx_shadow_cascades;
 extern Fvector4 ps_ssfx_wind_grass, ps_ssfx_wind_trees;
@@ -243,6 +242,7 @@ enum
     R2FLAG_VISOR_REFL_CONTROL = 1 << 17,
     R2FLAGEXT_TERRAIN_PARALLAX = 1 << 18,
     R2FLAGEXT_MT_TEXLOAD = 1 << 19,
+    R2FLAGEXT_FONT_SHADOWS = 1 << 20,
 };
 
 extern void xrRender_initconsole();

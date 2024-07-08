@@ -77,9 +77,6 @@ float adj_delta_pos = 0.0005f;
 float adj_delta_rot = 0.05f;
 //-----------------------------------------------------------
 
-BOOL g_bCheckTime = FALSE;
-int net_cl_inputupdaterate = 50;
-
 extern BOOL g_enable_memory_debug;
 
 Flags32 g_mt_config = {mtLevelPath | mtDetailPath | mtObjectHandler | mtSoundPlayer | mtAiVision | mtBullets | mtLUA_GC | mtLevelSounds | mtALife};
@@ -1420,7 +1417,7 @@ void CCC_RegisterCommands()
 {
     CMD1(CCC_MemStats, "stat_memory");
     // game
-    CMD3(CCC_Mask, "g_always_run", &psActorFlags, AF_ALWAYSRUN);
+    //CMD3(CCC_Mask, "g_always_run", &psActorFlags, AF_ALWAYSRUN);
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
 
     CMD3(CCC_Mask, "g_dof_zoom", &psActorFlags, AF_DOF_ZOOM);

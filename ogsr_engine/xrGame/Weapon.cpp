@@ -611,6 +611,29 @@ void CWeapon::Load(LPCSTR section)
 
     dont_interrupt_shot_anm = READ_IF_EXISTS(pSettings, r_bool, section, "dont_interrupt_shot_anm", false);
     is_gunslinger_weapon = READ_IF_EXISTS(pSettings, r_bool, section, "is_gunslinger_weapon", false);
+
+    if (pSettings->line_exist(section, "bullet_textures_in_model"))
+    {
+        const char* str = pSettings->r_string(section, "bullet_textures_in_model");
+        for (int i{}, count = _GetItemCount(str); i < count;)
+        {
+            xr_string bullet_tex;
+            _GetItem(str, i++, bullet_tex);
+            bullet_textures_in_model.emplace_back(std::move(bullet_tex));
+        }
+    }
+    if (pSettings->line_exist(section, "bullet_textures_for_ammos"))
+    {
+        const char* str = pSettings->r_string(section, "bullet_textures_for_ammos");
+        for (int i{}, count = _GetItemCount(str); i < count;)
+        {
+            xr_string ammo_section, bullet_tex;
+            _GetItem(str, i++, ammo_section);
+            ASSERT_FMT(i < count, "Incorrect [bullet_textures_for_ammos] in section [%s]", section);
+            _GetItem(str, i++, bullet_tex);
+            bullet_textures_for_ammos.emplace(std::move(ammo_section), std::move(bullet_tex));
+        }
+    }
 }
 
 void CWeapon::LoadFireParams(LPCSTR section, LPCSTR prefix)
@@ -1180,25 +1203,29 @@ bool CWeapon::Action(s32 cmd, u32 flags)
 
     case kWPN_ZOOM: {
         const u32 state = GetState();
-        if (IsZoomEnabled() && (state == eFire || state == eFire2 || state == eMagEmpty || state == eIdle || !IsPending()))
+        const bool bPending = IsPending();
+        if (IsZoomEnabled() && (state == eFire || state == eFire2 || state == eMagEmpty || state == eIdle || !bPending))
         {
             if (flags & CMD_START)
             {
                 if (psActorFlags.is(AF_WPN_AIM_TOGGLE) && IsZoomed())
                 {
                     OnZoomOut();
-                    SwitchState(eIdle);
+                    if (!bPending)
+                        SwitchState(eIdle);
                 }
                 else
                 {
                     OnZoomIn();
-                    SwitchState(eIdle);
+                    if (!bPending)
+                        SwitchState(eIdle);
                 }
             }
             else if (IsZoomed() && !psActorFlags.is(AF_WPN_AIM_TOGGLE))
             {
                 OnZoomOut();
-                SwitchState(eIdle);
+                if (!bPending)
+                    SwitchState(eIdle);
             }
             return true;
         }
@@ -1846,12 +1873,11 @@ bool CWeapon::ready_to_kill() const { return (!IsMisfire() && ((GetState() == eI
 // Получить индекс текущих координат худа
 u8 CWeapon::GetCurrentHudOffsetIdx() const
 {
-    const bool b_aiming = ((IsZoomed() && m_fZoomRotationFactor <= 1.f) || (!IsZoomed() && m_fZoomRotationFactor > 0.f));
-
-    if (b_aiming)
+    if (IsZoomed())
     {
         const bool has_gl = GrenadeLauncherAttachable() && IsGrenadeLauncherAttached();
         const bool has_scope = ScopeAttachable() && IsScopeAttached();
+        //const bool has_aim_alt = AimAlt && is_second_zoom_offset_enabled;
 
         if (IsGrenadeMode())
         {
@@ -1871,10 +1897,15 @@ u8 CWeapon::GetCurrentHudOffsetIdx() const
         {
             if (m_bUseScopeZoom && has_scope)
                 return hud_item_measures::m_hands_offset_type_aim_scope;
+            //else if (has_aim_alt)
+            //    return hud_item_measures::m_hands_offset_type_alt_aim;
             else
                 return hud_item_measures::m_hands_offset_type_aim;
         }
     }
+
+    //if (LoweredActive && !(g_actor->get_state() & mcSprint))
+    //    return hud_item_measures::m_hands_offset_type_lowered;
 
     return hud_item_measures::m_hands_offset_type_normal;
 }
@@ -2220,3 +2251,38 @@ void CWeapon::HUD_VisualBulletUpdate(bool force, int force_idx)
 }
 
 void CWeapon::ParseCurrentItem(CGameFont* F) { F->OutNext("WEAPON IN STRAPPED MODE: [%d]", m_strapped_mode); }
+
+void CWeapon::update_visual_bullet_textures(const bool forced)
+{
+    if (bullet_textures_in_model.empty())
+        return;
+
+    if (!GetHUDmode())
+        return;
+
+    const u32 id = m_set_next_ammoType_on_reload != u32(-1) ? m_set_next_ammoType_on_reload : m_ammoType;
+    const auto& current_ammo_sect = m_ammoTypes[id];
+    const auto bullet_texrure_find_it = bullet_textures_for_ammos.find(current_ammo_sect);
+    ASSERT_FMT(bullet_texrure_find_it != bullet_textures_for_ammos.end(), "!!Can't find [%s] in [bullet_textures_for_ammos] of [%s]", current_ammo_sect.c_str(),
+               cNameSect().c_str());
+    const auto& bullet_texrure_name = bullet_texrure_find_it->second;
+
+    if (!forced && current_bullet_texture == bullet_texrure_name)
+        return;
+
+    for (const auto& tex_name : bullet_textures_in_model)
+    {
+        const auto textures = Device.m_pRender->GetResourceManager()->FindTexture(tex_name.c_str());
+        if (textures.empty())
+        {
+            Msg("!![%s] can't find texture [%s] for [%s]", __FUNCTION__, tex_name.c_str(), cNameSect().c_str());
+            continue;
+        }
+
+        auto* tex = textures.front();
+        tex->Unload();
+        tex->Load(bullet_texrure_name.c_str());
+        current_bullet_texture = bullet_texrure_name;
+        //Msg("--[%s] replaced texture [%s] --> [%s] for [%s]", __FUNCTION__, tex_name.c_str(), current_bullet_texture.c_str(), cNameSect().c_str());
+    }
+}
