@@ -53,7 +53,10 @@ void CCustomDetector::shedule_Update(u32 dt)
     inherited::shedule_Update(dt);
 
     if (!IsPowerOn())
+    {
+        DisableUIDetection();
         return;
+    }
 
     Position().set(H_Parent()->Position());
 
