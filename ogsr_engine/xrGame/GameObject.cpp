@@ -100,7 +100,7 @@ void CGameObject::Load(LPCSTR section)
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_hidden_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_hidden_meshes.push_back(u8(atoi(mesh_num)));
         }
 }
 

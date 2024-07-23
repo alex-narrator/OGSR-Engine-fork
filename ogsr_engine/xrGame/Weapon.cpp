@@ -2100,7 +2100,7 @@ void CWeapon::LoadAddonMeshes(LPCSTR section)
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_scope_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_scope_meshes.push_back(u8(atoi(mesh_num)));
         }
     str = READ_IF_EXISTS(pSettings, r_string, section, "silencer_meshes", nullptr);
     if (str)
@@ -2108,7 +2108,7 @@ void CWeapon::LoadAddonMeshes(LPCSTR section)
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_silencer_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_silencer_meshes.push_back(u8(atoi(mesh_num)));
         }
     str = READ_IF_EXISTS(pSettings, r_string, section, "launcher_meshes", nullptr);
     if (str)
@@ -2116,7 +2116,7 @@ void CWeapon::LoadAddonMeshes(LPCSTR section)
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_launcher_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_launcher_meshes.push_back(u8(atoi(mesh_num)));
         }
     str = READ_IF_EXISTS(pSettings, r_string, section, "laser_meshes", nullptr);
     if (str)
@@ -2132,7 +2132,7 @@ void CWeapon::LoadAddonMeshes(LPCSTR section)
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_flashlight_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_flashlight_meshes.push_back(u8(atoi(mesh_num)));
         }
     str = READ_IF_EXISTS(pSettings, r_string, section, "magazine_meshes", nullptr);
     if (str)
@@ -2140,7 +2140,7 @@ void CWeapon::LoadAddonMeshes(LPCSTR section)
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_magazine_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_magazine_meshes.push_back(u8(atoi(mesh_num)));
         }
     str = READ_IF_EXISTS(pSettings, r_string, section, "stock_meshes", nullptr);
     if (str)
@@ -2148,7 +2148,7 @@ void CWeapon::LoadAddonMeshes(LPCSTR section)
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_stock_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_stock_meshes.push_back(u8(atoi(mesh_num)));
         }
 }
 
@@ -2160,7 +2160,7 @@ void CWeapon::LoadAddonMeshesHud()
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_scope_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_scope_meshes_hud.push_back(u8(atoi(mesh_num)));
         }
     str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "silencer_meshes", nullptr);
     if (str)
@@ -2168,7 +2168,7 @@ void CWeapon::LoadAddonMeshesHud()
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_silencer_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_silencer_meshes_hud.push_back(u8(atoi(mesh_num)));
         }
     str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "launcher_meshes", nullptr);
     if (str)
@@ -2176,7 +2176,7 @@ void CWeapon::LoadAddonMeshesHud()
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_launcher_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_launcher_meshes_hud.push_back(u8(atoi(mesh_num)));
         }
     str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "laser_meshes", nullptr);
     if (str)
@@ -2184,7 +2184,7 @@ void CWeapon::LoadAddonMeshesHud()
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_laser_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_laser_meshes_hud.push_back(u8(atoi(mesh_num)));
         }
     str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "flashlight_meshes", nullptr);
     if (str)
@@ -2192,7 +2192,7 @@ void CWeapon::LoadAddonMeshesHud()
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_flashlight_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_flashlight_meshes_hud.push_back(u8(atoi(mesh_num)));
         }
     str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "magazine_meshes", nullptr);
     if (str)
@@ -2200,7 +2200,7 @@ void CWeapon::LoadAddonMeshesHud()
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_magazine_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_magazine_meshes_hud.push_back(u8(atoi(mesh_num)));
         }
     str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "stock_meshes", nullptr);
     if (str)
@@ -2208,6 +2208,6 @@ void CWeapon::LoadAddonMeshesHud()
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_stock_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_stock_meshes_hud.push_back(u8(atoi(mesh_num)));
         }
 }

@@ -231,18 +231,18 @@ void player_hud::tune(const Ivector& _values)
             if (values.x)
                 diff.x = (values.x > 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
             if (values.y)
-                diff.y = (values.y < 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
+                diff.y = (values.y > 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
             if (values.z)
-                diff.z = (values.z < 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
+                diff.z = (values.z > 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
 
             pos_.add(diff);
         }
         else if (g_bHudAdjustMode == HUD_ROT)
         {
             if (values.x)
-                diff.y = (values.x > 0) ? _curr_dr : -_curr_dr;
+                diff.x = (values.x > 0) ? _curr_dr : -_curr_dr;
             if (values.y)
-                diff.x = (values.y > 0) ? _curr_dr : -_curr_dr;
+                diff.y = (values.y > 0) ? _curr_dr : -_curr_dr;
             if (values.z)
                 diff.z = (values.z > 0) ? _curr_dr : -_curr_dr;
 

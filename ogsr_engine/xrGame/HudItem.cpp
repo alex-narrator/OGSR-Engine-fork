@@ -85,7 +85,7 @@ void CHudItem::Load(LPCSTR section)
             {
                 string128 mesh_num;
                 _GetItem(str, i, mesh_num);
-                m_hidden_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+                m_hidden_meshes_hud.push_back(u8(atoi(mesh_num)));
             }
     }
 
@@ -1633,7 +1633,7 @@ void CHudItem::SetHudSection(shared_str sect)
         {
             string128 mesh_num;
             _GetItem(str, i, mesh_num);
-            m_hidden_meshes_hud.push_back(atoi(_GetItem(str, i, mesh_num)));
+            m_hidden_meshes_hud.push_back(u8(atoi(mesh_num)));
         }
 
     auto hi = HudItemData();
