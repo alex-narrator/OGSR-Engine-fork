@@ -26,7 +26,10 @@
 #include "ui\UIScriptWnd.h"
 #include "ui_base.h"
 
+#include "../../xr_3da/igame_persistent.h"
+
 ENGINE_API extern float psHUD_FOV_def;
+extern ENGINE_API float psHUD_FOV;
 
 // Загрузка параметров инерции --#SM+# Begin--
 constexpr float PITCH_OFFSET_R = 0.0f; // Насколько сильно ствол смещается вбок (влево) при вертикальных поворотах камеры
@@ -1547,17 +1550,17 @@ void CHudItem::GetBoneOffsetPosDir(const shared_str& bone_name, Fvector& dest_po
     HudItemData()->m_item_transform.transform_dir(dest_dir);
 }
 
-void CHudItem::CorrectDirFromWorldToHud(Fvector& dir)
+void CHudItem::CorrectDirFromWorldToHud(Fvector& worldPos)
 {
-    const auto& CamDir = Device.vCameraDirection;
-    const float Fov = Device.fFOV;
-    extern ENGINE_API float psHUD_FOV;
-    const float HudFov = psHUD_FOV < 1.f ? psHUD_FOV * Device.fFOV : psHUD_FOV;
-    const float diff = hud_recalc_koef * Fov / HudFov;
-    dir.sub(CamDir);
-    dir.mul(diff);
-    dir.add(CamDir);
-    dir.normalize();
+    Fmatrix hud_project;
+    hud_project.build_projection(deg2rad(psHUD_FOV <= 1.f ? psHUD_FOV * Device.fFOV : psHUD_FOV), Device.fASPECT, HUD_VIEWPORT_NEAR,
+                                 g_pGamePersistent->Environment().CurrentEnv->far_plane);
+
+    Device.mView.transform_dir(worldPos);
+    hud_project.transform_dir(worldPos);
+
+    Fmatrix{Device.mProject}.invert().transform_dir(worldPos);
+    Fmatrix{Device.mView}.invert().transform_dir(worldPos);
 }
 
 //void CHudItem::TimeLockAnimation()

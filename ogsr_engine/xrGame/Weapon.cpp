@@ -318,8 +318,6 @@ void CWeapon::Load(LPCSTR section)
 
     m_fZoomFactor = CurrentZoomFactor();
 
-    m_highlightAddons.clear();
-
     LPCSTR str{};
     if (m_eScopeStatus == ALife::eAddonAttachable)
     {
@@ -331,7 +329,6 @@ void CWeapon::Load(LPCSTR section)
                 string128 scope_section;
                 _GetItem(str, i, scope_section);
                 m_scopes.push_back(scope_section);
-                m_highlightAddons.push_back(scope_section);
             }
         }
     }
@@ -345,7 +342,6 @@ void CWeapon::Load(LPCSTR section)
                 string128 silencer_section;
                 _GetItem(str, i, silencer_section);
                 m_silencers.push_back(silencer_section);
-                m_highlightAddons.push_back(silencer_section);
             }
         }
     }
@@ -359,7 +355,6 @@ void CWeapon::Load(LPCSTR section)
                 string128 glauncher_section;
                 _GetItem(str, i, glauncher_section);
                 m_glaunchers.push_back(glauncher_section);
-                m_highlightAddons.push_back(glauncher_section);
             }
         }
     }
@@ -373,7 +368,6 @@ void CWeapon::Load(LPCSTR section)
                 string128 laser_section;
                 _GetItem(str, i, laser_section);
                 m_lasers.push_back(laser_section);
-                m_highlightAddons.push_back(laser_section);
             }
         }
     }
@@ -387,7 +381,6 @@ void CWeapon::Load(LPCSTR section)
                 string128 flashlight_section;
                 _GetItem(str, i, flashlight_section);
                 m_flashlights.push_back(flashlight_section);
-                m_highlightAddons.push_back(flashlight_section);
             }
         }
     }
@@ -401,7 +394,6 @@ void CWeapon::Load(LPCSTR section)
                 string128 stock_section;
                 _GetItem(str, i, stock_section);
                 m_stocks.push_back(stock_section);
-                m_highlightAddons.push_back(stock_section);
             }
         }
     }
@@ -415,7 +407,6 @@ void CWeapon::Load(LPCSTR section)
                 string128 extender_section;
                 _GetItem(str, i, extender_section);
                 m_extenders.push_back(extender_section);
-                m_highlightAddons.push_back(extender_section);
             }
         }
     }
@@ -429,7 +420,6 @@ void CWeapon::Load(LPCSTR section)
                 string128 forend_section;
                 _GetItem(str, i, forend_section);
                 m_forends.push_back(forend_section);
-                m_highlightAddons.push_back(forend_section);
             }
         }
     }
@@ -442,7 +432,6 @@ void CWeapon::Load(LPCSTR section)
             string128 mag_section;
             _GetItem(str, i, mag_section);
             m_magazines.push_back(mag_section);
-            m_highlightAddons.push_back(mag_section);
         }
     }
 
