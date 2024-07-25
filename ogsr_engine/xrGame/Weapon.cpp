@@ -882,10 +882,43 @@ void CWeapon::renderable_Render()
     // нарисовать подсветку
     RenderLight();
 
+    for (const auto& addon : m_addons_visual)
+    {
+        Fmatrix m_res{};
+        auto visual = Visual()->dcast_PKinematics();
+        u16 bone_id = visual->LL_BoneID(addon->bone_name);
+        Fmatrix bone_trans = visual->LL_GetTransform(bone_id);
+
+        m_res.mul(bone_trans, addon->visual_offset);
+        m_res.mulA_43(XFORM());
+
+        ::Render->set_Transform(&m_res);
+        ::Render->add_Visual(addon->visual);
+    }
+
     inherited::renderable_Render();
 }
 
 bool CWeapon::need_renderable() { return !Device.m_SecondViewport.IsSVPFrame() /*&& !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom())*/; }
+
+void CWeapon::render_hud_mode()
+{
+    for (const auto& addon : m_addons_visual_hud)
+    {
+        Fmatrix m_res{};
+        auto visual = HudItemData()->m_model;
+        u16 bone_id = visual->LL_BoneID(addon->bone_name);
+        Fmatrix bone_trans = visual->LL_GetTransform(bone_id);
+
+        m_res.mul(bone_trans, addon->visual_offset);
+        m_res.mulA_43(HudItemData()->m_item_transform);
+
+        ::Render->set_Transform(&m_res);
+        ::Render->add_Visual(addon->visual);
+    }
+
+    inherited::render_hud_mode();
+}
 
 void CWeapon::signal_HideComplete()
 {
@@ -1182,8 +1215,6 @@ void CWeapon::UpdateHUDAddonsVisibility()
     if (!GetHUDmode())
         return;
 
-    auto pWeaponVisual = smart_cast<IKinematics*>(Visual());
-
     if (AddonAttachable(eScope))
     {
         LPCSTR scope_hud_sect = READ_IF_EXISTS(pSettings, r_string, cNameSect(), "hud", nullptr);
@@ -1204,12 +1235,14 @@ void CWeapon::UpdateHUDAddonsVisibility()
         HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, IsAddonAttached(eScope), TRUE);
     }
 
+    InitAddonsVisualHud();
+
     if (m_eScopeStatus == ALife::eAddonDisabled)
         HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, FALSE, TRUE);
     else if (m_eScopeStatus == ALife::eAddonPermanent)
         HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, TRUE, TRUE);
 
-    if (pWeaponVisual->LL_BoneID(m_sHud_wpn_silencer_bone) != BI_NONE)
+    if (HudItemData()->m_model->LL_BoneID(m_sHud_wpn_silencer_bone) != BI_NONE)
     {
         if (AddonAttachable(eSilencer))
         {
@@ -1290,6 +1323,8 @@ void CWeapon::UpdateAddonsVisibility()
             pWeaponVisual = smart_cast<IKinematics*>(Visual());
         }
     }
+
+    InitAddonsVisual();
 
     ///////////////////////////////////////////////////////////////////
     u16 bone_id{};
@@ -2199,4 +2234,140 @@ void CWeapon::LoadAddonMeshesHud()
             _GetItem(str, i, mesh_num);
             m_stock_meshes_hud.push_back(u8(atoi(mesh_num)));
         }
+}
+
+/////////////////////////////////////////////////////visual addon attach/////////////////////////////////////////////////////////////
+
+LPCSTR param_names[] = {
+    "attach_visual",
+    "attach_visual_bone",
+    "attach_visual_offset_rot",
+    "attach_visual_offset_pos",
+    "attach_visual_hidden_meshes",
+};
+
+LPCSTR param_names_hud[] = {
+    "attach_visual_hud",
+    "attach_visual_hud_bone",
+    "attach_visual_hud_offset_rot",
+    "attach_visual_hud_offset_pos",
+    "attach_visual_hud_hidden_meshes",
+};
+
+LPCSTR prefix_name[] = {
+    "silencer",
+    "scope",
+    "grenade_launcher",
+    "laser",
+    "flashlight",
+    "stock",
+    "extender",
+    "forend",
+    "magazine",
+};
+
+void CWeapon::InitAddonsVisual()
+{
+    m_addons_visual.clear();
+
+    LPCSTR addon_name{};
+
+    for (u32 i = 0; i < eMaxAddon; i++)
+    {
+        if (IsAddonAttached(i))
+        {
+            addon_name = AddonAttachable(i) ? GetAddonName(i).c_str() : prefix_name[i];
+            string1024 res_sect{};
+            sprintf(res_sect, "%s_%s", addon_name, param_names[0]);
+            LPCSTR visual_name = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+            if (visual_name)
+            {
+                auto addon = new (addon_attach)();
+                addon->visual_name = visual_name;
+
+                addon->visual = ::Render->model_Create(addon->visual_name);
+
+                auto addon_hud_visual = smart_cast<IKinematics*>(addon->visual);
+
+                sprintf(res_sect, "%s_%s", addon_name, param_names[1]);
+                addon->bone_name = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, "wpn_body");
+
+                sprintf(res_sect, "%s_%s", addon_name, param_names[2]);
+                Fvector angle_offset = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
+                addon->visual_offset.setHPB(VPUSH(angle_offset));
+
+                sprintf(res_sect, "%s_%s", addon_name, param_names[3]);
+                addon->visual_offset.c = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
+
+                sprintf(res_sect, "%s_%s", addon_name, param_names[4]);
+
+                LPCSTR str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+                if (str)
+                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+                    {
+                        string128 mesh_num;
+                        _GetItem(str, i, mesh_num);
+                        addon_hud_visual->SetRFlag(u8(atoi(mesh_num)), false);
+                    }
+
+                addon_hud_visual->CalculateBones_Invalidate();
+                addon_hud_visual->CalculateBones();
+
+                m_addons_visual.push_back(addon);
+            }
+        }
+    }
+}
+
+void CWeapon::InitAddonsVisualHud()
+{ 
+    m_addons_visual_hud.clear();
+
+    LPCSTR addon_name{};
+
+    for (u32 i = 0; i < eMaxAddon; i++)
+    {
+        if (IsAddonAttached(i))
+        {
+            addon_name = AddonAttachable(i) ? GetAddonName(i).c_str() : prefix_name[i];
+            string1024 res_sect{};
+            sprintf(res_sect, "%s_%s", addon_name, param_names_hud[0]);
+            LPCSTR visual_name = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+            if (visual_name)
+            {
+                auto addon = new (addon_attach)();
+                addon->visual_name = visual_name;
+
+                addon->visual = ::Render->model_Create(addon->visual_name);
+
+                auto addon_hud_visual = smart_cast<IKinematics*>(addon->visual);
+
+                sprintf(res_sect, "%s_%s", addon_name, param_names_hud[1]);
+                addon->bone_name = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, "wpn_body");
+
+                sprintf(res_sect, "%s_%s", addon_name, param_names_hud[2]);
+                Fvector angle_offset = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
+                addon->visual_offset.setHPB(VPUSH(angle_offset));
+
+                sprintf(res_sect, "%s_%s", addon_name, param_names_hud[3]);
+                addon->visual_offset.c = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
+
+                sprintf(res_sect, "%s_%s", addon_name, param_names_hud[4]);
+
+                LPCSTR str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+                if (str)
+                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+                    {
+                        string128 mesh_num;
+                        _GetItem(str, i, mesh_num);
+                        addon_hud_visual->SetRFlag(u8(atoi(mesh_num)), false);
+                    }
+
+                addon_hud_visual->CalculateBones_Invalidate();
+                addon_hud_visual->CalculateBones();
+
+                m_addons_visual_hud.push_back(addon);
+            }
+        }
+    }
 }

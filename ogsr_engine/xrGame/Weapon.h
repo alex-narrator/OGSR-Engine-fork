@@ -28,6 +28,24 @@ constexpr float def_zoom_step_count = 4.0f;
 
 extern enum eWeaponAddonType { eSilencer, eScope, eLauncher, eLaser, eFlashlight, eStock, eExtender, eForend, eMagazine, eMaxAddon };
 
+struct addon_attach
+{
+    LPCSTR visual_name{};
+    IRenderVisual* visual{};
+    LPCSTR bone_name{};
+    Fmatrix visual_offset{};
+
+    addon_attach() = default;
+    ~addon_attach()
+    {
+        if (visual)
+        {
+            ::Render->model_Delete(visual);
+            visual = nullptr;
+        }
+    };
+};
+
 class CWeapon : public CHudItemObject, public CShootingObject
 {
     friend class CWeaponScript;
@@ -59,6 +77,7 @@ public:
 
     virtual void renderable_Render();
     virtual bool need_renderable();
+    virtual void render_hud_mode();
 
     virtual void OnH_B_Chield();
     virtual void OnH_A_Chield();
@@ -585,6 +604,10 @@ public:
     IC void ReloadWeapon() { Reload(); };
     virtual bool TryToGetAmmo(u32) { return true; };
 
+    //візуали адонів для атачу до зброї
+    xr_vector<addon_attach*> m_addons_visual{};
+    xr_vector<addon_attach*> m_addons_visual_hud{};
+
     xr_vector<shared_str> m_scopes{};
     u8 m_cur_scope{};
 
@@ -652,4 +675,7 @@ public:
 
     void LoadAddonMeshes(LPCSTR);
     void LoadAddonMeshesHud();
+
+    virtual void InitAddonsVisual();
+    virtual void InitAddonsVisualHud();
 };
