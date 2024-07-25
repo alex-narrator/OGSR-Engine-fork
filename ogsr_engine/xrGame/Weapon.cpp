@@ -1235,8 +1235,6 @@ void CWeapon::UpdateHUDAddonsVisibility()
         HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, IsAddonAttached(eScope), TRUE);
     }
 
-    InitAddonsVisualHud();
-
     if (m_eScopeStatus == ALife::eAddonDisabled)
         HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, FALSE, TRUE);
     else if (m_eScopeStatus == ALife::eAddonPermanent)
@@ -1280,19 +1278,21 @@ void CWeapon::UpdateHUDAddonsVisibility()
         HudItemData()->set_bone_visible(bone_name, FALSE, TRUE);
 
     // addon meshes
+    const auto weapon_visual = HudItemData()->m_model;
     for (const auto& mesh_idx : m_scope_meshes_hud)
-        HudItemData()->m_model->SetRFlag(mesh_idx, IsAddonAttached(eScope));
+        weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eScope));
     for (const auto& mesh_idx : m_silencer_meshes_hud)
-        HudItemData()->m_model->SetRFlag(mesh_idx, IsAddonAttached(eSilencer));
+        weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eSilencer));
     for (const auto& mesh_idx : m_launcher_meshes_hud)
-        HudItemData()->m_model->SetRFlag(mesh_idx, IsAddonAttached(eLauncher));
+        weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eLauncher));
     for (const auto& mesh_idx : m_laser_meshes_hud)
-        HudItemData()->m_model->SetRFlag(mesh_idx, IsAddonAttached(eLaser));
+        weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eLaser));
     for (const auto& mesh_idx : m_flashlight_meshes_hud)
-        HudItemData()->m_model->SetRFlag(mesh_idx, IsAddonAttached(eFlashlight));
+        weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eFlashlight));
     for (const auto& mesh_idx : m_stock_meshes_hud)
-        HudItemData()->m_model->SetRFlag(mesh_idx, IsAddonAttached(eStock));
+        weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eStock));
     //
+    InitAddonsVisualHud();
 
     callback(GameObject::eOnUpdateHUDAddonsVisibiility)();
 }
@@ -1323,8 +1323,6 @@ void CWeapon::UpdateAddonsVisibility()
             pWeaponVisual = smart_cast<IKinematics*>(Visual());
         }
     }
-
-    InitAddonsVisual();
 
     ///////////////////////////////////////////////////////////////////
     u16 bone_id{};
@@ -1426,6 +1424,7 @@ void CWeapon::UpdateAddonsVisibility()
     for (const auto& mesh_idx : m_stock_meshes)
         pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eStock));
     //
+    InitAddonsVisual();
 
     callback(GameObject::eOnUpdateAddonsVisibiility)();
 
@@ -2244,6 +2243,8 @@ LPCSTR param_names[] = {
     "attach_visual_offset_rot",
     "attach_visual_offset_pos",
     "attach_visual_hidden_meshes",
+    "attach_visual_hidden_meshes_weapon",
+    "attach_visual_hidden_bones_weapon",
 };
 
 LPCSTR param_names_hud[] = {
@@ -2252,6 +2253,8 @@ LPCSTR param_names_hud[] = {
     "attach_visual_hud_offset_rot",
     "attach_visual_hud_offset_pos",
     "attach_visual_hud_hidden_meshes",
+    "attach_visual_hud_hidden_meshes_weapon",
+    "attach_visual_hud_hidden_bones_weapon",
 };
 
 LPCSTR prefix_name[] = {
@@ -2300,7 +2303,6 @@ void CWeapon::InitAddonsVisual()
                 addon->visual_offset.c = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[4]);
-
                 LPCSTR str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
                 if (str)
                     for (int i = 0, count = _GetItemCount(str); i < count; ++i)
@@ -2312,6 +2314,30 @@ void CWeapon::InitAddonsVisual()
 
                 addon_hud_visual->CalculateBones_Invalidate();
                 addon_hud_visual->CalculateBones();
+
+                auto weapon_visual = Visual()->dcast_PKinematics();
+
+                sprintf(res_sect, "%s_%s", addon_name, param_names[5]);
+                str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+                if (str)
+                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+                    {
+                        string128 mesh_num;
+                        _GetItem(str, i, mesh_num);
+                        weapon_visual->SetRFlag(u8(atoi(mesh_num)), false);
+                    }
+
+                sprintf(res_sect, "%s_%s", addon_name, param_names[6]);
+                str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+                if (str)
+                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+                    {
+                        string128 bone_name;
+                        _GetItem(str, i, bone_name);
+                        u16 bone_id = weapon_visual->LL_BoneID(bone_name);
+                        if (bone_id != BI_NONE && weapon_visual->LL_GetBoneVisible(bone_id))
+                            weapon_visual->LL_SetBoneVisible(bone_id, FALSE, TRUE);
+                    }
 
                 m_addons_visual.push_back(addon);
             }
@@ -2353,7 +2379,6 @@ void CWeapon::InitAddonsVisualHud()
                 addon->visual_offset.c = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names_hud[4]);
-
                 LPCSTR str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
                 if (str)
                     for (int i = 0, count = _GetItemCount(str); i < count; ++i)
@@ -2365,6 +2390,28 @@ void CWeapon::InitAddonsVisualHud()
 
                 addon_hud_visual->CalculateBones_Invalidate();
                 addon_hud_visual->CalculateBones();
+
+                auto hid = HudItemData();
+
+                sprintf(res_sect, "%s_%s", addon_name, param_names_hud[5]);
+                str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+                if (str)
+                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+                    {
+                        string128 mesh_num;
+                        _GetItem(str, i, mesh_num);
+                        hid->m_model->SetRFlag(u8(atoi(mesh_num)), false);
+                    }
+
+                sprintf(res_sect, "%s_%s", addon_name, param_names[6]);
+                str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+                if (str)
+                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+                    {
+                        string128 bone_name;
+                        _GetItem(str, i, bone_name);
+                        hid->set_bone_visible(bone_name, FALSE, TRUE);
+                    }
 
                 m_addons_visual_hud.push_back(addon);
             }

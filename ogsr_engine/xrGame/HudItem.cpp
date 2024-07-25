@@ -377,12 +377,6 @@ void CHudItem::UpdateCL()
         }
         if (script_ui)
             script_ui->Update();
-
-        auto hi = HudItemData();
-        if (hi)
-            for (const auto& mesh_idx : m_hidden_meshes_hud)
-                if (hi->m_model->GetRFlag(mesh_idx))
-                    hi->m_model->SetRFlag(mesh_idx, false);
     }
 }
 
@@ -443,6 +437,12 @@ void CHudItem::on_a_hud_attach()
         else
             Msg("[%s]: Script UI functor [%s] does not exist!", object().cNameSect().c_str(), script_ui_funct);
     }
+
+    const auto hi = HudItemData();
+    if (hi)
+        for (const auto& mesh_idx : m_hidden_meshes_hud)
+            if (hi->m_model->GetRFlag(mesh_idx))
+                hi->m_model->SetRFlag(mesh_idx, false);
 }
 
 void CHudItem::render_item_3d_ui()
