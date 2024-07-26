@@ -2280,7 +2280,7 @@ void CWeapon::InitAddonsVisual()
 
                 addon->visual = ::Render->model_Create(addon->visual_name);
 
-                auto addon_hud_visual = smart_cast<IKinematics*>(addon->visual);
+                auto addon_visual = smart_cast<IKinematics*>(addon->visual);
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[1]);
                 addon->bone_name = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, "wpn_body");
@@ -2299,11 +2299,15 @@ void CWeapon::InitAddonsVisual()
                     {
                         string128 mesh_num;
                         _GetItem(str, i, mesh_num);
-                        addon_hud_visual->SetRFlag(u8(atoi(mesh_num)), false);
+                        u8 mesh_idx = u8(atoi(mesh_num));
+                        if (mesh_idx >= addon_visual->RChildCount())
+                            Msg("! [%s]: addon visual %s - wrong addon hidden mesh [%u/%u]", __FUNCTION__, visual_name, mesh_idx, addon_visual->RChildCount() - 1);
+                        else
+                            addon_visual->SetRFlag(mesh_idx, false);
                     }
 
-                addon_hud_visual->CalculateBones_Invalidate();
-                addon_hud_visual->CalculateBones();
+                addon_visual->CalculateBones_Invalidate();
+                addon_visual->CalculateBones();
 
                 auto weapon_visual = Visual()->dcast_PKinematics();
 
@@ -2314,7 +2318,11 @@ void CWeapon::InitAddonsVisual()
                     {
                         string128 mesh_num;
                         _GetItem(str, i, mesh_num);
-                        weapon_visual->SetRFlag(u8(atoi(mesh_num)), false);
+                        u8 mesh_idx = u8(atoi(mesh_num));
+                        if (mesh_idx >= weapon_visual->RChildCount())
+                            Msg("! [%s]: addon visual %s - wrong weapon hidden mesh [%u/%u]", __FUNCTION__, visual_name, mesh_idx, weapon_visual->RChildCount() - 1);
+                        else
+                            weapon_visual->SetRFlag(mesh_idx, false);
                     }
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[6]);
@@ -2356,7 +2364,7 @@ void CWeapon::InitAddonsVisualHud()
 
                 addon->visual = ::Render->model_Create(addon->visual_name);
 
-                auto addon_hud_visual = smart_cast<IKinematics*>(addon->visual);
+                auto addon_visual = smart_cast<IKinematics*>(addon->visual);
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[1]);
                 addon->bone_name = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, "wpn_body");
@@ -2375,13 +2383,18 @@ void CWeapon::InitAddonsVisualHud()
                     {
                         string128 mesh_num;
                         _GetItem(str, i, mesh_num);
-                        addon_hud_visual->SetRFlag(u8(atoi(mesh_num)), false);
+                        u8 mesh_idx = u8(atoi(mesh_num));
+                        if (mesh_idx >= addon_visual->RChildCount())
+                            Msg("! [%s]: addon visual %s - wrong addon hidden mesh [%u/%u]", __FUNCTION__, visual_name, mesh_idx, addon_visual->RChildCount() - 1);
+                        else
+                            addon_visual->SetRFlag(mesh_idx, false);
                     }
 
-                addon_hud_visual->CalculateBones_Invalidate();
-                addon_hud_visual->CalculateBones();
+                addon_visual->CalculateBones_Invalidate();
+                addon_visual->CalculateBones();
 
                 auto hid = HudItemData();
+                auto weapon_visual = hid->m_model;
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[5]);
                 str = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, nullptr);
@@ -2390,7 +2403,11 @@ void CWeapon::InitAddonsVisualHud()
                     {
                         string128 mesh_num;
                         _GetItem(str, i, mesh_num);
-                        hid->m_model->SetRFlag(u8(atoi(mesh_num)), false);
+                        u8 mesh_idx = u8(atoi(mesh_num));
+                        if (mesh_idx >= weapon_visual->RChildCount())
+                            Msg("! [%s]: addon visual %s - wrong weapon hidden mesh [%u/%u]", __FUNCTION__, visual_name, mesh_idx, weapon_visual->RChildCount() - 1);
+                        else
+                            weapon_visual->SetRFlag(mesh_idx, false);
                     }
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[6]);
