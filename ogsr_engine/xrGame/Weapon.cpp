@@ -2239,22 +2239,12 @@ void CWeapon::LoadAddonMeshesHud()
 
 LPCSTR param_names[] = {
     "attach_visual",
-    "attach_visual_bone",
-    "attach_visual_offset_rot",
-    "attach_visual_offset_pos",
-    "attach_visual_hidden_meshes",
-    "attach_visual_hidden_meshes_weapon",
-    "attach_visual_hidden_bones_weapon",
-};
-
-LPCSTR param_names_hud[] = {
-    "attach_visual_hud",
-    "attach_visual_hud_bone",
-    "attach_visual_hud_offset_rot",
-    "attach_visual_hud_offset_pos",
-    "attach_visual_hud_hidden_meshes",
-    "attach_visual_hud_hidden_meshes_weapon",
-    "attach_visual_hud_hidden_bones_weapon",
+    "attach_bone",
+    "attach_rot",
+    "attach_pos",
+    "attach_hidden_meshes",
+    "attach_hidden_meshes_weapon",
+    "attach_hidden_bones_weapon",
 };
 
 LPCSTR prefix_name[] = {
@@ -2357,8 +2347,8 @@ void CWeapon::InitAddonsVisualHud()
         {
             addon_name = AddonAttachable(i) ? GetAddonName(i).c_str() : prefix_name[i];
             string1024 res_sect{};
-            sprintf(res_sect, "%s_%s", addon_name, param_names_hud[0]);
-            LPCSTR visual_name = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+            sprintf(res_sect, "%s_%s", addon_name, param_names[0]);
+            LPCSTR visual_name = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, nullptr);
             if (visual_name)
             {
                 auto addon = new (addon_attach)();
@@ -2368,18 +2358,18 @@ void CWeapon::InitAddonsVisualHud()
 
                 auto addon_hud_visual = smart_cast<IKinematics*>(addon->visual);
 
-                sprintf(res_sect, "%s_%s", addon_name, param_names_hud[1]);
-                addon->bone_name = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, "wpn_body");
+                sprintf(res_sect, "%s_%s", addon_name, param_names[1]);
+                addon->bone_name = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, "wpn_body");
 
-                sprintf(res_sect, "%s_%s", addon_name, param_names_hud[2]);
-                Fvector angle_offset = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
+                sprintf(res_sect, "%s_%s", addon_name, param_names[2]);
+                Fvector angle_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, res_sect, Fvector{});
                 addon->visual_offset.setHPB(VPUSH(angle_offset));
 
-                sprintf(res_sect, "%s_%s", addon_name, param_names_hud[3]);
-                addon->visual_offset.c = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
+                sprintf(res_sect, "%s_%s", addon_name, param_names[3]);
+                addon->visual_offset.c = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, res_sect, Fvector{});
 
-                sprintf(res_sect, "%s_%s", addon_name, param_names_hud[4]);
-                LPCSTR str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+                sprintf(res_sect, "%s_%s", addon_name, param_names[4]);
+                LPCSTR str = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, nullptr);
                 if (str)
                     for (int i = 0, count = _GetItemCount(str); i < count; ++i)
                     {
@@ -2393,8 +2383,8 @@ void CWeapon::InitAddonsVisualHud()
 
                 auto hid = HudItemData();
 
-                sprintf(res_sect, "%s_%s", addon_name, param_names_hud[5]);
-                str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+                sprintf(res_sect, "%s_%s", addon_name, param_names[5]);
+                str = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, nullptr);
                 if (str)
                     for (int i = 0, count = _GetItemCount(str); i < count; ++i)
                     {
@@ -2404,7 +2394,7 @@ void CWeapon::InitAddonsVisualHud()
                     }
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[6]);
-                str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+                str = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, nullptr);
                 if (str)
                     for (int i = 0, count = _GetItemCount(str); i < count; ++i)
                     {
