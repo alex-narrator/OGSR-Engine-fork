@@ -6,11 +6,11 @@ CWeaponSVD::CWeaponSVD(void) : CWeaponCustomPistol("SVD") {}
 
 CWeaponSVD::~CWeaponSVD(void) {}
 
-//void CWeaponSVD::switch2_Fire()
-//{
-//    SetPending(TRUE);
-//    inherited::switch2_Fire();
-//}
+void CWeaponSVD::switch2_Fire()
+{
+    SetPending(TRUE);
+    inherited::switch2_Fire();
+}
 
 using namespace luabind;
 

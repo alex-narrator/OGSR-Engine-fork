@@ -112,7 +112,7 @@ void attachable_hud_item::tune(const Ivector& values)
             if (values.y)
                 diff.y = (values.y > 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
             if (values.z)
-                diff.z = (values.z < 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
+                diff.z = (values.z > 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
 
             Fvector d;
             Fmatrix ancor_m;

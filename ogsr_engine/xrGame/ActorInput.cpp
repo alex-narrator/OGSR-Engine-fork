@@ -263,9 +263,9 @@ void CActor::IR_OnKeyboardHold(int cmd)
     if (g_bHudAdjustMode && pInput->iGetAsyncKeyState(DIK_LSHIFT))
     {
         if (pInput->iGetAsyncKeyState(DIK_UP))
-            g_player_hud->tune(Ivector{0, -1, 0});
-        else if (pInput->iGetAsyncKeyState(DIK_DOWN))
             g_player_hud->tune(Ivector{0, 1, 0});
+        else if (pInput->iGetAsyncKeyState(DIK_DOWN))
+            g_player_hud->tune(Ivector{0, -1, 0});
         else if (pInput->iGetAsyncKeyState(DIK_LEFT))
             g_player_hud->tune(Ivector{-1, 0, 0});
         else if (pInput->iGetAsyncKeyState(DIK_RIGHT))
