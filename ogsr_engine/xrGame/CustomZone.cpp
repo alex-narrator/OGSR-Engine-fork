@@ -327,7 +327,7 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
     m_dwPeriod = pSettings->r_u32(cNameSect(), "period");
     m_owner_id = Z->m_owner_id;
     m_zone_ttl = Z->m_zone_ttl;
-    if (m_owner_id != u32(-1))
+    if (m_owner_id != u32(-1) && m_zone_ttl != u32(-1))
     {
         m_ttl = Device.dwTimeGlobal + 1000 * m_zone_ttl; // ttl in seconds
         Msg("anomaly [%s] spawned with ttl [%d], m_fMaxPower [%.4f]", Name_script(), m_zone_ttl, m_fMaxPower);
@@ -584,7 +584,7 @@ void CCustomZone::shedule_Update(u32 dt)
 
     UpdateOnOffState();
 
-    if (Device.dwTimeGlobal > m_ttl || LastBlowoutTime && (Device.dwTimeGlobal - LastBlowoutTime) > 300)
+    if (m_ttl != u32(-1) && Device.dwTimeGlobal > m_ttl || LastBlowoutTime && (Device.dwTimeGlobal - LastBlowoutTime) > 300)
         DestroyObject();
 }
 
@@ -1427,6 +1427,8 @@ void CCustomZone::enter_Zone(SZoneObjectInfo& io) { callback(GameObject::eZoneEn
 void CCustomZone::exit_Zone(SZoneObjectInfo& io)
 {
     StopObjectIdleParticles(io.object);
+    if (getDestroy())
+        return;
     callback(GameObject::eZoneExit)(lua_game_object(), io.object->lua_game_object());
 }
 
