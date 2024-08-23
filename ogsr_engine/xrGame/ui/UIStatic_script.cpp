@@ -75,6 +75,8 @@ void CUIStatic::script_register(lua_State* L)
                   .def("GetHeading", &CUIStatic::GetHeading)
                   .def("EnableHeading", &CUIStatic::EnableHeading)
                   .def("SetHeadingPivot", &CUIStatic::SetHeadingPivot)
+                  .def("SetConstHeading", &CUIStatic::SetConstHeading)
+                  .def("GetConstHeading", &CUIStatic::GetConstHeading)
 
                   .def("ClipperOn", &CUIStatic::ClipperOn)
                   .def("ClipperOff", (void(CUIStatic::*)(void)) & CUIStatic::ClipperOff)

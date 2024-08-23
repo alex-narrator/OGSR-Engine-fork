@@ -361,7 +361,7 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
         if (map->IsRectVisible(wnd_rect))
         {
             // update heading if needed
-            if (!IsUserDefined() && sp->Heading())
+            if (!IsUserDefined() && sp->Heading() && !sp->GetConstHeading())
             {
                 Fvector2 dir_global = Direction();
                 float h = dir_global.getH();

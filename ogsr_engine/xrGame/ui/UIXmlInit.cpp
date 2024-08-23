@@ -177,6 +177,14 @@ bool CUIXmlInit::InitStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* 
 
     pWnd->EnableHeading(!!xml_doc.ReadAttribInt(path, index, "heading", 0));
 
+	float heading_angle = xml_doc.ReadAttribFlt(path, index, "heading_angle", 0.0f);
+    if (!fis_zero(heading_angle))
+    {
+        pWnd->EnableHeading(true);
+        pWnd->SetConstHeading(true);
+        pWnd->SetHeading(deg2rad(heading_angle));
+    }
+
     LPCSTR str_flag = xml_doc.ReadAttrib(path, index, "light_anim", "");
     int flag_cyclic = xml_doc.ReadAttribInt(path, index, "la_cyclic", 1);
     int flag_text = xml_doc.ReadAttribInt(path, index, "la_text", 1);
