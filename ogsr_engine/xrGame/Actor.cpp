@@ -1288,25 +1288,12 @@ void CActor::OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_plac
 void CActor::OnItemBelt(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemBelt(inventory_item, previous_place); }
 void CActor::OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place) { CInventoryOwner::OnItemSlot(inventory_item, previous_place); }
 
-constexpr auto ITEMS_UPDATE_TIME = 0.100f;
 void CActor::UpdateItemsEffect()
 {
-    static float update_time{};
-
-    float f_update_time{};
-
-    if (update_time < ITEMS_UPDATE_TIME)
-    {
-        update_time += conditions().fdelta_time();
-        return;
-    }
-    else
-    {
-        f_update_time = update_time;
-        update_time = 0.0f;
-    }
-
     auto cond = &conditions();
+    if (!cond->IsTimeValid())
+        return;
+    float f_update_time = conditions().fdelta_time();
 
     // проходимо по усім рестор_параметрам для актора
     for (int i = 0; i < eRestoreBoostMax; ++i)

@@ -208,7 +208,8 @@ void CScriptActor::script_register(lua_State* L)
 
                .def("get_artefacts_effect", &CActor::GetTotalArtefactsEffect)
                .def("get_artefacts_protection", &CActor::GetArtefactsProtection)
-               .def("get_items_effect", &CActor::GetItemBoostedParams),
+               .def("get_items_effect", &CActor::GetItemBoostedParams) 
+               .def("update_items_effect", &CActor::UpdateItemsEffect),
                 //move commands
               class_<enum_exporter<EMoveCommand>>("move_command")
                .enum_("commands")[

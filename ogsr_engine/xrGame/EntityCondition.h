@@ -282,6 +282,8 @@ public:
     typedef xr_map<eBoostParams, SBooster> BOOSTER_MAP;
     virtual BOOSTER_MAP GetBoosters() const { return m_boosters; };
 
+    virtual bool IsTimeValid() { return m_bTimeValid; };
+
 protected:
     BOOSTER_MAP m_boosters;
     svector<float, eBoostMax> m_BoostParams;
