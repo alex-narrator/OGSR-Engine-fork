@@ -783,7 +783,10 @@ void CEntityCondition::ApplyRestoreBoost(int type, float value)
     }
     break;
     case eRadiationBoost: {
-        ChangeRadiation(GetRadiationRestore() * value);
+        if (Core.Features.test(xrCore::Feature::absolute_radiation))
+            ApplyInfluence(type, value);
+        else
+            ChangeRadiation(GetRadiationRestore() * value);
     }
     break;
     case ePsyHealthBoost: {

@@ -192,7 +192,7 @@ public:
             use_luminocity              = 1ull << 10,
             colorize_ammo               = 1ull << 11,
             colorize_untradable         = 1ull << 12,
-            select_mode_1342            = 1ull << 13,
+            absolute_radiation          = 1ull << 13,
             npc_simplified_shooting     = 1ull << 14,
             show_objectives_ondemand    = 1ull << 15,
             pickup_check_overlaped      = 1ull << 16,

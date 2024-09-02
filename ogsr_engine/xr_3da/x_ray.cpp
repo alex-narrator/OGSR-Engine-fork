@@ -80,7 +80,6 @@ void InitConsole()
     CORE_FEATURE_SET(colorize_ammo, "dragdrop");
     CORE_FEATURE_SET(colorize_untradable, "dragdrop");
     CORE_FEATURE_SET(equipped_untradable, "dragdrop");
-    CORE_FEATURE_SET(select_mode_1342, "dragdrop");
     CORE_FEATURE_SET(highlight_equipped, "dragdrop");
     CORE_FEATURE_SET(dynamic_sun_movement, "features");
     CORE_FEATURE_SET(wpn_bobbing, "features");
@@ -99,6 +98,7 @@ void InitConsole()
     CORE_FEATURE_SET(no_progress_bar_animation, "features");
     CORE_FEATURE_SET(limited_bolts, "features");
     CORE_FEATURE_SET(unique_logs, "features");
+    CORE_FEATURE_SET(absolute_radiation, "features");
 }
 
 void InitInput() { pInput = xr_new<CInput>(); }
