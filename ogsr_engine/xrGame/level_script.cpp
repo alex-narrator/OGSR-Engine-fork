@@ -84,7 +84,7 @@ CScriptGameObject* get_object_by_name(LPCSTR caObjectName)
 CScriptGameObject* get_object_by_id(u32 id)
 {
     CGameObject* pGameObject = smart_cast<CGameObject*>(Level().Objects.net_Find(id));
-    if (!pGameObject)
+    if (!pGameObject || pGameObject->getDestroy())
         return NULL;
 
     return pGameObject->lua_game_object();
