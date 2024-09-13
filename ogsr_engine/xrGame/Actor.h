@@ -790,7 +790,7 @@ public:
 
     bool IsFreeHands() const;
     bool m_bHideCrosshair{};
-    bool m_bHardCrosshair{true};
+    bool m_bCenterCrosshair{};
 
     float GetVisibility();
     void ResetVisibility();

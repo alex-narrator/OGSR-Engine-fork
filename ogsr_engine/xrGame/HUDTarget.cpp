@@ -94,7 +94,7 @@ void CHUDTarget::CursorOnFrame()
     Fvector p1 = Device.vCameraPosition;
     Fvector dir = Device.vCameraDirection;
 
-    if (auto Wpn = smart_cast<CHudItem*>(Actor->inventory().ActiveItem()))
+    if (auto Wpn = smart_cast<CHudItem*>(Actor->inventory().ActiveItem()); Wpn && !(psHUD_Flags.test(HUD_CROSSHAIR_CENTER) || Actor->m_bCenterCrosshair))
         Actor->g_fireParams(Wpn, p1, dir, true);
 
     // Render cursor
@@ -127,7 +127,7 @@ void CHUDTarget::Render()
     Fvector p1 = Device.vCameraPosition;
     Fvector dir = Device.vCameraDirection;
 
-    if (auto Wpn = smart_cast<CHudItem*>(Actor->inventory().ActiveItem()))
+    if (auto Wpn = smart_cast<CHudItem*>(Actor->inventory().ActiveItem()); Wpn && !(psHUD_Flags.test(HUD_CROSSHAIR_CENTER) || Actor->m_bCenterCrosshair))
         Actor->g_fireParams(Wpn, p1, dir, true);
 
     // Render cursor
@@ -214,7 +214,7 @@ void CHUDTarget::Render()
     }
 
     if (auto Wpn = smart_cast<CWeapon*>(Actor->inventory().ActiveItem());
-        Wpn && (Wpn->IsLaserOn() || Wpn->GetState() == CHUDState::EHudStates::eReload) && !psActorFlags.test(AF_CROSSHAIR_DBG))
+        Wpn && (Wpn->GetState() == CHUDState::EHudStates::eReload) && !psActorFlags.test(AF_CROSSHAIR_DBG))
         return;
 
     if (const u32 State = Actor->get_state() & mcSprint)
