@@ -9,7 +9,6 @@
 #include "../game_news.h"
 #include "../actor.h"
 #include "../alife_registry_wrappers.h"
-#include "UIInventoryUtilities.h"
 #include "UINewsItemWnd.h"
 #include "UIScrollView.h"
 
@@ -109,10 +108,10 @@ void CUINewsWnd::Show(bool status)
         if (m_flags.test(eNeedAdd))
             LoadNews();
     }
-    else
-    {
-        InventoryUtilities::SendInfoToActor("ui_pda_news_hide");
-    }
+    //else
+    //{
+    //    InventoryUtilities::SendInfoToActor("ui_pda_news_hide");
+    //}
 
     inherited::Show(status);
 }

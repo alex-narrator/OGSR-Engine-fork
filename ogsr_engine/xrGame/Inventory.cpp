@@ -503,6 +503,7 @@ bool CInventory::Action(s32 cmd, u32 flags)
     break;
     case kACTIVE_JOBS:
     case kMAP:
+    case kJOURNAL:
     case kCONTACTS: {
         if (flags & CMD_START)
         {
@@ -515,7 +516,7 @@ bool CInventory::Action(s32 cmd, u32 flags)
             else
             {
                 auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-                pGameSP->PdaMenu->SetActiveSubdialog(cmd == kACTIVE_JOBS ? eptQuests : (cmd == kMAP ? eptMap : eptContacts));
+                pGameSP->PdaMenu->SetActiveSubdialog(cmd == kACTIVE_JOBS ? eptQuests : (cmd == kMAP ? eptMap : (cmd == kJOURNAL ? eptDiary : eptContacts)));
                 b_send_event = Activate(PDA_SLOT, eKeyAction);
             }
         }

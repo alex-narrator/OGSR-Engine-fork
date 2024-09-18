@@ -231,6 +231,17 @@ bool CUIXmlInit::InitCheck(CUIXml& xml_doc, LPCSTR path, int index, CUICheckButt
     InitStatic(xml_doc, path, index, pWnd);
     InitOptionsItem(xml_doc, path, index, pWnd);
 
+    // init hint static
+    string256 hint;
+    strconcat(sizeof(hint), hint, path, ":hint");
+
+    if (xml_doc.NavigateToNode(hint, index))
+        InitStatic(xml_doc, hint, index, &pWnd->m_hint);
+
+    LPCSTR text_hint = xml_doc.ReadAttrib(path, index, "hint", NULL);
+    if (text_hint)
+        pWnd->m_hint_text = CStringTable().translate(text_hint);
+
     return true;
 }
 

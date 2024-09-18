@@ -16,6 +16,7 @@
 #include "../alife_registry_wrappers.h"
 #include "../encyclopedia_article.h"
 #include "UIPdaAux.h"
+#include "UIInventoryUtilities.h"
 
 constexpr auto DIARY = "events_new.xml";
 
@@ -145,8 +146,18 @@ void CUIDiaryWnd::Reload(EDiaryFilter new_filter)
 
     switch (m_currFilter)
     {
-    case eJournal: LoadJournalTab(); break;
-    case eNews: LoadNewsTab(); break;
+    case eJournal: 
+        LoadJournalTab(); 
+        InventoryUtilities::SendInfoToActor("ui_pda_journal");
+        break;
+    case eNews: 
+        LoadNewsTab();
+        InventoryUtilities::SendInfoToActor("ui_pda_news");
+        break;
+    default: 
+        string128 diary_info; 
+        xr_strconcat(diary_info, "ui_pda_diary_", std::to_string(m_currFilter).c_str());
+        InventoryUtilities::SendInfoToActor(diary_info);
     };
 }
 

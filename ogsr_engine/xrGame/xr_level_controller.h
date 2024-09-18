@@ -57,6 +57,7 @@ enum EGameActions
     kACTIVE_JOBS,
     kMAP,
     kCONTACTS,
+    kJOURNAL,
     kEXT_1,
 
     kNEXT_SLOT,

@@ -101,13 +101,14 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
     {
     case kACTIVE_JOBS:
     case kMAP:
+    case kJOURNAL:
     case kCONTACTS: {
         auto Pda = pActor->GetPDA();
         if ((!Pda || !Pda->Is3DPDA() || !psActorFlags.test(AF_3D_PDA)) && (!MainInputReceiver() || MainInputReceiver() == PdaMenu))
         {
             if (g_actor_allow_pda)
             {
-                PdaMenu->SetActiveSubdialog(bind == kACTIVE_JOBS ? eptQuests : (bind == kMAP ? eptMap : eptContacts));
+                PdaMenu->SetActiveSubdialog(bind == kACTIVE_JOBS ? eptQuests : (bind == kMAP ? eptMap : (bind == kJOURNAL ? eptDiary : eptContacts)));
                 m_game->StartStopMenu(PdaMenu, true);
                 return true;
             }
