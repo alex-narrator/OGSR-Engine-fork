@@ -154,10 +154,11 @@ void CUIDiaryWnd::Reload(EDiaryFilter new_filter)
         LoadNewsTab();
         InventoryUtilities::SendInfoToActor("ui_pda_news");
         break;
+    case eNotes:
+        InventoryUtilities::SendInfoToActor("ui_pda_notes");
+        break;
     default: 
-        string128 diary_info; 
-        xr_strconcat(diary_info, "ui_pda_diary_", std::to_string(m_currFilter).c_str());
-        InventoryUtilities::SendInfoToActor(diary_info);
+        Msg("%s - not registered button identifier [%d]", DIARY, m_currFilter);
     };
 }
 
@@ -253,6 +254,13 @@ void CUIDiaryWnd::Draw()
     pos = m_sign_places[eJournal];
     pos.add(tab_pos);
     if (g_pda_info_state & pda_section::journal)
+        draw_sign(m_updatedSectionImage, pos);
+    else
+        draw_sign(m_oldSectionImage, pos);
+
+    pos = m_sign_places[eNotes];
+    pos.add(tab_pos);
+    if (g_pda_info_state & pda_section::notes)
         draw_sign(m_updatedSectionImage, pos);
     else
         draw_sign(m_oldSectionImage, pos);
