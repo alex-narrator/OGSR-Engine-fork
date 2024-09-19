@@ -49,8 +49,6 @@ CHudItem::CHudItem()
     AllowHudInertion(TRUE);
 
     m_bobbing = std::make_unique<CWeaponBobbing>(this);
-
-    script_ui_matrix.identity();
 }
 
 DLL_Pure* CHudItem::_construct()
@@ -197,12 +195,9 @@ void CHudItem::Load(LPCSTR section)
     if (script_ui_funct = READ_IF_EXISTS(pSettings, r_string, section, "custom_ui_func", nullptr))
     {
         script_ui_bone = READ_IF_EXISTS(pSettings, r_string, section, "custom_ui_bone", "wpn_body");
+
         script_ui_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "custom_ui_pos", Fvector().set(0.f, 0.f, 0.f));
         script_ui_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "custom_ui_rot", Fvector().set(0.f, 0.f, 0.f));
-
-        script_ui_offset[1].mul(PI / 180.f);
-        script_ui_matrix.setHPB(script_ui_offset[1].x, script_ui_offset[1].y, script_ui_offset[1].z);
-        script_ui_matrix.translate_over(script_ui_offset[0]);
     }
 }
 
@@ -454,20 +449,14 @@ void CHudItem::render_item_3d_ui()
         u16 bid = HudItemData()->m_model->LL_BoneID(script_ui_bone);
         Fmatrix ui_bone = HudItemData()->m_model->LL_GetTransform(bid);
         LM.mul(trans, ui_bone);
-
-        //if (g_player_hud->m_adjust_mode)
-        //{
-        //    Fmatrix script_ui_adjust_matrix;
-        //    script_ui_adjust_matrix.identity();
-        //    Fvector& pos = g_player_hud->m_adjust_ui_offset[0];
-        //    Fvector& rot = g_player_hud->m_adjust_ui_offset[1];
-
-        //    script_ui_adjust_matrix.setHPB(rot.x, rot.y, rot.z);
-        //    script_ui_adjust_matrix.translate_over(pos);
-        //    LM.mulB_43(script_ui_adjust_matrix);
-        //}
-        //else
-            LM.mulB_43(script_ui_matrix);
+        
+        Fmatrix script_ui_matrix;
+        script_ui_matrix.identity();
+        Fvector pos = script_ui_offset[0];
+        Fvector rot = script_ui_offset[1];
+        script_ui_matrix.setHPB(rot.x, rot.y, rot.z);
+        script_ui_matrix.translate_over(pos);
+        LM.mulB_43(script_ui_matrix);
 
         IUIRender::ePointType bk = UI()->m_currentPointType;
         UI()->m_currentPointType = IUIRender::pttLIT;

@@ -22,6 +22,8 @@ enum HUD_ADJUST_MODE : int
     ADJUST_DELTA_ROT,
     LASETDOT_POS,
     FLASHLIGHT_POS,
+    SCRIPT_UI_POS,
+    SCRIPT_UI_ROT,
     _HUD_ADJUST_MODES_COUNT_
 };
 
@@ -38,6 +40,8 @@ static constexpr std::array<std::tuple<int, const char*>, _HUD_ADJUST_MODES_COUN
     {DIK_NUMPAD9, "adjusting rot STEP"},
     {DIK_1, "adjusting LASER POINT"},
     {DIK_2, "adjusting FLASHLIGHT POINT"},
+    {DIK_3, "adjusting SCRIPT UI POSITION"},
+    {DIK_4, "adjusting SCRIPT UI ROTATION"},
 }};
 
 int g_bHudAdjustMode = OFF;
@@ -135,6 +139,34 @@ void attachable_hud_item::tune(const Ivector& values)
 
             calc_cam_diff_pos(m_item_transform, diff, d);
             m_measures.m_item_attach[1].add(d);
+        }
+    }
+
+    if (g_bHudAdjustMode == SCRIPT_UI_POS || g_bHudAdjustMode == SCRIPT_UI_ROT)
+    {
+        if (g_bHudAdjustMode == SCRIPT_UI_POS)
+        {
+            if (values.x)
+                diff.x = (values.x > 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
+            if (values.y)
+                diff.y = (values.y > 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
+            if (values.z)
+                diff.z = (values.z > 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
+
+            //m_measures.m_script_ui_attach[0].add(diff);
+            m_parent_hud_item->script_ui_offset[0].add(diff);
+        }
+        else if (g_bHudAdjustMode == SCRIPT_UI_ROT)
+        {
+            if (values.x)
+                diff.x = (values.x > 0) ? g_bHudAdjustDeltaRot : -g_bHudAdjustDeltaRot;
+            if (values.y)
+                diff.y = (values.y > 0) ? g_bHudAdjustDeltaRot : -g_bHudAdjustDeltaRot;
+            if (values.z)
+                diff.z = (values.z > 0) ? g_bHudAdjustDeltaRot : -g_bHudAdjustDeltaRot;
+
+            //m_measures.m_script_ui_attach[1].add(diff);
+            m_parent_hud_item->script_ui_offset[1].add(diff);
         }
     }
 
@@ -264,6 +296,8 @@ void player_hud::tune(const Ivector& _values)
 void player_hud::DumpParamsToLog() 
 {
     const bool is_16x9 = UI()->is_widescreen();
+    if (!m_attached_items[g_bHudAdjustItemIdx])
+        return;
     auto hud_sect = m_attached_items[g_bHudAdjustItemIdx]->m_sect_name.c_str();
 
     if (g_bHudAdjustMode == HUD_POS || g_bHudAdjustMode == HUD_ROT)
@@ -340,6 +374,18 @@ void player_hud::DumpParamsToLog()
             Msg("item_orientation = %f,%f,%f", measures.m_item_attach[1].x, measures.m_item_attach[1].y, measures.m_item_attach[1].z);
             Log("####################################");
         }
+        else if (g_bHudAdjustMode == SCRIPT_UI_POS || g_bHudAdjustMode == SCRIPT_UI_ROT)
+        {
+            Log("####################################");
+            Msg("[%s]", hud_sect);
+            auto hi = m_attached_items[g_bHudAdjustItemIdx]->m_parent_hud_item;
+            auto pos = hi->script_ui_offset[0]; // measures.m_script_ui_attach[0];
+            auto rot = hi->script_ui_offset[1]; // measures.m_script_ui_attach[1];
+
+            Msg("custom_ui_pos = %f,%f,%f", pos.x, pos.y, pos.z);
+            Msg("custom_ui_rot = %f,%f,%f", rot.x, rot.y, rot.z);
+            Log("####################################");
+        }
         else if (g_bHudAdjustMode == FIRE_POINT || g_bHudAdjustMode == FIRE_POINT2 || g_bHudAdjustMode == SHELL_POINT || g_bHudAdjustMode == LASETDOT_POS ||
                  g_bHudAdjustMode == FLASHLIGHT_POS)
         {
@@ -367,7 +413,7 @@ void hud_draw_adjust_mode()
     if (pInput->iGetAsyncKeyState(DIK_LSHIFT))
         _text =
             "press SHIFT+NUM 0-return|1-hud_pos|2-hud_rot|3-itm_pos|4-itm_rot|5-fire_point|6-fire_point2|7-shell_point|8-pos_step|9-rot_step    ||||||    press "
-            "SHIFT+1-laser_point|2-flashlight_point";
+            "SHIFT+1-laser_point|2-flashlight_point|3-custom_ui_pos|4-custom_ui_rot";
     else if (pInput->iGetAsyncKeyState(DIK_LCONTROL))
         _text = "press CTRL+NUM 0-item idx 1|1-item idx 2";
     else

@@ -106,8 +106,6 @@ protected: //чтоб нельзя было вызвать на прямую
 	CUIWindow* script_ui{};
     LPCSTR script_ui_funct{};
     LPCSTR script_ui_bone{};
-    Fvector script_ui_offset[2]{}; // pos, rot
-    Fmatrix script_ui_matrix{};
 
     xr_vector<u8> m_hidden_meshes_hud{};
 
@@ -208,6 +206,8 @@ public:
     virtual void SetStopAimInertion(bool val) { m_bStopAimInertion = val; };
 
     void SetToScreenCenter(Fvector& dir, Fvector& pos, float distance = 0.1f);
+
+    Fvector script_ui_offset[2]{}; // pos, rot
 
 protected:
     BOOL hud_mode;
