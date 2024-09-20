@@ -1492,7 +1492,7 @@ void CCC_RegisterCommands()
     CMD1(CCC_TuneAttachableItem, "dbg_adjust_attachable_item");
     CMD1(CCC_TuneAttachableItemInSlot, "dbg_adjust_attachable_item_in_slot");
     // adjust mode support
-    CMD4(CCC_Integer, "hud_adjust_mode", &g_bHudAdjustMode, 0, 13);
+    CMD4(CCC_Integer, "hud_adjust_mode", &g_bHudAdjustMode, 0, 15);
     CMD4(CCC_Float, "hud_adjust_delta_pos", &g_bHudAdjustDeltaPos, 0.00001f, 1.f);
     CMD4(CCC_Float, "hud_adjust_delta_rot", &g_bHudAdjustDeltaRot, 0.00001f, 10.f);
 

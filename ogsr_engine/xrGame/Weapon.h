@@ -30,10 +30,11 @@ extern enum eWeaponAddonType { eSilencer, eScope, eLauncher, eLaser, eFlashlight
 
 struct addon_attach
 {
+    LPCSTR name{};
     LPCSTR visual_name{};
     IRenderVisual* visual{};
     LPCSTR bone_name{};
-    Fmatrix visual_offset{};
+    Fvector visual_offset[2]{}; // pos, rot
 
     addon_attach() = default;
     ~addon_attach()
@@ -607,6 +608,7 @@ public:
     //візуали адонів для атачу до зброї
     xr_vector<addon_attach*> m_addons_visual{};
     xr_vector<addon_attach*> m_addons_visual_hud{};
+    Fvector addon_adjust_offset[2]{}; // pos, rot
 
     xr_vector<shared_str> m_scopes{};
     u8 m_cur_scope{};

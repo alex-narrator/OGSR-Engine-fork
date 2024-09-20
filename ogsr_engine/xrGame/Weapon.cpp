@@ -876,20 +876,28 @@ void CWeapon::UpdateCL()
         m_idle_state = eIdle;
 }
 
+
+extern int g_bHudAdjustMode;
 void CWeapon::renderable_Render()
 {
     UpdateXForm();
     // нарисовать подсветку
     RenderLight();
 
-    for (const auto& addon : m_addons_visual)
+    for (const auto addon : m_addons_visual)
     {
         Fmatrix m_res{};
         auto visual = Visual()->dcast_PKinematics();
         u16 bone_id = visual->LL_BoneID(addon->bone_name);
         Fmatrix bone_trans = visual->LL_GetTransform(bone_id);
 
-        m_res.mul(bone_trans, addon->visual_offset);
+        Fmatrix offset{};
+        bool adjust = g_bHudAdjustMode == 14 || g_bHudAdjustMode == 15;
+        Fvector pos = adjust ? addon_adjust_offset[0] : addon->visual_offset[0];
+        Fvector rot = adjust ? addon_adjust_offset[1] : addon->visual_offset[1];
+        offset.setHPB(rot.x, rot.y, rot.z);
+        offset.translate_over(pos);
+        m_res.mul(bone_trans, offset);
         m_res.mulA_43(XFORM());
 
         ::Render->set_Transform(&m_res);
@@ -903,14 +911,21 @@ bool CWeapon::need_renderable() { return !Device.m_SecondViewport.IsSVPFrame() /
 
 void CWeapon::render_hud_mode()
 {
-    for (const auto& addon : m_addons_visual_hud)
+    for (const auto addon : m_addons_visual_hud)
     {
         Fmatrix m_res{};
         auto visual = HudItemData()->m_model;
         u16 bone_id = visual->LL_BoneID(addon->bone_name);
         Fmatrix bone_trans = visual->LL_GetTransform(bone_id);
 
-        m_res.mul(bone_trans, addon->visual_offset);
+        Fmatrix offset{};
+        bool adjust = g_bHudAdjustMode == 14 || g_bHudAdjustMode == 15;
+        Fvector pos = adjust ? addon_adjust_offset[0] : addon->visual_offset[0];
+        Fvector rot = adjust ? addon_adjust_offset[1] : addon->visual_offset[1];
+        offset.setHPB(rot.x, rot.y, rot.z);
+        offset.translate_over(pos);
+
+        m_res.mul(bone_trans, offset);
         m_res.mulA_43(HudItemData()->m_item_transform);
 
         ::Render->set_Transform(&m_res);
@@ -2240,8 +2255,8 @@ void CWeapon::LoadAddonMeshesHud()
 LPCSTR param_names[] = {
     "attach_visual",
     "attach_bone",
+    "attach_pos",    
     "attach_rot",
-    "attach_pos",
     "attach_hidden_meshes",
     "attach_hidden_meshes_weapon",
     "attach_hidden_bones_weapon",
@@ -2276,6 +2291,9 @@ void CWeapon::InitAddonsVisual()
             if (visual_name)
             {
                 auto addon = new (addon_attach)();
+                
+                addon->name = addon_name;
+                
                 addon->visual_name = visual_name;
 
                 addon->visual = ::Render->model_Create(addon->visual_name);
@@ -2287,10 +2305,10 @@ void CWeapon::InitAddonsVisual()
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[2]);
                 Fvector angle_offset = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
-                addon->visual_offset.setHPB(VPUSH(angle_offset));
+                addon->visual_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[3]);
-                addon->visual_offset.c = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
+                addon->visual_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[4]);
                 LPCSTR str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
@@ -2360,6 +2378,9 @@ void CWeapon::InitAddonsVisualHud()
             if (visual_name)
             {
                 auto addon = new (addon_attach)();
+                
+                addon->name = addon_name;
+
                 addon->visual_name = visual_name;
 
                 addon->visual = ::Render->model_Create(addon->visual_name);
@@ -2370,11 +2391,10 @@ void CWeapon::InitAddonsVisualHud()
                 addon->bone_name = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, "wpn_body");
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[2]);
-                Fvector angle_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, res_sect, Fvector{});
-                addon->visual_offset.setHPB(VPUSH(angle_offset));
+                addon->visual_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, res_sect, Fvector{});
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[3]);
-                addon->visual_offset.c = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, res_sect, Fvector{});
+                addon->visual_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, res_sect, Fvector{});
 
                 sprintf(res_sect, "%s_%s", addon_name, param_names[4]);
                 LPCSTR str = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, nullptr);
