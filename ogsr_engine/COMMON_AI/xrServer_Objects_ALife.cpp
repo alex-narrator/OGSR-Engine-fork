@@ -514,7 +514,15 @@ CSE_ALifeObjectPhysic::CSE_ALifeObjectPhysic(LPCSTR caSection) : CSE_ALifeDynami
     mass = 10.f;
 
     if (pSettings->section_exist(caSection) && pSettings->line_exist(caSection, "visual"))
+    {
         set_visual(pSettings->r_string(caSection, "visual"));
+
+        if (pSettings->line_exist(caSection, "startup_animation"))
+            startup_animation = pSettings->r_string(caSection, "startup_animation");
+    }
+
+	if (pSettings->line_exist(caSection, "fixed_bones"))
+        fixed_bones = pSettings->r_string(caSection, "fixed_bones");
 
     m_flags.set(flUseSwitches, FALSE);
     m_flags.set(flSwitchOffline, FALSE);
