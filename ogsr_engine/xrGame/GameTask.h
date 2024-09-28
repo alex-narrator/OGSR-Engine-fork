@@ -79,6 +79,7 @@ public:
     void SetMapHint_script(LPCSTR _str);
     void SetMapLocation_script(LPCSTR _str);
     void SetObjectID_script(u16 id);
+    u16 GetObjectID_script() { return object_id; };
 
     void SetIconName_script(LPCSTR _str);
     LPCSTR GetIconName_script() { return icon_texture_name.c_str(); };
