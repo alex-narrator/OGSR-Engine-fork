@@ -273,7 +273,7 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                 Jump = jump_speed;
                 m_fJumpTime = s_fJumpTime;
 
-                this->callback(GameObject::eOnActorJump)(this->lua_game_object());
+                this->callback(GameObject::eOnActorJump)(this->lua_game_object(), Jump);
 
                 // уменьшить силу игрока из-за выполненого прыжка
                 if (!GodMode())

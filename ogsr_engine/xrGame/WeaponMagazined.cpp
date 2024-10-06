@@ -1061,6 +1061,7 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
 
     m_fIronSightZoomFactor = READ_IF_EXISTS(pSettings, r_float, section, "ironsight_zoom_factor", 1.0f);
     m_fScopeInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "scope_inertion_factor", GetControlInertionFactor());
+    m_fSecondVPZoomFactor = READ_IF_EXISTS(pSettings, r_float, section, "scope_lense_fov_factor", 0.f);
 
     // second scope mode
     m_bHasScopeSecond = READ_IF_EXISTS(pSettings, r_bool, section, "scope_second", false) && !READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "ignore_scope_second", false);
