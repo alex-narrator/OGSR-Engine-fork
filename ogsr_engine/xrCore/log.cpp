@@ -154,7 +154,7 @@ void CreateLog(BOOL nl)
 {
     if (!nl)
     {
-        if (Core.Features.test(xrCore::Feature::unique_logs))
+        if (!strstr(Core.Params, "-no_unique_logs"))
         {
             string32 TimeBuf;
             using namespace std::chrono;
