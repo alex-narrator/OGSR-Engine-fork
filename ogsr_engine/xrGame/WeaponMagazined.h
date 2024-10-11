@@ -50,6 +50,7 @@ protected:
     ref_light laser_light_render;
     CLAItem* laser_lanim{};
     float laser_fBrightness{1.f};
+    float laser_cone_angle{};
     void UpdateLaser();
 
     // flashlight

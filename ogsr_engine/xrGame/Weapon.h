@@ -28,25 +28,6 @@ constexpr float def_zoom_step_count = 4.0f;
 
 extern enum eWeaponAddonType { eSilencer, eScope, eLauncher, eLaser, eFlashlight, eStock, eExtender, eForend, eMagazine, eMaxAddon };
 
-struct addon_attach
-{
-    LPCSTR name{};
-    LPCSTR visual_name{};
-    IRenderVisual* visual{};
-    LPCSTR bone_name{};
-    Fvector visual_offset[2]{}; // pos, rot
-
-    addon_attach() = default;
-    ~addon_attach()
-    {
-        if (visual)
-        {
-            ::Render->model_Delete(visual);
-            visual = nullptr;
-        }
-    };
-};
-
 class CWeapon : public CHudItemObject, public CShootingObject
 {
     friend class CWeaponScript;
@@ -606,9 +587,15 @@ public:
     virtual bool TryToGetAmmo(u32) { return true; };
 
     //візуали адонів для атачу до зброї
-    xr_vector<addon_attach*> m_addons_visual{};
-    xr_vector<addon_attach*> m_addons_visual_hud{};
-    Fvector addon_adjust_offset[2]{}; // pos, rot
+    LPCSTR world_attach_addon_name[eMaxAddon]{};
+    IRenderVisual* world_attach_visual[eMaxAddon]{};
+    LPCSTR world_attach_bone_name[eMaxAddon]{};
+    Fvector world_attach_visual_offset[eMaxAddon][2]{}; // pos, rot
+
+    LPCSTR hud_attach_addon_name[eMaxAddon]{};
+    IRenderVisual* hud_attach_visual[eMaxAddon]{};
+    LPCSTR hud_attach_bone_name[eMaxAddon]{};
+    Fvector hud_attach_visual_offset[eMaxAddon][2]{}; // pos, rot
 
     xr_vector<shared_str> m_scopes{};
     u8 m_cur_scope{};

@@ -877,31 +877,31 @@ void CWeapon::UpdateCL()
 }
 
 
-extern int g_bHudAdjustMode;
 void CWeapon::renderable_Render()
 {
     UpdateXForm();
     // нарисовать подсветку
     RenderLight();
 
-    for (const auto addon : m_addons_visual)
+    for (int i=0; i<eMaxAddon; ++i)
     {
+        if (!world_attach_visual[i])
+            continue;
         Fmatrix m_res{};
         auto visual = Visual()->dcast_PKinematics();
-        u16 bone_id = visual->LL_BoneID(addon->bone_name);
+        u16 bone_id = visual->LL_BoneID(world_attach_bone_name[i]);
         Fmatrix bone_trans = visual->LL_GetTransform(bone_id);
 
         Fmatrix offset{};
-        bool adjust = g_bHudAdjustMode == 14 || g_bHudAdjustMode == 15;
-        Fvector pos = adjust ? addon_adjust_offset[0] : addon->visual_offset[0];
-        Fvector rot = adjust ? addon_adjust_offset[1] : addon->visual_offset[1];
+        Fvector pos = world_attach_visual_offset[i][0];
+        Fvector rot = world_attach_visual_offset[i][1];
         offset.setHPB(rot.x, rot.y, rot.z);
         offset.translate_over(pos);
         m_res.mul(bone_trans, offset);
         m_res.mulA_43(XFORM());
 
         ::Render->set_Transform(&m_res);
-        ::Render->add_Visual(addon->visual);
+        ::Render->add_Visual(world_attach_visual[i]);
     }
 
     inherited::renderable_Render();
@@ -911,17 +911,18 @@ bool CWeapon::need_renderable() { return !Device.m_SecondViewport.IsSVPFrame() /
 
 void CWeapon::render_hud_mode()
 {
-    for (const auto addon : m_addons_visual_hud)
+    for (int i = 0; i < eMaxAddon; ++i)
     {
+        if (!hud_attach_visual[i])
+            continue;        
         Fmatrix m_res{};
         auto visual = HudItemData()->m_model;
-        u16 bone_id = visual->LL_BoneID(addon->bone_name);
+        u16 bone_id = visual->LL_BoneID(hud_attach_bone_name[i]);
         Fmatrix bone_trans = visual->LL_GetTransform(bone_id);
 
         Fmatrix offset{};
-        bool adjust = g_bHudAdjustMode == 14 || g_bHudAdjustMode == 15;
-        Fvector pos = adjust ? addon_adjust_offset[0] : addon->visual_offset[0];
-        Fvector rot = adjust ? addon_adjust_offset[1] : addon->visual_offset[1];
+        Fvector pos = hud_attach_visual_offset[i][0];
+        Fvector rot = hud_attach_visual_offset[i][1];
         offset.setHPB(rot.x, rot.y, rot.z);
         offset.translate_over(pos);
 
@@ -929,7 +930,7 @@ void CWeapon::render_hud_mode()
         m_res.mulA_43(HudItemData()->m_item_transform);
 
         ::Render->set_Transform(&m_res);
-        ::Render->add_Visual(addon->visual);
+        ::Render->add_Visual(hud_attach_visual[i]);
     }
 
     inherited::render_hud_mode();
@@ -2252,16 +2253,6 @@ void CWeapon::LoadAddonMeshesHud()
 
 /////////////////////////////////////////////////////visual addon attach/////////////////////////////////////////////////////////////
 
-LPCSTR param_names[] = {
-    "attach_visual",
-    "attach_bone",
-    "attach_pos",    
-    "attach_rot",
-    "attach_hidden_meshes",
-    "attach_hidden_meshes_weapon",
-    "attach_hidden_bones_weapon",
-};
-
 LPCSTR prefix_name[] = {
     "silencer",
     "scope",
@@ -2273,174 +2264,76 @@ LPCSTR prefix_name[] = {
     "forend",
     "magazine",
 };
-
+extern int g_bHudAdjustMode;
 void CWeapon::InitAddonsVisual()
 {
-    m_addons_visual.clear();
-
-    LPCSTR addon_name{};
-
     for (u32 i = 0; i < eMaxAddon; i++)
     {
+        world_attach_addon_name[i] = nullptr;
+        world_attach_visual[i] = nullptr;
+        world_attach_bone_name[i] = nullptr;
+
         if (IsAddonAttached(i))
         {
-            addon_name = AddonAttachable(i) ? GetAddonName(i).c_str() : prefix_name[i];
+            auto sect = cNameSect();
+            LPCSTR addon_name = AddonAttachable(i) ? GetAddonName(i).c_str() : prefix_name[i];
             string1024 res_sect{};
-            sprintf(res_sect, "%s_%s", addon_name, param_names[0]);
-            LPCSTR visual_name = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
+            sprintf(res_sect, "%s_%s", addon_name, "attach_visual");
+            LPCSTR visual_name = READ_IF_EXISTS(pSettings, r_string, sect, res_sect, nullptr);
             if (visual_name)
             {
-                auto addon = new (addon_attach)();
-                
-                addon->name = addon_name;
-                
-                addon->visual_name = visual_name;
+             
+                world_attach_addon_name[i] = addon_name;
 
-                addon->visual = ::Render->model_Create(addon->visual_name);
+                world_attach_visual[i] = ::Render->model_Create(visual_name);
 
-                auto addon_visual = smart_cast<IKinematics*>(addon->visual);
+                sprintf(res_sect, "%s_%s", addon_name, "attach_bone");
+                world_attach_bone_name[i] = READ_IF_EXISTS(pSettings, r_string, sect, res_sect, "wpn_body");
 
-                sprintf(res_sect, "%s_%s", addon_name, param_names[1]);
-                addon->bone_name = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, "wpn_body");
+                if (g_bHudAdjustMode)
+                    continue;
 
-                sprintf(res_sect, "%s_%s", addon_name, param_names[2]);
-                Fvector angle_offset = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
-                addon->visual_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
+                sprintf(res_sect, "%s_%s", addon_name, "attach_pos");
+                world_attach_visual_offset[i][0] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
 
-                sprintf(res_sect, "%s_%s", addon_name, param_names[3]);
-                addon->visual_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, cNameSect(), res_sect, Fvector{});
-
-                sprintf(res_sect, "%s_%s", addon_name, param_names[4]);
-                LPCSTR str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
-                if (str)
-                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-                    {
-                        string128 mesh_num;
-                        _GetItem(str, i, mesh_num);
-                        u8 mesh_idx = u8(atoi(mesh_num));
-                        if (mesh_idx >= addon_visual->RChildCount())
-                            Msg("! [%s]: addon visual %s - wrong addon hidden mesh [%u/%u]", __FUNCTION__, visual_name, mesh_idx, addon_visual->RChildCount() - 1);
-                        else
-                            addon_visual->SetRFlag(mesh_idx, false);
-                    }
-
-                addon_visual->CalculateBones_Invalidate();
-                addon_visual->CalculateBones();
-
-                auto weapon_visual = Visual()->dcast_PKinematics();
-
-                sprintf(res_sect, "%s_%s", addon_name, param_names[5]);
-                str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
-                if (str)
-                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-                    {
-                        string128 mesh_num;
-                        _GetItem(str, i, mesh_num);
-                        u8 mesh_idx = u8(atoi(mesh_num));
-                        if (mesh_idx >= weapon_visual->RChildCount())
-                            Msg("! [%s]: addon visual %s - wrong weapon hidden mesh [%u/%u]", __FUNCTION__, visual_name, mesh_idx, weapon_visual->RChildCount() - 1);
-                        else
-                            weapon_visual->SetRFlag(mesh_idx, false);
-                    }
-
-                sprintf(res_sect, "%s_%s", addon_name, param_names[6]);
-                str = READ_IF_EXISTS(pSettings, r_string, cNameSect(), res_sect, nullptr);
-                if (str)
-                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-                    {
-                        string128 bone_name;
-                        _GetItem(str, i, bone_name);
-                        u16 bone_id = weapon_visual->LL_BoneID(bone_name);
-                        if (bone_id != BI_NONE && weapon_visual->LL_GetBoneVisible(bone_id))
-                            weapon_visual->LL_SetBoneVisible(bone_id, FALSE, TRUE);
-                    }
-
-                m_addons_visual.push_back(addon);
+                sprintf(res_sect, "%s_%s", addon_name, "attach_rot");
+                world_attach_visual_offset[i][1] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
             }
         }
     }
 }
-
 void CWeapon::InitAddonsVisualHud()
 { 
-    m_addons_visual_hud.clear();
-
-    LPCSTR addon_name{};
-
     for (u32 i = 0; i < eMaxAddon; i++)
     {
+        hud_attach_addon_name[i] = nullptr;
+        hud_attach_visual[i] = nullptr;
+        hud_attach_bone_name[i] = nullptr;
+
         if (IsAddonAttached(i))
         {
-            addon_name = AddonAttachable(i) ? GetAddonName(i).c_str() : prefix_name[i];
+            auto& sect = hud_sect;
+            LPCSTR addon_name = AddonAttachable(i) ? GetAddonName(i).c_str() : prefix_name[i];
             string1024 res_sect{};
-            sprintf(res_sect, "%s_%s", addon_name, param_names[0]);
-            LPCSTR visual_name = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, nullptr);
+            sprintf(res_sect, "%s_%s", addon_name, "attach_visual");
+            LPCSTR visual_name = READ_IF_EXISTS(pSettings, r_string, sect, res_sect, nullptr);
             if (visual_name)
             {
-                auto addon = new (addon_attach)();
-                
-                addon->name = addon_name;
+                hud_attach_addon_name[i] = addon_name;
 
-                addon->visual_name = visual_name;
+                hud_attach_visual[i] = ::Render->model_Create(visual_name);
 
-                addon->visual = ::Render->model_Create(addon->visual_name);
+                sprintf(res_sect, "%s_%s", addon_name, "attach_bone");
+                hud_attach_bone_name[i] = READ_IF_EXISTS(pSettings, r_string, sect, res_sect, "wpn_body");
 
-                auto addon_visual = smart_cast<IKinematics*>(addon->visual);
+                if (g_bHudAdjustMode)
+                    continue;
 
-                sprintf(res_sect, "%s_%s", addon_name, param_names[1]);
-                addon->bone_name = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, "wpn_body");
+                sprintf(res_sect, "%s_%s", addon_name, "attach_pos");
+                hud_attach_visual_offset[i][0] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
 
-                sprintf(res_sect, "%s_%s", addon_name, param_names[2]);
-                addon->visual_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, res_sect, Fvector{});
-
-                sprintf(res_sect, "%s_%s", addon_name, param_names[3]);
-                addon->visual_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, res_sect, Fvector{});
-
-                sprintf(res_sect, "%s_%s", addon_name, param_names[4]);
-                LPCSTR str = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, nullptr);
-                if (str)
-                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-                    {
-                        string128 mesh_num;
-                        _GetItem(str, i, mesh_num);
-                        u8 mesh_idx = u8(atoi(mesh_num));
-                        if (mesh_idx >= addon_visual->RChildCount())
-                            Msg("! [%s]: addon visual %s - wrong addon hidden mesh [%u/%u]", __FUNCTION__, visual_name, mesh_idx, addon_visual->RChildCount() - 1);
-                        else
-                            addon_visual->SetRFlag(mesh_idx, false);
-                    }
-
-                addon_visual->CalculateBones_Invalidate();
-                addon_visual->CalculateBones();
-
-                auto hid = HudItemData();
-                auto weapon_visual = hid->m_model;
-
-                sprintf(res_sect, "%s_%s", addon_name, param_names[5]);
-                str = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, nullptr);
-                if (str)
-                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-                    {
-                        string128 mesh_num;
-                        _GetItem(str, i, mesh_num);
-                        u8 mesh_idx = u8(atoi(mesh_num));
-                        if (mesh_idx >= weapon_visual->RChildCount())
-                            Msg("! [%s]: addon visual %s - wrong weapon hidden mesh [%u/%u]", __FUNCTION__, visual_name, mesh_idx, weapon_visual->RChildCount() - 1);
-                        else
-                            weapon_visual->SetRFlag(mesh_idx, false);
-                    }
-
-                sprintf(res_sect, "%s_%s", addon_name, param_names[6]);
-                str = READ_IF_EXISTS(pSettings, r_string, hud_sect, res_sect, nullptr);
-                if (str)
-                    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-                    {
-                        string128 bone_name;
-                        _GetItem(str, i, bone_name);
-                        hid->set_bone_visible(bone_name, FALSE, TRUE);
-                    }
-
-                m_addons_visual_hud.push_back(addon);
+                sprintf(res_sect, "%s_%s", addon_name, "attach_rot");
+                hud_attach_visual_offset[i][1] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
             }
         }
     }

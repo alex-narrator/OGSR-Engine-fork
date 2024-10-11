@@ -1276,7 +1276,8 @@ void CWeaponMagazined::LoadLaserParams(LPCSTR section)
     laser_light_render->set_color(clr);
     const float range = READ_IF_EXISTS(pSettings, r_float, m_light_section, b_r2 ? "range_r2" : "range", 100.f);
     laser_light_render->set_range(range);
-    laser_light_render->set_cone(deg2rad(READ_IF_EXISTS(pSettings, r_float, m_light_section, "spot_angle", 1.f)));
+    laser_cone_angle = deg2rad(READ_IF_EXISTS(pSettings, r_float, m_light_section, "spot_angle", 1.f));
+    laser_light_render->set_cone(laser_cone_angle);
     laser_light_render->set_texture(READ_IF_EXISTS(pSettings, r_string, m_light_section, "spot_texture", nullptr));
 
     m_sounds.StopSound("sndLaserSwitch");
@@ -1357,9 +1358,12 @@ void CWeaponMagazined::UpdateLaser()
             laser_pos = get_LastFP();
             Fvector laser_dir = get_LastFD();
 
+            auto desire_cone = (GetHUDmode() && Actor()->active_cam() == eacFirstEye) ? laser_cone_angle / GetZoomFactor() : laser_cone_angle;
+            laser_light_render->set_cone(desire_cone);
+
             if (GetHUDmode())
             {
-                if (IsZoomed() && !IsRotatingToZoom())
+                if (IsZoomed() && !IsRotatingToZoom() && laserdot_attach_aim_dist > 0.f)
                 {
                     SetToScreenCenter(laser_dir, laser_pos, laserdot_attach_aim_dist);
                 }

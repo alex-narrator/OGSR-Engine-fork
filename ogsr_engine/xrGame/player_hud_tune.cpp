@@ -24,8 +24,10 @@ enum HUD_ADJUST_MODE : int
     FLASHLIGHT_POS,
     SCRIPT_UI_POS,
     SCRIPT_UI_ROT,
-    ADDON_ATTACH_POS,
-    ADDON_ATTACH_ROT,
+    HUD_ADDON_ATTACH_POS,
+    HUD_ADDON_ATTACH_ROT,
+    WORLD_ADDON_ATTACH_POS,
+    WORLD_ADDON_ATTACH_ROT,
     _HUD_ADJUST_MODES_COUNT_
 };
 
@@ -44,8 +46,10 @@ static constexpr std::array<std::tuple<int, const char*>, _HUD_ADJUST_MODES_COUN
     {DIK_2, "adjusting FLASHLIGHT POINT"},
     {DIK_3, "adjusting SCRIPT UI POSITION"},
     {DIK_4, "adjusting SCRIPT UI ROTATION"},
-    {DIK_5, "adjusting ADDON ATTACH POSITION"},
-    {DIK_6, "adjusting ADDON ATTACH ROTATION"},
+    {DIK_5, "adjusting HUD ADDON ATTACH POSITION"},
+    {DIK_6, "adjusting HUD ADDON ATTACH ROTATION"},
+    {DIK_7, "adjusting WORLD ADDON ATTACH POSITION"},
+    {DIK_8, "adjusting WORLD ADDON ATTACH ROTATION"},
 }};
 
 int g_bHudAdjustMode = OFF;
@@ -172,9 +176,9 @@ void attachable_hud_item::tune(const Ivector& values)
         }
     }
 
-    if (g_bHudAdjustMode == ADDON_ATTACH_POS || g_bHudAdjustMode == ADDON_ATTACH_ROT)
+    if (g_bHudAdjustMode == HUD_ADDON_ATTACH_POS || g_bHudAdjustMode == HUD_ADDON_ATTACH_ROT || g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_ROT)
     {
-        if (g_bHudAdjustMode == ADDON_ATTACH_POS)
+        if (g_bHudAdjustMode == HUD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS)
         {
             if (values.x)
                 diff.x = (values.x > 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
@@ -184,9 +188,21 @@ void attachable_hud_item::tune(const Ivector& values)
                 diff.z = (values.z > 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
 
             if (auto Wpn = smart_cast<CWeapon*>(m_parent_hud_item))
-                Wpn->addon_adjust_offset[0].add(diff);
+            {
+                for (int i = 0; i < eMaxAddon; ++i)
+                {
+                    if (g_bHudAdjustMode == HUD_ADDON_ATTACH_POS && Wpn->hud_attach_visual[i])
+                    {
+                        &Wpn->hud_attach_visual_offset[i][0].add(diff);
+                    }
+                    if (g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS && Wpn->world_attach_visual[i])
+                    {
+                        Wpn->world_attach_visual_offset[i][0].add(diff);
+                    }
+                }
+            }
         }
-        else if (g_bHudAdjustMode == ADDON_ATTACH_ROT)
+        else if (g_bHudAdjustMode == HUD_ADDON_ATTACH_ROT || g_bHudAdjustMode == WORLD_ADDON_ATTACH_ROT)
         {
             if (values.x)
                 diff.x = (values.x > 0) ? g_bHudAdjustDeltaRot : -g_bHudAdjustDeltaRot;
@@ -196,7 +212,19 @@ void attachable_hud_item::tune(const Ivector& values)
                 diff.z = (values.z > 0) ? g_bHudAdjustDeltaRot : -g_bHudAdjustDeltaRot;
 
             if (auto Wpn = smart_cast<CWeapon*>(m_parent_hud_item))
-                Wpn->addon_adjust_offset[1].add(diff);
+            {
+                for (int i = 0; i < eMaxAddon; ++i)
+                {
+                    if (g_bHudAdjustMode == HUD_ADDON_ATTACH_ROT && Wpn->hud_attach_visual[i])
+                    {
+                        &Wpn->hud_attach_visual_offset[i][1].add(diff);
+                    }
+                    if (g_bHudAdjustMode == WORLD_ADDON_ATTACH_ROT && Wpn->world_attach_visual[i])
+                    {
+                        Wpn->world_attach_visual_offset[i][1].add(diff);
+                    }
+                }
+            }
         }
     }
 
@@ -416,19 +444,32 @@ void player_hud::DumpParamsToLog()
             Msg("custom_ui_rot = %f,%f,%f", rot.x, rot.y, rot.z);
             Log("####################################");
         }
-        else if (g_bHudAdjustMode == ADDON_ATTACH_POS || g_bHudAdjustMode == ADDON_ATTACH_ROT)
+        else if (g_bHudAdjustMode == HUD_ADDON_ATTACH_POS || g_bHudAdjustMode == HUD_ADDON_ATTACH_ROT || 
+                g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_ROT)
         {
             if (auto Wpn = smart_cast<CWeapon*>(m_attached_items[g_bHudAdjustItemIdx]->m_parent_hud_item))
             {
-                auto addon = Wpn->m_addons_visual_hud.back();
-                Log("####################################");
-                Msg("[%s]", hud_sect);
-                auto pos = Wpn->addon_adjust_offset[0];
-                auto rot = Wpn->addon_adjust_offset[1];
-
-                Msg("%s_attach_pos = %f,%f,%f", addon->name, pos.x, pos.y, pos.z);
-                Msg("%s_attach_rot = %f,%f,%f", addon->name, rot.x, rot.y, rot.z);
-                Log("####################################");
+                for (int i = 0; i < eMaxAddon; ++i)
+                {
+                    if ((g_bHudAdjustMode == HUD_ADDON_ATTACH_POS || g_bHudAdjustMode == HUD_ADDON_ATTACH_ROT) && Wpn->hud_attach_visual[i])
+                    {
+                        Log("####################################");
+                        Msg("[%s]", hud_sect);
+                        auto pos = Wpn->hud_attach_visual_offset[i][0];
+                        auto rot = Wpn->hud_attach_visual_offset[i][1];
+                        Msg("%s_attach_pos = %f,%f,%f", Wpn->hud_attach_addon_name[i], pos.x, pos.y, pos.z);
+                        Msg("%s_attach_rot = %f,%f,%f", Wpn->hud_attach_addon_name[i], rot.x, rot.y, rot.z);
+                    }
+                    if ((g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_ROT) && Wpn->world_attach_visual[i])
+                    {
+                        Log("####################################");
+                        Msg("[%s]", Wpn->cNameSect().c_str());
+                        auto pos = Wpn->world_attach_visual_offset[i][0];
+                        auto rot = Wpn->world_attach_visual_offset[i][1];
+                        Msg("%s_attach_pos = %f,%f,%f", Wpn->world_attach_addon_name[i], pos.x, pos.y, pos.z);
+                        Msg("%s_attach_rot = %f,%f,%f", Wpn->world_attach_addon_name[i], rot.x, rot.y, rot.z);
+                    }
+                }
             }
         }
         else if (g_bHudAdjustMode == FIRE_POINT || g_bHudAdjustMode == FIRE_POINT2 || g_bHudAdjustMode == SHELL_POINT || g_bHudAdjustMode == LASETDOT_POS ||
@@ -458,7 +499,7 @@ void hud_draw_adjust_mode()
     if (pInput->iGetAsyncKeyState(DIK_LSHIFT))
         _text =
             "press SHIFT+NUM 0-return|1-hud_pos|2-hud_rot|3-itm_pos|4-itm_rot|5-fire_point|6-fire_point2|7-shell_point|8-pos_step|9-rot_step    ||||||    press "
-            "SHIFT+1-laser_point|2-flashlight_point|3-custom_ui_pos|4-custom_ui_rot|5-addon_attach_pos|6-addon_attach_rot";
+            "SHIFT+1-laser_point|2-flashlight_point|3-custom_ui_pos|4-custom_ui_rot|5-hud_addon_attach_pos|6-hud_addon_attach_rot|7-world_addon_attach_pos|8-world_addon_attach_rot";
     else if (pInput->iGetAsyncKeyState(DIK_LCONTROL))
         _text = "press CTRL+NUM 0-item idx 1|1-item idx 2";
     else
