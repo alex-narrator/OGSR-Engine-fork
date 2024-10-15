@@ -531,10 +531,9 @@ void CWeaponMagazinedWGrenade::OnH_B_Independent(bool just_before_destroy)
 
 bool CWeaponMagazinedWGrenade::CanAttach(PIItem pIItem)
 {
-    auto pGrenadeLauncher = smart_cast<CGrenadeLauncher*>(pIItem);
+    auto pGrenadeLauncher = std::find(m_glaunchers.begin(), m_glaunchers.end(), pIItem->object().cNameSect()) != m_glaunchers.end();
 
-    if (pGrenadeLauncher && CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) &&
-        std::find(m_glaunchers.begin(), m_glaunchers.end(), pIItem->object().cNameSect()) != m_glaunchers.end())
+    if (pGrenadeLauncher && CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher))
         return true;
     else
         return inherited::CanAttach(pIItem);
@@ -551,7 +550,7 @@ bool CWeaponMagazinedWGrenade::CanDetach(const char* item_section_name)
 
 bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
 {
-    auto pGrenadeLauncher = smart_cast<CGrenadeLauncher*>(pIItem);
+    auto pGrenadeLauncher = std::find(m_glaunchers.begin(), m_glaunchers.end(), pIItem->object().cNameSect()) != m_glaunchers.end();
 
     if (pGrenadeLauncher && CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher))
     {

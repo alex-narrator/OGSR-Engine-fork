@@ -38,14 +38,6 @@ private:
 public:
 	CGrenadeLauncher(void) {};
 	virtual ~CGrenadeLauncher(void) {};
-
-	virtual void Load(LPCSTR section);
-
-			float GetGrenadeVel() { return m_fGrenadeVel; }
-
-protected:
-	//стартовая скорость вылета подствольной гранаты
-	float m_fGrenadeVel{};
 };
 ///////////////////////////////////////////////////////////////
 // Laser - апгрейд оружия ЛЦУ

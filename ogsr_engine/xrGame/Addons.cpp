@@ -43,8 +43,3 @@ void CScope::script_register(lua_State* L)
         class_<CInventoryBox, CGameObject>("CInventoryBox").def(constructor<>())
 	];
 }
-
-void CGrenadeLauncher::Load(LPCSTR section){
-	m_fGrenadeVel = pSettings->r_float(section, "grenade_vel");
-	inherited::Load(section);
-}

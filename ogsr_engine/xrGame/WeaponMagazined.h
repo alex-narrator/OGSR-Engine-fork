@@ -52,6 +52,10 @@ protected:
     float laser_fBrightness{1.f};
     float laser_cone_angle{};
     void UpdateLaser();
+    bool laser_flashlight{};
+    void SetLaserRange(float);
+    void SetLaserAngle(float);
+    void SetLaserRGB(float, float, float);
 
     // flashlight
     float flashlight_attach_aim_dist{};
@@ -63,6 +67,9 @@ protected:
     CLAItem* flashlight_lanim{};
     float flashlight_fBrightness{1.f};
     void UpdateFlashlight();
+    void SetFlashlightRange(float, int = 0);
+    void SetFlashlightAngle(float, int = 0);
+    void SetFlashlightRGB(float, float, float, int = 0);
 
 protected:
     virtual void OnMagazineEmpty();
@@ -252,7 +259,6 @@ public:
     virtual void UnloadAmmo(int unload_count, bool spawn_ammo = true, bool detach_magazine = false);
     //
     virtual bool IsSingleReloading();
-    virtual LPCSTR GetCurrentMagazine_ShortName(bool = false);
 
     // действие передёргивания затвора
     virtual void ShutterAction();

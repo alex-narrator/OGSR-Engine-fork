@@ -35,8 +35,6 @@ enum EGameActions
     kWPN_6,
     kWPN_7, // kARTEFACT
     kWPN_8, // kDETECTOR
-    kLASER_ON,
-    kFLASHLIGHT,
     kWPN_NEXT,
     kWPN_FIRE,
     kWPN_ZOOM,

@@ -295,7 +295,6 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("is_addon_attached", &CWeapon::IsAddonAttached)
                   .def("addon_attachable", &CWeapon::AddonAttachable)
                   .def("get_addon_name", &get_addon_name)
-                  .def("get_addon_offset", &CWeapon::GetAddonOffset)
 
                   .def("get_ammo_sect", &get_ammo_sect)
 
@@ -335,7 +334,21 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("can_attach_addon", &CWeaponMagazined::CanAttach)
                   .def("can_detach_addon", &CWeaponMagazined::CanDetach)
                   .def("respawn_weapon", &CWeaponMagazined::RespawnWeapon)
-                  .def("firemod_string", &CWeaponMagazined::GetCurrentFireModeStr),
+                  .def("firemod_string", &CWeaponMagazined::GetCurrentFireModeStr)
+                    //laser
+                  .def("set_laser_range", &CWeaponMagazined::SetLaserRange)
+                  .def("set_laser_angle", &CWeaponMagazined::SetLaserAngle)
+                  .def("set_laser_rgb", &CWeaponMagazined::SetLaserRGB)
+                  .def("set_laser_on", &CWeaponMagazined::SetLaserOn)
+                  .def("is_laser_on", &CWeaponMagazined::IsLaserOn)
+                  .def("switch_laser", &CWeaponMagazined::SwitchLaser)
+                      //flashlight
+                  .def("set_flashlight_range", &CWeaponMagazined::SetFlashlightRange)
+                  .def("set_flashlight_angle", &CWeaponMagazined::SetFlashlightAngle)
+                  .def("set_flashlight_rgb", &CWeaponMagazined::SetFlashlightRGB)
+                  .def("set_flashlight_on", &CWeaponMagazined::SetFlashlightOn)
+                  .def("is_flashlight_on", &CWeaponMagazined::IsFlashlightOn)
+                  .def("switch_flashlight", &CWeaponMagazined::SwitchFlashlight),
               class_<CWeaponMagazinedWGrenade, CWeaponMagazined>("CWeaponMagazinedWGrenade")
                   .def_readwrite("gren_mag_size", &CWeaponMagazinedWGrenade::iMagazineSize2)
                   .def("switch_gl", &CWeaponMagazinedWGrenade::SwitchMode),

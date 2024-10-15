@@ -461,9 +461,8 @@ void CWeaponShotgun::StopHUDSounds() { inherited::StopHUDSounds(); }
 
 bool CWeaponShotgun::CanAttach(PIItem pIItem)
 {
-    auto pExtender = smart_cast<CExtender*>(pIItem);
-    if (pExtender && m_eExtenderStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
-        std::find(m_extenders.begin(), m_extenders.end(), pIItem->object().cNameSect()) != m_extenders.end())
+    auto pExtender = std::find(m_extenders.begin(), m_extenders.end(), pIItem->object().cNameSect()) != m_extenders.end();
+    if (pExtender && m_eExtenderStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender))
         return true;
     else
         return inherited::CanAttach(pIItem);
@@ -480,7 +479,7 @@ bool CWeaponShotgun::CanDetach(const char* item_section_name)
 
 bool CWeaponShotgun::Attach(PIItem pIItem, bool b_send_event)
 {
-    auto pExtender = smart_cast<CExtender*>(pIItem);
+    auto pExtender = std::find(m_extenders.begin(), m_extenders.end(), pIItem->object().cNameSect()) != m_extenders.end();
 
     if (pExtender && CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 == (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender))
     {

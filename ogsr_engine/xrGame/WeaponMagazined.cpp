@@ -819,30 +819,24 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
 
 bool CWeaponMagazined::CanAttach(PIItem pIItem)
 {
-    auto pScope = smart_cast<CScope*>(pIItem) || smart_cast<CWeaponBinoculars*>(pIItem);
-    auto pSilencer = smart_cast<CSilencer*>(pIItem);
-    auto pLaser = smart_cast<CLaser*>(pIItem);
-    auto pFlashlight = smart_cast<CAddonFlashlight*>(pIItem);
-    auto pStock = smart_cast<CStock*>(pIItem);
-    auto pForend = smart_cast<CForend*>(pIItem);
+    auto pScope = std::find(m_scopes.begin(), m_scopes.end(), pIItem->object().cNameSect()) != m_scopes.end();
+    auto pSilencer = std::find(m_silencers.begin(), m_silencers.end(), pIItem->object().cNameSect()) != m_silencers.end();
+    auto pLaser = std::find(m_lasers.begin(), m_lasers.end(), pIItem->object().cNameSect()) != m_lasers.end();
+    auto pFlashlight = std::find(m_flashlights.begin(), m_flashlights.end(), pIItem->object().cNameSect()) != m_flashlights.end();
+    auto pStock = std::find(m_stocks.begin(), m_stocks.end(), pIItem->object().cNameSect()) != m_stocks.end();
+    auto pForend = std::find(m_forends.begin(), m_forends.end(), pIItem->object().cNameSect()) != m_forends.end();
 
-    if (pScope && m_eScopeStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) == 0 &&
-        std::find(m_scopes.begin(), m_scopes.end(), pIItem->object().cNameSect()) != m_scopes.end())
+    if (pScope && m_eScopeStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) == 0)
         return true;
-    else if (pSilencer && m_eSilencerStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) == 0 &&
-             std::find(m_silencers.begin(), m_silencers.end(), pIItem->object().cNameSect()) != m_silencers.end())
+    else if (pSilencer && m_eSilencerStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) == 0)
         return true;
-    else if (pLaser && m_eLaserStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonLaser) == 0 &&
-             std::find(m_lasers.begin(), m_lasers.end(), pIItem->object().cNameSect()) != m_lasers.end())
+    else if (pLaser && m_eLaserStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonLaser) == 0)
         return true;
-    else if (pFlashlight && m_eFlashlightStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) == 0 &&
-             std::find(m_flashlights.begin(), m_flashlights.end(), pIItem->object().cNameSect()) != m_flashlights.end())
+    else if (pFlashlight && m_eFlashlightStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) == 0)
         return true;
-    else if (pStock && m_eStockStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock) == 0 &&
-             std::find(m_stocks.begin(), m_stocks.end(), pIItem->object().cNameSect()) != m_stocks.end())
+    else if (pStock && m_eStockStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock) == 0)
         return true;
-    else if (pForend && m_eForendStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend) == 0 &&
-             std::find(m_forends.begin(), m_forends.end(), pIItem->object().cNameSect()) != m_forends.end())
+    else if (pForend && m_eForendStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend) == 0)
         return true;
     else
         return inherited::CanAttach(pIItem);
@@ -876,12 +870,12 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 {
     bool result = false;
 
-    auto pScope = smart_cast<CScope*>(pIItem) || smart_cast<CWeaponBinoculars*>(pIItem);
-    auto pSilencer = smart_cast<CSilencer*>(pIItem);
-    auto pLaser = smart_cast<CLaser*>(pIItem);
-    auto pFlashlight = smart_cast<CAddonFlashlight*>(pIItem);
-    auto pStock = smart_cast<CStock*>(pIItem);
-    auto pForend = smart_cast<CForend*>(pIItem);
+    auto pScope = std::find(m_scopes.begin(), m_scopes.end(), pIItem->object().cNameSect()) != m_scopes.end();
+    auto pSilencer = std::find(m_silencers.begin(), m_silencers.end(), pIItem->object().cNameSect()) != m_silencers.end();
+    auto pLaser = std::find(m_lasers.begin(), m_lasers.end(), pIItem->object().cNameSect()) != m_lasers.end();
+    auto pFlashlight = std::find(m_flashlights.begin(), m_flashlights.end(), pIItem->object().cNameSect()) != m_flashlights.end();
+    auto pStock = std::find(m_stocks.begin(), m_stocks.end(), pIItem->object().cNameSect()) != m_stocks.end();
+    auto pForend = std::find(m_forends.begin(), m_forends.end(), pIItem->object().cNameSect()) != m_forends.end();
 
     if (pScope && m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) == 0)
     {
@@ -977,6 +971,8 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
              std::find(m_lasers.begin(), m_lasers.end(), item_section_name) != m_lasers.end())
     {
         SwitchLaser(false);
+        if (laser_flashlight)
+            SwitchFlashlight(false);
         m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonLaser;
         //
         m_cur_laser = 0;
@@ -1036,6 +1032,9 @@ void CWeaponMagazined::InitAddons()
     {
         sect = AddonAttachable(eLaser) ? GetAddonName(eLaser).c_str() : cNameSect().c_str();
         LoadLaserParams(sect);
+        laser_flashlight = pSettings->line_exist(sect, "light_definition");
+        if (laser_flashlight)
+            LoadFlashlightParams(sect);
     }
     // ліхтарик
     if (IsAddonAttached(eFlashlight))
@@ -1287,7 +1286,7 @@ void CWeaponMagazined::LoadLaserParams(LPCSTR section)
 
 void CWeaponMagazined::LoadFlashlightParams(LPCSTR section)
 {
-    if (!IsAddonAttached(eFlashlight))
+    if (!IsAddonAttached(eFlashlight) && !laser_flashlight)
         return;
 
     shared_str wpn_sect = cNameSect();
@@ -1300,7 +1299,7 @@ void CWeaponMagazined::LoadFlashlightParams(LPCSTR section)
 
     const bool b_r2 = psDeviceFlags.test(rsR2) || psDeviceFlags.test(rsR3) || psDeviceFlags.test(rsR4);
 
-    const char* m_light_section = pSettings->r_string(section, "flashlight_section");
+    const char* m_light_section = pSettings->r_string(section, "light_definition");
 
     flashlight_lanim = LALib.FindItem(READ_IF_EXISTS(pSettings, r_string, m_light_section, "color_animator", ""));
 
@@ -1402,7 +1401,7 @@ void CWeaponMagazined::UpdateLaser()
 
 void CWeaponMagazined::UpdateFlashlight()
 {
-    if (IsAddonAttached(eFlashlight))
+    if (IsAddonAttached(eFlashlight) || laser_flashlight)
     {
         auto io = smart_cast<CInventoryOwner*>(H_Parent());
         if (!flashlight_render->get_active() && IsFlashlightOn() && (!H_Parent() || (io && this == io->inventory().ActiveItem())))
@@ -2000,14 +1999,6 @@ bool CWeaponMagazined::IsGrenadeLauncherBroken() const
     return fis_zero(m_fAttachedGrenadeLauncherCondition) || IsAddonAttached(eLauncher) && !AddonAttachable(eLauncher) && fis_zero(GetCondition());
 }
 
-LPCSTR CWeaponMagazined::GetCurrentMagazine_ShortName(bool to_show)
-{
-    if (!IsAddonAttached(eMagazine))
-        return ("");
-    LPCSTR mag_short_name = pSettings->r_string(GetAddonName(eMagazine), "inv_name_short");
-    return CStringTable().translate(mag_short_name).c_str();
-}
-
 void CWeaponMagazined::SwitchLaser(bool on)
 {
     if (!IsAddonAttached(eLaser))
@@ -2027,7 +2018,7 @@ void CWeaponMagazined::SwitchLaser(bool on)
 
 void CWeaponMagazined::SwitchFlashlight(bool on)
 {
-    if (!IsAddonAttached(eFlashlight))
+    if (!IsAddonAttached(eFlashlight) && !laser_flashlight)
         return;
 
     SetFlashlightOn(on);
@@ -2156,4 +2147,85 @@ void CWeaponMagazined::RespawnWeapon(LPCSTR section)
     sobj2->Spawn_Write(P, TRUE);
     Level().Send(P, net_flags(TRUE));
     F_entity_Destroy(_abstract);
+}
+
+void CWeaponMagazined::SetLaserRange(float range) 
+{
+    if (!laser_light_render)
+        return;
+    laser_light_render->set_range(range);
+}
+void CWeaponMagazined::SetLaserAngle(float angle)
+{
+    if (!laser_light_render)
+        return;
+    laser_light_render->set_cone(angle);
+}
+void CWeaponMagazined::SetLaserRGB(float r, float g, float b) 
+{
+    if (!laser_light_render)
+        return;    
+    Fcolor c;
+    c.a = 1;
+    c.r = r;
+    c.g = g;
+    c.b = b;
+    laser_light_render->set_color(c);
+}
+
+void CWeaponMagazined::SetFlashlightRange(float range, int target)
+{
+    if (!flashlight_render)
+        return;
+    switch (target)
+    {
+    case 0: {
+        flashlight_render->set_range(range);
+        break;
+    }
+    case 1:
+        if (flashlight_omni)
+            flashlight_omni->set_range(range);
+        break;
+    case 2:
+        if (flashlight_glow)
+            flashlight_glow->set_radius(range);
+        break;
+    }
+}
+void CWeaponMagazined::SetFlashlightAngle(float angle, int target)
+{
+    if (!flashlight_render)
+        return;
+    switch (target)
+    {
+    case 0: light_render->set_cone(angle); break;
+    case 1:
+        if (flashlight_omni)
+            flashlight_omni->set_cone(angle);
+        break;
+    }
+}
+void CWeaponMagazined::SetFlashlightRGB(float r, float g, float b, int target)
+{
+    if (!flashlight_render)
+        return;
+    Fcolor c;
+    c.a = 1;
+    c.r = r;
+    c.g = g;
+    c.b = b;
+    switch (target)
+    {
+    case 0: flashlight_render->set_color(c);
+        break;
+    case 1:
+        if (flashlight_omni)
+            flashlight_omni->set_color(c);
+        break;
+    case 2:
+        if (flashlight_glow)
+            flashlight_glow->set_color(c);
+        break;
+    }
 }

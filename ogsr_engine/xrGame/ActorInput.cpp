@@ -167,16 +167,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
         OnPrevWeaponSlot();
     }
     break;
-    case kLASER_ON: {
-        if (auto wpn = smart_cast<CWeaponMagazined*>(inventory().ActiveItem()))
-            wpn->SwitchLaser(!wpn->IsLaserOn());
-    }
-    break;
-    case kFLASHLIGHT: {
-        if (auto wpn = smart_cast<CWeaponMagazined*>(inventory().ActiveItem()))
-            wpn->SwitchFlashlight(!wpn->IsFlashlightOn());
-    }
-    break;
     case kWPN_FUNC: {
         if (auto dev = smart_cast<CCustomDevice*>(inventory().ItemFromSlot(DETECTOR_SLOT)); dev && dev->GetHUDmode())
             dev->SwitchMode();

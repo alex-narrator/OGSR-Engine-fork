@@ -43,8 +43,6 @@ xr_vector<_action> actions = {
 	DEF_ACTION("wpn_6", kWPN_6)
 	DEF_ACTION("wpn_7", kWPN_7)
 	DEF_ACTION("wpn_8", kWPN_8)
-	DEF_ACTION("laser_on", kLASER_ON) 
-    DEF_ACTION("flashlight", kFLASHLIGHT)
 	DEF_ACTION("wpn_next", kWPN_NEXT)
 	DEF_ACTION("wpn_fire", kWPN_FIRE)
 	DEF_ACTION("wpn_zoom", kWPN_ZOOM)

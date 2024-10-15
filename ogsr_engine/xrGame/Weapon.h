@@ -160,8 +160,6 @@ public:
     // инициализация свойств присоединенных аддонов
     virtual void InitAddons(){};
 
-    // для отоброажения иконок апгрейдов в интерфейсе
-    Fvector2 GetAddonOffset(u32);
     virtual shared_str GetAddonName(u32) const;
 
     const shared_str GetMagazineIconSect() const;

@@ -2054,33 +2054,6 @@ shared_str CWeapon::GetAddonName(u32 addon) const
     }
 }
 
-Fvector2 CWeapon::GetAddonOffset(u32 addon)
-{
-    LPCSTR addon_prefix[] = {
-        "silencer", "scope", "grenade_launcher", "laser", "flashlight", "stock", "extender", "forend", "magazine",
-    };
-
-    float offset_x{}, offset_y{};
-    string1024 res_sect{};
-    shared_str weapon_sect{cNameSect()}, addon_sect{GetAddonName(addon)};
-    // x coordinate
-    sprintf(res_sect, "%s_x", addon_prefix[addon]);
-    offset_x = READ_IF_EXISTS(pSettings, r_s32, weapon_sect, res_sect, 0);
-    sprintf(res_sect, "%s_x", addon_sect.c_str());
-    if (pSettings->line_exist(weapon_sect, res_sect))
-        offset_x = pSettings->r_s32(weapon_sect, res_sect);
-    // y coordinate
-    sprintf(res_sect, "%s_y", addon_prefix[addon]);
-    offset_y = READ_IF_EXISTS(pSettings, r_s32, weapon_sect, res_sect, 0);
-    sprintf(res_sect, "%s_y", addon_sect.c_str());
-    if (pSettings->line_exist(weapon_sect, res_sect))
-        offset_y = pSettings->r_s32(weapon_sect, res_sect);
-
-    Fvector2 offset{offset_x, offset_y};
-
-    return offset;
-}
-
 float CWeapon::GetHitPowerForActor() const { return fvHitPower[g_SingleGameDifficulty]; }
 
 bool CWeapon::IsDirectReload(CWeaponAmmo* ammo)
