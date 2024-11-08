@@ -29,6 +29,14 @@ void CUIScrollView::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 void CUIScrollView::ForceUpdate() { m_flags.set(eNeedRecalc, TRUE); }
 
+void CUIScrollView::ForceScrollPosition()
+{
+    if (m_flags.test(eNeedRecalc))
+        RecalcSize();
+    const Fvector2 w_pos = m_pad->GetWndPos();
+    m_pad->SetWndPos(w_pos.x, m_targetScrollPosition);
+}
+
 void CUIScrollView::Init()
 {
     if (!m_pad)
@@ -89,6 +97,9 @@ void CUIScrollView::Update()
     if (m_flags.test(eNeedRecalc))
         RecalcSize();
 
+    const Fvector2 w_pos = m_pad->GetWndPos();
+    m_pad->SetWndPos(w_pos.x, m_targetScrollPosition * 0.3 + w_pos.y * 0.7);
+
     inherited::Update();
 }
 
@@ -136,11 +147,13 @@ void CUIScrollView::RecalcSize()
     m_pad->SetWndSize(pad_size);
 
     if (m_flags.test(eInverseDir))
-        m_pad->SetWndPos(m_pad->GetWndPos().x, GetHeight() - m_pad->GetHeight());
+        m_targetScrollPosition = GetHeight() - m_pad->GetHeight();
 
     UpdateScroll();
 
     m_flags.set(eNeedRecalc, FALSE);
+
+    UpdateScroll();
 }
 
 void CUIScrollView::UpdateScroll()
@@ -204,8 +217,7 @@ bool CUIScrollView::NeedShowScrollBar() { return m_flags.test(eFixedScrollBar) |
 void CUIScrollView::OnScrollV(CUIWindow*, void*)
 {
     int s_pos = m_VScrollBar->GetScrollPos();
-    Fvector2 w_pos = m_pad->GetWndPos();
-    m_pad->SetWndPos(w_pos.x, float(-s_pos));
+    m_targetScrollPosition = -static_cast<float>(s_pos);
 }
 
 #include "../xr_3da/xr_input.h"

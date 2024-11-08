@@ -21,6 +21,7 @@ protected:
     CUIScrollBar* m_VScrollBar;
     CUIWindow* m_pad;
 
+    float m_targetScrollPosition{};
     float m_rightIndent;
     float m_leftIndent;
     float m_upIndent;
@@ -64,6 +65,7 @@ public:
     CUIWindow* GetSelected();
     Fvector2 GetPadSize();
     void ForceUpdate();
+    void ForceScrollPosition();
     int GetMinScrollPos();
     int GetMaxScrollPos();
     int GetCurrentScrollPos();
