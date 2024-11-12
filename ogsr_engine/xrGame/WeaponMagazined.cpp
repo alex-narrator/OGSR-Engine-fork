@@ -1060,7 +1060,9 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
 
     m_fIronSightZoomFactor = READ_IF_EXISTS(pSettings, r_float, section, "ironsight_zoom_factor", 1.0f);
     m_fScopeInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "scope_inertion_factor", GetControlInertionFactor());
-    m_fSecondVPZoomFactor = READ_IF_EXISTS(pSettings, r_float, section, "scope_lense_fov_factor", 0.f);
+    m_fSecondVPZoomFactor = 0.f; // READ_IF_EXISTS(pSettings, r_float, section, "scope_lense_fov_factor", 0.f);
+    m_fSecondVPZoomK = READ_IF_EXISTS(pSettings, r_float, section, "scope_lense_fov_k", 0.f);
+    m_fZoomHudFov = READ_IF_EXISTS(pSettings, r_float, section, "scope_zoom_hud_fov", 0.0f);
 
     // second scope mode
     m_bHasScopeSecond = READ_IF_EXISTS(pSettings, r_bool, section, "scope_second", false) && !READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "ignore_scope_second", false);
@@ -1104,6 +1106,8 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
         ASSERT_FMT(_count >= 1, "!![%s] : No scope_zoom_factor params found in section [%s]", __FUNCTION__, section);
         string128 tmp;
         m_fScopeZoomFactor = atof(_GetItem(scope_zoom_line, 0, tmp));
+        if (m_fSecondVPZoomK > 0.f)
+            m_fSecondVPZoomFactor = m_fScopeZoomFactor;
         if (_count > 1)
         {
             m_fMaxScopeZoomFactor = atof(_GetItem(scope_zoom_line, 1, tmp));
@@ -1646,7 +1650,8 @@ void CWeaponMagazined::OnZoomOut(bool rezoom)
 void CWeaponMagazined::OnZoomChanged()
 {
     PlaySound("sndZoomChange", get_LastFP());
-    m_fRTZoomFactor = m_fZoomFactor; // store current
+    if (!SecondVPEnabled())
+        m_fRTZoomFactor = m_fZoomFactor; // store current
 }
 
 // переключение режимов стрельбы одиночными и очередями

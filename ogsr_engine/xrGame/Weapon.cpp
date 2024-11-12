@@ -1049,8 +1049,8 @@ void CWeapon::ZoomChange(bool inc)
     if (SecondVPEnabled())
     {
         const float currentZoomFactor = m_fRTZoomFactor;
-        m_fZoomFactor += GetZoomStepDelta(m_fSecondVPZoomFactor, m_fMaxScopeZoomFactor, m_uZoomStepCount) * (inc ? 1 : -1); // delta;
-        clamp(m_fSecondVPZoomFactor, m_fScopeZoomFactor, m_fMaxScopeZoomFactor);
+        m_fRTZoomFactor += GetZoomStepDelta(m_fSecondVPZoomFactor, m_fMaxScopeZoomFactor, m_uZoomStepCount) * (inc ? 1 : -1); // delta;
+        clamp(m_fRTZoomFactor, m_fSecondVPZoomFactor, m_fMaxScopeZoomFactor);
         wasChanged = !fsimilar(currentZoomFactor, m_fRTZoomFactor);
     }
     else
@@ -1870,8 +1870,8 @@ void CWeapon::UpdateSecondVP()
 
 bool CWeapon::SecondVPEnabled() const
 {
-    bool bCond_2 = m_fSecondVPZoomFactor > 0.0f; // В конфиге должен быть прописан фактор зума (scope_lense_fov_factor) больше чем 0
-    bool bCond_4 = !IsGrenadeMode(); // Мы не должны быть в режиме подствольника
+    bool bCond_2 = m_fSecondVPZoomK > 0.0f; // У конфігу має бути прописаний множник коригування зуму (scope_lense_fov_k) більше 0
+    bool bCond_4 = !IsGrenadeMode() && !IsSecondScopeMode(); // Мы не должны быть в режиме подствольника
     bool bcond_6 = psActorFlags.test(AF_3D_SCOPES);
     return bCond_2 && bCond_4 && bcond_6;
 }
@@ -1902,7 +1902,7 @@ float CWeapon::GetSecondVPFov() const
     {
         fov_factor = m_fRTZoomFactor;
     }
-    return atanf(tanf(g_fov * (0.5f * PI / 180)) / fov_factor) / (0.5f * PI / 180);
+    return (g_fov / m_fSecondVPZoomK) / fov_factor;
 }
 
 // Получить HUD FOV от текущего оружия игрока
