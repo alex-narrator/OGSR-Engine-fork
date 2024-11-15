@@ -346,6 +346,12 @@ class ShExports final
     Fvector4 pnv_color{};
     Fvector4 pnv_params{};
 
+    //mark switch
+    int ps_markswitch_current{};
+    int ps_markswitch_count{};
+    Fvector4 ps_markswitch_color{};
+
+
 public:
     void set_artefact_position(const u32& _i, const Fvector2& _pos) { artefacts_position[_i] = _pos; };
     void set_anomaly_position(const u32& _i, const Fvector2& _pos) { anomalys_position[_i] = _pos; };
@@ -366,6 +372,15 @@ public:
 
     const Fvector4& get_pnv_color() const { return pnv_color; };
     const Fvector4& get_pnv_params() const { return pnv_params; };
+
+    const Fvector4& get_markswitch_color() const { return ps_markswitch_color; };
+    void set_markswitch_color(float a, float b, float c, float d) { ps_markswitch_color = {a, b, c, d}; };
+
+    const int& get_markswitch_current() const { return ps_markswitch_current; };
+    void set_markswitch_current(int val) { ps_markswitch_current = val; };
+
+    const int& get_markswitch_count() const { return ps_markswitch_count; };
+    void set_markswitch_count(int val) { ps_markswitch_count = val; };
 };
 
 ENGINE_API extern ShExports shader_exports;

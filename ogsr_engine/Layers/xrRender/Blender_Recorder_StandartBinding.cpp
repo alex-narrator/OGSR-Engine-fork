@@ -471,6 +471,33 @@ static class ssfx_wpn_dof_2 final : public R_constant_setup
     }
 } ssfx_wpn_dof_2;
 
+static class ps_markswitch_current : public R_constant_setup
+{
+    void setup(R_constant* C) override
+    {
+        const auto& P = shader_exports.get_markswitch_current();
+        RCache.set_c(C, P);
+    }
+} ps_markswitch_current;
+
+static class ps_markswitch_count : public R_constant_setup
+{
+    void setup(R_constant* C) override
+    {
+        const auto& P = shader_exports.get_markswitch_count();
+        RCache.set_c(C, P);
+    }
+} ps_markswitch_count;
+
+static class ps_markswitch_color : public R_constant_setup
+{
+    void setup(R_constant* C) override
+    {
+        const auto& P = shader_exports.get_markswitch_color();
+        RCache.set_c(C, P.x, P.y, P.z, P.w);
+    }
+} ps_markswitch_color;
+
 // Standart constant-binding
 void CBlender_Compile::SetMapping()
 {
@@ -565,6 +592,11 @@ void CBlender_Compile::SetMapping()
 
     r_Constant("pnv_color", &binder_pnv_color);
     r_Constant("pnv_params", &binder_pnv_params);
+
+    //mark switch
+    r_Constant("markswitch_current", &ps_markswitch_current);
+    r_Constant("markswitch_count", &ps_markswitch_count);
+    r_Constant("markswitch_color", &ps_markswitch_color);
 
     // other common
     for (const auto& [name, s] : DEV->v_constant_setup)
