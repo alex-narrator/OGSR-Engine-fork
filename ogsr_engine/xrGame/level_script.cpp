@@ -1028,6 +1028,9 @@ void CLevel::script_register(lua_State* L)
         def("set_markswitch_current", [](const int& val) { shader_exports.set_markswitch_current(val); }),
         def("set_markswitch_count", [](const int& val) { shader_exports.set_markswitch_count(val); }),
         def("set_markswitch_color", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_markswitch_color(p1, p2, p3, p4); }),
+        //scope params
+        def("set_scope_params", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_scope_params(p1, p2, p3, p4); }),
+        def("set_scope_color", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_scope_color(p1, p2, p3, p4); }),
 
         class_<enum_exporter<collide::rq_target>>("rq_target")
         .enum_("rq_target")[value("rqtNone", int(collide::rqtNone)), value("rqtObject", int(collide::rqtObject)), value("rqtStatic", int(collide::rqtStatic)),

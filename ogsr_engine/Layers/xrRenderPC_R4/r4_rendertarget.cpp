@@ -438,7 +438,7 @@ CRenderTarget::CRenderTarget()
 
         rt_dof.create(r2_RT_dof, w, h, D3DFMT_A8R8G8B8);
         rt_secondVP.create(r2_RT_secondVP, w, h, D3DFMT_A8R8G8B8, 1); //--#SM+#-- +SecondVP+
-        rt_BeforeUi.create("$user$viewport_temp_before_ui", w, h, D3DFMT_A8R8G8B8, 1);
+        rt_BeforeUi.create(r2_RT_before_ui, w, h, D3DFMT_A8R8G8B8, 1);
 
         if (RImplementation.o.dx10_msaa)
         {

@@ -351,6 +351,10 @@ class ShExports final
     int ps_markswitch_count{};
     Fvector4 ps_markswitch_color{};
 
+    //scope params
+    Fvector4 ps_scope_params{};
+    Fvector4 ps_scope_color{};
+
 
 public:
     void set_artefact_position(const u32& _i, const Fvector2& _pos) { artefacts_position[_i] = _pos; };
@@ -381,6 +385,12 @@ public:
 
     const int& get_markswitch_count() const { return ps_markswitch_count; };
     void set_markswitch_count(int val) { ps_markswitch_count = val; };
+
+    const Fvector4& get_scope_params() const { return ps_scope_params; };
+    void set_scope_params(float a, float b, float c, float d) { ps_scope_params = {a, b, c, d}; };
+
+    const Fvector4& get_scope_color() const { return ps_scope_color; };
+    void set_scope_color(float a, float b, float c, float d) { ps_scope_color = {a, b, c, d}; };
 };
 
 ENGINE_API extern ShExports shader_exports;

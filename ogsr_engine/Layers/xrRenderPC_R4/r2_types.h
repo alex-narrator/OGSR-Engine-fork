@@ -63,6 +63,8 @@
 
 #define r2_RT_secondVP "$user$viewport2" // --#SM+#-- +SecondVP+ Хранит картинку со второго вьюпорта
 
+#define r2_RT_before_ui "$user$viewport_temp_before_ui" // image before ui drawing
+
 #define r2_RT_sunshafts0 "$user$sun_shafts0" // first rt
 #define r2_RT_sunshafts1 "$user$sun_shafts1" // second rt
 
