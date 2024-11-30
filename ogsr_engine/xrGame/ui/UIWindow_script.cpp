@@ -165,6 +165,7 @@ void CUIWindow::script_register(lua_State* L)
                   .def("GetMaxScrollPos", &CUIScrollView::GetMaxScrollPos)
                   .def("GetCurrentScrollPos", &CUIScrollView::GetCurrentScrollPos)
                   .def("SetScrollPos", &CUIScrollView::SetScrollPos)
+                  .def("ForceScrollPos", &CUIScrollView::ForceScrollPosition)
                   .def("GetDesiredChildWidth", &CUIScrollView::GetDesiredChildWidth)
                   .def("GetPadSize", &CUIScrollView::GetPadSize),
 
