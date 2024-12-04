@@ -854,11 +854,9 @@ void demo_record_set_direct_input(bool f)
 
 CEffectorBobbing* get_effector_bobbing() { return Actor()->GetEffectorBobbing(); }
 
-Fvector get_cursor_pos()
-{
-    Fvector pos{GetUICursor()->GetCursorPosition().x, GetUICursor()->GetCursorPosition().y, 0};
-    return pos;
-}
+Fvector2 get_cursor_pos() { return GetUICursor()->GetCursorPosition(); }
+
+void set_cursor_pos(const Fvector2& pos) { GetUICursor()->SetUICursorPosition(pos); }
 
 void iterate_nearest(const Fvector& pos, float radius, luabind::functor<bool> functor)
 {
@@ -1001,7 +999,7 @@ void CLevel::script_register(lua_State* L)
             def("set_blender_mode_main", &set_blender_mode_main), def("get_blender_mode_main", &get_blender_mode_main), def("set_shader_params", &set_shader_params),
             def("get_shader_params", &get_shader_params),
             //--#SM+# End --
-            def("get_cursor_pos", &get_cursor_pos), def("iterate_nearest", &iterate_nearest)
+            def("get_cursor_pos", &get_cursor_pos), def("set_cursor_pos", &set_cursor_pos), def("iterate_nearest", &iterate_nearest)
     ],
 
         module(L, "actor_stats")[def("add_points", &add_actor_points), def("add_points_str", &add_actor_points_str), def("get_points", &get_actor_points),
