@@ -733,6 +733,7 @@ void CActor::UpdateCL()
             g_pGamePersistent->m_pGShaderConstants.hud_params.x = pWeapon->GetZRotatingFactor(); //--#SM+#--
             g_pGamePersistent->m_pGShaderConstants.hud_params.y = pWeapon->GetSecondVPFov(); //--#SM+#--
             g_pGamePersistent->m_pGShaderConstants.hud_params.z = pWeapon->GetLastHudFov();
+            g_pGamePersistent->m_pGShaderConstants.hud_params.w = pWeapon->IsSecondScopeMode();
         }
     }
     else
