@@ -1029,6 +1029,8 @@ bool CWeapon::Action(s32 cmd, u32 flags)
             if (HasScopeSecond() && (flags & CMD_START))
             {
                 m_bScopeSecondMode = !m_bScopeSecondMode;
+                if (auto pActor = smart_cast<CActor*>(H_Parent()))
+                    pActor->callback(GameObject::eOnActorWeaponScopeModeChange)(lua_game_object());
                 if (IsZoomed())
                     OnZoomOut(true);
                 return true;
@@ -1911,6 +1913,11 @@ float CWeapon::GetHudFov()
     const float last_nw_hf = inherited::GetHudFov();
     if (m_fZoomRotationFactor > 0.0f)
     {
+        if (m_fConstZoomHudFov > 0.f)
+        {
+            return m_fZoomRotationFactor < 1.f ? last_nw_hf : m_fConstZoomHudFov;
+        }
+
         if (SecondVPEnabled() && m_fSecondVPHudFov > 0.0f)
         {
             // В линзе зума

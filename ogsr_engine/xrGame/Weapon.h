@@ -253,6 +253,8 @@ protected:
     // Целевой HUD FOV для линзы
     float m_fSecondVPHudFov{};
 
+    float m_fConstZoomHudFov{};
+
     bool m_bHasScopeSecond{};
     bool m_bScopeSecondMode{};
 

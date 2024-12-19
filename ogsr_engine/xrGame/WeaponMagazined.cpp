@@ -1064,6 +1064,8 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
     m_fSecondVPZoomK = READ_IF_EXISTS(pSettings, r_float, section, "scope_lense_fov_k", 0.f);
     m_fZoomHudFov = READ_IF_EXISTS(pSettings, r_float, section, "scope_zoom_hud_fov", 0.0f);
 
+    m_fConstZoomHudFov = READ_IF_EXISTS(pSettings, r_float, section, "const_zoom_hud_fov", 0.0f);
+
     // second scope mode
     m_bHasScopeSecond = READ_IF_EXISTS(pSettings, r_bool, section, "scope_second", false) && !READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "ignore_scope_second", false);
     if (m_bHasScopeSecond)
@@ -1652,6 +1654,9 @@ void CWeaponMagazined::OnZoomChanged()
     PlaySound("sndZoomChange", get_LastFP());
     if (!SecondVPEnabled())
         m_fRTZoomFactor = m_fZoomFactor; // store current
+
+    if (auto pActor = smart_cast<CActor*>(H_Parent()))
+        pActor->callback(GameObject::eOnActorWeaponZoomChange)(lua_game_object());
 }
 
 // переключение режимов стрельбы одиночными и очередями
