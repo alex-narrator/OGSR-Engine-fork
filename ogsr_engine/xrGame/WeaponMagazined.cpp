@@ -1071,6 +1071,9 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
     if (m_bHasScopeSecond)
         m_fScopeZoomFactorSecond = READ_IF_EXISTS(pSettings, r_float, section, "scope_zoom_factor_second", 1.0f);
 
+    if (!m_bHasScopeSecond)
+        m_bScopeSecondMode = false;
+
     if (!IsAddonAttached(eScope) || IsScopeBroken())
     {
         m_bScopeDynamicZoom = m_bVision = false;

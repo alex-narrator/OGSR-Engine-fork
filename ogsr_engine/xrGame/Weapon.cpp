@@ -1913,7 +1913,7 @@ float CWeapon::GetHudFov()
     const float last_nw_hf = inherited::GetHudFov();
     if (m_fZoomRotationFactor > 0.0f)
     {
-        if (m_fConstZoomHudFov > 0.f)
+        if (m_fConstZoomHudFov > 0.f && !IsSecondScopeMode() && !IsGrenadeMode() && (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonDisabled || IsAddonAttached(eScope)))
         {
             return m_fZoomRotationFactor < 1.f ? last_nw_hf : m_fConstZoomHudFov;
         }
