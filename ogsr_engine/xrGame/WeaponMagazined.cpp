@@ -1946,6 +1946,11 @@ void CWeaponMagazined::Hit(SHit* pHDS)
     inherited::Hit(pHDS);
 }
 
+float CWeaponMagazined::GetZoomRotationTime() const
+{
+    return (IsSecondScopeMode() || IsGrenadeMode()) ? READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME) : m_fZoomRotateTime;
+}
+
 #include "../Include/xrRender/Kinematics.h"
 bool CWeaponMagazined::IsHitToAddon(SHit* pHDS)
 {

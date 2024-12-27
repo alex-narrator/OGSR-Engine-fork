@@ -232,7 +232,7 @@ void CWeaponMagazinedWGrenade::PerformSwitchGL()
     SetGrenadeMode(!IsGrenadeMode());
 
     if (IsZoomed())
-        OnZoomOut(true);
+        OnZoomOut();
 
     m_fZoomFactor = CurrentZoomFactor();
 

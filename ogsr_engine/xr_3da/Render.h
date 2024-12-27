@@ -347,13 +347,17 @@ class ShExports final
     Fvector4 pnv_params{};
 
     //mark switch
-    int ps_markswitch_current{};
-    int ps_markswitch_count{};
+    //int ps_markswitch_current{};
+    //int ps_markswitch_count{};
+    Fvector4 ps_markswitch_params{};
     Fvector4 ps_markswitch_color{};
 
     //scope params
     Fvector4 ps_scope_params{};
     Fvector4 ps_scope_color{};
+
+    //weapon_params
+    Fvector4 ps_weapon_params{};
 
 
 public:
@@ -380,17 +384,23 @@ public:
     const Fvector4& get_markswitch_color() const { return ps_markswitch_color; };
     void set_markswitch_color(float a, float b, float c, float d) { ps_markswitch_color = {a, b, c, d}; };
 
-    const int& get_markswitch_current() const { return ps_markswitch_current; };
-    void set_markswitch_current(int val) { ps_markswitch_current = val; };
+    const Fvector4& get_markswitch_params() const { return ps_markswitch_params; };
+    void set_markswitch_params(float a, float b, float c, float d) { ps_markswitch_params = {a, b, c, d}; };
 
-    const int& get_markswitch_count() const { return ps_markswitch_count; };
-    void set_markswitch_count(int val) { ps_markswitch_count = val; };
+    //const int& get_markswitch_current() const { return ps_markswitch_current; };
+    //void set_markswitch_current(int val) { ps_markswitch_current = val; };
+
+    //const int& get_markswitch_count() const { return ps_markswitch_count; };
+    //void set_markswitch_count(int val) { ps_markswitch_count = val; };
 
     const Fvector4& get_scope_params() const { return ps_scope_params; };
     void set_scope_params(float a, float b, float c, float d) { ps_scope_params = {a, b, c, d}; };
 
     const Fvector4& get_scope_color() const { return ps_scope_color; };
     void set_scope_color(float a, float b, float c, float d) { ps_scope_color = {a, b, c, d}; };
+
+    const Fvector4& get_weapon_params() const { return ps_weapon_params; };
+    void set_weapon_params(float a, float b, float c, float d) { ps_weapon_params = {a, b, c, d}; };
 };
 
 ENGINE_API extern ShExports shader_exports;

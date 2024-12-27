@@ -472,23 +472,31 @@ static class ssfx_wpn_dof_2 final : public R_constant_setup
 } ssfx_wpn_dof_2;
 
 //mark switch
-static class ps_markswitch_current : public R_constant_setup
+static class ps_markswitch_params : public R_constant_setup
 {
-    void setup(R_constant* C) override
+    void setup(R_constant * C) override
     {
-        const auto& P = shader_exports.get_markswitch_current();
-        RCache.set_c(C, P);
+        const auto& P = shader_exports.get_markswitch_params();
+        RCache.set_c(C, P.x, P.y, P.z, P.w);
     }
-} ps_markswitch_current;
-
-static class ps_markswitch_count : public R_constant_setup
-{
-    void setup(R_constant* C) override
-    {
-        const auto& P = shader_exports.get_markswitch_count();
-        RCache.set_c(C, P);
-    }
-} ps_markswitch_count;
+} ps_markswitch_params;
+//static class ps_markswitch_current : public R_constant_setup
+//{
+//    void setup(R_constant* C) override
+//    {
+//        const auto& P = shader_exports.get_markswitch_current();
+//        RCache.set_c(C, P);
+//    }
+//} ps_markswitch_current;
+//
+//static class ps_markswitch_count : public R_constant_setup
+//{
+//    void setup(R_constant* C) override
+//    {
+//        const auto& P = shader_exports.get_markswitch_count();
+//        RCache.set_c(C, P);
+//    }
+//} ps_markswitch_count;
 
 static class ps_markswitch_color : public R_constant_setup
 {
@@ -508,6 +516,16 @@ static class ps_scope_params : public R_constant_setup
         RCache.set_c(C, P.x, P.y, P.z, P.w);
     }
 } ps_scope_params;
+
+// scope params
+static class ps_weapon_params : public R_constant_setup
+{
+    void setup(R_constant* C) override
+    {
+        const auto& P = shader_exports.get_weapon_params();
+        RCache.set_c(C, P.x, P.y, P.z, P.w);
+    }
+} ps_weapon_params;
 
 static class ps_scope_color : public R_constant_setup
 {
@@ -614,13 +632,17 @@ void CBlender_Compile::SetMapping()
     r_Constant("pnv_params", &binder_pnv_params);
 
     //mark switch
-    r_Constant("markswitch_current", &ps_markswitch_current);
-    r_Constant("markswitch_count", &ps_markswitch_count);
+    //r_Constant("markswitch_current", &ps_markswitch_current);
+    //r_Constant("markswitch_count", &ps_markswitch_count);
+    r_Constant("markswitch_params", &ps_markswitch_params);
     r_Constant("markswitch_color", &ps_markswitch_color);
 
     //scope params
     r_Constant("scope_params", &ps_scope_params);
     r_Constant("scope_color", &ps_scope_color);
+
+    // weapon params
+    r_Constant("weapon_params", &ps_weapon_params);
 
     // other common
     for (const auto& [name, s] : DEV->v_constant_setup)

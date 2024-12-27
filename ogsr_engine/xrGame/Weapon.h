@@ -304,8 +304,6 @@ public:
     virtual bool IsScopeBroken() const { return false; };
     virtual bool IsGrenadeLauncherBroken() const { return false; };
 
-    virtual float GetZoomRotationTime() const { return m_fZoomRotateTime; }
-
 public:
     IC LPCSTR strap_bone0() const { return m_strap_bone0; }
     IC LPCSTR strap_bone1() const { return m_strap_bone1; }

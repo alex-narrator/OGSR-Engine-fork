@@ -291,6 +291,8 @@ public:
     void CorrectDirFromWorldToHud(Fvector& worldPos);
     float GetLastHudFov() const { return m_nearwall_last_hud_fov; }
 
+    virtual float GetZoomRotationTime() const { return m_fZoomRotateTime; };
+
 protected:
     enum CollisionWeaponType : size_t
     {

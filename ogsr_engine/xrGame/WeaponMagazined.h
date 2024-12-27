@@ -251,6 +251,8 @@ public:
 
     virtual float GetConditionMisfireProbability() const;
 
+    virtual float GetZoomRotationTime() const override;
+
     // оружие использует отъёмный магазин
 
     // у оружия есть патронник

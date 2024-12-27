@@ -1057,9 +1057,9 @@ void CHudItem::UpdateHudAdditional(Fmatrix& trans, const bool need_update_collis
     if (b_aiming)
     {
         if (IsZoomed())
-            m_fZoomRotationFactor += Device.fTimeDelta / m_fZoomRotateTime;
+            m_fZoomRotationFactor += Device.fTimeDelta / GetZoomRotationTime();
         else
-            m_fZoomRotationFactor -= Device.fTimeDelta / m_fZoomRotateTime;
+            m_fZoomRotationFactor -= Device.fTimeDelta / GetZoomRotationTime();
 
         clamp(m_fZoomRotationFactor, 0.f, 1.f);
 
