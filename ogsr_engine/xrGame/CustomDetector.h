@@ -159,8 +159,6 @@ class CCustomDetector : public CCustomDevice
 protected:
     CUIArtefactDetectorBase* m_ui{};
     shared_str m_nightvision_particle{};
-    bool m_bCanSwitchModes{};
-    bool m_bAfMode{};
 
 public:
     CCustomDetector() = default;
@@ -168,8 +166,8 @@ public:
 
     virtual void Load(LPCSTR section) override;
 
-    virtual void save(NET_Packet& output_packet);
-    virtual void load(IReader& input_packet);
+    //virtual void save(NET_Packet& output_packet);
+    //virtual void load(IReader& input_packet);
 
     virtual void OnH_B_Independent(bool just_before_destroy) override;
 
@@ -178,10 +176,6 @@ public:
     virtual void Switch(bool);
 
     virtual u32 ef_detector_type() const override { return 1; }
-
-    virtual bool CanSwitchModes() const { return m_bCanSwitchModes; }
-    virtual void SwitchMode();
-    virtual bool IsAfMode() const { return m_bAfMode; }
 
     virtual float GetDetectionRadius() const { return m_fDetectRadius; };
 

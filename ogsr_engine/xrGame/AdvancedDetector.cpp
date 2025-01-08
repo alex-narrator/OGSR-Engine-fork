@@ -15,10 +15,6 @@ CUIArtefactDetectorAdv& CAdvancedDetector::ui() { return *((CUIArtefactDetectorA
 
 void CAdvancedDetector::UpdateAf()
 {
-    bool b_ui_indacation{!CanSwitchModes() || IsAfMode()}; 
-    if (b_ui_indacation) 
-        ui().SetValue(0.0f, Fvector{});
-
     if (m_artefacts.m_ItemInfos.empty())
         return;
 
@@ -40,16 +36,13 @@ void CAdvancedDetector::UpdateAf()
 
     CArtefact* pCurrentAf = it->first;
     // direction
-    if (b_ui_indacation)
-    {
-        Fvector dir_to_artefact{};
-        dir_to_artefact.sub(pCurrentAf->Position(), Device.vCameraPosition);
-        dir_to_artefact.normalize();
-        float _ang_af = dir_to_artefact.getH();
-        float _ang_cam = Device.vCameraDirection.getH();
-        float _diff = angle_difference_signed(_ang_af, _ang_cam);
-        ui().SetValue(_diff, dir_to_artefact);
-    }
+    Fvector dir_to_artefact{};
+    dir_to_artefact.sub(pCurrentAf->Position(), Device.vCameraPosition);
+    dir_to_artefact.normalize();
+    float _ang_af = dir_to_artefact.getH();
+    float _ang_cam = Device.vCameraDirection.getH();
+    float _diff = angle_difference_signed(_ang_af, _ang_cam);
+    ui().SetValue(_diff, dir_to_artefact);
 
     ITEM_INFO& af_info = it->second;
     ITEM_TYPE* item_type = af_info.curr_ref;
@@ -80,10 +73,6 @@ void CAdvancedDetector::UpdateAf()
 
 void CAdvancedDetector::UpdateZones()
 {
-    bool b_ui_indacation{!CanSwitchModes() || !IsAfMode()};
-    if (b_ui_indacation)
-        ui().SetValue(0.0f, Fvector{});
-
     if (m_zones.m_ItemInfos.empty())
         return;
 
@@ -133,17 +122,6 @@ void CAdvancedDetector::UpdateZones()
         else
             zone_info.snd_time += Device.fTimeDelta;
     }
-
-    // direction
-    if (!pNearestZone || !b_ui_indacation)
-        return;
-    Fvector dir_to_zone{};
-    dir_to_zone.sub(pNearestZone->Position(), Device.vCameraPosition);
-    dir_to_zone.normalize();
-    float _ang_zone = dir_to_zone.getH();
-    float _ang_cam = Device.vCameraDirection.getH();
-    float _diff = angle_difference_signed(_ang_zone, _ang_cam);
-    ui().SetValue(_diff, dir_to_zone);
 }
 
 void CAdvancedDetector::DisableUIDetection()

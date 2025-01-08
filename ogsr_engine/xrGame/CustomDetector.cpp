@@ -20,17 +20,15 @@ CCustomDetector::~CCustomDetector()
     xr_delete(m_ui);
 }
 
-void CCustomDetector::save(NET_Packet& output_packet)
-{
-    inherited::save(output_packet);
-    save_data(m_bAfMode, output_packet);
-}
-
-void CCustomDetector::load(IReader& input_packet)
-{
-    inherited::load(input_packet);
-    load_data(m_bAfMode, input_packet);
-}
+//void CCustomDetector::save(NET_Packet& output_packet)
+//{
+//    inherited::save(output_packet);
+//}
+//
+//void CCustomDetector::load(IReader& input_packet)
+//{
+//    inherited::load(input_packet);
+//}
 
 void CCustomDetector::Load(LPCSTR section)
 {
@@ -42,8 +40,6 @@ void CCustomDetector::Load(LPCSTR section)
     m_artefacts.m_af_rank = READ_IF_EXISTS(pSettings, r_u32, section, "af_rank", 0);
     m_zones.load(section, "zone");
     m_creatures.load(section, "creature");
-
-    m_bCanSwitchModes = m_artefacts.not_empty() && m_zones.not_empty();
 
     m_nightvision_particle = READ_IF_EXISTS(pSettings, r_string, section, "night_vision_particle", nullptr);
 }
@@ -103,7 +99,7 @@ void CCustomDetector::TryMakeArtefactVisible(CArtefact* artefact)
 {
     if (artefact->H_Parent())
         return;
-    if (artefact->CanBeInvisible() && GetHUDmode() && (!CanSwitchModes() || IsAfMode()))
+    if (artefact->CanBeInvisible() && GetHUDmode())
     {
         float dist = Position().distance_to(artefact->Position());
         if (dist < m_fAfVisRadius)
@@ -158,13 +154,6 @@ void CCustomDetector::OnMoveToBelt(EItemPlace prevPlace)
 {
     inherited::OnMoveToBelt(prevPlace);
     Switch(true);
-}
-
-void CCustomDetector::SwitchMode() 
-{
-    if (!CanSwitchModes())
-        return;
-    m_bAfMode = !m_bAfMode;
 }
 
 BOOL CAfList::feel_touch_contact(CObject* O)

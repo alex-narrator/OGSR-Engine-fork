@@ -42,8 +42,6 @@ public:
     virtual bool IsPowerOn() const;
     virtual void Switch(bool);
 
-    virtual void SwitchMode(){};
-
     void ToggleDevice(bool bFastMode);
     void HideDevice(bool bFastMode);
     void ShowDevice(bool bFastMode);

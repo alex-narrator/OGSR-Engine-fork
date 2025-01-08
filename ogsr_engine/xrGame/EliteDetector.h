@@ -15,8 +15,6 @@ public:
     virtual bool render_item_3d_ui_query() override;
     virtual LPCSTR ui_xml_tag() const { return "elite"; }
 
-    virtual bool CanSwitchModes() const { return false; }
-
 protected:
     virtual void UpdateAf() override;
     virtual void CreateUI() override;
@@ -34,8 +32,6 @@ public:
     CScientificDetector(){};
     virtual ~CScientificDetector();
     virtual LPCSTR ui_xml_tag() const override { return "scientific"; }
-
-    virtual bool CanSwitchModes() const { return false; }
 
 protected:
     virtual void UpdateWork() override;

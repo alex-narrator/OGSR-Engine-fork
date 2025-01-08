@@ -167,11 +167,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
         OnPrevWeaponSlot();
     }
     break;
-    case kWPN_FUNC: {
-        if (auto dev = smart_cast<CCustomDevice*>(inventory().ItemFromSlot(DETECTOR_SLOT)); dev && dev->GetHUDmode())
-            dev->SwitchMode();
-    }
-    break;
     }
 }
 void CActor::IR_OnMouseWheel(int direction)
