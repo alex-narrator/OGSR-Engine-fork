@@ -725,6 +725,10 @@ public:
     float GetBinocZoomFactor();
     float GetZoomFactor();
 
+    void ZoomIn();
+    void ZoomOut();
+    bool IsZoomed();
+
     u8 GetAddonFlags();
     void SetAddonFlags(u8 _flags);
     u32 GetMagazineSize();

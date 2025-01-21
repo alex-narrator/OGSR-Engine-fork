@@ -388,6 +388,9 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 
         .def("get_binoc_zoom_factor", &CScriptGameObject::GetBinocZoomFactor)
         .def("get_zoom_factor", &CScriptGameObject::GetZoomFactor)
+        .def("zoom_in", &CScriptGameObject::ZoomIn)
+        .def("zoom_out", &CScriptGameObject::ZoomOut)
+        .def("is_zoomed", &CScriptGameObject::IsZoomed)
         .def("get_addon_flags", &CScriptGameObject::GetAddonFlags)
         .def("set_addon_flags", &CScriptGameObject::SetAddonFlags)
         .def("get_magazine_size", &CScriptGameObject::GetMagazineSize)

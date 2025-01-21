@@ -177,7 +177,8 @@ bool CUIPdaWnd::OnMouse(float x, float y, EUIMessages mouse_action)
     case WINDOW_RBUTTON_DOWN:
         if (auto pda = Actor()->GetPDA(); pda && pda->Is3DPDA() && psActorFlags.test(AF_3D_PDA))
         {
-            pda->m_bZoomed = false;
+            /*pda->m_bZoomed = false;*/
+            pda->OnZoomOut();
             HUD().GetUI()->SetMainInputReceiver(nullptr, false);
             return true;
         }
@@ -483,9 +484,10 @@ bool CUIPdaWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
                         Console->Execute("main_menu");
                         return false;
                     }
-                    else if (pda->m_bZoomed)
+                    else if (pda->/*m_bZoomed*/IsZoomed())
                     {
-                        pda->m_bZoomed = false;
+                        /*pda->m_bZoomed = false;*/
+                        pda->OnZoomOut();
                         HUD().GetUI()->SetMainInputReceiver(nullptr, false);
                         return true;
                     }

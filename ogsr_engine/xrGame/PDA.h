@@ -59,6 +59,7 @@ private:
     static void JoystickCallback(CBoneInstance* B);
 
     bool this_is_3d_pda{};
+    bool m_bZoomed{};
 
 public:
     bool Is3DPDA() const { return this_is_3d_pda; }
@@ -71,16 +72,18 @@ public:
     virtual void OnActiveItem() override;
     virtual void OnHiddenItem() override;
 
+    virtual void OnZoomOut(bool = false) override;
+    virtual void OnZoomIn() override;
+    bool IsZoomed() const override { return m_bZoomed; }
+
     virtual void Switch(bool);
     virtual bool IsPowerOn() const { return m_bTurnedOn; };
 
     virtual void Show(bool = false);
     virtual void Hide(bool = false);
 
-    bool m_bZoomed{};
     float m_thumb_rot[2]{};
 
 protected:
     u8 GetCurrentHudOffsetIdx() const override { return (m_bZoomed || m_fZoomRotationFactor != 0.f) ? 1 : 0; }
-    bool IsZoomed() const override { return m_bZoomed; }
 };

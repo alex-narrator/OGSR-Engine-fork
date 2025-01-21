@@ -1015,7 +1015,7 @@ bool CWeapon::Action(s32 cmd, u32 flags)
         if (IsZoomEnabled() && IsZoomed() && m_bScopeDynamicZoom && IsAddonAttached(eScope) && (flags & CMD_START))
         {
             // если в режиме ПГ - не будем давать использовать динамический зум
-            if (IsGrenadeMode() || IsSecondScopeMode())
+            if (IsGrenadeMode() || IsAimAltMode())
                 return false;
             ZoomChange(cmd == kWPN_ZOOM_INC);
             return true;
@@ -1026,9 +1026,9 @@ bool CWeapon::Action(s32 cmd, u32 flags)
     case kWPN_FUNC: {
         if (Level().IR_GetKeyState(get_action_dik(kADDITIONAL_ACTION)))
         {
-            if (HasScopeSecond() && (flags & CMD_START))
+            if (HasAimAlt() && (flags & CMD_START))
             {
-                m_bScopeSecondMode = !m_bScopeSecondMode;
+                m_bAimAltMode = !m_bAimAltMode;
                 if (auto pActor = smart_cast<CActor*>(H_Parent()))
                     pActor->callback(GameObject::eOnActorWeaponScopeModeChange)(lua_game_object());
                 if (IsZoomed())
@@ -1463,7 +1463,7 @@ float CWeapon::CurrentZoomFactor()
         return res;
     if (IsAddonAttached(eScope))
     {
-        if (m_bScopeDynamicZoom && !IsSecondScopeMode())
+        if (m_bScopeDynamicZoom && !IsAimAltMode())
         {
             clamp(m_fRTZoomFactor, m_fScopeZoomFactor, m_fMaxScopeZoomFactor);
             res = m_fRTZoomFactor;
@@ -1471,7 +1471,7 @@ float CWeapon::CurrentZoomFactor()
         }
         else
         {
-            res = IsSecondScopeMode() ? m_fScopeZoomFactorSecond : m_fScopeZoomFactor;
+            res = IsAimAltMode() ? m_fScopeZoomFactorSecond : m_fScopeZoomFactor;
             //			Msg("m_fScopeZoomFactor res = [%.2f]", res);
         }
     }
@@ -1483,9 +1483,9 @@ float CWeapon::CurrentZoomFactor()
     return res;
 }
 
-bool CWeapon::HasScopeSecond() const { return IsAddonAttached(eScope) && !IsGrenadeMode() && m_bHasScopeSecond; }
+bool CWeapon::HasAimAlt() const { return /*IsAddonAttached(eScope) &&*/ !IsGrenadeMode() && m_bHasAimAlt; }
 
-bool CWeapon::IsSecondScopeMode() const { return IsAddonAttached(eScope) && !IsGrenadeMode() && m_bScopeSecondMode; }
+bool CWeapon::IsAimAltMode() const { return /*IsAddonAttached(eScope) &&*/ !IsGrenadeMode() && m_bAimAltMode; }
 
 void CWeapon::OnZoomIn()
 {
@@ -1666,7 +1666,7 @@ u8 CWeapon::GetCurrentHudOffsetIdx() const
         //const bool has_gl = AddonAttachable(eLauncher) && IsAddonAttached(eLauncher);
         const bool has_scope = AddonAttachable(eScope) && IsAddonAttached(eScope);
 
-        if (IsSecondScopeMode())
+        if (IsAimAltMode())
         {
             if (has_scope)
                 return hud_item_measures::m_hands_offset_type_aim_alt_scope;
@@ -1873,7 +1873,7 @@ void CWeapon::UpdateSecondVP()
 bool CWeapon::SecondVPEnabled() const
 {
     bool bCond_2 = m_fSecondVPZoomK > 0.0f; // У конфігу має бути прописаний множник коригування зуму (scope_lense_fov_k) більше 0
-    bool bCond_4 = !IsGrenadeMode() && !IsSecondScopeMode(); // Мы не должны быть в режиме подствольника
+    bool bCond_4 = !IsGrenadeMode() && !IsAimAltMode(); // Мы не должны быть в режиме подствольника
     bool bcond_6 = psActorFlags.test(AF_3D_SCOPES);
     return bCond_2 && bCond_4 && bcond_6;
 }
@@ -1913,7 +1913,7 @@ float CWeapon::GetHudFov()
     const float last_nw_hf = inherited::GetHudFov();
     if (m_fZoomRotationFactor > 0.0f)
     {
-        if (m_fConstZoomHudFov > 0.f && !IsSecondScopeMode() && !IsGrenadeMode() && (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonDisabled || IsAddonAttached(eScope)))
+        if (m_fConstZoomHudFov > 0.f && !IsAimAltMode() && !IsGrenadeMode() && (m_eScopeStatus == CSE_ALifeItemWeapon::eAddonDisabled || IsAddonAttached(eScope)))
         {
             return m_fZoomRotationFactor < 1.f ? last_nw_hf : m_fConstZoomHudFov;
         }

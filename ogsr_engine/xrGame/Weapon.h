@@ -255,8 +255,9 @@ protected:
 
     float m_fConstZoomHudFov{};
 
-    bool m_bHasScopeSecond{};
-    bool m_bScopeSecondMode{};
+    //alt aim
+    bool m_bHasAimAlt{};
+    bool m_bAimAltMode{};
 
     bool m_bScopeShowIndicators{true};
 
@@ -297,8 +298,8 @@ public:
     virtual float GetScopeZoomFactor() const { return m_fScopeZoomFactor; };
     virtual float GetMaxScopeZoomFactor() const { return m_fMaxScopeZoomFactor; };
 
-    virtual bool HasScopeSecond() const;
-    virtual bool IsSecondScopeMode() const;
+    virtual bool HasAimAlt() const;
+    virtual bool IsAimAltMode() const;
 
     virtual bool IsSilencerBroken() const { return false; };
     virtual bool IsScopeBroken() const { return false; };

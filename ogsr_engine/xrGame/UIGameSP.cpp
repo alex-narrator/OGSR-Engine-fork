@@ -126,7 +126,7 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
             IRFlags.set(recvItem::eIndicators, HUD().GetUI()->GameIndicatorsShown());
 
             HUD().GetUI()->SetMainInputReceiver(PdaMenu, false, IRFlags);
-            Pda->m_bZoomed = true;
+            Pda->OnZoomIn();
             return true;
         }
     }

@@ -486,6 +486,23 @@ float CScriptGameObject::GetZoomFactor()
     }
     return k->GetZoomFactor();
 }
+void CScriptGameObject::ZoomOut() 
+{
+    auto hi = smart_cast<CHudItem*>(&object());
+    if (hi)
+        hi->OnZoomOut();
+}
+void CScriptGameObject::ZoomIn()
+{
+    auto hi = smart_cast<CHudItem*>(&object());
+    if (hi)
+        hi->OnZoomIn();
+}
+bool CScriptGameObject::IsZoomed()
+{
+    auto hi = smart_cast<CHudItem*>(&object());
+    return hi ? hi->IsZoomed() : false;
+}
 u8 CScriptGameObject::GetAddonFlags()
 {
     CWeapon* k = smart_cast<CWeapon*>(&object());

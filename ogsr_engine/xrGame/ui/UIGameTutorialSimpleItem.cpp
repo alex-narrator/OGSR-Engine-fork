@@ -257,7 +257,8 @@ void CUISequenceSimpleItem::Start()
                     inv.Activate(PDA_SLOT);
                 else if (active_slot == PDA_SLOT && !bShowPda)
                     inv.Activate(NO_ACTIVE_SLOT);
-                Pda->m_bZoomed = zoom_3d_pda;
+                /*Pda->m_bZoomed = zoom_3d_pda;*/
+                zoom_3d_pda ? Pda->OnZoomIn() : Pda->OnZoomOut();
             }
             if ((!ui_game_sp->PdaMenu->IsShown() && bShowPda) || (ui_game_sp->PdaMenu->IsShown() && !bShowPda))
                 HUD().GetUI()->StartStopMenu(ui_game_sp->PdaMenu, true);

@@ -570,3 +570,6 @@ void CPda::Hide(bool now)
     else
         SwitchState(eHiding);
 }
+
+void CPda::OnZoomIn() { m_bZoomed = true; };
+void CPda::OnZoomOut(bool rezoom) { m_bZoomed = false; };

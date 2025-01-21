@@ -120,7 +120,7 @@ void CWeaponMagazined::save(NET_Packet& output_packet)
 {
     inherited::save(output_packet);
     save_data(m_iShotNum, output_packet);
-    save_data(m_bScopeSecondMode, output_packet);
+    save_data(m_bAimAltMode, output_packet);
     save_data(m_fRTZoomFactor, output_packet);
 }
 
@@ -128,7 +128,7 @@ void CWeaponMagazined::load(IReader& input_packet)
 {
     inherited::load(input_packet);
     load_data(m_iShotNum, input_packet);
-    load_data(m_bScopeSecondMode, input_packet);
+    load_data(m_bAimAltMode, input_packet);
     load_data(m_fRTZoomFactor, input_packet);
 }
 
@@ -1067,12 +1067,13 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
     m_fConstZoomHudFov = READ_IF_EXISTS(pSettings, r_float, section, "const_zoom_hud_fov", 0.0f);
 
     // second scope mode
-    m_bHasScopeSecond = READ_IF_EXISTS(pSettings, r_bool, section, "scope_second", false) && !READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "ignore_scope_second", false);
-    if (m_bHasScopeSecond)
+    m_bHasAimAlt = READ_IF_EXISTS(pSettings, r_bool, section, "aim_alt", false) && !READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "ignore_aim_alt", false) ||
+        READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "aim_alt_forced", false);
+    if (m_bHasAimAlt)
         m_fScopeZoomFactorSecond = READ_IF_EXISTS(pSettings, r_float, section, "scope_zoom_factor_second", 1.0f);
 
-    if (!m_bHasScopeSecond)
-        m_bScopeSecondMode = false;
+    if (!m_bHasAimAlt)
+        m_bAimAltMode = false;
 
     if (!IsAddonAttached(eScope) || IsScopeBroken())
     {
@@ -1620,7 +1621,7 @@ void CWeaponMagazined::OnZoomIn()
         if (IsAddonAttached(eScope) && !IsGrenadeMode())
         {
             PlaySound("sndZoomIn", H_Parent()->Position());
-            if (IsSecondScopeMode())
+            if (IsAimAltMode())
                 return;
             if (m_bVision && !m_binoc_vision)
                 m_binoc_vision = xr_new<CBinocularsVision>(this);
@@ -1948,7 +1949,7 @@ void CWeaponMagazined::Hit(SHit* pHDS)
 
 float CWeaponMagazined::GetZoomRotationTime() const
 {
-    return (IsSecondScopeMode() || IsGrenadeMode()) ? READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME) : m_fZoomRotateTime;
+    return (IsAimAltMode() || IsGrenadeMode()) ? READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME) : m_fZoomRotateTime;
 }
 
 #include "../Include/xrRender/Kinematics.h"
