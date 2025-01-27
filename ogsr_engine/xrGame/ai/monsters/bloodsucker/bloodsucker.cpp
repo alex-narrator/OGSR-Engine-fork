@@ -271,9 +271,9 @@ void CAI_Bloodsucker::LoadVampirePPEffector(LPCSTR section)
     pp_vampire_effector.noise.fps = pSettings->r_float(section, "noise_fps");
     VERIFY(!fis_zero(pp_vampire_effector.noise.fps));
 
-    sscanf(pSettings->r_string(section, "color_base"), "%f,%f,%f", &pp_vampire_effector.color_base.r, &pp_vampire_effector.color_base.g, &pp_vampire_effector.color_base.b);
-    sscanf(pSettings->r_string(section, "color_gray"), "%f,%f,%f", &pp_vampire_effector.color_gray.r, &pp_vampire_effector.color_gray.g, &pp_vampire_effector.color_gray.b);
-    sscanf(pSettings->r_string(section, "color_add"), "%f,%f,%f", &pp_vampire_effector.color_add.r, &pp_vampire_effector.color_add.g, &pp_vampire_effector.color_add.b);
+    sscanf(pSettings->r_string(section, "color_base"), "%g,%g,%g", &pp_vampire_effector.color_base.r, &pp_vampire_effector.color_base.g, &pp_vampire_effector.color_base.b);
+    sscanf(pSettings->r_string(section, "color_gray"), "%g,%g,%g", &pp_vampire_effector.color_gray.r, &pp_vampire_effector.color_gray.g, &pp_vampire_effector.color_gray.b);
+    sscanf(pSettings->r_string(section, "color_add"), "%g,%g,%g", &pp_vampire_effector.color_add.r, &pp_vampire_effector.color_add.g, &pp_vampire_effector.color_add.b);
 }
 
 void CAI_Bloodsucker::BoneCallback(CBoneInstance* B)

@@ -292,7 +292,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && stricmp(PH_DBG_ObjectTrack(), *cName()) == 0)
     {
-        Msg("CGameObject::net_Spawn obj %s Position set from CSE_Abstract %f,%f,%f", PH_DBG_ObjectTrack(), Position().x, Position().y, Position().z);
+        Msg("CGameObject::net_Spawn obj %s Position set from CSE_Abstract %g,%g,%g", PH_DBG_ObjectTrack(), Position().x, Position().y, Position().z);
     }
 #endif
     VERIFY(_valid(renderable.xform));
@@ -334,7 +334,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && stricmp(PH_DBG_ObjectTrack(), *cName()) == 0)
     {
-        Msg("CGameObject::net_Spawn obj %s After Script Binder reinit %f,%f,%f", PH_DBG_ObjectTrack(), Position().x, Position().y, Position().z);
+        Msg("CGameObject::net_Spawn obj %s After Script Binder reinit %g,%g,%g", PH_DBG_ObjectTrack(), Position().x, Position().y, Position().z);
     }
 #endif
     // load custom user data from server
@@ -382,7 +382,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
             if (!_valid(Position()))
             {
                 Fvector vertex_pos = ai().level_graph().vertex_position(ai_location().level_vertex_id());
-                Msg("! [%s]: %s has invalid Position[%f,%f,%f] level_vertex_id[%u][%f,%f,%f]", __FUNCTION__, cName().c_str(), Position().x, Position().y, Position().z,
+                Msg("! [%s]: %s has invalid Position[%g,%g,%g] level_vertex_id[%u][%g,%g,%g]", __FUNCTION__, cName().c_str(), Position().x, Position().y, Position().z,
                     ai_location().level_vertex_id(), vertex_pos.x, vertex_pos.y, vertex_pos.z);
                 Position().set(vertex_pos);
                 auto se_obj = alife_object();
@@ -405,7 +405,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && stricmp(PH_DBG_ObjectTrack(), *cName()) == 0)
     {
-        Msg("CGameObject::net_Spawn obj %s Before CScriptBinder::net_Spawn %f,%f,%f", PH_DBG_ObjectTrack(), Position().x, Position().y, Position().z);
+        Msg("CGameObject::net_Spawn obj %s Before CScriptBinder::net_Spawn %g,%g,%g", PH_DBG_ObjectTrack(), Position().x, Position().y, Position().z);
     }
     BOOL ret = CScriptBinder::net_Spawn(DC);
 #else
@@ -415,7 +415,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && stricmp(PH_DBG_ObjectTrack(), *cName()) == 0)
     {
-        Msg("CGameObject::net_Spawn obj %s Before CScriptBinder::net_Spawn %f,%f,%f", PH_DBG_ObjectTrack(), Position().x, Position().y, Position().z);
+        Msg("CGameObject::net_Spawn obj %s Before CScriptBinder::net_Spawn %g,%g,%g", PH_DBG_ObjectTrack(), Position().x, Position().y, Position().z);
     }
     return ret;
 #endif
@@ -479,7 +479,7 @@ void CGameObject::net_Load(IReader& ireader)
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && stricmp(PH_DBG_ObjectTrack(), *cName()) == 0)
     {
-        Msg("CGameObject::net_Load obj %s (loaded) %f,%f,%f", PH_DBG_ObjectTrack(), Position().x, Position().y, Position().z);
+        Msg("CGameObject::net_Load obj %s (loaded) %g,%g,%g", PH_DBG_ObjectTrack(), Position().x, Position().y, Position().z);
     }
 
 #endif

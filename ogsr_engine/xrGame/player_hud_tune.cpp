@@ -368,56 +368,56 @@ void player_hud::DumpParamsToLog()
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("hands_position%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("hands_orientation%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+            Msg("hands_position%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+            Msg("hands_orientation%s = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
         else if (idx == hud_item_measures::m_hands_offset_type_aim)
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("aim_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("aim_hud_offset_rot%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+            Msg("aim_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+            Msg("aim_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
         else if (idx == hud_item_measures::m_hands_offset_type_aim_alt)
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("aim_alt_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("aim_alt_hud_offset_rot%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+            Msg("aim_alt_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+            Msg("aim_alt_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
         else if (idx == hud_item_measures::m_hands_offset_type_aim_alt_scope)
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("aim_alt_scope_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("aim_alt_scope_hud_offset_rot%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+            Msg("aim_alt_scope_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+            Msg("aim_alt_scope_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
         else if (idx == hud_item_measures::m_hands_offset_type_aim_scope)
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("aim_scope_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("aim_scope_hud_offset_rot%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+            Msg("aim_scope_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+            Msg("aim_scope_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
         else if (idx == hud_item_measures::m_hands_offset_type_gl)
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("gl_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("gl_hud_offset_rot%s	 = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+            Msg("gl_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+            Msg("gl_hud_offset_rot%s	 = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
         else if (idx == hud_item_measures::m_hands_offset_type_gl_scope)
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("gl_scope_hud_offset_pos%s = %f,%f,%f", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("gl_scope_hud_offset_rot%s = %f,%f,%f", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+            Msg("gl_scope_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+            Msg("gl_scope_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
     }
@@ -428,8 +428,8 @@ void player_hud::DumpParamsToLog()
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("item_position = %f,%f,%f", measures.m_item_attach[0].x, measures.m_item_attach[0].y, measures.m_item_attach[0].z);
-            Msg("item_orientation = %f,%f,%f", measures.m_item_attach[1].x, measures.m_item_attach[1].y, measures.m_item_attach[1].z);
+            Msg("item_position = %g,%g,%g", measures.m_item_attach[0].x, measures.m_item_attach[0].y, measures.m_item_attach[0].z);
+            Msg("item_orientation = %g,%g,%g", measures.m_item_attach[1].x, measures.m_item_attach[1].y, measures.m_item_attach[1].z);
             Log("####################################");
         }
         else if (g_bHudAdjustMode == SCRIPT_UI_POS || g_bHudAdjustMode == SCRIPT_UI_ROT)
@@ -439,9 +439,8 @@ void player_hud::DumpParamsToLog()
             auto hi = m_attached_items[g_bHudAdjustItemIdx]->m_parent_hud_item;
             auto pos = hi->script_ui_offset[0];
             auto rot = hi->script_ui_offset[1];
-
-            Msg("custom_ui_pos = %f,%f,%f", pos.x, pos.y, pos.z);
-            Msg("custom_ui_rot = %f,%f,%f", rot.x, rot.y, rot.z);
+            Msg("custom_ui_pos = %g,%g,%g", pos.x, pos.y, pos.z);
+            Msg("custom_ui_rot = %g,%g,%g", rot.x, rot.y, rot.z);
             Log("####################################");
         }
         else if (g_bHudAdjustMode == HUD_ADDON_ATTACH_POS || g_bHudAdjustMode == HUD_ADDON_ATTACH_ROT || 
@@ -457,8 +456,9 @@ void player_hud::DumpParamsToLog()
                         Msg("[%s]", hud_sect);
                         auto pos = Wpn->hud_attach_visual_offset[i][0];
                         auto rot = Wpn->hud_attach_visual_offset[i][1];
-                        Msg("%s_attach_pos = %f,%f,%f", Wpn->hud_attach_addon_name[i], pos.x, pos.y, pos.z);
-                        Msg("%s_attach_rot = %f,%f,%f", Wpn->hud_attach_addon_name[i], rot.x, rot.y, rot.z);
+                        Msg("%s_attach_pos = %g,%g,%g", Wpn->hud_attach_addon_name[i], pos.x, pos.y, pos.z);
+                        Msg("%s_attach_rot = %g,%g,%g", Wpn->hud_attach_addon_name[i], rot.x, rot.y, rot.z);
+                        Log("####################################");
                     }
                     if ((g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_ROT) && Wpn->world_attach_visual[i])
                     {
@@ -466,8 +466,9 @@ void player_hud::DumpParamsToLog()
                         Msg("[%s]", Wpn->cNameSect().c_str());
                         auto pos = Wpn->world_attach_visual_offset[i][0];
                         auto rot = Wpn->world_attach_visual_offset[i][1];
-                        Msg("%s_attach_pos = %f,%f,%f", Wpn->world_attach_addon_name[i], pos.x, pos.y, pos.z);
-                        Msg("%s_attach_rot = %f,%f,%f", Wpn->world_attach_addon_name[i], rot.x, rot.y, rot.z);
+                        Msg("%s_attach_pos = %g,%g,%g", Wpn->world_attach_addon_name[i], pos.x, pos.y, pos.z);
+                        Msg("%s_attach_rot = %g,%g,%g", Wpn->world_attach_addon_name[i], rot.x, rot.y, rot.z);
+                        Log("####################################");
                     }
                 }
             }
@@ -477,13 +478,13 @@ void player_hud::DumpParamsToLog()
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("fire_point = %f,%f,%f", measures.m_fire_point_offset.x, measures.m_fire_point_offset.y, measures.m_fire_point_offset.z);
-            Msg("fire_point2 = %f,%f,%f", measures.m_fire_point2_offset.x, measures.m_fire_point2_offset.y, measures.m_fire_point2_offset.z);
-            Msg("shell_point = %f,%f,%f", measures.m_shell_point_offset.x, measures.m_shell_point_offset.y, measures.m_shell_point_offset.z);
+            Msg("fire_point = %g,%g,%g", measures.m_fire_point_offset.x, measures.m_fire_point_offset.y, measures.m_fire_point_offset.z);
+            Msg("fire_point2 = %g,%g,%g", measures.m_fire_point2_offset.x, measures.m_fire_point2_offset.y, measures.m_fire_point2_offset.z);
+            Msg("shell_point = %g,%g,%g", measures.m_shell_point_offset.x, measures.m_shell_point_offset.y, measures.m_shell_point_offset.z);
             if (auto Wpn = smart_cast<CWeaponMagazined*>(m_attached_items[g_bHudAdjustItemIdx]->m_parent_hud_item))
             {
-                Msg("laserdot_attach_offset = %f,%f,%f", Wpn->laserdot_attach_offset.x, Wpn->laserdot_attach_offset.y, Wpn->laserdot_attach_offset.z);
-                Msg("torch_attach_offset = %f,%f,%f", Wpn->flashlight_attach_offset.x, Wpn->flashlight_attach_offset.y, Wpn->flashlight_attach_offset.z);
+                Msg("laserdot_attach_offset = %g,%g,%g", Wpn->laserdot_attach_offset.x, Wpn->laserdot_attach_offset.y, Wpn->laserdot_attach_offset.z);
+                Msg("torch_attach_offset = %g,%g,%g", Wpn->flashlight_attach_offset.x, Wpn->flashlight_attach_offset.y, Wpn->flashlight_attach_offset.z);
             }
             Log("####################################");
         }

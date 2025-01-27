@@ -235,7 +235,7 @@ void CCharacterPhysicsSupport::SpawnInitPhysics(CSE_Abstract* e)
 #ifdef DEBUG
         if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && stricmp(PH_DBG_ObjectTrack(), *m_EntityAlife.cName()) == 0)
         {
-            Msg("CCharacterPhysicsSupport::SpawnInitPhysics obj %s before collision correction %f,%f,%f", PH_DBG_ObjectTrack(), m_EntityAlife.Position().x,
+            Msg("CCharacterPhysicsSupport::SpawnInitPhysics obj %s before collision correction %g,%g,%g", PH_DBG_ObjectTrack(), m_EntityAlife.Position().x,
                 m_EntityAlife.Position().y, m_EntityAlife.Position().z);
         }
 #endif
@@ -249,7 +249,7 @@ void CCharacterPhysicsSupport::SpawnInitPhysics(CSE_Abstract* e)
 #ifdef DEBUG
         if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && stricmp(PH_DBG_ObjectTrack(), *m_EntityAlife.cName()) == 0)
         {
-            Msg("CCharacterPhysicsSupport::SpawnInitPhysics obj %s after collision correction %f,%f,%f", PH_DBG_ObjectTrack(), m_EntityAlife.Position().x,
+            Msg("CCharacterPhysicsSupport::SpawnInitPhysics obj %s after collision correction %g,%g,%g", PH_DBG_ObjectTrack(), m_EntityAlife.Position().x,
                 m_EntityAlife.Position().y, m_EntityAlife.Position().z);
         }
 #endif

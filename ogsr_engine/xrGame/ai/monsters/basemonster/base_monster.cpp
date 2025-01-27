@@ -764,9 +764,9 @@ void CBaseMonster::load_effector(LPCSTR section, LPCSTR line, SAttackEffector& e
     effector.ppi.noise.fps = pSettings->r_float(ppi_section, "noise_fps");
     VERIFY(!fis_zero(effector.ppi.noise.fps));
 
-    sscanf(pSettings->r_string(ppi_section, "color_base"), "%f,%f,%f", &effector.ppi.color_base.r, &effector.ppi.color_base.g, &effector.ppi.color_base.b);
-    sscanf(pSettings->r_string(ppi_section, "color_gray"), "%f,%f,%f", &effector.ppi.color_gray.r, &effector.ppi.color_gray.g, &effector.ppi.color_gray.b);
-    sscanf(pSettings->r_string(ppi_section, "color_add"), "%f,%f,%f", &effector.ppi.color_add.r, &effector.ppi.color_add.g, &effector.ppi.color_add.b);
+    sscanf(pSettings->r_string(ppi_section, "color_base"), "%g,%g,%g", &effector.ppi.color_base.r, &effector.ppi.color_base.g, &effector.ppi.color_base.b);
+    sscanf(pSettings->r_string(ppi_section, "color_gray"), "%g,%g,%g", &effector.ppi.color_gray.r, &effector.ppi.color_gray.g, &effector.ppi.color_gray.b);
+    sscanf(pSettings->r_string(ppi_section, "color_add"), "%g,%g,%g", &effector.ppi.color_add.r, &effector.ppi.color_add.g, &effector.ppi.color_add.b);
 
     effector.time = pSettings->r_float(ppi_section, "time");
     effector.time_attack = pSettings->r_float(ppi_section, "time_attack");

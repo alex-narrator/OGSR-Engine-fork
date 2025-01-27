@@ -87,7 +87,7 @@ void CParticlesPlayer::LoadParticles(IKinematics* K)
             ASSERT_FMT(index != BI_NONE, "Particles bone [%s] not found in model [%s], section: [%s]", key.c_str(), m_self_object->cNameVisual().c_str(),
                        m_self_object->cNameSect().c_str());
             Fvector offs;
-            sscanf(value.c_str(), "%f,%f,%f", &offs.x, &offs.y, &offs.z);
+            sscanf(value.c_str(), "%g,%g,%g", &offs.x, &offs.y, &offs.z);
             m_Bones.emplace_back(index, offs);
             bone_mask |= u64(1) << u64(index);
         }

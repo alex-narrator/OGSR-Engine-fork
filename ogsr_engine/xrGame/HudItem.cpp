@@ -1345,7 +1345,7 @@ APPLY_EFFECTS:
         Fvector _angle{}, _pos{trans.c};
         trans.getHPB(_angle);
         _angle.add(-summary_rotate);
-        // Msg("##[%s] summary_rotate: [%f,%f,%f]", __FUNCTION__, summary_rotate.x, summary_rotate.y, summary_rotate.z);
+        // Msg("##[%s] summary_rotate: [%g,%g,%g]", __FUNCTION__, summary_rotate.x, summary_rotate.y, summary_rotate.z);
         trans.setHPB(_angle.x, _angle.y, _angle.z);
         trans.c = _pos;
 
@@ -1364,9 +1364,9 @@ APPLY_EFFECTS:
             hud_rotation_y.identity();
             hud_rotation_y.rotateZ(zr_rot.z);
             hud_rotation.mulA_43(hud_rotation_y);
-            // Msg("~~[%s] zr_rot: [%f,%f,%f]", __FUNCTION__, zr_rot.x, zr_rot.y, zr_rot.z);
+            // Msg("~~[%s] zr_rot: [%g,%g,%g]", __FUNCTION__, zr_rot.x, zr_rot.y, zr_rot.z);
         }
-        // Msg("--[%s] summary_offset: [%f,%f,%f]", __FUNCTION__, summary_offset.x, summary_offset.y, summary_offset.z);
+        // Msg("--[%s] summary_offset: [%g,%g,%g]", __FUNCTION__, summary_offset.x, summary_offset.y, summary_offset.z);
         hud_rotation.translate_over(summary_offset);
         trans.mulB_43(hud_rotation);
     }

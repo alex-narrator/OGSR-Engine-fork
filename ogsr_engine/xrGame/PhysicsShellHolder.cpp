@@ -112,11 +112,11 @@ void CPhysicsShellHolder::correct_spawn_pos()
 #ifdef DEBUG
     if (!valid_pos(ap, phBoundaries))
     {
-        Msg("not valid position	%f,%f,%f", ap.x, ap.y, ap.z);
-        Msg("size	%f,%f,%f", size.x, size.y, size.z);
+        Msg("not valid position	%g,%g,%g", ap.x, ap.y, ap.z);
+        Msg("size	%g,%g,%g", size.x, size.y, size.z);
         Msg("Object: %s", Name());
         Msg("Visual: %s", *(cNameVisual()));
-        Msg("Object	pos	%f,%f,%f", Position().x, Position().y, Position().z);
+        Msg("Object	pos	%g,%g,%g", Position().x, Position().y, Position().z);
     }
 #endif // DEBUG
     VERIFY(valid_pos(activation_shape.Position(), phBoundaries));

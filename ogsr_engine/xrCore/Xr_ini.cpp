@@ -106,7 +106,7 @@ Fvector3 CInifile::Sect::r_fvector3(LPCSTR L)
 {
     LPCSTR C = r_string(L);
     Fvector3 V{};
-    sscanf(C, "%f,%f,%f", &V.x, &V.y, &V.z);
+    sscanf(C, "%g,%g,%g", &V.x, &V.y, &V.z);
     return V;
 }
 
@@ -465,7 +465,7 @@ Fcolor CInifile::r_fcolor(LPCSTR S, LPCSTR L)
 {
     LPCSTR C = r_string(S, L);
     Fcolor V{};
-    sscanf(C, "%f,%f,%f,%f", &V.r, &V.g, &V.b, &V.a);
+    sscanf(C, "%g,%g,%g,%f", &V.r, &V.g, &V.b, &V.a);
     return V;
 }
 
@@ -513,7 +513,7 @@ Fvector3 CInifile::r_fvector3(LPCSTR S, LPCSTR L)
 {
     LPCSTR C = r_string(S, L);
     Fvector3 V{};
-    sscanf(C, "%f,%f,%f", &V.x, &V.y, &V.z);
+    sscanf(C, "%g,%g,%g", &V.x, &V.y, &V.z);
     return V;
 }
 
@@ -521,7 +521,7 @@ Fvector4 CInifile::r_fvector4(LPCSTR S, LPCSTR L)
 {
     LPCSTR C = r_string(S, L);
     Fvector4 V{};
-    sscanf(C, "%f,%f,%f,%f", &V.x, &V.y, &V.z, &V.w);
+    sscanf(C, "%g,%g,%g,%f", &V.x, &V.y, &V.z, &V.w);
     return V;
 }
 
@@ -646,7 +646,7 @@ void CInifile::w_float(LPCSTR S, LPCSTR L, float V)
 void CInifile::w_fcolor(LPCSTR S, LPCSTR L, const Fcolor& V)
 {
     string128 temp;
-    sprintf_s(temp, "%f,%f,%f,%f", V.r, V.g, V.b, V.a);
+    sprintf_s(temp, "%g,%g,%g,%f", V.r, V.g, V.b, V.a);
     w_string(S, L, temp);
 }
 
@@ -688,14 +688,14 @@ void CInifile::w_fvector2(LPCSTR S, LPCSTR L, const Fvector2& V)
 void CInifile::w_fvector3(LPCSTR S, LPCSTR L, const Fvector3& V)
 {
     string128 temp;
-    sprintf_s(temp, "%f,%f,%f", V.x, V.y, V.z);
+    sprintf_s(temp, "%g,%g,%g", V.x, V.y, V.z);
     w_string(S, L, temp);
 }
 
 void CInifile::w_fvector4(LPCSTR S, LPCSTR L, const Fvector4& V)
 {
     string128 temp;
-    sprintf_s(temp, "%f,%f,%f,%f", V.x, V.y, V.z, V.w);
+    sprintf_s(temp, "%g,%g,%g,%f", V.x, V.y, V.z, V.w);
     w_string(S, L, temp);
 }
 

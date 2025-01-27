@@ -107,10 +107,10 @@ void CDetailPathManager::build_path(const xr_vector<u32>& level_path, u32 interm
         }
         if (failed())
         {
-            Msg("! DetailPathManager has failed : from [%f,%f,%f] to [%f,%f,%f]", VPUSH(ai().level_graph().vertex_position(level_path.front())),
+            Msg("! DetailPathManager has failed : from [%g,%g,%g] to [%g,%g,%g]", VPUSH(ai().level_graph().vertex_position(level_path.front())),
                 VPUSH(ai().level_graph().vertex_position(level_path.back())));
 #ifdef DEBUG
-            Msg("! DetailPathManager has failed for object %s : from [%f,%f,%f] to [%f,%f,%f]", m_restricted_object ? *m_restricted_object->object().cName() : "unknown",
+            Msg("! DetailPathManager has failed for object %s : from [%g,%g,%g] to [%g,%g,%g]", m_restricted_object ? *m_restricted_object->object().cName() : "unknown",
                 VPUSH(ai().level_graph().vertex_position(level_path.front())), VPUSH(ai().level_graph().vertex_position(level_path.back())));
             Msg("List of available velocities :");
             xr_vector<STravelParamsIndex>::const_iterator I = m_start_params.begin();

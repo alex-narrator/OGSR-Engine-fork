@@ -135,14 +135,14 @@ void __cdecl Msg(const char* format, ...)
 void Log(const char* msg, const Fvector& dop)
 {
     char buf[1024];
-    std::snprintf(buf, sizeof(buf), "%s (%f,%f,%f)", msg, dop.x, dop.y, dop.z);
+    std::snprintf(buf, sizeof(buf), "%s (%g,%g,%g)", msg, dop.x, dop.y, dop.z);
     Log(buf);
 }
 
 void Log(const char* msg, const Fmatrix& dop)
 {
     char buf[1024];
-    std::snprintf(buf, sizeof(buf), "%s:\n%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n", msg, dop.i.x, dop.i.y, dop.i.z, dop._14_, dop.j.x, dop.j.y, dop.j.z, dop._24_,
+    std::snprintf(buf, sizeof(buf), "%s:\n%g,%g,%g,%f\n%g,%g,%g,%f\n%g,%g,%g,%f\n%g,%g,%g,%f\n", msg, dop.i.x, dop.i.y, dop.i.z, dop._14_, dop.j.x, dop.j.y, dop.j.z, dop._24_,
                   dop.k.x, dop.k.y, dop.k.z, dop._34_, dop.c.x, dop.c.y, dop.c.z, dop._44_);
     Log(buf);
 }

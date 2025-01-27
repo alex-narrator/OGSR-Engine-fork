@@ -18,6 +18,11 @@ enum HUD_Flags : u32
     HUD_CROSSHAIR_RT2 = 1 << 9,
     HUD_DRAW_RT = 1 << 10,
     HUD_CROSSHAIR_BUILD = 1 << 11, // старый стиль курсора
+    //
+    HUD_SHOW_WND_RECT = 1 << 12,
+    HUD_SHOW_WND_RECT_ALL = 1 << 13,
+    HUD_SHOW_WND_RECT_NAMES = 1 << 14,
+    HUD_SHOW_CONSOLE_ALWAYS = 1 << 15,
 };
 
 class CUI;

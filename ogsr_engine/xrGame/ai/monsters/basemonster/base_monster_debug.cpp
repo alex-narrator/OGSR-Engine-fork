@@ -283,7 +283,7 @@ void CBaseMonster::debug_fsm()
     CEntityAlive* entity = smart_cast<CEntityAlive*>(Level().CurrentEntity());
     if (entity && entity->character_physics_support()->movement())
     {
-        sprintf_s(st, "VELOCITY [%f,%f,%f] Value[%f]", VPUSH(entity->character_physics_support()->movement()->GetVelocity()),
+        sprintf_s(st, "VELOCITY [%g,%g,%g] Value[%f]", VPUSH(entity->character_physics_support()->movement()->GetVelocity()),
                   entity->character_physics_support()->movement()->GetVelocityActual());
         DBG().text(this).clear();
         DBG().text(this).add_item(st, 200, 100, COLOR_GREEN, 100);

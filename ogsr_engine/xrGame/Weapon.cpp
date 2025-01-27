@@ -1948,22 +1948,22 @@ void CWeapon::SaveAttachableParams()
 
     CInifile pHudCfg(buff, FALSE, FALSE, TRUE);
 
-    sprintf_s(buff, "%f,%f,%f", m_Offset.c.x, m_Offset.c.y, m_Offset.c.z);
+    sprintf_s(buff, "%g,%g,%g", m_Offset.c.x, m_Offset.c.y, m_Offset.c.z);
     pHudCfg.w_string(sect_name, "position", buff);
 
     Fvector ypr{};
     m_Offset.getHPB(ypr.x, ypr.y, ypr.z);
     ypr.mul(180.f / PI);
-    sprintf_s(buff, "%f,%f,%f", ypr.x, ypr.y, ypr.z);
+    sprintf_s(buff, "%g,%g,%g", ypr.x, ypr.y, ypr.z);
     pHudCfg.w_string(sect_name, "orientation", buff);
 
     if (pSettings->line_exist(sect_name, "strap_position") && pSettings->line_exist(sect_name, "strap_orientation"))
     {
-        sprintf_s(buff, "%f,%f,%f", m_StrapOffset.c.x, m_StrapOffset.c.y, m_StrapOffset.c.z);
+        sprintf_s(buff, "%g,%g,%g", m_StrapOffset.c.x, m_StrapOffset.c.y, m_StrapOffset.c.z);
         pHudCfg.w_string(sect_name, "strap_position", buff);
         m_StrapOffset.getHPB(ypr.x, ypr.y, ypr.z);
         ypr.mul(180.f / PI);
-        sprintf_s(buff, "%f,%f,%f", ypr.x, ypr.y, ypr.z);
+        sprintf_s(buff, "%g,%g,%g", ypr.x, ypr.y, ypr.z);
         pHudCfg.w_string(sect_name, "strap_orientation", buff);
     }
 

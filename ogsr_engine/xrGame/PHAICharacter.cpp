@@ -89,7 +89,7 @@ bool CPHAICharacter::TryPosition(Fvector pos, bool exact_state)
 	float	dif_m = dif.magnitude();
 	if(ret&&dif_m>EPS_L)
 	{
-		Msg("dif vec %f,%f,%f \n",dif.x,dif.y,dif.z);
+		Msg("dif vec %g,%g,%g \n",dif.x,dif.y,dif.z);
 		Msg("dif mag %f \n",dif_m);
 	}
 #endif

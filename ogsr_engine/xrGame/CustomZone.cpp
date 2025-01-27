@@ -224,7 +224,7 @@ void CCustomZone::Load(LPCSTR section)
 
     if (m_zone_flags.test(eBlowoutLight))
     {
-        sscanf(pSettings->r_string(section, "light_color"), "%f,%f,%f", &m_LightColor.r, &m_LightColor.g, &m_LightColor.b);
+        sscanf(pSettings->r_string(section, "light_color"), "%g,%g,%g", &m_LightColor.r, &m_LightColor.g, &m_LightColor.b);
         m_fLightRange = pSettings->r_float(section, "light_range");
         m_fLightTime = pSettings->r_float(section, "light_time");
         m_fLightTimeLeft = 0;

@@ -170,7 +170,7 @@ void CSpaceRestrictionShape::test_correctness()
     //		}
 
     //		if (!b_found) {
-    //			Msg("Node%u :: index[%u]:: position[%f,%f,%f]", index, (*I), VPUSH(ai().level_graph().vertex_position((*I))));
+    //			Msg("Node%u :: index[%u]:: position[%g,%g,%g]", index, (*I), VPUSH(ai().level_graph().vertex_position((*I))));
     //			index ++;
     //		}
 

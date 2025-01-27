@@ -61,10 +61,6 @@ extern BOOL g_ShowAnimationInfo;
 extern BOOL g_bShowHitSectors;
 extern BOOL g_bDebugDumpPhysicsStep;
 extern ESingleGameDifficulty g_SingleGameDifficulty;
-extern BOOL g_show_wnd_rect;
-extern BOOL g_show_wnd_rect2;
-extern BOOL g_show_wnd_rect_text;
-extern BOOL g_console_show_always;
     //-----------------------------------------------------------
 extern float g_fTimeFactor;
 extern BOOL g_bCopDeathAnim;
@@ -1033,17 +1029,6 @@ public:
     }
 };
 
-class CCC_ReloadUI : public IConsole_Command
-{
-public:
-    CCC_ReloadUI(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args) 
-    { 
-        if (g_hud)
-            g_hud->OnScreenRatioChanged();
-    }
-};
-
 struct CCC_StartTimeSingle : public IConsole_Command
 {
     CCC_StartTimeSingle(LPCSTR N) : IConsole_Command(N){};
@@ -1634,10 +1619,10 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "dbg_dump_physics_step", &g_bDebugDumpPhysicsStep, 0, 1);
 #endif
 
-    CMD4(CCC_Integer, "show_wnd_rect", &g_show_wnd_rect, 0, 1);
-    CMD4(CCC_Integer, "show_wnd_rect_all", &g_show_wnd_rect2, 0, 1);
-    CMD4(CCC_Integer, "show_wnd_rect_names", &g_show_wnd_rect_text, 0, 1);
-    CMD4(CCC_Integer, "g_console_show_always", &g_console_show_always, 0, 1);
+    CMD3(CCC_Mask, "show_wnd_rect", &psHUD_Flags, HUD_SHOW_WND_RECT);
+    CMD3(CCC_Mask, "show_wnd_rect_all", &psHUD_Flags, HUD_SHOW_WND_RECT_ALL);
+    CMD3(CCC_Mask, "show_wnd_rect_names", &psHUD_Flags, HUD_SHOW_WND_RECT_NAMES);
+    CMD3(CCC_Mask, "g_console_show_always", &psHUD_Flags, HUD_SHOW_CONSOLE_ALWAYS);
 
 
     *g_last_saved_game = 0;
@@ -1647,5 +1632,4 @@ void CCC_RegisterCommands()
 
     CMD4(CCC_Float, "missile_force_grow_speed", &g_fForceGrowSpeed, 1.0f, 50.0f); // скорость замаха гранатой/болтом
     CMD3(CCC_Mask, "g_bloodmarks_on_dynamics", &psActorFlags, AF_BLOODMARKS_ON_DYNAMIC);
-    CMD1(CCC_ReloadUI, "reload_ui");
 }

@@ -30,9 +30,6 @@ void dump_list_wnd() {}
 #endif
 
 static xr_vector<std::pair<shared_str, Frect>> g_wnds_rects;
-BOOL g_show_wnd_rect = FALSE;
-BOOL g_show_wnd_rect2 = FALSE;
-BOOL g_show_wnd_rect_text = FALSE;
 
 void clean_wnd_rects() { DRender->DestroyDebugShader(IDebugRender::dbgShaderWindow); }
 
@@ -54,7 +51,7 @@ static void draw_rect(const Frect& r, const u32 color, const shared_str& name)
     //.	UIRender->FlushLineStrip();
     UIRender->FlushPrimitive();
 
-    if (g_show_wnd_rect_text && name.size())
+    if (psHUD_Flags.test(HUD_SHOW_WND_RECT_NAMES) && name.size())
     {
         CGameFont* F = UI()->Font()->pFontDI;
         const float x = r.lt.x - (r.lt.x >= 20 ? 20 : 0);
@@ -172,7 +169,7 @@ void CUIWindow::Draw()
         (*it)->Draw();
     }
 
-    if (g_show_wnd_rect2)
+    if (psHUD_Flags.test(HUD_SHOW_WND_RECT_ALL))
     {
         Frect r;
         GetAbsoluteRect(r);
@@ -205,7 +202,7 @@ void CUIWindow::UpdateFocus(bool focus_lost)
             focus_lost = true;
     }
 
-    if (cursor_on_window && g_show_wnd_rect)
+    if (cursor_on_window && psHUD_Flags.test(HUD_SHOW_WND_RECT))
     {
         Frect r;
         GetAbsoluteRect(r);

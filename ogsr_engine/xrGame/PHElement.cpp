@@ -393,14 +393,14 @@ void CPHElement::PhDataUpdate(dReal step)
 #ifdef DEBUG
     if (!dV_valid(angular_velocity))
     {
-        Msg("angular vel %f,%f,%f", angular_velocity[0], angular_velocity[1], angular_velocity[2]);
-        Msg("linear vel %f,%f,%f", linear_velocity[0], linear_velocity[1], linear_velocity[2]);
-        Msg("position  %f,%f,%f", dBodyGetPosition(m_body)[0], dBodyGetPosition(m_body)[1], dBodyGetPosition(m_body)[2]);
-        Msg("quaternion  %f,%f,%f,%f", dBodyGetQuaternion(m_body)[0], dBodyGetQuaternion(m_body)[1], dBodyGetQuaternion(m_body)[2], dBodyGetQuaternion(m_body)[3]);
+        Msg("angular vel %g,%g,%g", angular_velocity[0], angular_velocity[1], angular_velocity[2]);
+        Msg("linear vel %g,%g,%g", linear_velocity[0], linear_velocity[1], linear_velocity[2]);
+        Msg("position  %g,%g,%g", dBodyGetPosition(m_body)[0], dBodyGetPosition(m_body)[1], dBodyGetPosition(m_body)[2]);
+        Msg("quaternion  %g,%g,%g,%f", dBodyGetQuaternion(m_body)[0], dBodyGetQuaternion(m_body)[1], dBodyGetQuaternion(m_body)[2], dBodyGetQuaternion(m_body)[3]);
         Msg("matrix");
-        Msg("x  %f,%f,%f", dBodyGetRotation(m_body)[0], dBodyGetRotation(m_body)[4], dBodyGetRotation(m_body)[8]);
-        Msg("y  %f,%f,%f", dBodyGetRotation(m_body)[1], dBodyGetRotation(m_body)[5], dBodyGetRotation(m_body)[9]);
-        Msg("z  %f,%f,%f", dBodyGetRotation(m_body)[2], dBodyGetRotation(m_body)[6], dBodyGetRotation(m_body)[10]);
+        Msg("x  %g,%g,%g", dBodyGetRotation(m_body)[0], dBodyGetRotation(m_body)[4], dBodyGetRotation(m_body)[8]);
+        Msg("y  %g,%g,%g", dBodyGetRotation(m_body)[1], dBodyGetRotation(m_body)[5], dBodyGetRotation(m_body)[9]);
+        Msg("z  %g,%g,%g", dBodyGetRotation(m_body)[2], dBodyGetRotation(m_body)[6], dBodyGetRotation(m_body)[10]);
         CPhysicsShellHolder* ph = PhysicsRefObject();
         Msg("name visual %s", *ph->cNameVisual());
         Msg("name obj %s", ph->Name());

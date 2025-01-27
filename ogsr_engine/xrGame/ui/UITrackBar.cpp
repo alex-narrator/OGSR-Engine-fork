@@ -71,10 +71,10 @@ void CUITrackBar::SetCurrentValue()
         if (IsOptionsItem())
             GetOptFloatValue(m_f_val, m_f_min, m_f_max);
 
-        if (!fis_zero(m_f_min_xml) && m_f_min_xml > m_f_min)
+        if (!fis_zero(m_f_min_xml) && m_f_min_xml != m_f_min)
             m_f_min = m_f_min_xml;
 
-        if (!fis_zero(m_f_max_xml) && m_f_max_xml < m_f_max)
+        if (!fis_zero(m_f_max_xml) && m_f_max_xml != m_f_max)
             m_f_max = m_f_max_xml;
     }
     else
@@ -82,10 +82,10 @@ void CUITrackBar::SetCurrentValue()
         if (IsOptionsItem())
             GetOptIntegerValue(m_i_val, m_i_min, m_i_max);
 
-        if (!fis_zero(m_f_min_xml) && m_f_min_xml > m_i_min)
+        if (!fis_zero(m_f_min_xml) && m_f_min_xml != m_i_min)
             m_i_min = iFloor(m_f_min_xml);
 
-        if (!fis_zero(m_f_max_xml) && m_f_max_xml < m_i_max)
+        if (!fis_zero(m_f_max_xml) && m_f_max_xml != m_i_max)
             m_i_max = iFloor(m_f_max_xml);
     }
 
@@ -105,12 +105,7 @@ void CUITrackBar::SaveValue()
     {
         if (IsOptionsItem())
             SaveOptFloatValue(m_f_val);
-        if (m_f_step >= 1)
-            sprintf_s(buf, "%2.0f", m_f_val);
-        else if (m_f_step >= 0.1)
-            sprintf_s(buf, "%3.1f", m_f_val);
-        else
-            sprintf_s(buf, "%4.2f", m_f_val);
+        sprintf_s(buf, "%g", m_f_val);
     }
     else
     {
@@ -125,6 +120,16 @@ void CUITrackBar::SaveValue()
 }
 
 float CUITrackBar::GetTrackValue() { return m_b_is_float ? m_f_val : float(m_i_val); }
+
+void CUITrackBar::SetTrackValue(float val) 
+{ 
+    if (m_b_is_float)
+        m_f_val = val;
+    else
+        m_i_val = val;
+    SaveValue();
+    SetCurrentValue();
+}
 
 bool CUITrackBar::IsChanged()
 {

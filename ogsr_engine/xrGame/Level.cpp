@@ -322,7 +322,7 @@ int CLevel::get_RPID(LPCSTR /**name/**/)
     // Read data
     Fvector4	pos;
     int			team;
-    sscanf		(params,"%f,%f,%f,%d,%f",&pos.x,&pos.y,&pos.z,&team,&pos.w); pos.y += 0.1f;
+    sscanf		(params,"%g,%g,%g,%d,%f",&pos.x,&pos.y,&pos.z,&team,&pos.w); pos.y += 0.1f;
 
     // Search respawn point
     svector<Fvector4,maxRP>	&rp = Level().get_team(team).RespawnPoints;

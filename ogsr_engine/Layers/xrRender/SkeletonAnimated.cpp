@@ -876,7 +876,7 @@ void CKinematicsAnimated::BuildBoneMatrix(const CBoneData* bd, CBoneInstance& bi
     {
     Log("BLEND_INST",BLEND_INST.Blend.size());
     Log("Bone",LL_BoneName_dbg(SelfID));
-    Msg("Result.Q %f,%f,%f,%f",Result.Q.x,Result.Q.y,Result.Q.z,Result.Q.w);
+    Msg("Result.Q %g,%g,%g,%f",Result.Q.x,Result.Q.y,Result.Q.z,Result.Q.w);
     Log("Result.T",Result.T);
     Log("lp parent",(u32)parent);
     Log("parent",*parent);

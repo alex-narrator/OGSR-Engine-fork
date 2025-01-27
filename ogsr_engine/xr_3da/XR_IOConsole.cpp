@@ -14,6 +14,7 @@
 #include "GameFont.h"
 
 #include "../Include/xrRender/UIRender.h"
+#include "CustomHUD.h"
 
 static float const UI_BASE_WIDTH = 1024.0f;
 static float const UI_BASE_HEIGHT = 768.0f;
@@ -43,8 +44,6 @@ char const* const ioc_prompt = ">>> ";
 
 extern char const* const ch_cursor;
 char const* const ch_cursor = "_";
-
-BOOL g_console_show_always = FALSE;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -227,7 +226,7 @@ CConsole::~CConsole()
     xr_delete(pFont2);
     Commands.clear();
 
-    if (g_console_show_always)
+    if (psHUD_Flags.test(HUD_SHOW_CONSOLE_ALWAYS))
         Device.seqRender.Remove(this);
 	Device.seqResolutionChanged.Remove(this);
 }
@@ -308,7 +307,7 @@ void CConsole::OnScreenResolutionChanged()
 
 void CConsole::OnRender()
 {
-    if (!bVisible && !g_console_show_always)
+    if (!bVisible && !psHUD_Flags.test(HUD_SHOW_CONSOLE_ALWAYS))
 	{
 		return;
 	}
@@ -715,7 +714,7 @@ void CConsole::Show()
 
 	m_editor->IR_Capture();
 
-	if (!g_console_show_always)
+	if (!psHUD_Flags.test(HUD_SHOW_CONSOLE_ALWAYS))
 		Device.seqRender.Add(this, 1);
 	Device.seqFrame.Add(this);
 
@@ -741,7 +740,7 @@ void CConsole::Hide()
 	update_tips();
 
 	Device.seqFrame.Remove(this);
-    if (!g_console_show_always)
+    if (!psHUD_Flags.test(HUD_SHOW_CONSOLE_ALWAYS))
 		Device.seqRender.Remove(this);
 	m_editor->IR_Release();
 }
@@ -778,7 +777,7 @@ void CConsole::ExecuteScript(LPCSTR str)
     xr_strconcat(cmd, "cfg_load ", str);
     Execute(cmd);
 	
-	if (g_console_show_always)
+	if (psHUD_Flags.test(HUD_SHOW_CONSOLE_ALWAYS))
         Device.seqRender.Add(this, 1);
 }
 

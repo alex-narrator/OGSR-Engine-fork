@@ -110,7 +110,7 @@ void CWeaponRG6::LaunchGrenade(const Fvector& p1, const Fvector& d1)
 #endif
                 if (canfire0 != 0)
                 {
-                    //					Msg ("d[%f,%f,%f] - res [%f,%f,%f]", d.x, d.y, d.z, res[0].x, res[0].y, res[0].z);
+                    //					Msg ("d[%g,%g,%g] - res [%g,%g,%g]", d.x, d.y, d.z, res[0].x, res[0].y, res[0].z);
                     d = res[0];
                 };
             }

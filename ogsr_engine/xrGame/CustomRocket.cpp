@@ -97,7 +97,7 @@ void CCustomRocket::SetLaunchParams(const Fmatrix& xform, const Fvector& vel, co
     m_vLaunchVelocity = vel;
     //	if(m_pOwner->ID()==Actor()->ID())
     //	{
-    //		Msg("set p start v:	%f,%f,%f	\n",m_vLaunchVelocity.x,m_vLaunchVelocity.y,m_vLaunchVelocity.z);
+    //		Msg("set p start v:	%g,%g,%g	\n",m_vLaunchVelocity.x,m_vLaunchVelocity.y,m_vLaunchVelocity.z);
     //	}
     m_vLaunchAngularVelocity = angular_vel;
     m_time_to_explode = Device.fTimeGlobal + pSettings->r_float(cNameSect(), "force_explode_time") / 1000.0f;
@@ -118,7 +118,7 @@ void CCustomRocket::activate_physic_shell()
 
     //	if(m_pOwner->ID()==Actor()->ID())
     //	{
-    //		Msg("start v:	%f,%f,%f	\n",m_vLaunchVelocity.x,m_vLaunchVelocity.y,m_vLaunchVelocity.z);
+    //		Msg("start v:	%g,%g,%g	\n",m_vLaunchVelocity.x,m_vLaunchVelocity.y,m_vLaunchVelocity.z);
     //	}
     m_pPhysicsShell->Activate(m_LaunchXForm, m_vLaunchVelocity, m_vLaunchAngularVelocity);
     m_pPhysicsShell->Update();
@@ -298,7 +298,7 @@ void CCustomRocket::reload(LPCSTR section)
     m_bLightsEnabled = !!pSettings->r_bool(section, "lights_enabled");
     if (m_bLightsEnabled)
     {
-        sscanf(pSettings->r_string(section, "trail_light_color"), "%f,%f,%f", &m_TrailLightColor.r, &m_TrailLightColor.g, &m_TrailLightColor.b);
+        sscanf(pSettings->r_string(section, "trail_light_color"), "%g,%g,%g", &m_TrailLightColor.r, &m_TrailLightColor.g, &m_TrailLightColor.b);
         m_fTrailLightRange = pSettings->r_float(section, "trail_light_range");
     }
 

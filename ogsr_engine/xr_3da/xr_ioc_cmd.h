@@ -308,7 +308,7 @@ public:
     {
         Fvector v;
         // Fixed parsing FVector for user.ltx
-        if ((3 != sscanf(args, "%f,%f,%f", &v.x, &v.y, &v.z)) && (3 != sscanf(args, "(%f, %f, %f)", &v.x, &v.y, &v.z)))
+        if ((3 != sscanf(args, "%g,%g,%g", &v.x, &v.y, &v.z)) && (3 != sscanf(args, "(%f, %f, %f)", &v.x, &v.y, &v.z)))
         {
             InvalidSyntax();
             return;

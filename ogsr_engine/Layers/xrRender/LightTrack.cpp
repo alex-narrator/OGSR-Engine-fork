@@ -249,7 +249,7 @@ void CROS_impl::update(IRenderable* O)
         //		lacc.x		*= desc.lmap_color.x;
         //		lacc.y		*= desc.lmap_color.y;
         //		lacc.z		*= desc.lmap_color.z;
-        //		Msg				("- rgb[%f,%f,%f]",lacc.x,lacc.y,lacc.z);
+        //		Msg				("- rgb[%g,%g,%g]",lacc.x,lacc.y,lacc.z);
         accum.add(lacc);
     }
     else

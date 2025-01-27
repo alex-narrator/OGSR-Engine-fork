@@ -27,7 +27,7 @@ static float erp = 1.f;
 #define CHECK_POS(pos, msg, br) \
     if (!valid_pos(pos, phBoundaries)) \
     { \
-        Msg("pos:%f,%f,%f", pos.x, pos.y, pos.z); \
+        Msg("pos:%g,%g,%g", pos.x, pos.y, pos.z); \
         Msg(msg); \
         VERIFY(!br); \
     }

@@ -37,9 +37,9 @@ void CScanningAbilityAbstract::load(LPCSTR section)
     m_effector_info.noise.fps = pSettings->r_float(ppi_section, "noise_fps");
     VERIFY(!fis_zero(m_effector_info.noise.fps));
 
-    sscanf(pSettings->r_string(ppi_section, "color_base"), "%f,%f,%f", &m_effector_info.color_base.r, &m_effector_info.color_base.g, &m_effector_info.color_base.b);
-    sscanf(pSettings->r_string(ppi_section, "color_gray"), "%f,%f,%f", &m_effector_info.color_gray.r, &m_effector_info.color_gray.g, &m_effector_info.color_gray.b);
-    sscanf(pSettings->r_string(ppi_section, "color_add"), "%f,%f,%f", &m_effector_info.color_add.r, &m_effector_info.color_add.g, &m_effector_info.color_add.b);
+    sscanf(pSettings->r_string(ppi_section, "color_base"), "%g,%g,%g", &m_effector_info.color_base.r, &m_effector_info.color_base.g, &m_effector_info.color_base.b);
+    sscanf(pSettings->r_string(ppi_section, "color_gray"), "%g,%g,%g", &m_effector_info.color_gray.r, &m_effector_info.color_gray.g, &m_effector_info.color_gray.b);
+    sscanf(pSettings->r_string(ppi_section, "color_add"), "%g,%g,%g", &m_effector_info.color_add.r, &m_effector_info.color_add.g, &m_effector_info.color_add.b);
 
     m_effector_time = pSettings->r_float(ppi_section, "time");
     m_effector_time_attack = pSettings->r_float(ppi_section, "time_attack");

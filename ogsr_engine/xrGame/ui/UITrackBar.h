@@ -32,6 +32,7 @@ public:
     bool GetCheck();
     void SetCheck(bool b);
     float GetTrackValue();
+    void SetTrackValue(float val);
 
     void SetMin(float v) { m_f_min_xml = v; }
     void SetMax(float v) { m_f_max_xml = v; }

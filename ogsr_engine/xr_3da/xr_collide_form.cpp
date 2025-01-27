@@ -153,7 +153,7 @@ void CCF_Skeleton::BuildState()
             if (!b)
             {
                 Msg("! ERROR: invalid bone xform . Bone disabled.");
-                Msg("! ERROR: bone_id=[%d], world_pos[%f,%f,%f]", I->elem_id, VPUSH(TW.c));
+                Msg("! ERROR: bone_id=[%d], world_pos[%g,%g,%g]", I->elem_id, VPUSH(TW.c));
                 Msg("visual name %s", owner->cNameVisual().c_str());
                 Msg("object name %s", owner->cName().c_str());
 #ifdef DEBUG

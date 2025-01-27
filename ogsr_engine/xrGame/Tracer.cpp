@@ -28,7 +28,7 @@ CTracer::CTracer()
         if (!pSettings->line_exist(TRACERS_COLOR_TABLE, LineName))
             break;
         float r, g, b;
-        sscanf(pSettings->r_string(TRACERS_COLOR_TABLE, *LineName), "%f,%f,%f", &r, &g, &b);
+        sscanf(pSettings->r_string(TRACERS_COLOR_TABLE, *LineName), "%g,%g,%g", &r, &g, &b);
         m_aColors.push_back(color_argb_f(1.0f, r, g, b));
     };
 }

@@ -37,10 +37,10 @@ public:
 #ifdef DEBUG
         if (kD.square_magnitude() <= std::numeric_limits<T>::min())
         {
-            Msg("dir :%f,%f,%f", dir.x, dir.y, dir.z);
-            Msg("kU :%f,%f,%f", kU.x, kU.y, kU.z);
-            Msg("kV :%f,%f,%f", kV.x, kV.y, kV.z);
-            Msg("kW :%f,%f,%f", kW.x, kW.y, kW.z);
+            Msg("dir :%g,%g,%g", dir.x, dir.y, dir.z);
+            Msg("kU :%g,%g,%g", kU.x, kU.y, kU.z);
+            Msg("kV :%g,%g,%g", kV.x, kV.y, kV.z);
+            Msg("kW :%g,%g,%g", kW.x, kW.y, kW.z);
             VERIFY2(0, "KD is zero");
         }
 #endif
