@@ -2098,8 +2098,6 @@ float CWeapon::GetCondDecPerShotToShow() const
     return (conditionDecreasePerShot + conditionDecreasePerShot * silencer_dec_k);
 }
 
-const shared_str CWeapon::GetMagazineIconSect() const { return READ_IF_EXISTS(pSettings, r_string, GetAddonName(eMagazine), "mag_icon_sect", nullptr); }
-
 bool CWeapon::ZoomHideCrosshair()
 {
     auto* pA = smart_cast<CActor*>(H_Parent());
