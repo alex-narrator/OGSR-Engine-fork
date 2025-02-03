@@ -355,7 +355,7 @@ public:
     bool script_anim_item_attached{};
     bool script_override_arms;
     bool script_override_item;
-    IKinematicsAnimated* script_anim_item_model{};
+    IKinematics* script_item_model{};
     xr_vector<script_layer*> m_script_layers;
 
     // Movement animation layers: 0 = aim_walk, 1 = aim_crouch, 2 = crouch, 3 = walk, 4 = run, 5 = sprint

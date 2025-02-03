@@ -820,7 +820,7 @@ void player_hud::render_hud()
         return;
 
     bool b_has_hands =
-        (m_attached_items[0] && m_attached_items[0]->m_has_separated_hands) || (m_attached_items[1] && m_attached_items[1]->m_has_separated_hands) || script_anim_item_model;
+        (m_attached_items[0] && m_attached_items[0]->m_has_separated_hands) || (m_attached_items[1] && m_attached_items[1]->m_has_separated_hands) || script_item_model;
 
     if (b_has_hands || script_anim_part != u8(-1))
     {
@@ -842,10 +842,10 @@ void player_hud::render_hud()
 
     if (b_has_hands)
     {
-        if (script_anim_item_model)
+        if (script_item_model)
         {
             ::Render->set_Transform(&m_item_pos);
-            ::Render->add_Visual(script_anim_item_model->dcast_RenderVisual());
+            ::Render->add_Visual(script_item_model->dcast_RenderVisual());
         }
     }
 }
@@ -985,7 +985,7 @@ void player_hud::update(const Fmatrix& cam_trans)
     m_transform_2.mul(trans_2, m_attach_offset_2);
 
     bool hasHands = (m_attached_items[0] && m_attached_items[0]->m_has_separated_hands) || (m_attached_items[1] && m_attached_items[1]->m_has_separated_hands);
-    if (hasHands || script_anim_item_model)
+    if (hasHands || script_item_model)
     {
         m_model->UpdateTracks();
         m_model->dcast_PKinematics()->CalculateBones_Invalidate();
@@ -1107,7 +1107,7 @@ void player_hud::update(const Fmatrix& cam_trans)
     if (m_attached_items[1])
         m_attached_items[1]->update(true);
 
-    if (script_anim_item_attached && script_anim_item_model)
+    if (script_anim_item_attached && script_item_model)
         update_script_item();
 
     {
@@ -1323,7 +1323,7 @@ void player_hud::calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmat
 {
     bool hasHands = m_attached_items[attach_slot_idx] && m_attached_items[attach_slot_idx]->m_has_separated_hands;
 
-    if (hasHands || script_anim_item_model)
+    if (hasHands || script_item_model)
     {
         IKinematics* kin = (attach_slot_idx == 0) ? m_model->dcast_PKinematics() : m_model_2->dcast_PKinematics();
         Fmatrix ancor_m = kin->LL_GetTransform(m_ancors[attach_slot_idx]);
@@ -1557,7 +1557,7 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
 
     if (pSettings->line_exist(hud_section, "item_visual"))
     {
-        script_anim_item_model = ::Render->model_Create(pSettings->r_string(hud_section, "item_visual"))->dcast_PKinematicsAnimated();
+        script_item_model = ::Render->model_Create(pSettings->r_string(hud_section, "item_visual"))->dcast_PKinematics();
         item_pos[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_section, "item_position", def);
         item_pos[1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_section, "item_orientation", def);
         script_anim_item_attached = READ_IF_EXISTS(pSettings, r_bool, hud_section, "item_attached", true);
@@ -1578,7 +1578,8 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
     script_anim_offset[1] = rrot;
     script_anim_part = hand;
 
-    player_hud_motion_container* pm = get_hand_motions(hud_section, script_anim_item_model);
+    auto ka = script_item_model ? script_item_model->dcast_PKinematicsAnimated() : nullptr;
+    player_hud_motion_container* pm = get_hand_motions(hud_section, ka);
     player_hud_motion* phm = pm->find_motion(anm_name);
 
     if (!phm)
@@ -1592,7 +1593,7 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
 
     const motion_descr& M = phm->m_animations[Random.randI(phm->m_animations.size())];
 
-    if (script_anim_item_model)
+    if (ka)
     {
         MotionID M2;
 
@@ -1608,7 +1609,7 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
             if (bDebug)
                 Msg("playing item animation [%s]", additional.name.c_str());
 
-            M2 = script_anim_item_model->ID_Cycle_Safe(additional.name);
+            M2 = ka->ID_Cycle_Safe(additional.name);
         }
         else
         {
@@ -1617,29 +1618,29 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
             if (bDebug)
                 Msg("playing item animation [%s]", item_anm_name.c_str());
 
-            M2 = script_anim_item_model->ID_Cycle_Safe(item_anm_name);
+            M2 = ka->ID_Cycle_Safe(item_anm_name);
         }
 
         if (!M2.valid())
-            M2 = script_anim_item_model->ID_Cycle_Safe("idle");
+            M2 = ka->ID_Cycle_Safe("idle");
 
         R_ASSERT3(M2.valid(), "model %s has no motion [idle] ", pSettings->r_string(m_sect_name, "item_visual"));
 
-        u16 root_id = script_anim_item_model->dcast_PKinematics()->LL_GetBoneRoot();
-        CBoneInstance& root_binst = script_anim_item_model->dcast_PKinematics()->LL_GetBoneInstance(root_id);
+        u16 root_id = script_item_model->LL_GetBoneRoot();
+        CBoneInstance& root_binst = script_item_model->LL_GetBoneInstance(root_id);
         root_binst.set_callback_overwrite(TRUE);
         root_binst.mTransform.identity();
 
-        u16 pc = script_anim_item_model->partitions().count();
+        u16 pc = ka->partitions().count();
         for (u16 pid = 0; pid < pc; ++pid)
         {
-            CBlend* B = script_anim_item_model->PlayCycle(pid, M2, bMixIn);
+            CBlend* B = ka->PlayCycle(pid, M2, bMixIn);
             R_ASSERT(B);
             B->speed *= speed;
             B->timeCurrent = CalculateMotionStartSeconds(phm->params.start_k, B->timeTotal);
         }
 
-        script_anim_item_model->dcast_PKinematics()->CalculateBones_Invalidate();
+        script_item_model->CalculateBones_Invalidate();
     }
 
     if (hand == 0) // right hand
@@ -1698,7 +1699,7 @@ void player_hud::script_anim_stop()
 {
     u8 part = script_anim_part;
     script_anim_part = u8(-1);
-    script_anim_item_model = nullptr;
+    script_item_model = nullptr;
     script_override_item = false;
 
     updateMovementLayerState();
@@ -1748,11 +1749,12 @@ void player_hud::update_script_item()
 
     calc_transform(m_attach_idx, m_attach_offset, m_item_pos);
 
-    if (script_anim_item_model)
+    auto ka = script_item_model->dcast_PKinematicsAnimated();
+    if (ka)
     {
-        script_anim_item_model->UpdateTracks();
-        script_anim_item_model->dcast_PKinematics()->CalculateBones_Invalidate();
-        script_anim_item_model->dcast_PKinematics()->CalculateBones(TRUE);
+        ka->UpdateTracks();
+        script_item_model->CalculateBones_Invalidate();
+        script_item_model->CalculateBones(TRUE);
     }
 }
 
