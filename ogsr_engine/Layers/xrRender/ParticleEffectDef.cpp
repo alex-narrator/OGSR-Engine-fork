@@ -1,8 +1,8 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "ParticleEffectDef.h"
 #include "ParticleEffect.h"
+#include "ParticleEffectActions.h"
 
 //---------------------------------------------------------------------------
 using namespace PAPI;
@@ -31,7 +31,10 @@ CPEDef::CPEDef()
 
 CPEDef::~CPEDef()
 {
+    for (EPAVecIt it = m_EActionList.begin(); it != m_EActionList.end(); it++)
+        xr_delete(*it);
 }
+
 void CPEDef::CreateShader()
 {
     if (*m_ShaderName && *m_TextureName)
@@ -41,6 +44,7 @@ void CPEDef::CreateShader()
     else
         Msg("! ParticleEffect [%s] with empty texture or shader. Cannot create shader for Visual!", m_Name.c_str());
 }
+
 void CPEDef::DestroyShader() { m_CachedShader.destroy(); }
 void CPEDef::SetName(LPCSTR name) { m_Name = name; }
 
@@ -88,6 +92,7 @@ void CPEDef::pTimeLimit(float time_limit)
     m_fTimeLimit		= time_limit;
 }
 */
+
 void CPEDef::ExecuteAnimate(Particle* particles, u32 p_cnt, float dt)
 {
     float speedFac = m_Frame.m_fSpeed * dt;
@@ -122,6 +127,7 @@ void CPEDef::ExecuteCollision(PAPI::Particle* particles, u32 p_cnt, float dt, CP
             if (dist >= EPS)
             {
                 dir.div(dist);
+
                 collide::rq_result RQ;
                 collide::rq_target RT = m_Flags.is(dfCollisionDyn) ? collide::rqtBoth : collide::rqtStatic;
                 if (g_pGameLevel->ObjectSpace.RayPick(m.posB, dir, dist, RT, RQ, NULL))
@@ -137,6 +143,7 @@ void CPEDef::ExecuteCollision(PAPI::Particle* particles, u32 p_cnt, float dt, CP
                         Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
                         n.mknormal(verts[T->verts[0]], verts[T->verts[1]], verts[T->verts[2]]);
                     }
+
                     pick_cnt++;
                     if (cb && (pick_cnt == 1))
                         if (!cb(owner, m, pt, n))
@@ -241,7 +248,46 @@ BOOL CPEDef::Load(IReader& F)
         }
     }
 
+    if (F.find_chunk(PED_CHUNK_EDATA))
+    {
+        m_EActionList.resize(F.r_u32());
+        bool valid = false;
+        for (EPAVecIt it = m_EActionList.begin(); it != m_EActionList.end(); ++it)
+        {
+            PAPI::PActionEnum type = (PAPI::PActionEnum)F.r_u32();
+            (*it) = pCreateEAction(type);
+            valid = (*it)->Load(F);
+            if (!valid)
+                break;
+        }
+        // if (valid)
+        //     Compile(m_EActionList);
+        // else
+        //     m_EActionList.clear();
+    }
+
     return TRUE;
+}
+
+void PS::CPEDef::Compile(EPAVec& v)
+{
+    m_Actions.clear();
+    m_Actions.w_u32(v.size());
+    int cnt = 0;
+    EPAVecIt it = v.begin();
+    EPAVecIt it_e = v.end();
+
+    for (; it != it_e; ++it)
+    {
+        if ((*it)->flags.is(EParticleAction::flEnabled))
+        {
+            (*it)->Compile(m_Actions);
+            cnt++;
+        }
+    }
+
+    m_Actions.seek(0);
+    m_Actions.w_u32(cnt);
 }
 
 BOOL CPEDef::Load2(CInifile& ini)
@@ -286,15 +332,28 @@ BOOL CPEDef::Load2(CInifile& ini)
     {
         m_APDefaultRotation = ini.r_fvector3("align_to_path", "default_rotation");
     }
+
+    u32 count = ini.r_u32("_effect", "action_count");
+    m_EActionList.resize(count);
+    u32 action_id = 0;
+    for (EPAVecIt it = m_EActionList.begin(); it != m_EActionList.end(); ++it, ++action_id)
+    {
+        string256 sect;
+        xr_sprintf(sect, sizeof(sect), "action_%04d", action_id);
+        PAPI::PActionEnum type = (PAPI::PActionEnum)(ini.r_u32(sect, "action_type"));
+        (*it) = pCreateEAction(type);
+        (*it)->Load2(ini, sect);
+    }
+
+    Compile(m_EActionList);
+
     return TRUE;
 }
 
 void CPEDef::Save2(CInifile& ini)
 {
     ini.w_u16("_effect", "version", PED_VERSION);
-    //.	ini.w_string	("_effect", "name",				m_Name.c_str());
     ini.w_u32("_effect", "max_particles", m_MaxParticles);
-    //.!!	F.w				(m_Actions.pointer(),m_Actions.size());
     ini.w_u32("_effect", "flags", m_Flags.get());
 
     if (m_Flags.is(dfSprite))
@@ -332,6 +391,16 @@ void CPEDef::Save2(CInifile& ini)
     if (m_Flags.is(dfAlignToPath))
     {
         ini.w_fvector3("align_to_path", "default_rotation", m_APDefaultRotation);
+    }
+
+    ini.w_u32("_effect", "action_count", m_EActionList.size());
+    u32 action_id = 0;
+    for (EPAVecIt it = m_EActionList.begin(); it != m_EActionList.end(); ++it, ++action_id)
+    {
+        string256 sect;
+        xr_sprintf(sect, sizeof(sect), "action_%04d", action_id);
+        ini.w_u32(sect, "action_type", (*it)->type);
+        (*it)->Save2(ini, sect);
     }
 }
 
@@ -399,4 +468,13 @@ void CPEDef::Save(IWriter& F)
         F.w_fvector3(m_APDefaultRotation);
         F.close_chunk();
     }
+
+    F.open_chunk(PED_CHUNK_EDATA);
+    F.w_u32(m_EActionList.size());
+    for (EPAVecIt it = m_EActionList.begin(); it != m_EActionList.end(); it++)
+    {
+        F.w_u32((*it)->type);
+        (*it)->Save(F);
+    }
+    F.close_chunk();
 }

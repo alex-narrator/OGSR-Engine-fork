@@ -315,6 +315,7 @@
     <ClInclude Include="..\xrRender\NvTriStripObjects.h" />
     <ClInclude Include="..\xrRender\occRasterizer.h" />
     <ClInclude Include="..\xrRender\ParticleEffect.h" />
+    <ClInclude Include="..\xrRender\ParticleEffectActions.h" />
     <ClInclude Include="..\xrRender\ParticleEffectDef.h" />
     <ClInclude Include="..\xrRender\ParticleGroup.h" />
     <ClInclude Include="..\xrRender\PSLibrary.h" />
@@ -485,6 +486,7 @@
     <ClCompile Include="..\xrRender\occRasterizer.cpp" />
     <ClCompile Include="..\xrRender\occRasterizer_core.cpp" />
     <ClCompile Include="..\xrRender\ParticleEffect.cpp" />
+    <ClCompile Include="..\xrRender\ParticleEffectActions.cpp" />
     <ClCompile Include="..\xrRender\ParticleEffectDef.cpp" />
     <ClCompile Include="..\xrRender\ParticleGroup.cpp" />
     <ClCompile Include="..\xrRender\PSLibrary.cpp" />

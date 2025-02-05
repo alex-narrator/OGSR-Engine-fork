@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "../../xrParticles/psystem.h"
 
@@ -74,10 +73,12 @@ BOOL CPGDef::Load(IReader& F)
 }
 
 BOOL CPGDef::Load2(CInifile& ini)
-{    
+{
     m_Flags.assign(ini.r_u32("_group", "flags"));
 
     m_Effects.resize(ini.r_u32("_group", "effects_count"));
+
+    m_fTimeLimit = ini.r_float("_group", "timelimit");
 
     u32 counter = 0;
     string256 buff;
@@ -96,7 +97,7 @@ BOOL CPGDef::Load2(CInifile& ini)
         (*it)->m_Time1 = ini.r_float(buff, "time1");
         (*it)->m_Flags.assign(ini.r_u32(buff, "flags"));
     }
-    m_fTimeLimit = ini.r_float("_group", "timelimit");
+
     return TRUE;
 }
 
@@ -139,6 +140,8 @@ void CPGDef::Save2(CInifile& ini)
 
     ini.w_u32("_group", "effects_count", m_Effects.size());
 
+    ini.w_float("_group", "timelimit", m_fTimeLimit);
+
     u32 counter = 0;
     string256 buff;
     for (EffectIt it = m_Effects.begin(); it != m_Effects.end(); ++it, ++counter)
@@ -153,8 +156,6 @@ void CPGDef::Save2(CInifile& ini)
         ini.w_float(buff, "time1", (*it)->m_Time1);
         ini.w_u32(buff, "flags", (*it)->m_Flags.get());
     }
-
-    ini.w_float("_group", "timelimit", m_fTimeLimit);
 }
 //------------------------------------------------------------------------------
 // Particle Group item
@@ -237,7 +238,7 @@ void CParticleGroup::SItem::StartFreeChild(CParticleEffect* emitter, LPCSTR nm, 
     }
     else
     {
-        Debug.fatal(DEBUG_INFO, "Can't use looped effect '%s' as 'On Birth' child for group.", nm);
+        FATAL("Can't use looped effect '%s' as 'On Birth' child for group.", nm);
     }
 }
 void CParticleGroup::SItem::Play()
