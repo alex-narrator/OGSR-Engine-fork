@@ -32,7 +32,6 @@ void CInventoryItem::script_register(lua_State* L)
                .def_readwrite("item_condition", &CInventoryItem::m_fCondition)
                .def_readwrite("inv_weight", &CInventoryItem::m_weight)
                .def_readwrite("m_flags", &CInventoryItem::m_flags)
-               .def_readwrite("always_ungroupable", &CInventoryItem::m_always_ungroupable)
 
                .def("hit_type_protection", &CInventoryItem::GetHitTypeProtection)
                .def("hit_type_protection", (void(CInventoryItem::*)(int, float)) & CInventoryItem::SetHitTypeProtection)

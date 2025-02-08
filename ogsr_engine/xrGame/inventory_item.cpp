@@ -126,10 +126,6 @@ void CInventoryItem::Load(LPCSTR section)
     m_fControlInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "control_inertion_factor", 1.0f);
     m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
 
-    m_always_ungroupable = READ_IF_EXISTS(pSettings, r_bool, section, "always_ungroupable", false);
-
-    //m_need_brief_info = READ_IF_EXISTS(pSettings, r_bool, section, "show_brief_info", true);
-
     b_breakable = READ_IF_EXISTS(pSettings, r_bool, section, "breakable", false);
 
     if (pSettings->line_exist(section, "break_particles"))
@@ -638,24 +634,10 @@ bool CInventoryItem::IsNecessaryItem(CInventoryItem* item) { return IsNecessaryI
 
 BOOL CInventoryItem::IsInvalid() const { return object().getDestroy() || GetDropManual(); }
 
-bool CInventoryItem::GetInvShowCondition() const { return m_icon_params.show_condition; }
-
 void CInventoryItem::OnMoveToSlot(EItemPlace prevPlace)
 {
     if (auto pActor = smart_cast<CActor*>(object().H_Parent()))
     {
-        if (Core.Features.test(xrCore::Feature::equipped_untradable))
-        {
-            m_flags.set(FIAlwaysUntradable, TRUE);
-            m_flags.set(FIUngroupable, TRUE);
-            if (Core.Features.test(xrCore::Feature::highlight_equipped))
-                m_highlight_equipped = true;
-        }
-        else if (Core.Features.test(xrCore::Feature::highlight_equipped))
-        {
-            m_flags.set(FIUngroupable, TRUE);
-            m_highlight_equipped = true;
-        }
         for (const auto slot : m_slots_locked)
             pActor->inventory().DropSlotsToRuck(slot);
         if (bone_protection_sect.size())
@@ -667,18 +649,6 @@ void CInventoryItem::OnMoveToBelt(EItemPlace prevPlace)
 {
     if (auto pActor = smart_cast<CActor*>(object().H_Parent()))
     {
-        if (Core.Features.test(xrCore::Feature::equipped_untradable))
-        {
-            m_flags.set(FIAlwaysUntradable, TRUE);
-            m_flags.set(FIUngroupable, TRUE);
-            if (Core.Features.test(xrCore::Feature::highlight_equipped))
-                m_highlight_equipped = true;
-        }
-        else if (Core.Features.test(xrCore::Feature::highlight_equipped))
-        {
-            m_flags.set(FIUngroupable, TRUE);
-            m_highlight_equipped = true;
-        }
         for (const auto slot : m_slots_locked)
             pActor->inventory().DropSlotsToRuck(slot);
     }
@@ -688,18 +658,6 @@ void CInventoryItem::OnMoveToRuck(EItemPlace prevPlace)
 {
     if (auto pActor = smart_cast<CActor*>(object().H_Parent()))
     {
-        if (Core.Features.test(xrCore::Feature::equipped_untradable))
-        {
-            m_flags.set(FIAlwaysUntradable, FALSE);
-            m_flags.set(FIUngroupable, FALSE);
-            if (Core.Features.test(xrCore::Feature::highlight_equipped))
-                m_highlight_equipped = false;
-        }
-        else if (Core.Features.test(xrCore::Feature::highlight_equipped))
-        {
-            m_flags.set(FIUngroupable, FALSE);
-            m_highlight_equipped = false;
-        }
         if (prevPlace != eItemPlaceUndefined)
         {
             for (const auto slot : m_slots_unlocked)

@@ -61,12 +61,7 @@ public:
         FInInterpolation = (1 << 9),
         FInInterpolate = (1 << 10),
         FIsQuestItem = (1 << 11),
-        FIAlwaysUntradable = (1 << 12),
-        FIUngroupable = (1 << 13),
-        FIHiddenForInventory = (1 << 14),
     };
-    const u32 ClrEquipped = READ_IF_EXISTS(pSettings, r_color, "dragdrop", "color_equipped", color_argb(255, 255, 225, 0));
-    const u32 ClrUntradable = READ_IF_EXISTS(pSettings, r_color, "dragdrop", "color_untradable", color_argb(255, 124, 0, 0));
     Flags16 m_flags;
     CIconParams m_icon_params;
 
@@ -156,8 +151,6 @@ public:
     int GetXPos() const;
     int GetYPos() const;
 
-    bool GetInvShowCondition() const;
-
     float GetCondition() const { return m_fCondition; }
     void ChangeCondition(float fDeltaCondition);
     virtual void SetCondition(float fNewCondition)
@@ -195,7 +188,6 @@ protected:
 
     float m_fControlInertionFactor;
     shared_str m_icon_name;
-    bool m_need_brief_info;
 
     // 0-используется без участия рук, 1-одна рука, 2-две руки
     EHandDependence eHandDependence;
@@ -271,9 +263,6 @@ public:
     virtual CHudItem* cast_hud_item() { return 0; }
     virtual CWeaponAmmo* cast_weapon_ammo() { return 0; }
     virtual CGameObject* cast_game_object() { return 0; };
-
-    bool m_highlight_equipped{};
-    bool m_always_ungroupable{};
 
     virtual void BreakItem();
 

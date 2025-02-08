@@ -179,26 +179,22 @@ public:
     struct Feature
     {
         static constexpr u64 
-            equipped_untradable         = 1ull << 0,
-            highlight_equipped          = 1ull << 1,
-            dynamic_sun_movement        = 1ull << 2,
-            wpn_bobbing                 = 1ull << 3,
-            remove_alt_keybinding       = 1ull << 4,
-            stop_anim_playing           = 1ull << 5,
-            corpses_collision           = 1ull << 6,
-            keep_inprogress_tasks_only  = 1ull << 7,
-            gd_master_only              = 1ull << 8,
-            wpn_cost_include_addons     = 1ull << 9,
-            use_luminocity              = 1ull << 10,
-            colorize_ammo               = 1ull << 11,
-            colorize_untradable         = 1ull << 12,
-            absolute_radiation          = 1ull << 13,
-            npc_simplified_shooting     = 1ull << 14,
-            show_objectives_ondemand    = 1ull << 15,
-            pickup_check_overlaped      = 1ull << 16,
-            disable_dialog_break        = 1ull << 17,
-            no_progress_bar_animation   = 1ull << 18,
-            limited_bolts               = 1ull << 19;
+            dynamic_sun_movement        = 1ull << 1,
+            wpn_bobbing                 = 1ull << 2,
+            remove_alt_keybinding       = 1ull << 3,
+            stop_anim_playing           = 1ull << 4,
+            corpses_collision           = 1ull << 5,
+            keep_inprogress_tasks_only  = 1ull << 6,
+            gd_master_only              = 1ull << 7,
+            wpn_cost_include_addons     = 1ull << 8,
+            use_luminocity              = 1ull << 9,
+            absolute_radiation          = 1ull << 10,
+            npc_simplified_shooting     = 1ull << 11,
+            show_objectives_ondemand    = 1ull << 12,
+            pickup_check_overlaped      = 1ull << 13,
+            disable_dialog_break        = 1ull << 14,
+            no_progress_bar_animation   = 1ull << 15,
+            limited_bolts               = 1ull << 16;
     };
 
     void _initialize(LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0);

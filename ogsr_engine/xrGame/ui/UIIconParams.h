@@ -9,7 +9,6 @@ class CIconParams
 public:
     int icon_group{};
     float grid_x{}, grid_y{}, grid_width{}, grid_height{};
-    bool show_condition{};
     shared_str name{}, section{};
 
     CIconParams() = default;

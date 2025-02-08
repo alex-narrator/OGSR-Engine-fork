@@ -107,9 +107,7 @@ void CObjectScript::script_register(lua_State* L)
                        value("Fruck", int(CInventoryItem::EIIFlags::Fruck)), value("FRuckDefault", int(CInventoryItem::EIIFlags::FRuckDefault)),
                        value("FUsingCondition", int(CInventoryItem::EIIFlags::FUsingCondition)), value("FAllowSprint", int(CInventoryItem::EIIFlags::FAllowSprint)),
                        value("Fuseful_for_NPC", int(CInventoryItem::EIIFlags::Fuseful_for_NPC)), value("FInInterpolation", int(CInventoryItem::EIIFlags::FInInterpolation)),
-                       value("FInInterpolate", int(CInventoryItem::EIIFlags::FInInterpolate)), value("FIsQuestItem", int(CInventoryItem::EIIFlags::FIsQuestItem)),
-                       value("FIAlwaysUntradable", int(CInventoryItem::EIIFlags::FIAlwaysUntradable)), value("FIUngroupable", int(CInventoryItem::EIIFlags::FIUngroupable)),
-                       value("FIHiddenForInventory", int(CInventoryItem::EIIFlags::FIHiddenForInventory))]
+                       value("FInInterpolate", int(CInventoryItem::EIIFlags::FInInterpolate)), value("FIsQuestItem", int(CInventoryItem::EIIFlags::FIsQuestItem))]
                   .enum_("se_object_flags")[value("flUseSwitches", int(CSE_ALifeObject::flUseSwitches)), value("flSwitchOnline", int(CSE_ALifeObject::flSwitchOnline)),
                                             value("flSwitchOffline", int(CSE_ALifeObject::flSwitchOffline)), value("flInteractive", int(CSE_ALifeObject::flInteractive)),
                                             value("flVisibleForAI", int(CSE_ALifeObject::flVisibleForAI)), value("flUsefulForAI", int(CSE_ALifeObject::flUsefulForAI)),

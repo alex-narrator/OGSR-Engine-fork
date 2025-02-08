@@ -12,7 +12,6 @@ void CIconParams::Load(const shared_str& item_section)
     grid_height = pSettings->r_float(section, "inv_grid_height");
     grid_x = pSettings->r_float(section, "inv_grid_x");
     grid_y = pSettings->r_float(section, "inv_grid_y");
-    show_condition = READ_IF_EXISTS(pSettings, r_bool, section, "inv_show_condition", false);
     loaded = true;
 }
 

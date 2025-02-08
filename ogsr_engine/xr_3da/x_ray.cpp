@@ -77,10 +77,6 @@ void InitConsole()
         strcpy_s(Console->ConfigFile, c_name);
     }
 
-    CORE_FEATURE_SET(colorize_ammo, "dragdrop");
-    CORE_FEATURE_SET(colorize_untradable, "dragdrop");
-    CORE_FEATURE_SET(equipped_untradable, "dragdrop");
-    CORE_FEATURE_SET(highlight_equipped, "dragdrop");
     CORE_FEATURE_SET(dynamic_sun_movement, "features");
     CORE_FEATURE_SET(wpn_bobbing, "features");
     CORE_FEATURE_SET(remove_alt_keybinding, "features");
