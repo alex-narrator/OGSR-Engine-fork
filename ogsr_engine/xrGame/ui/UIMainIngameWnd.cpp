@@ -85,10 +85,6 @@ void CUIMainIngameWnd::Init()
     UIZoneMap->Init();
     UIZoneMap->SetScale(DEFAULT_MAP_SCALE);
 
-    // Подсказки, которые возникают при наведении прицела на объект
-    AttachChild(&UIStaticQuickHelp);
-    xml_init.InitStatic(uiXml, "quick_info", 0, &UIStaticQuickHelp);
-
     uiXml.SetLocalRoot(uiXml.GetRoot());
 
     // Flashing icons initialize
@@ -105,8 +101,6 @@ void CUIMainIngameWnd::Draw()
 
     if (m_bShowZoneMap)
         UIZoneMap->Render();
-
-    RenderQuickInfos();
 }
 
 void CUIMainIngameWnd::Update()
@@ -162,29 +156,6 @@ bool CUIMainIngameWnd::OnKeyboardPress(int dik)
     }
 
     return false;
-}
-
-void CUIMainIngameWnd::RenderQuickInfos()
-{
-    if (!m_pActor)
-        return;
-
-    static CGameObject* pObject = NULL;
-    LPCSTR actor_action = m_pActor->GetDefaultActionForObject();
-    UIStaticQuickHelp.Show(NULL != actor_action);
-
-    if (NULL != actor_action)
-    {
-        if (stricmp(actor_action, UIStaticQuickHelp.GetText()))
-            UIStaticQuickHelp.SetTextST(actor_action);
-    }
-
-    if (pObject != m_pActor->ObjectWeLookingAt())
-    {
-        UIStaticQuickHelp.SetTextST(actor_action);
-        UIStaticQuickHelp.ResetClrAnimation();
-        pObject = m_pActor->ObjectWeLookingAt();
-    }
 }
 
 void CUIMainIngameWnd::ReceiveNews(GAME_NEWS_DATA* news)

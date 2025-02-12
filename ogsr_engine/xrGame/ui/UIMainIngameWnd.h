@@ -38,7 +38,6 @@ public:
     bool OnKeyboardHold(int cmd);
 
 protected:
-    CUIStatic UIStaticQuickHelp;
     CUIZoneMap* UIZoneMap;
 
 public:
@@ -67,9 +66,6 @@ protected:
 
     // для текущего активного актера и оружия
     CActor* m_pActor;
-
-    // Отображение подсказок при наведении прицела на объект
-    void RenderQuickInfos();
 
 public:
     void OnConnected();
