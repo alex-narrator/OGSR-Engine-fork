@@ -221,6 +221,7 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("get_current_holder", &CScriptGameObject::get_current_holder)
         // usable object
         .def("set_tip_text", &CScriptGameObject::SetTipText)
+        .def("get_tip_text", &CScriptGameObject::GetTipText)
         .def("set_tip_text_default", &CScriptGameObject::SetTipTextDefault)
         .def("set_nonscript_usable", &CScriptGameObject::SetNonscriptUsable)
         .def("is_nonscript_usable", &CScriptGameObject::GetNonscriptUsable)

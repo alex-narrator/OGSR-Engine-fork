@@ -34,6 +34,18 @@ void CScriptGameObject::SetTipTextDefault()
         l_tpUseableScriptObject->set_tip_text_default();
 }
 
+LPCSTR CScriptGameObject::GetTipText() 
+{
+    CUsableScriptObject* l_tpUseableScriptObject = smart_cast<CUsableScriptObject*>(&object());
+    if (!l_tpUseableScriptObject)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "GetTipText . Reason: the object is not usable");
+        return nullptr;
+    }
+    else
+        return l_tpUseableScriptObject->tip_text();
+}
+
 void CScriptGameObject::SetNonscriptUsable(bool nonscript_usable)
 {
     CUsableScriptObject* l_tpUseableScriptObject = smart_cast<CUsableScriptObject*>(&object());

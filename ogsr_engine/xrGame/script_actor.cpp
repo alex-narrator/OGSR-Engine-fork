@@ -206,6 +206,8 @@ void CScriptActor::script_register(lua_State* L)
                .def("get_visibility", &CActor::GetVisibility)
                .def("reset_visibility", &CActor::ResetVisibility)
 
+               .def("get_default_action_for_obj", &CActor::GetDefaultActionForObject)
+
                .def("get_artefacts_effect", &CActor::GetTotalArtefactsEffect)
                .def("get_artefacts_protection", &CActor::GetArtefactsProtection)
                .def("get_items_effect", &CActor::GetItemBoostedParams) 
