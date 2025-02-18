@@ -35,12 +35,7 @@ void CShootingObject::reinit() { m_pFlameParticles = NULL; }
 
 void CShootingObject::Load(LPCSTR section)
 {
-    if (pSettings->line_exist(section, "light_disabled"))
-    {
-        m_bLightShotEnabled = !pSettings->r_bool(section, "light_disabled");
-    }
-    else
-        m_bLightShotEnabled = true;
+    m_bLightShotEnabled = !READ_IF_EXISTS(pSettings, r_bool, section, "light_disabled", false);
 
     //время затрачиваемое на выстрел
     fTimeToFire = pSettings->r_float(section, "rpm");

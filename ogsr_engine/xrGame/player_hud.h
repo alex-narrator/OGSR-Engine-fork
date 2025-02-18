@@ -355,6 +355,7 @@ public:
     bool script_anim_item_attached{};
     bool script_override_arms;
     bool script_override_item;
+    u8 script_override_item_hand{u8(-1)};
     IKinematics* script_item_model{};
     xr_vector<script_layer*> m_script_layers;
 

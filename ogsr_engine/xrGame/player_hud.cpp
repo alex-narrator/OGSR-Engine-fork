@@ -655,6 +655,7 @@ player_hud::player_hud()
     m_item_pos.identity();
     script_override_arms = false;
     script_override_item = false;
+    script_override_item_hand = u8(-1);
 
     if (pSettings->section_exist("hud_movement_layers"))
     {
@@ -838,6 +839,21 @@ void player_hud::render_hud()
 
         if (m_attached_items[1])
             m_attached_items[1]->render();
+    }
+    else
+    {
+        switch (script_override_item_hand)
+        {
+        case 0:
+            if (m_attached_items[1])
+                m_attached_items[1]->render();
+            break;
+        case 1: 
+            if (m_attached_items[0])
+                m_attached_items[0]->render();
+            break;
+        default: break;
+        }
     }
 
     if (b_has_hands)
@@ -1683,6 +1699,7 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
     if (length > 0)
     {
         script_override_item = bOverride_item;
+        script_override_item_hand = hand;
 
         m_bStopAtEndAnimIsRunning = true;
         script_anim_end = Device.dwTimeGlobal + length;
@@ -1701,6 +1718,7 @@ void player_hud::script_anim_stop()
     script_anim_part = u8(-1);
     script_item_model = nullptr;
     script_override_item = false;
+    script_override_item_hand = u8(-1);
 
     updateMovementLayerState();
 
