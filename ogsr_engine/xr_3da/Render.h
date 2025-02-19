@@ -345,6 +345,7 @@ class ShExports final
     Fvector4 dof_params{};
     Fvector4 pnv_color{};
     Fvector4 pnv_params{};
+    Fvector4 pnv_params_2{};
 
     //mark switch
     //int ps_markswitch_current{};
@@ -370,6 +371,7 @@ public:
 
     void set_pnv_color(float a, float b, float c, float d) { pnv_color = {a, b, c, d}; };
     void set_pnv_params(float a, float b, float c, float d) { pnv_params = {a, b, c, d}; };
+    void set_pnv_params_2(float a, float b, float c, float d) { pnv_params_2 = {a, b, c, d}; };
 
     const Fvector2& get_artefact_position(const u32& _i) { return artefacts_position[_i]; }
     const Fvector2& get_anomaly_position(const u32& _i) { return anomalys_position[_i]; }
@@ -380,6 +382,7 @@ public:
 
     const Fvector4& get_pnv_color() const { return pnv_color; };
     const Fvector4& get_pnv_params() const { return pnv_params; };
+    const Fvector4& get_pnv_params_2() const { return pnv_params_2; };
 
     const Fvector4& get_markswitch_color() const { return ps_markswitch_color; };
     void set_markswitch_color(float a, float b, float c, float d) { ps_markswitch_color = {a, b, c, d}; };

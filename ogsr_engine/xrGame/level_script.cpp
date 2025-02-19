@@ -1022,6 +1022,7 @@ void CLevel::script_register(lua_State* L)
         def("set_dof_params", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_dof_params(p1, p2, p3, p4); }),
         def("set_pnv_color", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_pnv_color(p1, p2, p3, p4); }),// R|G|B|intensity
         def("set_pnv_params", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_pnv_params(p1, p2, p3, p4); }), // noise|scanlines|vignette|flickering
+        def("set_pnv_params_2", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_pnv_params_2(p1, p2, p3, p4); }), //tube num|work area radius
 
         //def("set_markswitch_current", [](const int& val) { shader_exports.set_markswitch_current(val); }),
         //def("set_markswitch_count", [](const int& val) { shader_exports.set_markswitch_count(val); }),

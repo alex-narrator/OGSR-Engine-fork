@@ -451,6 +451,15 @@ static class cl_pnv_params final : public R_constant_setup
     }
 } binder_pnv_params;
 
+static class cl_pnv_params_2 final : public R_constant_setup
+{
+    void setup(R_constant* C) override
+    {
+        const auto& P = shader_exports.get_pnv_params_2();
+        RCache.set_c(C, P.x, P.y, P.z, P.w);
+    }
+} binder_pnv_params_2;
+
 // Screen Space Shaders Stuff
 extern float ps_ssfx_wpn_dof_2;
 
@@ -630,6 +639,7 @@ void CBlender_Compile::SetMapping()
 
     r_Constant("pnv_color", &binder_pnv_color);
     r_Constant("pnv_params", &binder_pnv_params);
+    r_Constant("pnv_params_2", &binder_pnv_params_2);
 
     //mark switch
     //r_Constant("markswitch_current", &ps_markswitch_current);
