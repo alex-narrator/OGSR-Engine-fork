@@ -1061,7 +1061,7 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
     m_fIronSightZoomFactor = READ_IF_EXISTS(pSettings, r_float, section, "ironsight_zoom_factor", 1.0f);
     m_fScopeInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "scope_inertion_factor", GetControlInertionFactor());
     m_fSecondVPZoomFactor = 0.f; // READ_IF_EXISTS(pSettings, r_float, section, "scope_lense_fov_factor", 0.f);
-    m_fSecondVPZoomK = READ_IF_EXISTS(pSettings, r_float, section, "scope_lense_fov_k", 0.f);
+    m_bSecondVPEnabled = READ_IF_EXISTS(pSettings, r_bool, section, "second_vp_enabled", false);
     m_fZoomHudFov = READ_IF_EXISTS(pSettings, r_float, section, "scope_zoom_hud_fov", 0.0f);
 
     m_fConstZoomHudFov = READ_IF_EXISTS(pSettings, r_float, section, "const_zoom_hud_fov", 0.0f);
@@ -1112,7 +1112,7 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
         ASSERT_FMT(_count >= 1, "!![%s] : No scope_zoom_factor params found in section [%s]", __FUNCTION__, section);
         string128 tmp;
         m_fScopeZoomFactor = atof(_GetItem(scope_zoom_line, 0, tmp));
-        if (m_fSecondVPZoomK > 0.f)
+        if (m_bSecondVPEnabled)
             m_fSecondVPZoomFactor = m_fScopeZoomFactor;
         if (_count > 1)
         {

@@ -238,8 +238,8 @@ protected:
     bool m_bZoomMode{};
     // коэффициент увеличения во втором вьюпорте при зуме
     float m_fSecondVPZoomFactor{};
-    // множник для збільшення у другому вьюпорті - для корегування відносно розмірів прицілу
-    float m_fSecondVPZoomK{};
+    // дозвіл використання другого в'юпорта
+    bool m_bSecondVPEnabled{};
     // прятать перекрестие в режиме прицеливания
     bool m_bHideCrosshairInZoom{true};
     // разрешить инерцию оружия в режиме прицеливания
@@ -569,6 +569,7 @@ public:
     float GetSecondVPFov() const; //--#SM+#--
     bool SecondVPEnabled() const;
     float GetHudFov() override;
+    float GetSecondVPZoom() const;
 
     virtual void OnBulletHit();
     bool IsPartlyReloading() { return iAmmoElapsed; };

@@ -1872,7 +1872,7 @@ void CWeapon::UpdateSecondVP()
 
 bool CWeapon::SecondVPEnabled() const
 {
-    bool bCond_2 = m_fSecondVPZoomK > 0.0f; // У конфігу має бути прописаний множник коригування зуму (scope_lense_fov_k) більше 0
+    bool bCond_2 = m_bSecondVPEnabled; // У конфігу має бути дозволений другий в'юпорт
     bool bCond_4 = !IsGrenadeMode() && !IsAimAltMode(); // Мы не должны быть в режиме подствольника
     bool bcond_6 = psActorFlags.test(AF_3D_SCOPES);
     return bCond_2 && bCond_4 && bcond_6;
@@ -1897,15 +1897,9 @@ float CWeapon::GetControlInertionFactor() const
     return fInertionFactor;
 }
 
-float CWeapon::GetSecondVPFov() const
-{
-    float fov_factor = m_fSecondVPZoomFactor;
-    if (m_bScopeDynamicZoom)
-    {
-        fov_factor = m_fRTZoomFactor;
-    }
-    return (g_fov / m_fSecondVPZoomK) / fov_factor;
-}
+float CWeapon::GetSecondVPFov() const { return g_fov / GetSecondVPZoom(); }
+
+float CWeapon::GetSecondVPZoom() const { return m_bScopeDynamicZoom ? m_fRTZoomFactor : m_fSecondVPZoomFactor; }
 
 // Получить HUD FOV от текущего оружия игрока
 float CWeapon::GetHudFov()
