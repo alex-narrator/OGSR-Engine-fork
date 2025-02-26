@@ -114,29 +114,34 @@ void CUIComboBox::OnListItemSelect()
 #include "../string_table.h"
 void CUIComboBox::SetCurrentValue()
 {
-    m_list.Clear();
-    const xr_token* tok = GetOptToken();
-
-    while (tok->name)
+    if (!b_SkipOption)
     {
-        AddItem_(tok->name, tok->id);
-        tok++;
-    }
+        m_list.Clear();
+        const xr_token* tok = GetOptToken();
 
-    LPCSTR cur_val = *CStringTable().translate(GetOptTokenValue());
-    m_text.SetText(cur_val);
-    m_list.SetSelectedText(cur_val);
+        while (tok->name)
+        {
+            AddItem_(tok->name, tok->id);
+            tok++;
+        }
+    }
 
     CUIListBoxItem* itm = m_list.GetSelectedItem();
     if (itm)
         m_itoken_id = m_list.GetSelectedIDX(); // (int)(__int64)itm->GetData();
     else
         m_itoken_id = 0; // 1; //first
+
+    LPCSTR cur_val = *CStringTable().translate(b_SkipOption ? m_list.GetSelectedText() : GetOptTokenValue());
+    m_text.SetText(cur_val);
+    m_list.SetSelectedText(cur_val);
 }
 
 void CUIComboBox::SaveValue()
 {
     CUIOptionsItem::SaveValue();
+    if (b_SkipOption)
+        return;
     const xr_token* tok = GetOptToken();
     const char* cur_val = tok[m_itoken_id].name;
     SaveOptTokenValue(cur_val);
