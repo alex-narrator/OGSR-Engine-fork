@@ -1170,8 +1170,7 @@ void CWeaponMagazined::ApplySilencerParams()
         LoadFireParams(cNameSect().c_str(), "");
 
         // подсветка от выстрела
-        LPCSTR light_prfx = READ_IF_EXISTS(pSettings, r_string, cNameSect(), "silencer_", "");
-        LoadLights(cNameSect().c_str(), light_prfx);
+        LoadLights(cNameSect().c_str(), "silencer_");
         if (AddonAttachable(eSilencer))
             ApplySilencerKoeffs();
     }
@@ -1367,7 +1366,7 @@ void CWeaponMagazined::UpdateLaser()
             laser_pos = get_LastFP();
             Fvector laser_dir = get_LastFD();
 
-            auto desire_cone = (GetHUDmode() && Actor()->active_cam() == eacFirstEye) ? laser_cone_angle / GetZoomFactor() : laser_cone_angle;
+            auto desire_cone = (GetHUDmode() && Actor()->active_cam() == eacFirstEye) ? laser_cone_angle / (Device.m_SecondViewport.IsSVPFrame() ? GetSecondVPZoom() : GetZoomFactor()) : laser_cone_angle;
             laser_light_render->set_cone(desire_cone);
 
             if (GetHUDmode())
@@ -2178,7 +2177,8 @@ void CWeaponMagazined::SetLaserAngle(float angle)
 {
     if (!laser_light_render)
         return;
-    laser_light_render->set_cone(angle);
+    laser_cone_angle = deg2rad(angle);
+    laser_light_render->set_cone(laser_cone_angle);
 }
 void CWeaponMagazined::SetLaserRGB(float r, float g, float b) 
 {
@@ -2216,12 +2216,13 @@ void CWeaponMagazined::SetFlashlightAngle(float angle, int target)
 {
     if (!flashlight_render)
         return;
+    float _angle = deg2rad(angle);
     switch (target)
     {
-    case 0: light_render->set_cone(angle); break;
+    case 0: light_render->set_cone(_angle); break;
     case 1:
         if (flashlight_omni)
-            flashlight_omni->set_cone(angle);
+            flashlight_omni->set_cone(_angle);
         break;
     }
 }

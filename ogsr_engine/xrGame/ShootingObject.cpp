@@ -119,6 +119,7 @@ void CShootingObject::LoadFireParams(LPCSTR section, LPCSTR prefix)
 void CShootingObject::LoadLights(LPCSTR section, LPCSTR prefix)
 {
     string256 full_name;
+    m_bLightShotEnabled = !READ_IF_EXISTS(pSettings, r_bool, section, strconcat(sizeof(full_name), full_name, prefix, "light_disabled"), false);
     // light
     if (m_bLightShotEnabled)
     {
