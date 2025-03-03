@@ -1884,15 +1884,16 @@ float CWeapon::GetControlInertionFactor() const
     float fInertionFactor = inherited::GetControlInertionFactor();
     if (IsZoomed() && !IsRotatingToZoom())
     {
-        if (SecondVPEnabled() && m_bScopeDynamicZoom)
-        {
-            const float delta_factor_total = 1 - m_fSecondVPZoomFactor;
-            float min_zoom_factor = 1 + delta_factor_total * m_fMinZoomK;
-            float k = (m_fRTZoomFactor - min_zoom_factor) / (m_fSecondVPZoomFactor - min_zoom_factor);
-            return (m_fScopeInertionFactor - fInertionFactor) * k + fInertionFactor;
-        }
-        else
-            return (fInertionFactor + fInertionFactor * m_fAimControlInertionK);
+        //if (SecondVPEnabled() && m_bScopeDynamicZoom)
+        //{
+        //    const float delta_factor_total = 1 - m_fSecondVPZoomFactor;
+        //    float min_zoom_factor = 1 + delta_factor_total * m_fMinZoomK;
+        //    float k = (m_fRTZoomFactor - min_zoom_factor) / (m_fSecondVPZoomFactor - min_zoom_factor);
+        //    return (m_fScopeInertionFactor - fInertionFactor) * k + fInertionFactor;
+        //}
+        //else
+        float k = SecondVPEnabled() ? GetSecondVPZoom() : 1.f;
+        return (fInertionFactor + fInertionFactor * m_fAimControlInertionK) * (k * m_fScopeInertionFactor);
     }
     return fInertionFactor;
 }

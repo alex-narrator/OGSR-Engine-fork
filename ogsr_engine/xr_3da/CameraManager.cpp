@@ -366,7 +366,7 @@ bool CCameraManager::ProcessCameraEffector(CEffectorCam* eff)
 
 void CCameraManager::UpdateCamEffectors()
 {
-    if (m_EffectorsCam.empty() || Device.m_SecondViewport.IsSVPFrame())
+    if (m_EffectorsCam.empty() /*|| Device.m_SecondViewport.IsSVPFrame()*/)
         return;
 
     auto r_it = m_EffectorsCam.rbegin();
