@@ -28,6 +28,8 @@ enum HUD_ADJUST_MODE : int
     HUD_ADDON_ATTACH_ROT,
     WORLD_ADDON_ATTACH_POS,
     WORLD_ADDON_ATTACH_ROT,
+    HUD_ADDON_ATTACH_SCALE,
+    WORLD_ADDON_ATTACH_SCALE,
     _HUD_ADJUST_MODES_COUNT_
 };
 
@@ -50,6 +52,8 @@ static constexpr std::array<std::tuple<int, const char*>, _HUD_ADJUST_MODES_COUN
     {DIK_6, "adjusting HUD ADDON ATTACH ROTATION"},
     {DIK_7, "adjusting WORLD ADDON ATTACH POSITION"},
     {DIK_8, "adjusting WORLD ADDON ATTACH ROTATION"},
+    {DIK_9, "adjusting HUD ADDON ATTACH SCALE"},
+    {DIK_0, "adjusting WORLD ADDON ATTACH SCALE"},
 }};
 
 int g_bHudAdjustMode = OFF;
@@ -176,9 +180,11 @@ void attachable_hud_item::tune(const Ivector& values)
         }
     }
 
-    if (g_bHudAdjustMode == HUD_ADDON_ATTACH_POS || g_bHudAdjustMode == HUD_ADDON_ATTACH_ROT || g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_ROT)
+    if (g_bHudAdjustMode == HUD_ADDON_ATTACH_POS || g_bHudAdjustMode == HUD_ADDON_ATTACH_ROT || 
+        g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_ROT || 
+        g_bHudAdjustMode == HUD_ADDON_ATTACH_SCALE || g_bHudAdjustMode == WORLD_ADDON_ATTACH_SCALE)
     {
-        if (g_bHudAdjustMode == HUD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS)
+        if (g_bHudAdjustMode == HUD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS || g_bHudAdjustMode == HUD_ADDON_ATTACH_SCALE || g_bHudAdjustMode == WORLD_ADDON_ATTACH_SCALE)
         {
             if (values.x)
                 diff.x = (values.x > 0) ? g_bHudAdjustDeltaPos : -g_bHudAdjustDeltaPos;
@@ -191,13 +197,19 @@ void attachable_hud_item::tune(const Ivector& values)
             {
                 for (int i = 0; i < eMaxAddon; ++i)
                 {
-                    if (g_bHudAdjustMode == HUD_ADDON_ATTACH_POS && Wpn->hud_attach_visual[i])
+                    if (Wpn->hud_attach_visual[i])
                     {
-                        &Wpn->hud_attach_visual_offset[i][0].add(diff);
+                        if (g_bHudAdjustMode == HUD_ADDON_ATTACH_POS)
+                            &Wpn->hud_attach_visual_offset[i][0].add(diff);
+                        if (g_bHudAdjustMode == HUD_ADDON_ATTACH_SCALE)
+                            Wpn->hud_attach_visual_scale[i] += diff.x;
                     }
-                    if (g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS && Wpn->world_attach_visual[i])
+                    if (Wpn->world_attach_visual[i])
                     {
-                        Wpn->world_attach_visual_offset[i][0].add(diff);
+                        if (g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS)
+                            Wpn->world_attach_visual_offset[i][0].add(diff);
+                        if (g_bHudAdjustMode == WORLD_ADDON_ATTACH_SCALE)
+                            Wpn->world_attach_visual_scale[i] += diff.x;
                     }
                 }
             }
@@ -444,30 +456,35 @@ void player_hud::DumpParamsToLog()
             Log("####################################");
         }
         else if (g_bHudAdjustMode == HUD_ADDON_ATTACH_POS || g_bHudAdjustMode == HUD_ADDON_ATTACH_ROT || 
-                g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_ROT)
+            g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_ROT || 
+            g_bHudAdjustMode == HUD_ADDON_ATTACH_SCALE || g_bHudAdjustMode == WORLD_ADDON_ATTACH_SCALE)
         {
             if (auto Wpn = smart_cast<CWeapon*>(m_attached_items[g_bHudAdjustItemIdx]->m_parent_hud_item))
             {
                 for (int i = 0; i < eMaxAddon; ++i)
                 {
-                    if ((g_bHudAdjustMode == HUD_ADDON_ATTACH_POS || g_bHudAdjustMode == HUD_ADDON_ATTACH_ROT) && Wpn->hud_attach_visual[i])
+                    if ((g_bHudAdjustMode == HUD_ADDON_ATTACH_POS || g_bHudAdjustMode == HUD_ADDON_ATTACH_ROT || g_bHudAdjustMode == HUD_ADDON_ATTACH_SCALE) && Wpn->hud_attach_visual[i])
                     {
                         Log("####################################");
                         Msg("[%s]", hud_sect);
                         auto pos = Wpn->hud_attach_visual_offset[i][0];
                         auto rot = Wpn->hud_attach_visual_offset[i][1];
+                        auto scale = Wpn->hud_attach_visual_scale[i];
                         Msg("%s_attach_pos = %g,%g,%g", Wpn->hud_attach_addon_name[i], pos.x, pos.y, pos.z);
                         Msg("%s_attach_rot = %g,%g,%g", Wpn->hud_attach_addon_name[i], rot.x, rot.y, rot.z);
+                        Msg("%s_attach_scale = %g", Wpn->hud_attach_addon_name[i], scale);
                         Log("####################################");
                     }
-                    if ((g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_ROT) && Wpn->world_attach_visual[i])
+                    if ((g_bHudAdjustMode == WORLD_ADDON_ATTACH_POS || g_bHudAdjustMode == WORLD_ADDON_ATTACH_ROT || g_bHudAdjustMode == WORLD_ADDON_ATTACH_SCALE) && Wpn->world_attach_visual[i])
                     {
                         Log("####################################");
                         Msg("[%s]", Wpn->cNameSect().c_str());
                         auto pos = Wpn->world_attach_visual_offset[i][0];
                         auto rot = Wpn->world_attach_visual_offset[i][1];
+                        auto scale = Wpn->world_attach_visual_scale[i];
                         Msg("%s_attach_pos = %g,%g,%g", Wpn->world_attach_addon_name[i], pos.x, pos.y, pos.z);
                         Msg("%s_attach_rot = %g,%g,%g", Wpn->world_attach_addon_name[i], rot.x, rot.y, rot.z);
+                        Msg("%s_attach_scale = %g", Wpn->hud_attach_addon_name[i], scale);
                         Log("####################################");
                     }
                 }
@@ -500,7 +517,7 @@ void hud_draw_adjust_mode()
     if (pInput->iGetAsyncKeyState(DIK_LSHIFT))
         _text =
             "press SHIFT+NUM 0-return|1-hud_pos|2-hud_rot|3-itm_pos|4-itm_rot|5-fire_point|6-fire_point2|7-shell_point|8-pos_step|9-rot_step    ||||||    press "
-            "SHIFT+1-laser_point|2-flashlight_point|3-custom_ui_pos|4-custom_ui_rot|5-hud_addon_attach_pos|6-hud_addon_attach_rot|7-world_addon_attach_pos|8-world_addon_attach_rot";
+            "SHIFT+1-laser_point|2-flashlight_point|3-custom_ui_pos|4-custom_ui_rot|5-hud_addon_attach_pos|6-hud_addon_attach_rot|7-world_addon_attach_pos|8-world_addon_attach_rot|9-hud_addon_attach_scale|0-world_addon_attach_scale";
     else if (pInput->iGetAsyncKeyState(DIK_LCONTROL))
         _text = "press CTRL+NUM 0-item idx 1|1-item idx 2";
     else

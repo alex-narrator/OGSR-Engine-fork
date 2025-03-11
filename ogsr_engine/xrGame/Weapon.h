@@ -591,11 +591,13 @@ public:
     IRenderVisual* world_attach_visual[eMaxAddon]{};
     LPCSTR world_attach_bone_name[eMaxAddon]{};
     Fvector world_attach_visual_offset[eMaxAddon][2]{}; // pos, rot
+    float world_attach_visual_scale[eMaxAddon]{}; // scale
 
     LPCSTR hud_attach_addon_name[eMaxAddon]{};
     IRenderVisual* hud_attach_visual[eMaxAddon]{};
     LPCSTR hud_attach_bone_name[eMaxAddon]{};
     Fvector hud_attach_visual_offset[eMaxAddon][2]{}; // pos, rot
+    float hud_attach_visual_scale[eMaxAddon]{}; // scale
 
     xr_vector<shared_str> m_scopes{};
     u8 m_cur_scope{};
