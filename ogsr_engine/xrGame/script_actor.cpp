@@ -69,8 +69,6 @@ void set_jump_speed(CActor* pActor, float speed)
     get_movement(pActor)->SetJumpUpVelocity(speed);
 }
 
-float get_exo_factor(CActor* pActor){}
-
 CHitImmunity* get_immunities(CActor* pActor) { return pActor->conditions().cast_hit_immunities(); }
 
 CEntity::SEntityState* get_actor_state(CActor* pActor)
