@@ -231,14 +231,13 @@ public:
 
     // --------------------------------------------------------------------------------------
     // Monster Settings
-    ref_smem<SMonsterSettings> m_base_settings;
-    ref_smem<SMonsterSettings> m_current_settings;
+    SMonsterSettings m_current_settings;
 
     void settings_read(CInifile* ini, LPCSTR section, SMonsterSettings& data);
     void settings_load(LPCSTR section);
     void settings_overrides();
 
-    SMonsterSettings& db() { return *(*m_current_settings); }
+    SMonsterSettings& db() { return (m_current_settings); }
     // --------------------------------------------------------------------------------------
 
     CCharacterPhysicsSupport* m_pPhysics_support;
