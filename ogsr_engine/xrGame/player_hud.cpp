@@ -534,7 +534,9 @@ void attachable_hud_item::load(const shared_str& sect_name)
         m_has_separated_hands = true;
     }
 
+    ::Render->hud_loading = true;
     m_model = smart_cast<IKinematics*>(::Render->model_Create(m_visual_name.c_str()));
+    ::Render->hud_loading = false;
 
     m_attach_place_idx = READ_IF_EXISTS(pSettings, r_u16, sect_name, "attach_place_idx", 0);
     m_measures.load(sect_name, m_model);
