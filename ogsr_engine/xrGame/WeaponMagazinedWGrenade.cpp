@@ -660,8 +660,8 @@ void CWeaponMagazinedWGrenade::PlayAnimReload()
             PlayHUDMotion({"anim_reload_gl_partly", "anm_reload_w_gl_partly", "anim_reload_gl", "anm_reload_w_gl"}, true, GetState());
         else if (IsSingleReloading())
         {
-            if (AnimationExist("anim_reload_single_w_gl"))
-                PlayHUDMotion("anim_reload_single_w_gl", true, GetState());
+            if (AnimationExist("anm_reload_single_w_gl"))
+                PlayHUDMotion("anm_reload_single_w_gl", true, GetState());
             else
                 PlayHUDMotion({"anim_draw_gl", "anm_show_w_gl"}, false, GetState());
         }

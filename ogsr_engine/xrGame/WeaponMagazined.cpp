@@ -1510,8 +1510,8 @@ void CWeaponMagazined::PlayAnimReload()
         PlayHUDMotion({"anim_reload_partly", "anm_reload_partly", "anim_reload", "anm_reload"}, true, GetState());
     else if (IsSingleReloading())
     {
-        if (AnimationExist("anim_reload_single"))
-            PlayHUDMotion("anim_reload_single", true, GetState());
+        if (AnimationExist({"anm_reload_single"}))
+            PlayHUDMotion("anm_reload_single", true, GetState());
         else
             PlayHUDMotion({"anim_draw", "anm_show"}, false, GetState());
     }
