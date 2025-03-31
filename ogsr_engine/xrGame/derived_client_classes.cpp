@@ -353,7 +353,7 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("is_flashlight_on", &CWeaponMagazined::IsFlashlightOn)
                   .def("switch_flashlight", &CWeaponMagazined::SwitchFlashlight)
                   
-                  .def_readwrite("shell_drop_delay", &CWeaponMagazined::m_iShellDropDelay),
+                  .def_readwrite("shell_drop_delay", &CWeaponMagazined::m_fShellDropDelay),
               class_<CWeaponMagazinedWGrenade, CWeaponMagazined>("CWeaponMagazinedWGrenade")
                   .def_readwrite("gren_mag_size", &CWeaponMagazinedWGrenade::iMagazineSize2)
                   .def("switch_gl", &CWeaponMagazinedWGrenade::SwitchMode),

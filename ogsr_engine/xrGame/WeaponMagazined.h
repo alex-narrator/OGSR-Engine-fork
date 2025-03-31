@@ -184,7 +184,7 @@ protected:
     bool m_bHasChamber{true};
 
     //затримка перед викиданням гільзи
-    u32 m_iShellDropDelay{};
+    float m_fShellDropDelay{};
     u32 m_iShellDropTime{};
 
     // переменная блокирует использование

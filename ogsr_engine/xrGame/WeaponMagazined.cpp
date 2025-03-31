@@ -213,7 +213,7 @@ void CWeaponMagazined::Load(LPCSTR section)
     m_fire_zoomout_time = READ_IF_EXISTS(pSettings, r_u32, section, "fire_zoomout_time", u32(-1));
 
     m_bHasChamber = READ_IF_EXISTS(pSettings, r_bool, section, "has_chamber", true);
-    m_iShellDropDelay = READ_IF_EXISTS(pSettings, r_u32, section, "shell_drop_delay", 0.f);
+    m_fShellDropDelay = READ_IF_EXISTS(pSettings, r_float, section, "shell_drop_delay", 0.f);
 }
 
 void CWeaponMagazined::FireStart()
@@ -644,13 +644,13 @@ void CWeaponMagazined::OnShot()
 
     // Shell Drop
     Fvector vel;
-    if (m_iShellDropDelay == 0)
+    if (fis_zero(m_fShellDropDelay))
     {
         PHGetLinearVell(vel);
         OnShellDrop(get_LastSP(), vel);
     }
     else
-        m_iShellDropTime = Device.dwTimeGlobal + m_iShellDropDelay * 1000;
+        m_iShellDropTime = Device.dwTimeGlobal + m_fShellDropDelay * 1000;
 
     // Огонь из ствола
     StartFlameParticles();
