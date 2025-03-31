@@ -183,6 +183,10 @@ protected:
     // у оружия есть патронник
     bool m_bHasChamber{true};
 
+    //затримка перед викиданням гільзи
+    u32 m_iShellDropDelay{};
+    u32 m_iShellDropTime{};
+
     // переменная блокирует использование
     // только разных типов патронов
     bool m_bLockType{};

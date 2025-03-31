@@ -63,7 +63,7 @@ void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
     VERIFY(u16(-1) != l_cartridge.bullet_material_idx);
     //-------------------------------------------------------------
 #pragma todo("KRodin: мне кажется, или здесь должно быть && вместо & ? Надо б посмотреть, работает ли оно вообще.")
-    l_cartridge.m_flags.set(CCartridge::cfTracer, (m_bHasTracers & !!l_cartridge.m_flags.test(CCartridge::cfTracer)));
+    l_cartridge.m_flags.set(CCartridge::cfTracer, (m_bHasTracers && !!l_cartridge.m_flags.test(CCartridge::cfTracer)));
     if (m_u8TracerColorID != u8(-1))
         l_cartridge.m_u8ColorID = m_u8TracerColorID;
     //-------------------------------------------------------------
