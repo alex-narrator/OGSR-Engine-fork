@@ -621,15 +621,6 @@ bool CInventoryItem::CanTrade() const
     return (res && m_flags.test(FCanTrade) && !IsQuestItem());
 }
 
-int CInventoryItem::GetGridWidth() const { return (int)m_icon_params.grid_width; }
-
-int CInventoryItem::GetGridHeight() const { return (int)m_icon_params.grid_height; }
-
-int CInventoryItem::GetIconIndex() const { return m_icon_params.icon_group; }
-
-int CInventoryItem::GetXPos() const { return (int)m_icon_params.grid_x; }
-int CInventoryItem::GetYPos() const { return (int)m_icon_params.grid_y; }
-
 bool CInventoryItem::IsNecessaryItem(CInventoryItem* item) { return IsNecessaryItem(item->object().cNameSect()); };
 
 BOOL CInventoryItem::IsInvalid() const { return object().getDestroy() || GetDropManual(); }

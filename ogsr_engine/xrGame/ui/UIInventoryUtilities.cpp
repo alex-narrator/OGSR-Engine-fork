@@ -28,7 +28,7 @@ constexpr LPCSTR ratingField = "rating_names";
 constexpr LPCSTR reputationgField = "reputation_names";
 constexpr LPCSTR goodwillField = "goodwill_names";
 
-static xr_unordered_map<size_t, ui_shader> g_EquipmentIconsShaders;
+static string_unordered_map<shared_str, ui_shader> g_EquipmentIconsShaders;
 
 typedef std::pair<CHARACTER_RANK_VALUE, shared_str> CharInfoStringID;
 DEF_MAP(CharInfoStrings, CHARACTER_RANK_VALUE, shared_str);
@@ -234,16 +234,15 @@ bool InventoryUtilities::HasFreeSpace(TIItemContainer& item_list, PIItem _item, 
     return true;
 }
 
-ui_shader& InventoryUtilities::GetEquipmentIconsShader(size_t icon_group)
+ui_shader& InventoryUtilities::GetEquipmentIconsShader(shared_str icon_group)
 {
     if (auto it = g_EquipmentIconsShaders.find(icon_group); it == g_EquipmentIconsShaders.end())
     {
         string_path file;
         strcpy_s(file, EQUIPMENT_ICONS);
-        if (icon_group > 0)
+        if (icon_group.size())
         {
-            strcat_s(file, "_");
-            itoa(icon_group, file + strlen(file), 10);
+            xr_strconcat(file, EQUIPMENT_ICONS, "_", icon_group.c_str());
         }
 
         g_EquipmentIconsShaders[icon_group]->create("hud\\default", file);

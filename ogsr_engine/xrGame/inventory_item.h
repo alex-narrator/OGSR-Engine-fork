@@ -144,12 +144,12 @@ public:
     virtual void OnMoveToRuck(EItemPlace prevPlace);
     virtual void OnMoveOut(EItemPlace prevPlace);
 
-    int GetGridWidth() const;
-    int GetGridHeight() const;
+    int GetGridWidth() const { return (int)m_icon_params.grid_width; };
+    int GetGridHeight() const { return (int)m_icon_params.grid_height; };
     const shared_str& GetIconName() const { return m_icon_name; };
-    int GetIconIndex() const;
-    int GetXPos() const;
-    int GetYPos() const;
+    const shared_str& GetIconIndex() const { return m_icon_params.icon_group; };
+    int GetXPos() const { return (int)m_icon_params.grid_x; };
+    int GetYPos() const { return (int)m_icon_params.grid_y; };
 
     float GetCondition() const { return m_fCondition; }
     void ChangeCondition(float fDeltaCondition);

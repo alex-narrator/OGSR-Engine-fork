@@ -896,9 +896,10 @@ void CWeapon::renderable_Render()
         Fvector pos = world_attach_visual_offset[i][0];
         Fvector rot = world_attach_visual_offset[i][1];
         float scale = world_attach_visual_scale[i];
+        if (!fis_zero(scale))
+            bone_trans.scale(scale, scale, scale);
         offset.setHPB(rot.x, rot.y, rot.z);
         offset.translate_over(pos);
-        bone_trans.scale(scale, scale, scale);
         m_res.mul(bone_trans, offset);
         m_res.mulA_43(XFORM());
 
@@ -926,9 +927,10 @@ void CWeapon::render_hud_mode()
         Fvector pos = hud_attach_visual_offset[i][0];
         Fvector rot = hud_attach_visual_offset[i][1];
         float scale = hud_attach_visual_scale[i];
+        if (!fis_zero(scale))
+            bone_trans.scale(scale, scale, scale);
         offset.setHPB(rot.x, rot.y, rot.z);
         offset.translate_over(pos);
-        bone_trans.scale(scale, scale, scale);
         m_res.mul(bone_trans, offset);
         m_res.mulA_43(HudItemData()->m_item_transform);
 
@@ -2276,7 +2278,7 @@ void CWeapon::InitAddonsVisual()
                 world_attach_visual_offset[i][1] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
 
                 sprintf(res_sect, "%s_%s", addon_name, "attach_scale");
-                world_attach_visual_scale[i] = READ_IF_EXISTS(pSettings, r_float, sect, res_sect, 1.f);
+                world_attach_visual_scale[i] = READ_IF_EXISTS(pSettings, r_float, sect, res_sect, 0.f);
             }
         }
     }
@@ -2315,7 +2317,7 @@ void CWeapon::InitAddonsVisualHud()
                 hud_attach_visual_offset[i][1] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
 
                 sprintf(res_sect, "%s_%s", addon_name, "attach_scale");
-                hud_attach_visual_scale[i] = READ_IF_EXISTS(pSettings, r_float, sect, res_sect, 1.f);
+                hud_attach_visual_scale[i] = READ_IF_EXISTS(pSettings, r_float, sect, res_sect, 0.f);
             }
         }
     }

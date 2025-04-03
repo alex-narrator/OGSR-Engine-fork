@@ -34,7 +34,7 @@ bool FreeRoom_byColumns(TIItemContainer& item_list, PIItem item, int width, int 
 bool HasFreeSpace(TIItemContainer&, PIItem, int, int, bool);
 
 // получить shader на иконки инвенторя
-ui_shader& GetEquipmentIconsShader(size_t icon_group = 0);
+ui_shader& GetEquipmentIconsShader(shared_str icon_group);
 // удаляем все шейдеры
 void DestroyShaders();
 void CreateShaders();

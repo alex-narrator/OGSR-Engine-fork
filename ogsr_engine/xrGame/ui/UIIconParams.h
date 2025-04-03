@@ -7,7 +7,7 @@ class CIconParams
     bool loaded{};
 
 public:
-    int icon_group{};
+    shared_str icon_group{};
     float grid_x{}, grid_y{}, grid_width{}, grid_height{};
     shared_str name{}, section{};
 
