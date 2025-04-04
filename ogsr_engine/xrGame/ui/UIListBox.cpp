@@ -12,6 +12,7 @@ CUIListBox::CUIListBox()
     m_text_color = 0xff000000;
     m_text_color_s = 0xff000000;
     m_text_al = CGameFont::alLeft;
+    m_text_v_al = CGameFont::valTop;
 
     m_bImmediateSelection = false;
 
@@ -246,6 +247,10 @@ CGameFont* CUIListBox::GetFont() { return CUIWindow::GetFont(); }
 void CUIListBox::SetTextAlignment(ETextAlignment alignment) { m_text_al = alignment; }
 
 ETextAlignment CUIListBox::GetTextAlignment() { return m_text_al; }
+
+void CUIListBox::SetVTextAlignment(EVTextAlignment alignment) { m_text_v_al = alignment; }
+
+EVTextAlignment CUIListBox::GetVTextAlignment() { return m_text_v_al; }
 
 float CUIListBox::GetLongestLength()
 {

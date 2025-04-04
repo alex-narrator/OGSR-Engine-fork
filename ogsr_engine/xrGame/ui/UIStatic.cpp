@@ -525,7 +525,8 @@ void CUIStatic::SetMask(CUIFrameWindow* pMask)
 //	return m_pLines->GetTextAlignment();
 // }
 
-CGameFont::EAligment CUIStatic::GetTextAlignment() { return m_pLines->GetTextAlignment(); }
+ETextAlignment CUIStatic::GetTextAlignment() { return m_pLines->GetTextAlignment(); }
+EVTextAlignment CUIStatic::GetVTextAlignment() { return m_pLines->GetVTextAlignment(); }
 
 // void CUIStatic::SetTextAlign(CGameFont::EAligment align){
 //	CREATE_LINES;

@@ -124,6 +124,9 @@ public:
     virtual void SetTextAlignment(ETextAlignment alignment) { m_lines.SetTextAlignment(alignment); }
     virtual ETextAlignment GetTextAlignment() { return m_lines.GetTextAlignment(); }
 
+    virtual void SetVTextAlignment(EVTextAlignment alignment) { m_lines.SetVTextAlignment(alignment); }
+    virtual EVTextAlignment GetVTextAlignment() { return m_lines.GetVTextAlignment(); }
+
     // IUITextControl : public IUIFontControl{
     virtual void SetText(LPCSTR text) { m_lines.SetText(text); }
     virtual LPCSTR GetText() { return m_lines.GetText(); }

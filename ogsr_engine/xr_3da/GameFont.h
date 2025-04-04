@@ -22,7 +22,7 @@ public:
     {
         valTop = 0,
         valCenter,
-        valBotton
+        valBottom
     };
 
 private:

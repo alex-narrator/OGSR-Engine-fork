@@ -41,6 +41,8 @@ public:
     virtual CGameFont* GetFont();
     virtual void SetTextAlignment(ETextAlignment alignment);
     virtual ETextAlignment GetTextAlignment();
+    virtual void SetVTextAlignment(EVTextAlignment alignment);
+    virtual EVTextAlignment GetVTextAlignment();
 
 protected:
     float m_def_item_height;
@@ -48,6 +50,7 @@ protected:
     u32 m_text_color;
     u32 m_text_color_s;
     ETextAlignment m_text_al;
+    EVTextAlignment m_text_v_al;
     shared_str m_selection_texture;
 
     bool m_bImmediateSelection;

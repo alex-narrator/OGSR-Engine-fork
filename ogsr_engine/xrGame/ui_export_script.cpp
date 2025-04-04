@@ -15,7 +15,7 @@ void UIRegistrator::script_register(lua_State* L)
 
         class_<CGameFont>("CGameFont")
             .enum_("EAligment")[value("alLeft", int(CGameFont::alLeft)), value("alRight", int(CGameFont::alRight)), value("alCenter", int(CGameFont::alCenter))]
-            .enum_("VAligment")[value("valTop", int(CGameFont::valTop)), value("valCenter", int(CGameFont::valCenter)), value("valBotton", int(CGameFont::valBotton))],
+            .enum_("VAligment")[value("valTop", int(CGameFont::valTop)), value("valCenter", int(CGameFont::valCenter)), value("valBottom", int(CGameFont::valBottom))],
 
         class_<CUICaption>("CUICaption").def("addCustomMessage", &CUICaption::addCustomMessage).def("setCaption", &CUICaption::setCaption),
 

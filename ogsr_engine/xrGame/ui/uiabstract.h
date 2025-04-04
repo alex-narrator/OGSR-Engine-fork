@@ -18,6 +18,8 @@ public:
     virtual CGameFont* GetFont() = 0;
     virtual void SetTextAlignment(ETextAlignment alignment) = 0;
     virtual ETextAlignment GetTextAlignment() = 0;
+    virtual void SetVTextAlignment(EVTextAlignment alignment) = 0;
+    virtual EVTextAlignment GetVTextAlignment() = 0;
 };
 
 class IUITextControl : public IUIFontControl

@@ -271,11 +271,20 @@ bool CUIXmlInit::InitSpin(CUIXml& xml_doc, const char* path, int index, CUICusto
 bool CUIXmlInit::InitText(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* pWnd)
 {
     InitText(xml_doc, path, index, (IUITextControl*)pWnd);
-    shared_str al = xml_doc.ReadAttrib(path, index, "vert_align", "");
+
+    shared_str al = xml_doc.ReadAttrib(path, index, "align");
+    if (0 == xr_strcmp(al, "c"))
+        pWnd->SetTextAlignment(CGameFont::alCenter);
+    else if (0 == xr_strcmp(al, "r"))
+        pWnd->SetTextAlignment(CGameFont::alRight);
+    else if (0 == xr_strcmp(al, "l"))
+        pWnd->SetTextAlignment(CGameFont::alLeft);
+
+    al = xml_doc.ReadAttrib(path, index, "vert_align", "");
     if (0 == xr_strcmp(al, "c"))
         pWnd->SetVTextAlignment(CGameFont::valCenter);
     else if (0 == xr_strcmp(al, "b"))
-        pWnd->SetVTextAlignment(CGameFont::valBotton);
+        pWnd->SetVTextAlignment(CGameFont::valBottom);
     else if (0 == xr_strcmp(al, "t"))
         pWnd->SetVTextAlignment(CGameFont::valTop);
 
@@ -306,6 +315,14 @@ bool CUIXmlInit::InitText(CUIXml& xml_doc, const char* path, int index, IUITextC
         pWnd->SetTextAlignment(CGameFont::alRight);
     else if (0 == xr_strcmp(al, "l"))
         pWnd->SetTextAlignment(CGameFont::alLeft);
+
+    al = xml_doc.ReadAttrib(path, index, "v_align");
+    if (0 == xr_strcmp(al, "c"))
+        pWnd->SetVTextAlignment(CGameFont::valCenter);
+    else if (0 == xr_strcmp(al, "t"))
+        pWnd->SetVTextAlignment(CGameFont::valTop);
+    else if (0 == xr_strcmp(al, "b"))
+        pWnd->SetVTextAlignment(CGameFont::valBottom);
 
     shared_str text = xml_doc.Read(path, index, NULL);
     CStringTable st;
@@ -1312,6 +1329,14 @@ bool CUIXmlInit::InitListBox(CUIXml& xml_doc, const char* path, int index, CUILi
 
     else if (0 == xr_strcmp(al, "l"))
         pWnd->SetTextAlignment(CGameFont::alLeft);
+
+    al = xml_doc.ReadAttrib(path, index, "v_align");
+    if (0 == xr_strcmp(al, "c"))
+        pWnd->SetVTextAlignment(CGameFont::valCenter);
+    else if (0 == xr_strcmp(al, "t"))
+        pWnd->SetVTextAlignment(CGameFont::valTop);
+    else if (0 == xr_strcmp(al, "b"))
+        pWnd->SetVTextAlignment(CGameFont::valBottom);
 
     return true;
 }

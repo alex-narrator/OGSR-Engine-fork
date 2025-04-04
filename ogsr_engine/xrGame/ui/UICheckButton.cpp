@@ -10,6 +10,7 @@
 CUICheckButton::CUICheckButton(void)
 {
     SetTextAlignment(CGameFont::alLeft);
+    SetVTextAlignment(CGameFont::valCenter);
     m_bCheckMode = true;
     m_pDependControl = NULL;
 }

@@ -538,7 +538,7 @@ float CUILines::GetVIndentByAlign()
         return delta_h * -1;
     }
     case CGameFont::valCenter: r = (m_wndSize.y - GetVisibleHeight()) / 2; break;
-    case CGameFont::valBotton: r = m_wndSize.y - GetVisibleHeight(); break;
+    case CGameFont::valBottom: r = m_wndSize.y - GetVisibleHeight(); break;
     default: NODEFAULT;
     }
 
