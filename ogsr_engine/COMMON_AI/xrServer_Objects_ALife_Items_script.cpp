@@ -40,7 +40,23 @@ void CSE_ALifeItemWeapon::script_register(lua_State* L)
                   .def_readwrite("ammo_elapsed", &CSE_ALifeItemWeapon::a_elapsed)
                   .def_readwrite("weapon_state", &CSE_ALifeItemWeapon::wpn_state)
                   .def_readwrite("addon_flags", &CSE_ALifeItemWeapon::m_addon_flags)
-                  .def_readwrite("ammo_type", &CSE_ALifeItemWeapon::ammo_type)];
+                  .def_readwrite("ammo_type", &CSE_ALifeItemWeapon::ammo_type)
+                  .def_readwrite("current_scope", &CSE_ALifeItemWeapon::m_cur_scope)
+                  .def_readwrite("current_silencer", &CSE_ALifeItemWeapon::m_cur_silencer)
+                  .def_readwrite("current_launcher", &CSE_ALifeItemWeapon::m_cur_glauncher)
+                  .def_readwrite("current_laser", &CSE_ALifeItemWeapon::m_cur_laser)
+                  .def_readwrite("current_flashlight", &CSE_ALifeItemWeapon::m_cur_flashlight)
+                  .def_readwrite("current_stock", &CSE_ALifeItemWeapon::m_cur_stock)
+                  .def_readwrite("current_extender", &CSE_ALifeItemWeapon::m_cur_extender)
+                  .def_readwrite("current_forend", &CSE_ALifeItemWeapon::m_cur_forend)
+                  .def_readwrite("current_magazine", &CSE_ALifeItemWeapon::m_cur_magazine),
+
+              class_<enum_exporter<EWeaponAddonState>>("addon_flag")
+                  .enum_("addon_flag")[value("scope", int(eWeaponAddonScope)), value("launcher", int(eWeaponAddonGrenadeLauncher)), value("silencer", int(eWeaponAddonSilencer)), 
+                                       value("laser", int(eWeaponAddonLaser)), value("flashlight", int(eWeaponAddonFlashlight)), value("stock", int(eWeaponAddonStock)), 
+                                        value("extender", int(eWeaponAddonExtender)), value("forend", int(eWeaponAddonForend))
+                  ]
+    ];
 }
 
 void CSE_ALifeItemWeaponShotGun::script_register(lua_State* L) { module(L)[luabind_class_item1(CSE_ALifeItemWeaponShotGun, "cse_alife_item_weapon_shotgun", CSE_ALifeItemWeapon)]; }
