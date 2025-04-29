@@ -194,6 +194,7 @@ protected:
     virtual void DisableUIDetection(){};
 
     float m_fDetectRadius{};
+    float m_fArtefactRadius{};
     float m_fAfVisRadius{};
     CAfList m_artefacts;
     CZoneList m_zones;

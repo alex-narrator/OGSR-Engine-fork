@@ -46,7 +46,7 @@ void CEliteDetector::UpdateAf()
 
     float dist = min_dist;
 
-    float fRelPow = (dist / m_fDetectRadius);
+    float fRelPow = (dist / m_fArtefactRadius);
     clamp(fRelPow, 0.f, 1.f);
 
     // определить текущую частоту срабатывания сигнала

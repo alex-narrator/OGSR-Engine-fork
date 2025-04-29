@@ -35,6 +35,7 @@ void CCustomDetector::Load(LPCSTR section)
     inherited::Load(section);
 
     m_fDetectRadius = READ_IF_EXISTS(pSettings, r_float, section, "detect_radius", 15.0f);
+    m_fArtefactRadius = READ_IF_EXISTS(pSettings, r_float, section, "af_radius", m_fDetectRadius);
     m_fAfVisRadius = READ_IF_EXISTS(pSettings, r_float, section, "af_vis_radius", 2.0f);
     m_artefacts.load(section, "af");
     m_artefacts.m_af_rank = READ_IF_EXISTS(pSettings, r_u32, section, "af_rank", 0);
@@ -59,7 +60,7 @@ void CCustomDetector::shedule_Update(u32 dt)
     Fvector P{};
     P.set(H_Parent()->Position());
 
-    m_artefacts.feel_touch_update(P, m_fDetectRadius);
+    m_artefacts.feel_touch_update(P, m_fArtefactRadius);
     m_zones.feel_touch_update(P, m_fDetectRadius);
     m_creatures.feel_touch_update(P, m_fDetectRadius);
 }
