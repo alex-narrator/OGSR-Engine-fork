@@ -161,9 +161,7 @@ bool CUIMainIngameWnd::OnKeyboardPress(int dik)
 void CUIMainIngameWnd::ReceiveNews(GAME_NEWS_DATA* news)
 {
     VERIFY(news->texture_name.size());
-    auto pda = m_pActor->GetPDA();
-    if (pda && pda->IsPowerOn() || !m_pActor->g_Alive())
-        HUD().GetUI()->m_pMessagesWnd->AddIconedPdaMessage(*(news->texture_name), news->tex_rect, news->SingleLineText(), news->show_time);
+    HUD().GetUI()->m_pMessagesWnd->AddIconedPdaMessage(*(news->texture_name), news->tex_rect, news->SingleLineText(), news->show_time);
 }
 
 void CUIMainIngameWnd::SetFlashIconState_(EFlashingIcons type, bool enable)
@@ -223,11 +221,7 @@ void CUIMainIngameWnd::UpdateFlashingIcons()
 {
     for (FlashingIcons_it it = m_FlashingIcons.begin(); it != m_FlashingIcons.end(); ++it)
     {
-        auto pda = m_pActor->GetPDA();
-        if (pda && pda->IsPowerOn())
-            it->second->Update();
-        else
-            it->second->Show(false);
+        it->second->Update();
     }
 }
 
