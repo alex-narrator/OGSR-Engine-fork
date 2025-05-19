@@ -649,17 +649,6 @@ void CScriptGameObject::ResetState()
     k->ResetStates();
 }
 
-void CScriptGameObject::ZeroEffects()
-{
-    CEatableItem* item = smart_cast<CEatableItem*>(&object());
-    if (!item)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CEatableItem : cannot access class member ZeroEffects!");
-        return;
-    }
-    item->ZeroAllEffects();
-}
-
 u32 CScriptGameObject::GetHudItemState()
 {
     CHudItem* k = smart_cast<CHudItem*>(&object());

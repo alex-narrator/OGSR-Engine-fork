@@ -22,9 +22,6 @@ CEatableItem::CEatableItem()
 {
     m_ItemInfluence.clear();
     m_ItemInfluence.resize(eInfluenceMax);
-
-    m_ItemBoost.clear();
-    m_ItemBoost.resize(eBoostMax);
 }
 
 DLL_Pure* CEatableItem::_construct()
@@ -45,37 +42,11 @@ void CEatableItem::Load(LPCSTR section)
     m_ItemInfluence[ePsyHealthInfluence] = READ_IF_EXISTS(pSettings, r_float, section, "eat_psyhealth", 0.0f);
     m_ItemInfluence[eAlcoholInfluence] = READ_IF_EXISTS(pSettings, r_float, section, "eat_alcohol", 0.0f);
     m_ItemInfluence[eWoundsHealInfluence] = READ_IF_EXISTS(pSettings, r_float, section, "eat_wounds_heal", 0.0f);
-    // boost
-    m_ItemBoost[eHealthBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_health", 0.0f);
-    m_ItemBoost[ePowerBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_power", 0.0f);
-    m_ItemBoost[eMaxPowerBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_max_power", 0.0f);
-    m_ItemBoost[eSatietyBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_satiety", 0.0f);
-    m_ItemBoost[eRadiationBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_radiation", 0.0f);
-    m_ItemBoost[ePsyHealthBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_psyhealth", 0.0f);
-    m_ItemBoost[eAlcoholBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_alcohol", 0.0f);
-    m_ItemBoost[eWoundsHealBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_wounds_heal", 0.0f);
-
-    m_ItemBoost[eAdditionalSprintBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_sprint", 0.0f);
-    m_ItemBoost[eAdditionalJumpBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_jump", 0.0f);
-    m_ItemBoost[eAdditionalWeightBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_weight", 0.0f);
-
-    m_ItemBoost[eBurnImmunityBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_burn_protection", 0.0f);
-    m_ItemBoost[eShockImmunityBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_strike_protection", 0.0f);
-    m_ItemBoost[eStrikeImmunityBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_shock_protection", 0.0f);
-    m_ItemBoost[eWoundImmunityBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_wound_protection", 0.0f);
-    m_ItemBoost[eRadiationImmunityBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_radiation_protection", 0.0f);
-    m_ItemBoost[eTelepaticImmunityBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_telepatic_protection", 0.0f);
-    m_ItemBoost[eChemicalBurnImmunityBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_chemical_burn_protection", 0.0f);
-    m_ItemBoost[eExplosionImmunitBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_explosion_protection", 0.0f);
-    m_ItemBoost[eFireWoundImmunityBoost] = READ_IF_EXISTS(pSettings, r_float, section, "boost_fire_wound_protection", 0.0f);
-    m_fBoostTime = READ_IF_EXISTS(pSettings, r_float, section, "boost_time", 0.f);
 
     m_iPortionsNum = m_iStartPortionsNum = READ_IF_EXISTS(pSettings, r_s32, section, "eat_portions_num", 1);
     VERIFY(m_iPortionsNum < 10000);
 
     m_fSelfRadiationInfluence = READ_IF_EXISTS(pSettings, r_float, section, "eat_radiation_self", 0.1f);
-
-    m_sUseMenuTip = READ_IF_EXISTS(pSettings, r_string, section, "menu_use_tip", "st_use");
 }
 
 BOOL CEatableItem::net_Spawn(CSE_Abstract* DC)
@@ -143,13 +114,6 @@ void CEatableItem::UseBy(CEntityAlive* entity_alive)
         entity_alive->conditions().ApplyInfluence(i, GetItemInfluence(i));
     }
 
-    const auto sect = object().cNameSect();
-    for (int i = 0; i < eBoostMax; ++i)
-    {
-        SBooster B{(eBoostParams)i, GetItemBoost(i), GetItemBoostTime(), sect.c_str()};
-        entity_alive->conditions().ApplyBooster(B);
-    }
-
     // уменьшить количество порций
     if (m_iPortionsNum > 0)
         --(m_iPortionsNum);
@@ -165,14 +129,6 @@ void CEatableItem::UseBy(CEntityAlive* entity_alive)
 
     SetWeight(weight);
     SetCost(cost);
-}
-void CEatableItem::ZeroAllEffects()
-{
-    for (int i = 0; i < eInfluenceMax; ++i)
-        m_ItemInfluence[i] = 0.f;
-    for (int i = 0; i < eBoostMax; ++i)
-        m_ItemBoost[i] = 0.f;
-    m_fBoostTime = 0.f;
 }
 
 float CEatableItem::GetOnePortionWeight()
@@ -219,31 +175,4 @@ float CEatableItem::GetItemInfluence(int influence) const
         return (m_ItemInfluence[influence] + GetItemEffect(eRadiationRestoreSpeed) * m_fSelfRadiationInfluence)/* * GetCondition()*/;
     }
     return m_ItemInfluence[influence]/* * GetCondition()*/;
-}
-
-float CEatableItem::GetItemBoost(int boost) const { return m_ItemBoost[boost]/* * GetCondition()*/; }
-
-float CEatableItem::GetItemBoostTime() const { return m_fBoostTime/* * GetCondition()*/; }
-
-bool CEatableItem::IsInfluencer() const
-{
-    for (int i = 0; i < eInfluenceMax; ++i)
-    {
-        if (!fis_zero(GetItemInfluence(i)))
-            return true;
-    }
-    return false;
-}
-
-bool CEatableItem::IsBooster() const
-{
-    if (fis_zero(GetItemBoostTime()))
-        return false;
-
-    for (int i = 0; i < eBoostMax; ++i)
-    {
-        if (!fis_zero(GetItemBoost(i)))
-            return true;
-    }
-    return false;
 }

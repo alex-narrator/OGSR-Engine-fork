@@ -31,9 +31,6 @@ public:
     virtual void OnH_B_Independent(bool just_before_destroy);
     virtual void UseBy(CEntityAlive* entity_alive);
     bool Empty() const { return m_iPortionsNum == 0; };
-    virtual void ZeroAllEffects();
-
-    LPCSTR GetUseMenuTip() const { return m_sUseMenuTip; };
 
     bool m_bCanBeEaten{true};
 
@@ -49,22 +46,12 @@ protected:
     float GetOnePortionWeight();
     u32 GetOnePortionCost();
 
-    LPCSTR m_sUseMenuTip{};
-
-    float m_fBoostTime{};
-
 public:
     int GetStartPortionsNum() const { return m_iStartPortionsNum; };
     int GetPortionsNum() const { return m_iPortionsNum; };
 
     virtual float GetItemInfluence(int) const;
-    virtual float GetItemBoost(int) const;
-    virtual float GetItemBoostTime() const;
-
-    virtual bool IsInfluencer() const;
-    virtual bool IsBooster() const;
 
 protected:
     svector<float, eInfluenceMax> m_ItemInfluence;
-    svector<float, eBoostMax> m_ItemBoost;
 };

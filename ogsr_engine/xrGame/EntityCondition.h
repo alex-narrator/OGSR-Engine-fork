@@ -57,14 +57,6 @@ enum eBoostParams
     eBoostMax,
 };
 
-struct SBooster
-{
-    eBoostParams m_BoostType{};
-    float f_BoostValue{};
-    float f_BoostTime{};
-    LPCSTR s_BoostSection{};
-};
-
 class CEntityCondition;
 class CEntityConditionSimple
 {
@@ -265,26 +257,12 @@ public:
 
     // застосувати зміни параметрів сутності у абсолюдних значеннях
     virtual void ApplyInfluence(int, float);
-    virtual void ApplyBooster(SBooster&);
 
-    virtual void UpdateBoosters();
-
-    virtual float GetBoostedParams(int);
-    virtual float GetBoostedTime(int);
-    virtual float GetBoostedHitTypeProtection(int);
-    virtual void BoostParameters(const SBooster&);
-    virtual void DisableBoostParameters(const SBooster&);
-
-    virtual void ClearAllBoosters();
     // застосувати зміни параметрів сутності у відносних значеннях
     virtual void ApplyRestoreBoost(int, float);
-
-    typedef xr_map<eBoostParams, SBooster> BOOSTER_MAP;
-    virtual BOOSTER_MAP GetBoosters() const { return m_boosters; };
 
     virtual bool IsTimeValid() { return m_bTimeValid; };
 
 protected:
-    BOOSTER_MAP m_boosters;
     svector<float, eBoostMax> m_BoostParams;
 };

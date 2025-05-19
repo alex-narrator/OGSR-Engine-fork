@@ -64,8 +64,6 @@ CEntityCondition::CEntityCondition(CEntityAlive* object) : CEntityConditionSimpl
 
     m_bIsBleeding = false;
     m_bCanBeHarmed = true;
-
-    ClearAllBoosters();
 }
 
 CEntityCondition::~CEntityCondition(void) { ClearWounds(); }
@@ -129,7 +127,6 @@ void CEntityCondition::reinit()
     m_iWhoID = NULL;
 
     ClearWounds();
-    ClearAllBoosters();
 }
 
 void CEntityCondition::ChangeEntityMorale(float value) { m_fDeltaEntityMorale += value; }
@@ -239,8 +236,6 @@ void CEntityCondition::UpdateCondition()
 
     UpdateAlcohol();
     UpdateSatiety();
-
-    UpdateBoosters();
 
     UpdateEntityMorale();
 
@@ -353,7 +348,12 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
     float hit_power = hit_power_org;
     hit_power = HitOutfitEffect(pHDS);
 
-    hit_power *= (1.f - GetBoostedHitTypeProtection(pHDS->hit_type));
+    if (pSettings->line_exist("engine_callbacks", "on_actor_condition_hit") && m_object->cast_actor())
+    {
+        const char* callback = pSettings->r_string("engine_callbacks", "on_actor_condition_hit");
+        if (luabind::functor<float> lua_function; ai().script_engine().functor(callback, lua_function))
+            hit_power = lua_function(hit_power, pHDS->hit_type);
+    }
 
     bool bAddWound = true;
     switch (pHDS->hit_type)
@@ -490,21 +490,11 @@ void CEntityCondition::save(NET_Packet& output_packet)
         output_packet.w_u8((u8)m_WoundVector.size());
         for (WOUND_VECTOR_IT it = m_WoundVector.begin(); m_WoundVector.end() != it; it++)
             (*it)->save(output_packet);
-
-        output_packet.w_u8((u8)m_boosters.size());
-        for (const auto& item : m_boosters)
-        {
-            SBooster B = item.second;
-            output_packet.w_u8(B.m_BoostType);
-            output_packet.w_float(B.f_BoostValue);
-            output_packet.w_float(B.f_BoostTime);
-            output_packet.w_stringZ(B.s_BoostSection);
-        }
     }
 }
 
-#include "alife_registry_wrappers.h"
-#include "alife_simulator_header.h"
+//#include "alife_registry_wrappers.h"
+//#include "alife_simulator_header.h"
 
 void CEntityCondition::load(IReader& input_packet)
 {
@@ -527,20 +517,6 @@ void CEntityCondition::load(IReader& input_packet)
                 pWound->load(input_packet);
                 m_WoundVector[i] = pWound;
             }
-
-        u8 booster_count = input_packet.r_u8();
-        for (; booster_count > 0; booster_count--)
-        {
-            SBooster B;
-            B.m_BoostType = (eBoostParams)input_packet.r_u8();
-            B.f_BoostValue = input_packet.r_float();
-            B.f_BoostTime = input_packet.r_float();
-            shared_str _tmp;
-            input_packet.r_stringZ(_tmp);
-            B.s_BoostSection = _tmp.c_str();
-            m_boosters[B.m_BoostType] = B;
-            BoostParameters(B);
-        }
     }
 }
 
@@ -629,15 +605,7 @@ void CEntityCondition::script_register(lua_State* L)
                   .def_readonly("is_bleeding", &CEntityCondition::m_bIsBleeding)
                   //.def_readwrite("health_hit_part", &CEntityCondition::m_fHealthHitPart)
                   .def_readwrite("power_hit_part", &CEntityCondition::m_fPowerHitPart)
-                  .def("get_boosted_params", &CEntityCondition::GetBoostedParams)
-                  .def("get_boosted_time", &CEntityCondition::GetBoostedTime),
-
-              class_<SBooster>("SBooster")
-                  .def(constructor<>())
-                  .def_readwrite("type", &SBooster::m_BoostType)
-                  .def_readwrite("value", &SBooster::f_BoostValue)
-                  .def_readwrite("time", &SBooster::f_BoostTime)
-                  .def_readwrite("section", &SBooster::s_BoostSection)];
+    ];
 }
 
 void CEntityCondition::ApplyInfluence(int type, float value)
@@ -682,84 +650,6 @@ void CEntityCondition::ApplyInfluence(int type, float value)
     }
 }
 
-void CEntityCondition::ApplyBooster(SBooster& B)
-{
-    if (fis_zero(B.f_BoostValue) || fis_zero(B.f_BoostTime))
-        return;
-
-    BOOSTER_MAP::iterator it = m_boosters.find(B.m_BoostType);
-    if (it != m_boosters.end())
-        DisableBoostParameters(it->second);
-    //{
-    //    auto& _b = it->second;
-    //    DisableBoostParameters(_b);
-    //    B.f_BoostValue += _b.f_BoostValue;
-    //    B.f_BoostTime += _b.f_BoostTime;
-    //}
-
-    //float limit = B.m_BoostType < eHitTypeProtectionBoosterIndex ? 5.f : 1.f;
-    //clamp(B.f_BoostValue, -limit, limit);
-
-    m_boosters[B.m_BoostType] = B;
-    BoostParameters(B);
-}
- //#include "ui/UIInventoryUtilities.h"
-void CEntityCondition::BoostParameters(const SBooster& B)
-{
-    /*Msg("%s param %d value %.4f time %.4f at game time %s", __FUNCTION__, B.m_BoostType, B.f_BoostValue, B.f_BoostTime,
-    InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());*/
-    m_BoostParams[B.m_BoostType] += B.f_BoostValue;
-}
-
-void CEntityCondition::DisableBoostParameters(const SBooster& B)
-{
-    /*Msg("%s param %d value %.4f time %.4f at game time %s", __FUNCTION__, B.m_BoostType, B.f_BoostValue, B.f_BoostTime,
-    InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes).c_str());*/
-    m_BoostParams[B.m_BoostType] -= B.f_BoostValue;
-}
-
-void CEntityCondition::UpdateBoosters()
-{
-    if (!m_bTimeValid)
-        return;
-    for (auto& item : m_boosters)
-    {
-        auto& B = item.second;
-        B.f_BoostTime -= m_fDeltaTime / 60.f; // приведення до ігрових хвилин
-        if (B.f_BoostTime <= 0.0f)
-        {
-            DisableBoostParameters(B);
-            m_boosters.erase(item.first);
-        }
-        else if(B.m_BoostType < eRestoreBoostMax)
-            ApplyRestoreBoost(B.m_BoostType, B.f_BoostValue * m_fDeltaTime);
-    }
-}
-
-void CEntityCondition::ClearAllBoosters()
-{
-    m_BoostParams.clear();
-    m_BoostParams.resize(eBoostMax);
-    for (auto& param : m_BoostParams)
-        param = 0.f;
-}
-
-float CEntityCondition::GetBoostedHitTypeProtection(int hit_type)
-{
-    int boost_protection = hit_type + eHitTypeProtectionBoosterIndex;
-    return GetBoostedParams(boost_protection);
-}
-
-float CEntityCondition::GetBoostedParams(int i) { return m_BoostParams[i]; }
-
-float CEntityCondition::GetBoostedTime(int i) 
-{ 
-    BOOSTER_MAP::iterator it = m_boosters.find((eBoostParams)i);
-    if (it != m_boosters.end())
-        return it->second.f_BoostTime;
-    return 0.f;
-}
-
 void CEntityCondition::ApplyRestoreBoost(int type, float value)
 {
     if (fis_zero(value))
@@ -783,10 +673,7 @@ void CEntityCondition::ApplyRestoreBoost(int type, float value)
     }
     break;
     case eRadiationBoost: {
-        if (Core.Features.test(xrCore::Feature::absolute_radiation))
-            ApplyInfluence(type, value);
-        else
-            ChangeRadiation(GetRadiationRestore() * value);
+        ChangeRadiation(GetRadiationRestore() * value);
     }
     break;
     case ePsyHealthBoost: {

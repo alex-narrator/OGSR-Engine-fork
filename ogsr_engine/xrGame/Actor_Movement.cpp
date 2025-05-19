@@ -245,8 +245,6 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                 // custom jump speed
                 float jump_speed = m_fJumpSpeed;
 
-                jump_speed += m_fJumpSpeed * conditions().GetBoostedParams(eAdditionalJumpBoost);
-
                 for (const auto& item : inventory().m_all)
                 {
                     auto artefact = smart_cast<CArtefact*>(item);
@@ -265,7 +263,6 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
                 if (backpack && !fis_zero(backpack->GetCondition()))
                     jump_speed += m_fJumpSpeed * backpack->GetItemEffect(CInventoryItem::eAdditionalJump);
 
-                jump_speed *= conditions().GetSmoothOwerweightKoef();
                 clamp(jump_speed, 0.0f, jump_speed);
 
                 character_physics_support()->movement()->SetJumpUpVelocity(jump_speed);
@@ -392,7 +389,6 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
             if (scale > EPS)
             {
                 float walk_accel{m_fWalkAccel};
-                walk_accel *= conditions().GetSmoothOwerweightKoef();
                 clamp(walk_accel, 0.0f, walk_accel);
 
                 scale = walk_accel / scale;
@@ -411,7 +407,6 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
 
                 // custom sprint factor
                 float sprint_k{m_fSprintFactor};
-                sprint_k += m_fSprintFactor * conditions().GetBoostedParams(eAdditionalSprintBoost);
                 for (const auto& item : inventory().m_all)
                 {
                     auto artefact = smart_cast<CArtefact*>(item);

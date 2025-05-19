@@ -66,11 +66,7 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
 
     m_fV_Satiety = pSettings->r_float(section, "satiety_v");
 
-    m_fBleedingPowerDecrease = READ_IF_EXISTS(pSettings, r_float, section, "bleeding_power_dec", 0.f);
-    m_fMinPowerWalkJump = READ_IF_EXISTS(pSettings, r_float, section, "min_power_walk_jump", 1.0f);
     m_fAlcoholSatietyIntens = READ_IF_EXISTS(pSettings, r_float, section, "satiety_to_alcohol_effector_intensity", 1.0f);
-    m_fStressFactor = READ_IF_EXISTS(pSettings, r_float, section, "stress_factor", 1.0f);
-    m_fMinRegenK = READ_IF_EXISTS(pSettings, r_float, section, "min_regen_k", 0.f);
 }
 
 // вычисление параметров с ходом времени
@@ -109,8 +105,6 @@ CWound* CActorCondition::ConditionHit(SHit* pHDS)
 {
     if (GodMode())
         return NULL;
-    if (pHDS->hit_type == ALife::eHitTypeTelepatic)
-        pHDS->power *= (1.0f - GetAlcohol());
     return inherited::ConditionHit(pHDS);
 }
 
@@ -203,9 +197,6 @@ void CActorCondition::ChangeAlcohol(float value) { m_fAlcohol += value; }
 
 void CActorCondition::ChangeSatiety(float value)
 {
-    // влияние поглощённой дозы радиации на насыщение едой
-    if (value > 0.f)
-        value *= (1.0f - GetRadiation());
     m_fSatiety += value;
     clamp(m_fSatiety, 0.0f, 1.0f);
 }
@@ -316,37 +307,9 @@ float CActorCondition::HitSlowmo(SHit* pHDS)
     return ret;
 }
 
-float CActorCondition::GetRegenK() 
-{ 
-    float res = (1.0f - GetRadiation()) * GetSatiety();
-    clamp(res, m_fMinRegenK, 1.f);
-    return res; 
-}
-
-float CActorCondition::GetSmoothOwerweightKoef()
-{
-    float power_k = m_fMinPowerWalkJump + (1.0f - m_fMinPowerWalkJump) * GetPower(); // коэф влияния выносливости
-    float overweight_k = object().GetCarryWeight() > object().MaxCarryWeight() ? // считаем коэф. только если есть перегруз
-        object().MaxCarryWeight() / object().GetCarryWeight() : // коэф влияния перегруза
-        1.0f;
-    return power_k * overweight_k;
-}
-
-float CActorCondition::GetStress()
-{
-    float res{1.0f};
-    if (object().get_state() & (mcSprint | mcJump))
-        res *= m_fStressFactor;
-    if (object().GetCarryWeight() > object().MaxCarryWeight())
-        res *= (object().GetCarryWeight() / object().MaxCarryWeight());
-    return res;
-}
-
 void CActorCondition::UpdatePower()
 {
     float delta = GetPowerRestore();
-    if (m_bIsBleeding)
-        delta -= BleedingSpeed() * m_fBleedingPowerDecrease;
     m_fPower += delta * m_fDeltaTime;
     clamp(m_fPower, 0.0f, /*1.0f*/ GetMaxPower());
 }
@@ -403,25 +366,4 @@ void CActorCondition::UpdateAlcohol()
                 RemoveEffector(m_object, effAlcohol);
         }
     }
-}
-
-float CActorCondition::BleedingSpeed() { return inherited::BleedingSpeed() * GetStress(); }
-float CActorCondition::GetWoundIncarnation() { return inherited::GetWoundIncarnation() * GetRegenK(); }
-float CActorCondition::GetHealthRestore() { return inherited::GetHealthRestore() * GetRegenK(); }
-float CActorCondition::GetPsyHealthRestore() { return inherited::GetPsyHealthRestore() * GetRegenK(); }
-float CActorCondition::GetPowerRestore() { return m_fV_Power * GetRegenK(); }
-float CActorCondition::GetMaxPowerRestore() { return m_fPowerLeakSpeed * GetStress(); }
-float CActorCondition::GetSatietyRestore() { return m_fV_Satiety * GetStress(); }
-float CActorCondition::GetAlcoholRestore() { return m_fV_Alcohol * GetStress(); }
- 
-void CActorCondition::BoostParameters(const SBooster& B) 
-{ 
-    inherited::BoostParameters(B); 
-    object().callback(GameObject::eBoosterEnable)(B);
-}
-
-void CActorCondition::DisableBoostParameters(const SBooster& B) 
-{ 
-    inherited::DisableBoostParameters(B); 
-    object().callback(GameObject::eBoosterDisable)(B);
 }

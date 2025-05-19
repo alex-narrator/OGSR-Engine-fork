@@ -103,7 +103,6 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("on_inv_box_item_take", int(GameObject::eOnInvBoxItemTake)), value("on_inv_box_item_drop", int(GameObject::eOnInvBoxItemDrop)),
                     value("on_inv_box_open", int(GameObject::eOnInvBoxOpen)), value("select_pda_contact", int(GameObject::eSelectPdaContact)),
 
-                    value("on_booster_enable", int(GameObject::eBoosterEnable)), value("on_booster_disable", int(GameObject::eBoosterDisable)),
                     value("on_hud_state_switch", int(GameObject::eOnHudStateSwitch)),
 
                     value("on_actor_footstep", int(GameObject::eOnActorFootStep)), value("on_actor_land", int(GameObject::eOnActorLand)),

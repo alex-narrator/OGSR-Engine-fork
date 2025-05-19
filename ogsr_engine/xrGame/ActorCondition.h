@@ -53,8 +53,6 @@ public:
 
     virtual CWound* ConditionHit(SHit* pHDS);
     virtual void UpdateCondition();
-    // скорость потери крови из всех открытых ран
-    virtual float BleedingSpeed();
 
     virtual void ChangeAlcohol(float value);
     virtual void ChangeSatiety(float value);
@@ -120,34 +118,12 @@ protected:
     //float m_fV_HealthMax{};
 
 public:
-    float m_fBleedingPowerDecrease{};
-    //
-    float m_fMinPowerWalkJump{1.f};
-    //
     float m_fAlcoholSatietyIntens{1.f}; // коэфф. для рассчета интенсивности постэффекта опьянения от голода
-    //
-    float m_fStressFactor{1.f}; // фактор физнагрузки - множитель для коэффициента нагрузки актора при спринте и прыжке
-    float m_fMinRegenK{}; // мінімальне значення фактору регенерації
-
-    //float m_fBleedingHealthMaxDecrease{};
-
-    float GetSmoothOwerweightKoef();
-    // коэфф. регенерации актора - зависит от сытости и дозы облучения
-    float GetRegenK();
-    // коэффициент нагрузки актора
-    float GetStress();
 
     float AlcoholSatiety() { return m_fAlcohol * (1.0f + m_fAlcoholSatietyIntens - GetSatiety()); }
 
-    virtual float GetWoundIncarnation() override;
-    virtual float GetHealthRestore() override;
-
-    virtual float GetPsyHealthRestore() override;
-    virtual float GetPowerRestore() override;
-    virtual float GetMaxPowerRestore() override;
-    virtual float GetSatietyRestore() override;
-    virtual float GetAlcoholRestore() override;
-
-    virtual void BoostParameters(const SBooster&) override;
-    virtual void DisableBoostParameters(const SBooster&) override;
+    virtual float GetPowerRestore() override { return m_fV_Power; };
+    virtual float GetMaxPowerRestore() override { return m_fPowerLeakSpeed; };
+    virtual float GetSatietyRestore() override { return m_fV_Satiety; };
+    virtual float GetAlcoholRestore() override { return m_fV_Alcohol; };
 };

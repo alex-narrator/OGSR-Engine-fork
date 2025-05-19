@@ -414,10 +414,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("zoom_mode", &CScriptGameObject::ZoomMode)
         .def("reset_state", &CScriptGameObject::ResetState)
 
-        // для CEatableItem
-        .def("zero_effects", &CScriptGameObject::ZeroEffects)
-        // KD
-
         // by Real Wolf 11.07.2014
         .def("get_bone_name", &CScriptGameObject::GetBoneName)
 

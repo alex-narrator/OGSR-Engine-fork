@@ -139,8 +139,6 @@ public:
     // максимальный вес инвентаря
     float m_fMaxWeight;
 
-    bool m_bBeltVertical{};
-
     bool m_bBlockDevice{};
 
 protected:

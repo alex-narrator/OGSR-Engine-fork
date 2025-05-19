@@ -294,9 +294,6 @@ float CInventoryOwner::MaxCarryWeight() const
 {
     float res{inventory().GetMaxWeight()}, base_weight{inventory().GetMaxWeight()};
 
-    const auto EA = smart_cast<const CEntityAlive*>(this);
-    res += (base_weight * EA->conditions().GetBoostedParams(eAdditionalWeightBoost));
-
     auto outfit = GetOutfit();
     if (outfit && !fis_zero(outfit->GetCondition()))
         res += (base_weight * outfit->GetItemEffect(CInventoryItem::eAdditionalWeight));

@@ -104,9 +104,6 @@ enum ECallbackType
     eOnActorLand,
     eOnActorJump,
 
-    eBoosterEnable,
-    eBoosterDisable,
-
     eDummy = u32(-1),
 };
 };

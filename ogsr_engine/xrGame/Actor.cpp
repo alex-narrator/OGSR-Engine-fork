@@ -1342,7 +1342,8 @@ void CActor::UpdateItemsEffect()
                 m_ActorItemBoostedParam[i] += backpack->GetItemEffect(i);
         }
         // apllying boost on actor *_restore conditions
-        cond->ApplyRestoreBoost(i, m_ActorItemBoostedParam[i] * f_update_time);
+        //cond->ApplyRestoreBoost(i, m_ActorItemBoostedParam[i] * f_update_time);
+        cond->ApplyInfluence(i, m_ActorItemBoostedParam[i] * f_update_time);
     }
 
     callback(GameObject::eUpdateItemsEffect)(f_update_time);
@@ -1596,18 +1597,6 @@ bool CActor::IsHitToBackPack(SHit* pHDS) const
     if (calculate_direction && is_from_behind(pHDS->direction()))
         return true;
     return false;
-}
-
-bool CActor::IsHitToHead(SHit* pHDS) const
-{
-    auto pK = smart_cast<IKinematics*>(Visual());
-    return is_bone_head(*pK, pHDS->bone());
-}
-
-bool CActor::HasDetectorWorkable()
-{
-    auto item_in_det_slot = inventory().ItemFromSlot(DETECTOR_SLOT);
-    return item_in_det_slot && item_in_det_slot->IsPowerOn() && !fis_zero(item_in_det_slot->GetCondition());
 }
 
 float CActor::GetItemBoostedParams(int type) { return m_ActorItemBoostedParam[type]; }

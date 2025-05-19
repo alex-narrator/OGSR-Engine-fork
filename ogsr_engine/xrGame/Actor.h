@@ -777,12 +777,6 @@ public:
     void BlockSprint();
     // визначаємо чи треба передати хіт до рюкзака та його вмісту
     virtual bool IsHitToBackPack(SHit* pHDS) const;
-    virtual bool IsHitToHead(SHit* pHDS) const;
-
-    bool HasDetectorWorkable();
-
-protected:
-    bool m_bRuckAmmoPlacement{};
 
 public:
     float GetItemBoostedParams(int);

@@ -748,9 +748,6 @@ public:
     bool ZoomMode();
     void ResetState();
 
-    // для CEatableItem, используются в реализации радиопротектора
-    void ZeroEffects();
-
     // functions for CInventoryItem class
     void SetIIFlags(Flags16);
     Flags16 GetIIFlags();

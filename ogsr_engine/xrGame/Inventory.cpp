@@ -50,7 +50,6 @@ CInventory::CInventory()
     m_fMaxWeight = pSettings->r_float("inventory", "max_weight");
 
     m_iMaxBelt = READ_IF_EXISTS(pSettings, r_u32, "inventory", "max_belt", 0);
-    m_bBeltVertical = READ_IF_EXISTS(pSettings, r_bool, "inventory", "belt_vertical", false);
 
     m_slots.resize(SLOTS_TOTAL);
 

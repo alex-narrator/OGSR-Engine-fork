@@ -187,14 +187,12 @@ public:
             keep_inprogress_tasks_only  = 1ull << 6,
             gd_master_only              = 1ull << 7,
             wpn_cost_include_addons     = 1ull << 8,
-            use_luminocity              = 1ull << 9,
-            absolute_radiation          = 1ull << 10,
-            npc_simplified_shooting     = 1ull << 11,
-            show_objectives_ondemand    = 1ull << 12,
-            pickup_check_overlaped      = 1ull << 13,
-            disable_dialog_break        = 1ull << 14,
-            no_progress_bar_animation   = 1ull << 15,
-            limited_bolts               = 1ull << 16;
+            npc_simplified_shooting     = 1ull << 9,
+            show_objectives_ondemand    = 1ull << 10,
+            pickup_check_overlaped      = 1ull << 11,
+            disable_dialog_break        = 1ull << 12,
+            no_progress_bar_animation   = 1ull << 13,
+            limited_bolts               = 1ull << 14;
     };
 
     void _initialize(LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0);
