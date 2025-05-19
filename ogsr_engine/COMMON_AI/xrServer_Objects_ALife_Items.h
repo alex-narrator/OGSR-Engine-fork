@@ -252,7 +252,6 @@ add_to_type_list(CSE_ALifeItemDetector)
 
     SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemArtefact, CSE_ALifeItem) 
 float m_fAnomalyValue{100.f};
-float m_fRandomK{1.f};
 CSE_ALifeItemArtefact(LPCSTR caSection);
 virtual ~CSE_ALifeItemArtefact();
 virtual BOOL Net_Relevant();

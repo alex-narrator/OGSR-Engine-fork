@@ -815,20 +815,9 @@ void CSE_ALifeItemArtefact::STATE_Read(NET_Packet& tNetPacket, u16 size) { inher
 
 void CSE_ALifeItemArtefact::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
 
-void CSE_ALifeItemArtefact::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Read(tNetPacket); 
-    //
-    if (m_wVersion > 118)
-        tNetPacket.r_float(m_fRandomK);
-}
+void CSE_ALifeItemArtefact::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
 
-void CSE_ALifeItemArtefact::UPDATE_Write(NET_Packet& tNetPacket) 
-{ 
-    inherited::UPDATE_Write(tNetPacket);
-    //
-    tNetPacket.w_float(m_fRandomK);
-}
+void CSE_ALifeItemArtefact::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
 
 BOOL CSE_ALifeItemArtefact::Net_Relevant() { return (inherited::Net_Relevant()); }
 

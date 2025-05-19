@@ -41,7 +41,6 @@ public:
 
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual void net_Export(CSE_Abstract* E);
 
     virtual void OnH_A_Chield();
     virtual void OnH_B_Independent(bool just_before_destroy);
@@ -99,24 +98,6 @@ public:
     virtual void PhTune(dReal step){};
 
     bool m_bCanSpawnZone;
-    //
-    float m_fRandomKMin{1.f};
-    float m_fRandomKMax{1.f};
-    float m_fRandomK{1.f};
-    float GetRandomKoef() const { return m_fRandomK; };
-
-    virtual float GetHitTypeProtection(int) const;
-    virtual float GetItemEffect(int) const;
-
-//public:
-//    enum EAFHudStates
-//    {
-//        eIdle = 0,
-//        eShowing,
-//        eHiding,
-//        eHidden,
-//        eActivating,
-//    };
 
 public:
     virtual void Hide(bool = false);

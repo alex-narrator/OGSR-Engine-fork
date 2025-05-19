@@ -140,33 +140,8 @@ BOOL CArtefact::net_Spawn(CSE_Abstract* DC)
     o_render_frame = 0;
     SetState(eHidden);
 
-    if (auto se_artefact = smart_cast<CSE_ALifeItemArtefact*>(DC))
-    {
-        if (se_artefact->m_fRandomK != 1.f)
-            m_fRandomK = se_artefact->m_fRandomK;
-        else if (pSettings->line_exist(cNameSect(), "random_k"))
-        {
-            LPCSTR str = pSettings->r_string(cNameSect(), "random_k");
-            int cnt = _GetItemCount(str);
-            if (cnt > 1)
-            { // заданы границы рандома свойств
-                Fvector2 m = pSettings->r_fvector2(cNameSect(), "random_k");
-                m_fRandomK = ::Random.randF(m.x, m.y);
-            }
-            else if (cnt == 1)
-                m_fRandomK = ::Random.randF(0.f, pSettings->r_float(cNameSect(), "random_k"));
-        }
-    }
-
     return result;
 }
-
-void CArtefact::net_Export(CSE_Abstract* E)
-{
-    inherited::net_Export(E);
-    auto se_artefact = smart_cast<CSE_ALifeItemArtefact*>(E);
-    se_artefact->m_fRandomK = m_fRandomK;
-};
 
 void CArtefact::net_Destroy()
 {
@@ -496,10 +471,6 @@ void CArtefact::SwitchAfParticles(bool bOn)
         CParticlesPlayer::StopParticles(m_sParticlesName, BI_NONE, true);
     }
 }
-
-float CArtefact::GetHitTypeProtection(int hit_type) const { return inherited::GetHitTypeProtection(hit_type) * GetRandomKoef(); }
-
-float CArtefact::GetItemEffect(int effect) const { return m_ItemEffect[effect] * GetRandomKoef(); }
 
 bool CArtefact::CanAffect()
 { 
