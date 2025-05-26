@@ -20,25 +20,25 @@ public:
     typedef CEntityCondition inherited;
     enum
     {
-        eCriticalPowerReached = (1 << 0),
-        eCriticalMaxPowerReached = (1 << 1),
-        eCriticalBleedingSpeed = (1 << 2),
-        eCriticalSatietyReached = (1 << 3),
-        eCriticalRadiationReached = (1 << 4),
-        ePhyHealthMinReached = (1 << 5),
+        //eCriticalPowerReached = (1 << 0),
+        //eCriticalMaxPowerReached = (1 << 1),
+        //eCriticalBleedingSpeed = (1 << 2),
+        //eCriticalSatietyReached = (1 << 3),
+        //eCriticalRadiationReached = (1 << 4),
+        //ePhyHealthMinReached = (1 << 5),
 
-        eWeaponJammedReached = (1 << 6),
-        eKnifeCriticalReached = (1 << 7),
+        //eWeaponJammedReached = (1 << 6),
+        //eKnifeCriticalReached = (1 << 7),
 
-        eLimping = (1 << 8),
-        eCantWalk = (1 << 9),
-        eCantSprint = (1 << 10),
+        eLimping = (1 << 0),
+        eCantWalk = (1 << 1),
+        eCantSprint = (1 << 2),
     };
     Flags16 m_condition_flags;
 
 private:
     CActor* m_object;
-    void UpdateTutorialThresholds();
+    //void UpdateTutorialThresholds();
     virtual void UpdateSatiety() override;
     virtual void UpdateAlcohol() override;
     virtual void UpdatePower() override;

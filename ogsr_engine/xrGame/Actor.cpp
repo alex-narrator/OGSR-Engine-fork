@@ -1315,15 +1315,13 @@ void CActor::UpdateItemsEffect()
                 bool affect = radiation_restore_speed > 0.f || art && art->CanAffect();
                 float res_rrs = affect ? radiation_restore_speed : 0.f;
 
-                if (item != inventory().ActiveItem())
-                { // що взяте в руки те випромінює на повну
-                    if (outfit) // костюм захищає від радіації речей
-                        res_rrs *= (1.f - outfit->GetHitTypeProtection(ALife::eHitTypeRadiation));
-                    if (backpack && inventory().InRuck(item)) // рюкзак захищає від радіації речей у рюкзаку
-                        res_rrs *= (1.f - backpack->GetHitTypeProtection(ALife::eHitTypeRadiation));
-                    if (helmet && inventory().InRuck(item)) // шолом захищає від радіації речей у рюкзаку
-                        res_rrs *= (1.f - helmet->GetHitTypeProtection(ALife::eHitTypeRadiation));
-                }
+                if (outfit) // костюм захищає від радіації речей
+                    res_rrs *= (1.f - outfit->GetHitTypeProtection(ALife::eHitTypeRadiation));
+                if (backpack && inventory().InRuck(item)) // рюкзак захищає від радіації речей у рюкзаку
+                    res_rrs *= (1.f - backpack->GetHitTypeProtection(ALife::eHitTypeRadiation));
+                if (helmet) // шолом захищає від радіації речей
+                    res_rrs *= (1.f - helmet->GetHitTypeProtection(ALife::eHitTypeRadiation));
+
                 m_ActorItemBoostedParam[i] += res_rrs;
             }
         }
