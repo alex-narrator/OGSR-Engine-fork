@@ -229,7 +229,6 @@ void CUIPdaWnd::Hide()
 {
     inherited::Hide();
     InventoryUtilities::SendInfoToActor("ui_pda_hide");
-    HUD().GetUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, false);
 }
 
 void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
@@ -335,7 +334,6 @@ void CUIPdaWnd::PdaContentsChanged(pda_section::part type, bool flash)
     if (flash)
     {
         g_pda_info_state |= type;
-        HUD().GetUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, true);
     }
 }
 void draw_sign(CUIStatic* s, Fvector2& pos)

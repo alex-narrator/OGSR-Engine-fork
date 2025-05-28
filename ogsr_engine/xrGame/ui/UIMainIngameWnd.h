@@ -44,26 +44,9 @@ public:
     CUIZoneMap* GetUIZoneMap() { return UIZoneMap; }
     bool m_bShowZoneMap{};
 
-    // Енум перечисления возможных мигающих иконок
-    enum EFlashingIcons
-    {
-        efiPdaTask = 0,
-        efiMail
-    };
-
-    void SetFlashIconState_(EFlashingIcons type, bool enable);
-
     void ReceiveNews(GAME_NEWS_DATA* news);
 
 protected:
-    void InitFlashingIcons(CUIXml* node);
-    void DestroyFlashingIcons();
-    void UpdateFlashingIcons();
-
-    // first - иконка, second - анимация
-    DEF_MAP(FlashingIcons, EFlashingIcons, CUIStatic*);
-    FlashingIcons m_FlashingIcons;
-
     // для текущего активного актера и оружия
     CActor* m_pActor;
 

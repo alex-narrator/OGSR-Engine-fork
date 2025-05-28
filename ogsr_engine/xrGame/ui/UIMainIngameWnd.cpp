@@ -7,31 +7,8 @@
 #include <dinput.h>
 #include "../actor.h"
 #include "../HUDManager.h"
-#include "../PDA.h"
-#include "WeaponMagazined.h"
-#include "../character_info.h"
-#include "../inventory.h"
 #include "../UIGameSP.h"
-#include "../xrServer_objects_ALife.h"
-#include "../alife_simulator.h"
-#include "../alife_object_registry.h"
-#include "../game_cl_base.h"
-#include "../level.h"
-#include "../seniority_hierarchy_holder.h"
 
-#include "../date_time.h"
-#include "../xrServer_Objects_ALife_Monsters.h"
-#include "../../xr_3da/LightAnimLibrary.h"
-
-#include "UIInventoryUtilities.h"
-
-#include "UIXmlInit.h"
-#include "UIPdaMsgListItem.h"
-#include "../alife_registry_wrappers.h"
-#include "../actorcondition.h"
-
-#include "../string_table.h"
-#include "clsid_game.h"
 #include "UIMap.h"
 
 #ifdef DEBUG
@@ -39,14 +16,9 @@
 #include "..\..\xr_3da\xr_input.h"
 #endif
 
-#include "map_hint.h"
-#include "UIColorAnimatorWrapper.h"
 #include "../game_news.h"
 
-using namespace InventoryUtilities;
-
 constexpr auto DEFAULT_MAP_SCALE = 1.f;
-constexpr auto MAININGAME_XML = "maingame.xml";
 
 static CUIMainIngameWnd* GetMainIngameWindow()
 {
@@ -65,18 +37,10 @@ CUIMainIngameWnd::CUIMainIngameWnd()
     UIZoneMap = xr_new<CUIZoneMap>();
 }
 
-CUIMainIngameWnd::~CUIMainIngameWnd()
-{
-    DestroyFlashingIcons();
-    xr_delete(UIZoneMap);
-}
+CUIMainIngameWnd::~CUIMainIngameWnd() { xr_delete(UIZoneMap); }
 
 void CUIMainIngameWnd::Init()
 {
-    CUIXml uiXml;
-    uiXml.Init(CONFIG_PATH, UI_PATH, MAININGAME_XML);
-
-    CUIXmlInit xml_init;
     CUIWindow::Init(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
 
     Enable(false);
@@ -84,12 +48,6 @@ void CUIMainIngameWnd::Init()
     // индикаторы
     UIZoneMap->Init();
     UIZoneMap->SetScale(DEFAULT_MAP_SCALE);
-
-    uiXml.SetLocalRoot(uiXml.GetRoot());
-
-    // Flashing icons initialize
-    uiXml.SetLocalRoot(uiXml.NavigateToNode("flashing_icons"));
-    InitFlashingIcons(&uiXml);
 }
 
 void CUIMainIngameWnd::Draw()
@@ -116,8 +74,6 @@ void CUIMainIngameWnd::Update()
     float h, p;
     Device.vCameraDirection.getHP(h, p);
     UIZoneMap->SetHeading(-h);
-
-    UpdateFlashingIcons(); // обновляем состояние мигающих иконок
 
     CUIWindow::Update();
 }
@@ -162,67 +118,6 @@ void CUIMainIngameWnd::ReceiveNews(GAME_NEWS_DATA* news)
 {
     VERIFY(news->texture_name.size());
     HUD().GetUI()->m_pMessagesWnd->AddIconedPdaMessage(*(news->texture_name), news->tex_rect, news->SingleLineText(), news->show_time);
-}
-
-void CUIMainIngameWnd::SetFlashIconState_(EFlashingIcons type, bool enable)
-{
-    // Включаем анимацию требуемой иконки
-    FlashingIcons_it icon = m_FlashingIcons.find(type);
-    R_ASSERT2(icon != m_FlashingIcons.end(), "Flashing icon with this type not existed");
-    icon->second->Show(enable);
-}
-
-void CUIMainIngameWnd::InitFlashingIcons(CUIXml* node)
-{
-    const char* const flashingIconNodeName = "flashing_icon";
-    int staticsCount = node->GetNodesNum("", 0, flashingIconNodeName);
-
-    CUIXmlInit xml_init;
-    CUIStatic* pIcon = NULL;
-    // Пробегаемся по всем нодам и инициализируем из них статики
-    for (int i = 0; i < staticsCount; ++i)
-    {
-        pIcon = xr_new<CUIStatic>();
-        xml_init.InitStatic(*node, flashingIconNodeName, i, pIcon);
-        shared_str iconType = node->ReadAttrib(flashingIconNodeName, i, "type", "none");
-
-        // Теперь запоминаем иконку и ее тип
-        EFlashingIcons type = efiPdaTask;
-
-        if (iconType == "pda")
-            type = efiPdaTask;
-        else if (iconType == "mail")
-            type = efiMail;
-        else
-            R_ASSERT(!"Unknown type of mainingame flashing icon");
-
-        R_ASSERT2(m_FlashingIcons.find(type) == m_FlashingIcons.end(), "Flashing icon with this type already exists");
-
-        CUIStatic*& val = m_FlashingIcons[type];
-        val = pIcon;
-
-        AttachChild(pIcon);
-        pIcon->Show(false);
-    }
-}
-
-void CUIMainIngameWnd::DestroyFlashingIcons()
-{
-    for (FlashingIcons_it it = m_FlashingIcons.begin(); it != m_FlashingIcons.end(); ++it)
-    {
-        DetachChild(it->second);
-        xr_delete(it->second);
-    }
-
-    m_FlashingIcons.clear();
-}
-
-void CUIMainIngameWnd::UpdateFlashingIcons()
-{
-    for (FlashingIcons_it it = m_FlashingIcons.begin(); it != m_FlashingIcons.end(); ++it)
-    {
-        it->second->Update();
-    }
 }
 
 void CUIMainIngameWnd::OnConnected() { UIZoneMap->SetupCurrentMap(); }
