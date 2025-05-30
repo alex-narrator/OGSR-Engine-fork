@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "inventory.h"
 #include "actor.h"
-#include "trade.h"
 #include "weapon.h"
 
 #include "ui/UIInventoryUtilities.h"

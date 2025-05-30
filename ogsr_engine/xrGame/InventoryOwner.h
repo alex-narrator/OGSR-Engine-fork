@@ -22,7 +22,6 @@ class CInfoPortionWrapper;
 class NET_Packet;
 class CCharacterInfo;
 class CSpecificCharacter;
-class CTradeParameters;
 class CPurchaseList;
 class CWeapon;
 class CCustomOutfit;
@@ -66,10 +65,7 @@ public:
     ////////////////////////////////////
     //торговля и общение с персонажем
 
-    virtual bool AllowItemToTrade(CInventoryItem const* item, EItemPlace place) const;
     virtual void OnFollowerCmd(int cmd){}; // redefine for CAI_Stalkker
-    //инициализация объекта торговли
-    CTrade* GetTrade();
 
     //для включения разговора
     virtual bool OfferTalk(CInventoryOwner* talk_partner);
@@ -97,8 +93,6 @@ public:
 
 protected:
     u32 m_money;
-    // торговля
-    CTrade* m_pTrade{};
     bool m_bTalking;
     CInventoryOwner* m_pTalkPartner{};
 
@@ -223,17 +217,9 @@ public:
     virtual bool use_simplified_visual() const { return (false); };
 
 private:
-    CTradeParameters* m_trade_parameters{};
-    CPurchaseList* m_purchase_list;
     BOOL m_need_osoznanie_mode{};
 
 public:
-    IC CTradeParameters& trade_parameters() const;
-    virtual LPCSTR trade_section() const;
-    void buy_supplies(CInifile& ini_file, LPCSTR section);
-    void sell_useless_items();
-    virtual void on_before_sell(CInventoryItem* item) {}
-    virtual void on_before_buy(CInventoryItem* item) {}
     virtual bool use_default_throw_force();
     virtual float missile_throw_force();
     virtual bool use_throw_randomness();
@@ -241,5 +227,3 @@ public:
 
     void SetNextItemSlot(u32);
 };
-
-#include "inventory_owner_inline.h"

@@ -611,15 +611,7 @@ void CInventoryItem::modify_holder_params(float& range, float& fov) const
     fov *= m_holder_fov_modifier;
 }
 
-bool CInventoryItem::CanTrade() const
-{
-    bool res = true;
-#pragma todo("Dima to Andy : why CInventoryItem::CanTrade can be called for the item, which doesn't have owner?")
-    if (m_pCurrentInventory)
-        res = inventory_owner().AllowItemToTrade(this, m_eItemPlace);
-
-    return (res && m_flags.test(FCanTrade) && !IsQuestItem());
-}
+bool CInventoryItem::CanTrade() const { return m_flags.test(FCanTrade) && !IsQuestItem(); }
 
 bool CInventoryItem::IsNecessaryItem(CInventoryItem* item) { return IsNecessaryItem(item->object().cNameSect()); };
 

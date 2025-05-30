@@ -2,7 +2,6 @@
 #include <dinput.h>
 #include "Actor.h"
 #include "Torch.h"
-#include "trade.h"
 #include "../xr_3da/camerabase.h"
 #ifdef DEBUG
 #include "PHDebug.h"

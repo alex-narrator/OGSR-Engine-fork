@@ -59,9 +59,7 @@ void CScriptGameObject::script_register(lua_State* L)
 
            class_<enum_exporter<GameObject::ECallbackType>>("callback")
                .enum_("callback_types")
-                   [value("trade_start", int(GameObject::eTradeStart)), value("trade_stop", int(GameObject::eTradeStop)),
-                    value("trade_sell_buy_item", int(GameObject::eTradeSellBuyItem)), value("trade_perform_operation", int(GameObject::eTradePerformTradeOperation)),
-                    value("trader_global_anim_request", int(GameObject::eTraderGlobalAnimationRequest)),
+                   [value("trader_global_anim_request", int(GameObject::eTraderGlobalAnimationRequest)),
                     value("trader_head_anim_request", int(GameObject::eTraderHeadAnimationRequest)), value("trader_sound_end", int(GameObject::eTraderSoundEnd)),
                     value("zone_enter", int(GameObject::eZoneEnter)), value("zone_exit", int(GameObject::eZoneExit)), value("level_border_exit", int(GameObject::eExitLevelBorder)),
                     value("level_border_enter", int(GameObject::eEnterLevelBorder)), value("death", int(GameObject::eDeath)),
@@ -77,7 +75,7 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("script_animation", int(GameObject::eScriptAnimation)), value("task_state", int(GameObject::eTaskStateChange)),
                     value("take_item_from_box", int(GameObject::eInvBoxItemTake)), value("place_item_to_box", int(GameObject::eInvBoxItemPlace)),
                     value("map_location_added", int(GameObject::eMapLocationAdded)), value("map_relation_location_added", int(GameObject::eMapRelationLocationAdded)),
-                    value("on_key_press", int(GameObject::eOnKeyPress)),value("on_key_release", int(GameObject::eOnKeyRelease)), value("on_key_hold", int(GameObject::eOnKeyHold)),
+                    value("on_key_press", int(GameObject::eOnKeyPress)), value("on_key_release", int(GameObject::eOnKeyRelease)), value("on_key_hold", int(GameObject::eOnKeyHold)),
                     value("on_mouse_wheel", int(GameObject::eOnMouseWheel)), value("on_mouse_move", int(GameObject::eOnMouseMove)),
                     value("on_ruck", int(GameObject::eOnItemToRuck)), value("on_slot", int(GameObject::eOnItemToSlot)), value("on_belt", int(GameObject::eOnItemToBelt)),
                     value("on_before_use_item", int(GameObject::eOnBeforeUseItem)), value("entity_alive_before_hit", int(GameObject::entity_alive_before_hit)),
@@ -85,17 +83,15 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("update_hud_addons_visibility", int(GameObject::eOnUpdateHUDAddonsVisibiility)), value("on_addon_init", int(GameObject::eOnAddonInit)),
 
                     value("on_before_save", int(GameObject::eBeforeSave)), value("on_after_save", int(GameObject::ePostSave)),
-                    value("on_level_map_click", int(GameObject::eUIMapClick)), value("on_group_items", int(GameObject::eUIGroupItems)), 
-                    
-                    value("on_weapon_shell_drop", int(GameObject::eOnWpnShellDrop)), 
-                    value("on_actor_weapon_zoom_in", int(GameObject::eOnActorWeaponZoomIn)),
-                    value("on_actor_weapon_zoom_out", int(GameObject::eOnActorWeaponZoomOut)),
-                    value("on_actor_weapon_zoom_change", int(GameObject::eOnActorWeaponZoomChange)),
+                    value("on_level_map_click", int(GameObject::eUIMapClick)), value("on_group_items", int(GameObject::eUIGroupItems)),
+
+                    value("on_weapon_shell_drop", int(GameObject::eOnWpnShellDrop)), value("on_actor_weapon_zoom_in", int(GameObject::eOnActorWeaponZoomIn)),
+                    value("on_actor_weapon_zoom_out", int(GameObject::eOnActorWeaponZoomOut)), value("on_actor_weapon_zoom_change", int(GameObject::eOnActorWeaponZoomChange)),
                     value("on_actor_weapon_scope_mode_change", int(GameObject::eOnActorWeaponScopeModeChange)),
 
                     value("on_throw_grenade", int(GameObject::eOnThrowGrenade)), value("on_grenade_type_switch", int(GameObject::eOnGrenadeTypeSwitch)),
-                    value("on_goodwill_change", int(GameObject::eOnGoodwillChange)),
-                    value("update_items_effect", int(GameObject::eUpdateItemsEffect)), value("level_changer_action", int(GameObject::eLevelChangerAction)),
+                    value("on_goodwill_change", int(GameObject::eOnGoodwillChange)), value("update_items_effect", int(GameObject::eUpdateItemsEffect)),
+                    value("level_changer_action", int(GameObject::eLevelChangerAction)),
 
                     value("on_attach_vehicle", int(GameObject::eAttachVehicle)), value("on_detach_vehicle", int(GameObject::eDetachVehicle)),
                     value("on_use_vehicle", int(GameObject::eUseVehicle)),
@@ -106,12 +102,8 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("on_hud_state_switch", int(GameObject::eOnHudStateSwitch)),
 
                     value("on_actor_footstep", int(GameObject::eOnActorFootStep)), value("on_actor_land", int(GameObject::eOnActorLand)),
-                    value("on_actor_jump", int(GameObject::eOnActorJump))
-                   ],
-
-           def("buy_condition", (void (*)(CScriptIniFile*, LPCSTR))(&::buy_condition)), def("buy_condition", (void (*)(float, float))(&::buy_condition)),
-           def("sell_condition", (void (*)(CScriptIniFile*, LPCSTR))(&::sell_condition)), def("sell_condition", (void (*)(float, float))(&::sell_condition)),
-           def("show_condition", &::show_condition)];
+                    value("on_actor_jump", int(GameObject::eOnActorJump))]
+    ];
 
     script_register_game_object4(L);
     CHitImmunity::script_register(L);

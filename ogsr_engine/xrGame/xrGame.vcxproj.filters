@@ -1402,27 +1402,6 @@
     <Filter Include="Core\Client\Objects\inventory\InventoryOwner\relation registry">
       <UniqueIdentifier>{53963a65-14cb-4092-abdc-962850451fe7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters">
-      <UniqueIdentifier>{ba1813d8-f0fb-48ad-9a3b-2fa7d66c2b3b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_bool_parameters">
-      <UniqueIdentifier>{336b093e-d74d-4806-bd3a-17fa2abb38e9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_factors">
-      <UniqueIdentifier>{cbd1a1c6-c22f-4166-beb2-098c22902f14}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_factor_parameters">
-      <UniqueIdentifier>{322d7372-bfaf-49e8-8f3a-eaa7bb24435d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_action_parameters">
-      <UniqueIdentifier>{88142f43-f738-4877-83c8-91ea9b0aaee5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_parameters">
-      <UniqueIdentifier>{28954a03-8b19-46de-bbab-08b4bf4c1fbd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters\purchase_list">
-      <UniqueIdentifier>{1fec23dd-35a1-4ad0-a2ab-e2d96482aa6e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Client\Objects\inventory\PhysicItem">
       <UniqueIdentifier>{32f1e300-debe-4ad7-9e06-09e6d02a53f9}</UniqueIdentifier>
     </Filter>
@@ -1903,9 +1882,6 @@
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\InventoryWnd">
       <UniqueIdentifier>{52761f31-0b3f-4031-a68d-aa3f03b0188f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\UI\Common\TradeWnd">
-      <UniqueIdentifier>{7897c4f1-1edb-4adb-b61e-80c1fd665488}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\PdaWnd">
       <UniqueIdentifier>{00bb034a-c463-4e1b-873e-355cf0c5f96d}</UniqueIdentifier>
     </Filter>
@@ -2067,9 +2043,6 @@
     </Filter>
     <Filter Include="Core\Client\Objects\inventory\InventoryContainer">
       <UniqueIdentifier>{b72c5438-5c04-4b55-acd5-7c7610097b03}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\Trade">
-      <UniqueIdentifier>{3a55f86c-d979-48cd-a2f8-1781a70d2db2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Grenades &amp; Missiles">
       <UniqueIdentifier>{5d4622d7-dcee-45a4-a668-b0e76259941c}</UniqueIdentifier>
@@ -4401,9 +4374,6 @@
     <ClInclude Include="inventory_item_object.h">
       <Filter>Core\Client\Objects\inventory\InventoryItemObject</Filter>
     </ClInclude>
-    <ClInclude Include="inventory_owner_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner</Filter>
-    </ClInclude>
     <ClInclude Include="InventoryOwner.h">
       <Filter>Core\Client\Objects\inventory\InventoryOwner</Filter>
     </ClInclude>
@@ -4442,39 +4412,6 @@
     </ClInclude>
     <ClInclude Include="relation_registry_inline.h">
       <Filter>Core\Client\Objects\inventory\InventoryOwner\relation registry</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_bool_parameters.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_bool_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_bool_parameters_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_bool_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_factors.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_factors</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_factors_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_factors</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_factor_parameters.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_factor_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_factor_parameters_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_factor_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_action_parameters.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_action_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_action_parameters_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_action_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_parameters.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_parameters_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="purchase_list.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\purchase_list</Filter>
     </ClInclude>
     <ClInclude Include="physic_item.h">
       <Filter>Core\Client\Objects\inventory\PhysicItem</Filter>
@@ -4697,9 +4634,6 @@
     </ClInclude>
     <ClInclude Include="searchlight.h">
       <Filter>Core\Client\Objects\searchlight</Filter>
-    </ClInclude>
-    <ClInclude Include="trade.h">
-      <Filter>Core\Client\Objects\Trade</Filter>
     </ClInclude>
     <ClInclude Include="CustomZone.h">
       <Filter>Core\Client\Objects\zones\CustomZone</Filter>
@@ -7501,12 +7435,6 @@
     <ClCompile Include="relation_registry_fights.cpp">
       <Filter>Core\Client\Objects\inventory\InventoryOwner\relation registry</Filter>
     </ClCompile>
-    <ClCompile Include="trade_parameters.cpp">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_parameters</Filter>
-    </ClCompile>
-    <ClCompile Include="purchase_list.cpp">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\purchase_list</Filter>
-    </ClCompile>
     <ClCompile Include="physic_item.cpp">
       <Filter>Core\Client\Objects\inventory\PhysicItem</Filter>
     </ClCompile>
@@ -7767,12 +7695,6 @@
     </ClCompile>
     <ClCompile Include="searchlight.cpp">
       <Filter>Core\Client\Objects\searchlight</Filter>
-    </ClCompile>
-    <ClCompile Include="trade.cpp">
-      <Filter>Core\Client\Objects\Trade</Filter>
-    </ClCompile>
-    <ClCompile Include="trade2.cpp">
-      <Filter>Core\Client\Objects\Trade</Filter>
     </ClCompile>
     <ClCompile Include="CustomZone.cpp">
       <Filter>Core\Client\Objects\zones\CustomZone</Filter>

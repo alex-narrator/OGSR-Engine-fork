@@ -1241,7 +1241,6 @@
     <ClInclude Include="inventory_item_impl.h" />
     <ClInclude Include="inventory_item_inline.h" />
     <ClInclude Include="inventory_item_object.h" />
-    <ClInclude Include="inventory_owner_inline.h" />
     <ClInclude Include="InventoryOwner.h" />
     <ClInclude Include="character_community.h" />
     <ClInclude Include="..\COMMON_AI\character_info.h" />
@@ -1255,17 +1254,6 @@
     <ClInclude Include="relation_registry.h" />
     <ClInclude Include="relation_registry_defs.h" />
     <ClInclude Include="relation_registry_inline.h" />
-    <ClInclude Include="trade_bool_parameters.h" />
-    <ClInclude Include="trade_bool_parameters_inline.h" />
-    <ClInclude Include="trade_factors.h" />
-    <ClInclude Include="trade_factors_inline.h" />
-    <ClInclude Include="trade_factor_parameters.h" />
-    <ClInclude Include="trade_factor_parameters_inline.h" />
-    <ClInclude Include="trade_action_parameters.h" />
-    <ClInclude Include="trade_action_parameters_inline.h" />
-    <ClInclude Include="trade_parameters.h" />
-    <ClInclude Include="trade_parameters_inline.h" />
-    <ClInclude Include="purchase_list.h" />
     <ClInclude Include="physic_item.h" />
     <ClInclude Include="ShootingObject.h" />
     <ClInclude Include="Weapon.h" />
@@ -1344,7 +1332,6 @@
     <ClInclude Include="ExplosiveItem.h" />
     <ClInclude Include="wallmark_manager.h" />
     <ClInclude Include="searchlight.h" />
-    <ClInclude Include="trade.h" />
     <ClInclude Include="CustomZone.h" />
     <ClInclude Include="GraviZone.h" />
     <ClInclude Include="level_changer.h" />
@@ -2179,8 +2166,6 @@
     <ClCompile Include="relation_registry.cpp" />
     <ClCompile Include="relation_registry_actions.cpp" />
     <ClCompile Include="relation_registry_fights.cpp" />
-    <ClCompile Include="trade_parameters.cpp" />
-    <ClCompile Include="purchase_list.cpp" />
     <ClCompile Include="physic_item.cpp" />
     <ClCompile Include="ShootingObject.cpp" />
     <ClCompile Include="Weapon.cpp" />
@@ -2269,8 +2254,6 @@
     <ClCompile Include="ExplosiveScript.cpp" />
     <ClCompile Include="wallmark_manager.cpp" />
     <ClCompile Include="searchlight.cpp" />
-    <ClCompile Include="trade.cpp" />
-    <ClCompile Include="trade2.cpp" />
     <ClCompile Include="CustomZone.cpp" />
     <ClCompile Include="GraviZone.cpp" />
     <ClCompile Include="level_changer.cpp" />

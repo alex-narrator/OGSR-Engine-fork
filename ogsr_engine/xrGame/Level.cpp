@@ -32,7 +32,6 @@
 #include "../xr_3da/cameramanager.h"
 #include "level_sounds.h"
 #include "car.h"
-#include "trade_parameters.h"
 #include "clsid_game.h"
 #include "MainMenu.h"
 #include "../xr_3da/XR_IOConsole.h"
@@ -235,7 +234,6 @@ CLevel::~CLevel()
     // here we clean default trade params
     // because they should be new for each saved/loaded game
     // and I didn't find better place to put this code in
-    CTradeParameters::clean();
 }
 
 shared_str CLevel::name() const { return (m_name); }

@@ -4,12 +4,7 @@ namespace GameObject
 {
 enum ECallbackType
 {
-    eTradeStart = u32(0),
-    eTradeStop,
-    eTradeSellBuyItem,
-    eTradePerformTradeOperation,
-
-    eZoneEnter,
+    eZoneEnter = u32(0),
     eZoneExit,
     eExitLevelBorder,
     eEnterLevelBorder,

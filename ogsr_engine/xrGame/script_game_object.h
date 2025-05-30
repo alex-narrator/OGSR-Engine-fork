@@ -622,13 +622,6 @@ public:
     void debug_planner(const script_planner* planner);
 #endif
 
-    void sell_condition(CScriptIniFile* ini_file, LPCSTR section);
-    void sell_condition(float friend_factor, float enemy_factor);
-    void buy_condition(CScriptIniFile* ini_file, LPCSTR section);
-    void buy_condition(float friend_factor, float enemy_factor);
-    void show_condition(CScriptIniFile* ini_file, LPCSTR section);
-    void buy_supplies(CScriptIniFile* ini_file, LPCSTR section);
-
     LPCSTR sound_prefix() const;
     void sound_prefix(LPCSTR sound_prefix);
 
@@ -701,7 +694,6 @@ public:
     float GetMaxWeight() const;
 //    float GetMaxWalkWeight() const;
     float GetInventoryWeight() const;
-    u32 CalcItemPrice(CScriptGameObject* item, bool b_buying) const;
 
     float GetShapeRadius() const;
 
@@ -856,12 +848,6 @@ public:
 add_to_type_list(CScriptGameObject)
 #undef script_type_list
 #define script_type_list save_type_list(CScriptGameObject)
-
-    extern void sell_condition(CScriptIniFile* ini_file, LPCSTR section);
-extern void sell_condition(float friend_factor, float enemy_factor);
-extern void buy_condition(CScriptIniFile* ini_file, LPCSTR section);
-extern void buy_condition(float friend_factor, float enemy_factor);
-extern void show_condition(CScriptIniFile* ini_file, LPCSTR section);
 
 void AddIconedTalkMessage(CScriptGameObject*, LPCSTR text, LPCSTR texture_name, const Frect& tex_rect, LPCSTR templ_name);
 bool GiveGameNews(CScriptGameObject*, LPCSTR text, LPCSTR texture_name, const Frect& tex_rect, int delay, int show_time);

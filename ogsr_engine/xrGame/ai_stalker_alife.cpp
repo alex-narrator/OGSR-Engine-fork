@@ -21,7 +21,6 @@
 #include "ef_storage.h"
 #include "ef_primary.h"
 #include "ef_pattern.h"
-#include "trade_parameters.h"
 
 u32 get_rank(const shared_str&) { return u32(-1); }
 
@@ -45,7 +44,7 @@ bool CAI_Stalker::tradable_item(CInventoryItem* inventory_item, const u16& curre
             return (false);
     }
 
-    return (trade_parameters().enabled(CTradeParameters::action_sell(0), inventory_item->object().cNameSect()));
+    return inventory_item->CanTrade();
 }
 
 u32 CAI_Stalker::fill_items(CInventory& inventory, CGameObject* old_owner, ALife::_OBJECT_ID new_owner_id)
@@ -260,14 +259,6 @@ bool CAI_Stalker::can_sell(CInventoryItem const* item)
     xr_vector<CTradeItem>::const_iterator I = std::find(m_temp_items.begin(), m_temp_items.end(), item->object().ID());
     VERIFY(I != m_temp_items.end());
     return ((*I).m_new_owner_id != ID());
-}
-
-bool CAI_Stalker::AllowItemToTrade(CInventoryItem const* item, EItemPlace place) const
-{
-    if (!g_Alive())
-        return (trade_parameters().enabled(CTradeParameters::action_show(0), item->object().cNameSect()));
-
-    return (const_cast<CAI_Stalker*>(this)->can_sell(item));
 }
 
 bool CAI_Stalker::non_conflicted(const CInventoryItem* item, const CWeapon* new_weapon) const

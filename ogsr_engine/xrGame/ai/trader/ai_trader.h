@@ -26,9 +26,6 @@ class CAI_Trader : public CEntityAlive, public CInventoryOwner, public CScriptEn
 {
     typedef CEntityAlive inherited;
 
-private:
-    bool m_busy_now;
-
 public:
     CAI_Trader();
     virtual ~CAI_Trader();
@@ -83,9 +80,6 @@ public:
     static void BoneCallback(CBoneInstance* B);
     void LookAtActor(CBoneInstance* B);
 
-    void OnStartTrade();
-    void OnStopTrade();
-
     //игровое имя
     virtual LPCSTR Name() const { return CInventoryOwner::Name(); }
 
@@ -96,8 +90,6 @@ public:
     virtual bool bfAssignSound(CScriptEntityAction* tpEntityAction);
 
     virtual ALife::ERelationType tfGetRelationType(const CEntityAlive* tpEntityAlive) const;
-
-    IC bool busy_now() const { return (m_busy_now); }
 
 private:
     CSoundPlayer* m_sound_player;
@@ -111,7 +103,6 @@ public:
     virtual bool unlimited_ammo() const { return false; };
     virtual bool natural_weapon() const { return false; }
     virtual bool natural_detector() const { return false; }
-    virtual bool AllowItemToTrade(CInventoryItem const* item, EItemPlace place) const;
 
     void dialog_sound_start(LPCSTR phrase);
     void dialog_sound_stop();

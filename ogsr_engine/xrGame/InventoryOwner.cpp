@@ -3,7 +3,6 @@
 #include "entity_alive.h"
 #include "pda.h"
 #include "actor.h"
-#include "trade.h"
 #include "inventory.h"
 #include "xrserver_objects_alife_items.h"
 #include "character_info.h"
@@ -21,7 +20,6 @@
 #include "script_callback_ex.h"
 #include "game_object_space.h"
 #include "AI/Monsters/BaseMonster/base_monster.h"
-#include "trade_parameters.h"
 #include "purchase_list.h"
 #include "clsid_game.h"
 #include "Artifact.h"
@@ -43,20 +41,14 @@ CInventoryOwner::CInventoryOwner()
 
 DLL_Pure* CInventoryOwner::_construct()
 {
-    m_trade_parameters = 0;
-    m_purchase_list = 0;
-
     return (smart_cast<DLL_Pure*>(this));
 }
 
 CInventoryOwner::~CInventoryOwner()
 {
     xr_delete(m_inventory);
-    xr_delete(m_pTrade);
     xr_delete(m_pCharacterInfo);
     xr_delete(m_known_info_registry);
-    xr_delete(m_trade_parameters);
-    xr_delete(m_purchase_list);
 }
 
 void CInventoryOwner::Load(LPCSTR section)
@@ -90,14 +82,6 @@ void CInventoryOwner::reinit()
 // call this after CGameObject::net_Spawn
 BOOL CInventoryOwner::net_Spawn(CSE_Abstract* DC)
 {
-    if (!m_pTrade)
-        m_pTrade = xr_new<CTrade>(this);
-
-    if (m_trade_parameters)
-        xr_delete(m_trade_parameters);
-
-    m_trade_parameters = xr_new<CTradeParameters>(trade_section());
-
     //получить указатель на объект, InventoryOwner
     // m_inventory->setSlotsBlocked(false);
     CGameObject* pThis = smart_cast<CGameObject*>(this);
@@ -177,8 +161,6 @@ void CInventoryOwner::load(IReader& input_packet)
 void CInventoryOwner::UpdateInventoryOwner(u32 deltaT)
 {
     inventory().Update();
-    if (m_pTrade)
-        m_pTrade->UpdateTrade();
 
     if (IsTalking())
     {
@@ -199,12 +181,6 @@ void CInventoryOwner::UpdateInventoryOwner(u32 deltaT)
 
 //достать PDA из специального слота инвентаря
 CPda* CInventoryOwner::GetPDA() const { return (CPda*)(m_inventory->m_slots[PDA_SLOT].m_pIItem); }
-
-CTrade* CInventoryOwner::GetTrade()
-{
-    R_ASSERT2(m_pTrade, "trade for object does not init yet");
-    return m_pTrade;
-}
 
 //состояние диалога
 
@@ -238,10 +214,6 @@ void CInventoryOwner::StartTalk(CInventoryOwner* talk_partner, bool start_trade)
 {
     m_bTalking = true;
     m_pTalkPartner = talk_partner;
-
-    //тут же включаем торговлю
-    if (start_trade)
-        GetTrade()->StartTrade(talk_partner);
 }
 #include "UIGameSP.h"
 #include "HUDmanager.h"
@@ -251,8 +223,6 @@ void CInventoryOwner::StopTalk()
 {
     m_pTalkPartner = NULL;
     m_bTalking = false;
-
-    GetTrade()->StopTrade();
 
     CUIGameSP* ui_sp = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
     if (ui_sp && ui_sp->TalkMenu->IsShown())
@@ -451,49 +421,6 @@ void CInventoryOwner::on_weapon_shot_start(CWeapon* weapon) {}
 void CInventoryOwner::on_weapon_shot_stop(CWeapon* weapon) {}
 
 void CInventoryOwner::on_weapon_hide(CWeapon* weapon) {}
-
-LPCSTR CInventoryOwner::trade_section() const
-{
-    const CGameObject* game_object = smart_cast<const CGameObject*>(this);
-    VERIFY(game_object);
-    return (READ_IF_EXISTS(pSettings, r_string, game_object->cNameSect(), "trade_section", "trade"));
-}
-
-void CInventoryOwner::buy_supplies(CInifile& ini_file, LPCSTR section)
-{
-    if (!m_purchase_list)
-        m_purchase_list = xr_new<CPurchaseList>();
-
-    m_purchase_list->process(ini_file, section, *this);
-}
-
-void CInventoryOwner::sell_useless_items()
-{
-    CGameObject* object = smart_cast<CGameObject*>(this);
-
-    TIItemContainer::iterator I = inventory().m_all.begin();
-    TIItemContainer::iterator E = inventory().m_all.end();
-    for (; I != E; ++I)
-    {
-        if ((*I)->object().CLS_ID == CLSID_IITEM_BOLT)
-            continue;
-
-        if ((*I)->object().CLS_ID == CLSID_DEVICE_PDA)
-        {
-            CPda* pda = smart_cast<CPda*>(*I);
-            VERIFY(pda);
-            if (pda->GetOriginalOwnerID() == object->ID())
-                continue;
-        }
-
-        (*I)->object().DestroyObject();
-    }
-}
-
-bool CInventoryOwner::AllowItemToTrade(CInventoryItem const* item, EItemPlace place) const
-{
-    return (trade_parameters().enabled(CTradeParameters::action_sell(0), item->object().cNameSect()));
-}
 
 void CInventoryOwner::set_money(u32 amount, bool bSendEvent)
 {
