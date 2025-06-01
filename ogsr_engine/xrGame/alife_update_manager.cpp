@@ -183,7 +183,7 @@ bool CALifeUpdateManager::change_level(NET_Packet& net_packet)
 
     string256 autosave_name;
     auto dest_lvl_name = get_level_name_by_id(ai().game_graph().vertex(graph().actor()->m_tGraphID)->level_id());
-    strconcat(sizeof(autosave_name), autosave_name, Core.UserName, "_", /*"autosave"*/ CStringTable().translate(dest_lvl_name).c_str());
+    strconcat(sizeof(autosave_name), autosave_name, CStringTable().translate("st_autosave").c_str(), " ", /*"autosave"*/ CStringTable().translate(dest_lvl_name).c_str());
     LPCSTR temp0 = strchr(**m_server_command_line, '/');
     VERIFY(temp0);
     string256 temp;
