@@ -479,14 +479,24 @@ void CLevel::OnRender()
     auto pActor = smart_cast<CActor*>(Level().CurrentEntity());
     CPda* Pda = pActor ? pActor->GetPDA() : nullptr;
     const bool need_pda_render = Pda && Pda->Is3DPDA() && psActorFlags.test(AF_3D_PDA) && pGameSP->PdaMenu->IsShown();
+    
     Render->AfterWorldRender(need_pda_render);
 
     if (need_pda_render)
     {
-        HUD().RenderUI();
-        if (g_btnHint)
-            g_btnHint->OnRender();
-        GetUICursor()->OnRender();
+        pGameSP->PdaMenu->Draw();
+
+        const CUIDialogWnd* receiver = pGameSP->MainInputReceiver();
+        const bool is_top = receiver == pGameSP->PdaMenu;
+
+        if (is_top || !receiver)
+        {
+            if (g_btnHint)
+                g_btnHint->OnRender();
+            GetUICursor()->Show();
+            GetUICursor()->OnRender();
+        }
+
         draw_wnds_rects();
 
         Fvector2 cursor_pos = GetUICursor()->GetCursorPosition();
@@ -499,9 +509,10 @@ void CLevel::OnRender()
     }
 
     HUD().RenderUI();
+
     if (g_btnHint)
         g_btnHint->OnRender();
-    GetUICursor()->OnRender();
+
     draw_wnds_rects();
 
 #ifndef DEBUG

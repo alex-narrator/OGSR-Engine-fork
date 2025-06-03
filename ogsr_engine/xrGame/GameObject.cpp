@@ -945,12 +945,9 @@ void CGameObject::DestroyObject()
     if (getDestroy())
         return;
 
-    if (Local())
-    {
-        NET_Packet P;
-        u_EventGen(P, GE_DESTROY, ID());
-        u_EventSend(P);
-    }
+    NET_Packet P;
+    u_EventGen(P, GE_DESTROY, ID());
+    u_EventSend(P);
 }
 
 void CGameObject::shedule_Update(u32 dt)

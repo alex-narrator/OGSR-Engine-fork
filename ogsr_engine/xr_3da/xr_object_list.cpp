@@ -217,6 +217,7 @@ void CObjectList::ProcessDestroyQueue()
         {
             CObject* O = destroy_queue[it];
             // Msg( "Object [%x]", O );
+            O->setDestroy(TRUE);
 #ifdef DEBUG
             Msg("Destroying object[%x] [%d][%s] frame[%d]", O, O->ID(), O->cName().c_str(), Device.dwFrame);
 #endif // DEBUG
