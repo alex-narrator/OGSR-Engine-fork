@@ -34,6 +34,8 @@
 #include "monster_community.h"
 #include "GamePersistent.h"
 #include "EffectorBobbing.h"
+#include "postprocessanimator.h"
+#include "actoreffector.h"
 
 using namespace luabind;
 
@@ -490,7 +492,6 @@ void iterate_sounds2(LPCSTR prefix, u32 max_count, const luabind::object& object
     iterate_sounds(prefix, max_count, temp);
 }
 
-#include "actoreffector.h"
 float add_cam_effector(LPCSTR fn, int id, bool cyclic, LPCSTR cb_func)
 {
     CAnimatorCamEffectorScriptCB* e = xr_new<CAnimatorCamEffectorScriptCB>(cb_func);
@@ -534,14 +535,21 @@ extern int get_actor_ranking();
 extern void add_human_to_top_list(u16 id);
 extern void remove_human_from_top_list(u16 id);
 
-#include "ActorEffector.h"
 void add_complex_effector(LPCSTR section, int id) { AddEffector(Actor(), id, section); }
+void add_complex_effector2(LPCSTR section, int id, float factor) { AddEffector(Actor(), id, section, factor); }
 
 void remove_complex_effector(int id) { RemoveEffector(Actor(), id); }
 
 bool check_complex_effector(int id) { return CheckEffector(Actor(), id); };
 
-#include "postprocessanimator.h"
+void set_complex_effector_factor(int id, float factor) 
+{ 
+    if (auto pp = smart_cast<CPostprocessAnimator*>(Actor()->Cameras().GetPPEffector((EEffectorPPType)id)))
+        pp->SetCurrentFactor(factor);
+    if (auto ce = smart_cast<CAnimatorCamLerpEffectorConst*>(Actor()->Cameras().GetCamEffector((ECamEffectorType)id)))
+        ce->SetFactor(factor);
+}
+
 void add_pp_effector(LPCSTR fn, int id, bool cyclic)
 {
     CPostprocessAnimator* pp = xr_new<CPostprocessAnimator>(id, cyclic);
@@ -970,7 +978,8 @@ void CLevel::script_register(lua_State* L)
             def("demo_record_get_HPB", &demo_record_get_HPB), def("demo_record_set_HPB", &demo_record_set_HPB),
             def("demo_record_set_direct_input", &demo_record_set_direct_input),
 
-            def("add_complex_effector", &add_complex_effector), def("remove_complex_effector", &remove_complex_effector), def("check_complex_effector", &check_complex_effector),
+            def("add_complex_effector", &add_complex_effector), def("add_complex_effector", &add_complex_effector2), def("set_complex_effector_factor", &set_complex_effector_factor), 
+            def("remove_complex_effector", &remove_complex_effector), def("check_complex_effector", &check_complex_effector),
 
             def("game_id", &GameID), def("set_ignore_game_state_update", &set_ignore_game_state_update),
 

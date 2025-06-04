@@ -69,7 +69,6 @@ public:
     void ConditionWalk(float weight, bool accel, bool sprint);
 
     float GetAlcohol() { return m_fAlcohol; }
-    float GetPsy() { return 1.0f - GetPsyHealth(); }
     float GetSatiety() { return m_fSatiety; }
 
 public:
@@ -118,10 +117,6 @@ protected:
     //float m_fV_HealthMax{};
 
 public:
-    float m_fAlcoholSatietyIntens{1.f}; // коэфф. для рассчета интенсивности постэффекта опьянения от голода
-
-    float AlcoholSatiety() { return m_fAlcohol * (1.0f + m_fAlcoholSatietyIntens - GetSatiety()); }
-
     virtual float GetPowerRestore() override { return m_fV_Power; };
     virtual float GetMaxPowerRestore() override { return m_fPowerLeakSpeed; };
     virtual float GetSatietyRestore() override { return m_fV_Satiety; };

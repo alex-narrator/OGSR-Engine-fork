@@ -1,22 +1,6 @@
 #include "stdafx.h"
 #include "actorcondition.h"
 #include "actor.h"
-#include "actorEffector.h"
-#include "inventory.h"
-#include "level.h"
-#include "sleepeffector.h"
-#include "game_base_space.h"
-#include "xrserver.h"
-#include "ai_space.h"
-#include "script_callback_ex.h"
-#include "script_game_object.h"
-#include "game_object_space.h"
-#include "script_callback_ex.h"
-#include "object_broker.h"
-#include "weapon.h"
-#include "WeaponKnife.h"
-#include "PDA.h"
-#include "ai/monsters/BaseMonster/base_monster.h"
 
 BOOL GodMode() { return psActorFlags.test(AF_GODMODE); }
 
@@ -65,8 +49,6 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     m_fV_Power = pSettings->r_float(section, "power_v");
 
     m_fV_Satiety = pSettings->r_float(section, "satiety_v");
-
-    m_fAlcoholSatietyIntens = READ_IF_EXISTS(pSettings, r_float, section, "satiety_to_alcohol_effector_intensity", 1.0f);
 }
 
 // вычисление параметров с ходом времени
@@ -201,89 +183,6 @@ void CActorCondition::ChangeSatiety(float value)
     clamp(m_fSatiety, 0.0f, 1.0f);
 }
 
-//void CActorCondition::UpdateTutorialThresholds()
-//{
-//    string256 cb_name;
-//    static float _cPowerThr = pSettings->r_float("tutorial_conditions_thresholds", "power");
-//    static float _cPowerMaxThr = pSettings->r_float("tutorial_conditions_thresholds", "max_power");
-//    static float _cBleeding = pSettings->r_float("tutorial_conditions_thresholds", "bleeding");
-//    static float _cSatiety = pSettings->r_float("tutorial_conditions_thresholds", "satiety");
-//    static float _cRadiation = pSettings->r_float("tutorial_conditions_thresholds", "radiation");
-//    static float _cPsyHealthThr = pSettings->r_float("tutorial_conditions_thresholds", "psy_health");
-//    static float _cKnifeCondThr = READ_IF_EXISTS(pSettings, r_float, "tutorial_conditions_thresholds", "knife_condition", 0.5f);
-//
-//    bool b = true;
-//    if (b && !m_condition_flags.test(eCriticalPowerReached) && GetPower() < _cPowerThr)
-//    {
-//        m_condition_flags.set(eCriticalPowerReached, TRUE);
-//        b = false;
-//        strcpy_s(cb_name, "_G.on_actor_critical_power");
-//    }
-//
-//    if (b && !m_condition_flags.test(eCriticalMaxPowerReached) && GetMaxPower() < _cPowerMaxThr)
-//    {
-//        m_condition_flags.set(eCriticalMaxPowerReached, TRUE);
-//        b = false;
-//        strcpy_s(cb_name, "_G.on_actor_critical_max_power");
-//    }
-//
-//    if (b && !m_condition_flags.test(eCriticalBleedingSpeed) && BleedingSpeed() > _cBleeding)
-//    {
-//        m_condition_flags.set(eCriticalBleedingSpeed, TRUE);
-//        b = false;
-//        strcpy_s(cb_name, "_G.on_actor_bleeding");
-//    }
-//
-//    if (b && !m_condition_flags.test(eCriticalSatietyReached) && GetSatiety() < _cSatiety)
-//    {
-//        m_condition_flags.set(eCriticalSatietyReached, TRUE);
-//        b = false;
-//        strcpy_s(cb_name, "_G.on_actor_satiety");
-//    }
-//
-//    if (b && !m_condition_flags.test(eCriticalRadiationReached) && GetRadiation() > _cRadiation)
-//    {
-//        m_condition_flags.set(eCriticalRadiationReached, TRUE);
-//        b = false;
-//        strcpy_s(cb_name, "_G.on_actor_radiation");
-//    }
-//
-//    if (b && !m_condition_flags.test(ePhyHealthMinReached) && GetPsyHealth() < _cPsyHealthThr)
-//    {
-//        m_condition_flags.set(ePhyHealthMinReached, TRUE);
-//        b = false;
-//        strcpy_s(cb_name, "_G.on_actor_psy");
-//    }
-//
-//    if (b && !m_condition_flags.test(eWeaponJammedReached) && m_object->inventory().ActiveItem())
-//    {
-//        if (auto pWeapon = smart_cast<CWeapon*>(m_object->inventory().ActiveItem()); 
-//            pWeapon && pWeapon->IsMisfire())
-//        {
-//            m_condition_flags.set(eWeaponJammedReached, TRUE);
-//            b = false;
-//            strcpy_s(cb_name, "_G.on_actor_weapon_jammed");
-//        }
-//    }
-//
-//    if (b && !m_condition_flags.test(eKnifeCriticalReached) && m_object->inventory().ActiveItem())
-//    {
-//        if (auto pKnife = smart_cast<CWeaponKnife*>(m_object->inventory().ActiveItem()); pKnife && pKnife->GetCondition() < _cKnifeCondThr)
-//        {
-//            m_condition_flags.set(eKnifeCriticalReached, TRUE);
-//            b = false;
-//            strcpy_s(cb_name, "_G.on_actor_knife_condition");
-//        }
-//    }
-//
-//    if (!b)
-//    {
-//        luabind::functor<LPCSTR> fl;
-//        R_ASSERT(ai().script_engine().functor<LPCSTR>(cb_name, fl));
-//        fl();
-//    }
-//}
-
 bool CActorCondition::DisableSprint(SHit* pHDS)
 {
     switch (pHDS->hit_type)
@@ -321,25 +220,6 @@ void CActorCondition::UpdatePsyHealth()
     else
     {
         m_fDeltaPsyHealth += GetPsyHealthRestore() * m_fDeltaTime;
-        CEffectorPP* ppe = object().Cameras().GetPPEffector((EEffectorPPType)effPsyHealth);
-
-        string64 pp_sect_name;
-        shared_str ln = Level().name();
-        strconcat(sizeof(pp_sect_name), pp_sect_name, "effector_psy_health", "_", ln.c_str());
-        if (!pSettings->section_exist(pp_sect_name))
-            strcpy_s(pp_sect_name, "effector_psy_health");
-        if (!fsimilar(GetPsyHealth(), 1.0f, 0.05f))
-        {
-            if (!ppe)
-            {
-                AddEffector(m_object, effPsyHealth, pp_sect_name, GET_KOEFF_FUNC(this, &CActorCondition::GetPsy));
-            }
-        }
-        else
-        {
-            if (ppe)
-                RemoveEffector(m_object, effPsyHealth);
-        }
     }
 }
 
@@ -352,18 +232,5 @@ void CActorCondition::UpdateAlcohol()
     {
         m_fAlcohol += GetAlcoholRestore() * m_fDeltaTime;
         clamp(m_fAlcohol, 0.0f, 1.0f);
-        CEffectorCam* ce = Actor()->Cameras().GetCamEffector((ECamEffectorType)effAlcohol);
-        if (!fis_zero(m_fAlcohol))
-        {
-            if (!ce)
-            {
-                AddEffector(m_object, effAlcohol, "effector_alcohol", GET_KOEFF_FUNC(this, &CActorCondition::AlcoholSatiety));
-            }
-        }
-        else
-        {
-            if (ce)
-                RemoveEffector(m_object, effAlcohol);
-        }
     }
 }
