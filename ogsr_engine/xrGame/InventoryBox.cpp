@@ -48,7 +48,6 @@ void IInventoryBox::ProcessEvent(CGameObject* O, NET_Packet& P, u16 type)
                 Actor()->callback(GameObject::eInvBoxItemPlace)(O->lua_game_object(), obj->lua_game_object());
             }
         }
-        smart_cast<PIItem>(itm)->SetDropTime(false);
         InvalidateState();
     }
     break;
@@ -81,7 +80,6 @@ void IInventoryBox::ProcessEvent(CGameObject* O, NET_Packet& P, u16 type)
                 Actor()->callback(GameObject::eInvBoxItemTake)(O->lua_game_object(), obj->lua_game_object());
             }
         }
-        smart_cast<PIItem>(itm)->SetDropTime(true);
         InvalidateState();
     }
     break;

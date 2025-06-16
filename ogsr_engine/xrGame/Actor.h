@@ -775,8 +775,6 @@ public:
     void ActorThrow();
 
     void BlockSprint();
-    // визначаємо чи треба передати хіт до рюкзака та його вмісту
-    virtual bool IsHitToBackPack(SHit* pHDS) const;
 
 public:
     float GetItemBoostedParams(int);

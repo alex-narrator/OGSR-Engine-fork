@@ -557,8 +557,6 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
         m_cur_glauncher = (u8)std::distance(m_glaunchers.begin(), std::find(m_glaunchers.begin(), m_glaunchers.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
 
-        m_fAttachedGrenadeLauncherCondition = pIItem->GetCondition();
-
         // уничтожить подствольник из инвентаря
         if (b_send_event)
         {
@@ -589,9 +587,6 @@ bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spaw
         m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher;
 
         m_cur_glauncher = 0;
-        if (b_spawn_item)
-            item_condition = m_fAttachedGrenadeLauncherCondition;
-        m_fAttachedGrenadeLauncherCondition = 1.f;
 
         UpdateAddonsVisibility();
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);

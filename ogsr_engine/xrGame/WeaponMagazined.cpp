@@ -86,15 +86,6 @@ BOOL CWeaponMagazined::net_Spawn(CSE_Abstract* DC)
             continue;
         l_cartridge.Load(m_ammoTypes[LocalAmmoType].c_str(), LocalAmmoType);
     }
-
-    if (IsAddonAttached(eSilencer))
-        m_fAttachedSilencerCondition = wpn->m_fAttachedSilencerCondition;
-    if (IsAddonAttached(eScope))
-        m_fAttachedScopeCondition = wpn->m_fAttachedScopeCondition;
-    if (IsAddonAttached(eLauncher))
-        m_fAttachedGrenadeLauncherCondition = wpn->m_fAttachedGrenadeLauncherCondition;
-    if (IsAddonAttached(eMagazine))
-        m_fAttachedMagazineCondition = wpn->m_fAttachedMagazineCondition;
     //
     return bRes;
 }
@@ -110,10 +101,6 @@ void CWeaponMagazined::net_Export(CSE_Abstract* E)
         CCartridge& l_cartridge = *(m_magazine.begin() + i);
         wpn->m_AmmoIDs.push_back(l_cartridge.m_LocalAmmoType);
     }
-    wpn->m_fAttachedSilencerCondition = m_fAttachedSilencerCondition;
-    wpn->m_fAttachedScopeCondition = m_fAttachedScopeCondition;
-    wpn->m_fAttachedGrenadeLauncherCondition = m_fAttachedGrenadeLauncherCondition;
-    wpn->m_fAttachedMagazineCondition = m_fAttachedMagazineCondition;
 }
 
 void CWeaponMagazined::save(NET_Packet& output_packet)
@@ -380,7 +367,6 @@ void CWeaponMagazined::ReloadMagazine()
         iMagazineSize = mag_size + HasChamber();
         m_cur_magazine = b_attaching_magazine ? (u8)std::distance(m_magazines.begin(), std::find(m_magazines.begin(), m_magazines.end(), m_pAmmo->cNameSect())) : 0;
         SetMagazineAttached(b_attaching_magazine);
-        m_fAttachedMagazineCondition = b_attaching_magazine ? m_pAmmo->GetCondition() : 1.f;
     }
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
@@ -606,10 +592,6 @@ void CWeaponMagazined::state_Fire(float dt)
             fTime += fTimeToFire;
             // Msg("fTimeToFire = %.6f", fTimeToFire);
         }
-        //
-        // повысить изношенность глушителя
-        DeteriorateSilencerAttachable(-GetSilencerDeterioration());
-        //
 
         ++m_iShotNum;
 
@@ -896,14 +878,12 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
         m_cur_scope = (u8)std::distance(m_scopes.begin(), std::find(m_scopes.begin(), m_scopes.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonScope;
         result = true;
-        m_fAttachedScopeCondition = pIItem->GetCondition();
     }
     else if (pSilencer && m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) == 0)
     {
         m_cur_silencer = (u8)std::distance(m_silencers.begin(), std::find(m_silencers.begin(), m_silencers.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonSilencer;
         result = true;
-        m_fAttachedSilencerCondition = pIItem->GetCondition();
     }
     else if (pLaser && m_eLaserStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonLaser) == 0)
     {
@@ -955,10 +935,6 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
         m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonScope;
         //
         m_cur_scope = 0;
-        if (b_spawn_item)
-            item_condition = m_fAttachedScopeCondition;
-        m_fAttachedScopeCondition = 1.f;
-        //
         if (!ScopeRespawn())
         {
             UpdateAddonsVisibility();
@@ -973,10 +949,6 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
         m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonSilencer;
         //
         m_cur_silencer = 0;
-        if (b_spawn_item)
-            item_condition = m_fAttachedSilencerCondition;
-        m_fAttachedSilencerCondition = 1.f;
-        //
         UpdateAddonsVisibility();
         InitAddons();
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
@@ -1147,7 +1119,6 @@ void CWeaponMagazined::ApplySilencerParams()
     if (IsAddonAttached(eSilencer) && AddonAttachable(eSilencer))
     {
         conditionDecreasePerShotSilencer = READ_IF_EXISTS(pSettings, r_float, GetAddonName(eSilencer), "condition_shot_dec_silencer", 0.f);
-        conditionDecreasePerShotSilencerSelf = READ_IF_EXISTS(pSettings, r_float, GetAddonName(eSilencer), "condition_shot_dec", 0.f);
     }
 
     if (IsAddonAttached(eSilencer) && !IsSilencerBroken())
@@ -1760,7 +1731,6 @@ void CWeaponMagazined::UnloadAmmo(int unload_count, bool spawn_ammo, bool detach
 
         iMagazineSize = HasChamber();
         SetMagazineAttached(false);
-        m_fAttachedMagazineCondition = 1.f;
     }
 
     xr_map<LPCSTR, u16> l_ammo;
@@ -1818,8 +1788,6 @@ void CWeaponMagazined::HandleCartridgeInChamber()
         // *m_magazine[1].m_ammoSect);
     }
 }
-
-float CWeaponMagazined::GetSilencerDeterioration() { return conditionDecreasePerShotSilencerSelf; };
 
 // работа затвора
 void CWeaponMagazined::OnShutter() { SwitchState(eShutter); }
@@ -1883,21 +1851,6 @@ void CWeaponMagazined::ShutterAction() // передёргивание затв�
     }
 }
 
-void CWeaponMagazined::DeteriorateSilencerAttachable(float fDeltaCondition)
-{
-    if (IsAddonAttached(eSilencer) && AddonAttachable(eSilencer) && !fis_zero(conditionDecreasePerShotSilencerSelf))
-    {
-        if (fis_zero(m_fAttachedSilencerCondition))
-            Detach(GetAddonName(eSilencer).c_str(), false);
-        else
-        {
-            CCartridge& l_cartridge = m_magazine.back(); // с учетом влияния конкретного патрона
-            m_fAttachedSilencerCondition += fDeltaCondition + (fDeltaCondition * l_cartridge.m_impair);
-            clamp(m_fAttachedSilencerCondition, 0.f, 1.f);
-        }
-    }
-};
-//
 float CWeaponMagazined::GetConditionMisfireProbability() const
 {
     float mis = inherited::GetConditionMisfireProbability();
@@ -1905,7 +1858,6 @@ float CWeaponMagazined::GetConditionMisfireProbability() const
     if (AddonAttachable(eMagazine) && IsAddonAttached(eMagazine))
     {
         mis += READ_IF_EXISTS(pSettings, r_float, GetAddonName(eMagazine), "misfire_probability_box", 0.0f);
-        mis += (1.f - m_fAttachedMagazineCondition);
     }
     clamp(mis, 0.0f, 0.99f);
     return mis;
@@ -1929,106 +1881,9 @@ float CWeaponMagazined::Weight() const
     return res;
 }
 
-void CWeaponMagazined::ChangeAttachedSilencerCondition(float fDeltaCondition)
-{
-    if (fis_zero(m_fAttachedSilencerCondition))
-        return;
-    m_fAttachedSilencerCondition += fDeltaCondition;
-    clamp(m_fAttachedSilencerCondition, 0.f, 1.f);
-}
-
-void CWeaponMagazined::ChangeAttachedScopeCondition(float fDeltaCondition)
-{
-    if (fis_zero(m_fAttachedScopeCondition))
-        return;
-    m_fAttachedScopeCondition += fDeltaCondition;
-    clamp(m_fAttachedScopeCondition, 0.f, 1.f);
-}
-
-void CWeaponMagazined::ChangeAttachedGrenadeLauncherCondition(float fDeltaCondition)
-{
-    if (fis_zero(m_fAttachedGrenadeLauncherCondition))
-        return;
-    m_fAttachedGrenadeLauncherCondition += fDeltaCondition;
-    clamp(m_fAttachedGrenadeLauncherCondition, 0.f, 1.f);
-}
-
-void CWeaponMagazined::Hit(SHit* pHDS)
-{
-    if (IsHitToAddon(pHDS))
-        return;
-    inherited::Hit(pHDS);
-}
-
 float CWeaponMagazined::GetZoomRotationTime() const
 {
     return (IsAimAltMode() || IsGrenadeMode()) ? READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME) : m_fZoomRotateTime;
-}
-
-#include "../Include/xrRender/Kinematics.h"
-bool CWeaponMagazined::IsHitToAddon(SHit* pHDS)
-{
-    auto pWeaponVisual = smart_cast<IKinematics*>(Visual());
-    VERIFY(pWeaponVisual);
-
-    bool result = false;
-    float hit_power = pHDS->damage();
-    hit_power *= m_HitTypeK[pHDS->hit_type];
-
-    u16 bone_id{};
-    for (const auto& sbone : m_sWpn_scope_bones)
-    {
-        bone_id = pWeaponVisual->LL_BoneID(sbone);
-
-        if (IsAddonAttached(eScope) && pWeaponVisual->LL_GetBoneVisible(bone_id))
-        {
-            if (pHDS->bone() == bone_id)
-            {
-                ChangeAttachedScopeCondition(-hit_power);
-                result = true;
-            }
-        }
-    }
-
-    if (IsAddonAttached(eSilencer))
-    {
-        bone_id = pWeaponVisual->LL_BoneID(m_sWpn_silencer_bone);
-        if (pHDS->bone() == bone_id)
-        {
-            ChangeAttachedSilencerCondition(-hit_power);
-            result = true;
-        }
-    }
-
-    if (IsAddonAttached(eLauncher))
-    {
-        bone_id = pWeaponVisual->LL_BoneID(m_sWpn_launcher_bone);
-        if (pHDS->bone() == bone_id)
-        {
-            ChangeAttachedGrenadeLauncherCondition(-hit_power);
-            result = true;
-        }
-    }
-
-    if (result && hud_mode && IsZoomed())
-        OnZoomOut();
-
-    if (IsSilencerBroken() || IsScopeBroken() || IsGrenadeLauncherBroken())
-        InitAddons();
-
-    return result;
-}
-
-bool CWeaponMagazined::IsSilencerBroken() const
-{
-    return fis_zero(m_fAttachedSilencerCondition) || IsAddonAttached(eSilencer) && !AddonAttachable(eSilencer) && fis_zero(GetCondition());
-}
-
-bool CWeaponMagazined::IsScopeBroken() const { return fis_zero(m_fAttachedScopeCondition) || IsAddonAttached(eScope) && !AddonAttachable(eScope) && fis_zero(GetCondition()); }
-
-bool CWeaponMagazined::IsGrenadeLauncherBroken() const
-{
-    return fis_zero(m_fAttachedGrenadeLauncherCondition) || IsAddonAttached(eLauncher) && !AddonAttachable(eLauncher) && fis_zero(GetCondition());
 }
 
 void CWeaponMagazined::SwitchLaser(bool on)

@@ -101,7 +101,6 @@ void CInventory::Take(CGameObject* pObj, bool bNotActivate, bool strict_placemen
 
     pIItem->m_pCurrentInventory = this;
     pIItem->SetDropManual(FALSE);
-    pIItem->SetDropTime(false);
 
     m_all.push_back(pIItem);
 
@@ -228,7 +227,6 @@ bool CInventory::DropItem(CGameObject* pObj)
         Msg("! CInventory::Drop item not found in inventory!!!");
 
     pIItem->OnMoveOut(pIItem->m_eItemPlace);
-    pIItem->SetDropTime(true);
 
     pIItem->m_pCurrentInventory = nullptr;
 
@@ -1054,90 +1052,6 @@ bool CInventory::IsActiveSlotBlocked() const
         if (slot.CanBeActivated())
             return false;
     return true;
-}
-
-// получаем айтем из всего инвентаря или с пояса
-PIItem CInventory::GetSame(const PIItem pIItem, bool bSearchRuck) const
-{
-    if (bSearchRuck)
-    {
-        for (const auto& _item : m_ruck)
-        {
-            if ((_item != pIItem) && !xr_strcmp(_item->object().cNameSect(), pIItem->object().cNameSect()))
-            {
-                return _item;
-            }
-        }
-    }
-    else
-    {
-        for (const auto& _item : m_belt)
-        {
-            if ((_item != pIItem) && !xr_strcmp(_item->object().cNameSect(), pIItem->object().cNameSect()))
-            {
-                return _item;
-            }
-        }
-        for (const auto& _slot : m_slots)
-        {
-            const auto _item = _slot.m_pIItem;
-            if (!_item)
-                continue;
-
-            if ((_item != pIItem) && !xr_strcmp(_item->object().cNameSect(), pIItem->object().cNameSect()))
-            {
-                return _item;
-            }
-        }
-    }
-    return nullptr;
-}
-
-PIItem CInventory::GetSameEatable(const PIItem pIItem, bool bSearchRuck) const 
-{
-    PIItem item{};
-    int limit{};
-
-    const auto target_sect = pIItem->object().cNameSect();
-
-    auto callback = [&](const auto _pIItem) -> bool {
-        const auto* eatable = smart_cast<CEatableItem*>(_pIItem);
-
-        if (!eatable || _pIItem == pIItem)
-            return false;
-
-        if (!xr_strcmp(eatable->object().cNameSect(), target_sect))
-        {
-            const bool size_fits_limit = (eatable->GetPortionsNum() == 1);
-            const bool update_limit = (limit == 0 || eatable->GetPortionsNum() < limit);
-
-            if (size_fits_limit)
-            {
-                item = _pIItem;
-                return true;
-            }
-            if (update_limit)
-            {
-                item = _pIItem;
-                limit = eatable->GetPortionsNum();
-            }
-        }
-        return false;
-    };
-
-    Iterate(bSearchRuck, callback);
-    return item;
-}
-
-u32 CInventory::GetSameItemCount(LPCSTR caSection)
-{
-    u32 l_dwCount{};
-    for (const auto& item : m_all)
-    {
-        if (item && item->Useful() && !xr_strcmp(item->object().cNameSect(), caSection))
-            ++l_dwCount;
-    }
-    return l_dwCount;
 }
 
 int CInventory::BeltSize() const { return m_iMaxBelt; }

@@ -433,8 +433,6 @@ protected:
     float conditionDecreasePerShotSilencer{1.f};
     // увеличение изношености при выстреле из подствольника
     float conditionDecreasePerShotGL;
-    // увеличение изношености при выстреле с глушителем для самого глушителя
-    float conditionDecreasePerShotSilencerSelf{};
 
     //  [8/2/2005]
     float m_fPDM_disp_base;

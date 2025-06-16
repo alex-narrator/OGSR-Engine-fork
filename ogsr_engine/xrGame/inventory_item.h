@@ -179,8 +179,6 @@ public:
     virtual bool IsNecessaryItem(CInventoryItem* item);
     virtual bool IsNecessaryItem(const shared_str& item_sect) { return false; };
 
-    virtual void SetDropTime(bool);
-
 protected:
     xr_vector<u8> m_slots{};
     LPCSTR m_slots_sect{};

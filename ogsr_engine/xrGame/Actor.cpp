@@ -1585,17 +1585,6 @@ void CActor::BlockSprint()
         mstate_wishful &= ~mcSprint;
 }
 
-bool CActor::IsHitToBackPack(SHit* pHDS) const
-{
-    bool calculate_direction{true};
-    // якщо хіт вогнепальний або поріз то має значення кістка попадання
-    if (pHDS->type() == ALife::eHitTypeFireWound || pHDS->type() == ALife::eHitTypeWound || pHDS->type() == ALife::eHitTypeWound_2)
-        calculate_direction = (pHDS->bone() == m_spine || pHDS->bone() == m_spine1 || pHDS->bone() == m_spine2);
-    if (calculate_direction && is_from_behind(pHDS->direction()))
-        return true;
-    return false;
-}
-
 float CActor::GetItemBoostedParams(int type) { return m_ActorItemBoostedParam[type]; }
 
 float CActor::GetTotalArtefactsEffect(int i)

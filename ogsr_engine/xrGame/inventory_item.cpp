@@ -805,14 +805,6 @@ bool CInventoryItem::can_be_attached() const
     return actor ? (m_eItemPlace == eItemPlaceBelt || m_eItemPlace == eItemPlaceSlot) : true;
 }
 
-void CInventoryItem::SetDropTime(bool b_set)
-{
-    if (IsQuestItem() || object().story_id() != INVALID_STORY_ID)
-        return;
-    if (auto se_itm = smart_cast<CSE_ALifeItem*>(object().alife_object()))
-        se_itm->m_drop_time = b_set ? Level().GetGameTime() : 0;
-}
-
 float CInventoryItem::GetPowerLoss() { return m_fPowerLoss < 0.f && fis_zero(GetCondition()) ? 0.f : m_fPowerLoss; }
 
 float CInventoryItem::HitThruArmour(SHit* pHDS)

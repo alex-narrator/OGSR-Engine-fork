@@ -179,20 +179,7 @@ void CSE_ALifeDynamicObject::try_switch_offline()
     alife().switch_offline(this);
 }
 
-bool CSE_ALifeDynamicObject::redundant() const // { return (false); }
-{
-    if (m_bOnline)
-        return false;
-    if (m_story_id != INVALID_STORY_ID)
-        return false;
-    if (!m_drop_time || !m_stay_after_drop_time_interval)
-        return false;
-    if (m_drop_time + m_stay_after_drop_time_interval > alife().time_manager().game_time())
-        return false;
-    //Msg("~~ %s TRUE! remove item [%s]|ID[%u]|m_drop_time [%u]|m_stay_after_drop_time_interval [%u]|current time [%u]", 
-    //    __FUNCTION__, name(), ID, m_drop_time, m_stay_after_drop_time_interval, alife().time_manager().game_time());
-    return true;
-}
+bool CSE_ALifeDynamicObject::redundant() const { return (false); }
 
 /*
 void CSE_InventoryBox::add_online	(const bool &update_registries)

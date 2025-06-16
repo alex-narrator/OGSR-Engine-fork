@@ -178,11 +178,6 @@ private:
     bool m_bUpdated{};
 
 public:
-    PIItem GetSame(const PIItem pIItem, bool bSearchRuck) const; // получаем айтем из всего инвентаря или с пояса
-    PIItem GetSameEatable(const PIItem pIItem, bool bSearchRuck) const; // получаем айтем из всего инвентаря или с пояса
-    // считаем предметы в рюкзаке или на поясе + в слотах
-    virtual u32 GetSameItemCount(LPCSTR caSection);
-
     int BeltSize() const;
 
     void DropBeltToRuck();

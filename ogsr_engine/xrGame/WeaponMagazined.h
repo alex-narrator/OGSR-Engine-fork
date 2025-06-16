@@ -235,16 +235,6 @@ protected:
 
     virtual int ShotsFired() { return m_iShotNum; }
     virtual float GetWeaponDeterioration() const;
-    // для хранения состояния присоединённого прицела
-    float m_fAttachedScopeCondition{1.f};
-    // для хранения состояния присоединённого гранатомёта
-    float m_fAttachedGrenadeLauncherCondition{1.f};
-    // для хранения состояния присоединённого глушителя
-    float m_fAttachedSilencerCondition{1.f};
-    float m_fAttachedMagazineCondition{1.f};
-    // износ самого глушителя при стрельбе
-    virtual float GetSilencerDeterioration();
-    virtual void DeteriorateSilencerAttachable(float);
 
     virtual void OnDrawUI();
     virtual void net_Relcase(CObject* object);
@@ -278,17 +268,6 @@ public:
     virtual void LoadFlashlightParams(LPCSTR);
     //
     LPCSTR binoc_vision_sect{};
-    //
-    virtual void ChangeAttachedSilencerCondition(float);
-    virtual void ChangeAttachedScopeCondition(float);
-    virtual void ChangeAttachedGrenadeLauncherCondition(float);
-
-    virtual bool IsSilencerBroken() const;
-    virtual bool IsScopeBroken() const;
-    virtual bool IsGrenadeLauncherBroken() const;
-
-    virtual void Hit(SHit* pHDS);
-    virtual bool IsHitToAddon(SHit* pHDS);
 
     virtual bool IsVisionPresent() const { return m_bVision; };
 

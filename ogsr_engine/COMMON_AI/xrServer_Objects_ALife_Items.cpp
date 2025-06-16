@@ -167,13 +167,7 @@ u32 CSE_ALifeInventoryItem::update_rate() const { return (1000); }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItem
 ////////////////////////////////////////////////////////////////////////////
-CSE_ALifeItem::CSE_ALifeItem(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection), CSE_ALifeInventoryItem(caSection) 
-{
-    u32 default_stay_after_drop_time = READ_IF_EXISTS(pSettings, r_u32, "features", "stay_after_drop_time_interval", 0);
-    u32 stay_after_drop_time = READ_IF_EXISTS(pSettings, r_u32, caSection, "stay_after_drop_time_interval", default_stay_after_drop_time);
-    if (stay_after_drop_time)
-        m_stay_after_drop_time_interval = generate_time(1, 1, 1, stay_after_drop_time, 0, 0);
-}
+CSE_ALifeItem::CSE_ALifeItem(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection), CSE_ALifeInventoryItem(caSection) {}
 
 CSE_ALifeItem::~CSE_ALifeItem() {}
 
@@ -192,7 +186,6 @@ void CSE_ALifeItem::STATE_Write(NET_Packet& tNetPacket)
 {
     inherited1::STATE_Write(tNetPacket);
     inherited2::STATE_Write(tNetPacket);
-    tNetPacket.w(&m_drop_time, sizeof(m_drop_time));
 }
 
 void CSE_ALifeItem::STATE_Read(NET_Packet& tNetPacket, u16 size)
@@ -205,8 +198,6 @@ void CSE_ALifeItem::STATE_Read(NET_Packet& tNetPacket, u16 size)
         tNetPacket.r_u8();
     }
     inherited2::STATE_Read(tNetPacket, size);
-    if (m_wVersion > 118)
-        tNetPacket.r(&m_drop_time, sizeof(m_drop_time));
 }
 
 void CSE_ALifeItem::UPDATE_Write(NET_Packet& tNetPacket)
@@ -578,10 +569,6 @@ void CSE_ALifeItemWeaponMagazined::UPDATE_Read(NET_Packet& P)
         {
             m_AmmoIDs.push_back(P.r_u8());
         }
-        P.r_float_q8(m_fAttachedSilencerCondition, 0.f, 1.f);
-        P.r_float_q8(m_fAttachedScopeCondition, 0.f, 1.f);
-        P.r_float_q8(m_fAttachedGrenadeLauncherCondition, 0.f, 1.f);
-        P.r_float_q8(m_fAttachedMagazineCondition, 0.f, 1.f);
     }
 }
 void CSE_ALifeItemWeaponMagazined::UPDATE_Write(NET_Packet& P)
@@ -595,10 +582,6 @@ void CSE_ALifeItemWeaponMagazined::UPDATE_Write(NET_Packet& P)
     {
         P.w_u8(u8(m_AmmoIDs[i]));
     }
-    P.w_float_q8(m_fAttachedSilencerCondition, 0.f, 1.f);
-    P.w_float_q8(m_fAttachedScopeCondition, 0.f, 1.f);
-    P.w_float_q8(m_fAttachedGrenadeLauncherCondition, 0.f, 1.f);
-    P.w_float_q8(m_fAttachedMagazineCondition, 0.f, 1.f);
 }
 
 void CSE_ALifeItemWeaponMagazined::STATE_Read(NET_Packet& P, u16 size) 
@@ -615,10 +598,6 @@ void CSE_ALifeItemWeaponMagazined::STATE_Read(NET_Packet& P, u16 size)
         {
             m_AmmoIDs.push_back(P.r_u8());
         }
-        P.r_float_q8(m_fAttachedSilencerCondition, 0.f, 1.f);
-        P.r_float_q8(m_fAttachedScopeCondition, 0.f, 1.f);
-        P.r_float_q8(m_fAttachedGrenadeLauncherCondition, 0.f, 1.f);
-        P.r_float_q8(m_fAttachedMagazineCondition, 0.f, 1.f);
     }
 }
 void CSE_ALifeItemWeaponMagazined::STATE_Write(NET_Packet& P) 
@@ -632,10 +611,6 @@ void CSE_ALifeItemWeaponMagazined::STATE_Write(NET_Packet& P)
     {
         P.w_u8(u8(m_AmmoIDs[i]));
     }
-    P.w_float_q8(m_fAttachedSilencerCondition, 0.f, 1.f);
-    P.w_float_q8(m_fAttachedScopeCondition, 0.f, 1.f);
-    P.w_float_q8(m_fAttachedGrenadeLauncherCondition, 0.f, 1.f);
-    P.w_float_q8(m_fAttachedMagazineCondition, 0.f, 1.f);
 }
 
 ////////////////////////////////////////////////////////////////////////////

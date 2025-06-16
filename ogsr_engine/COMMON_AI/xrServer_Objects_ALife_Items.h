@@ -206,10 +206,6 @@ add_to_type_list(CSE_ALifeItemWeapon)
 
 SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeaponMagazined, CSE_ALifeItemWeapon)
 u8 m_u8CurFireMode{};
-float m_fAttachedScopeCondition{1.f};
-float m_fAttachedGrenadeLauncherCondition{1.f};
-float m_fAttachedSilencerCondition{1.f};
-float m_fAttachedMagazineCondition{1.f};
 xr_vector<u8> m_AmmoIDs;
 //u8 m_cur_magazine{};
 CSE_ALifeItemWeaponMagazined(LPCSTR caSection);

@@ -19,8 +19,7 @@ private:
 public:
     CInventoryContainer(){};
     virtual ~CInventoryContainer(){};
-    virtual void Load(LPCSTR section);
-    //virtual bool CanTrade() const;
+
     virtual u32 Cost() const;
     virtual float Weight() const;
 
@@ -33,20 +32,7 @@ public:
 
     virtual bool can_be_attached() const override;
 
-    virtual void Hit(SHit* pHDS);
-    void HitItemsInBackPack(SHit* pHDS);
-    void HitItemsInContainer(SHit* pHDS);
-
-    virtual u32 GetSameItemCount(shared_str) const;
-
-    void AddUniqueItems(TIItemContainer& items_container) const;
-
-    virtual bool CanTakeItem(CInventoryItem*) const;
-
-    float HitThruArmour(SHit* pHDS);
-
 protected:
     void UpdateDropTasks();
     void UpdateDropItem(PIItem pIItem);
-    xr_vector<shared_str> m_allowed_classes{};
 };
