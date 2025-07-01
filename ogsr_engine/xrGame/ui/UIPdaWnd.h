@@ -40,7 +40,7 @@ protected:
     CUIStatic* m_oldSectionImage{};
 
     // Текущий активный диалог
-    CUIWindow* m_pActiveDialog;
+    CUIWindow* m_pActiveDialog{};
     xr_vector<Fvector2> m_sign_places_main;
 
 public:

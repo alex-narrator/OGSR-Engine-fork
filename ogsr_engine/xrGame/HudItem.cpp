@@ -423,7 +423,7 @@ void CHudItem::on_a_hud_attach()
         if (ai().script_engine().functor(script_ui_funct, funct))
         {
             CUIDialogWndEx* ret = funct(object().lua_game_object());
-            CUIWindow* pScriptWnd = ret ? smart_cast<CUIWindow*>(ret) : (0);
+            CUIWindow* pScriptWnd = ret ? smart_cast<CUIWindow*>(ret) : nullptr;
             if (pScriptWnd)
                 script_ui = pScriptWnd;
             else

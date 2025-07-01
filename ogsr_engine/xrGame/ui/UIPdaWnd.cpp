@@ -31,6 +31,7 @@
 #include "player_hud.h"
 #include "../../xr_3da/XR_IOConsole.h"
 #include "inventory.h"
+#include "UIScriptWnd.h"
 
 constexpr auto PDA_XML = "pda.xml";
 u32 g_pda_info_state = 0;
@@ -66,8 +67,6 @@ void CUIPdaWnd::Init()
     R_ASSERT3(xml_result, "xml file not found: pda.xml", PDA_XML);
 
     CUIXmlInit xml_init;
-
-    m_pActiveDialog = NULL;
 
     xml_init.InitWindow(uiXml, "main", 0, this);
 
@@ -144,8 +143,9 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     else
     {
-        R_ASSERT(m_pActiveDialog);
-        m_pActiveDialog->SendMessage(pWnd, msg, pData);
+        //R_ASSERT(m_pActiveDialog);
+        if (m_pActiveDialog)
+            m_pActiveDialog->SendMessage(pWnd, msg, pData);
     }
 }
 
@@ -229,6 +229,12 @@ void CUIPdaWnd::Hide()
 {
     inherited::Hide();
     InventoryUtilities::SendInfoToActor("ui_pda_hide");
+    if (m_pActiveDialog)
+    {
+        m_pActiveDialog->Show(false);
+        m_pActiveDialog = smart_cast<CUIWindow*>(UIEventsWnd); // hack for script window
+        m_pActiveSection = eptNoActiveTab;
+    }
 }
 
 void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
@@ -238,7 +244,8 @@ void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
 
     if (m_pActiveDialog)
     {
-        UIMainPdaFrame->DetachChild(m_pActiveDialog);
+        if (UIMainPdaFrame->IsChild(m_pActiveDialog))
+            UIMainPdaFrame->DetachChild(m_pActiveDialog);
         m_pActiveDialog->Show(false);
     }
 
@@ -278,15 +285,30 @@ void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
         g_pda_info_state &= ~pda_section::quests;
         InventoryUtilities::SendInfoToActor("ui_pda_quests");
         break;
-    default: Msg("not registered button identifier [%d]", UITabControl->GetActiveIndex());
+    default: //Msg("not registered button identifier [%d]", UITabControl->GetActiveIndex());
+        if (pSettings->line_exist("engine_callbacks", "on_pda_custom_tab"))
+        {
+            const char* callback = pSettings->r_string("engine_callbacks", "on_pda_custom_tab");
+            if (luabind::functor<CUIDialogWndEx*> lua_function; ai().script_engine().functor(callback, lua_function))
+            {
+                CUIDialogWndEx* res = lua_function(section);
+                if (res)
+                    m_pActiveDialog = smart_cast<CUIWindow*>(res);
+            }
+        }
     }
-    UIMainPdaFrame->AttachChild(m_pActiveDialog);
-    m_pActiveDialog->Show(true);
 
-    if (UITabControl->GetActiveIndex() != section)
-        UITabControl->SetNewActiveTab(section);
+    if (m_pActiveDialog)
+    {
+        if (!UIMainPdaFrame->IsChild(m_pActiveDialog))
+            UIMainPdaFrame->AttachChild(m_pActiveDialog);
+        m_pActiveDialog->Show(true);
 
-    m_pActiveSection = section;
+        if (UITabControl->GetActiveIndex() != section)
+            UITabControl->SetNewActiveTab(section);
+
+        m_pActiveSection = section;
+    }
 }
 
 void CUIPdaWnd::Draw()
