@@ -897,20 +897,9 @@ void CSE_ALifeItemGrenade::STATE_Read(NET_Packet& tNetPacket, u16 size) { inheri
 
 void CSE_ALifeItemGrenade::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
 
-void CSE_ALifeItemGrenade::UPDATE_Read(NET_Packet& tNetPacket) 
-{ 
-    inherited::UPDATE_Read(tNetPacket); 	
-    //
-    if (m_wVersion > 118)
-        tNetPacket.r_u32(m_dwDestroyTimeMax);
-}
+void CSE_ALifeItemGrenade::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
 
-void CSE_ALifeItemGrenade::UPDATE_Write(NET_Packet& tNetPacket) 
-{ 
-    inherited::UPDATE_Write(tNetPacket); 	
-    //
-    tNetPacket.w_u32(m_dwDestroyTimeMax);
-}
+void CSE_ALifeItemGrenade::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemExplosive

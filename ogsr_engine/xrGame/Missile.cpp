@@ -2,7 +2,6 @@
 #include "missile.h"
 #include "PhysicsShell.h"
 #include "actor.h"
-#include "torch.h"
 #include "xrserver_objects_alife.h"
 #include "level.h"
 #include "xr_level_controller.h"
@@ -16,14 +15,8 @@
 #endif
 #include "../xr_3da/x_ray.h"
 
-#include "ui/UIProgressShape.h"
-#include "ui/UIXmlInit.h"
-
 #include "CalculateTriangle.h"
 #include "tri-colliderknoopc/dcTriangle.h"
-
-#include "ActorCondition.h"
-#include "HUDManager.h"
 
 float g_fForceGrowSpeed{25.f};
 
@@ -196,8 +189,8 @@ void CMissile::UpdateCL()
         {
             if (auto actor = smart_cast<CActor*>(H_Parent()))
             {
-                m_fThrowForce += (g_fForceGrowSpeed * actor->GetExoFactor() * Device.dwTimeDelta) * .001f;
-                clamp(m_fThrowForce, m_fMinForce, GetMaxForce());
+                m_fThrowForce += (g_fForceGrowSpeed * Device.dwTimeDelta) * .001f;
+                clamp(m_fThrowForce, m_fMinForce, m_fMaxForce);
             }
         }
     }
@@ -332,11 +325,6 @@ void CMissile::OnAnimationEnd(u32 state)
     }
     break;
     case eThrow: {
-        auto pActor = smart_cast<CActor*>(H_Parent());
-        bool b_have_no_power = pActor && pActor->conditions().IsCantWalk();
-        if (pActor && !b_have_no_power && !GodMode())
-            pActor->conditions().ConditionJump(Weight() * 0.1f);
-
         if (!m_throwMotionMarksAvailable)
             Throw();
         SwitchState(eThrowEnd);
@@ -484,12 +472,8 @@ void CMissile::Throw()
     VERIFY(inventory_owner);
     if (inventory_owner->use_default_throw_force())
     {
-        //
-        auto pActor = smart_cast<CActor*>(H_Parent());
-        float f_const_force = (m_fMinForce + GetMaxForce()) / 2;
-        float power_k = pActor ? pActor->conditions().GetPower() : 1.f;
-        //
-        m_fake_missile->m_fThrowForce = (m_constpower ? f_const_force : m_fThrowForce) * power_k;
+        float f_const_force = (m_fMinForce + m_fMaxForce) / 2;
+        m_fake_missile->m_fThrowForce = (m_constpower ? f_const_force : m_fThrowForce);
     }
     else
         m_fake_missile->m_fThrowForce = inventory_owner->missile_throw_force(); 
@@ -705,12 +689,4 @@ void CMissile::ExitContactCallback(bool& do_colide, bool bo1, dContact& c, SGame
             l_this->Contact(gd2 ? smart_cast<CPhysicsShellHolder*>(gd2->ph_ref_object) : nullptr);
         }
     }
-}
-
-float CMissile::GetMaxForce() const 
-{ 
-    float res = m_fMaxForce;
-    if (auto actor = smart_cast<const CActor*>(H_Parent()))
-        res *= actor->GetExoFactor();
-    return res;
 }

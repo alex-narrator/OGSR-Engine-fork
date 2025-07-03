@@ -1,6 +1,7 @@
 #pragma once
 #include "hud_item_object.h"
 #include "HudSound.h"
+#include "script_export_space.h"
 
 struct dContact;
 struct SGameMtl;
@@ -87,8 +88,6 @@ protected:
     bool m_contacted{};
     bool b_impact_fuze{};
 
-    virtual float GetMaxForce() const;
-
 protected:
     //относительная точка и направление вылета гранаты
     Fvector m_vThrowPoint;
@@ -119,4 +118,10 @@ public:
 
     virtual void Contact(CPhysicsShellHolder* obj) { m_contacted = true; };
     bool Contacted() const { return m_contacted; };
+
+    DECLARE_SCRIPT_REGISTER_FUNCTION
 };
+
+add_to_type_list(CMissile)
+#undef script_type_list
+#define script_type_list save_type_list(CMissile)

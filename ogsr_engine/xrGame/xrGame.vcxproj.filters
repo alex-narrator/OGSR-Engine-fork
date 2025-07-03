@@ -8669,6 +8669,9 @@
     <ClCompile Include="flashlight_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Devices\Flashlight</Filter>
     </ClCompile>
+    <ClCompile Include="Missile_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Grenades &amp; Missiles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="Explosive.h">

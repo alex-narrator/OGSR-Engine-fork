@@ -356,9 +356,6 @@ void CWeaponScript::script_register(lua_State* L)
               class_<CWeaponMagazinedWGrenade, CWeaponMagazined>("CWeaponMagazinedWGrenade")
                   .def_readwrite("gren_mag_size", &CWeaponMagazinedWGrenade::iMagazineSize2)
                   .def("switch_gl", &CWeaponMagazinedWGrenade::SwitchMode),
-              class_<CMissile, CInventoryItemObject>("CMissile")
-                  .def_readwrite("destroy_time", &CMissile::m_dwDestroyTime)
-                  .def_readwrite("destroy_time_max", &CMissile::m_dwDestroyTimeMax),
               class_<enum_exporter<eWeaponAddonType>>("addon").enum_("addon")[
                   value("silencer", int(eSilencer)), value("scope", int(eScope)), value("launcher", int(eLauncher)), 
                   value("laser", int(eLaser)), value("flashlight", int(eFlashlight)), value("stock", int(eStock)), 
