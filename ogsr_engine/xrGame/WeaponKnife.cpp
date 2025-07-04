@@ -251,18 +251,12 @@ void CWeaponKnife::FireStart()
 {
     inherited::FireStart();
     SwitchState(eFire);
-
-    if (ParentIsActor() && !GodMode() && !Actor()->conditions().IsCantWalk())
-        Actor()->conditions().ConditionJump(Weight() * 0.1f);
 }
 
 void CWeaponKnife::Fire2Start()
 {
     inherited::Fire2Start();
     SwitchState(eFire2);
-
-    if (ParentIsActor() && !GodMode() && !Actor()->conditions().IsCantWalk())
-        Actor()->conditions().ConditionJump(Weight() * 0.1f);
 }
 
 bool CWeaponKnife::Action(s32 cmd, u32 flags)
