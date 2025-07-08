@@ -22,6 +22,9 @@ enum
     AF_AI_VOLUMETRIC_LIGHTS = 1 << 17,
     AF_EFFECTS_ON_DEMORECORD = 1 << 18,
     AF_FIRST_PERSON_DEATH = 1 << 19,
+    AF_LOCK_RELOAD = 1 << 20,
+    AF_CAM_COLLISION_COP = 1 << 21,
+    AF_ACTOR_SHADOW = 1 << 22,
 };
 
 //enum

@@ -43,13 +43,6 @@ IC int get_token_id(xr_token* tokens, LPCSTR key)
     return -1;
 }
 
-struct XRCORE_API xr_token2
-{
-    LPCSTR name;
-    LPCSTR info;
-    int id;
-};
-
 // generic
 template <class T>
 IC T _min(T a, T b)
@@ -62,7 +55,7 @@ IC T _max(T a, T b)
     return a > b ? a : b;
 }
 template <class T>
-IC T _sqr(T a)
+constexpr T _sqr(T a)
 {
     return a * a;
 }
@@ -219,3 +212,7 @@ inline bool StringHasUTF8(const char* str)
     }
     return true;
 }
+
+// Round @val to next or prev @mul boundary, where @mul is a power of two
+constexpr ICF size_t roundup(size_t val, long mul) { return (val + mul - 1) & -mul; }
+constexpr ICF size_t rounddown(size_t val, long mul) { return val & -mul; }

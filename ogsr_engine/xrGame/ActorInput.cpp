@@ -47,9 +47,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
         return;
     }
 
-    if (m_blocked_actions.find((EGameActions)cmd) != m_blocked_actions.end())
-        return; // Real Wolf. 14.10.2014
-
     if (Remote())
         return;
 
@@ -112,18 +109,15 @@ void CActor::IR_OnKeyboardPress(int cmd)
     case kCAM_1: cam_Set(eacFirstEye); break;
     case kCAM_2: cam_Set(eacLookAt); break;
     case kCAM_3: cam_Set(eacFreeLook); break;
-    case kNIGHT_VISION: {
-        auto act_it = inventory().ActiveItem();
-        auto pTorch = smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT));
-        if (pTorch && !smart_cast<CWeaponMagazined*>(act_it) && !smart_cast<CWeaponKnife*>(act_it) && !smart_cast<CMissile*>(act_it))
-            pTorch->SwitchNightVision();
-    }
-    break;
+    case kNIGHT_VISION:
     case kTORCH: {
         auto act_it = inventory().ActiveItem();
+        auto active_hud = smart_cast<CHudItem*>(act_it);
+        if (active_hud && active_hud->GetState() != CHudItem::eIdle && Core.Features.test(xrCore::Feature::busy_actor_restrictions))
+            return;
         auto pTorch = smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT));
         if (pTorch && !smart_cast<CWeaponMagazined*>(act_it) && !smart_cast<CWeaponKnife*>(act_it) && !smart_cast<CMissile*>(act_it))
-            pTorch->Switch();
+            cmd == kNIGHT_VISION ? pTorch->SwitchNightVision() : pTorch->Switch();
     }
     break;
     case kWPN_8: {
@@ -147,6 +141,10 @@ void CActor::IR_OnKeyboardPress(int cmd)
 
     case kUSE_BANDAGE:
     case kUSE_MEDKIT: {
+        auto active_hud = smart_cast<CHudItem*>(inventory().ActiveItem());
+        if (active_hud && active_hud->GetState() != CHudItem::eIdle && Core.Features.test(xrCore::Feature::busy_actor_restrictions))
+            return;
+
         if (!(GetTrade()->IsInTradeState()))
         {
             PIItem itm = inventory().item((cmd == kUSE_BANDAGE) ? CLSID_IITEM_BANDAGE : CLSID_IITEM_MEDKIT);
@@ -197,9 +195,6 @@ void CActor::IR_OnKeyboardRelease(int cmd)
 {
     if (g_bHudAdjustMode && pInput->iGetAsyncKeyState(DIK_LSHIFT))
         return;
-
-    if (m_blocked_actions.find((EGameActions)cmd) != m_blocked_actions.end())
-        return; // Real Wolf. 14.10.2014
 
     if (Remote())
         return;
@@ -257,9 +252,6 @@ void CActor::IR_OnKeyboardHold(int cmd)
             g_player_hud->tune(Ivector{0, 0, -1});
         return;
     }
-
-    if (m_blocked_actions.find((EGameActions)cmd) != m_blocked_actions.end())
-        return; // Real Wolf. 14.10.2014
 
     if (Remote() || !g_Alive())
         return;
@@ -406,6 +398,10 @@ void CActor::ActorUse()
     if (auto Pda = GetPDA(); Pda && Pda->Is3DPDA() && psActorFlags.test(AF_3D_PDA) && pGameSP->PdaMenu->IsShown())
         return;
 
+    auto active_hud = smart_cast<CHudItem*>(inventory().ActiveItem());
+    if (active_hud && active_hud->GetState() != CHudItem::eIdle && Core.Features.test(xrCore::Feature::busy_actor_restrictions))
+        return;
+
     if (g_bDisableAllInput || HUD().GetUI()->MainInputReceiver())
         return;
 
@@ -453,7 +449,7 @@ void CActor::ActorUse()
                 return;
             }
             //обыск трупа
-            else if (!Level().IR_GetKeyState(DIK_LSHIFT))
+            else if (!pInput->iGetAsyncKeyState(DIK_LSHIFT))
             {
                 //только если находимся в режиме single
                 CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
@@ -467,7 +463,7 @@ void CActor::ActorUse()
         CPhysicsShellHolder* object = smart_cast<CPhysicsShellHolder*>(RQ.O);
         if (object && object->getVisible())
         {
-            if (Level().IR_GetKeyState(DIK_LSHIFT))
+            if (pInput->iGetAsyncKeyState(DIK_LSHIFT))
             {
                 if (object->ActorCanCapture())
                 {

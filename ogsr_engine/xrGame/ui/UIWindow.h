@@ -55,7 +55,7 @@ public:
     virtual void OnMouseScroll(float iDirection);
     virtual bool OnDbClick();
     virtual bool OnMouseDown(int mouse_btn);
-    virtual void OnMouseUp(int mouse_btn);
+    virtual bool OnMouseUp(int mouse_btn);
     virtual void OnFocusReceive();
     virtual void OnFocusLost();
     virtual void UpdateFocus(bool = false);
@@ -206,6 +206,8 @@ protected:
     int m_dbg_id;
     Flags32 m_dbg_flag;
 #endif
+
+    static void create_ui_snd(ref_sound& S, LPCSTR fName);
 
 public:
     inline float GetMousePosX() const { return cursor_pos.x; }

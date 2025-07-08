@@ -97,7 +97,7 @@ u32 CScriptGameObject::game_vertex_id() const { return (object().ai_location().g
 
 float CScriptGameObject::level_vertex_light(const u32& level_vertex_id) const { return ((float)ai().level_graph().vertex(level_vertex_id)->light() / 15.f); }
 
-CScriptIniFile* CScriptGameObject::spawn_ini() const { return ((CScriptIniFile*)object().spawn_ini()); }
+CInifile* CScriptGameObject::spawn_ini() const { return ((CInifile*)object().spawn_ini()); }
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -682,7 +682,7 @@ CUIStatic* CScriptGameObject::GetCellItem() const
 LPCSTR CScriptGameObject::GetBoneName(u16 id) const
 {
     if (auto K = smart_cast<IKinematics*>(object().Visual()))
-        return K->LL_BoneName_dbg(id);
+        return K->LL_BoneName(id);
     return 0;
 }
 

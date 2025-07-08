@@ -3,7 +3,6 @@
 #include "hudmanager.h"
 #ifdef DEBUG
 #include "ode_include.h"
-#include "../xr_3da/StatGraph.h"
 #include "PHDebug.h"
 #endif // DEBUG
 #include "alife_space.h"
@@ -87,7 +86,7 @@ static Fbox bbCrouchBox;
 static Fvector vFootCenter;
 static Fvector vFootExt;
 
-Flags32 psActorFlags = {AF_3D_SCOPES | AF_KEYPRESS_ON_START | AF_CAM_COLLISION | AF_AI_VOLUMETRIC_LIGHTS | AF_DOF_RELOAD | AF_3D_PDA | AF_ALWAYSRUN | AF_FIRST_PERSON_DEATH};
+Flags32 psActorFlags{AF_KEYPRESS_ON_START | AF_CAM_COLLISION | AF_CAM_COLLISION_COP | AF_AI_VOLUMETRIC_LIGHTS | AF_DOF_ZOOM | AF_DOF_RELOAD | AF_3D_PDA | AF_ALWAYSRUN | AF_FIRST_PERSON_DEATH};
 
 static bool updated;
 
@@ -161,8 +160,6 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
     m_pVehicleWeLookingAt = NULL;
     m_pObjectWeLookingAt = NULL;
     m_bPickupMode = false;
-
-    pStatGraph = NULL;
 
     m_pActorEffector = NULL;
 
@@ -397,10 +394,6 @@ void CActor::Load(LPCSTR section)
 
         m_HeavyBreathSnd.create(pSettings->r_string(section, "heavy_breath_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
         m_BloodSnd.create(pSettings->r_string(section, "heavy_blood_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
-    }
-    if (this == Level().CurrentEntity()) //--#SM+#-- Сбрасываем режим рендеринга в дефолтный [reset some render flags]
-    {
-        g_pGamePersistent->m_pGShaderConstants.m_blender_mode.set(0.f, 0.f, 0.f, 0.f);
     }
 
     // KRodin: это, мне кажется, лишнее.
@@ -775,12 +768,14 @@ float CActor::currentFOV()
 
     if (eacFirstEye == cam_active && pWeapon && pWeapon->IsZoomed() && (!pWeapon->ZoomTexture() || (!pWeapon->IsRotatingToZoom() && pWeapon->ZoomTexture())))
         if (Core.Features.test(xrCore::Feature::ogse_wpn_zoom_system))
-            return atanf(tanf(g_fov * (0.5f * PI / 180)) / pWeapon->GetZoomFactor()) / (0.5f * PI / 180);
+            return atanf(tanf(g_fov * (0.5f * PI / 180.f)) / pWeapon->GetZoomFactor()) / (0.5f * PI / 180.f);
         else
             return pWeapon->GetZoomFactor() * 0.75f;
     else
         return g_fov;
 }
+
+bool Is3dssZoomed{};
 
 void CActor::UpdateCL()
 {
@@ -795,8 +790,6 @@ void CActor::UpdateCL()
             }
         }
     }
-    if (m_holder)
-        m_holder->UpdateEx(currentFOV());
 
     m_snd_noise -= 0.3f * Device.fTimeDelta;
 
@@ -811,19 +804,16 @@ void CActor::UpdateCL()
 
     PickupModeUpdate_COD();
 
-    m_bZoomAimingMode = false;
-    CWeapon* pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
-
-    Device.Statistic->TEST1.Begin();
-    cam_Update(float(Device.dwTimeDelta) / 1000.0f, currentFOV());
-    Device.Statistic->TEST1.End();
-
     if (Level().CurrentEntity() && this->ID() == Level().CurrentEntity()->ID())
     {
         psHUD_Flags.set(HUD_CROSSHAIR_RT2, true);
         psHUD_Flags.set(HUD_DRAW_RT, true);
     }
-    if (pWeapon)
+
+    Is3dssZoomed = false;
+    m_bZoomAimingMode = false;
+
+    if (CWeapon* pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem()))
     {
         if (pWeapon->IsZoomed())
         {
@@ -834,27 +824,24 @@ void CActor::UpdateCL()
                 S->SetParams(full_fire_disp);
 
             m_bZoomAimingMode = true;
+
+            Is3dssZoomed = !pWeapon->IsRotatingToZoom() && pWeapon->Is3dssEnabled();
         }
 
         if (Level().CurrentEntity() && this->ID() == Level().CurrentEntity()->ID())
         {
             float fire_disp_full = pWeapon->GetFireDispersion(true);
 
-            if (!Device.m_SecondViewport.IsSVPFrame()) //--#SM+#-- +SecondVP+ Чтобы перекрестие не скакало из за смены FOV (Sin!) [fix for crosshair shaking while SecondVP]
-                HUD().SetCrosshairDisp(fire_disp_full, 0.02f);
+            HUD().SetCrosshairDisp(fire_disp_full, 0.02f);
 
             HUD().ShowCrosshair(!psHUD_Flags.test(HUD_CROSSHAIR_BUILD) && pWeapon->use_crosshair());
 
             psHUD_Flags.set(HUD_CROSSHAIR_RT2, pWeapon->show_crosshair());
             psHUD_Flags.set(HUD_DRAW_RT, pWeapon->show_indicators());
 
-            // Обновляем двойной рендер от оружия [Update SecondVP with weapon data]
-            pWeapon->UpdateSecondVP(); //--#SM+#-- +SecondVP+
-
             // Обновляем информацию об оружии в шейдерах
-            g_pGamePersistent->m_pGShaderConstants.hud_params.x = pWeapon->GetZRotatingFactor(); //--#SM+#--
-            g_pGamePersistent->m_pGShaderConstants.hud_params.y = pWeapon->GetSecondVPFov(); //--#SM+#--
-            g_pGamePersistent->m_pGShaderConstants.hud_params.z = pWeapon->GetLastHudFov();
+#pragma todo("Simp: подумать над тем что передавать в y и w")
+            shader_exports.set_hud_params(Fvector4{pWeapon->GetZRotatingFactor(), pWeapon->CurrentZoomFactor(), pWeapon->GetLastHudFov(), pWeapon->CurrentZoomFactor()});
         }
     }
     else
@@ -865,11 +852,7 @@ void CActor::UpdateCL()
             HUD().ShowCrosshair(false);
 
             // Очищаем информацию об оружии в шейдерах
-            g_pGamePersistent->m_pGShaderConstants.hud_params.set(0.f, 0.f, 0.f, 0.f); //--#SM+#--
-
-            // Отключаем второй вьюпорт  [Turn off SecondVP]
-            // + CWeapon::UpdateSecondVP();
-            Device.m_SecondViewport.SetSVPActive(false); //--#SM+#-- +SecondVP+
+            shader_exports.set_hud_params({});
         }
     }
 
@@ -899,7 +882,9 @@ void CActor::UpdateCL()
         Cameras().hud_camera_Matrix(trans);
     }
     else
+    {
         Cameras().camera_Matrix(trans);
+    }
 
     if (IsFocused())
     {
@@ -996,6 +981,15 @@ void CActor::shedule_Update(u32 DT)
         */
         return;
     }
+
+    if (m_holder)
+        m_holder->UpdateEx(currentFOV());
+
+    Device.Statistic->cam_Update.Begin();
+    cam_Update(float(Device.dwTimeDelta) / 1000.0f, currentFOV());
+    Device.Statistic->cam_Update.End();
+
+    Device.OnCameraUpdated(true);
 
     //
     clamp(DT, 0u, 100u);
@@ -1128,10 +1122,13 @@ void CActor::shedule_Update(u32 DT)
     //если в режиме HUD, то сама модель актера не рисуется
     if (!character_physics_support()->IsRemoved() && !m_holder)
         setVisible(!HUDview());
+
     //что актер видит перед собой
     collide::rq_result& RQ = HUD().GetCurrentRayQuery();
+    auto active_hud = smart_cast<CHudItem*>(inventory().ActiveItem());
+    const bool can_use = !active_hud || active_hud->GetState() == CHudItem::eIdle || !Core.Features.test(xrCore::Feature::busy_actor_restrictions);
 
-    if (!input_external_handler_installed() && !m_holder && RQ.O && RQ.O->getVisible() && RQ.range < inventory().GetTakeDist())
+    if (can_use && !input_external_handler_installed() && !m_holder && RQ.O && RQ.O->getVisible() && RQ.range < inventory().GetTakeDist())
     {
         m_pObjectWeLookingAt = smart_cast<CGameObject*>(RQ.O);
         m_pUsableObject = smart_cast<CUsableScriptObject*>(RQ.O);
@@ -1206,27 +1203,27 @@ void CActor::shedule_Update(u32 DT)
 
     updated = true;
 };
-#include "debug_renderer.h"
-void CActor::renderable_Render()
+
+//#include "debug_renderer.h"
+void CActor::renderable_Render(u32 context_id, IRenderable* root)
 {
-    inherited::renderable_Render();
+//    if (!psAI_Flags.test(aiStalker))
+    {
+        inherited::renderable_Render(context_id, root);
 
-    if ((cam_active == eacFirstEye && // first eye cam
-         ::Render->get_generation() == ::Render->GENERATION_R2 && // R2
-         ::Render->active_phase() == 1) // shadow map rendering on R2
-
-        ||
-
-        !(IsFocused() && (cam_active == eacFirstEye) && ((!m_holder) || (m_holder && m_holder->allowWeapon() && m_holder->HUDView()))))
-        CInventoryOwner::renderable_Render();
+        if (!HUDview())
+        {
+            CInventoryOwner::renderable_Render(context_id, root);
+        }
+    }
 }
 
-BOOL CActor::renderable_ShadowGenerate()
+BOOL CActor::renderable_ShadowReceive()
 {
     if (m_holder)
         return FALSE;
 
-    return inherited::renderable_ShadowGenerate();
+    return TRUE;
 }
 
 void CActor::g_PerformDrop()
@@ -1234,7 +1231,7 @@ void CActor::g_PerformDrop()
     b_DropActivated = FALSE;
 
     PIItem pItem = inventory().ActiveItem();
-    if (0 == pItem)
+    if (!pItem || pItem->IsQuestItem())
         return;
 
     u32 s = inventory().GetActiveSlot();
@@ -1248,9 +1245,9 @@ void CActor::g_PerformDrop()
 extern BOOL g_ShowAnimationInfo;
 #endif // DEBUG
 // HUD
-void CActor::OnHUDDraw(CCustomHUD* /**hud/**/)
+void CActor::OnHUDDraw(CCustomHUD* hud, u32 context_id, IRenderable* root)
 {
-    g_player_hud->render_hud();
+    g_player_hud->render_hud(context_id, root);
 
 #if 0 // ndef NDEBUG
 	if (Level().CurrentControlEntity() == this && g_ShowAnimationInfo)
@@ -1282,65 +1279,6 @@ void CActor::OnHUDDraw(CCustomHUD* /**hud/**/)
 	};
 #endif
 }
-
-static float mid_size = 0.097f;
-static float fontsize = 15.0f;
-static float upsize = 0.33f;
-void CActor::RenderText(LPCSTR Text, Fvector dpos, float* pdup, u32 color)
-{
-    if (!g_Alive())
-        return;
-
-    CBoneInstance& BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(u16(m_head));
-    Fmatrix M;
-    smart_cast<IKinematics*>(Visual())->CalculateBones();
-    M.mul(XFORM(), BI.mTransform);
-    //------------------------------------------------
-    Fvector v0, v1;
-    v0.set(M.c);
-    v1.set(M.c);
-    Fvector T = Device.vCameraTop;
-    v1.add(T);
-
-    Fvector v0r, v1r;
-    Device.mFullTransform.transform(v0r, v0);
-    Device.mFullTransform.transform(v1r, v1);
-    float size = v1r.distance_to(v0r);
-    CGameFont* pFont = HUD().Font().pFontArial14;
-    if (!pFont)
-        return;
-    //	float OldFontSize = pFont->GetHeight	();
-    float delta_up = 0.0f;
-    if (size < mid_size)
-        delta_up = upsize;
-    else
-        delta_up = upsize * (mid_size / size);
-    dpos.y += delta_up;
-    if (size > mid_size)
-        size = mid_size;
-    //	float NewFontSize = size/mid_size * fontsize;
-    //------------------------------------------------
-    M.c.y += dpos.y;
-
-    Fvector4 v_res;
-    Device.mFullTransform.transform(v_res, M.c);
-
-    if (v_res.z < 0 || v_res.w < 0)
-        return;
-    if (v_res.x < -1.f || v_res.x > 1.f || v_res.y < -1.f || v_res.y > 1.f)
-        return;
-
-    float x = (1.f + v_res.x) / 2.f * (Device.dwWidth);
-    float y = (1.f - v_res.y) / 2.f * (Device.dwHeight);
-
-    pFont->SetAligment(CGameFont::alCenter);
-    pFont->SetColor(color);
-    //	pFont->SetHeight	(NewFontSize);
-    pFont->Out(x, y, Text);
-    //-------------------------------------------------
-    //	pFont->SetHeight(OldFontSize);
-    *pdup = delta_up;
-};
 
 void CActor::SetPhPosition(const Fmatrix& transform)
 {
@@ -1809,23 +1747,6 @@ CCustomOutfit* CActor::GetOutfit() const
 {
     PIItem _of = inventory().m_slots[OUTFIT_SLOT].m_pIItem;
     return _of ? smart_cast<CCustomOutfit*>(_of) : NULL;
-}
-
-void CActor::block_action(EGameActions cmd)
-{
-    if (m_blocked_actions.find(cmd) == m_blocked_actions.end())
-    {
-        m_blocked_actions[cmd] = true;
-    }
-}
-
-void CActor::unblock_action(EGameActions cmd)
-{
-    auto iter = m_blocked_actions.find(cmd);
-    if (iter != m_blocked_actions.end())
-    {
-        m_blocked_actions.erase(iter);
-    }
 }
 
 bool CActor::is_actor_normal() { return mstate_real & (mcAnyAction | mcLookout | mcCrouch | mcClimb | mcSprint) ? false : true; }

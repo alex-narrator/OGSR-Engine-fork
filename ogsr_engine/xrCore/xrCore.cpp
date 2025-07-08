@@ -23,13 +23,6 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs,
     if (0 == init_counter)
     {
 #ifdef XRCORE_STATIC
-        _clearfp();
-#ifdef _M_IX86
-        _controlfp(_PC_53, MCW_PC);
-#endif
-        _controlfp(_RC_CHOP, MCW_RC);
-        _controlfp(_RC_NEAR, MCW_RC);
-        _controlfp(_MCW_EM, MCW_EM);
         /*
             По сути это не рекомендуемый Microsoft, но повсеместно используемый
            способ повышения точности соблюдения и измерения временных интревалов
@@ -92,22 +85,11 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs,
     if (init_fs)
     {
         u32 flags = 0;
-        if (0 != strstr(Params, "-build"))
-            flags |= CLocatorAPI::flBuildCopy;
-        if (0 != strstr(Params, "-ebuild"))
-            flags |= CLocatorAPI::flBuildCopy | CLocatorAPI::flEBuildCopy;
-#ifdef DEBUG
-        if constexpr (false) /*(strstr(Params,"-cache"))*/
-            flags |= CLocatorAPI::flCacheFiles;
-        else
-            flags &= ~CLocatorAPI::flCacheFiles;
-#endif // DEBUG
-        flags |= CLocatorAPI::flScanAppRoot;
 
-        if (0 != strstr(Params, "-file_activity"))
+        if (nullptr != strstr(Core.Params, "-file_activity"))
             flags |= CLocatorAPI::flDumpFileActivity;
 
-        FS._initialize(flags, 0, fs_fname);
+        FS._initialize(flags, fs_fname);
 
         Msg("[OGSR Engine (%s)] build date: [" __DATE__ " " __TIME__ "]",
             GetBuildConfiguration());
@@ -140,7 +122,8 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs,
     {
         th_count = dwOverride;
     }
-    TTAPI = xr_new<task_thread_pool::task_thread_pool>(th_count);
+    TTAPI = xr_new<task_thread_pool::task_thread_pool>("TTAPI", th_count);
+    TTAPI->init();
     Msg("TTAPI number of threads: [%u]", TTAPI->get_num_threads());
 }
 
@@ -162,7 +145,6 @@ void xrCore::_destroy()
         CoUninitialize();
 
 #ifdef XRCORE_STATIC
-        _clearfp();
         timeEndPeriod(1);
 #endif
     }
@@ -200,13 +182,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
 {
     switch (ul_reason_for_call)
     {
-    case DLL_PROCESS_ATTACH: _clearfp();
-#ifdef _M_IX86
-        _controlfp(_PC_53, MCW_PC);
-#endif
-        _controlfp(_RC_CHOP, MCW_RC);
-        _controlfp(_RC_NEAR, MCW_RC);
-        _controlfp(_MCW_EM, MCW_EM);
+    case DLL_PROCESS_ATTACH:
         /*
             По сути это не рекомендуемый Microsoft, но повсеместно используемый способ повышения точности
             соблюдения и измерения временных интревалов функциями Sleep, QueryPerformanceCounter,
@@ -225,7 +201,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
         timeBeginPeriod(1);
         break;
     case DLL_PROCESS_DETACH:
-        _clearfp();
         timeEndPeriod(1);
         break;
     }

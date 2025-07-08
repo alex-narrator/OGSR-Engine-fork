@@ -24,7 +24,7 @@ extern class_<CScriptGameObject> script_register_game_object_trader(class_<CScri
 
 extern void script_register_game_object4(lua_State* L);
 
-#pragma optimize("s", on)
+
 void CScriptGameObject::script_register(lua_State* L)
 {
     class_<CScriptGameObject> instance("game_object");
@@ -104,8 +104,8 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("on_actor_land", int(GameObject::eOnActorLand)),
                     value("on_actor_jump", int(GameObject::eOnActorJump))],
 
-           def("buy_condition", (void (*)(CScriptIniFile*, LPCSTR))(&::buy_condition)), def("buy_condition", (void (*)(float, float))(&::buy_condition)),
-           def("sell_condition", (void (*)(CScriptIniFile*, LPCSTR))(&::sell_condition)), def("sell_condition", (void (*)(float, float))(&::sell_condition)),
+           def("buy_condition", (void (*)(CInifile*, LPCSTR))(&::buy_condition)), def("buy_condition", (void (*)(float, float))(&::buy_condition)),
+           def("sell_condition", (void (*)(CInifile*, LPCSTR))(&::sell_condition)), def("sell_condition", (void (*)(float, float))(&::sell_condition)),
            def("show_condition", &::show_condition)];
 
     script_register_game_object4(L);

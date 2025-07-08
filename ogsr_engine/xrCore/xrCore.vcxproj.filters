@@ -58,6 +58,9 @@
     <Filter Include="Utils\imdexlib">
       <UniqueIdentifier>{58baf96e-ab86-4e39-8fab-60b26515b38c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Profiler">
+      <UniqueIdentifier>{03acac38-71f4-48a3-833f-d74066591de7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -151,10 +154,16 @@
       <Filter>XML_Parser</Filter>
     </ClCompile>
     <ClCompile Include="..\Layers\xrAPI\xrAPI.cpp" />
-    <ClCompile Include="Event.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
     <ClCompile Include="trivial_encryptor.cpp">
+      <Filter>FS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rd_party\Src\tracy\public\TracyClient.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="arc_db.cpp">
+      <Filter>FS</Filter>
+    </ClCompile>
+    <ClCompile Include="arc_sqfs.cpp">
       <Filter>FS</Filter>
     </ClCompile>
   </ItemGroup>
@@ -240,7 +249,7 @@
     <ClInclude Include="cpuid.h">
       <Filter>Math\CPU</Filter>
     </ClInclude>
-    <ClInclude Include="FixedMap.h">
+    <ClInclude Include="xr_fixed_map.h">
       <Filter>Math\STLext</Filter>
     </ClInclude>
     <ClInclude Include="FixedVector.h">
@@ -331,9 +340,6 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\xrAPI\xrAPI.h" />
-    <ClInclude Include="Event.hpp">
-      <Filter>Threading</Filter>
-    </ClInclude>
     <ClInclude Include="xrSyncronize.h">
       <Filter>Threading</Filter>
     </ClInclude>

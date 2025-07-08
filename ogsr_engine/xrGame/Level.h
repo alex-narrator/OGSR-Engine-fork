@@ -7,11 +7,11 @@
 #include "..\xr_3da\igame_level.h"
 #include "../xr_3da/NET_Server_Trash/net_client.h"
 #include "script_export_space.h"
-#include "..\xr_3da\StatGraph.h"
 #include "xrMessages.h"
 #include "alife_space.h"
 #include "xrDebug.h"
 #include "xrServer.h"
+#include "xr_level_controller.h"
 
 class CHUDManager;
 class CParticlesObject;
@@ -85,10 +85,8 @@ protected:
     EVENT eEnvironment;
     EVENT eEntitySpawn;
     //---------------------------------------------
-    CStatGraph* pStatGraphS;
     u32 m_dwSPC; // SendedPacketsCount
     u32 m_dwSPS; // SendedPacketsSize
-    CStatGraph* pStatGraphR;
     u32 m_dwRPC; // ReceivedPacketsCount
     u32 m_dwRPS; // ReceivedPacketsSize
     //---------------------------------------------
@@ -148,12 +146,16 @@ private:
     SoundRegistryMap sound_registry;
     xr_deque<std::string> sound_registry_defer;
 
+    xr_set<EGameActions> m_blocked_actions; // Вектор с заблокированными действиями. Real Wolf. 14.10.2014.
+
 public:
     bool PrefetchSound(LPCSTR name);
     bool PrefetchManySounds(LPCSTR prefix);
     bool PrefetchManySoundsLater(LPCSTR prefix);
     void PrefetchDeferredSounds();
     void CancelPrefetchManySounds(LPCSTR prefix);
+
+    void script_gc() const override;
 
 protected:
     BOOL net_start_result_total;
@@ -219,6 +221,11 @@ public:
     virtual void IR_OnMouseWheel(int direction);
     virtual void IR_OnActivate(void);
 
+   // Real Wolf. Start. 14.10.2014
+    void block_action(EGameActions cmd);
+    void unblock_action(EGameActions cmd);
+    // Real Wolf. End. 14.10.2014
+
     int get_RPID(LPCSTR name);
 
     // Game
@@ -259,7 +266,6 @@ public:
     float GetGameTimeFactor();
     void SetGameTimeFactor(const float fTimeFactor);
     void SetGameTimeFactor(ALife::_TIME_ID GameTime, const float fTimeFactor);
-    virtual void SetEnvironmentGameTimeFactor(u64 const& GameTime, float const& fTimeFactor);
 
     void GetGameTimeForShaders(u32& hours, u32& minutes, u32& seconds, u32& milliseconds) override;
 
@@ -308,7 +314,7 @@ private:
     bool m_is_removing_objects;
 
 public:
-    bool is_removing_objects() { return m_is_removing_objects; }
+    bool is_removing_objects() const override { return m_is_removing_objects; }
     void remove_objects();
     virtual void OnSessionTerminate(LPCSTR reason);
     void OnDestroyObject(u16 id) override;
@@ -327,7 +333,11 @@ add_to_type_list(CLevel)
 IC game_cl_GameState& Game() { return *Level().game; }
 u32 GameID();
 
-IC CHUDManager& HUD() { return *((CHUDManager*)Level().pHUD); }
+extern ENGINE_API CCustomHUD* g_hud;
+
+IC CHUDManager& HUD() { return *((CHUDManager*)g_hud); }
+
+IC bool Has_HUD() { return g_hud != nullptr; }
 
 #ifdef DEBUG
 IC CLevelDebug& DBG() { return *((CLevelDebug*)Level().m_level_debug); }

@@ -407,9 +407,8 @@ bool CScriptEntity::bfAssignParticles(CScriptEntityAction* tpEntityAction)
             if (!l_tParticleAction.m_bStartedToPlay)
             {
                 const Fmatrix& l_tMatrix = GetUpdatedMatrix(*l_tParticleAction.m_caBoneName, l_tParticleAction.m_tParticlePosition, l_tParticleAction.m_tParticleAngles);
-                Fvector zero_vel = {0.f, 0.f, 0.f};
-                l_tParticleAction.m_tpParticleSystem->UpdateParent(l_tMatrix, zero_vel);
-                l_tParticleAction.m_tpParticleSystem->play_at_pos(l_tMatrix.c);
+                l_tParticleAction.m_tpParticleSystem->UpdateParent(l_tMatrix, {});
+                l_tParticleAction.m_tpParticleSystem->PlayAtPos(l_tMatrix.c);
                 l_tParticleAction.m_bStartedToPlay = true;
             }
             else
@@ -477,7 +476,7 @@ bool CScriptEntity::bfAssignMovement(CScriptEntityAction* tpEntityAction)
         m_monster->movement().detail().set_dest_position(l_tMovementAction.m_tDestinationPosition);
 
         u32 vertex_id;
-        vertex_id = ai().level_graph().vertex(object().ai_location().level_vertex_id(), l_tMovementAction.m_tDestinationPosition);
+        vertex_id = ai().level_graph().vertex_id(object().ai_location().level_vertex_id(), l_tMovementAction.m_tDestinationPosition);
         if (!ai().level_graph().valid_vertex_id(vertex_id))
             vertex_id = ai().level_graph().check_position_in_direction(object().ai_location().level_vertex_id(), object().Position(), l_tMovementAction.m_tDestinationPosition);
 

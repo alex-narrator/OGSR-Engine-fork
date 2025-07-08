@@ -46,6 +46,7 @@
 #include "map_hint.h"
 #include "UIColorAnimatorWrapper.h"
 #include "../game_news.h"
+#include "../xr_3da/xr_input.h"
 
 using namespace InventoryUtilities;
 
@@ -437,7 +438,7 @@ void CUIMainIngameWnd::Update()
 
 bool CUIMainIngameWnd::OnKeyboardPress(int dik)
 {
-    const bool shift = Level().IR_GetKeyState(DIK_LSHIFT) || Level().IR_GetKeyState(DIK_RSHIFT);
+    const bool shift = pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_RSHIFT);
     const auto bind = get_binded_action(dik);
 
     if (bind == kHIDEHUD)
@@ -709,26 +710,25 @@ void CUIMainIngameWnd::UpdatePickUpItem()
     UIPickUpItemIcon.SetColor(color_rgba(255, 255, 255, 192));
     if (auto wpn = m_pPickUpItem->cast_weapon())
     {
-        auto cell_item = xr_new<CUIWeaponCellItem>(wpn);
+        CUIWeaponCellItem cell_item{wpn};
 
         if (wpn->SilencerAttachable() && wpn->IsSilencerAttached())
         {
-            auto sil = init_addon(cell_item, *wpn->GetSilencerName(), scale, UI()->get_current_kx(), eAddonType::eSilencer);
+            auto sil = init_addon(&cell_item, *wpn->GetSilencerName(), scale, UI()->get_current_kx(), eAddonType::eSilencer);
             UIPickUpItemIcon.AttachChild(sil);
         }
 
         if (wpn->ScopeAttachable() && wpn->IsScopeAttached())
         {
-            auto scope = init_addon(cell_item, *wpn->GetScopeName(), scale, UI()->get_current_kx(), eAddonType::eScope);
+            auto scope = init_addon(&cell_item, *wpn->GetScopeName(), scale, UI()->get_current_kx(), eAddonType::eScope);
             UIPickUpItemIcon.AttachChild(scope);
         }
 
         if (wpn->GrenadeLauncherAttachable() && wpn->IsGrenadeLauncherAttached())
         {
-            auto launcher = init_addon(cell_item, *wpn->GetGrenadeLauncherName(), scale, UI()->get_current_kx(), eAddonType::eLauncher);
+            auto launcher = init_addon(&cell_item, *wpn->GetGrenadeLauncherName(), scale, UI()->get_current_kx(), eAddonType::eLauncher);
             UIPickUpItemIcon.AttachChild(launcher);
         }
-        delete_data(cell_item);
     }
 
     // Real Wolf: Колбек для скриптового добавления своих иконок. 10.08.2014.
@@ -827,7 +827,7 @@ void GetStaticRaw(CUIMainIngameWnd* wnd, lua_State* L)
 
 using namespace luabind;
 
-#pragma optimize("s", on)
+
 void CUIMainIngameWnd::script_register(lua_State* L)
 {
     module(L)[

@@ -28,8 +28,6 @@ CShootingObject::CShootingObject(void)
     fvHitPower.set(0.0f, 0.0f, 0.0f, 0.0f);
     m_fStartBulletSpeed = 1000.f;
 
-    m_vCurrentShootDir.set(0, 0, 0);
-    m_vCurrentShootPos.set(0, 0, 0);
     m_iCurrentParentID = 0xFFFF;
 
     m_fPredBulletTime = 0.0f;
@@ -89,10 +87,6 @@ void CShootingObject::Light_Create()
 {
     // lights
     light_render = ::Render->light_create();
-    if (::Render->get_generation() == IRender_interface::GENERATION_R2)
-        light_render->set_shadow(true);
-    else
-        light_render->set_shadow(false);
     light_render->set_moveable(true);
 }
 
@@ -167,29 +161,38 @@ void CShootingObject::Light_Start()
     if (!light_render)
         Light_Create();
 
-    if (Device.dwFrame != light_frame)
+    if (Device.dwFrame != light_start_frame)
     {
-        light_frame = Device.dwFrame;
+        light_start_frame = Device.dwFrame;
         light_time = light_lifetime;
 
-        light_build_color.set(Random.randFs(light_var_color, light_base_color.r), Random.randFs(light_var_color, light_base_color.g),
-                              Random.randFs(light_var_color, light_base_color.b), 1);
+        light_build_color.set(
+            Random.randFs(light_var_color, light_base_color.r), 
+            Random.randFs(light_var_color, light_base_color.g),
+            Random.randFs(light_var_color, light_base_color.b), 
+            1);
         light_build_range = Random.randFs(light_var_range, light_base_range);
     }
 }
 
-void CShootingObject::Light_Render(const Fvector& P)
+void CShootingObject::Light_Update(const Fvector& P)
 {
-    float light_scale = light_time / light_lifetime;
-    R_ASSERT(light_render);
-
-    light_render->set_position(P);
-    light_render->set_color(light_build_color.r * light_scale, light_build_color.g * light_scale, light_build_color.b * light_scale);
-    light_render->set_range(light_build_range * light_scale);
-
-    if (!light_render->get_active())
+    if (Device.dwFrame != light_update_frame)
     {
-        light_render->set_active(true);
+        light_update_frame = Device.dwFrame;
+        const float light_scale = light_time / light_lifetime;
+
+        //R_ASSERT(light_render);
+        light_render->set_position(P);
+        light_render->set_color(light_build_color.r * light_scale, light_build_color.g * light_scale, light_build_color.b * light_scale);
+        light_render->set_range(light_build_range * light_scale);
+
+        light_render->set_shadow(!Core.Features.test(xrCore::Feature::npc_simplified_shooting) || ParentIsActor());
+
+        if (!light_render->get_active())
+        {
+            light_render->set_active(true);
+        }
     }
 }
 
@@ -266,10 +269,6 @@ void CShootingObject::LoadFlameParticles(LPCSTR section, LPCSTR prefix)
     strconcat(sizeof(full_name), full_name, prefix, "smoke_particles");
     if (pSettings->line_exist(section, full_name))
         m_sSmokeParticles = pSettings->r_string(section, full_name);
-
-    strconcat(sizeof(full_name), full_name, prefix, "shot_particles");
-    if (pSettings->line_exist(section, full_name))
-        m_sShotParticles = pSettings->r_string(section, full_name);
 
     //текущие партиклы
     m_sFlameParticlesCurrent = m_sFlameParticles;
@@ -389,7 +388,7 @@ void CShootingObject::RenderLight()
 {
     if (light_render && light_time > 0)
     {
-        Light_Render(get_CurrentFirePoint());
+        Light_Update(get_CurrentFirePoint());
     }
 }
 
@@ -426,8 +425,6 @@ void CShootingObject::FireBullet(const Fvector& pos, const Fvector& shot_dir, fl
             dir.setHP(dir_yaw, dir_pitch);
         }
 
-    m_vCurrentShootDir = dir;
-    m_vCurrentShootPos = pos;
     m_iCurrentParentID = parent_id;
 
     bool aim_bullet;
@@ -477,9 +474,3 @@ void CShootingObject::FireBullet(const Fvector& pos, const Fvector& shot_dir, fl
 
 void CShootingObject::FireStart() { bWorking = true; }
 void CShootingObject::FireEnd() { bWorking = false; }
-
-void CShootingObject::StartShotParticles()
-{
-    CParticlesObject* pSmokeParticles = NULL;
-    StartParticles(pSmokeParticles, *m_sShotParticles, m_vCurrentShootPos, m_vCurrentShootDir, true);
-}

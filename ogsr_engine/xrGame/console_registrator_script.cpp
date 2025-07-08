@@ -53,7 +53,7 @@ void enable_cmd(CConsole* c, LPCSTR cmd)
         icmd->SetEnabled(true);
 }
 
-#pragma optimize("s", on)
+
 void console_registrator::script_register(lua_State* L)
 {
     module(L)[def("get_console", &console),
@@ -65,14 +65,15 @@ void console_registrator::script_register(lua_State* L)
                   .def("execute_script", &CConsole::ExecuteScript)
                   .def("show", &CConsole::Show)
                   .def("hide", &CConsole::Hide)
-                  //		.def("save",						&CConsole::Save)
+
                   .def("get_string", &CConsole::GetString)
                   .def("get_integer", &get_console_integer)
                   .def("get_bool", &get_console_bool)
                   .def("get_float", &get_console_float)
                   .def("get_token", &CConsole::GetToken)
+                  .def("get_vector", &CConsole::GetFVector3)
+                  .def("get_vector4", &CConsole::GetFVector4)
                   .def_readonly("visible", &CConsole::bVisible)
-              //		.def("",				&CConsole::)
 
     ];
 }

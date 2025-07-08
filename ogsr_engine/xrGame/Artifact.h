@@ -50,9 +50,6 @@ public:
 
     virtual bool CanTake() const;
 
-    // virtual void					renderable_Render				();
-    virtual BOOL renderable_ShadowGenerate() { return FALSE; }
-    virtual BOOL renderable_ShadowReceive() { return TRUE; }
     virtual void create_physic_shell();
 
     // for smart_cast
@@ -128,20 +125,18 @@ public:
     // optimization FAST/SLOW mode
 public:
     u32 o_render_frame;
-    BOOL o_fastmode;
+    bool o_fastmode;
     IC void o_switch_2_fast()
     {
         if (o_fastmode)
             return;
-        o_fastmode = TRUE;
-        // processing_activate		();
+        o_fastmode = true;
     }
     IC void o_switch_2_slow()
     {
         if (!o_fastmode)
             return;
-        o_fastmode = FALSE;
-        // processing_deactivate		();
+        o_fastmode = false;
     }
 
     void FollowByPath(LPCSTR path_name, int start_idx, Fvector magic_force);

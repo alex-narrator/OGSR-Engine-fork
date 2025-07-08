@@ -147,12 +147,13 @@ void CUICarBodyWnd::Init()
         XML_NODE* stored_root = uiXml.GetLocalRoot();
         uiXml.SetLocalRoot(uiXml.NavigateToNode("action_sounds", 0));
 
-        ::Sound->create(sounds[eInvSndOpen], uiXml.Read("snd_open", 0, NULL), st_Effect, sg_SourceType);
-        ::Sound->create(sounds[eInvSndClose], uiXml.Read("snd_close", 0, NULL), st_Effect, sg_SourceType);
-        ::Sound->create(sounds[eInvProperties], uiXml.Read("snd_properties", 0, NULL), st_Effect, sg_SourceType);
-        ::Sound->create(sounds[eInvDropItem], uiXml.Read("snd_drop_item", 0, NULL), st_Effect, sg_SourceType);
-        ::Sound->create(sounds[eInvDetachAddon], uiXml.Read("snd_detach_addon", 0, NULL), st_Effect, sg_SourceType);
-        ::Sound->create(sounds[eInvItemUse], uiXml.Read("snd_item_use", 0, NULL), st_Effect, sg_SourceType);
+        create_ui_snd(sounds[eInvSndOpen], uiXml.Read("snd_open", 0, nullptr));
+        create_ui_snd(sounds[eInvSndClose], uiXml.Read("snd_close", 0, nullptr));
+        create_ui_snd(sounds[eInvProperties], uiXml.Read("snd_properties", 0, nullptr));
+        create_ui_snd(sounds[eInvDropItem], uiXml.Read("snd_drop_item", 0, nullptr));
+        create_ui_snd(sounds[eInvDetachAddon], uiXml.Read("snd_detach_addon", 0, nullptr));
+        create_ui_snd(sounds[eInvItemUse], uiXml.Read("snd_item_use", 0, nullptr));
+        create_ui_snd(sounds[eInvItemMove], uiXml.Read("snd_item_move", 0, nullptr));
 
         uiXml.SetLocalRoot(stored_root);
     }
@@ -273,7 +274,7 @@ void CUICarBodyWnd::UpdateLists()
         if (inv_item->m_highlight_equipped)
         {
             itm->m_select_equipped = true;
-            itm->SetColor(reinterpret_cast<CInventoryItem*>(itm->m_pData)->ClrEquipped);
+            itm->SetColor(static_cast<CInventoryItem*>(itm->m_pData)->ClrEquipped);
         }
         m_pUIOurBagList->SetItem(itm);
     }
@@ -567,6 +568,7 @@ void CUICarBodyWnd::MoveItems(CUICellItem* itm)
     owner_list->RemoveItem(itm, true);
 
     SetCurrentItem(NULL);
+    PlaySnd(eInvItemMove);
 }
 
 void SendEvent_Item_Drop(u16 from_id, PIItem pItem)
@@ -825,7 +827,7 @@ bool CUICarBodyWnd::OnItemDrop(CUICellItem* itm)
     if (old_owner == new_owner || !old_owner || !new_owner)
         return false;
 
-    if (Level().IR_GetKeyState(DIK_LSHIFT) || Level().IR_GetKeyState(DIK_RSHIFT))
+    if (pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_RSHIFT))
     {
         MoveItems(itm);
     }
@@ -839,7 +841,7 @@ bool CUICarBodyWnd::OnItemDrop(CUICellItem* itm)
 
 bool CUICarBodyWnd::OnItemDbClick(CUICellItem* itm)
 {
-    if (Level().IR_GetKeyState(DIK_LSHIFT) || Level().IR_GetKeyState(DIK_RSHIFT))
+    if (pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_RSHIFT))
     {
         MoveItems(itm);
     }
@@ -879,6 +881,7 @@ void CUICarBodyWnd::MoveItem(CUICellItem* itm)
         new_owner->SetItem(ci);
     }
     SetCurrentItem(NULL);
+    PlaySnd(eInvItemMove);
 }
 
 bool CUICarBodyWnd::OnItemSelected(CUICellItem* itm)
@@ -942,6 +945,6 @@ void CUICarBodyWnd::BindDragDropListEnents(CUIDragDropListEx* lst)
 
 void CUICarBodyWnd::PlaySnd(eInventorySndAction a)
 {
-    if (sounds[a]._handle())
+    if (sounds[a]._handle() && !sounds[a]._feedback())
         sounds[a].play(NULL, sm_2D);
 }

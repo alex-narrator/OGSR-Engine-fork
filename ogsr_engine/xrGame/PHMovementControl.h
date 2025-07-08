@@ -1,9 +1,8 @@
 #pragma once
-#ifndef CPHMOVEMENT_CONTROL_H
-#define CPHMOVEMENT_CONTROL_H
 
 #include "PHCharacter.h"
 #include "MathUtils.h"
+
 namespace ALife
 {
 enum EHitType;
@@ -135,7 +134,6 @@ private:
     int m_start_index;
 
     float m_path_distance;
-    u16 m_material;
 
     float fLastMotionMag;
 
@@ -376,4 +374,3 @@ public:
 private:
     void UpdateCollisionDamage();
 };
-#endif

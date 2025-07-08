@@ -37,10 +37,12 @@ void CLevel::remove_objects()
 
     {
         VERIFY(Server);
-        Server->SLS_Clear();
+        Server->SLS_Clear(); // generate GE_DESTROY for all game objects
     }
 
     snd_Events.clear();
+
+    // process destroy queue 
     for (int i = 0; i < 6; ++i)
     {
         // ugly hack for checks that update is twice on frame
@@ -114,6 +116,9 @@ void CLevel::remove_objects()
 
     m_debug_render_queue.clear();
 
+    // clean up scheduler queues
+    Engine.Sheduler.Destroy();
+
     m_is_removing_objects = false;
 }
 
@@ -142,6 +147,8 @@ void CLevel::net_Stop()
     ai().script_engine().collect_all_garbage();
 
     Remove_all_statics();
+
+    Memory.mem_compact();
 
 #ifdef DEBUG
     show_animation_stats();
@@ -202,17 +209,12 @@ void CLevel::net_Update()
 {
     if (game_configured)
     {
-        // If we have enought bandwidth - replicate client data on to server
-        Device.Statistic->netClient2.Begin();
         ClientSend();
-        Device.Statistic->netClient2.End();
     }
-    // If server - perform server-update
+
     if (Server)
     {
-        Device.Statistic->netServer.Begin();
         Server->Update();
-        Device.Statistic->netServer.End();
     }
 }
 

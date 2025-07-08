@@ -92,7 +92,7 @@ bool CPhraseDialog::SayPhrase(DIALOG_SHARED_PTR& phrase_dialog, const shared_str
     else
     {
         //обновить список фраз, которые сейчас сможет говорить собеседник
-        for (xr_vector<CPhraseGraph::CEdge>::const_iterator it = phrase_vertex->edges().begin(); it != phrase_vertex->edges().end(); it++)
+        for (xr_vector<CPhraseGraph::CEdge>::const_iterator it = phrase_vertex->edges().begin(); it != phrase_vertex->edges().end(); ++it)
         {
             const CPhraseGraph::CEdge& edge = *it;
             CPhraseGraph::CVertex* next_phrase_vertex = phrase_dialog->data()->m_PhraseGraph.vertex(edge.vertex_id());
@@ -271,8 +271,7 @@ void CPhraseDialog::AddPhrase(CUIXml* pXml, XML_NODE* phrase_node, const shared_
     {
         LPCSTR next_phrase_id_str = pXml->Read(phrase_node, "next", i, "");
         XML_NODE* next_phrase_node = pXml->NavigateToNodeWithAttribute("phrase", "id", next_phrase_id_str);
-        R_ASSERT2(next_phrase_node, next_phrase_id_str);
-        //.		int next_phrase_id				= atoi(next_phrase_id_str);
+        ASSERT_FMT(next_phrase_node, "!!Can`t find next phrase with id: [%s]! Phrase text: [%s]. Phrase dialog [%s]", next_phrase_id_str, sText, m_DialogId.c_str());
 
         AddPhrase(pXml, next_phrase_node, next_phrase_id_str, phrase_id);
     }

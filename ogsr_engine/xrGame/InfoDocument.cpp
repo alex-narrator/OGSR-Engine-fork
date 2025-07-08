@@ -89,8 +89,8 @@ void CInfoDocument::OnH_A_Chield()
 
 void CInfoDocument::OnH_B_Independent(bool just_before_destroy) { inherited::OnH_B_Independent(just_before_destroy); }
 
-void CInfoDocument::renderable_Render() { inherited::renderable_Render(); }
+void CInfoDocument::renderable_Render(u32 context_id, IRenderable* root) { inherited::renderable_Render(context_id, root); }
 
 using namespace luabind;
-#pragma optimize("s", on)
+
 void CInfoDocument::script_register(lua_State* L) { module(L)[class_<CInfoDocument, CGameObject>("CInfoDocument").def(constructor<>())]; }

@@ -22,6 +22,9 @@
 #include "ui/UICarBodyWnd.h"
 #include "ui/UIMessageBox.h"
 
+#include "inventory.h"
+#include "HudItem.h"
+
 CUIGameSP::CUIGameSP()
 {
     m_game = NULL;
@@ -93,6 +96,10 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
     hud_adjust_mode_keyb(dik);
     if (attach_adjust_mode_keyb(dik))
         return true;
+
+    auto active_hud = smart_cast<CHudItem*>(pActor->inventory().ActiveItem());
+    if (active_hud && active_hud->GetState() != CHudItem::eIdle && Core.Features.test(xrCore::Feature::busy_actor_restrictions))
+        return false;
 
     auto bind = get_binded_action(dik);
     switch (bind)
@@ -278,6 +285,16 @@ void CChangeLevelWnd::OnOk()
 void CChangeLevelWnd::OnCancel()
 {
     Game().StartStopMenu(this, true);
+
+    auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+    if (auto pda = Actor()->GetPDA(); pda && pda->Is3DPDA() && psActorFlags.test(AF_3D_PDA) && pGameSP->PdaMenu->IsShown())
+    {
+        pGameSP->PdaMenu->SetHolder(HUD().GetUI());
+        GetUICursor()->Show();
+        if (pda->m_bZoomed)
+            HUD().GetUI()->SetMainInputReceiver(pGameSP->PdaMenu, false);
+    }
+
     if (m_b_position_cancel)
     {
         Actor()->MoveActor(m_position_cancel, m_angles_cancel);

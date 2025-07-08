@@ -28,12 +28,12 @@ class CUIAmmoCellItem : public CUIInventoryCellItem
 {
     typedef CUIInventoryCellItem inherited;
 
-protected:
-    virtual void UpdateItemText();
-
 public:
     CUIAmmoCellItem(CWeaponAmmo* itm);
+    virtual ~CUIAmmoCellItem() = default;
+
     virtual void Update();
+    virtual void UpdateItemText() override;
     virtual bool EqualTo(CUICellItem* itm);
     CWeaponAmmo* object() { return static_cast<CWeaponAmmo*>(m_pData); }
 };
@@ -73,14 +73,4 @@ public:
     virtual bool EqualTo(CUICellItem* itm);
     CUIStatic* get_addon_static(u32 idx) { return m_addons[idx]; }
     Fvector2 get_addon_offset(u32 idx) { return m_addon_offset[idx]; }
-};
-
-class CBuyItemCustomDrawCell : public ICustomDrawCell
-{
-    CGameFont* m_pFont;
-    string16 m_string;
-
-public:
-    CBuyItemCustomDrawCell(LPCSTR str, CGameFont* pFont);
-    virtual void OnDraw(CUICellItem* cell);
 };

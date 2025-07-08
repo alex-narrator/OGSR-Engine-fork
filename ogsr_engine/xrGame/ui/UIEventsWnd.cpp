@@ -187,8 +187,17 @@ void CUIEventsWnd::ReloadList(bool bClearOnly)
 void CUIEventsWnd::Show(bool status)
 {
     inherited::Show(status);
+
+    // хз почему, но если сделать Show для m_UIMapWnd, который не приаттачен к родителю - на нём пропадают LevelMap, причину не нашел, будет пока костыль
+
+    if (!GetDescriptionMode())
+        m_UIRightWnd->AttachChild(m_UIMapWnd);
+
     m_UIMapWnd->Show(status);
     m_UITaskInfoWnd->Show(status);
+
+    if (!GetDescriptionMode())
+        m_UIRightWnd->DetachChild(m_UIMapWnd);
 
     ReloadList(status == false);
 }
@@ -201,7 +210,7 @@ bool CUIEventsWnd::Filter(CGameTask* t)
     return (false /*m_currFilter==eOwnTask && task_state==eTaskUserDefined*/) ||
         ((true /*!bprimary_only || (bprimary_only && t->m_is_task_general)*/) &&
          ((m_currFilter == eAccomplishedTask && task_state == eTaskStateCompleted) || (m_currFilter == eFailedTask && task_state == eTaskStateFail) ||
-          (m_currFilter == eActiveTask && task_state == eTaskStateInProgress)));
+          (m_currFilter == eActiveTask && task_state == eTaskStateInProgress) || (m_currFilter == eSkipedTask && task_state == eTaskStateSkiped)));
 }
 
 void CUIEventsWnd::SetDescriptionMode(bool bMap)

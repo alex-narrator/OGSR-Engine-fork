@@ -1210,9 +1210,6 @@
     <Filter Include="AI\AScript\ScriptEngine">
       <UniqueIdentifier>{ec7b39b3-95cf-47f3-aeed-a40ec9c722cc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AScript\ScriptStorage">
-      <UniqueIdentifier>{0ac542c4-3a17-41af-90ff-0d988b494e6d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\ASound">
       <UniqueIdentifier>{6a79ab5a-f675-4b39-8c96-b7dc473c8e21}</UniqueIdentifier>
     </Filter>
@@ -1717,9 +1714,6 @@
     <Filter Include="Core\Common\ObjectFactory\object_item_single">
       <UniqueIdentifier>{e66cceec-c04f-4176-aaee-a7abcdd1c4f9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Common\Profiler">
-      <UniqueIdentifier>{d8936339-3abb-48e2-a7c7-57109a477ec0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Common\QuadTree">
       <UniqueIdentifier>{b192e123-85f6-4666-9769-4123a966983f}</UniqueIdentifier>
     </Filter>
@@ -2109,6 +2103,9 @@
     </Filter>
     <Filter Include="EmbeddedEditor">
       <UniqueIdentifier>{2ae8c39f-5f30-4c34-b654-7b159e43244b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AI\AScript\ScriptClasses\ScriptWriter">
+      <UniqueIdentifier>{aa3b1cb8-4167-4170-b6cf-7f27304a9431}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -4116,9 +4113,6 @@
     <ClInclude Include="..\COMMON_AI\script_engine_export.h">
       <Filter>AI\AScript\ScriptEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\COMMON_AI\script_storage.h">
-      <Filter>AI\AScript\ScriptStorage</Filter>
-    </ClInclude>
     <ClInclude Include="..\COMMON_AI\ai_sounds.h">
       <Filter>AI\ASound</Filter>
     </ClInclude>
@@ -4881,9 +4875,6 @@
     <ClInclude Include="..\COMMON_AI\object_item_single_inline.h">
       <Filter>Core\Common\ObjectFactory\object_item_single</Filter>
     </ClInclude>
-    <ClInclude Include="profiler_inline.h">
-      <Filter>Core\Common\Profiler</Filter>
-    </ClInclude>
     <ClInclude Include="..\COMMON_AI\shared_data.h">
       <Filter>Core\Common\Shared</Filter>
     </ClInclude>
@@ -5643,9 +5634,6 @@
     <ClInclude Include="..\COMMON_AI\ALGORITHMS\quadtree_inline.h">
       <Filter>Core\Common\QuadTree</Filter>
     </ClInclude>
-    <ClInclude Include="..\COMMON_AI\profiler.h">
-      <Filter>Core\Common\Profiler</Filter>
-    </ClInclude>
     <ClInclude Include="..\COMMON_AI\LevelGameDef.h">
       <Filter>Core\Client\Level</Filter>
     </ClInclude>
@@ -6085,6 +6073,15 @@
     </ClInclude>
     <ClInclude Include="LevelDebugScript.h">
       <Filter>Core\Client\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="..\COMMON_AI\script_writer.h">
+      <Filter>AI\AScript\ScriptClasses\ScriptWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="ActorCameraCollision.h">
+      <Filter>Core\Client\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryBits.h">
+      <Filter>Core\Client\Objects\physics\Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -7168,9 +7165,6 @@
     <ClCompile Include="script_hit_script.cpp">
       <Filter>AI\AScript\ScriptClasses\ScriptHit</Filter>
     </ClCompile>
-    <ClCompile Include="..\COMMON_AI\script_ini_file.cpp">
-      <Filter>AI\AScript\ScriptClasses\ScriptIniFile</Filter>
-    </ClCompile>
     <ClCompile Include="..\COMMON_AI\script_ini_file_script.cpp">
       <Filter>AI\AScript\ScriptClasses\ScriptIniFile</Filter>
     </ClCompile>
@@ -7239,9 +7233,6 @@
     </ClCompile>
     <ClCompile Include="..\COMMON_AI\script_engine_script.cpp">
       <Filter>AI\AScript\ScriptEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\COMMON_AI\script_storage.cpp">
-      <Filter>AI\AScript\ScriptStorage</Filter>
     </ClCompile>
     <ClCompile Include="..\COMMON_AI\ai_sounds.cpp">
       <Filter>AI\ASound</Filter>
@@ -8007,9 +7998,6 @@
     </ClCompile>
     <ClCompile Include="..\COMMON_AI\object_item_script.cpp">
       <Filter>Core\Common\ObjectFactory\object_item_script</Filter>
-    </ClCompile>
-    <ClCompile Include="profiler.cpp">
-      <Filter>Core\Common\Profiler</Filter>
     </ClCompile>
     <ClCompile Include="string_table.cpp">
       <Filter>Core\Common\StringTable</Filter>
@@ -8885,8 +8873,20 @@
     <ClCompile Include="embedded_editor\embedded_editor_sound_env.cpp">
       <Filter>EmbeddedEditor</Filter>
     </ClCompile>
+    <ClCompile Include="level_graph_script.cpp">
+      <Filter>AI\ANavigation\LevelGraph</Filter>
+    </ClCompile>
     <ClCompile Include="LevelDebugScript.cpp">
       <Filter>Core\Client\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="..\COMMON_AI\script_writer_script.cpp">
+      <Filter>AI\AScript\ScriptClasses\ScriptWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorCameraCollision.cpp">
+      <Filter>Core\Client\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryBits.cpp">
+      <Filter>Core\Client\Objects\physics\Base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -177,7 +177,7 @@ void CProjector::UpdateCL()
     angle_lerp(_current.pitch, _target.pitch, bone_y.velocity, Device.fTimeDelta);
 }
 
-void CProjector::renderable_Render() { inherited::renderable_Render(); }
+void CProjector::renderable_Render(u32 context_id, IRenderable* root) { inherited::renderable_Render(context_id, root); }
 
 BOOL CProjector::UsedAI_Locations() { return (FALSE); }
 
@@ -241,7 +241,7 @@ void CProjector::Hit(SHit* pHDS)
     callback(GameObject::eHit)(lua_game_object(), HDS.power, HDS.dir, smart_cast<const CGameObject*>(HDS.who)->lua_game_object(), HDS.bone());
 }
 
-#pragma optimize("s", on)
+
 void CProjector::script_register(lua_State* L)
 {
     luabind::module(L)[luabind::class_<CProjector, CGameObject>("projector")

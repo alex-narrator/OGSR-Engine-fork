@@ -11,7 +11,7 @@
 
 using namespace luabind;
 
-#pragma optimize("s", on)
+
 void CScriptParticles::script_register(lua_State* L)
 {
     module(L)[class_<CScriptParticles>("particles_object")
@@ -36,6 +36,7 @@ void CScriptParticles::script_register(lua_State* L)
                   .def("stop_path", &CScriptParticles::StopPath)
                   .def("pause_path", &CScriptParticles::PausePath)
 
+                  // same values, left for compat with anomaly exports ?
                   .def("life_time", &CScriptParticles::LifeTime)
                   .def("length", &CScriptParticles::Length)];
 }

@@ -8,13 +8,6 @@ class CUIDragDropListEx;
 class CUICellItem;
 class CUIProgressBar;
 
-class ICustomDrawCell
-{
-public:
-    virtual ~ICustomDrawCell(){};
-    virtual void OnDraw(CUICellItem* cell) = 0;
-};
-
 class CUICellItem : public CUIStatic
 {
 private:
@@ -26,9 +19,7 @@ protected:
     CUIDragDropListEx* m_pParentList;
     Ivector2 m_grid_size;
     Fvector2 m_cell_size;
-    ICustomDrawCell* m_custom_draw;
     int m_accelerator;
-    virtual void UpdateItemText();
 
     CUIProgressBar* m_pConditionState;
     bool m_condition_auto_width;
@@ -43,13 +34,14 @@ public:
     virtual bool OnMouse(float x, float y, EUIMessages mouse_action);
     virtual void Draw();
     virtual void Update();
+    virtual void UpdateItemText();
 
     virtual void OnAfterChild(CUIDragDropListEx* parent_list){};
 
     u32 ChildsCount();
     void PushChild(CUICellItem*);
     CUICellItem* PopChild();
-    CUICellItem* Child(u32 idx) { return m_childs[idx]; };
+    CUICellItem* Child(u32 idx) { return m_childs.at(idx); };
     bool HasChild(CUICellItem* item);
     virtual bool EqualTo(CUICellItem* itm);
     IC const Ivector2& GetGridSize() { return m_grid_size; }; // size in grid
@@ -61,11 +53,9 @@ public:
     CUIDragDropListEx* OwnerList() { return m_pParentList; }
     static CUICellItem* m_mouse_selected_item;
     void SetOwnerList(CUIDragDropListEx* p);
-    void SetCustomDraw(ICustomDrawCell* c);
     void* m_pData;
     int m_index;
     bool m_b_already_drawn;
-    bool m_b_destroy_childs;
     void ColorizeItems(std::initializer_list<CUIDragDropListEx*>);
     void UpdateConditionProgressBar();
     bool m_selected;

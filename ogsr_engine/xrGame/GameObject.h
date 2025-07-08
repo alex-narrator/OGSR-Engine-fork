@@ -127,7 +127,7 @@ public:
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
 
-    virtual BOOL net_Relevant() { return getLocal(); } // send messages only if active and local
+    virtual BOOL net_Relevant() { return getLocal(); } // always TRUE
     virtual void spatial_move();
     virtual BOOL Ready() { return getReady(); } // update only if active and fully initialized by/for network
 
@@ -138,7 +138,7 @@ public:
     virtual void ForceTransform(const Fmatrix& m) override {}
     virtual void ForceTransformAndDirection(const Fmatrix& m) override { ForceTransform(m); }
 
-    virtual void renderable_Render();
+    virtual void renderable_Render(u32 context_id, IRenderable* root) override;
     virtual void OnEvent(NET_Packet& P, u16 type);
     virtual void Hit(SHit* pHDS){};
     virtual void SetHitInfo(CObject* who, CObject* weapon, s16 element, Fvector Pos, Fvector Dir){};
@@ -158,8 +158,8 @@ public:
     // Position stack
     virtual SavedPosition ps_Element(u32 ID) const;
 
-    void setup_parent_ai_locations(bool assign_position = true);
-    void validate_ai_locations(bool decrement_reference = true);
+    void setup_parent_ai_locations(bool assign_position);
+    void validate_ai_locations(bool decrement_reference);
 
     // animation_movement_controller
     virtual void create_anim_mov_ctrl(CBlend* b);

@@ -180,6 +180,20 @@ void CUITradeWnd::Init()
     BindDragDropListEvents(&m_uidata->UIOthersBagList);
     BindDragDropListEvents(&m_uidata->UIOurTradeList);
     BindDragDropListEvents(&m_uidata->UIOthersTradeList);
+
+    // Load sounds
+    if (uiXml.NavigateToNode("action_sounds", 0))
+    {
+        XML_NODE* stored_root = uiXml.GetLocalRoot();
+        uiXml.SetLocalRoot(uiXml.NavigateToNode("action_sounds", 0));
+
+        create_ui_snd(sounds[eInvProperties], uiXml.Read("snd_properties", 0, nullptr));
+        create_ui_snd(sounds[eInvItemMove], uiXml.Read("snd_item_move", 0, nullptr));
+        create_ui_snd(sounds[eInvSndTrade], uiXml.Read("snd_trade_completed", 0, nullptr));
+        create_ui_snd(sounds[eInvSndTradeBlock], uiXml.Read("snd_trade_blocked", 0, nullptr));
+
+        uiXml.SetLocalRoot(stored_root);
+    }
 }
 
 void CUITradeWnd::InitTrade(CInventoryOwner* pOur, CInventoryOwner* pOthers)
@@ -534,6 +548,7 @@ void CUITradeWnd::ActivatePropertiesBox()
     cursor_pos = GetUICursor()->GetCursorPosition();
     cursor_pos.sub(vis_rect.lt);
     m_pUIPropertiesBox->Show(vis_rect, cursor_pos);
+    PlaySnd(eInvProperties);
 }
 
 void CUITradeWnd::DisableAll()
@@ -666,7 +681,7 @@ bool CUITradeWnd::OnItemDrop(CUICellItem* itm)
     if (old_owner == new_owner || !old_owner || !new_owner)
         return false;
 
-    if (Level().IR_GetKeyState(DIK_LSHIFT) || Level().IR_GetKeyState(DIK_RSHIFT))
+    if (pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_RSHIFT))
     {
         MoveItems(itm);
     }
@@ -682,7 +697,7 @@ bool CUITradeWnd::OnItemDbClick(CUICellItem* itm)
 {
     SetCurrentItem(itm);
 
-    if (Level().IR_GetKeyState(DIK_LSHIFT) || Level().IR_GetKeyState(DIK_RSHIFT))
+    if (pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_RSHIFT))
     {
         MoveItems(itm);
     }
@@ -741,6 +756,7 @@ void CUITradeWnd::MoveItems(CUICellItem* itm)
     to->SetItem(_itm);
 
     UpdatePrices();
+    PlaySnd(eInvItemMove);
 
     SetCurrentItem(NULL);
 }
@@ -758,6 +774,7 @@ bool CUITradeWnd::MoveItem(CUICellItem* itm)
     else if (old_owner == &m_uidata->UIOthersTradeList)
         ToOthersBag(itm);
 
+    PlaySnd(eInvItemMove);
     return true;
 }
 
@@ -801,6 +818,12 @@ void CUITradeWnd::BindDragDropListEvents(CUIDragDropListEx* lst)
     lst->m_f_item_rbutton_click = fastdelegate::MakeDelegate(this, &CUITradeWnd::OnItemRButtonClick);
 }
 
+void CUITradeWnd::PlaySnd(eInventorySndAction a)
+{
+    if (sounds[a]._handle() && !sounds[a]._feedback())
+        sounds[a].play(nullptr, sm_2D);
+}
+
 void CUITradeWnd::ColorizeItem(CUICellItem* itm, bool canTrade, bool highlighted)
 {
     static const bool highlight_cop_enabled = !Core.Features.test(xrCore::Feature::colorize_untradable); //Это опция для Dsh, не убирать!
@@ -809,13 +832,13 @@ void CUITradeWnd::ColorizeItem(CUICellItem* itm, bool canTrade, bool highlighted
     {
         if (highlight_cop_enabled)
             itm->m_select_untradable = true;
-        itm->SetColor(reinterpret_cast<CInventoryItem*>(itm->m_pData)->ClrUntradable);
+        itm->SetColor(static_cast<CInventoryItem*>(itm->m_pData)->ClrUntradable);
     }
     else
     {
         if (highlight_cop_enabled)
             itm->m_select_untradable = false;
         if (highlighted)
-            itm->SetColor(reinterpret_cast<CInventoryItem*>(itm->m_pData)->ClrEquipped);
+            itm->SetColor(static_cast<CInventoryItem*>(itm->m_pData)->ClrEquipped);
     }
 }

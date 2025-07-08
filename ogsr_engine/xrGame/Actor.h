@@ -10,7 +10,6 @@
 #include "PHMovementControl.h"
 #include "PhysicsShell.h"
 #include "InventoryOwner.h"
-#include "..\xr_3da\StatGraph.h"
 #include "PhraseDialogManager.h"
 
 #include "step_manager.h"
@@ -120,8 +119,9 @@ public:
     virtual void OnEvent(NET_Packet& P, u16 type);
 
     // Render
-    virtual void renderable_Render();
-    virtual BOOL renderable_ShadowGenerate();
+    virtual void renderable_Render(u32 context_id, IRenderable* root) override;
+    virtual BOOL renderable_ShadowReceive() override;
+
     virtual void feel_sound_new(CObject* who, int type, CSound_UserDataPtr user_data, const Fvector& Position, float power);
     virtual Feel::Sound* dcast_FeelSound() { return this; }
     float m_snd_noise;
@@ -327,7 +327,7 @@ public:
     // HUD
     //////////////////////////////////////////////////////////////////////////
 public:
-    virtual void OnHUDDraw(CCustomHUD* hud);
+    virtual void OnHUDDraw(CCustomHUD* hud, u32 context_id, IRenderable* root) override;
     BOOL HUDview() const;
 
     // visiblity
@@ -352,6 +352,7 @@ public:
 protected:
     void cam_Set(EActorCameras style);
     void cam_Update(float dt, float fFOV);
+    void cam_Lookout(const Fmatrix& xform, float camera_height);
     void camUpdateLadder(float dt);
     void cam_SetLadder();
     void cam_UnsetLadder();
@@ -600,8 +601,6 @@ public:
     virtual void ChangeVisual(shared_str NewVisual);
     virtual void OnChangeVisual();
 
-    virtual void RenderText(LPCSTR Text, Fvector dpos, float* pdup, u32 color);
-
     //////////////////////////////////////////////////////////////////////////
     // Controlled Routines
     //////////////////////////////////////////////////////////////////////////
@@ -618,7 +617,6 @@ private:
     /////////////////////////////////////////
     // DEBUG INFO
 protected:
-    CStatGraph* pStatGraph;
 
     shared_str m_DefaultVisualOutfit;
 
@@ -709,7 +707,6 @@ public:
 private:
     ALife::_OBJECT_ID m_holder_id;
 
-    xr_map<EGameActions, bool> m_blocked_actions; // Вектор с заблокированными действиями. Real Wolf. 14.10.2014.
 public:
     virtual bool register_schedule() const { return false; }
     IC u32 get_state() const { return this->mstate_real; }
@@ -719,11 +716,6 @@ public:
     IC u32 get_state_wishful() const { return this->mstate_wishful; }
 
     IC void set_state_wishful(u32 state) { mstate_wishful = state; }
-
-    // Real Wolf. Start. 14.10.2014
-    void block_action(EGameActions cmd);
-    void unblock_action(EGameActions cmd);
-    // Real Wolf. End. 14.10.2014
 
     bool is_actor_normal();
     bool is_actor_crouch();

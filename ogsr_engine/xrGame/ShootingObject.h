@@ -14,8 +14,6 @@ class CCartridge;
 class CParticlesObject;
 class IRender_Sector;
 
-extern const Fvector zero_vel;
-
 #define WEAPON_MATERIAL_NAME "objects\\bullet"
 
 class CShootingObject
@@ -30,8 +28,6 @@ protected:
     void reload(LPCSTR section){};
     void Load(LPCSTR section);
 
-    Fvector m_vCurrentShootDir;
-    Fvector m_vCurrentShootPos;
     // ID персонажа который иницировал действие
     u16 m_iCurrentParentID;
 
@@ -95,7 +91,8 @@ protected:
     float light_var_color;
     float light_var_range;
     float light_lifetime;
-    u32 light_frame;
+    u32 light_start_frame{};
+    u32 light_update_frame{};
     float light_time;
     //включение подсветки во время выстрела
     bool m_bLightShotEnabled;
@@ -105,7 +102,7 @@ protected:
     void Light_Destroy();
 
     void Light_Start();
-    void Light_Render(const Fvector& P);
+    void Light_Update(const Fvector& P);
 
     virtual void LoadLights(LPCSTR section, LPCSTR prefix);
     virtual void RenderLight();
@@ -124,9 +121,9 @@ protected:
 
     ////////////////////////////////////////////////
     //общие функции для работы с партиклами оружия
-    virtual void StartParticles(CParticlesObject*& pParticles, LPCSTR particles_name, const Fvector& pos, const Fvector& vel = zero_vel, bool auto_remove_flag = false);
+    virtual void StartParticles(CParticlesObject*& pParticles, LPCSTR particles_name, const Fvector& pos, const Fvector& vel = {}, bool auto_remove_flag = false);
     virtual void StopParticles(CParticlesObject*& pParticles);
-    virtual void UpdateParticles(CParticlesObject*& pParticles, const Fvector& pos, const Fvector& vel = zero_vel);
+    virtual void UpdateParticles(CParticlesObject*& pParticles, const Fvector& pos, const Fvector& vel = {});
 
     virtual void LoadShellParticles(LPCSTR section, LPCSTR prefix);
     virtual void LoadFlameParticles(LPCSTR section, LPCSTR prefix);
@@ -140,9 +137,6 @@ protected:
 
     //партиклы дыма
     virtual void StartSmokeParticles(const Fvector& play_pos, const Fvector& parent_vel);
-
-    //партиклы полосы от пули
-    virtual void StartShotParticles();
 
     //партиклы гильз
     virtual void OnShellDrop(const Fvector& play_pos, const Fvector& parent_vel);
@@ -168,7 +162,4 @@ protected:
     //имя пратиклов для дыма
     shared_str m_sSmokeParticlesCurrent;
     shared_str m_sSmokeParticles;
-
-    //имя партиклов следа от пули
-    shared_str m_sShotParticles;
 };

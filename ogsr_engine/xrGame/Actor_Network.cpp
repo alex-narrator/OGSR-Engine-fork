@@ -8,6 +8,7 @@
 #include "ActorEffector.h"
 
 #include "PHWorld.h"
+#include "actorcameracollision.h"
 #include "level.h"
 #include "alife_registry_wrappers.h"
 #include "..\Include/xrRender/Kinematics.h"
@@ -114,9 +115,8 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     CSE_ALifeTraderAbstract* pTA = smart_cast<CSE_ALifeTraderAbstract*>(e);
     set_money(pTA->m_dwMoney, false);
 
-    ROS()->force_mode(IRender_ObjectSpecific::TRACE_ALL);
-
     m_pPhysics_support->in_NetSpawn(e);
+
     character_physics_support()->movement()->ActivateBox(m_loaded_ph_box_id);
     if (E->m_holderID != u16(-1))
     {
@@ -171,27 +171,7 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     LastPosH.clear();
     LastPosL.clear();
 #endif
-    //*
 
-    //	if (OnServer())// && E->s_flags.is(M_SPAWN_OBJECT_LOCAL))
-    /*
-        if (OnClient())
-        {
-            if (!pStatGraph)
-            {
-                static g_Y = 0;
-                pStatGraph = xr_new<CStatGraph>();
-                pStatGraph->SetRect(0, g_Y, Device.dwWidth, 100, 0xff000000, 0xff000000);
-                g_Y += 110;
-                if (g_Y > 700) g_Y = 100;
-                pStatGraph->SetGrid(0, 0.0f, 10, 1.0f, 0xff808080, 0xffffffff);
-                pStatGraph->SetMinMax(0, 10, 300);
-                pStatGraph->SetStyle(CStatGraph::stBar);
-                pStatGraph->AppendSubGraph(CStatGraph::stCurve);
-                pStatGraph->AppendSubGraph(CStatGraph::stCurve);
-            }
-        }
-    */
     SetDefaultVisualOutfit(cNameVisual());
 
     smart_cast<IKinematics*>(Visual())->CalculateBones();
@@ -231,7 +211,6 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     m_statistic_manager = xr_new<CActorStatisticMgr>();
 
     spatial.type |= STYPE_REACTTOSOUND;
-    psHUD_Flags.set(HUD_WEAPON_RT, TRUE);
 
     g_player_hud->load_default();
 
@@ -262,7 +241,6 @@ void CActor::net_Destroy()
     m_pPhysics_support->in_NetDestroy();
 
     xr_delete(m_sndShockEffector);
-    xr_delete(pStatGraph);
     xr_delete(m_pActorEffector);
     pCamBobbing = NULL;
 
@@ -282,6 +260,9 @@ void CActor::net_Destroy()
         g_actor = NULL;
 
     Engine.Sheduler.Unregister(this);
+
+    if (actor_camera_shell && actor_camera_shell->get_ElementByStoreOrder(0)->PhysicsRefObject() == this)
+        destroy_physics_shell(actor_camera_shell);
 }
 
 void CActor::net_Relcase(CObject* O)
@@ -533,7 +514,7 @@ bool CActor::InventoryAllowSprint()
     auto wpn = smart_cast<const CWeapon*>(pActiveItem);
     if (wpn)
     {
-        if (Core.Features.test(xrCore::Feature::lock_reload_in_sprint) && wpn->GetState() == CWeapon::eReload)
+        if (psActorFlags.test(AF_LOCK_RELOAD) && wpn->GetState() == CWeapon::eReload)
         {
             return false;
         }

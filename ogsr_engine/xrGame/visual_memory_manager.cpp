@@ -19,7 +19,7 @@
 #include "agent_manager.h"
 #include "agent_member_manager.h"
 #include "ai_space.h"
-#include "profiler.h"
+
 #include "actor.h"
 #include "../xr_3da/camerabase.h"
 #include "gamepersistent.h"
@@ -409,6 +409,9 @@ bool CVisualMemoryManager::visible(const CGameObject* game_object, float time_de
 
 void CVisualMemoryManager::add_visible_object(const CObject* object, float time_delta, bool fictitious)
 {
+    if (object && object->getDestroy())
+        return;
+
 #ifndef MASTER_GOLD
     if (object && (object->CLS_ID == CLSID_OBJECT_ACTOR) && psAI_Flags.test(aiIgnoreActor))
         return;

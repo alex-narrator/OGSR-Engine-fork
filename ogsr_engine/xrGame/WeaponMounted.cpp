@@ -152,12 +152,12 @@ void CWeaponMounted::UpdateCL()
 
 void CWeaponMounted::shedule_Update(u32 dt) { inherited::shedule_Update(dt); }
 
-void CWeaponMounted::renderable_Render()
+void CWeaponMounted::renderable_Render(u32 context_id, IRenderable* root)
 {
     //нарисовать подсветку
     RenderLight();
 
-    inherited::renderable_Render();
+    inherited::renderable_Render(context_id, root);
 }
 
 void CWeaponMounted::OnMouseMove(int dx, int dy)
@@ -307,14 +307,12 @@ void CWeaponMounted::OnShot()
 
     FireBullet(get_CurrentFirePoint(), fire_dir, fireDispersionBase, m_CurrentAmmo, Owner()->ID(), ID(), SendHitAllowed(Owner()));
 
-    StartShotParticles();
-
     if (m_bLightShotEnabled)
         Light_Start();
 
     StartFlameParticles();
-    StartSmokeParticles(fire_pos, zero_vel);
-    OnShellDrop(fire_pos, zero_vel);
+    StartSmokeParticles(fire_pos, {});
+    OnShellDrop(fire_pos, {});
 
     bool b_hud_mode = (Level().CurrentEntity() == smart_cast<CObject*>(Owner()));
     HUD_SOUND::PlaySound(sndShot, fire_pos, Owner(), b_hud_mode);

@@ -1,57 +1,69 @@
-#ifndef ParticlesObjectH
-#define ParticlesObjectH
+#pragma once
 
 #include "..\xr_3da\PS_instance.h"
-
-extern const Fvector zero_vel;
 
 class CParticlesObject : public CPS_Instance
 {
     typedef CPS_Instance inherited;
 
-    u32 dwLastTime;
-    void Init(LPCSTR p_name, IRender_Sector* S, BOOL bAutoRemove);
+    std::atomic<u32> dwLastTime{};
+    std::atomic<u32> market{};
+
+    std::atomic_bool m_bLooped{}; // флаг, что система зациклена
+    std::atomic_bool m_bPlaying{}; // вызвана функция Play()
+    std::atomic_bool m_bStopping{}; // вызвана функция Stop()
+    std::atomic_bool m_bDeferredStopped{};
+
+    std::atomic_bool m_bCreated{}; // визуал партикла уже создан
+
+    void Init(LPCSTR p_name, IRender_Sector::sector_id_t sector_id, BOOL bAutoRemove);
     void UpdateSpatial();
+    void DoWork();
 
 protected:
-    bool m_bLooped; //флаг, что система зациклена
-    bool m_bStopping; //вызвана функция Stop()
+    shared_str m_name{}; // имя группы или эффекта
 
-protected:
-    u32 mt_dt;
+    Fmatrix matrix{};
+    Fvector velocity{};
+    bool hud_mode{};
+    bool xform_set{};
 
 public:
     CParticlesObject(LPCSTR p_name, BOOL bAutoRemove, bool destroy_on_game_load);
     virtual ~CParticlesObject();
 
-    virtual bool shedule_Needed() { return true; };
+    virtual bool shedule_Needed() { return true; }
     virtual float shedule_Scale();
     virtual void shedule_Update(u32 dt);
-    virtual void renderable_Render();
-    void PerformAllTheWork(u32 dt);
-    void PerformAllTheWork_mt();
+    virtual void renderable_Render(u32 context_id, IRenderable* root);
 
-    Fvector& Position();
+    virtual void PerformFrame();
+    virtual void PerformCreate();    
+
     void SetXFORM(const Fmatrix& m);
     IC Fmatrix& XFORM() { return renderable.xform; }
     void UpdateParent(const Fmatrix& m, const Fvector& vel);
 
-    void play_at_pos(const Fvector& pos, BOOL xform = FALSE);
+    void PlayAtPos(const Fvector& pos);
     virtual void Play(BOOL hudMode = FALSE);
     void Stop(BOOL bDefferedStop = TRUE);
-    virtual BOOL Locked() { return mt_dt; }
 
-    bool IsLooped() { return m_bLooped; }
-    bool IsAutoRemove();
-    bool IsPlaying();
+    bool IsLooped() const { return m_bLooped; }
+    bool IsAutoRemove() const;
     void SetAutoRemove(bool auto_remove);
+
+    bool IsPlaying() const;
+    bool IsDeferredStopped() const;
+
     int LifeTime() const { return m_iLifeTime; }
 
-    const shared_str Name();
+    shared_str Name() const;
 
 public:
     static CParticlesObject* Create(LPCSTR p_name, BOOL bAutoRemove = TRUE, bool remove_on_game_load = true)
     {
+        ZoneScoped;
+
         return xr_new<CParticlesObject>(p_name, bAutoRemove, remove_on_game_load);
     }
     static void Destroy(CParticlesObject*& p)
@@ -59,9 +71,7 @@ public:
         if (p)
         {
             p->PSI_destroy();
-            p = 0;
+            p = nullptr;
         }
     }
 };
-
-#endif /*ParticlesObjectH*/
