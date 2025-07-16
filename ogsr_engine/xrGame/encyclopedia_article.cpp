@@ -7,10 +7,7 @@
 #include "encyclopedia_article.h"
 #include "ui/xrUIXmlParser.h"
 #include "ui/UIXmlInit.h"
-#include "ui/UIInventoryUtilities.h"
 #include "object_broker.h"
-
-using namespace InventoryUtilities;
 
 void ARTICLE_DATA::load(IReader& stream)
 {
@@ -71,17 +68,7 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
     data()->name = pXML->ReadAttrib(pNode, "name", "");
     //группа
     data()->group = pXML->ReadAttrib(pNode, "group", "");
-    //секция ltx, откуда читать данные
-    LPCSTR ltx = pXML->Read(pNode, "ltx", 0, NULL);
 
-    if (ltx)
-    {
-        CIconParams params(ltx);
-        params.set_shader(&(data()->image));
-        data()->image.ClipperOn();
-        data()->image.TextureAvailable(true);
-    }
-    else
     {
         if (pXML->NavigateToNode(pNode, "texture", 0))
         {

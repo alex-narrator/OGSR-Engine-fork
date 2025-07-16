@@ -79,7 +79,6 @@ CInventoryItem::~CInventoryItem()
 void CInventoryItem::Load(LPCSTR section)
 {
     CHitImmunity::LoadImmunities(pSettings->r_string(section, "immunities_sect"), pSettings);
-    m_icon_params.Load(section);
 
     ISpatial* self = smart_cast<ISpatial*>(this);
     if (self)
@@ -124,7 +123,6 @@ void CInventoryItem::Load(LPCSTR section)
     m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", FALSE));
 
     m_fControlInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "control_inertion_factor", 1.0f);
-    m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
 
     b_breakable = READ_IF_EXISTS(pSettings, r_bool, section, "breakable", false);
 

@@ -11,7 +11,6 @@
 #include "inventory_space.h"
 #include "hit_immunity.h"
 #include "attachable_item.h"
-#include "ui\UIIconParams.h"
 
 enum EHandDependence
 {
@@ -63,7 +62,6 @@ public:
         FIsQuestItem = (1 << 11),
     };
     Flags16 m_flags;
-    CIconParams m_icon_params;
 
 public:
     CInventoryItem();
@@ -144,13 +142,6 @@ public:
     virtual void OnMoveToRuck(EItemPlace prevPlace);
     virtual void OnMoveOut(EItemPlace prevPlace);
 
-    int GetGridWidth() const { return (int)m_icon_params.grid_width; };
-    int GetGridHeight() const { return (int)m_icon_params.grid_height; };
-    const shared_str& GetIconName() const { return m_icon_name; };
-    const shared_str& GetIconIndex() const { return m_icon_params.icon_group; };
-    int GetXPos() const { return (int)m_icon_params.grid_x; };
-    int GetYPos() const { return (int)m_icon_params.grid_y; };
-
     float GetCondition() const { return m_fCondition; }
     void ChangeCondition(float fDeltaCondition);
     virtual void SetCondition(float fNewCondition)
@@ -185,7 +176,6 @@ protected:
     float m_fCondition{1.f};
 
     float m_fControlInertionFactor;
-    shared_str m_icon_name;
 
     // 0-используется без участия рук, 1-одна рука, 2-две руки
     EHandDependence eHandDependence;

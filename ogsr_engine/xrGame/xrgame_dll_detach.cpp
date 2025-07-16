@@ -45,7 +45,6 @@ void init_game_globals()
     CInfoPortion::InitInternal();
     CEncyclopediaArticle::InitInternal();
     CPhraseDialog::InitInternal();
-    InventoryUtilities::CreateShaders();
     CCharacterInfo::InitInternal();
     CSpecificCharacter::InitInternal();
     CHARACTER_COMMUNITY::InitInternal();
@@ -78,7 +77,6 @@ void clean_game_globals()
     CPhraseDialog::DeleteSharedData();
     CPhraseDialog::DeleteIdToIndexData();
 
-    InventoryUtilities::DestroyShaders();
     CCharacterInfo::DeleteSharedData();
     CCharacterInfo::DeleteIdToIndexData();
 

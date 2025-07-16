@@ -1,5 +1,8 @@
 #pragma once
 #include "hud_item_object.h"
+
+class CLAItem;
+
 class CCustomDevice : public CHudItemObject
 {
     typedef CHudItemObject inherited;

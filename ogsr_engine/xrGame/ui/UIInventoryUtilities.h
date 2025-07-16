@@ -26,19 +26,6 @@ constexpr auto TRADE_ICONS_SCALE{4.f / 5.f};
 namespace InventoryUtilities
 {
 
-// для проверки свободного места
-bool FreeRoom(TIItemContainer& item_list, PIItem item, int width, int height, bool vertical);
-bool FreeRoom_byRows(TIItemContainer& item_list, PIItem item, int width, int height);
-// теж саме що й FreeRoom_byRows тільки для предметів з іконками height > width
-bool FreeRoom_byColumns(TIItemContainer& item_list, PIItem item, int width, int height);
-bool HasFreeSpace(TIItemContainer&, PIItem, int, int, bool);
-
-// получить shader на иконки инвенторя
-ui_shader& GetEquipmentIconsShader(shared_str icon_group);
-// удаляем все шейдеры
-void DestroyShaders();
-void CreateShaders();
-
 // Получить значение времени в текстовом виде
 
 // Точность возвращаемого функцией GetGameDateTimeAsString значения: до часов, до минут, до секунд
@@ -59,8 +46,6 @@ enum EDatePrecision
     edpDateToYear
 };
 
-const shared_str GetGameDateAsString(EDatePrecision datePrec, char dateSeparator = '/');
-const shared_str GetGameTimeAsString(ETimePrecision timePrec, char timeSeparator = ':');
 const shared_str GetDateAsString(ALife::_TIME_ID time, EDatePrecision datePrec, char dateSeparator = '/');
 const shared_str GetTimeAsString(ALife::_TIME_ID time, ETimePrecision timePrec, char timeSeparator = ':');
 LPCSTR GetTimePeriodAsString(LPSTR _buff, u32 buff_sz, ALife::_TIME_ID _from, ALife::_TIME_ID _to);

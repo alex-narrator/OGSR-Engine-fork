@@ -13,6 +13,7 @@
 class CCartridge;
 class CParticlesObject;
 class IRender_Sector;
+class CLAItem;
 
 extern const Fvector zero_vel;
 

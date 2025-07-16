@@ -3,8 +3,6 @@
 #include "actor.h"
 #include "weapon.h"
 
-#include "ui/UIInventoryUtilities.h"
-
 #include "eatable_item.h"
 #include "script_engine.h"
 #include "xrmessages.h"
@@ -24,16 +22,15 @@
 #include "HudManager.h"
 #include "ui/UIPDAWnd.h"
 
-using namespace InventoryUtilities;
+#include "game_object_space.h"
+#include "script_callback_ex.h"
+#include "script_game_object.h"
 
 // what to block
 u32 INV_STATE_BLOCK_ALL = 0xffffffff;
 u32 INV_STATE_BLOCK_2H = 1 << FIRST_WEAPON_SLOT | 1 << SECOND_WEAPON_SLOT | 1 << ARTEFACT_SLOT; // вважаємо що саме у цих слотах будуть "дворучні" предмети та блокуємо їх
-u32 INV_STATE_INV_WND = INV_STATE_BLOCK_2H;
-u32 INV_STATE_BUY_MENU = INV_STATE_BLOCK_ALL;
 u32 INV_STATE_LADDER = INV_STATE_BLOCK_ALL; // INV_STATE_BLOCK_2H;
 u32 INV_STATE_CAR = INV_STATE_BLOCK_2H;
-u32 INV_STATE_PDA = INV_STATE_BLOCK_ALL;
 
 bool CInventorySlot::CanBeActivated() const { return (m_bVisible && !IsBlocked()); };
 
@@ -691,9 +688,6 @@ CInventoryItem* CInventory::get_object_by_id(ALife::_OBJECT_ID tObjectID)
 }
 
 // скушать предмет
-#include "game_object_space.h"
-#include "script_callback_ex.h"
-#include "script_game_object.h"
 bool CInventory::Eat(PIItem pIItem, CInventoryOwner* eater)
 {
     // устанаовить съедобна ли вещь
@@ -801,9 +795,17 @@ bool CInventory::CanPutInBelt(PIItem pIItem) const
         return false;
     if (!IsAllItemsLoaded())
         return true;
-    auto belt = static_cast<TIItemContainer>(m_belt);
+    if (m_belt.size() >= BeltSize())
+        return false;
 
-    return FreeRoom(belt, pIItem, BeltSize(), 1, false); // BeltArray().x, BeltArray().y, IsBeltVertical());
+    bool res{true};
+    if (pSettings->line_exist("engine_callbacks", "can_put_in_belt"))
+    {
+        const char* callback = pSettings->r_string("engine_callbacks", "can_put_in_belt");
+        if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
+            res = lua_function(smart_cast<CGameObject*>(pIItem)->lua_game_object());
+    }
+    return res;
 }
 
 // проверяет можем ли поместить вещь в рюкзак,
