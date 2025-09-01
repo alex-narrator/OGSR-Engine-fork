@@ -359,6 +359,9 @@ void CRenderDevice::on_idle()
 #endif
         }
 
+        extern void LogD3D11DebugMessages();
+        LogD3D11DebugMessages();
+
         FrameMark;
     }
 

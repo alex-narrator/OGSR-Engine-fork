@@ -1019,6 +1019,13 @@ void CWeapon::UpdateCL()
 
     VERIFY(smart_cast<IKinematics*>(Visual()));
 
+    CInventoryItem* pActorItem{};
+    auto pActor = smart_cast<CActor*>(H_Parent());
+    if (pActor)
+    {
+        pActorItem = pActor->inventory().ActiveItem();
+    }
+
     if (GetState() == eIdle)
     {
         auto state = idle_state();
@@ -1030,8 +1037,10 @@ void CWeapon::UpdateCL()
                 SwitchState(eIdle);
             }
         }
-    }
-    else
+
+                UpdateDof(dof_zoom_effect, Is3dssEnabled() ? dof_params_reload : dof_params_zoom, true);
+        }
+
         m_idle_state = eIdle;
 }
 
@@ -2194,6 +2203,9 @@ void CWeapon::ParseCurrentItem(CGameFont* F) { F->OutNext("WEAPON IN STRAPPED MO
 
 void CWeapon::update_visual_bullet_textures(const bool forced)
 {
+    if (IsGrenadeMode())
+        return;
+
     if (bullet_textures_in_model.empty())
         return;
 
