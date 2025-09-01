@@ -1019,13 +1019,6 @@ void CWeapon::UpdateCL()
 
     VERIFY(smart_cast<IKinematics*>(Visual()));
 
-    CInventoryItem* pActorItem{};
-    auto pActor = smart_cast<CActor*>(H_Parent());
-    if (pActor)
-    {
-        pActorItem = pActor->inventory().ActiveItem();
-    }
-
     if (GetState() == eIdle)
     {
         auto state = idle_state();
@@ -1037,10 +1030,8 @@ void CWeapon::UpdateCL()
                 SwitchState(eIdle);
             }
         }
-
-                UpdateDof(dof_zoom_effect, Is3dssEnabled() ? dof_params_reload : dof_params_zoom, true);
-        }
-
+    }
+    else
         m_idle_state = eIdle;
 }
 
