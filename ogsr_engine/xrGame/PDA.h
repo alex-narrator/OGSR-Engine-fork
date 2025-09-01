@@ -13,7 +13,7 @@ class CPda : public CHudItemObject, public Feel::Touch
 
 public:
     CPda();
-    virtual ~CPda();
+    virtual ~CPda() {};
 
     virtual BOOL net_Spawn(CSE_Abstract* DC) override;
     virtual void Load(LPCSTR section) override;
@@ -32,13 +32,6 @@ public:
     u16 GetOriginalOwnerID() const { return m_idOriginalOwner; }
     CInventoryOwner* GetOriginalOwner() const;
 
-    void TurnOn();
-    void TurnOff();
-
-    bool IsActive() const { return IsOn(); }
-    bool IsOn() const { return !m_bTurnedOff; }
-    bool IsOff() const { return m_bTurnedOff; }
-
     xr_map<u16, CPda*> ActivePDAContacts();
     CPda* GetPdaFromOwner(CObject* owner);
     u32 ActiveContactsNum() const { return m_active_contacts.size(); }
@@ -55,17 +48,15 @@ private:
     float m_fRadius;
     bool m_changed;
 
-    u16 m_idOriginalOwner;
-    shared_str m_SpecificChracterOwner;
+    u16 m_idOriginalOwner{u16(-1)};
+    shared_str m_SpecificChracterOwner{};
     xr_string m_sFullName;
 
-    bool m_bTurnedOff;
+    bool m_bTurnedOn{};
 
     const char* m_joystick_bone{};
     u16 joystick{BI_NONE};
     static void JoystickCallback(CBoneInstance* B);
-
-    HUD_SOUND sndShow, sndHide, sndBtnPress, sndBtnRelease;
 
     bool this_is_3d_pda{};
 
@@ -77,16 +68,26 @@ public:
     virtual void PlayAnimIdle() override;
     bool ThumbAnimsAllowed() const { return joystick == BI_NONE; }
 
+    virtual void OnMoveToSlot(EItemPlace prevPlace) override;
     virtual void OnMoveToRuck(EItemPlace prevPlace) override;
     virtual void UpdateCL() override;
     virtual void UpdateXForm() override;
     virtual void OnActiveItem() override;
     virtual void OnHiddenItem() override;
 
+    virtual void OnZoomOut(bool = false) override;
+    virtual void OnZoomIn() override;
+    bool IsZoomed() const override { return m_bZoomed; }
+
+    virtual void Switch(bool);
+    virtual bool IsPowerOn() const { return m_bTurnedOn; };
+
+    virtual void Show(bool = false);
+    virtual void Hide(bool = false);
+
     bool m_bZoomed{};
     float m_thumb_rot[2]{};
     xr_string thumb_anim_name;
 
     u8 GetCurrentHudOffsetIdx() const override { return IsZoomed() ? 1 : 0; }
-    bool IsZoomed() const override { return m_bZoomed; }
 };

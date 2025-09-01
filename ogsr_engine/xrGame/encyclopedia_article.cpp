@@ -7,10 +7,7 @@
 #include "encyclopedia_article.h"
 #include "ui/xrUIXmlParser.h"
 #include "ui/UIXmlInit.h"
-#include "ui/UIInventoryUtilities.h"
 #include "object_broker.h"
-
-using namespace InventoryUtilities;
 
 void ARTICLE_DATA::load(IReader& stream)
 {
@@ -59,23 +56,18 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
     XML_NODE* pNode = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
     THROW3(pNode, "encyclopedia article id=", *item_data.id);
 
-    //текст
-    data()->text = pXML->Read(pNode, "text", 0, "");
-    //имя
-    data()->name = pXML->ReadAttrib(pNode, "name", "");
-    //группа
-    data()->group = pXML->ReadAttrib(pNode, "group", "");
-    //секция ltx, откуда читать данные
-    LPCSTR ltx = pXML->Read(pNode, "ltx", 0, NULL);
+    int pic_width{}, pic_height{}, pic_min_size{};
+    pic_width = pXML->ReadAttribInt(pNode, "pic_width", 0);
+    pic_height = pXML->ReadAttribInt(pNode, "pic_height", 0);
+    pic_min_size = pXML->ReadAttribInt(pNode, "pic_min_size", 65);
 
-    if (ltx)
-    {
-        CIconParams params(ltx);
-        params.set_shader(&(data()->image));
-        data()->image.ClipperOn();
-        data()->image.TextureAvailable(true);
-    }
-    else
+    // текст
+    data()->text = pXML->Read(pNode, "text", 0, "");
+    // имя
+    data()->name = pXML->ReadAttrib(pNode, "name", "");
+    // группа
+    data()->group = pXML->ReadAttrib(pNode, "group", "");
+
     {
         if (pXML->NavigateToNode(pNode, "texture", 0))
         {
@@ -90,21 +82,28 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
         Frect r = data()->image.GetUIStaticItem().GetOriginalRect();
         data()->image.SetAutoDelete(false);
 
-        const int minSize = 65;
-
         // Сначала устанавливаем если надо минимально допустимые размеры иконки
-        if (r.width() < minSize)
+        if (r.width() < pic_min_size)
         {
-            float dx = minSize - r.width();
+            float dx = pic_min_size - r.width();
             r.x2 += dx;
             data()->image.SetTextureOffset(dx / 2, data()->image.GetTextureOffeset()[1]);
         }
 
-        if (r.height() < minSize)
+        if (r.height() < pic_min_size)
         {
-            float dy = minSize - r.height();
+            float dy = pic_min_size - r.height();
             r.y2 += dy;
             data()->image.SetTextureOffset(data()->image.GetTextureOffeset()[0], dy / 2);
+        }
+
+        if (pic_width && pic_height)
+        {
+            float dx = pic_width - r.width();
+            float dy = pic_height - r.height();
+            r.x2 += dx;
+            r.y2 += dy;
+            data()->image.SetTextureOffset(dx / 2, dy / 2);
         }
 
         data()->image.SetWndRect(0, 0, r.width(), r.height());

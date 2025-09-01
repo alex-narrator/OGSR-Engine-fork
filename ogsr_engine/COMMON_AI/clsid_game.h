@@ -104,6 +104,11 @@ constexpr auto CLSID_OBJECT_A_M209 = MK_CLSID('A', '_', 'M', '2', '0', '9', ' ',
 constexpr auto CLSID_OBJECT_W_SCOPE = MK_CLSID('W', '_', 'S', 'C', 'O', 'P', 'E', ' ');
 constexpr auto CLSID_OBJECT_W_SILENCER = MK_CLSID('W', '_', 'S', 'I', 'L', 'E', 'N', 'C');
 constexpr auto CLSID_OBJECT_W_GLAUNCHER = MK_CLSID('W', '_', 'G', 'L', 'A', 'U', 'N', 'C');
+constexpr auto CLSID_OBJECT_W_LASER = MK_CLSID('W', '_', 'L', 'A', 'S', 'E', 'R', ' ');
+constexpr auto CLSID_OBJECT_W_FLASHLIGHT = MK_CLSID('W', '_', 'F', 'L', 'A', 'S', 'H', 'L');
+constexpr auto CLSID_OBJECT_W_STOCK = MK_CLSID('W', '_', 'S', 'T', 'O', 'C', 'K', ' ');
+constexpr auto CLSID_OBJECT_W_EXTENDER = MK_CLSID('W', '_', 'E', 'X', 'T', 'N', 'D', 'R');
+constexpr auto CLSID_OBJECT_W_FOREND = MK_CLSID('W', '_', 'F', 'O', 'R', 'E', 'N', 'D');
 
 // Modifiers
 constexpr auto CLSID_OBJECT_M_QDAMAGE = MK_CLSID('O', '_', 'Q', 'D', 'M', 'G', ' ', ' ');
@@ -167,6 +172,9 @@ constexpr auto CLSID_DEVICE_PDA = MK_CLSID('D', '_', 'P', 'D', 'A', ' ', ' ', ' 
 constexpr auto CLSID_DEVICE_TORCH = MK_CLSID('D', '_', 'T', 'O', 'R', 'C', 'H', ' ');
 constexpr auto CLSID_DEVICE_AF_MERGER = MK_CLSID('D', '_', 'A', 'F', 'M', 'E', 'R', 'G');
 
+constexpr auto CLSID_DEVICE_FLASHLIGHT = MK_CLSID('D', '_', 'F', 'L', 'A', 'L', 'I', 'T');
+constexpr auto CLSID_DEVICE_CUSTOM = MK_CLSID('D', '_', 'C', 'U', 'S', 'T', 'O', 'M');
+
 // Inventory items
 constexpr auto CLSID_IITEM_BOLT = MK_CLSID('I', 'I', '_', 'B', 'O', 'L', 'T', ' ');
 
@@ -198,6 +206,8 @@ constexpr auto CLSID_EQUIPMENT_SCIENTIFIC = MK_CLSID('E', 'Q', 'U', '_', 'S', 'C
 constexpr auto CLSID_EQUIPMENT_STALKER = MK_CLSID('E', 'Q', 'U', '_', 'S', 'T', 'L', 'K');
 constexpr auto CLSID_EQUIPMENT_MILITARY = MK_CLSID('E', 'Q', 'U', '_', 'M', 'L', 'T', 'R');
 constexpr auto CLSID_EQUIPMENT_EXO = MK_CLSID('E', 'Q', 'U', '_', 'E', 'X', 'O', ' ');
+
+constexpr auto CLSID_HELMET = MK_CLSID('E', 'Q', '_', 'H', 'E', 'L', 'M', 'T');
 
 // Game types
 constexpr auto CLSID_SV_GAME_SINGLE = MK_CLSID('S', 'V', '_', 'S', 'I', 'N', 'G', 'L');

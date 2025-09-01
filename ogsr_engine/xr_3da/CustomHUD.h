@@ -9,12 +9,12 @@ enum HUD_Flags : u32
     HUD_CROSSHAIR = 1 << 0,
     HUD_CROSSHAIR_DIST = 1 << 1,
 
-    // 1 << 2,
+    HUD_CROSSHAIR_CENTER = 1 << 2, // перехрестя завжди по центру екрану, навіть якщо увімкнено HUD_CROSSHAIR_HARD
     HUD_INFO = 1 << 3,
     HUD_DRAW = 1 << 4,
 
     HUD_CROSSHAIR_RT = 1 << 5,
-    // 1 << 6,
+    // = 1 << 6,
 
     HUD_CROSSHAIR_DYNAMIC = 1 << 7,
     HUD_CROSSHAIR_HARD = 1 << 8, // Усложненный режим прицела - оружие от бедра будет стрелять не по центру камеры, а по реальному направлению ствола

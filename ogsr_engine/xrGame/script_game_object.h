@@ -27,6 +27,8 @@
 enum EPdaMsg;
 enum ESoundTypes;
 enum ETaskState;
+class CGameTask;
+class SGameTaskObjective;
 
 namespace ALife
 {
@@ -175,6 +177,12 @@ public:
     u32 Cost() const;
     float GetCondition() const;
     void SetCondition(float val);
+    void ChangeCondition(float val);
+
+    bool CanTrade() const;
+
+    void SwitchPower(bool);
+    bool IsPowerOn();
 
     // CEntity
     _DECLARE_FUNCTION10(DeathTime, u32);
@@ -198,7 +206,6 @@ public:
     _DECLARE_FUNCTION10(GetMaxPower, float);
     _DECLARE_FUNCTION10(GetAlcohol, float);
     _DECLARE_FUNCTION10(GetSatiety, float);
-    _DECLARE_FUNCTION10(GetThirst, float);
 
     _DECLARE_FUNCTION11(SetHealth, void, float);
     _DECLARE_FUNCTION11(SetPsyHealth, void, float);
@@ -291,6 +298,7 @@ public:
     //передача порции информации InventoryOwner
     bool GiveInfoPortion(LPCSTR info_id);
     bool DisableInfoPortion(LPCSTR info_id);
+    void GetKnownInfo(luabind::object O);
 
     //предикаты наличия/отсутствия порции информации у персонажа
     bool HasInfo(LPCSTR info_id);
@@ -300,6 +308,9 @@ public:
     ETaskState GetGameTaskState(LPCSTR task_id, int objective_num);
     void SetGameTaskState(ETaskState state, LPCSTR task_id, int objective_num);
     void GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExisting);
+    void SetTaskSelected(const shared_str& id, u16 idx, const bool safe);
+    CGameTask* GetActiveTask();
+    SGameTaskObjective* GetActiveObjective();
 
     bool IsTalking();
     void StopTalk();
@@ -317,6 +328,8 @@ public:
     void MarkItemDropped(CScriptGameObject* item);
     bool MarkedDropped(CScriptGameObject* item);
     void UnloadMagazine(bool spawn_ammo = false, bool unload_gl = false);
+    bool IsDirectReload(CScriptGameObject* pItem);
+    void UnloadMagazineFull();
 
     void DropItem(CScriptGameObject* pItem);
     void DropItemAndTeleport(CScriptGameObject* pItem, Fvector position);
@@ -336,13 +349,16 @@ public:
     void SetGoodwill(int goodwill, CScriptGameObject* pWhoToSet);
     void ChangeGoodwill(int delta_goodwill, CScriptGameObject* pWhoToSet);
 
+    void SetCharacterIcon(LPCSTR);
+    LPCSTR GetCharacterIcon();
+    LPCSTR GetDefaultCharacterIcon();
+    bool InfinitiveMoney() const;
+
     void SetStartDialog(LPCSTR dialog_id);
     const char* GetStartDialog();
     void RestoreDefaultStartDialog();
 
-    void SwitchToTrade();
-    void SwitchToTalk();
-    void RunTalkDialog(CScriptGameObject* pToWho);
+    void RunTalkDialog(CScriptGameObject* pToWho) const;
 
     void HideWeapon();
     void RestoreWeapon();
@@ -595,18 +611,13 @@ public:
     u32 active_slot();
     void activate_slot(u8 slot_id);
 
+    CScriptGameObject* active_device() const;
+
     void SwitchTorch(bool enable);
 
 #ifdef DEBUG
     void debug_planner(const script_planner* planner);
 #endif
-
-    void sell_condition(CInifile* ini_file, LPCSTR section);
-    void sell_condition(float friend_factor, float enemy_factor);
-    void buy_condition(CInifile* ini_file, LPCSTR section);
-    void buy_condition(float friend_factor, float enemy_factor);
-    void show_condition(CInifile* ini_file, LPCSTR section);
-    void buy_supplies(CInifile* ini_file, LPCSTR section);
 
     LPCSTR sound_prefix() const;
     void sound_prefix(LPCSTR sound_prefix);
@@ -630,12 +641,6 @@ public:
     // инвентарь
     float GetActorMaxWeight() const;
     void SetActorMaxWeight(float max_weight);
-    float GetActorMaxWalkWeight() const;
-    void SetActorMaxWalkWeight(float max_walk_weight);
-    float GetAdditionalMaxWeight() const;
-    void SetAdditionalMaxWeight(float add_max_weight);
-    float GetAdditionalMaxWalkWeight() const;
-    void SetAdditionalMaxWalkWeight(float add_max_walk_weight);
     float GetTotalWeight() const;
     float Weight() const;
     /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
@@ -655,12 +660,15 @@ public:
     bool IsInRuck(CScriptGameObject* object) const;
     bool IsInSlot(CScriptGameObject* object) const;
     u8 GetSlot() const;
+    void SetSlot(u8 slot) const;
     bool MoveToSlot(CScriptGameObject* object, bool bNotActivate = true);
     bool MoveToBelt(CScriptGameObject* object);
     bool MoveToRuck(CScriptGameObject* object);
     u32 BeltSize() const;
     u32 RuckSize() const;
     void InvalidateInventory();
+    bool CanPutInSlot(CScriptGameObject* object, u8 slot);
+    bool CanPutInBelt(CScriptGameObject* object);
 
     void SetActorCamDir(Fvector _dir);
     void UpdateCondition();
@@ -670,17 +678,13 @@ public:
     void AddWound(float hit_power, int hit_type, u16 element);
     float GetItemWeight();
     u32 InvBoxCount();
-    void OpenInvBox(CScriptGameObject* object);
     CScriptGameObject* ObjectFromInvBox(int _i);
     float GetCamFOV();
     void SetCamFOV(float _fov);
 
     void SetMaxWeight(float _weight);
-    void SetMaxWalkWeight(float _weight);
     float GetMaxWeight() const;
-    float GetMaxWalkWeight() const;
     float GetInventoryWeight() const;
-    u32 CalcItemPrice(CScriptGameObject* item, bool b_buying) const;
 
     float GetShapeRadius() const;
 
@@ -690,6 +694,10 @@ public:
     void SetAmmoBoxSize(u16);
 
     const char* GetVisualName() const;
+    void SetVisualName(LPCSTR);
+
+    const char* GetHudSect() const;
+    void SetHudSect(LPCSTR);
 
     CInifile* GetVisIni();
     void SetBoneVisible(LPCSTR _bone_name, BOOL _visible);
@@ -698,15 +706,16 @@ public:
     BOOL GetHudBoneVisible(LPCSTR _bone_name);
     u16 GetBoneID(LPCSTR _bone_name);
 
-    float GetBinocZoomFactor();
-    void SetBinocZoomFactor(float _zoom);
     float GetZoomFactor();
+
+    void ZoomIn();
+    void ZoomOut();
+    bool IsZoomed();
 
     u8 GetAddonFlags();
     void SetAddonFlags(u8 _flags);
     u32 GetMagazineSize();
     void SetMagazineSize(int _size);
-    bool GrenadeLauncherAttachable();
     u32 GetAmmoType();
     u32 GetUnderbarrelAmmoType();
     u32 GetAmmoElapsed2();
@@ -720,18 +729,14 @@ public:
     bool ZoomMode();
     void ResetState();
 
-    // для CEatableItem, используются в реализации радиопротектора
-    void ZeroEffects();
-    void SetRadiationInfluence(float _rad);
-    // для актора - иммунитеты
-    void SetDrugRadProtection(float _prot);
-    void SetDrugPsyProtection(float _prot);
-
     // functions for CInventoryItem class
     void SetIIFlags(Flags16);
     Flags16 GetIIFlags();
     u32 GetHudItemState();
+    bool IsPending() const;
+    void StopAimInertion(bool);
     float GetRadius();
+    void ShowItemHud(bool);
 
     // functions for object testing
     _DECLARE_FUNCTION10(IsGameObject, bool);
@@ -748,6 +753,7 @@ public:
     _DECLARE_FUNCTION10(IsEatableItem, bool);
     _DECLARE_FUNCTION10(IsAntirad, bool);
     _DECLARE_FUNCTION10(IsCustomOutfit, bool);
+    _DECLARE_FUNCTION10(IsHelmet, bool);
     _DECLARE_FUNCTION10(IsScope, bool);
     _DECLARE_FUNCTION10(IsSilencer, bool);
     _DECLARE_FUNCTION10(IsGrenadeLauncher, bool);
@@ -786,7 +792,6 @@ public:
     // KD
 
     // Real Wolf 07.07.2014.
-    CUIStatic* GetCellItem() const;
     LPCSTR GetBoneName(u16) const;
 
     // alpet: visual functions for CWeapon descedants
@@ -833,12 +838,6 @@ public:
 add_to_type_list(CScriptGameObject)
 #undef script_type_list
 #define script_type_list save_type_list(CScriptGameObject)
-
-    extern void sell_condition(CInifile* ini_file, LPCSTR section);
-extern void sell_condition(float friend_factor, float enemy_factor);
-extern void buy_condition(CInifile* ini_file, LPCSTR section);
-extern void buy_condition(float friend_factor, float enemy_factor);
-extern void show_condition(CInifile* ini_file, LPCSTR section);
 
 void AddTalkMessage(CScriptGameObject*, LPCSTR text, bool is_actor = false);
 void AddIconedTalkMessage(CScriptGameObject*, LPCSTR text, LPCSTR texture_name, const Frect& tex_rect, LPCSTR templ_name);

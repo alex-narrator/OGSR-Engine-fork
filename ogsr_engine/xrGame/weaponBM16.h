@@ -10,7 +10,7 @@ class CWeaponBM16 : public CWeaponShotgun
     HUD_SOUND m_sndReload1;
 
 public:
-    virtual ~CWeaponBM16();
+    virtual ~CWeaponBM16() {};
     virtual void Load(LPCSTR section);
 
 protected:
@@ -25,13 +25,14 @@ protected:
     virtual void PlayAnimIdleMovingCrouchSlow() override;
     virtual void PlayAnimIdleSprint();
     virtual void PlayAnimIdle();
+    virtual void PlayAnimShutter() override;
+    virtual void PlayAnimShutterMisfire() override;
     virtual void PlayAnimCheckMisfire() override;
-    virtual void PlayAnimDeviceSwitch() override;
     virtual void PlayAnimSprintStart() override;
     virtual void PlayAnimSprintEnd() override;
     virtual void PlayReloadSound();
     virtual void OnShot();
-    virtual void UpdateSounds() override;
+    /*virtual void UpdateSounds() override;*/
 
     virtual size_t GetWeaponTypeForCollision() const override { return BM_16; }
 

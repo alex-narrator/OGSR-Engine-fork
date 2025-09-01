@@ -207,3 +207,10 @@ void CActorStatisticMgr::RemovePoints(const shared_str& key, const shared_str& d
     SStatSectionData& sect = GetSection(key);
     sect.RemoveData(detail_key);
 }
+
+s32 CActorStatisticMgr::GetSectionKeyPoints(const shared_str& key, const shared_str& detail_key)
+{
+    SStatSectionData& sect = GetSection(key);
+    SStatDetailBData& d = sect.GetData(detail_key);
+    return d.int_points;
+}

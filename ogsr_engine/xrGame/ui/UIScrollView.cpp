@@ -227,13 +227,13 @@ bool CUIScrollView::OnMouse(float x, float y, EUIMessages mouse_action)
     if (inherited::OnMouse(x, y, mouse_action))
         return true;
 
-    bool with_shift = pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_RSHIFT);
+    bool speed_up = pInput->iGetAsyncKeyState(get_action_dik(kADDITIONAL_ACTION));
 
     switch (mouse_action)
     {
     case WINDOW_MOUSE_WHEEL_UP:
         m_VScrollBar->TryScrollDec();
-        if (with_shift)
+        if (speed_up)
         {
             m_VScrollBar->TryScrollDec();
             m_VScrollBar->TryScrollDec();
@@ -242,7 +242,7 @@ bool CUIScrollView::OnMouse(float x, float y, EUIMessages mouse_action)
         break;
     case WINDOW_MOUSE_WHEEL_DOWN:
         m_VScrollBar->TryScrollInc();
-        if (with_shift)
+        if (speed_up)
         {
             m_VScrollBar->TryScrollInc();
             m_VScrollBar->TryScrollInc();
@@ -405,4 +405,12 @@ void CUIScrollView::UpdateChildrenLenght()
     {
         (*it)->SetWidth(len);
     }
+}
+
+Fvector2 CUIScrollView::GetPadSize()
+{
+    if (m_flags.test(eNeedRecalc))
+        RecalcSize();
+
+    return m_pad->GetWndSize();
 }

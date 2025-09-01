@@ -116,6 +116,7 @@ public:
         bool m_bfinalize;
     };
     xr_vector<SActionItem> m_actions;
+    bool zoom_3d_pda{};
 
 public:
     CUISequenceSimpleItem(CUISequencer* owner) : CUISequenceItem(owner) {}

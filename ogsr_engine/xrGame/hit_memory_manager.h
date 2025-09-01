@@ -61,7 +61,7 @@ public:
 
 public:
     void add(const CEntityAlive* who);
-    void add(float amount, const Fvector& local_direction, const CObject* who, s16 element);
+    void add(float amount, const Fvector& local_direction, const CObject* who, s16 element, int type);
     void add(const CHitObject& hit_object);
 
 public:

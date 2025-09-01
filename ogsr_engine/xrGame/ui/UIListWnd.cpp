@@ -464,14 +464,14 @@ int CUIListWnd::FindItemWithValue(int iValue)
 
 bool CUIListWnd::OnMouse(float x, float y, EUIMessages mouse_action)
 {
-    bool with_shift = pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_RSHIFT);
+    bool speed_up = pInput->iGetAsyncKeyState(get_action_dik(kADDITIONAL_ACTION)); /*pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_RSHIFT);*/
 
     switch (mouse_action)
     {
     case WINDOW_LBUTTON_DB_CLICK: break;
     case WINDOW_MOUSE_WHEEL_DOWN:
         m_ScrollBar->TryScrollInc();
-        if (with_shift)
+        if (speed_up)
         {
             m_ScrollBar->TryScrollInc();
             m_ScrollBar->TryScrollInc();
@@ -480,7 +480,7 @@ bool CUIListWnd::OnMouse(float x, float y, EUIMessages mouse_action)
         break;
     case WINDOW_MOUSE_WHEEL_UP:
         m_ScrollBar->TryScrollDec();
-        if (with_shift)
+        if (speed_up)
         {
             m_ScrollBar->TryScrollDec();
             m_ScrollBar->TryScrollDec();

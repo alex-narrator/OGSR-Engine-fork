@@ -35,6 +35,8 @@ public:
     //время через которое эффектор меняет направление движения
     u32 m_dwDeltaTime;
 
+    bool m_bPauseEffect{};
+
     void CalcNextPoint();
     void LoadParams(LPCSTR Section, LPCSTR Prefix);
 

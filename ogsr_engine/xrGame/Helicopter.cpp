@@ -13,28 +13,19 @@
 #include "../xr_3da/LightAnimLibrary.h"
 #include "HudManager.h"
 #include "physicscommon.h"
+#include "HudSound.h"
 
 // 50fps fixed
 float STEP = 0.02f;
 
 CHelicopter::CHelicopter()
 {
-    m_pParticle = NULL;
-    m_light_render = NULL;
-    m_lanim = NULL;
-
     ISpatial* self = smart_cast<ISpatial*>(this);
     if (self)
         self->spatial.type |= STYPE_VISIBLEFORAI;
 
     m_movement.parent = this;
     m_body.parent = this;
-}
-
-CHelicopter::~CHelicopter()
-{
-    HUD_SOUND::DestroySound(m_sndShot);
-    HUD_SOUND::DestroySound(m_sndShotRocket);
 }
 
 void CHelicopter::setState(CHelicopter::EHeliState s) { m_curState = s; }
@@ -86,8 +77,12 @@ void CHelicopter::Load(LPCSTR section)
 
     // weapons
     CShootingObject::Load(section);
-    HUD_SOUND::LoadSound(section, "snd_shoot", m_sndShot, SOUND_TYPE_WEAPON_SHOOTING);
-    HUD_SOUND::LoadSound(section, "snd_shoot_rocket", m_sndShotRocket, SOUND_TYPE_WEAPON_SHOOTING);
+    //HUD_SOUND::LoadSound(section, "snd_shoot", m_sndShot, SOUND_TYPE_WEAPON_SHOOTING);
+    //HUD_SOUND::LoadSound(section, "snd_shoot_rocket", m_sndShotRocket, SOUND_TYPE_WEAPON_SHOOTING);
+
+    m_sounds.LoadSound(section, "snd_shoot", "sndShot", SOUND_TYPE_WEAPON_SHOOTING);
+    m_sounds.LoadSound(section, "snd_shoot_rocket", "sndShotRocket", SOUND_TYPE_WEAPON_SHOOTING);
+
     CRocketLauncher::Load(section);
 
     UseFireTrail(m_enemy.bUseFireTrail); // temp force reloar disp params

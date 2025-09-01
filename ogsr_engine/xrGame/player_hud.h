@@ -75,13 +75,11 @@ struct hud_item_measures
     {
         m_hands_offset_type_normal, // Не прицеливаемся
         m_hands_offset_type_aim, // Смотрим в механический прицел
+        m_hands_offset_type_aim_alt, // Дивимося у альтернативний приціл
+        m_hands_offset_type_aim_alt_scope, // Дивимося у альтернативний приціл коли приєднано оптичний приціл
+        m_hands_offset_type_aim_scope, // Смотрим в присоединяемый прицел
         m_hands_offset_type_gl, // Смотрим в механический прицел в режиме ПГ
-        m_hands_offset_type_aim_scope, // Смотрим в присоединяемый нетекстурный прицел (будь то 3д прицел или колиматор) если включен "use_scope_zoom"
-        m_hands_offset_type_gl_scope, // Смотрим в присоединяемый нетекстурный прицел (будь то 3д прицел или колиматор) в режиме ПГ если включен "use_scope_grenade_zoom" - мне вот
-                                      // щас не понятно зачем это надо, но это как-то используют.
-        m_hands_offset_type_aim_gl_normal, // Смотрим в механический прицел если гранатомет присоединен
-        m_hands_offset_type_gl_normal_scope, // Смотрим в присоединяемый нетекстурный прицел (будь то 3д прицел или колиматор) если включен "use_scope_zoom" и гранатомет
-                                             // присоединен
+        m_hands_offset_type_gl_scope, // Дивимось у приціл ПГ із приєднаним оптичним прицілом (сам приціл може заважати прицілюванню з ПГ)
         m_hands_offset_type_size
     };
     Fvector m_hands_offset[m_hands_offset_size][m_hands_offset_type_size]{};
@@ -321,6 +319,7 @@ public:
 
     void calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result);
     void tune(const Ivector& values);
+    void DumpParamsToLog();
 
     u32 motion_length(const motion_params& P, const motion_descr& M, const CMotionDef*& md, IKinematicsAnimated* itemModel, float speed);
     u32 motion_length(const shared_str& anim_name, const shared_str& hud_name, const CMotionDef*& md, float speed = 1.f);
@@ -356,15 +355,16 @@ public:
     u32 motion_length_script(LPCSTR section, LPCSTR anm_name, float speed);
     bool allow_script_anim();
 
-    u8 script_anim_part;
+    u8 script_anim_part{u8(-1)};
     Fvector script_anim_offset[2];
     u32 script_anim_end;
-    float script_anim_offset_factor;
+    float script_anim_offset_factor{};
     bool m_bStopAtEndAnimIsRunning;
     bool script_anim_item_attached{};
-    bool script_override_arms;
-    bool script_override_item;
-    IKinematicsAnimated* script_anim_item_model{};
+    bool script_override_arms{};
+    bool script_override_item{};
+    u8 script_override_item_hand{u8(-1)};
+    IKinematics* script_item_model{};
     xr_vector<script_layer*> m_script_layers;
 
     // Movement animation layers: 0 = aim_walk, 1 = aim_crouch, 2 = crouch, 3 = walk, 4 = run, 5 = sprint

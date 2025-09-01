@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "UITalkWnd.h"
 
-#include "UITradeWnd.h"
 #include "UITalkDialogWnd.h"
 
 #include "../actor.h"
@@ -56,13 +55,6 @@ void CUITalkWnd::Init()
     UITalkDialogWnd->SetAutoDelete(true);
     AttachChild(UITalkDialogWnd);
     UITalkDialogWnd->Init(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
-
-    /////////////////////////
-    //Меню торговли
-    UITradeWnd = xr_new<CUITradeWnd>();
-    UITradeWnd->SetAutoDelete(true);
-    AttachChild(UITradeWnd);
-    UITradeWnd->Hide();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -82,8 +74,6 @@ void CUITalkWnd::InitTalkDialog()
     //имена собеседников
     UITalkDialogWnd->UICharacterInfoLeft.InitCharacter(m_pOurInvOwner->object_id());
     UITalkDialogWnd->UICharacterInfoRight.InitCharacter(m_pOthersInvOwner->object_id());
-    UITalkDialogWnd->UIDialogFrame.UITitleText.SetText(m_pOthersInvOwner->Name());
-    UITalkDialogWnd->UIOurPhrasesFrame.UITitleText.SetText(m_pOurInvOwner->Name());
 
     //очистить лог сообщений
     UITalkDialogWnd->ClearAll();
@@ -94,8 +84,6 @@ void CUITalkWnd::InitTalkDialog()
 
     UITalkDialogWnd->SetOsoznanieMode(m_pOthersInvOwner->NeedOsoznanieMode());
     UITalkDialogWnd->Show();
-
-    UITradeWnd->Hide();
 }
 
 void CUITalkWnd::InitOthersStartDialog()
@@ -168,18 +156,9 @@ void CUITalkWnd::UpdateQuestions()
 
 void CUITalkWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (pWnd == UITalkDialogWnd && msg == TALK_DIALOG_TRADE_BUTTON_CLICKED /*&& ( !Core.Features.test( xrCore::Feature::disable_dialog_break ) || !m_pCurrentDialog )*/)
-    {
-        SwitchToTrade();
-    }
-    else if (pWnd == UITalkDialogWnd && msg == TALK_DIALOG_QUESTION_CLICKED)
+    if (pWnd == UITalkDialogWnd && msg == TALK_DIALOG_QUESTION_CLICKED)
     {
         AskQuestion();
-    }
-    else if (pWnd == UITradeWnd && msg == TRADE_WND_CLOSED)
-    {
-        UITalkDialogWnd->Show();
-        UITradeWnd->Hide();
     }
 
     inherited::SendMessage(pWnd, msg, pData);
@@ -251,9 +230,7 @@ void CUITalkWnd::Draw() { inherited::Draw(); }
 
 void CUITalkWnd::Show()
 {
-    if (Core.Features.test(xrCore::Feature::more_hide_weapon))
-        Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);
-
+    InventoryUtilities::SendInfoToActor("ui_talk");
     InitTalkDialog();
     inherited::Show();
 }
@@ -266,7 +243,6 @@ void CUITalkWnd::Hide()
     StopSnd();
 
     inherited::Hide();
-    UITradeWnd->Hide();
     if (!m_pActor)
         return;
 
@@ -274,9 +250,6 @@ void CUITalkWnd::Hide()
 
     if (m_pActor->IsTalking())
         m_pActor->StopTalk();
-
-    if (Core.Features.test(xrCore::Feature::more_hide_weapon))
-        m_pActor->SetWeaponHideState(INV_STATE_BLOCK_ALL, false);
 
     m_pActor = NULL;
 }
@@ -360,20 +333,6 @@ void CUITalkWnd::AddAnswer(const shared_str& text, LPCSTR SpeakerName)
 }
 
 //////////////////////////////////////////////////////////////////////////
-
-void CUITalkWnd::SwitchToTrade()
-{
-    if (m_pOurInvOwner->IsTradeEnabled() && m_pOthersInvOwner->IsTradeEnabled())
-    {
-        UITalkDialogWnd->Hide();
-
-        UITradeWnd->InitTrade(m_pOurInvOwner, m_pOthersInvOwner);
-        UITradeWnd->Show();
-        UITradeWnd->StartTrade();
-        UITradeWnd->BringAllToTop();
-        StopSnd();
-    }
-}
 
 bool CUITalkWnd::IR_OnKeyboardPress(int dik)
 {

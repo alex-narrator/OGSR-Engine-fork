@@ -525,7 +525,8 @@ void CUIStatic::SetMask(CUIFrameWindow* pMask)
 //	return m_pLines->GetTextAlignment();
 // }
 
-CGameFont::EAligment CUIStatic::GetTextAlignment() { return m_pLines->GetTextAlignment(); }
+ETextAlignment CUIStatic::GetTextAlignment() { return m_pLines->GetTextAlignment(); }
+EVTextAlignment CUIStatic::GetVTextAlignment() { return m_pLines->GetVTextAlignment(); }
 
 // void CUIStatic::SetTextAlign(CGameFont::EAligment align){
 //	CREATE_LINES;
@@ -587,6 +588,26 @@ void CUIStatic::OnFocusLost()
     inherited::OnFocusLost();
     if (GetMessageTarget())
         GetMessageTarget()->SendMessage(this, STATIC_FOCUS_LOST, NULL);
+}
+
+void CUIStatic::OnMouseMove()
+{
+    if (GetMessageTarget())
+        GetMessageTarget()->SendMessage(this, WINDOW_MOUSE_MOVE, NULL);
+}
+
+bool CUIStatic::OnMouseDown(int mouse_btn)
+{
+    if (GetMessageTarget() && (mouse_btn == MOUSE_1 || mouse_btn == MOUSE_2))
+        GetMessageTarget()->SendMessage(this, mouse_btn == MOUSE_1 ? WINDOW_LBUTTON_DOWN : WINDOW_RBUTTON_DOWN, NULL);
+    return inherited::OnMouseDown(mouse_btn);
+}
+
+bool CUIStatic::OnMouseUp(int mouse_btn)
+{
+    if (GetMessageTarget() && (mouse_btn == MOUSE_1 || mouse_btn == MOUSE_2))
+        GetMessageTarget()->SendMessage(this, mouse_btn == MOUSE_1 ? WINDOW_LBUTTON_UP : WINDOW_RBUTTON_UP, NULL);
+    return inherited::OnMouseUp(mouse_btn);
 }
 
 void CUIStatic::AdjustHeightToText()

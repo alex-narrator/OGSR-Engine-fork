@@ -25,35 +25,32 @@ private:
 protected:
     //элементы декоративного интерфейса
     CUIFrameLineWnd* UIMainButtonsBackground;
-    CUIFrameLineWnd* UITimerBackground;
 
     // кнопки PDA
     CUITabControl* UITabControl;
 
-    // Установить игровое время
-    void UpdateDateTime();
     void DrawUpdatedSections();
 
 protected:
     // Бэкграунд
-    CUIStatic* UIMainPdaFrame;
-    CUIStatic* m_updatedSectionImage;
-    CUIStatic* m_oldSectionImage;
+    CUIStatic* UIMainPdaFrame{};
+    CUIStatic* m_updatedSectionImage{};
+    CUIStatic* m_oldSectionImage{};
 
     // Текущий активный диалог
-    CUIWindow* m_pActiveDialog;
+    CUIWindow* m_pActiveDialog{};
     xr_vector<Fvector2> m_sign_places_main;
 
 public:
     EPdaTabs m_pActiveSection;
     // Поддиалоги PDA
-    CUIMapWnd* UIMapWnd;
-    CUIPdaContactsWnd* UIPdaContactsWnd;
-    CUIEncyclopediaWnd* UIEncyclopediaWnd;
-    CUIDiaryWnd* UIDiaryWnd;
-    CUIActorInfoWnd* UIActorInfo;
-    CUIStalkersRankingWnd* UIStalkersRanking;
-    CUIEventsWnd* UIEventsWnd;
+    CUIMapWnd* UIMapWnd{};
+    CUIPdaContactsWnd* UIPdaContactsWnd{};
+    CUIEncyclopediaWnd* UIEncyclopediaWnd{};
+    CUIDiaryWnd* UIDiaryWnd{};
+    CUIActorInfoWnd* UIActorInfo{};
+    CUIStalkersRankingWnd* UIStalkersRanking{};
+    CUIEventsWnd* UIEventsWnd{};
     virtual void Reset();
 
 public:
@@ -65,7 +62,6 @@ public:
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 
     virtual void Draw();
-    virtual void Update();
     virtual void Show();
     virtual void Hide();
     virtual bool OnMouse(float x, float y, EUIMessages mouse_action) override;

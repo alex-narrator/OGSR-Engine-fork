@@ -4,26 +4,19 @@
 #include "../UIStaticItem.h"
 #include "UIStatic.h"
 #include "xrServer_Objects_ALife.h"
-#include "../eatable_item.h"
 #include "../Level.h"
 #include "../HUDManager.h"
 #include "../date_time.h"
 #include "../string_table.h"
-#include "../Inventory.h"
-#include "../InventoryOwner.h"
 
 #include "../InfoPortion.h"
 #include "../game_base_space.h"
 #include "../actor.h"
 
-#define EQUIPMENT_ICONS "ui\\ui_icon_equipment"
-
 constexpr LPCSTR relationsLtxSection = "game_relations";
 constexpr LPCSTR ratingField = "rating_names";
 constexpr LPCSTR reputationgField = "reputation_names";
 constexpr LPCSTR goodwillField = "goodwill_names";
-
-static xr_unordered_map<size_t, ui_shader> g_EquipmentIconsShaders;
 
 typedef std::pair<CHARACTER_RANK_VALUE, shared_str> CharInfoStringID;
 DEF_MAP(CharInfoStrings, CHARACTER_RANK_VALUE, shared_str);
@@ -31,185 +24,6 @@ DEF_MAP(CharInfoStrings, CHARACTER_RANK_VALUE, shared_str);
 CharInfoStrings* charInfoReputationStrings = NULL;
 CharInfoStrings* charInfoRankStrings = NULL;
 CharInfoStrings* charInfoGoodwillStrings = NULL;
-
-void InventoryUtilities::CreateShaders() {}
-
-void InventoryUtilities::DestroyShaders() { g_EquipmentIconsShaders.clear(); }
-
-bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
-{
-    Ivector2 r1, r2;
-    r1.x = item1->GetGridWidth();
-    r1.y = item1->GetGridHeight();
-    r2.x = item2->GetGridWidth();
-    r2.y = item2->GetGridHeight();
-
-    if (r1.x > r2.x)
-        return true;
-
-    if (r1.x == r2.x)
-    {
-        if (r1.y > r2.y)
-            return true;
-
-        if (r1.y == r2.y)
-        {
-            auto item1ClassName = typeid(*item1).name();
-            auto item2ClassName = typeid(*item2).name();
-
-            int s = xr_strcmp(item1ClassName, item2ClassName);
-
-            if (s == 0)
-            {
-                const CLASS_ID class1 = TEXT2CLSID(pSettings->r_string(item1->object().cNameSect(), "class"));
-                const CLASS_ID class2 = TEXT2CLSID(pSettings->r_string(item2->object().cNameSect(), "class"));
-
-                // if (!xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()))
-                if (class1 == class2)
-                {
-                    if (!xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()))
-                    {
-                        const auto* ammo1 = smart_cast<CWeaponAmmo*>(item1);
-                        const auto* ammo2 = smart_cast<CWeaponAmmo*>(item2);
-
-                        if (ammo1 && ammo2)
-                        {
-                            if (ammo1->m_boxCurr == ammo2->m_boxCurr)
-                                // return (item1->object().ID() < item2->object().ID());
-                                return xr_strcmp(item1->Name(), item2->Name()) < 0;
-
-                            return (ammo1->m_boxCurr > ammo2->m_boxCurr);
-                        }
-
-                        if (fsimilar(item1->GetCondition(), item2->GetCondition(), 0.01f))
-                            // return (item1->object().ID() < item2->object().ID());
-                            return xr_strcmp(item1->Name(), item2->Name()) < 0;
-
-                        return (item1->GetCondition() > item2->GetCondition());
-                    }
-                    else
-                        return xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()) < 0;
-                }
-                else
-                    // return xr_strcmp(item1->object().cNameSect(), item2->object().cNameSect()) < 0;
-                    return class1 < class2;
-            }
-            else
-            {
-                return s < 0;
-            }
-        }
-
-        return false;
-    }
-    return false;
-}
-
-bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _item, int width, int height)
-{
-    bool* ruck_room = (bool*)alloca(width * height);
-
-    int i, j, k, m;
-    int place_row = 0, place_col = 0;
-    bool found_place;
-    bool can_place;
-
-    for (i = 0; i < height; ++i)
-        for (j = 0; j < width; ++j)
-            ruck_room[i * width + j] = false;
-
-    item_list.push_back(_item);
-    std::stable_sort(item_list.begin(), item_list.end(), [](const auto& a, const auto& b) {
-        if (a->GetGridWidth() > b->GetGridWidth())
-            return true;
-        if (a->GetGridWidth() == b->GetGridWidth())
-            return a->GetGridHeight() > b->GetGridHeight();
-        return false;
-    });
-
-    found_place = true;
-
-    for (xr_vector<PIItem>::iterator it = item_list.begin(); (item_list.end() != it) && found_place; ++it)
-    {
-        PIItem pItem = *it;
-        int iWidth = pItem->GetGridWidth();
-        int iHeight = pItem->GetGridHeight();
-        //проверить можно ли разместить элемент,
-        //проверяем последовательно каждую клеточку
-        found_place = false;
-
-        for (i = 0; (i < height - iHeight + 1) && !found_place; ++i)
-        {
-            for (j = 0; (j < width - iWidth + 1) && !found_place; ++j)
-            {
-                can_place = true;
-
-                for (k = 0; (k < iHeight) && can_place; ++k)
-                {
-                    for (m = 0; (m < iHeight) && can_place; ++m)
-                    {
-                        if (ruck_room[(i + k) * width + (j + m)])
-                            can_place = false;
-                    }
-                }
-
-                if (can_place)
-                {
-                    found_place = true;
-                    place_row = i;
-                    place_col = j;
-                }
-            }
-        }
-
-        //разместить элемент на найденном месте
-        if (found_place)
-        {
-            for (k = 0; k < iHeight; ++k)
-            {
-                for (m = 0; m < iWidth; ++m)
-                {
-                    ruck_room[(place_row + k) * width + place_col + m] = true;
-                }
-            }
-        }
-    }
-
-    // remove
-    item_list.erase(std::remove(item_list.begin(), item_list.end(), _item), item_list.end());
-
-    //для какого-то элемента места не нашлось
-    if (!found_place)
-        return false;
-
-    return true;
-}
-
-ui_shader& InventoryUtilities::GetEquipmentIconsShader(size_t icon_group)
-{
-    if (auto it = g_EquipmentIconsShaders.find(icon_group); it == g_EquipmentIconsShaders.end())
-    {
-        string_path file;
-        strcpy_s(file, EQUIPMENT_ICONS);
-        if (icon_group > 0)
-        {
-            strcat_s(file, "_");
-            itoa(icon_group, file + strlen(file), 10);
-        }
-
-        g_EquipmentIconsShaders[icon_group]->create("hud\\default", file);
-    }
-
-    return g_EquipmentIconsShaders.at(icon_group);
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-const shared_str InventoryUtilities::GetGameDateAsString(EDatePrecision datePrec, char dateSeparator) { return GetDateAsString(Level().GetGameTime(), datePrec, dateSeparator); }
-
-//////////////////////////////////////////////////////////////////////////
-
-const shared_str InventoryUtilities::GetGameTimeAsString(ETimePrecision timePrec, char timeSeparator) { return GetTimeAsString(Level().GetGameTime(), timePrec, timeSeparator); }
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -286,44 +100,6 @@ LPCSTR InventoryUtilities::GetTimePeriodAsString(LPSTR _buff, u32 buff_sz, ALife
         cnt = sprintf_s(_buff + cnt, buff_sz - cnt, "%d %s", secs2 - secs1, *CStringTable().translate("ui_st_secs"));
 
     return _buff;
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-void InventoryUtilities::UpdateWeight(CUIStatic& wnd, bool withPrefix)
-{
-    CInventoryOwner* pInvOwner = smart_cast<CInventoryOwner*>(Level().CurrentEntity());
-    R_ASSERT(pInvOwner);
-    string128 buf{};
-
-    float total = pInvOwner->inventory().CalcTotalWeight();
-    float max = pInvOwner->MaxCarryWeight();
-
-    string16 cl{};
-
-    if (total > max)
-    {
-        strcpy_s(cl, "%c[red]");
-    }
-    else
-    {
-        strcpy_s(cl, "%c[UI_orange]");
-    }
-
-    string32 prefix{};
-
-    if (withPrefix)
-    {
-        sprintf_s(prefix, "%%c[default]%s ", *CStringTable().translate("ui_inv_weight"));
-    }
-    else
-    {
-        strcpy_s(prefix, "");
-    }
-
-    sprintf_s(buf, "%s%s%3.1f %s/%5.1f", prefix, cl, total, "%c[UI_orange]", max);
-    wnd.SetText(buf);
-    //	UIStaticWeight.ClipperOff();
 }
 
 //////////////////////////////////////////////////////////////////////////

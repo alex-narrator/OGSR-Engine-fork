@@ -6,25 +6,23 @@
 
 CWeaponPistol::CWeaponPistol(LPCSTR name) : CWeaponCustomPistol(name)
 {
-    m_eSoundClose = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING /*| eSoundType*/);
-    m_opened = false;
+    //m_eSoundClose = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING /*| eSoundType*/);
 }
 
-CWeaponPistol::~CWeaponPistol(void) {}
-
-void CWeaponPistol::net_Destroy()
-{
-    inherited::net_Destroy();
-
-    // sounds
-    HUD_SOUND::DestroySound(sndClose);
-}
+//void CWeaponPistol::net_Destroy()
+//{
+//    inherited::net_Destroy();
+//
+//    // sounds
+//    HUD_SOUND::DestroySound(sndClose);
+//}
 
 void CWeaponPistol::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    HUD_SOUND::LoadSound(section, "snd_close", sndClose, m_eSoundClose);
+    /*HUD_SOUND::LoadSound(section, "snd_close", sndClose, m_eSoundClose);*/
+    m_sounds.LoadSound(section, "snd_close", "sndClose", SOUND_TYPE_WEAPON_RECHARGING);
 }
 
 void CWeaponPistol::OnH_B_Chield()
@@ -103,7 +101,7 @@ void CWeaponPistol::PlayAnimIdle()
             if (AnimationExist("anm_idle_aim_end_empty"))
             {
                 PlayHUDMotion("anm_idle_aim_end_empty", true, GetState());
-                PlaySound(sndAimEnd, get_LastFP());
+                PlaySound("sndAimEnd", get_LastFP());
                 return;
             }
         }
@@ -123,7 +121,7 @@ void CWeaponPistol::PlayAnimAim()
             if (AnimationExist("anm_idle_aim_start_empty"))
             {
                 PlayHUDMotion("anm_idle_aim_start_empty", true, GetState());
-                PlaySound(sndAimStart, get_LastFP());
+                PlaySound("sndAimStart", get_LastFP());
                 return;
             }
         }
@@ -148,7 +146,7 @@ void CWeaponPistol::PlayAnimAim()
 void CWeaponPistol::PlayAnimReload()
 {
     VERIFY(GetState() == eReload);
-    if (m_opened && !IsMisfire())
+    if (m_opened && !IsMisfire() && !IsSingleReloading())
         PlayHUDMotion({"anim_reload_empty", "anm_reload_empty"}, true, GetState());
     else
         inherited::PlayAnimReload();
@@ -161,7 +159,7 @@ void CWeaponPistol::PlayAnimHide()
     VERIFY(GetState() == eHiding);
     if (m_opened && !IsMisfire())
     {
-        PlaySound(sndClose, get_LastFP());
+        PlaySound("sndClose", get_LastFP());
         PlayHUDMotion({"anim_close", "anm_hide_empty"}, true, GetState());
     }
     else
@@ -171,8 +169,7 @@ void CWeaponPistol::PlayAnimHide()
 void CWeaponPistol::PlayAnimShoot()
 {
     string128 guns_shoot_anm;
-    xr_strconcat(guns_shoot_anm, "anm_shoot", (this->IsZoomed() && !this->IsRotatingToZoom()) ? "_aim" : "", iAmmoElapsed == 1 ? "_last" : "",
-                 this->IsSilencerAttached() ? "_sil" : "");
+    xr_strconcat(guns_shoot_anm, "anm_shoot", (this->IsZoomed() && !this->IsRotatingToZoom()) ? "_aim" : "", iAmmoElapsed == 1 ? "_last" : "", IsAddonAttached(eSilencer) ? "_sil" : "");
 
     if (AnimationExist(guns_shoot_anm))
     {
@@ -195,17 +192,15 @@ void CWeaponPistol::PlayAnimShoot()
 
 void CWeaponPistol::OnAnimationEnd(u32 state)
 {
-    if (state == eHiding && m_opened)
+    if ((state == eHiding || state == eShutter) && m_opened)
     {
         m_opened = false;
     }
     inherited::OnAnimationEnd(state);
 }
 
-void CWeaponPistol::UpdateSounds()
-{
-    inherited::UpdateSounds();
-
-    if (sndClose.playing())
-        sndClose.set_position(get_LastFP());
-}
+//void CWeaponPistol::UpdateSounds()
+//{
+//    inherited::UpdateSounds();
+//    UpdateSoundPosition("sndClose", get_LastFP());
+//}

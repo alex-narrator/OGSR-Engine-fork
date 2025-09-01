@@ -7,11 +7,11 @@ class CWeaponPistol : public CWeaponCustomPistol
 
 public:
     CWeaponPistol(LPCSTR name);
-    virtual ~CWeaponPistol(void);
+    virtual ~CWeaponPistol(void) {};
 
     virtual void Load(LPCSTR section);
 
-    virtual void net_Destroy();
+    /*virtual void net_Destroy();*/
     virtual void OnH_B_Chield();
 
     virtual void OnAnimationEnd(u32 state);
@@ -29,15 +29,15 @@ public:
     virtual void PlayAnimReload() override;
     virtual void PlayAnimShoot() override;
 
-    virtual void UpdateSounds();
+    /*virtual void UpdateSounds();*/
 
 protected:
     virtual bool AllowFireWhileWorking() { return true; }
 
     virtual size_t GetWeaponTypeForCollision() const override { return Pistol; }
 
-    HUD_SOUND sndClose;
-    ESoundTypes m_eSoundClose;
+    //HUD_SOUND sndClose;
+    //ESoundTypes m_eSoundClose;
 
-    bool m_opened;
+    bool m_opened{};
 };

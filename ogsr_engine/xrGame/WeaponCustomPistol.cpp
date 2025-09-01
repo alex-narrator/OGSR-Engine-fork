@@ -10,6 +10,7 @@
 CWeaponCustomPistol::CWeaponCustomPistol(LPCSTR name) : CWeaponMagazined(name, SOUND_TYPE_WEAPON_PISTOL) {}
 
 CWeaponCustomPistol::~CWeaponCustomPistol() {}
+
 void CWeaponCustomPistol::switch2_Fire()
 {
     if (GetCurrentFireMode() == 1)
@@ -23,4 +24,14 @@ void CWeaponCustomPistol::switch2_Fire()
     {
         inherited::switch2_Fire();
     }
+}
+
+void CWeaponCustomPistol::FireEnd()
+{
+    if (fTime <= 0 && GetCurrentFireMode() == 1)
+    {
+        SetPending(FALSE);
+    }
+
+    inherited::FireEnd();
 }

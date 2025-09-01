@@ -36,6 +36,9 @@ void set_ini_string_script(CSE_Abstract* abstract, LPCSTR cd)
     abstract->m_ini_file = nullptr;
 }
 
+void set_startup_anim(CSE_Visual* obj, LPCSTR anim) { obj->startup_animation = anim; }
+LPCSTR get_startup_anim(CSE_Visual* obj) { return obj->startup_animation.c_str(); }
+
 template <typename T>
 struct CWrapperBase : public T, public luabind::wrap_base
 {
@@ -118,6 +121,7 @@ void CSE_Visual::script_register(lua_State* L)
               //			.def(		constructor<>())
               //			.def(		constructor<LPCSTR>())
                   .property("visual_name", &CSE_Visual::get_visual, &CSE_Visual::set_visual)
+                  .property("startup_animation", &get_startup_anim, &set_startup_anim)
     ];
 }
 

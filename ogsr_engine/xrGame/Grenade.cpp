@@ -13,23 +13,17 @@
 #include "game_object_space.h"
 #include "script_callback_ex.h"
 #include "script_game_object.h"
+#include "ai_object_location.h"
 
-CGrenade::CGrenade(void)
-{
-    m_destroy_callback.clear();
-    m_eSoundCheckout = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING);
-}
-
-CGrenade::~CGrenade(void) { HUD_SOUND::DestroySound(sndCheckout); }
+CGrenade::CGrenade(void) { m_destroy_callback.clear(); }
 
 void CGrenade::Load(LPCSTR section)
 {
     inherited::Load(section);
     CExplosive::Load(section);
 
-    HUD_SOUND::LoadSound(section, "snd_checkout", sndCheckout, m_eSoundCheckout);
-
-    m_grenade_detonation_threshold_hit = READ_IF_EXISTS(pSettings, r_float, section, "detonation_threshold_hit", 100);
+    m_grenade_detonation_threshold_hit = READ_IF_EXISTS(pSettings, r_float, section, "detonation_threshold_hit", 100.f);
+    b_impact_fuze = READ_IF_EXISTS(pSettings, r_bool, section, "impact_fuze", false);
 }
 
 void CGrenade::Hit(SHit* pHDS)
@@ -51,7 +45,7 @@ BOOL CGrenade::net_Spawn(CSE_Abstract* DC)
     box.set(max_size, max_size, max_size);
     box.mul(3.f);
     CExplosive::SetExplosionSize(box);
-    m_thrown = false;
+    //m_thrown = false;
     return ret;
 }
 
@@ -81,12 +75,6 @@ void CGrenade::State(u32 state, u32 oldState)
 {
     switch (state)
     {
-    case eThrowStart: {
-        Fvector C;
-        Center(C);
-        PlaySound(sndCheckout, C);
-    }
-    break;
     case eThrowEnd: {
         if (m_thrown)
         {
@@ -94,9 +82,6 @@ void CGrenade::State(u32 state, u32 oldState)
                 m_pPhysicsShell->Deactivate();
             xr_delete(m_pPhysicsShell);
             m_dwDestroyTime = 0xffffffff;
-
-            if (H_Parent())
-                PutNextToSlot();
 
             if (Local())
             {
@@ -127,15 +112,6 @@ void CGrenade::Throw()
         pGrenade->SetInitiator(H_Parent()->ID());
     }
     inherited::Throw();
-
-    if (m_pCurrentInventory->GetOwner())
-    {
-        CActor* pActor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner());
-        if (pActor)
-        {
-            Actor()->set_state_wishful(Actor()->get_state_wishful() & (~mcSprint));
-        }
-    }
 
     m_fake_missile->processing_activate(); //@sliph
     m_thrown = true;
@@ -178,78 +154,11 @@ void CGrenade::OnEvent(NET_Packet& P, u16 type)
     CExplosive::OnEvent(P, type);
 }
 
-void CGrenade::PutNextToSlot()
-{
-    VERIFY(!getDestroy());
-
-    //выкинуть гранату из инвентаря
-    if (m_pCurrentInventory)
-    {
-        NET_Packet P;
-        m_pCurrentInventory->Ruck(this);
-
-        this->u_EventGen(P, GEG_PLAYER_ITEM2RUCK, this->H_Parent()->ID());
-        P.w_u16(this->ID());
-        this->u_EventSend(P);
-
-        CGrenade* pNext = smart_cast<CGrenade*>(m_pCurrentInventory->Same(this, true));
-        if (!pNext)
-            pNext = smart_cast<CGrenade*>(m_pCurrentInventory->SameSlot(GRENADE_SLOT, this, true));
-
-        VERIFY(pNext != this);
-
-        if (pNext && m_pCurrentInventory->Slot(pNext))
-        {
-            pNext->u_EventGen(P, GEG_PLAYER_ITEM2SLOT, pNext->H_Parent()->ID());
-            P.w_u16(pNext->ID());
-            pNext->u_EventSend(P);
-            m_pCurrentInventory->SetActiveSlot(pNext->GetSlot());
-        }
-        else
-        {
-            CActor* pActor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner());
-
-            if (pActor)
-                pActor->OnPrevWeaponSlot();
-        }
-    }
-}
-
-void CGrenade::TrySwitchGrenade(CGrenade* grenade)
-{  
-    static CGrenade* target{}; 
-    static bool need_next{};
-
-    if (!need_next && grenade)
-    {
-        target = grenade;
-        need_next = true;
-        SwitchState(eHiding);
-    }
-    else if (need_next)
-    {
-        need_next = false;
-        if (m_pCurrentInventory && target)
-        {
-            m_pCurrentInventory->Ruck(this);
-            m_pCurrentInventory->SetActiveSlot(NO_ACTIVE_SLOT);
-            m_pCurrentInventory->Slot(target);
-        }
-        target = nullptr;
-    }
-}
-
 void CGrenade::OnAnimationEnd(u32 state)
 {
     switch (state)
     {
     case eThrowEnd: SwitchState(eHidden); break;
-    case eHiding: {
-        TrySwitchGrenade();
-        setVisible(FALSE);
-        SwitchState(eHidden);
-        break;
-    }
     default: inherited::OnAnimationEnd(state);
     }
 }
@@ -258,41 +167,6 @@ void CGrenade::UpdateCL()
 {
     inherited::UpdateCL();
     CExplosive::UpdateCL();
-}
-
-bool CGrenade::Action(s32 cmd, u32 flags)
-{
-    if (inherited::Action(cmd, flags))
-        return true;
-
-    switch (cmd)
-    {
-    //переключение типа гранаты
-    case kWPN_NEXT: {
-        if (flags & CMD_START)
-        {
-            const u32 state = GetState();
-            if (m_pCurrentInventory && (state == eHidden || state == eIdle || state == eBore))
-            {
-                xr_map<shared_str, CGrenade*> tmp;
-                tmp.insert(mk_pair(cNameSect(), this));
-                for (auto it : m_pCurrentInventory->m_ruck)
-                {
-                    CGrenade* pGrenade = smart_cast<CGrenade*>(it);
-                    if (pGrenade && (tmp.find(pGrenade->cNameSect()) == tmp.end()))
-                        tmp.insert(mk_pair(pGrenade->cNameSect(), pGrenade));
-                }
-                xr_map<shared_str, CGrenade*>::iterator curr_it = tmp.find(cNameSect());
-                curr_it++;
-                CGrenade* tgt = curr_it != tmp.end() ? curr_it->second : tmp.begin()->second;
-                if (tgt->cNameSect() != this->cNameSect()) // prxphet: Если тот же тип, ничего не делаем
-                    TrySwitchGrenade(tgt);
-            }
-        }
-        return true;
-    };
-    }
-    return false;
 }
 
 BOOL CGrenade::UsedAI_Locations()
@@ -339,20 +213,32 @@ void CGrenade::Deactivate(bool now)
     inherited::Deactivate(now || (GetState() == eThrowStart || GetState() == eReady || GetState() == eThrow));
 }
 
-void CGrenade::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
-{
-    str_name = NameShort();
-    u32 ThisGrenadeCount = m_pCurrentInventory->dwfGetSameItemCount(*cNameSect(), true);
-    string16 stmp;
-    sprintf_s(stmp, "%d", ThisGrenadeCount);
-    str_count = stmp;
-    icon_sect_name = *cNameSect();
-}
-
 bool CGrenade::CanTake() const
 {
     if (!inherited::CanTake())
         return false;
 
     return !m_explosion_flags.test(flExploding) && !m_explosion_flags.test(flExploded);
+}
+
+void CGrenade::Contact(CPhysicsShellHolder* obj)
+{
+    inherited::Contact(obj);
+    if (Initiator() == u16(-1) || !b_impact_fuze)
+        return;
+    if (m_dwDestroyTime <= Level().timeServer())
+    {
+        VERIFY(!m_pCurrentInventory);
+        Destroy();
+        return;
+    }
+    // recreate usable grenade
+    Fvector pos{Position()};
+    u32 lvid = UsedAI_Locations() ? ai_location().level_vertex_id() : ai().level_graph().vertex_id(pos);
+    CSE_Abstract* object = Level().spawn_item(cNameSect().c_str(), pos, lvid, 0xffff, true);
+    NET_Packet P;
+    object->Spawn_Write(P, TRUE);
+    Level().Send(P, net_flags(TRUE));
+    F_entity_Destroy(object);
+    DestroyObject();
 }

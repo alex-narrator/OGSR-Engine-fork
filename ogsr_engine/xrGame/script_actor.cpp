@@ -83,12 +83,11 @@ CActorConditionObject* get_actor_condition(CActor* pActor) { return (CActorCondi
 SRotation& get_actor_orientation(CActor* pActor) { return pActor->Orientation(); }
 
 // extern LPCSTR get_lua_class_name(luabind::object O);
+bool IsLimping(CActorCondition* C) { return C->IsLimping(); }
 
-bool IsLimping(CActorCondition* C) { return C->m_condition_flags.test(CActorCondition::eLimping); }
+bool IsCantWalk(CActorCondition* C) { return C->IsCantWalk(); }
 
-bool IsCantWalk(CActorCondition* C) { return C->m_condition_flags.test(CActorCondition::eCantWalk); }
-
-bool IsCantSprint(CActorCondition* C) { return C->m_condition_flags.test(CActorCondition::eCantSprint); }
+bool IsCantSprint(CActorCondition* C) { return C->IsCantSprint(); }
 
 void CScriptActor::script_register(lua_State* L)
 {
@@ -96,30 +95,20 @@ void CScriptActor::script_register(lua_State* L)
         L)[class_<CActorCondition>("CActorConditionBase")
                .property("health", &CActorCondition::GetHealth, &set_health)
                .property("health_max", &CActorCondition::GetMaxHealth, &set_max_health)
-               .def_readwrite("alcohol_health", &CActorCondition::m_fAlcohol)
+               .def_readwrite("alcohol", &CActorCondition::m_fAlcohol)
                .def_readwrite("alcohol_v", &CActorCondition::m_fV_Alcohol)
                .def_readwrite("power_v", &CActorCondition::m_fV_Power)
                .def_readwrite("satiety", &CActorCondition::m_fSatiety)
                .def_readwrite("satiety_v", &CActorCondition::m_fV_Satiety)
-               .def_readwrite("satiety_health_v", &CActorCondition::m_fV_SatietyHealth)
-               .def_readwrite("satiety_power_v", &CActorCondition::m_fV_SatietyPower)
 
-               .def_readwrite("thirst", &CActorCondition::m_fThirst)
-               .def_readwrite("thirst_v", &CActorCondition::m_fV_Thirst)
-               .def_readwrite("thirst_health_v", &CActorCondition::m_fV_ThirstHealth)
-               .def_readwrite("thirst_power_v", &CActorCondition::m_fV_ThirstPower)
 
                .def_readwrite("max_power_leak_speed", &CActorCondition::m_fPowerLeakSpeed)
                .def_readwrite("jump_power", &CActorCondition::m_fJumpPower)
-               .def_readwrite("stand_power", &CActorCondition::m_fStandPower)
                .def_readwrite("walk_power", &CActorCondition::m_fWalkPower)
-               .def_readwrite("jump_weight_power", &CActorCondition::m_fJumpWeightPower)
-               .def_readwrite("walk_weight_power", &CActorCondition::m_fWalkWeightPower)
                .def_readwrite("overweight_walk_k", &CActorCondition::m_fOverweightWalkK)
                .def_readwrite("overweight_jump_k", &CActorCondition::m_fOverweightJumpK)
                .def_readwrite("accel_k", &CActorCondition::m_fAccelK)
                .def_readwrite("sprint_k", &CActorCondition::m_fSprintK)
-               .def_readwrite("max_walk_weight", &CActorCondition::m_MaxWalkWeight)
 
                //.def_readwrite("health_hit_part",			&CActorCondition::m_fHealthHitPart)
                .def_readwrite("power_hit_part", &CActorCondition::m_fPowerHitPart)
@@ -163,6 +152,7 @@ void CScriptActor::script_register(lua_State* L)
                .def_readwrite("hit_slowmo", &CActor::hit_slowmo)
                .def_readwrite("hit_probability", &CActor::hit_probability)
                .def_readwrite("walk_accel", &CActor::m_fWalkAccel)
+               .def_readwrite("exo_factor", &CActor::m_fExoFactor)
 
                .def_readwrite("run_coef", &CActor::m_fRunFactor)
                .def_readwrite("run_back_coef", &CActor::m_fRunBackFactor)
@@ -185,6 +175,8 @@ void CScriptActor::script_register(lua_State* L)
                .property("orientation", &get_actor_orientation)
 
                // Real Wolf. Start. 14.10.2014.
+               .def("block_action", &CActor::block_action)
+               .def("unblock_action", &CActor::unblock_action)
                .def("press_action", &CActor::IR_OnKeyboardPress)
                .def("hold_action", &CActor::IR_OnKeyboardHold)
                .def("release_action", &CActor::IR_OnKeyboardRelease)
@@ -203,8 +195,56 @@ void CScriptActor::script_register(lua_State* L)
                .def("is_actor_creeping", &CActor::is_actor_creeping)
                .def("is_actor_climbing", &CActor::is_actor_climbing)
                .def("is_actor_moving", &CActor::is_actor_moving)
-               .def("UpdateArtefactsOnBelt", &CActor::UpdateArtefactsOnBelt)
-               .def("IsDetectorActive", &CActor::IsDetectorActive),
+
+                // wishful state
+               .def("get_state_wishful", &CActor::get_state_wishful)
+               .def("set_state_wishful", &CActor::set_state_wishful)
+
+               .def_readwrite("clear_crouch", &CActor::b_ClearCrouch)
+
+               .def("IsDetectorActive", &CActor::IsDetectorActive)
+               .def_readonly("sound_noise", &CActor::m_snd_noise)
+               .def("is_accelerated", &isActorAccelerated)
+
+               .def("get_visibility", &CActor::GetVisibility)
+               .def("reset_visibility", &CActor::ResetVisibility)
+
+               .def("get_default_action_for_obj", &CActor::GetDefaultActionForObject)
+
+               .def("get_artefacts_effect", &CActor::GetTotalArtefactsEffect)
+               .def("get_artefacts_protection", &CActor::GetArtefactsProtection)
+               .def("get_items_effect", &CActor::GetItemBoostedParams)
+               .def("update_items_effect", &CActor::UpdateItemsEffect)
+               
+               .def_readwrite("center_crosshair", &CActor::m_bCenterCrosshair)
+               .def_readwrite("hide_crosshair", &CActor::m_bHideCrosshair)
+                ,
+
+                //move commands
+              class_<enum_exporter<EMoveCommand>>("move_command")
+               .enum_("commands")[
+                   value("mcFwd", int(mcFwd)), 
+                   value("mcBack", int(mcBack)), 
+                   value("mcLStrafe", int(mcLStrafe)), 
+                   value("mcRStrafe", int(mcRStrafe)),
+                   value("mcCrouch", int(mcCrouch)), 
+                   value("mcAccel", int(mcAccel)), 
+                   value("mcTurn", int(mcTurn)), 
+                   value("mcJump", int(mcJump)), 
+                   value("mcTurn", int(mcTurn)),
+                   value("mcFall", int(mcFall)), 
+                   value("mcLanding", int(mcLanding)), 
+                   value("mcLanding2", int(mcLanding2)),
+                   value("mcClimb", int(mcClimb)), 
+                   value("mcSprint", int(mcSprint)), 
+                   value("mcLLookout", int(mcLLookout)),
+                   value("mcRLookout", int(mcRLookout)), 
+                   value("mcAnyMove", int(mcAnyMove)), 
+                   value("mcAnyAction", int(mcAnyAction)),
+                   value("mcAnyState", int(mcAnyState)),
+                   value("mcLookout", int(mcLookout)),
+                   value("mcCrouchAccel", int(mcCrouchAccel))
+               ],
            class_<CActorObject, bases<CActor, CEntityAlive>>("CActor") // хак с наследованием нужен для переопределения свойств. Luabind не поддерживает property getters override
 
     ];

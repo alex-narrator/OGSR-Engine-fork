@@ -9,7 +9,7 @@
 #include "UIMMShniaga.h"
 #include "UITextureMaster.h"
 #include "UIScrollView.h"
-#include "UIIconParams.h"
+#include "UIProgressBar.h"
 
 CFontManager& mngr() { return *(UI()->Font()); }
 
@@ -44,8 +44,6 @@ Frect get_texture_rect(LPCSTR icon_name) { return CUITextureMaster::GetTextureRe
 LPCSTR get_texture_name(LPCSTR icon_name) { return CUITextureMaster::GetTextureFileName(icon_name); }
 
 TEX_INFO get_texture_info(LPCSTR name, LPCSTR def_name) { return CUITextureMaster::FindItem(name, def_name); }
-
-LPCSTR CIconParams__get_name(CIconParams* self) { return self->name.c_str(); }
 
 template <typename T>
 T* wnd_object_cast(CUIWindow* wnd)
@@ -125,7 +123,11 @@ void CUIWindow::script_register(lua_State* L)
                   .def("FindChild", (CUIWindow * (CUIWindow::*)(LPCSTR)) & CUIWindow::FindChild)
                   .def("GetButton", &wnd_object_cast<CUIButton>)
                   .def("GetCUIStatic", &wnd_object_cast<CUIStatic>)
-                  .def("GetAbsoluteRect", (void(CUIWindow::*)(Frect&)) & CUIWindow::GetAbsoluteRect),
+                  .def("GetProgressBar", &wnd_object_cast<CUIProgressBar>)
+                  .def("GetAbsoluteRect", (void(CUIWindow::*)(Frect&)) & CUIWindow::GetAbsoluteRect)
+                  .def("BringToTop", &CUIWindow::BringToTop)
+                  .def("BringToBottom", &CUIWindow::BringToBottom)
+                  .def("BringAllToTop", &CUIWindow::BringAllToTop),
 
               //		.def("",						&CUIWindow::)
 
@@ -169,18 +171,11 @@ void CUIWindow::script_register(lua_State* L)
                   .def("GetMaxScrollPos", &CUIScrollView::GetMaxScrollPos)
                   .def("GetCurrentScrollPos", &CUIScrollView::GetCurrentScrollPos)
                   .def("SetScrollPos", &CUIScrollView::SetScrollPos)
-                  .def("ForceUpdate", &CUIScrollView::ForceUpdate),
+                  .def("ForceUpdate", &CUIScrollView::ForceUpdate)
+                  .def("ForceScrollPos", &CUIScrollView::ForceScrollPosition)
+                  .def("GetDesiredChildWidth", &CUIScrollView::GetDesiredChildWidth)
+                  .def("GetPadSize", &CUIScrollView::GetPadSize),
 
-              class_<CIconParams>("CIconParams")
-                  .def(constructor<LPCSTR>())
-                  .def_readonly("icon_group", &CIconParams::icon_group)
-                  .def_readonly("grid_width", &CIconParams::grid_width)
-                  .def_readonly("grid_height", &CIconParams::grid_height)
-                  .def_readonly("grid_x", &CIconParams::grid_x)
-                  .def_readonly("grid_y", &CIconParams::grid_y)
-                  .property("icon_name", &CIconParams__get_name)
-                  .def("original_rect", &CIconParams::original_rect)
-                  .def("set_shader", (void(CIconParams::*)(CUIStatic*)) & CIconParams::set_shader),
 
               //		.def("",						&CUIFrameLineWnd::)
               //		.def("",						&CUIFrameLineWnd::)
@@ -217,10 +212,6 @@ void CUIWindow::script_register(lua_State* L)
 #pragma todo("KRodin: ивент RADIOBUTTON_SET нигде не вызывается. Надо доделать по необходимости.")
                       value("RADIOBUTTON_SET", int(RADIOBUTTON_SET)),
 
-                      // CUIdragDropItem
-                      value("DRAG_DROP_ITEM_DRAG", int(DRAG_DROP_ITEM_DRAG)), value("DRAG_DROP_ITEM_DROP", int(DRAG_DROP_ITEM_DROP)),
-                      value("DRAG_DROP_ITEM_DB_CLICK", int(DRAG_DROP_ITEM_DB_CLICK)), value("DRAG_DROP_ITEM_RBUTTON_CLICK", int(DRAG_DROP_ITEM_RBUTTON_CLICK)),
-
                       // CUIScrollBox
                       value("SCROLLBOX_MOVE", int(SCROLLBOX_MOVE)),
 
@@ -239,20 +230,10 @@ void CUIWindow::script_register(lua_State* L)
                       value("MESSAGE_BOX_QUIT_GAME_CLICKED", int(MESSAGE_BOX_QUIT_GAME_CLICKED)), value("MESSAGE_BOX_QUIT_WIN_CLICKED", int(MESSAGE_BOX_QUIT_WIN_CLICKED)),
 
                       // CUITalkDialogWnd
-                      value("TALK_DIALOG_TRADE_BUTTON_CLICKED", int(TALK_DIALOG_TRADE_BUTTON_CLICKED)), value("TALK_DIALOG_QUESTION_CLICKED", int(TALK_DIALOG_QUESTION_CLICKED)),
+                      value("TALK_DIALOG_QUESTION_CLICKED", int(TALK_DIALOG_QUESTION_CLICKED)),
 
     // CUIPdaContactsWnd
 #pragma todo( \
     "KRodin: ивент PDA_CONTACTS_WND_CONTACT_SELECTED нигде не вызывается. Надо доделать по необходимости. Хотя я не очень представляю, для чего он может понадобиться в скриптах.")
-                      value("PDA_CONTACTS_WND_CONTACT_SELECTED", int(PDA_CONTACTS_WND_CONTACT_SELECTED)),
-
-                      // CUITradeWnd
-                      value("TRADE_WND_CLOSED", int(TRADE_WND_CLOSED)),
-
-                      // CUIInventroyWnd
-                      value("INVENTORY_DROP_ACTION", int(INVENTORY_DROP_ACTION)), value("INVENTORY_EAT_ACTION", int(INVENTORY_EAT_ACTION)),
-                      value("INVENTORY_TO_BELT_ACTION", int(INVENTORY_TO_BELT_ACTION)), value("INVENTORY_TO_SLOT_ACTION", int(INVENTORY_TO_SLOT_ACTION)),
-                      value("INVENTORY_TO_BAG_ACTION", int(INVENTORY_TO_BAG_ACTION)), value("INVENTORY_ATTACH_ADDON", int(INVENTORY_ATTACH_ADDON)),
-                      value("INVENTORY_DETACH_SCOPE_ADDON", int(INVENTORY_DETACH_SCOPE_ADDON)), value("INVENTORY_DETACH_SILENCER_ADDON", int(INVENTORY_DETACH_SILENCER_ADDON)),
-                      value("INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON", int(INVENTORY_DETACH_GRENADE_LAUNCHER_ADDON))]];
+                      value("PDA_CONTACTS_WND_CONTACT_SELECTED", int(PDA_CONTACTS_WND_CONTACT_SELECTED))]];
 }

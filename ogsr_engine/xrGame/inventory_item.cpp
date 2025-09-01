@@ -26,38 +26,35 @@
 #include "alife_simulator_header.h"
 #include "grenade.h"
 
+#include "game_object_space.h"
+#include "script_callback_ex.h"
+#include "script_game_object.h"
+
+#include "BoneProtections.h"
+
 #ifdef DEBUG
 #include "debug_renderer.h"
 #endif
 
 CInventoryItem::CInventoryItem()
 {
+    SetDropManual(FALSE);
     SetSlot(NO_ACTIVE_SLOT);
     m_flags.zero();
     m_flags.set(Fbelt, FALSE);
     m_flags.set(Fruck, TRUE);
-    m_flags.set(FRuckDefault, TRUE);
-    m_pCurrentInventory = NULL;
-
-    SetDropManual(FALSE);
-
+    m_flags.set(FRuckDefault, FALSE);
     m_flags.set(FCanTake, TRUE);
     m_flags.set(FCanTrade, TRUE);
     m_flags.set(FUsingCondition, FALSE);
-    m_fCondition = 1.0f;
 
-    m_name = m_nameShort = NULL;
+    m_HitTypeProtection.clear();
+    m_HitTypeProtection.resize(ALife::eHitTypeMax);
 
-    m_eItemPlace = eItemPlaceUndefined;
-    m_Description = "";
-    m_cell_item = NULL;
+    m_ItemEffect.clear();
+    m_ItemEffect.resize(eEffectMax);
 
-    m_fPsyHealthRestoreSpeed = 0.f;
-    m_fRadiationRestoreSpeed = 0.f;
-
-    loaded_belt_index = (u8)(-1);
-    m_highlight_equipped = false;
-    m_always_ungroupable = false;
+    m_boneProtection = xr_new<SBoneProtections>();
 }
 
 CInventoryItem::~CInventoryItem()
@@ -74,12 +71,14 @@ CInventoryItem::~CInventoryItem()
 
         Msg("! ERROR item_id[%d] H_Parent=[%s][%d] [%d]", object().ID(), p ? p->cName().c_str() : "none", p ? p->ID() : -1, Device.dwFrame);
     }
+
+    sndBreaking.destroy();
+    xr_delete(m_boneProtection);
 }
 
 void CInventoryItem::Load(LPCSTR section)
 {
     CHitImmunity::LoadImmunities(pSettings->r_string(section, "immunities_sect"), pSettings);
-    m_icon_params.Load(section);
 
     ISpatial* self = smart_cast<ISpatial*>(this);
     if (self)
@@ -95,76 +94,120 @@ void CInventoryItem::Load(LPCSTR section)
     m_cost = pSettings->r_u32(section, "cost");
 
     m_slots_sect = READ_IF_EXISTS(pSettings, r_string, section, "slot", "");
+    m_slots.clear();
+    SetSlot(NO_ACTIVE_SLOT);
+    if (m_slots_sect)
     {
         char buf[16];
         const int count = _GetItemCount(m_slots_sect);
         if (count)
-            m_slots.clear(); // full override!
-        for (int i = 0; i < count; ++i)
         {
-            u8 slot = u8(atoi(_GetItem(m_slots_sect, i, buf)));
-            // вместо std::find(m_slots.begin(), m_slots.end(), slot) == m_slots.end() используется !IsPlaceable
-            if (slot < SLOTS_TOTAL && !IsPlaceable(slot, slot))
-                m_slots.push_back(slot);
-        }
-        if (count)
+            for (int i = 0; i < count; ++i)
+            {
+                u8 slot = u8(atoi(_GetItem(m_slots_sect, i, buf)));
+                // вместо std::find(m_slots.begin(), m_slots.end(), slot) == m_slots.end() используется !IsPlaceable
+                if (slot < SLOTS_TOTAL && !IsPlaceable(slot, slot))
+                    m_slots.push_back(slot);
+            }
             SetSlot(m_slots[0]);
-    }
-
-    if (Core.Features.test(xrCore::Feature::forcibly_equivalent_slots))
-    {
-        // В OGSR, первый и второй оружейные слоты принудительно
-        // равнозначны. Что бы сохранить совместимость с этим, если
-        // для предмета указан только один слот и это оружейный слот,
-        // добавим к нему соотв. второй оружейный слот.
-        if (GetSlotsCount() == 1)
-        {
-            if (m_slots[0] == FIRST_WEAPON_SLOT)
-                m_slots.push_back(SECOND_WEAPON_SLOT);
-            else if (m_slots[0] == SECOND_WEAPON_SLOT)
-                m_slots.push_back(FIRST_WEAPON_SLOT);
         }
     }
-
-    // Description
-    if (pSettings->line_exist(section, "description"))
-        m_Description = CStringTable().translate(pSettings->r_string(section, "description"));
 
     m_flags.set(Fbelt, READ_IF_EXISTS(pSettings, r_bool, section, "belt", FALSE));
-    m_flags.set(FRuckDefault, READ_IF_EXISTS(pSettings, r_bool, section, "default_to_ruck", TRUE));
+    m_flags.set(FRuckDefault, READ_IF_EXISTS(pSettings, r_bool, section, "default_to_ruck", FALSE));
     m_flags.set(FCanTake, READ_IF_EXISTS(pSettings, r_bool, section, "can_take", TRUE));
     m_flags.set(FCanTrade, READ_IF_EXISTS(pSettings, r_bool, section, "can_trade", TRUE));
     m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
-
     m_flags.set(FAllowSprint, READ_IF_EXISTS(pSettings, r_bool, section, "sprint_allowed", TRUE));
+    //
+    m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", FALSE));
+
     m_fControlInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "control_inertion_factor", 1.0f);
-    m_icon_name = READ_IF_EXISTS(pSettings, r_string, section, "icon_name", NULL);
 
-    m_fPsyHealthRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "psy_health_restore_speed", 0.f);
-    m_fRadiationRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "radiation_restore_speed", 0.f);
-    m_always_ungroupable = READ_IF_EXISTS(pSettings, r_bool, section, "always_ungroupable", false);
+    b_breakable = READ_IF_EXISTS(pSettings, r_bool, section, "breakable", false);
 
-    m_need_brief_info = READ_IF_EXISTS(pSettings, r_bool, section, "show_brief_info", true);
-}
+    if (pSettings->line_exist(section, "break_particles"))
+        m_sBreakParticles = pSettings->r_string(section, "break_particles");
 
-void CInventoryItem::ReloadNames()
-{
-    m_name = CStringTable().translate(pSettings->r_string(m_object->cNameSect(), "inv_name"));
-    m_nameShort = CStringTable().translate(pSettings->r_string(m_object->cNameSect(), "inv_name_short"));
-    m_Description = CStringTable().translate(pSettings->r_string(m_object->cNameSect(), "description"));
+    if (pSettings->line_exist(section, "break_sound"))
+        sndBreaking.create(pSettings->r_string(section, "break_sound"), st_Effect, sg_SourceType);
+
+    //*_restore_speed
+    m_ItemEffect[eHealthRestoreSpeed] = READ_IF_EXISTS(pSettings, r_float, section, "health_restore_speed", 0.f);
+    m_ItemEffect[ePowerRestoreSpeed] = READ_IF_EXISTS(pSettings, r_float, section, "power_restore_speed", 0.f);
+    m_ItemEffect[eMaxPowerRestoreSpeed] = READ_IF_EXISTS(pSettings, r_float, section, "max_power_restore_speed", 0.f);
+    m_ItemEffect[eSatietyRestoreSpeed] = READ_IF_EXISTS(pSettings, r_float, section, "satiety_restore_speed", 0.f);
+    m_ItemEffect[eRadiationRestoreSpeed] = READ_IF_EXISTS(pSettings, r_float, section, "radiation_restore_speed", 0.f);
+    m_ItemEffect[ePsyHealthRestoreSpeed] = READ_IF_EXISTS(pSettings, r_float, section, "psy_health_restore_speed", 0.f);
+    m_ItemEffect[eAlcoholRestoreSpeed] = READ_IF_EXISTS(pSettings, r_float, section, "alcohol_restore_speed", 0.f);
+    m_ItemEffect[eWoundsHealSpeed] = READ_IF_EXISTS(pSettings, r_float, section, "wounds_heal_speed", 0.f);
+    // addition
+    m_ItemEffect[eAdditionalSprint] = READ_IF_EXISTS(pSettings, r_float, section, "additional_sprint", 0.f);
+    m_ItemEffect[eAdditionalJump] = READ_IF_EXISTS(pSettings, r_float, section, "additional_jump", 0.f);
+    m_ItemEffect[eAdditionalWeight] = READ_IF_EXISTS(pSettings, r_float, section, "additional_weight", 0.f);
+    // protection
+    m_HitTypeProtection[ALife::eHitTypeBurn] = READ_IF_EXISTS(pSettings, r_float, section, "burn_protection", 0.f);
+    m_HitTypeProtection[ALife::eHitTypeShock] = READ_IF_EXISTS(pSettings, r_float, section, "shock_protection", 0.f);
+    m_HitTypeProtection[ALife::eHitTypeStrike] = READ_IF_EXISTS(pSettings, r_float, section, "strike_protection", 0.f);
+    m_HitTypeProtection[ALife::eHitTypeWound] = READ_IF_EXISTS(pSettings, r_float, section, "wound_protection", 0.f);
+    m_HitTypeProtection[ALife::eHitTypeRadiation] = READ_IF_EXISTS(pSettings, r_float, section, "radiation_protection", 0.f);
+    m_HitTypeProtection[ALife::eHitTypeTelepatic] = READ_IF_EXISTS(pSettings, r_float, section, "telepatic_protection", 0.f);
+    m_HitTypeProtection[ALife::eHitTypeChemicalBurn] = READ_IF_EXISTS(pSettings, r_float, section, "chemical_burn_protection", 0.f);
+    m_HitTypeProtection[ALife::eHitTypeExplosion] = READ_IF_EXISTS(pSettings, r_float, section, "explosion_protection", 0.f);
+    m_HitTypeProtection[ALife::eHitTypeFireWound] = READ_IF_EXISTS(pSettings, r_float, section, "fire_wound_protection", 0.f);
+    m_HitTypeProtection[ALife::eHitTypeWound_2] = READ_IF_EXISTS(pSettings, r_float, section, "wound_2_protection", 0.f);
+    m_HitTypeProtection[ALife::eHitTypePhysicStrike] = READ_IF_EXISTS(pSettings, r_float, section, "physic_strike_protection", 0.f);
+    // надбання вторинної радіації
+    //m_fRadiationAccumFactor = READ_IF_EXISTS(pSettings, r_float, section, "radiation_accum_factor", 0.f);
+    //m_fRadiationAccumLimit = READ_IF_EXISTS(pSettings, r_float, section, "radiation_accum_limit", 0.f);
+    // hands
+    eHandDependence = EHandDependence(READ_IF_EXISTS(pSettings, r_u32, section, "hand_dependence", hdNone));
+    m_bIsSingleHanded = READ_IF_EXISTS(pSettings, r_bool, section, "single_handed", TRUE);
+
+    m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 0.f);
+
+    bone_protection_sect = READ_IF_EXISTS(pSettings, r_string, section, "bones_koeff_protection", nullptr);
+
+    if (pSettings->line_exist(section, "slots_locked"))
+    {
+        LPCSTR str = pSettings->r_string(section, "slots_locked");
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 item_section;
+            _GetItem(str, i, item_section);
+            m_slots_locked.push_back(atoi(_GetItem(str, i, item_section)));
+        }
+    }
+    if (pSettings->line_exist(section, "slots_unlocked"))
+    {
+        LPCSTR str = pSettings->r_string(section, "slots_unlocked");
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 item_section;
+            _GetItem(str, i, item_section);
+            m_slots_unlocked.push_back(atoi(_GetItem(str, i, item_section)));
+        }
+    }
+
+    // covered bones
+    auto covered_bones_sect = READ_IF_EXISTS(pSettings, r_string, section, "covered_bones_sect", nullptr);
+    if (covered_bones_sect && pSettings->section_exist(covered_bones_sect))
+    {
+        for (int i = 0, count = pSettings->line_count(covered_bones_sect); i < count; ++i)
+        {
+            LPCSTR name, value;
+            pSettings->r_line(covered_bones_sect, i, &name, &value);
+            m_covered_bones.push_back(name);
+        }
+    }
 }
 
 void CInventoryItem::ChangeCondition(float fDeltaCondition)
 {
     m_fCondition += fDeltaCondition;
     clamp(m_fCondition, 0.f, 1.f);
-    auto se_obj = object().alife_object();
-    if (se_obj)
-    {
-        CSE_ALifeInventoryItem* itm = smart_cast<CSE_ALifeInventoryItem*>(se_obj);
-        if (itm)
-            itm->m_fCondition = m_fCondition;
-    }
+    if (auto itm = smart_cast<CSE_ALifeInventoryItem*>(object().alife_object()))
+        itm->m_fCondition = m_fCondition;
 }
 
 void CInventoryItem::SetSlot(u8 slot)
@@ -211,21 +254,35 @@ bool CInventoryItem::IsPlaceable(u8 min_slot, u8 max_slot)
 
 void CInventoryItem::Hit(SHit* pHDS)
 {
-    if (!m_flags.test(FUsingCondition))
-        return;
-
     float hit_power = pHDS->damage();
     hit_power *= m_HitTypeK[pHDS->hit_type];
 
-    if (hit_power > 0)
-    {
-        ChangeCondition(-hit_power);
-    }
+    bool is_rad_hit = pHDS->type() == ALife::eHitTypeRadiation;
+
+    //if (is_rad_hit && !fis_zero(m_fRadiationAccumFactor))
+    //{
+    //    m_ItemEffect[eRadiationRestoreSpeed] += m_fRadiationAccumFactor * pHDS->damage();
+    //    clamp(m_ItemEffect[eRadiationRestoreSpeed], -m_fRadiationAccumLimit, m_fRadiationAccumLimit);
+    //    // Msg("! item [%s] current m_fRadiationRestoreSpeed [%.3f]", object().cName().c_str(), m_fRadiationRestoreSpeed);
+    //    if (auto itm = smart_cast<CSE_ALifeInventoryItem*>(object().alife_object()))
+    //        itm->m_fRadiationRestoreSpeed = m_ItemEffect[eRadiationRestoreSpeed];
+    //}
+
+    object().callback(GameObject::eHit)(object().lua_game_object(), pHDS->damage(), pHDS->direction(), smart_cast<const CGameObject*>(pHDS->who)->lua_game_object(), pHDS->bone(),
+                                        pHDS->type());
+
+    if (!m_flags.test(FUsingCondition) || is_rad_hit)
+        return;
+
+    ChangeCondition(-hit_power);
+
+    if (fis_zero(GetCondition()) && b_breakable && !IsQuestItem())
+        BreakItem();
 }
 
-const char* CInventoryItem::Name() { return *m_name; }
+const char* CInventoryItem::Name() { return m_name.c_str(); }
 
-const char* CInventoryItem::NameShort() { return *m_nameShort; }
+const char* CInventoryItem::NameShort() { return m_nameShort.c_str(); }
 
 bool CInventoryItem::Useful() const { return CanTake(); }
 
@@ -273,7 +330,9 @@ void CInventoryItem::UpdateCL()
 
 void CInventoryItem::OnEvent(NET_Packet& P, u16 type)
 {
-    if (type == GE_CHANGE_POS) {
+    switch (type)
+    {
+    case GE_CHANGE_POS: {
         Fvector p;
         P.r_vec3(p);
         CPHSynchronize* pSyncObj = NULL;
@@ -286,12 +345,20 @@ void CInventoryItem::OnEvent(NET_Packet& P, u16 type)
         state.previous_position = p;
         pSyncObj->set_State(state);
     }
+    break;
+    }
 }
 
-//процесс отсоединения вещи заключается в спауне новой вещи
-//в инвентаре и установке соответствующих флагов в родительском
-//объекте, поэтому функция должна быть переопределена
-bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
+bool CInventoryItem::CanAttach(PIItem pIItem) { return false; }
+
+bool CInventoryItem::CanDetach(const char* item_section_name) { return false; }
+
+bool CInventoryItem::Attach(PIItem pIItem, bool b_send_event) { return false; }
+
+// процесс отсоединения вещи заключается в спауне новой вещи
+// в инвентаре и установке соответствующих флагов в родительском
+// объекте, поэтому функция должна быть переопределена
+bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item, float item_condition)
 {
     if (b_spawn_item)
     {
@@ -301,7 +368,11 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
         R_ASSERT(l_tpALifeDynamicObject);
 
         l_tpALifeDynamicObject->m_tNodeID = object().ai_location().level_vertex_id();
-
+        //
+        CSE_ALifeInventoryItem* item = smart_cast<CSE_ALifeInventoryItem*>(l_tpALifeDynamicObject);
+        if (item)
+            item->m_fCondition = item_condition;
+        //
         // Fill
         D->s_name = item_section_name;
         D->set_name_replace("");
@@ -323,6 +394,15 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
     return true;
 }
 
+void CInventoryItem::DetachAll()
+{
+    // if (m_pCurrentInventory)
+    //{
+    //     if (!m_pCurrentInventory->InRuck(this))
+    //         m_pCurrentInventory->Ruck(this);
+    // }
+}
+
 /////////// network ///////////////////////////////
 BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
 {
@@ -337,14 +417,10 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
         m_flags.set(Fuseful_for_NPC, alife_object->m_flags.test(CSE_ALifeObject::flUsefulForAI));
     }
 
-    auto se_obj = object().alife_object();
-    if (se_obj)
+    if (auto itm = smart_cast<CSE_ALifeInventoryItem*>(object().alife_object()))
     {
-        CSE_ALifeInventoryItem* itm = smart_cast<CSE_ALifeInventoryItem*>(se_obj);
-        if (itm)
-        {
-            m_fCondition = itm->m_fCondition;
-        }
+        m_fCondition = itm->m_fCondition;
+        /*m_ItemEffect[eRadiationRestoreSpeed] = itm->m_fRadiationRestoreSpeed;*/
     }
 
     CSE_ALifeInventoryItem* pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(e);
@@ -356,20 +432,20 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
 
 void CInventoryItem::net_Destroy()
 {
-    //инвентарь которому мы принадлежали
+    // инвентарь которому мы принадлежали
     //.	m_pCurrentInventory = NULL;
 }
 
+void CInventoryItem::net_Export(CSE_Abstract* E)
+{
+    CSE_ALifeInventoryItem* item = smart_cast<CSE_ALifeInventoryItem*>(E);
+    item->m_u8NumItems = 0;
+};
+
 void CInventoryItem::save(NET_Packet& packet)
 {
-    if (m_eItemPlace == eItemPlaceBelt && smart_cast<CActor*>(object().H_Parent()))
-    {
-        packet.w_u8((u8)eItemPlaceBeltActor);
-        packet.w_u8((u8)m_pCurrentInventory->GetIndexOnBelt(this));
-    }
-    else
-        packet.w_u8((u8)m_eItemPlace);
-    packet.w_float(m_fCondition);
+    packet.w_u8((u8)m_eItemPlace);
+
     if (m_eItemPlace == eItemPlaceSlot)
         packet.w_u8((u8)GetSlot());
 
@@ -384,35 +460,12 @@ void CInventoryItem::save(NET_Packet& packet)
     object().PHSaveState(packet);
 }
 
-void CInventoryItem::net_Export(CSE_Abstract* E)
-{
-    CSE_ALifeInventoryItem* item = smart_cast<CSE_ALifeInventoryItem*>(E);
-    item->m_u8NumItems = 0;
-};
-
 void CInventoryItem::load(IReader& packet)
 {
     m_eItemPlace = (EItemPlace)packet.r_u8();
-    if (m_eItemPlace == eItemPlaceBeltActor)
-    {
-        if (Belt())
-            SetLoadedBeltIndex(packet.r_u8());
-        else
-        {
-            packet.r_u8();
-            Msg("! [%s]: move %s from belt, because belt = false", __FUNCTION__, object().cName().c_str());
-            m_eItemPlace = eItemPlaceRuck;
-        }
-    }
-    m_fCondition = packet.r_float();
+
     if (m_eItemPlace == eItemPlaceSlot)
-        if (ai().get_alife()->header().version() < 4)
-        {
-            auto slots = GetSlots();
-            SetSlot(slots.size() ? slots[0] : NO_ACTIVE_SLOT);
-        }
-        else
-            SetSlot(packet.r_u8());
+        SetSlot(packet.r_u8());
 
     u8 tmp = packet.r_u8();
     if (!tmp)
@@ -482,7 +535,7 @@ void CInventoryItem::UpdateXForm()
     if (parent && parent->use_simplified_visual())
         return;
 
-    if (parent->attached(this))
+    if (parent && parent->attached(this))
         return;
 
     R_ASSERT(E);
@@ -499,8 +552,8 @@ void CInventoryItem::UpdateXForm()
     Fmatrix& mL = V->LL_GetTransform(u16(boneL));
     Fmatrix& mR = V->LL_GetTransform(u16(boneR));
     // Calculate
-    Fmatrix mRes;
-    Fvector R, D, N;
+    Fmatrix mRes{};
+    Fvector R{}, D{}, N{};
     D.sub(mL.c, mR.c);
     D.normalize_safe();
 
@@ -556,90 +609,176 @@ void CInventoryItem::modify_holder_params(float& range, float& fov) const
     fov *= m_holder_fov_modifier;
 }
 
-bool CInventoryItem::CanTrade() const
-{
-    bool res = true;
-#pragma todo("Dima to Andy : why CInventoryItem::CanTrade can be called for the item, which doesn't have owner?")
-    if (m_pCurrentInventory)
-        res = inventory_owner().AllowItemToTrade(this, m_eItemPlace);
-
-    return (res && m_flags.test(FCanTrade) && !IsQuestItem());
-}
-
-int CInventoryItem::GetGridWidth() const { return (int)m_icon_params.grid_width; }
-
-int CInventoryItem::GetGridHeight() const { return (int)m_icon_params.grid_height; }
-
-int CInventoryItem::GetIconIndex() const { return m_icon_params.icon_group; }
-
-int CInventoryItem::GetXPos() const { return (int)m_icon_params.grid_x; }
-int CInventoryItem::GetYPos() const { return (int)m_icon_params.grid_y; }
+bool CInventoryItem::CanTrade() const { return m_flags.test(FCanTrade) && !IsQuestItem(); }
 
 bool CInventoryItem::IsNecessaryItem(CInventoryItem* item) { return IsNecessaryItem(item->object().cNameSect()); };
 
 BOOL CInventoryItem::IsInvalid() const { return object().getDestroy() || GetDropManual(); }
 
-bool CInventoryItem::GetInvShowCondition() const { return m_icon_params.show_condition; }
-
-void CInventoryItem::SetLoadedBeltIndex(u8 pos)
+void CInventoryItem::OnMoveToSlot(EItemPlace prevPlace)
 {
-    loaded_belt_index = pos;
-    m_eItemPlace = eItemPlaceBelt;
+    if (auto pActor = smart_cast<CActor*>(object().H_Parent()))
+    {
+        //for (const auto slot : m_slots_locked)
+        //    pActor->inventory().DropSlotsToRuck(slot);
+        if (bone_protection_sect.size())
+            m_boneProtection->reload(bone_protection_sect, smart_cast<IKinematics*>(pActor->Visual()));
+    }
+};
+
+//void CInventoryItem::OnMoveToBelt(EItemPlace prevPlace)
+//{
+//    if (auto pActor = smart_cast<CActor*>(object().H_Parent()))
+//    {
+//        for (const auto slot : m_slots_locked)
+//            pActor->inventory().DropSlotsToRuck(slot);
+//    }
+//};
+//
+//void CInventoryItem::OnMoveToRuck(EItemPlace prevPlace)
+//{
+//    if (auto pActor = smart_cast<CActor*>(object().H_Parent()))
+//    {
+//        if (prevPlace != eItemPlaceUndefined)
+//        {
+//            for (const auto slot : m_slots_unlocked)
+//                pActor->inventory().DropSlotsToRuck(slot);
+//        }
+//    }
+//};
+
+void CInventoryItem::OnMoveOut(EItemPlace prevPlace) { OnMoveToRuck(prevPlace); };
+
+void CInventoryItem::BreakItem()
+{
+    if (object().H_Parent())
+    {
+        object().setEnabled(false);
+        object().setVisible(false);
+        // играем звук
+        sndBreaking.play_no_feedback(object().H_Parent(), u32{}, float{}, &object().H_Parent()->Position());
+        SetDropManual(TRUE);
+    }
+    else
+    {
+        // играем звук
+        sndBreaking.play_no_feedback(cast_game_object(), u32{}, float{}, &object().Position());
+        // отыграть партиклы разбивания
+        if (!!m_sBreakParticles)
+        {
+            // показываем эффекты
+            CParticlesObject* pStaticPG;
+            pStaticPG = CParticlesObject::Create(m_sBreakParticles.c_str(), TRUE);
+            pStaticPG->PlayAtPos(object().Position());
+        }
+    }
+    object().DestroyObject();
 }
 
-void CInventoryItem::OnMoveToSlot()
-{
-    if (smart_cast<CActor*>(object().H_Parent()) /* && !smart_cast<CGrenade*>( this )*/)
-    {
-        if (Core.Features.test(xrCore::Feature::equipped_untradable))
-        {
-            m_flags.set(FIAlwaysUntradable, TRUE);
-            m_flags.set(FIUngroupable, TRUE);
-            if (Core.Features.test(xrCore::Feature::highlight_equipped))
-                m_highlight_equipped = true;
-        }
-        else if (Core.Features.test(xrCore::Feature::highlight_equipped))
-        {
-            m_flags.set(FIUngroupable, TRUE);
-            m_highlight_equipped = true;
-        }
-    }
-};
+float CInventoryItem::GetHitTypeProtection(int hit_type) const { return m_HitTypeProtection[hit_type] * GetCondition(); }
 
-void CInventoryItem::OnMoveToBelt()
+float CInventoryItem::GetItemEffect(int effect) const
 {
-    if (smart_cast<CActor*>(object().H_Parent()))
-    {
-        if (Core.Features.test(xrCore::Feature::equipped_untradable))
-        {
-            m_flags.set(FIAlwaysUntradable, TRUE);
-            m_flags.set(FIUngroupable, TRUE);
-            if (Core.Features.test(xrCore::Feature::highlight_equipped))
-                m_highlight_equipped = true;
-        }
-        else if (Core.Features.test(xrCore::Feature::highlight_equipped))
-        {
-            m_flags.set(FIUngroupable, TRUE);
-            m_highlight_equipped = true;
-        }
-    }
-};
+    // на випромінення радіації стан предмету не впливає
+    float condition_k = (effect == eRadiationRestoreSpeed) ? 1.f : GetCondition();
+    return m_ItemEffect[effect] * condition_k;
+}
 
-void CInventoryItem::OnMoveToRuck(EItemPlace prevPlace)
+void CInventoryItem::SetHitTypeProtection(int hit_type, float val)
 {
-    if (smart_cast<CActor*>(object().H_Parent()))
+    if (hit_type >= ALife::eHitTypeMax)
     {
-        if (Core.Features.test(xrCore::Feature::equipped_untradable))
-        {
-            m_flags.set(FIAlwaysUntradable, FALSE);
-            m_flags.set(FIUngroupable, FALSE);
-            if (Core.Features.test(xrCore::Feature::highlight_equipped))
-                m_highlight_equipped = false;
-        }
-        else if (Core.Features.test(xrCore::Feature::highlight_equipped))
-        {
-            m_flags.set(FIUngroupable, FALSE);
-            m_highlight_equipped = false;
-        }
+        Msg("![%s] object [%s] :  hit_type %d non valid, max existed hit_type is %d", __FUNCTION__, Name(), hit_type, ALife::eHitTypeMax - 1);
+        return;
     }
-};
+    m_HitTypeProtection[hit_type] = val;
+}
+void CInventoryItem::SetItemEffect(int effect, float val)
+{
+    if (effect >= eEffectMax)
+    {
+        Msg("![%s] object [%s] :  effect %d non valid, max existed effect is %d", __FUNCTION__, Name(), effect, eEffectMax - 1);
+        return;
+    }
+    m_ItemEffect[effect] = val;
+}
+
+bool CInventoryItem::IsPowerOn() const { return false; }
+
+void CInventoryItem::Switch() { Switch(!IsPowerOn()); }
+
+void CInventoryItem::Switch(bool turn_on) {}
+
+//void CInventoryItem::Drop()
+//{
+//    OnMoveOut(m_eItemPlace);
+//    SetDropManual(TRUE);
+//}
+
+//void CInventoryItem::Transfer(u16 from_id, u16 to_id)
+//{
+//    OnMoveOut(m_eItemPlace);
+//
+//    NET_Packet P;
+//    CGameObject::u_EventGen(P, GE_TRANSFER_REJECT, from_id);
+//    P.w_u16(object().ID());
+//    CGameObject::u_EventSend(P);
+//
+//    if (to_id == u16(-1))
+//        return;
+//
+//    // другому инвентарю - взять вещь
+//    CGameObject::u_EventGen(P, GE_TRANSFER_TAKE, to_id);
+//    P.w_u16(object().ID());
+//    CGameObject::u_EventSend(P);
+//}
+
+bool CInventoryItem::can_be_attached() const
+{
+    const auto actor = smart_cast<const CActor*>(object().H_Parent());
+    return actor ? (m_eItemPlace == eItemPlaceBelt || m_eItemPlace == eItemPlaceSlot) : true;
+}
+
+float CInventoryItem::GetPowerLoss() { return m_fPowerLoss < 0.f && fis_zero(GetCondition()) ? 0.f : m_fPowerLoss; }
+
+float CInventoryItem::HitThruArmour(SHit* pHDS)
+{
+    float hit_power = pHDS->damage();
+    auto actor = smart_cast<CActor*>(m_pCurrentInventory->GetOwner());
+    if (!actor)
+        return hit_power;
+
+    bool b_to_covered_bone{m_covered_bones.empty() || pHDS->boneID == BI_NONE};
+    if (!b_to_covered_bone)
+        for (const auto& bone : m_covered_bones)
+            if (!xr_strcmp(smart_cast<IKinematics*>(actor->Visual())->LL_BoneName(pHDS->boneID), bone))
+            {
+                b_to_covered_bone = true;
+                break;
+            }
+
+    if (!b_to_covered_bone)
+        return hit_power;
+
+    auto hit_type = pHDS->type();
+
+    if (hit_type == ALife::eHitTypeFireWound)
+    {
+        // броню не пробито, хіт тільки від умовного удару в броню
+        float ba = m_boneProtection->getBoneArmour(pHDS->bone()) * !fis_zero(GetCondition());
+        if (pHDS->ap < ba)
+            hit_power *= m_boneProtection->m_fHitFrac;
+    }
+    else
+        hit_power *= (1.0f - GetHitTypeProtection(hit_type));
+
+    Hit(pHDS);
+
+    return hit_power;
+}
+
+void CInventoryItem::ReloadNames()
+{
+    m_name = CStringTable().translate(pSettings->r_string(m_object->cNameSect(), "inv_name"));
+    m_nameShort = CStringTable().translate(pSettings->r_string(m_object->cNameSect(), "inv_name_short"));
+}

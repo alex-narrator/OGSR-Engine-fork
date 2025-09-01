@@ -26,5 +26,7 @@ void CUIComboBox::script_register(lua_State* L)
 
                   //		.def("AddItem",				(void (CUIComboBox::*)(LPCSTR, bool)) CUIComboBox::AddItem)
                   .def("AddItem", (CUIListBoxItem * (CUIComboBox::*)(LPCSTR)) & CUIComboBox::AddItem_)
-                  .def("GetText", &CUIComboBox::GetText)];
+                  .def("GetText", &CUIComboBox::GetText)
+                  .def("SetSkipOption", &CUIComboBox::SetSkipOption),
+              class_<CUIListBoxItem, CUILabel>("CUIListBoxItem").def(constructor<>())];
 }

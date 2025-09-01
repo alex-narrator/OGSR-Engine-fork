@@ -65,6 +65,10 @@ public:
 
 public:
     virtual u32 ef_weapon_type() const;
+
+    DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
-#include "inventory_item_inline.h"
+add_to_type_list(CInventoryItemObject)
+#undef script_type_list
+#define script_type_list save_type_list(CInventoryItemObject)

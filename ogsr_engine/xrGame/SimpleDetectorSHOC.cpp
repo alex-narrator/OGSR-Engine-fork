@@ -28,9 +28,9 @@ CCustomDetectorSHOC::CCustomDetectorSHOC(void)
 
 CCustomDetectorSHOC::~CCustomDetectorSHOC(void)
 {
-    ZONE_TYPE_MAP_IT it;
-    for (it = m_ZoneTypeMap.begin(); m_ZoneTypeMap.end() != it; ++it)
-        HUD_SOUND::DestroySound(it->second.detect_snds);
+    //ZONE_TYPE_MAP_IT it;
+    //for (it = m_ZoneTypeMap.begin(); m_ZoneTypeMap.end() != it; ++it)
+    //    HUD_SOUND::DestroySound(it->second.detect_snds);
     //		it->second.detect_snd.destroy();
 
     m_ZoneInfoMap.clear();
@@ -74,7 +74,8 @@ void CCustomDetectorSHOC::Load(LPCSTR section)
             R_ASSERT(zone_type.min_freq < zone_type.max_freq);
             sprintf_s(temp, "zone_sound_%d_", i);
 
-            HUD_SOUND::LoadSound(section, temp, zone_type.detect_snds, SOUND_TYPE_ITEM);
+            /*HUD_SOUND::LoadSound(section, temp, zone_type.detect_snds, SOUND_TYPE_ITEM);*/
+            zone_type.detect_snds.LoadSound(section, temp, "sndDetect", SOUND_TYPE_ITEM);
 
             sprintf_s(temp, "zone_map_location_%d", i);
 
@@ -98,7 +99,7 @@ void CCustomDetectorSHOC::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
 
-    if (!IsWorking())
+    if (!IsPowerOn())
         return;
     if (!H_Parent())
         return;
@@ -120,7 +121,8 @@ void CCustomDetectorSHOC::StopAllSounds()
     for (it = m_ZoneTypeMap.begin(); m_ZoneTypeMap.end() != it; ++it)
     {
         ZONE_TYPE_SHOC& zone_type = (*it).second;
-        HUD_SOUND::StopSound(zone_type.detect_snds);
+        /*HUD_SOUND::StopSound(zone_type.detect_snds);*/
+        zone_type.detect_snds.StopAllSounds();
         //		zone_type.detect_snd.stop();
     }
 }
@@ -129,7 +131,7 @@ void CCustomDetectorSHOC::UpdateCL()
 {
     inherited::UpdateCL();
 
-    if (!IsWorking())
+    if (!IsPowerOn())
         return;
 
     if (!H_Parent())
@@ -186,7 +188,8 @@ void CCustomDetectorSHOC::UpdateCL()
         if ((float)zone_info.snd_time > current_snd_time)
         {
             zone_info.snd_time = 0;
-            HUD_SOUND::PlaySound(zone_type.detect_snds, Fvector().set(0, 0, 0), this, true, false);
+            /*HUD_SOUND::PlaySound(zone_type.detect_snds, Fvector().set(0, 0, 0), this, true, false);*/
+            zone_type.detect_snds.PlaySound("sndDetect", Fvector{}, this, true);
         }
         else
             zone_info.snd_time += Device.dwTimeDelta;
@@ -243,31 +246,26 @@ u32 CCustomDetectorSHOC::ef_detector_type() const { return (m_ef_detector_type);
 void CCustomDetectorSHOC::OnMoveToRuck(EItemPlace prevPlace)
 {
     inherited::OnMoveToRuck(prevPlace);
-    TurnOff();
+    Switch(false);
 }
 
-void CCustomDetectorSHOC::OnMoveToSlot()
+void CCustomDetectorSHOC::OnMoveToSlot(EItemPlace prevPlace)
 {
-    inherited::OnMoveToSlot();
-    TurnOn();
+    inherited::OnMoveToSlot(prevPlace);
+    Switch(true);
 }
 
-void CCustomDetectorSHOC::OnMoveToBelt()
+void CCustomDetectorSHOC::OnMoveToBelt(EItemPlace prevPlace)
 {
-    inherited::OnMoveToBelt();
-    TurnOn();
+    inherited::OnMoveToBelt(prevPlace);
+    Switch(true);
 }
 
-void CCustomDetectorSHOC::TurnOn()
+void CCustomDetectorSHOC::Switch(bool turn_on)
 {
-    m_bWorking = true;
-    UpdateMapLocations();
-    UpdateNightVisionMode();
-}
+    inherited::Switch(turn_on);
 
-void CCustomDetectorSHOC::TurnOff()
-{
-    m_bWorking = false;
+    m_bWorking = turn_on;
     UpdateMapLocations();
     UpdateNightVisionMode();
 }
@@ -301,7 +299,7 @@ void CCustomDetectorSHOC::UpdateMapLocations() // called on turn on/off only
 {
     ZONE_INFO_MAP_IT it;
     for (it = m_ZoneInfoMap.begin(); it != m_ZoneInfoMap.end(); ++it)
-        AddRemoveMapSpot(it->first, IsWorking());
+        AddRemoveMapSpot(it->first, IsPowerOn());
 }
 
 #include "clsid_game.h"
@@ -310,7 +308,7 @@ void CCustomDetectorSHOC::UpdateNightVisionMode()
 {
     bool bNightVision = Actor()->Cameras().GetPPEffector(EEffectorPPType(effNightvision)) != NULL;
 
-    bool bOn = bNightVision && m_pCurrentActor && m_pCurrentActor == Level().CurrentViewEntity() && IsWorking() && m_nightvision_particle.size();
+    bool bOn = bNightVision && m_pCurrentActor && m_pCurrentActor == Level().CurrentViewEntity() && IsPowerOn() && m_nightvision_particle.size();
 
     ZONE_INFO_MAP_IT it;
     for (it = m_ZoneInfoMap.begin(); m_ZoneInfoMap.end() != it; ++it)
@@ -364,16 +362,9 @@ void CCustomDetectorSHOC::update_actor_radiation()
     if (radiation_snd_time > current_snd_time)
     {
         radiation_snd_time = 0;
-        HUD_SOUND::PlaySound(zone_type.detect_snds, Fvector().set(0, 0, 0), this, true, false);
+        /*HUD_SOUND::PlaySound(zone_type.detect_snds, Fvector().set(0, 0, 0), this, true, false);*/
+        zone_type.detect_snds.PlaySound("sndDetect", Fvector{}, this, true);
     }
     else
         radiation_snd_time += Device.dwTimeDelta;
 }
-
-CSimpleDetectorSHOC::CSimpleDetectorSHOC()
-{
-    m_weight = .5f;
-    // m_belt = true;
-}
-
-CSimpleDetectorSHOC::~CSimpleDetectorSHOC() {}

@@ -1,22 +1,17 @@
 #include "stdafx.h"
 #include "torch.h"
-#include "entity.h"
 #include "actor.h"
 #include "../xr_3da/LightAnimLibrary.h"
 #include "PhysicsShell.h"
 #include "xrserver_objects_alife_items.h"
-#include "ai_sounds.h"
 
 #include "HUDManager.h"
-#include "level.h"
 #include "../Include/xrRender/Kinematics.h"
 #include "../xr_3da/camerabase.h"
 #include "inventory.h"
-#include "game_base_space.h"
 
 #include "UIGameCustom.h"
 #include "actorEffector.h"
-#include "CustomOutfit.h"
 #include "HUDTarget.h"
 
 static const float TIME_2_HIDE = 5.f;
@@ -42,19 +37,7 @@ CTorch::CTorch(void)
     light_omni->set_shadow(false);
     light_omni->set_moveable(true);
 
-    m_switched_on = false;
     glow_render = ::Render->glow_create();
-    lanim = 0;
-    time2hide = 0;
-    fBrightness = 1.f;
-
-    /*m_NightVisionRechargeTime	= 6.f;
-    m_NightVisionRechargeTimeMin= 2.f;
-    m_NightVisionDischargeTime	= 10.f;
-    m_NightVisionChargeTime		= 0.f;*/
-
-    m_prev_hp.set(0, 0);
-    m_delta_h = 0;
 
     // Disabling shift by x and z axes for 1st render,
     // because we don't have dynamic lighting in it.
@@ -64,10 +47,8 @@ CTorch::CTorch(void)
         TORCH_OFFSET.z = 0;
     }
 
-    m_bind_to_camera = false;
     m_camera_torch_offset = TORCH_OFFSET;
     m_camera_omni_offset = OMNI_OFFSET;
-    m_min_target_dist = 0.5f;
 }
 
 CTorch::~CTorch(void)
@@ -75,162 +56,36 @@ CTorch::~CTorch(void)
     light_render.destroy();
     light_omni.destroy();
     glow_render.destroy();
-    HUD_SOUND::DestroySound(m_NightVisionOnSnd);
-    HUD_SOUND::DestroySound(m_NightVisionOffSnd);
-    HUD_SOUND::DestroySound(m_NightVisionIdleSnd);
-    HUD_SOUND::DestroySound(m_NightVisionBrokenSnd);
-    HUD_SOUND::DestroySound(sndTurnOn);
-    HUD_SOUND::DestroySound(sndTurnOff);
 }
 
 void CTorch::Load(LPCSTR section)
 {
     inherited::Load(section);
-    light_trace_bone = pSettings->r_string(section, "light_trace_bone");
-
-    if (pSettings->line_exist(section, "snd_turn_on"))
-        HUD_SOUND::LoadSound(section, "snd_turn_on", sndTurnOn, SOUND_TYPE_ITEM_USING);
-    if (pSettings->line_exist(section, "snd_turn_off"))
-        HUD_SOUND::LoadSound(section, "snd_turn_off", sndTurnOff, SOUND_TYPE_ITEM_USING);
-
-    m_bNightVisionEnabled = !!pSettings->r_bool(section, "night_vision");
-    if (m_bNightVisionEnabled)
-    {
-        HUD_SOUND::LoadSound(section, "snd_night_vision_on", m_NightVisionOnSnd, SOUND_TYPE_ITEM_USING);
-        HUD_SOUND::LoadSound(section, "snd_night_vision_off", m_NightVisionOffSnd, SOUND_TYPE_ITEM_USING);
-        HUD_SOUND::LoadSound(section, "snd_night_vision_idle", m_NightVisionIdleSnd, SOUND_TYPE_ITEM_USING);
-        HUD_SOUND::LoadSound(section, "snd_night_vision_broken", m_NightVisionBrokenSnd, SOUND_TYPE_ITEM_USING);
-    }
-
-    m_bind_to_camera = READ_IF_EXISTS(pSettings, r_bool, section, "bind_to_camera", false);
-    m_camera_torch_offset = READ_IF_EXISTS(pSettings, r_fvector3, section, "camera_torch_offset", TORCH_OFFSET);
-    m_camera_omni_offset = READ_IF_EXISTS(pSettings, r_fvector3, section, "camera_omni_offset", OMNI_OFFSET);
-    m_min_target_dist = READ_IF_EXISTS(pSettings, r_float, section, "camera_min_target_dist", m_min_target_dist);
+    m_light_descr_sect = READ_IF_EXISTS(pSettings, r_string, section, "light_definition", nullptr);
+    LoadLightDefinitions(m_light_descr_sect);
 }
 
-void CTorch::SwitchNightVision()
-{
-    SwitchNightVision(!m_bNightVisionOn);
-}
+void CTorch::Switch() { Switch(!m_switched_on); }
 
-void CTorch::SwitchNightVision(bool vision_on)
+void CTorch::Switch(bool turn_on)
 {
-    if (!m_bNightVisionEnabled)
-    {
-        m_bNightVisionOn = vision_on;
-        return;
-    }
-
-    auto* pA = smart_cast<CActor*>(H_Parent());
-    if (!pA)
+    if (!m_light_descr_sect)
         return;
 
-    auto* pActorTorch = smart_cast<CTorch*>(pA->inventory().ItemFromSlot(TORCH_SLOT));
-    if (pActorTorch && pActorTorch != this)
-        return;
+    inherited::Switch(turn_on);
 
-    bool bPlaySoundFirstPerson = (pA == Level().CurrentViewEntity());
+    m_switched_on = turn_on;
+    light_render->set_active(turn_on);
+    light_omni->set_active(turn_on);
+    glow_render->set_active(turn_on);
 
-    auto* pCO = pA->GetOutfit();
-    if (pCO && pCO->m_NightVisionSect.size())
-    {
-        const char* disabled_names = pSettings->r_string(cNameSect(), "disabled_maps");
-        const char* curr_map = Level().name().c_str();
-        u32 cnt = _GetItemCount(disabled_names);
-        bool b_allow = true;
-        string512 tmp;
-        for (u32 i = 0; i < cnt; ++i)
-        {
-            _GetItem(disabled_names, i, tmp);
-            if (!stricmp(tmp, curr_map))
-            {
-                b_allow = false;
-                break;
-            }
-        }
-
-        if (!b_allow)
-        {
-            HUD_SOUND::PlaySound(m_NightVisionBrokenSnd, pA->Position(), pA, bPlaySoundFirstPerson);
-            return;
-        }
-        else
-        {
-            m_bNightVisionOn = vision_on;
-
-            if (m_bNightVisionOn)
-            {
-                CEffectorPP* pp = pA->Cameras().GetPPEffector((EEffectorPPType)effNightvision);
-                if (!pp)
-                {
-                    AddEffector(pA, effNightvision, pCO->m_NightVisionSect);
-                    HUD_SOUND::PlaySound(m_NightVisionOnSnd, pA->Position(), pA, bPlaySoundFirstPerson);
-                    HUD_SOUND::PlaySound(m_NightVisionIdleSnd, pA->Position(), pA, bPlaySoundFirstPerson, true);
-                }
-            }
-        }
-    }
-    else
-    {
-        m_bNightVisionOn = false;
-    }
-
-    if (!m_bNightVisionOn)
-    {
-        CEffectorPP* pp = pA->Cameras().GetPPEffector((EEffectorPPType)effNightvision);
-        if (pp)
-        {
-            pp->Stop(1.0f);
-            HUD_SOUND::PlaySound(m_NightVisionOffSnd, pA->Position(), pA, bPlaySoundFirstPerson);
-            HUD_SOUND::StopSound(m_NightVisionIdleSnd);
-        }
-    }
-}
-
-void CTorch::UpdateSwitchNightVision()
-{
-    if (!m_bNightVisionEnabled)
-        return;
-
-    auto* pA = smart_cast<CActor*>(H_Parent());
-    if (pA && m_bNightVisionOn && !pA->Cameras().GetPPEffector((EEffectorPPType)effNightvision))
-        SwitchNightVision(true);
-}
-
-void CTorch::Switch()
-{
-    bool bActive = !m_switched_on;
-    Switch(bActive);
-}
-
-void CTorch::Switch(bool light_on)
-{
-    if (auto pActor = smart_cast<CActor*>(H_Parent()); pActor && pActor->g_Alive())
-    {
-        if (light_on && !m_switched_on)
-        {
-            if (!sndTurnOn.sounds.empty())
-                HUD_SOUND::PlaySound(sndTurnOn, pActor->Position(), pActor, !!pActor->HUDview());
-        }
-        else if (!light_on && m_switched_on)
-        {
-            if (!sndTurnOff.sounds.empty())
-                HUD_SOUND::PlaySound(sndTurnOff, pActor->Position(), pActor, !!pActor->HUDview());
-        }
-    }
-
-    m_switched_on = light_on;
-    light_render->set_active(light_on);
-    light_omni->set_active(light_on);
-    glow_render->set_active(light_on);
-
-    if (*light_trace_bone)
+    if (!!light_trace_bone)
     {
         IKinematics* pVisual = smart_cast<IKinematics*>(Visual());
         VERIFY(pVisual);
         u16 bi = pVisual->LL_BoneID(light_trace_bone);
 
-        pVisual->LL_SetBoneVisible(bi, light_on, TRUE);
+        pVisual->LL_SetBoneVisible(bi, turn_on, TRUE);
         pVisual->CalculateBones(TRUE);
     }
 }
@@ -250,61 +105,9 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
     if (!inherited::net_Spawn(DC))
         return (FALSE);
 
-    constexpr bool b_r2 = true;
-
-    IKinematics* K = smart_cast<IKinematics*>(Visual());
-    CInifile* pUserData = K->LL_UserData();
-    R_ASSERT3(pUserData, "Empty Torch user data!", torch->get_visual());
-    lanim = LALib.FindItem(pUserData->r_string("torch_definition", "color_animator"));
-    guid_bone = K->LL_BoneID(pUserData->r_string("torch_definition", "guide_bone"));
-    VERIFY(guid_bone != BI_NONE);
-
-    m_color = pUserData->r_fcolor("torch_definition", b_r2 ? "color_r2" : "color");
-    fBrightness = m_color.intensity();
-    float range = pUserData->r_float("torch_definition", (b_r2) ? "range_r2" : "range");
-    light_render->set_color(m_color);
-    light_render->set_range(range);
-
-    if (b_r2)
-    {
-        useVolumetric = READ_IF_EXISTS(pUserData, r_bool, "torch_definition", "volumetric_enabled", false);
-        useVolumetricForActor = READ_IF_EXISTS(pUserData, r_bool, "torch_definition", "volumetric_for_actor", false);
-        light_render->set_volumetric(useVolumetric);
-        if (useVolumetric)
-        {
-            float volQuality = READ_IF_EXISTS(pUserData, r_float, "torch_definition", "volumetric_quality", 1.0f);
-            volQuality = std::clamp(volQuality, 0.f, 1.f);
-            light_render->set_volumetric_quality(volQuality);
-
-            float volIntensity = READ_IF_EXISTS(pUserData, r_float, "torch_definition", "volumetric_intensity", 0.15f);
-            volIntensity = std::clamp(volIntensity, 0.f, 10.f);
-            light_render->set_volumetric_intensity(volIntensity);
-
-            float volDistance = READ_IF_EXISTS(pUserData, r_float, "torch_definition", "volumetric_distance", 0.45f);
-            volDistance = std::clamp(volDistance, 0.f, 1.f);
-            light_render->set_volumetric_distance(volDistance);
-        }
-    }
-
-    Fcolor clr_o = pUserData->r_fcolor("torch_definition", (b_r2) ? "omni_color_r2" : "omni_color");
-    float range_o = pUserData->r_float("torch_definition", (b_r2) ? "omni_range_r2" : "omni_range");
-    light_omni->set_color(clr_o);
-    light_omni->set_range(range_o);
-
-    light_render->set_cone(deg2rad(pUserData->r_float("torch_definition", "spot_angle")));
-    light_render->set_texture(pUserData->r_string("torch_definition", "spot_texture"));
-
-    glow_render->set_texture(pUserData->r_string("torch_definition", "glow_texture"));
-    glow_render->set_color(m_color);
-    glow_render->set_radius(pUserData->r_float("torch_definition", "glow_radius"));
-
     //включить/выключить фонарик
     Switch(torch->m_active);
     VERIFY(!torch->m_active || (torch->ID_Parent != 0xffff));
-
-    m_bNightVisionOn = torch->m_nightvision_active;
-
-    calc_m_delta_h(range);
 
     return (TRUE);
 }
@@ -312,8 +115,6 @@ BOOL CTorch::net_Spawn(CSE_Abstract* DC)
 void CTorch::net_Destroy()
 {
     Switch(false);
-    SwitchNightVision(false);
-
     inherited::net_Destroy();
 }
 
@@ -329,22 +130,11 @@ void CTorch::OnH_B_Independent(bool just_before_destroy)
     time2hide = TIME_2_HIDE;
 
     Switch(false);
-    SwitchNightVision(false);
-
-    HUD_SOUND::StopSound(m_NightVisionOnSnd);
-    HUD_SOUND::StopSound(m_NightVisionOffSnd);
-    HUD_SOUND::StopSound(m_NightVisionIdleSnd);
-    HUD_SOUND::StopSound(sndTurnOn);
-    HUD_SOUND::StopSound(sndTurnOff);
-
-    // m_NightVisionChargeTime		= m_NightVisionRechargeTime;
 }
 
 void CTorch::UpdateCL()
 {
     inherited::UpdateCL();
-
-    UpdateSwitchNightVision();
 
     if (!m_switched_on)
         return;
@@ -363,7 +153,7 @@ void CTorch::UpdateCL()
     }
 
     CBoneInstance& BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(guid_bone);
-    Fmatrix M;
+    Fmatrix M{};
 
     if (H_Parent())
     {
@@ -506,7 +296,7 @@ void CTorch::UpdateCL()
     // возвращает в формате BGR
     u32 clr = lanim->CalculateBGR(Device.fTimeGlobal, frame);
 
-    Fcolor fclr;
+    Fcolor fclr{};
     fclr.set((float)color_get_B(clr) / 255.f, (float)color_get_G(clr) / 255.f, (float)color_get_R(clr) / 255.f, 1.f);
     fclr.mul_rgb(fBrightness);
 
@@ -526,25 +316,14 @@ void CTorch::net_Export(CSE_Abstract* E)
     inherited::net_Export(E);
     CSE_ALifeItemTorch* torch = smart_cast<CSE_ALifeItemTorch*>(E);
     torch->m_active = m_switched_on;
-    torch->m_nightvision_active = m_bNightVisionOn;
     const CActor* pA = smart_cast<const CActor*>(H_Parent());
     torch->m_attached = (pA && pA->attached(this));
 }
 
 bool CTorch::can_be_attached() const
 {
-    //	if( !inherited::can_be_attached() ) return false;
-
     const CActor* pA = smart_cast<const CActor*>(H_Parent());
-    if (pA)
-    {
-        //		if(pA->inventory().Get(ID(), false))
-        if ((const CTorch*)smart_cast<CTorch*>(pA->inventory().m_slots[GetSlot()].m_pIItem) == this)
-            return true;
-        else
-            return false;
-    }
-    return true;
+    return pA ? (pA->inventory().m_slots[GetSlot()].m_pIItem == this) : true;
 }
 void CTorch::afterDetach()
 {
@@ -556,3 +335,63 @@ void CTorch::renderable_Render(u32 context_id, IRenderable* root) { inherited::r
 void CTorch::calc_m_delta_h(float range) { m_delta_h = PI_DIV_2 - atan((range * 0.5f) / _abs(TORCH_OFFSET.x)); }
 
 float CTorch::get_range() const { return light_render->get_range(); }
+
+void CTorch::LoadLightDefinitions(shared_str light_sect)
+{
+    if (!light_sect)
+        return;
+
+    light_trace_bone = READ_IF_EXISTS(pSettings, r_string, light_sect, "light_trace_bone", nullptr);
+
+    constexpr bool b_r2 = true;
+
+    lanim = LALib.FindItem(pSettings->r_string(light_sect, "color_animator"));
+    guid_bone = smart_cast<IKinematics*>(Visual())->LL_BoneID(pSettings->r_string(light_sect, "guide_bone"));
+    VERIFY(guid_bone != BI_NONE);
+
+    m_color = pSettings->r_fcolor(light_sect, b_r2 ? "color_r2" : "color");
+    fBrightness = m_color.intensity();
+    m_fRange = pSettings->r_float(light_sect, (b_r2) ? "range_r2" : "range");
+    light_render->set_color(m_color);
+    light_render->set_range(m_fRange);
+
+    if (b_r2)
+    {
+        useVolumetric = READ_IF_EXISTS(pSettings, r_bool, light_sect, "volumetric_enabled", false);
+        useVolumetricForActor = READ_IF_EXISTS(pSettings, r_bool, light_sect, "volumetric_for_actor", false);
+        light_render->set_volumetric(useVolumetric);
+        if (useVolumetric)
+        {
+            float volQuality = READ_IF_EXISTS(pSettings, r_float, light_sect, "volumetric_quality", 1.0f);
+            volQuality = std::clamp(volQuality, 0.f, 1.f);
+            light_render->set_volumetric_quality(volQuality);
+
+            float volIntensity = READ_IF_EXISTS(pSettings, r_float, light_sect, "volumetric_intensity", 0.15f);
+            volIntensity = std::clamp(volIntensity, 0.f, 10.f);
+            light_render->set_volumetric_intensity(volIntensity);
+
+            float volDistance = READ_IF_EXISTS(pSettings, r_float, light_sect, "volumetric_distance", 0.45f);
+            volDistance = std::clamp(volDistance, 0.f, 1.f);
+            light_render->set_volumetric_distance(volDistance);
+        }
+    }
+
+    Fcolor clr_o = pSettings->r_fcolor(light_sect, (b_r2) ? "omni_color_r2" : "omni_color");
+    float range_o = pSettings->r_float(light_sect, (b_r2) ? "omni_range_r2" : "omni_range");
+    light_omni->set_color(clr_o);
+    light_omni->set_range(range_o);
+
+    light_render->set_cone(deg2rad(pSettings->r_float(light_sect, "spot_angle")));
+    light_render->set_texture(pSettings->r_string(light_sect, "spot_texture"));
+
+    glow_render->set_texture(pSettings->r_string(light_sect, "glow_texture"));
+    glow_render->set_color(m_color);
+    glow_render->set_radius(pSettings->r_float(light_sect, "glow_radius"));
+
+    calc_m_delta_h(m_fRange);
+
+    m_bind_to_camera = READ_IF_EXISTS(pSettings, r_bool, light_sect, "bind_to_camera", false);
+    m_camera_torch_offset = READ_IF_EXISTS(pSettings, r_fvector3, light_sect, "camera_torch_offset", TORCH_OFFSET);
+    m_camera_omni_offset = READ_IF_EXISTS(pSettings, r_fvector3, light_sect, "camera_omni_offset", OMNI_OFFSET);
+    m_min_target_dist = READ_IF_EXISTS(pSettings, r_float, light_sect, "camera_min_target_dist", m_min_target_dist);
+}

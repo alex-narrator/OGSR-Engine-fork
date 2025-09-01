@@ -168,18 +168,6 @@ void CCar::OnKeyboardPress(int cmd)
     case kJUMP: PressBreaks(); break;
     case kENGINE: SwitchEngine(); break;
     case kTORCH: m_lights.SwitchHeadLights(); break;
-    case kNIGHT_VISION: {
-        auto* Act = OwnerActor();
-        if (Act)
-        {
-            auto* pTorch = smart_cast<CTorch*>(Act->inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch)
-            {
-                pTorch->SwitchNightVision();
-            }
-        }
-    }
-    break;
     case kUSE: break;
     };
 }

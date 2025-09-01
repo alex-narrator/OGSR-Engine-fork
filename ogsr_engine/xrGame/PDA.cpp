@@ -30,9 +30,7 @@ CPda::CPda()
     SetSlot(PDA_SLOT);
     m_flags.set(Fruck, TRUE);
 
-    m_idOriginalOwner = u16(-1);
-    m_SpecificChracterOwner = nullptr;
-    TurnOff();
+    Switch(false);
 }
 
 BOOL CPda::net_Spawn(CSE_Abstract* DC)
@@ -53,7 +51,7 @@ void CPda::net_Destroy()
     else
         CInventoryItemObject::net_Destroy();
 
-    TurnOff();
+    Switch(false);
     feel_touch.clear();
 }
 
@@ -71,16 +69,16 @@ void CPda::Load(LPCSTR section)
         return;
 
     m_joystick_bone = READ_IF_EXISTS(pSettings, r_string, section, "joystick_bone", nullptr);
-    HUD_SOUND::LoadSound(section, "snd_draw", sndShow, SOUND_TYPE_ITEM_TAKING);
-    HUD_SOUND::LoadSound(section, "snd_holster", sndHide, SOUND_TYPE_ITEM_HIDING);
 
-    HUD_SOUND::LoadSound(section, "snd_btn_press", sndBtnPress, SOUND_TYPE_ITEM_USING);
-    HUD_SOUND::LoadSound(section, "snd_btn_release", sndBtnRelease, SOUND_TYPE_ITEM_USING);
+    m_sounds.LoadSound(section, "snd_draw", "sndShow", SOUND_TYPE_ITEM_TAKING);
+    m_sounds.LoadSound(section, "snd_holster", "sndHide", SOUND_TYPE_ITEM_HIDING);
+    m_sounds.LoadSound(section, "snd_btn_press", "sndBtnPress", SOUND_TYPE_ITEM_USING);
+    m_sounds.LoadSound(section, "snd_btn_release", "sndBtnRelease", SOUND_TYPE_ITEM_USING);
 
     m_thumb_rot[0] = READ_IF_EXISTS(pSettings, r_float, section, "thumb_rot_x", 0.f);
     m_thumb_rot[1] = READ_IF_EXISTS(pSettings, r_float, section, "thumb_rot_y", 0.f);
 
-    m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", 0.25f);
+    /*m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", 0.25f);*/
 }
 
 void CPda::shedule_Update(u32 dt)
@@ -91,12 +89,12 @@ void CPda::shedule_Update(u32 dt)
         return;
     Position().set(H_Parent()->Position());
 
-    if (IsOn() && Level().CurrentEntity() && Level().CurrentEntity()->ID() == H_Parent()->ID())
+    if (IsPowerOn() && Level().CurrentEntity() && Level().CurrentEntity()->ID() == H_Parent()->ID())
     {
         CEntityAlive* EA = smart_cast<CEntityAlive*>(H_Parent());
         if (!EA || !EA->g_Alive())
         {
-            TurnOff();
+            Switch(false);
             return;
         }
 
@@ -189,7 +187,7 @@ void CPda::OnH_A_Chield()
     //включить PDA только если оно находится у первого владельца
     if (H_Parent()->ID() == m_idOriginalOwner)
     {
-        TurnOn();
+        Switch(true);
         if (m_sFullName.empty())
         {
             m_sFullName.assign(inherited::Name());
@@ -211,16 +209,18 @@ void CPda::OnH_B_Independent(bool just_before_destroy)
         CInventoryItemObject::OnH_B_Independent(just_before_destroy);
 
     //выключить
-    TurnOff();
+    Switch(false);
 
     if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
         return;
 
-    HUD_SOUND::PlaySound(sndHide, Position(), H_Root(), !!GetHUDmode(), false, false);
+    /*HUD_SOUND::PlaySound(sndHide, Position(), H_Root(), !!GetHUDmode(), false, false);*/
+    m_sounds.PlaySound("sndHide", Position(), H_Root(), !!GetHUDmode());
 
     SwitchState(eHidden);
     SetPending(FALSE);
-    m_bZoomed = false;
+    /*m_bZoomed = false;*/
+    OnZoomOut();
 
     CUIPdaWnd* pda = GetPdaWindow();
     // KRodin: TODO: А тут надо скрывать окно пда?
@@ -285,18 +285,6 @@ LPCSTR CPda::Name()
 
 CPda* CPda::GetPdaFromOwner(CObject* owner) { return smart_cast<CInventoryOwner*>(owner)->GetPDA(); }
 
-void CPda::TurnOn()
-{
-    m_bTurnedOff = false;
-    m_changed = true;
-}
-
-void CPda::TurnOff()
-{
-    m_bTurnedOff = true;
-    m_active_contacts.clear();
-}
-
 void CPda::net_Relcase(CObject* O)
 {
     inherited::net_Relcase(O);
@@ -323,7 +311,8 @@ void CPda::OnStateSwitch(u32 S, u32 oldState)
     case eShowing: {
         g_player_hud->attach_item(this);
 
-        HUD_SOUND::PlaySound(sndShow, Position(), H_Root(), !!GetHUDmode(), false, false);
+        /*HUD_SOUND::PlaySound(sndShow, Position(), H_Root(), !!GetHUDmode(), false, false);*/
+        m_sounds.PlaySound("sndShow", Position(), H_Root(), !!GetHUDmode());
 
         PlayHUDMotion("anm_show", false, GetState());
 
@@ -333,10 +322,12 @@ void CPda::OnStateSwitch(u32 S, u32 oldState)
     case eHiding: {
         if (oldState != eHiding)
         {
-            HUD_SOUND::PlaySound(sndHide, Position(), H_Root(), !!GetHUDmode(), false, false);
+            /*HUD_SOUND::PlaySound(sndHide, Position(), H_Root(), !!GetHUDmode(), false, false);*/
+            m_sounds.PlaySound("sndHide", Position(), H_Root(), !!GetHUDmode());
             PlayHUDMotion("anm_hide", true, GetState());
             SetPending(TRUE);
-            m_bZoomed = false;
+            /*m_bZoomed = false;*/
+            OnZoomOut();
             auto pdawnd = GetPdaWindow();
             g_player_hud->reset_thumb(false);
             if (pdawnd)
@@ -349,7 +340,8 @@ void CPda::OnStateSwitch(u32 S, u32 oldState)
     case eHidden: {
         if (oldState != eHidden)
         {
-            m_bZoomed = false;
+            /*m_bZoomed = false;*/
+            OnZoomOut();
             CUIPdaWnd* pda = GetPdaWindow();
             // KRodin: TODO: А тут надо скрывать окно пда?
             g_player_hud->reset_thumb(true);
@@ -427,8 +419,10 @@ void CPda::PlayAnimIdle()
             {
                 Fvector C;
                 Center(C);
-                HUD_SOUND::PlaySound(sndBtnPress, C, H_Root(), !!GetHUDmode(), false, false);
-                HUD_SOUND::PlaySound(sndBtnRelease, C, H_Root(), !!GetHUDmode(), false, false);
+                //HUD_SOUND::PlaySound(sndBtnPress, C, H_Root(), !!GetHUDmode(), false, false);
+                //HUD_SOUND::PlaySound(sndBtnRelease, C, H_Root(), !!GetHUDmode(), false, false);
+                m_sounds.PlaySound("sndBtnPress", C, H_Root(), !!GetHUDmode());
+                m_sounds.PlaySound("sndBtnRelease", C, H_Root(), !!GetHUDmode());
             }
         }
         else
@@ -483,9 +477,11 @@ void CPda::JoystickCallback(CBoneInstance* B)
         press += diff;
 
         if (prev_press == 0.f && press < 0.f)
-            HUD_SOUND::PlaySound(Pda->sndBtnPress, B->mTransform.c, Pda->H_Root(), !!Pda->GetHUDmode(), false, false);
+            /*HUD_SOUND::PlaySound(Pda->sndBtnPress, B->mTransform.c, Pda->H_Root(), !!Pda->GetHUDmode(), false, false);*/
+            Pda->m_sounds.PlaySound("sndBtnPress", B->mTransform.c, Pda->H_Root(), !!Pda->GetHUDmode());
         else if (prev_press < -.001f && press >= -.001f)
-            HUD_SOUND::PlaySound(Pda->sndBtnRelease, B->mTransform.c, Pda->H_Root(), !!Pda->GetHUDmode(), false, false);
+            /*HUD_SOUND::PlaySound(Pda->sndBtnRelease, B->mTransform.c, Pda->H_Root(), !!Pda->GetHUDmode(), false, false);*/
+            Pda->m_sounds.PlaySound("sndBtnRelease", B->mTransform.c, Pda->H_Root(), !!Pda->GetHUDmode());
     }
     else
         press = target_press;
@@ -529,6 +525,12 @@ void CPda::OnMoveToRuck(EItemPlace prevPlace)
     SetPending(FALSE);
 }
 
+void CPda::OnMoveToSlot(EItemPlace prevPlace)
+{
+    inherited::OnMoveToSlot(prevPlace);
+    Switch(true);
+}
+
 void CPda::UpdateCL()
 {
     if (this_is_3d_pda)
@@ -544,7 +546,7 @@ void CPda::OnActiveItem()
     if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
         return;
 
-    SwitchState(eShowing);
+    //SwitchState(eShowing);
 
     if (!psActorFlags.test(AF_3D_PDA))
         return;
@@ -560,7 +562,7 @@ void CPda::OnHiddenItem()
     if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
         return;
 
-    SwitchState(eHiding);
+    //SwitchState(eHiding);
 
     if (!psActorFlags.test(AF_3D_PDA))
         return;
@@ -569,13 +571,53 @@ void CPda::OnHiddenItem()
     pGameSP->ShowHidePda(false);
 }
 
-CPda::~CPda()
+void CPda::Switch(bool turn_on)
 {
-    if (!this_is_3d_pda)
+    inherited::Switch(turn_on);
+
+    m_bTurnedOn = turn_on;
+    if (turn_on)
+        m_changed = true;
+    else
+        m_active_contacts.clear();
+}
+
+void CPda::Show(bool now)
+{
+    if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
         return;
 
-    HUD_SOUND::DestroySound(sndShow);
-    HUD_SOUND::DestroySound(sndHide);
-    HUD_SOUND::DestroySound(sndBtnPress);
-    HUD_SOUND::DestroySound(sndBtnRelease);
+    if (!psActorFlags.test(AF_3D_PDA))
+        return;
+
+    if (now)
+    {
+        StopCurrentAnimWithoutCallback();
+        OnStateSwitch(eIdle, GetState());
+        SetState(eIdle);
+        StopHUDSounds();
+    }
+    else
+        SwitchState(eShowing);
 }
+
+void CPda::Hide(bool now)
+{
+    if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
+        return;
+
+    if (!psActorFlags.test(AF_3D_PDA))
+        return;
+
+    if (now)
+    {
+        OnStateSwitch(eHidden, GetState());
+        SetState(eHidden);
+        StopHUDSounds();
+    }
+    else
+        SwitchState(eHiding);
+}
+
+void CPda::OnZoomIn() { m_bZoomed = true; };
+void CPda::OnZoomOut(bool rezoom) { m_bZoomed = false; };

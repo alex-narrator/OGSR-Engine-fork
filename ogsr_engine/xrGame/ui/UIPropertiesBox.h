@@ -4,6 +4,7 @@
 #include "uilistbox.h"
 
 #include "../script_export_space.h"
+#include "script_game_object.h"
 
 class CUIPropertiesBox : public CUIFrameWindow
 {
@@ -35,6 +36,10 @@ public:
     CUIListBoxItem* GetClickedItem();
 
     void AutoUpdateSize();
+
+    string_unordered_map<shared_str, xr_vector<shared_str>> m_custom_actions_map_spot;
+    void CheckCustomActionsMapSpot(u16 id, LPCSTR spot_type, LPCSTR location_name, Fvector pos);
+    void ProcessCustomActionsMapSpot(u16 id, LPCSTR spot_type, LPCSTR location_name, Fvector pos);
 
 protected:
     CUIListBox m_UIListWnd;

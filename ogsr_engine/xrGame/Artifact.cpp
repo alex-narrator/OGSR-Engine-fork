@@ -16,8 +16,10 @@
 #include "ai_space.h"
 #include "actor.h"
 #include "patrol_path_storage.h"
+#include "script_game_object.h"
+#include "ai_sounds.h"
 
-#define FASTMODE_DISTANCE (50.f) // distance to camera from sphere, when zone switches to fast update sequence
+constexpr auto FASTMODE_DISTANCE = (50.f); // distance to camera from sphere, when zone switches to fast update sequence;
 
 #define CHOOSE_MAX(x, inst_x, y, inst_y, z, inst_z) \
     if (x > y) \
@@ -53,12 +55,12 @@ struct SArtefactActivation
     {
         float m_time;
         shared_str m_snd;
-        Fcolor m_light_color;
+        Fcolor m_light_color{};
         float m_light_range{};
         shared_str m_particle;
         shared_str m_animation;
 
-        SStateDef() : m_time(0.0f){};
+        SStateDef() : m_time(0.0f) {};
         void Load(LPCSTR section, LPCSTR name);
     };
 
@@ -87,9 +89,6 @@ CArtefact::CArtefact()
 {
     shedule.t_min = 20;
     shedule.t_max = 50;
-    m_sParticlesName = nullptr;
-    m_pTrailLight = nullptr;
-    m_activationObj = nullptr;
 }
 
 void CArtefact::Load(LPCSTR section)
@@ -102,23 +101,16 @@ void CArtefact::Load(LPCSTR section)
     m_bLightsEnabled = !!pSettings->r_bool(section, "lights_enabled");
     if (m_bLightsEnabled)
     {
-        sscanf(pSettings->r_string(section, "trail_light_color"), "%f,%f,%f", &m_TrailLightColor.r, &m_TrailLightColor.g, &m_TrailLightColor.b);
+        sscanf(pSettings->r_string(section, "trail_light_color"), "%g,%g,%g", &m_TrailLightColor.r, &m_TrailLightColor.g, &m_TrailLightColor.b);
         m_fTrailLightRange = pSettings->r_float(section, "trail_light_range");
     }
 
-    {
-        m_fHealthRestoreSpeed = pSettings->r_float(section, "health_restore_speed");
-        m_fSatietyRestoreSpeed = pSettings->r_float(section, "satiety_restore_speed");
-        m_fPowerRestoreSpeed = pSettings->r_float(section, "power_restore_speed");
-        m_fBleedingRestoreSpeed = pSettings->r_float(section, "bleeding_restore_speed");
-        if (pSettings->section_exist(/**cNameSect(), */ pSettings->r_string(section, "hit_absorbation_sect")))
-            m_ArtefactHitImmunities.LoadImmunities(pSettings->r_string(section, "hit_absorbation_sect"), pSettings);
-        m_additional_weight = READ_IF_EXISTS(pSettings, r_float, section, "additional_inventory_weight", 0.f);
-        m_additional_weight2 = READ_IF_EXISTS(pSettings, r_float, section, "additional_inventory_weight2", 0.f);
-        m_fThirstRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "thirst_restore_speed", 0.f);
-    }
     m_bCanSpawnZone = !!pSettings->line_exist("artefact_spawn_zones", section);
     m_af_rank = READ_IF_EXISTS(pSettings, r_u8, section, "af_rank", 0);
+
+    m_sounds.LoadSound(section, "snd_draw", "sndShow", SOUND_TYPE_ITEM_TAKING);
+    m_sounds.LoadSound(section, "snd_holster", "sndHide", SOUND_TYPE_ITEM_HIDING);
+    m_sounds.LoadSound(section, "snd_activate", "sndActivate", SOUND_TYPE_ITEM_USING);
 }
 
 BOOL CArtefact::net_Spawn(CSE_Abstract* DC)
@@ -133,7 +125,6 @@ BOOL CArtefact::net_Spawn(CSE_Abstract* DC)
     VERIFY(m_pTrailLight == NULL);
     m_pTrailLight = ::Render->light_create();
     m_pTrailLight->set_shadow(true);
-    m_pTrailLight->set_moveable(true);
 
     StartLights();
     /////////////////////////////////////////
@@ -143,7 +134,7 @@ BOOL CArtefact::net_Spawn(CSE_Abstract* DC)
     if (K)
         K->PlayCycle("idle");
 
-    o_fastmode = true; // start initially with fast-mode enabled
+    o_fastmode = FALSE; // start initially with fast-mode enabled
     o_render_frame = 0;
     SetState(eHidden);
 
@@ -181,11 +172,8 @@ void CArtefact::OnH_B_Independent(bool just_before_destroy)
     VERIFY(!ph_world->Processing());
     inherited::OnH_B_Independent(just_before_destroy);
 
-    if (!just_before_destroy)
-    {
-        StartLights();
-        SwitchAfParticles(true);
-    }
+    StartLights();
+    SwitchAfParticles(true);
 }
 
 // called only in "fast-mode"
@@ -259,13 +247,13 @@ void CArtefact::create_physic_shell()
 void CArtefact::StartLights()
 {
     VERIFY(!ph_world->Processing());
-    if (!m_bLightsEnabled)
+    if (!IsLightsEnabled())
         return;
 
-    //включить световую подсветку от двигателя
+    // включить световую подсветку от двигателя
     m_pTrailLight->set_color(m_TrailLightColor.r, m_TrailLightColor.g, m_TrailLightColor.b);
 
-    m_pTrailLight->set_range(m_fTrailLightRange);
+    m_pTrailLight->set_range(GetTrailLightRange());
     m_pTrailLight->set_position(Position());
     m_pTrailLight->set_active(true);
 }
@@ -273,7 +261,7 @@ void CArtefact::StartLights()
 void CArtefact::StopLights()
 {
     VERIFY(!ph_world->Processing());
-    if (!m_bLightsEnabled)
+    if (!IsLightsEnabled())
         return;
     m_pTrailLight->set_active(false);
 }
@@ -281,7 +269,7 @@ void CArtefact::StopLights()
 void CArtefact::UpdateLights()
 {
     VERIFY(!ph_world->Processing());
-    if (!m_bLightsEnabled || !m_pTrailLight->get_active())
+    if (!IsLightsEnabled() || !m_pTrailLight->get_active())
         return;
     m_pTrailLight->set_position(Position());
 }
@@ -310,8 +298,7 @@ bool CArtefact::CanTake() const
 void CArtefact::Hide(bool now) { SwitchState(eHiding); }
 
 void CArtefact::Show(bool now) { SwitchState(eShowing); }
-#include "inventoryOwner.h"
-#include "Entity_alive.h"
+
 void CArtefact::UpdateXForm()
 {
     if (Device.dwFrame != dwXF_Frame)
@@ -346,8 +333,8 @@ void CArtefact::UpdateXForm()
         Fmatrix& mR = V->LL_GetTransform(u16(boneR));
 
         // Calculate
-        Fmatrix mRes;
-        Fvector R, D, N;
+        Fmatrix mRes{};
+        Fvector R{}, D{}, N{};
         D.sub(mL.c, mR.c);
         D.normalize_safe();
         R.crossproduct(mR.j, D);
@@ -360,7 +347,7 @@ void CArtefact::UpdateXForm()
         XFORM().mul(mRes, offset());
     }
 }
-#include "xr_level_controller.h"
+
 bool CArtefact::Action(s32 cmd, u32 flags)
 {
     switch (cmd)
@@ -389,19 +376,28 @@ void CArtefact::OnStateSwitch(u32 S, u32 oldState)
     switch (S)
     {
     case eShowing: {
+        SetPending(TRUE);
         PlayHUDMotion({"anim_show", "anm_show"}, false, S);
+        PlaySound("sndShow", Position());
     }
     break;
     case eHiding: {
         if (oldState != eHiding)
+        {
+            SetPending(TRUE);
             PlayHUDMotion({"anim_hide", "anm_hide"}, true, S);
+            PlaySound("sndHide", Position());
+        }
     }
     break;
     case eActivating: {
+        SetPending(TRUE);
         PlayHUDMotion({"anim_activate", "anm_activate"}, true, S);
+        PlaySound("sndActivate", Position());
     }
     break;
     case eIdle: {
+        SetPending(FALSE);
         PlayAnimIdle();
     }
     break;
@@ -410,14 +406,14 @@ void CArtefact::OnStateSwitch(u32 S, u32 oldState)
 
 void CArtefact::PlayAnimIdle() { PlayHUDMotion({"anim_idle", "anm_idle"}, true, eIdle); }
 
+#include "HUDManager.h"
 void CArtefact::OnAnimationEnd(u32 state)
 {
     switch (state)
     {
     case eHiding: {
         SwitchState(eHidden);
-        //.			if(m_pCurrentInventory->GetNextActiveSlot()!=NO_ACTIVE_SLOT)
-        //.				m_pCurrentInventory->Activate(m_pCurrentInventory->GetPrevActiveSlot());
+        SetPending(FALSE);
     }
     break;
     case eShowing: {
@@ -427,23 +423,20 @@ void CArtefact::OnAnimationEnd(u32 state)
     case eActivating: {
         if (Local())
         {
-            SwitchState(eHiding);
-            NET_Packet P;
-            u_EventGen(P, GEG_PLAYER_ACTIVATEARTEFACT, H_Parent()->ID());
-            P.w_u16(ID());
-            u_EventSend(P);
+            if (!fis_zero(GetCondition()))
+            {
+                ActivateArtefact();
+                SwitchState(eHiding);
+            }
+            else
+            {
+                SwitchState(eIdle);
+            }
         }
     }
     break;
     default: inherited::OnAnimationEnd(state);
     }
-}
-
-void CArtefact::GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count)
-{
-    str_name = NameShort();
-    str_count = "";
-    icon_sect_name = *cNameSect();
 }
 
 void CArtefact::FollowByPath(LPCSTR path_name, int start_idx, Fvector magic_force)
@@ -467,8 +460,7 @@ void CArtefact::SwitchAfParticles(bool bOn)
 
     if (bOn)
     {
-        Fvector dir;
-        dir.set(0, 1, 0);
+        Fvector dir{0, 1, 0};
         CParticlesPlayer::StartParticles(m_sParticlesName, dir, ID(), -1, false);
     }
     else
@@ -477,13 +469,24 @@ void CArtefact::SwitchAfParticles(bool bOn)
     }
 }
 
+bool CArtefact::CanAffect()
+{
+    bool res{true};
+    if (pSettings->line_exist("engine_callbacks", "can_artefact_affect"))
+    {
+        const char* callback = pSettings->r_string("engine_callbacks", "can_artefact_affect");
+        if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
+            res = lua_function(lua_game_object());
+    }
+    return res;
+}
+
 //---SArtefactActivation----
 SArtefactActivation::SArtefactActivation(CArtefact* af, u32 owner_id)
 {
     m_af = af;
     Load();
     m_light = ::Render->light_create();
-    m_light->set_moveable(true);
     m_light->set_shadow(true);
     m_owner_id = owner_id;
 }
@@ -576,7 +579,7 @@ void SArtefactActivation::ChangeEffects()
 
     if (state_def.m_particle.size())
     {
-        Fvector dir;
+        Fvector dir{};
         dir.set(0, 1, 0);
 
         m_af->CParticlesPlayer::StartParticles(state_def.m_particle, dir, m_af->ID(), iFloor(state_def.m_time * 1000));
@@ -602,28 +605,41 @@ void SArtefactActivation::SpawnAnomaly()
 {
     VERIFY(!ph_world->Processing());
     string128 tmp;
-    LPCSTR str = pSettings->r_string("artefact_spawn_zones", *m_af->cNameSect());
-    VERIFY3(_GetItemCount(str) >= 3, "Bad record format in artefact_spawn_zones", str);
+    LPCSTR str = pSettings->r_string("artefact_spawn_zones", m_af->cNameSect().c_str());
+    VERIFY3(_GetItemCount(str) >= 4, "Bad record format in artefact_spawn_zones", str);
     float zone_radius = (float)atof(_GetItem(str, 1, tmp));
+    float zone_power = (float)atof(_GetItem(str, 2, tmp));
+    u32 zone_ttl = (u32)atof(_GetItem(str, 3, tmp));
     u8 restrictor_type = RestrictionSpace::eRestrictorTypeNone;
-    if (_GetItemCount(str) > 3 && atoi(_GetItem(str, 3, tmp)) != 0)
+    if (_GetItemCount(str) > 4 && atoi(_GetItem(str, 4, tmp)) != 0)
     {
         restrictor_type = RestrictionSpace::eDefaultRestrictorTypeNone;
     }
+    //
+    float af_condition = m_af->GetCondition();
+    if (af_condition < 1.f)
+    {
+        zone_radius *= af_condition;
+        zone_power *= af_condition;
+        zone_ttl = (u32)ceil((float)zone_ttl * af_condition);
+    }
+    //
     LPCSTR zone_sect = _GetItem(str, 0, tmp); // must be last call of _GetItem... (LPCSTR !!!)
 
     Fvector pos;
     m_af->Center(pos);
-    u32 lvid = m_af->UsedAI_Locations() ? m_af->ai_location().level_vertex_id() : ai().level_graph().nearest_vertex_id(pos);
+    u32 lvid = m_af->UsedAI_Locations() ? m_af->ai_location().level_vertex_id() : ai().level_graph().vertex_id(pos);
     CSE_Abstract* object = Level().spawn_item(zone_sect, pos, lvid, 0xffff, true);
     CSE_ALifeAnomalousZone* AlifeZone = smart_cast<CSE_ALifeAnomalousZone*>(object);
     VERIFY(AlifeZone);
-    CShapeData::shape_def _shape;
+    CShapeData::shape_def _shape{};
     _shape.data.sphere.P.set(0.0f, 0.0f, 0.0f);
     _shape.data.sphere.R = zone_radius;
     _shape.type = CShapeData::cfSphere;
     AlifeZone->assign_shapes(&_shape, 1);
     AlifeZone->m_owner_id = m_owner_id;
+    AlifeZone->m_maxPower = zone_power;
+    AlifeZone->m_zone_ttl = zone_ttl;
     AlifeZone->m_space_restrictor_type = restrictor_type;
 
     NET_Packet P;
@@ -631,7 +647,7 @@ void SArtefactActivation::SpawnAnomaly()
     Level().Send(P, net_flags(TRUE));
     F_entity_Destroy(object);
     //. #ifdef DEBUG
-    Msg("artefact [%s] spawned a zone [%s] at [%f]", *m_af->cName(), zone_sect, Device.fTimeGlobal);
+    // Msg("artefact [%s] spawned a zone [%s] at [%f]", *m_af->cName(), zone_sect, Device.fTimeGlobal);
     //. #endif
 }
 
@@ -739,7 +755,7 @@ void SArtefactDetectorsSupport::UpdateOnFrame()
             }
         }
         float cos_et = _cos(deg2rad(45.f));
-        Fvector dir;
+        Fvector dir{};
         dir.sub(m_destPoint, m_parent->Position()).normalize_safe();
 
         Fvector v;

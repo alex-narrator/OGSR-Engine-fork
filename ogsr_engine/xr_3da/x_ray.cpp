@@ -110,48 +110,21 @@ void InitConsole()
         strcpy_s(Console->ConfigFile, c_name);
     }
 
-    CORE_FEATURE_SET(colorize_ammo, "dragdrop");
-    CORE_FEATURE_SET(colorize_untradable, "dragdrop");
-    CORE_FEATURE_SET(equipped_untradable, "dragdrop");
-    CORE_FEATURE_SET(select_mode_1342, "dragdrop");
-    CORE_FEATURE_SET(highlight_equipped, "dragdrop");
-    CORE_FEATURE_SET(af_radiation_immunity_mod, "features");
-    CORE_FEATURE_SET(condition_jump_weight_mod, "features");
-    CORE_FEATURE_SET(forcibly_equivalent_slots, "features");
-    CORE_FEATURE_SET(slots_extend_menu, "features");
+    CORE_FEATURE_SET(remove_articles_on_disable_info, "features");
     CORE_FEATURE_SET(dynamic_sun_movement, "features");
     CORE_FEATURE_SET(wpn_bobbing, "features");
-    CORE_FEATURE_SET(show_inv_item_condition, "features");
     CORE_FEATURE_SET(remove_alt_keybinding, "features");
-    CORE_FEATURE_SET(binoc_firing, "features");
-    CORE_FEATURE_SET(stop_anim_playing, "features");
     CORE_FEATURE_SET(corpses_collision, "features");
-    CORE_FEATURE_SET(more_hide_weapon, "features");
     CORE_FEATURE_SET(keep_inprogress_tasks_only, "features");
     CORE_FEATURE_SET(show_dialog_numbers, "features");
-    CORE_FEATURE_SET(objects_radioactive, "features");
-    CORE_FEATURE_SET(af_zero_condition, "features");
-    CORE_FEATURE_SET(af_satiety, "features");
-    CORE_FEATURE_SET(af_psy_health, "features");
-    CORE_FEATURE_SET(outfit_af, "features");
     CORE_FEATURE_SET(gd_master_only, "features");
-    CORE_FEATURE_SET(scope_textures_autoresize, "features");
-    CORE_FEATURE_SET(ogse_new_slots, "features");
-    CORE_FEATURE_SET(ogse_wpn_zoom_system, "features");
     CORE_FEATURE_SET(wpn_cost_include_addons, "features");
-    CORE_FEATURE_SET(hard_ammo_reload, "features");
-    CORE_FEATURE_SET(engine_ammo_repacker, "features");
-    CORE_FEATURE_SET(ruck_flag_preferred, "features");
-    CORE_FEATURE_SET(old_outfit_slot_style, "features");
     CORE_FEATURE_SET(npc_simplified_shooting, "features");
-    CORE_FEATURE_SET(use_trade_deficit_factor, "features");
     CORE_FEATURE_SET(show_objectives_ondemand, "features");
     CORE_FEATURE_SET(pickup_check_overlaped, "features");
-    CORE_FEATURE_SET(actor_thirst, "features");
-    CORE_FEATURE_SET(autoreload_wpn, "features");
     CORE_FEATURE_SET(no_progress_bar_animation, "features");
     CORE_FEATURE_SET(disable_dialog_break, "features");
-    CORE_FEATURE_SET(busy_actor_restrictions, "features");
+    CORE_FEATURE_SET(limited_bolts, "features");
 }
 
 void InitInput() { pInput = xr_new<CInput>(); }

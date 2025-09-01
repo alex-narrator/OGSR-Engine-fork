@@ -333,7 +333,7 @@ void CHangingLamp::TurnOff()
 void CHangingLamp::Hit(SHit* pHDS)
 {
     SHit HDS = *pHDS;
-    callback(GameObject::eHit)(lua_game_object(), HDS.power, HDS.dir, smart_cast<const CGameObject*>(HDS.who)->lua_game_object(), HDS.bone());
+    callback(GameObject::eHit)(lua_game_object(), HDS.power, HDS.dir, smart_cast<const CGameObject*>(HDS.who)->lua_game_object(), HDS.bone(), HDS.type());
     bool bWasAlive = Alive();
 
     if (m_pPhysicsShell)

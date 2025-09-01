@@ -74,7 +74,6 @@ BIND_FUNCTION10(&object(), CScriptGameObject::GetMaxPower, CEntityAlive, conditi
 BIND_FUNCTION10(&object(), CScriptGameObject::GetRadiation, CEntityAlive, conditions().GetRadiation, float, -1);
 BIND_FUNCTION10(&object(), CScriptGameObject::GetBleeding, CEntityAlive, conditions().BleedingSpeed, float, -1);
 BIND_FUNCTION10(&object(), CScriptGameObject::GetMorale, CEntityAlive, conditions().GetEntityMorale, float, -1);
-BIND_FUNCTION10(&object(), CScriptGameObject::GetThirst, CEntityAlive, conditions().GetThirst, float, -1);
 BIND_FUNCTION01(&object(), CScriptGameObject::SetHealth, CEntityAlive, conditions().ChangeHealth, float, float);
 BIND_FUNCTION01(&object(), CScriptGameObject::SetPsyHealth, CEntityAlive, conditions().ChangePsyHealth, float, float);
 BIND_FUNCTION01(&object(), CScriptGameObject::SetPower, CEntityAlive, conditions().ChangePower, float, float);
@@ -83,7 +82,6 @@ BIND_FUNCTION01(&object(), CScriptGameObject::SetRadiation, CEntityAlive, condit
 BIND_FUNCTION01(&object(), CScriptGameObject::SetSatiety, CEntityAlive, conditions().ChangeSatiety, float, float);
 BIND_FUNCTION01(&object(), CScriptGameObject::SetAlcohol, CEntityAlive, conditions().ChangeAlcohol, float, float);
 BIND_FUNCTION01(&object(), CScriptGameObject::SetMorale, CEntityAlive, conditions().ChangeEntityMorale, float, float);
-BIND_FUNCTION01(&object(), CScriptGameObject::SetThirst, CEntityAlive, conditions().ChangeThirst, float, float);
 BIND_FUNCTION02(&object(), CScriptGameObject::SetScriptControl, CScriptEntity, SetScriptControl, bool, LPCSTR, bool, shared_str);
 BIND_FUNCTION10(&object(), CScriptGameObject::GetScriptControl, CScriptEntity, GetScriptControl, bool, false);
 BIND_FUNCTION10(&object(), CScriptGameObject::GetScriptControlName, CScriptEntity, GetScriptControlName, LPCSTR, "");
@@ -424,6 +422,52 @@ void CScriptGameObject::SetCondition(float val)
     inventory_item->SetCondition(val);
 }
 
+void CScriptGameObject::ChangeCondition(float val)
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
+    if (!inventory_item)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member ChangeCondition!");
+        return;
+    }
+    // val					-= inventory_item->GetCondition();
+    inventory_item->ChangeCondition(val);
+}
+//
+bool CScriptGameObject::CanTrade() const
+{
+    CInventoryItem* inventory_item = smart_cast<CInventoryItem*>(&object());
+    if (!inventory_item)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CSciptEntity : cannot access class member GetMarked!");
+        return false;
+    }
+    return inventory_item->CanTrade();
+}
+//
+
+void CScriptGameObject::SwitchPower(bool on)
+{
+    auto iitem = smart_cast<CInventoryItem*>(&object());
+    if (!iitem)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject : cannot access class member SwitchPower!");
+        return;
+    }
+    iitem->Switch(on);
+}
+
+bool CScriptGameObject::IsPowerOn()
+{
+    auto iitem = smart_cast<CInventoryItem*>(&object());
+    if (!iitem)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject : cannot access class member IsPowerOn!");
+        return false;
+    }
+    return iitem->IsPowerOn();
+}
+
 void CScriptGameObject::eat(CScriptGameObject* item)
 {
     if (!item)
@@ -670,13 +714,6 @@ void CScriptGameObject::SetActorExoFactor(float _factor)
         return;
     }
     act->SetExoFactor(_factor);
-}
-
-CUIStatic* CScriptGameObject::GetCellItem() const
-{
-    if (auto obj = smart_cast<CInventoryItem*>(&object()))
-        return (CUIStatic*)obj->m_cell_item;
-    return NULL;
 }
 
 LPCSTR CScriptGameObject::GetBoneName(u16 id) const

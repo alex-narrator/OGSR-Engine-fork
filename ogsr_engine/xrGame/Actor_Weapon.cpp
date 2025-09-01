@@ -108,7 +108,7 @@ void CActor::SetWeaponHideState(u32 State, bool bSet, bool now)
         this->inventory().SetSlotsBlocked(State, bSet, now);
 }
 
-#define ENEMY_HIT_SPOT "mp_hit_sector_location"
+constexpr auto ENEMY_HIT_SPOT = "mp_hit_sector_location";
 BOOL g_bShowHitSectors = TRUE;
 
 void CActor::HitSector(CObject* who, CObject* weapon)
@@ -130,10 +130,10 @@ void CActor::HitSector(CObject* who, CObject* weapon)
         CWeapon* pWeapon = smart_cast<CWeapon*>(weapon);
         if (pWeapon)
         {
-            if (pWeapon->IsSilencerAttached())
+            if (pWeapon->IsAddonAttached(eSilencer))
             {
                 bShowHitSector = false;
-                if (pWeapon->IsGrenadeLauncherAttached())
+                if (pWeapon->IsAddonAttached(eLauncher))
                 {}
             }
         }
@@ -161,22 +161,17 @@ void CActor::on_weapon_shot_start(CWeapon* weapon)
         if (effector->IsSingleShot())
             update_camera(effector);
 
-        if (pWM->GetCurrentFireMode() == 1)
-        {
-            effector->SetSingleShoot(TRUE);
-        }
-        else
-        {
-            effector->SetSingleShoot(FALSE);
-        }
+        effector->SetSingleShoot(true);
     };
 
+    //effector->SetRndSeed(GetShotRndSeed());
     effector->SetActor(this);
-    effector->Shot(weapon->camDispersion + weapon->camDispersionInc * float(weapon->ShotsFired()));
+    float exo_factor{1.f / GetExoFactor()};
+    effector->Shot(weapon->camDispersion * exo_factor + weapon->camDispersionInc * /*exo_factor **/ float(weapon->ShotsFired()));
 
     if (pWM)
     {
-        if (pWM->GetCurrentFireMode() != 1)
+        if (!pWM->m_bCamRecoilCompensation)
         {
             effector->SetActive(FALSE);
             update_camera(effector);

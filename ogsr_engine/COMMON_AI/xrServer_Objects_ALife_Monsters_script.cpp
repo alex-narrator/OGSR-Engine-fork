@@ -45,7 +45,12 @@ void CSE_ALifeTrader::script_register(lua_State* L)
                   .def("smart_terrain_id", &CSE_AlifeTrader__smart_terrain_id)];
 }
 
-void CSE_ALifeCustomZone::script_register(lua_State* L) { module(L)[luabind_class_dynamic_alife1(CSE_ALifeCustomZone, "cse_custom_zone", CSE_ALifeSpaceRestrictor)]; }
+void CSE_ALifeCustomZone::script_register(lua_State* L)
+{
+    module(L)[luabind_class_dynamic_alife1(CSE_ALifeCustomZone, "cse_custom_zone", CSE_ALifeSpaceRestrictor)
+                  .def_readwrite("owner_id", &CSE_ALifeCustomZone::m_owner_id)
+                  .def_readwrite("zone_ttl", &CSE_ALifeCustomZone::m_zone_ttl)];
+}
 
 void CSE_ALifeAnomalousZone::script_register(lua_State* L)
 {

@@ -326,7 +326,7 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
     bool is_16x9 = UI()->is_widescreen();
     string64 _prefix;
     xr_sprintf(_prefix, "%s", is_16x9 ? "_16x9" : "");
-    string128 val_name, val_name2;
+    string128 val_name/*, val_name2*/;
 
     strconcat(sizeof(val_name), val_name, "hands_position", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
@@ -434,108 +434,70 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
             m_shell_point_offset.set(0.f, 0.f, 0.f);
     }
 
-    strconcat(sizeof(val_name), val_name, "aim_hud_offset_pos", _prefix);
+    xr_strconcat(val_name, "aim_hud_offset_pos", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
         xr_strcpy(val_name, "aim_hud_offset_pos");
-    if (!pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, "zoom_offset"))
-        m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim] = pSettings->r_fvector3(sect_name, "zoom_offset");
-    else
-        m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
+    m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
 
-    strconcat(sizeof(val_name), val_name, "aim_hud_offset_rot", _prefix);
+    xr_strconcat(val_name, "aim_hud_offset_rot", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
         xr_strcpy(val_name, "aim_hud_offset_rot");
-    if (!pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, "zoom_rotate_x") && pSettings->line_exist(sect_name, "zoom_rotate_y"))
-        m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim] =
-            Fvector().set(pSettings->r_float(sect_name, "zoom_rotate_x"), pSettings->r_float(sect_name, "zoom_rotate_y"), 0.f);
-    else
-        m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
+    m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
 
-    strconcat(sizeof(val_name), val_name, "gl_hud_offset_pos", _prefix);
+    auto aim_pos = m_hands_offset[m_hands_offset_pos];
+    auto aim_rot = m_hands_offset[m_hands_offset_rot];
+
+    // scope second ofset
+    xr_strconcat(val_name, "aim_alt_hud_offset_pos", _prefix);
+    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
+        xr_strcpy(val_name, "aim_alt_hud_offset_pos");
+    m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim_alt] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_pos[m_hands_offset_type_aim]);
+
+    xr_strconcat(val_name, "aim_alt_hud_offset_rot", _prefix);
+    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
+        xr_strcpy(val_name, "aim_alt_hud_offset_rot");
+    m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim_alt] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_rot[m_hands_offset_type_aim]);
+    //
+    // scope second ofset with scope
+    xr_strconcat(val_name, "aim_alt_scope_hud_offset_pos", _prefix);
+    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
+        xr_strcpy(val_name, "aim_alt_scope_hud_offset_pos");
+    m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim_alt_scope] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_pos[m_hands_offset_type_aim_alt]);
+
+    xr_strconcat(val_name, "aim_alt_scope_hud_offset_rot", _prefix);
+    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
+        xr_strcpy(val_name, "aim_alt_scope_hud_offset_rot");
+    m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim_alt_scope] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_rot[m_hands_offset_type_aim_alt]);
+    //
+    xr_strconcat(val_name, "aim_scope_hud_offset_pos", _prefix);
+    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
+        xr_strcpy(val_name, "aim_scope_hud_offset_pos");
+    m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim_scope] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_pos[m_hands_offset_type_aim]);
+
+    xr_strconcat(val_name, "aim_scope_hud_offset_rot", _prefix);
+    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
+        xr_strcpy(val_name, "aim_scope_hud_offset_rot");
+    m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim_scope] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_rot[m_hands_offset_type_aim]);
+    //
+    xr_strconcat(val_name, "gl_hud_offset_pos", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
         xr_strcpy(val_name, "gl_hud_offset_pos");
-    if (!pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, "grenade_zoom_offset"))
-        m_hands_offset[m_hands_offset_pos][m_hands_offset_type_gl] = pSettings->r_fvector3(sect_name, "grenade_zoom_offset");
-    else
-        m_hands_offset[m_hands_offset_pos][m_hands_offset_type_gl] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
+    m_hands_offset[m_hands_offset_pos][m_hands_offset_type_gl] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_pos[m_hands_offset_type_aim]);
 
-    strconcat(sizeof(val_name), val_name, "gl_hud_offset_rot", _prefix);
+    xr_strconcat(val_name, "gl_hud_offset_rot", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
         xr_strcpy(val_name, "gl_hud_offset_rot");
-    if (!pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, "grenade_zoom_rotate_x") && pSettings->line_exist(sect_name, "grenade_zoom_rotate_y"))
-        m_hands_offset[m_hands_offset_rot][m_hands_offset_type_gl] =
-            Fvector().set(pSettings->r_float(sect_name, "grenade_zoom_rotate_x"), pSettings->r_float(sect_name, "grenade_zoom_rotate_y"), 0.f);
-    else
-        m_hands_offset[m_hands_offset_rot][m_hands_offset_type_gl] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, Fvector{});
-
-    //ОГСР-специфичные параметры
-    xr_strconcat(val_name, "scope_zoom_offset", _prefix);
-    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
-        xr_strcpy(val_name, "scope_zoom_offset");
-    if (pSettings->line_exist(sect_name, val_name))
-        m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim_scope] = pSettings->r_fvector3(sect_name, val_name);
-
-    xr_strconcat(val_name, "scope_zoom_rotate_x", _prefix);
-    xr_strconcat(val_name2, "scope_zoom_rotate_y", _prefix);
-    if (is_16x9 && (!pSettings->line_exist(sect_name, val_name) || !pSettings->line_exist(sect_name, val_name2)))
-    {
-        xr_strcpy(val_name, "scope_zoom_rotate_x");
-        xr_strcpy(val_name2, "scope_zoom_rotate_y");
-    }
-    if (pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, val_name2))
-        m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim_scope] = Fvector{pSettings->r_float(sect_name, val_name), pSettings->r_float(sect_name, val_name2)};
+    m_hands_offset[m_hands_offset_rot][m_hands_offset_type_gl] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_rot[m_hands_offset_type_aim]);
     //
-    xr_strconcat(val_name, "scope_grenade_zoom_offset", _prefix);
+    xr_strconcat(val_name, "gl_scope_hud_offset_pos", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
-        xr_strcpy(val_name, "scope_grenade_zoom_offset");
-    if (pSettings->line_exist(sect_name, val_name))
-        m_hands_offset[m_hands_offset_pos][m_hands_offset_type_gl_scope] = pSettings->r_fvector3(sect_name, val_name);
+        xr_strcpy(val_name, "gl_scope_hud_offset_pos");
+    m_hands_offset[m_hands_offset_pos][m_hands_offset_type_gl_scope] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_pos[m_hands_offset_type_gl]);
 
-    xr_strconcat(val_name, "scope_grenade_zoom_rotate_x", _prefix);
-    xr_strconcat(val_name2, "scope_grenade_zoom_rotate_y", _prefix);
-    if (is_16x9 && (!pSettings->line_exist(sect_name, val_name) || !pSettings->line_exist(sect_name, val_name2)))
-    {
-        xr_strcpy(val_name, "scope_grenade_zoom_rotate_x");
-        xr_strcpy(val_name2, "scope_grenade_zoom_rotate_y");
-    }
-    if (pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, val_name2))
-        m_hands_offset[m_hands_offset_rot][m_hands_offset_type_gl_scope] = Fvector{pSettings->r_float(sect_name, val_name), pSettings->r_float(sect_name, val_name2)};
-    //
-    xr_strconcat(val_name, "grenade_normal_zoom_offset", _prefix);
+    xr_strconcat(val_name, "gl_scope_hud_offset_rot", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
-        xr_strcpy(val_name, "grenade_normal_zoom_offset");
-    if (pSettings->line_exist(sect_name, val_name))
-        m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim_gl_normal] = pSettings->r_fvector3(sect_name, val_name);
-    else
-        m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim_gl_normal] = m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim];
-
-    xr_strconcat(val_name, "grenade_normal_zoom_rotate_x", _prefix);
-    xr_strconcat(val_name2, "grenade_normal_zoom_rotate_y", _prefix);
-    if (is_16x9 && (!pSettings->line_exist(sect_name, val_name) || !pSettings->line_exist(sect_name, val_name2)))
-    {
-        xr_strcpy(val_name, "grenade_normal_zoom_rotate_x");
-        xr_strcpy(val_name2, "grenade_normal_zoom_rotate_y");
-    }
-    if (pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, val_name2))
-        m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim_gl_normal] = Fvector{pSettings->r_float(sect_name, val_name), pSettings->r_float(sect_name, val_name2)};
-    else
-        m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim_gl_normal] = m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim];
-    //
-    xr_strconcat(val_name, "scope_grenade_normal_zoom_offset", _prefix);
-    if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
-        xr_strcpy(val_name, "scope_grenade_normal_zoom_offset");
-    if (pSettings->line_exist(sect_name, val_name))
-        m_hands_offset[m_hands_offset_pos][m_hands_offset_type_gl_normal_scope] = pSettings->r_fvector3(sect_name, val_name);
-
-    xr_strconcat(val_name, "scope_grenade_normal_zoom_rotate_x", _prefix);
-    xr_strconcat(val_name2, "scope_grenade_normal_zoom_rotate_y", _prefix);
-    if (is_16x9 && (!pSettings->line_exist(sect_name, val_name) || !pSettings->line_exist(sect_name, val_name2)))
-    {
-        xr_strcpy(val_name, "scope_grenade_normal_zoom_rotate_x");
-        xr_strcpy(val_name2, "scope_grenade_normal_zoom_rotate_y");
-    }
-    if (pSettings->line_exist(sect_name, val_name) && pSettings->line_exist(sect_name, val_name2))
-        m_hands_offset[m_hands_offset_rot][m_hands_offset_type_gl_normal_scope] = Fvector{pSettings->r_float(sect_name, val_name), pSettings->r_float(sect_name, val_name2)};
+        xr_strcpy(val_name, "gl_scope_hud_offset_rot");
+    m_hands_offset[m_hands_offset_rot][m_hands_offset_type_gl_scope] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_rot[m_hands_offset_type_gl]);
     //
 
     if (useCopFirePoint) // cop configs
@@ -690,11 +652,7 @@ player_hud::player_hud()
     m_transform.identity();
     m_transform_2.identity();
 
-    script_anim_part = u8(-1);
-    script_anim_offset_factor = 0.f;
     m_item_pos.identity();
-    script_override_arms = false;
-    script_override_item = false;
 
     if (pSettings->section_exist("hud_movement_layers"))
     {
@@ -870,7 +828,7 @@ void player_hud::render_hud(u32 context_id, IRenderable* root)
         return;
 
     bool b_has_hands =
-        (m_attached_items[0] && m_attached_items[0]->m_has_separated_hands) || (m_attached_items[1] && m_attached_items[1]->m_has_separated_hands) || script_anim_item_model;
+        (m_attached_items[0] && m_attached_items[0]->m_has_separated_hands) || (m_attached_items[1] && m_attached_items[1]->m_has_separated_hands) || script_item_model;
 
     if (b_has_hands || script_anim_part != u8(-1))
     {
@@ -887,12 +845,27 @@ void player_hud::render_hud(u32 context_id, IRenderable* root)
         if (m_attached_items[1])
             m_attached_items[1]->render(context_id, root);
     }
+    else
+    {
+        switch (script_override_item_hand)
+        {
+        case 0:
+            if (m_attached_items[1])
+                m_attached_items[1]->render(context_id, root);
+            break;
+        case 1:
+            if (m_attached_items[0])
+                m_attached_items[0]->render(context_id, root);
+            break;
+        default: break;
+        }
+    }
 
     if (b_has_hands)
     {
-        if (script_anim_item_model)
+        if (script_item_model)
         {
-            ::Render->add_Visual(context_id, root, script_anim_item_model->dcast_RenderVisual(), m_item_pos);
+            ::Render->add_Visual(context_id, root, script_item_model->dcast_RenderVisual(), m_item_pos);
         }
     }
 }
@@ -1032,7 +1005,7 @@ void player_hud::update(const Fmatrix& cam_trans)
     m_transform_2.mul(trans_2, m_attach_offset_2);
 
     bool hasHands = (m_attached_items[0] && m_attached_items[0]->m_has_separated_hands) || (m_attached_items[1] && m_attached_items[1]->m_has_separated_hands);
-    if (hasHands || script_anim_item_model)
+    if (hasHands || script_item_model)
     {
         m_model->UpdateTracks();
         m_model->dcast_PKinematics()->CalculateBones_Invalidate();
@@ -1154,7 +1127,7 @@ void player_hud::update(const Fmatrix& cam_trans)
     if (m_attached_items[1])
         m_attached_items[1]->update(true);
 
-    if (script_anim_item_attached && script_anim_item_model)
+    if (script_anim_item_attached && script_item_model)
         update_script_item();
 
     {
@@ -1370,7 +1343,7 @@ void player_hud::calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmat
 {
     bool hasHands = m_attached_items[attach_slot_idx] && m_attached_items[attach_slot_idx]->m_has_separated_hands;
 
-    if (hasHands || script_anim_item_model)
+    if (hasHands || script_item_model)
     {
         IKinematics* kin = (attach_slot_idx == 0) ? m_model->dcast_PKinematics() : m_model_2->dcast_PKinematics();
         Fmatrix ancor_m = kin->LL_GetTransform(m_ancors.at(attach_slot_idx));
@@ -1561,9 +1534,9 @@ void player_hud::Thumb02Callback(CBoneInstance* B)
 
 bool player_hud::allow_script_anim()
 {
-    if (m_attached_items[0] && (m_attached_items[0]->m_parent_hud_item->IsPending() || m_attached_items[0]->m_parent_hud_item->GetState() == CHudItem::EHudStates::eBore))
+    if (m_attached_items[0] && m_attached_items[0]->m_parent_hud_item->IsPending())
         return false;
-    else if (m_attached_items[1] && (m_attached_items[1]->m_parent_hud_item->IsPending() || m_attached_items[1]->m_parent_hud_item->GetState() == CHudItem::EHudStates::eBore))
+    else if (m_attached_items[1] && m_attached_items[1]->m_parent_hud_item->IsPending())
         return false;
     else if (script_anim_part != u8(-1))
         return false;
@@ -1605,7 +1578,7 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
     if (pSettings->line_exist(hud_section, "item_visual"))
     {
         ::Render->hud_loading = true;
-        script_anim_item_model = ::Render->model_Create(pSettings->r_string(hud_section, "item_visual"))->dcast_PKinematicsAnimated();
+        script_item_model = ::Render->model_Create(pSettings->r_string(hud_section, "item_visual"))->dcast_PKinematics();
         ::Render->hud_loading = false;
 
         item_pos[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_section, "item_position", def);
@@ -1624,13 +1597,14 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
         }
     }
     else
-        script_anim_item_model = nullptr;
+        script_item_model = nullptr;
 
     script_anim_offset[0] = offs;
     script_anim_offset[1] = rrot;
     script_anim_part = hand;
 
-    player_hud_motion_container* pm = get_hand_motions(hud_section, script_anim_item_model);
+    auto ka = script_item_model ? script_item_model->dcast_PKinematicsAnimated() : nullptr;
+    player_hud_motion_container* pm = get_hand_motions(hud_section, ka);
     player_hud_motion* phm = pm->find_motion(anm_name);
 
     if (!phm)
@@ -1644,7 +1618,7 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
 
     const motion_descr& M = phm->m_animations[Random.randI(phm->m_animations.size())];
 
-    if (script_anim_item_model)
+    if (ka)
     {
         MotionID M2;
 
@@ -1660,7 +1634,7 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
             if (bDebug)
                 Msg("playing item animation [%s]", additional.name.c_str());
 
-            M2 = script_anim_item_model->ID_Cycle_Safe(additional.name);
+            M2 = ka->ID_Cycle_Safe(additional.name);
         }
         else
         {
@@ -1669,29 +1643,29 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
             if (bDebug)
                 Msg("playing item animation [%s]", item_anm_name.c_str());
 
-            M2 = script_anim_item_model->ID_Cycle_Safe(item_anm_name);
+            M2 = ka->ID_Cycle_Safe(item_anm_name);
         }
 
         if (!M2.valid())
-            M2 = script_anim_item_model->ID_Cycle_Safe("idle");
+            M2 = ka->ID_Cycle_Safe("idle");
 
         R_ASSERT(M2.valid(), "model %s has no motion [idle] ", pSettings->r_string(hud_section, "item_visual"));
 
-        u16 root_id = script_anim_item_model->dcast_PKinematics()->LL_GetBoneRoot();
-        CBoneInstance& root_binst = script_anim_item_model->dcast_PKinematics()->LL_GetBoneInstance(root_id);
+        u16 root_id = script_item_model->LL_GetBoneRoot();
+        CBoneInstance& root_binst = script_item_model->LL_GetBoneInstance(root_id);
         root_binst.set_callback_overwrite(TRUE);
         root_binst.mTransform.identity();
 
-        u16 pc = script_anim_item_model->partitions().count();
+        u16 pc = ka->partitions().count();
         for (u16 pid = 0; pid < pc; ++pid)
         {
-            CBlend* B = script_anim_item_model->PlayCycle(pid, M2, bMixIn);
+            CBlend* B = ka->PlayCycle(pid, M2, bMixIn);
             R_ASSERT(B);
             B->speed *= speed;
             B->timeCurrent = CalculateMotionStartSeconds(phm->params.start_k, B->timeTotal);
         }
 
-        script_anim_item_model->dcast_PKinematics()->CalculateBones_Invalidate();
+        script_item_model->CalculateBones_Invalidate();
     }
 
     if (hand == 0) // right hand
@@ -1734,6 +1708,7 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
     if (length > 0)
     {
         script_override_item = bOverride_item;
+        script_override_item_hand = hand;
 
         m_bStopAtEndAnimIsRunning = true;
         script_anim_end = Device.dwTimeGlobal + length;
@@ -1750,8 +1725,9 @@ void player_hud::script_anim_stop()
 {
     u8 part = script_anim_part;
     script_anim_part = u8(-1);
-    script_anim_item_model = nullptr;
+    script_item_model = nullptr;
     script_override_item = false;
+    script_override_item_hand = u8(-1);
 
     updateMovementLayerState();
 
@@ -1802,11 +1778,12 @@ void player_hud::update_script_item()
 
     calc_transform(m_attach_idx, m_attach_offset, m_item_pos);
 
-    if (script_anim_item_model)
+    auto ka = script_item_model->dcast_PKinematicsAnimated();
+    if (ka)
     {
-        script_anim_item_model->UpdateTracks();
-        script_anim_item_model->dcast_PKinematics()->CalculateBones_Invalidate();
-        script_anim_item_model->dcast_PKinematics()->CalculateBones(TRUE);
+        ka->UpdateTracks();
+        script_item_model->CalculateBones_Invalidate();
+        script_item_model->CalculateBones(TRUE);
     }
 }
 

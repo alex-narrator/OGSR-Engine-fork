@@ -972,7 +972,7 @@ void CAI_Stalker::on_after_change_team()
     agent_manager().member().register_in_combat(this);
 }
 
-bool CAI_Stalker::unlimited_ammo() { return infinite_ammo() && CObjectHandler::planner().object().g_Alive(); }
+bool CAI_Stalker::unlimited_ammo() const { return infinite_ammo() && CObjectHandler::planner().object().g_Alive(); }
 
 CAgentManager& CAI_Stalker::agent_manager() const { return Level().seniority_holder().team(g_Team()).squad(g_Squad()).group(g_Group()).agent_manager(); }
 

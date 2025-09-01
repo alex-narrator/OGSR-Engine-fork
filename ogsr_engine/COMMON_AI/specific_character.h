@@ -56,6 +56,7 @@ struct SSpecificCharacterData : CSharedResource
     DIALOG_ID_VECTOR m_ActorDialogs;
 
     shared_str m_icon_name;
+    shared_str m_default_icon_name;
     //команда
     CHARACTER_COMMUNITY m_Community;
 
@@ -147,6 +148,10 @@ public:
     LPCSTR critical_wound_weights() const;
 
     const shared_str& IconName() const { return data()->m_icon_name; };
+
+    void SetIcon(LPCSTR icon) { data()->m_icon_name = icon; }
+    LPCSTR GetIcon() { return data()->m_icon_name.c_str(); }
+    LPCSTR GetDefaultIcon() { return data()->m_default_icon_name.c_str(); }
 #endif
     shared_str terrain_sect() const;
 };

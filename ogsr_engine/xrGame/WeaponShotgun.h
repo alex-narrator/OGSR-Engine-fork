@@ -9,33 +9,36 @@ class CWeaponShotgun : public CWeaponCustomPistol
 
 public:
     CWeaponShotgun(void);
-    virtual ~CWeaponShotgun(void);
+    virtual ~CWeaponShotgun(void) {};
 
     virtual void Load(LPCSTR section);
 
-    virtual void net_Destroy();
-    virtual void net_Export(CSE_Abstract* E);
+    /*virtual void net_Destroy();*/
+    /*virtual void net_Export(CSE_Abstract* E);*/
 
     virtual void Reload();
-    void TryReload();
+    /*void TryReload();*/
     virtual void Fire2Start();
     virtual void Fire2End();
     virtual void OnShot();
     virtual void OnShotBoth();
     virtual void switch2_Fire();
     virtual void switch2_Fire2();
-    virtual void StopHUDSounds();
+    /*virtual void StopHUDSounds();*/
 
-    virtual void UpdateSounds();
+    /*virtual void UpdateSounds();*/
 
     virtual void UpdateCL();
 
     virtual bool Action(s32 cmd, u32 flags);
 
-#ifdef DUPLET_STATE_SWITCH
-    bool is_duplet_enabled = false;
-    void SwitchDuplet();
-#endif // !DUPLET_STATE_SWITCH
+    virtual bool Attach(PIItem pIItem, bool b_send_event);
+    virtual bool Detach(const char* item_section_name, bool b_spawn_item, float item_condition = 1.f);
+    virtual bool CanAttach(PIItem pIItem);
+    virtual bool CanDetach(const char* item_section_name);
+    virtual void InitAddons();
+
+    virtual bool CanBeReloaded();
 
 protected:
     virtual void OnAnimationEnd(u32 state);
@@ -44,17 +47,20 @@ protected:
 
     bool HaveCartridgeInInventory(u8 cnt);
     virtual u8 AddCartridge(u8 cnt);
-    virtual void ReloadMagazine();
+    /*virtual void ReloadMagazine();*/
 
-    HUD_SOUND sndShotBoth;
-    ESoundTypes m_eSoundShotBoth;
+    virtual void PlayAnimShutter();
+    virtual void PlayAnimShutterMisfire();
 
-    ESoundTypes m_eSoundOpen{};
-    ESoundTypes m_eSoundAddCartridge;
-    ESoundTypes m_eSoundClose;
-    HUD_SOUND m_sndOpen;
-    HUD_SOUND m_sndAddCartridge, m_sndAddCartridgeSecond, m_sndAddCartridgeStart, m_sndAddCartridgeEmpty;
-    HUD_SOUND m_sndClose, m_sndCloseEmpty, m_sndBreech, m_sndBreechJammed;
+    //HUD_SOUND sndShotBoth;
+    //ESoundTypes m_eSoundShotBoth;
+
+    //ESoundTypes m_eSoundOpen{};
+    //ESoundTypes m_eSoundAddCartridge;
+    //ESoundTypes m_eSoundClose;
+    //HUD_SOUND m_sndOpen;
+    //HUD_SOUND m_sndAddCartridge, m_sndAddCartridgeSecond, m_sndAddCartridgeStart, m_sndAddCartridgeEmpty;
+    //HUD_SOUND m_sndClose, m_sndCloseEmpty, m_sndBreech, m_sndBreechJammed;
 
     bool m_stop_triStateReload{};
     bool has_anm_reload_jammed{};

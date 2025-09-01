@@ -73,12 +73,12 @@ public:
     virtual CBaseMonster* cast_base_monster() { return this; }
 
     virtual CInventoryOwner* cast_inventory_owner() { return this; }
-    virtual bool unlimited_ammo() { return false; }
+    virtual bool unlimited_ammo() const { return false; }
     virtual CGameObject* cast_game_object() { return this; }
 
 public:
     virtual void Die(CObject* who);
-    virtual void HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element);
+    virtual void HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element, int type);
     virtual void Hit(SHit* pHDS);
     virtual void PHHit(SHit& H);
     virtual void SelectAnimation(const Fvector& _view, const Fvector& _move, float speed);

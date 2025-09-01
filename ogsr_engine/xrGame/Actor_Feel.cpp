@@ -148,7 +148,7 @@ void CActor::PickupModeUpdate_COD()
 
     if (!g_Alive() || eacFirstEye != cam_active)
     {
-        HUD().GetUI()->UIMainIngameWnd->SetPickUpItem(NULL);
+        SetPickUpItem(NULL);
         return;
     }
 
@@ -186,7 +186,7 @@ void CActor::PickupModeUpdate_COD()
             }
         }
 
-        HUD().GetUI()->UIMainIngameWnd->SetPickUpItem(pNearestItem);
+        SetPickUpItem(pNearestItem);
 
         return;
     }
@@ -287,7 +287,7 @@ void CActor::PickupModeUpdate_COD()
         }
     }
 
-    HUD().GetUI()->UIMainIngameWnd->SetPickUpItem(pNearestItem);
+    SetPickUpItem(pNearestItem);
 };
 
 void CActor::PickupInfoDraw(CObject* object)

@@ -23,7 +23,6 @@
 
 #include "map_manager.h"
 #include "HUDManager.h"
-#include "ui/UIArtefactPanel.h"
 #include "GameTaskManager.h"
 #include "holder_custom.h"
 #include "actor_memory.h"
@@ -287,7 +286,6 @@ void CActor::net_Relcase(CObject* O)
 
     memory().remove_links(O);
     m_pPhysics_support->in_NetRelcase(O);
-    conditions().net_Relcase(O);
 }
 
 BOOL CActor::net_Relevant() // relevant for export to server
@@ -509,15 +507,6 @@ bool CActor::InventoryAllowSprint()
     if (pActiveItem && !pActiveItem->IsSprintAllowed())
     {
         return false;
-    }
-
-    auto wpn = smart_cast<const CWeapon*>(pActiveItem);
-    if (wpn)
-    {
-        if (psActorFlags.test(AF_LOCK_RELOAD) && wpn->GetState() == CWeapon::eReload)
-        {
-            return false;
-        }
     }
 
     const PIItem pOutfitItem = inventory().ItemFromSlot(OUTFIT_SLOT);

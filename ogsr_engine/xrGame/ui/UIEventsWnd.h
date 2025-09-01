@@ -22,35 +22,30 @@ class CUIEventsWnd : public CUIWindow, public CUIWndCallback
         eActiveTask = 0,
         eAccomplishedTask,
         eFailedTask,
-        eSkipedTask,
         //.						eOwnTask,
         eMaxTask
     };
     enum EEventWndFlags
     {
         flNeedReload = (1 << 0),
-        flMapMode = (1 << 1),
     };
-    Flags16 m_flags;
-    ETaskFilters m_currFilter;
-    CUIFrameWindow* m_UILeftFrame;
-    CUIWindow* m_UIRightWnd;
-    CUIFrameLineWnd* m_UILeftHeader;
-    CUIAnimatedStatic* m_UIAnimation;
-    CUIMapWnd* m_UIMapWnd;
-    CUITaskDescrWnd* m_UITaskInfoWnd;
-    CUIScrollView* m_ListWnd;
-    CUITabControl* m_TaskFilter;
+    Flags16 m_flags{};
+    ETaskFilters m_currFilter{};
+    CUIFrameWindow* m_UILeftFrame{};
+    CUIWindow* m_UIRightWnd{};
+    CUIFrameLineWnd* m_UILeftHeader{};
+    CUIAnimatedStatic* m_UIAnimation{};
+    CUITaskDescrWnd* m_UITaskInfoWnd{};
+    CUIScrollView* m_ListWnd{};
+    CUITabControl* m_TaskFilter{};
 
     bool Filter(CGameTask* t);
     void OnFilterChanged(CUIWindow*, void*);
     void ReloadList(bool bClearOnly);
 
 public:
-    void SetDescriptionMode(bool bMap);
-    bool GetDescriptionMode();
     void ShowDescription(CGameTask* t, int idx);
-    bool ItemHasDescription(CUITaskItem*);
+    void ShowTarget(CGameTask* t, int idx);
 
 public:
     CUIEventsWnd();

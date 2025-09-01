@@ -9,36 +9,71 @@
 #define DEF_ACTION(a1, a2) {a1, a2, #a2},
 
 xr_vector<_action> actions = {
-    DEF_ACTION("left", kLEFT) DEF_ACTION("right", kRIGHT) DEF_ACTION("up", kUP) DEF_ACTION("down", kDOWN) DEF_ACTION("jump", kJUMP) DEF_ACTION("crouch", kCROUCH)
-        DEF_ACTION("crouch_toggle", kCROUCH_TOGGLE) DEF_ACTION("accel", kACCEL) DEF_ACTION("sprint_toggle", kSPRINT_TOGGLE)
+    DEF_ACTION("left", kLEFT) 
+    DEF_ACTION("right", kRIGHT) 
+    DEF_ACTION("up", kUP) 
+    DEF_ACTION("down", kDOWN) 
+    DEF_ACTION("jump", kJUMP) 
+    DEF_ACTION("crouch", kCROUCH)
+    DEF_ACTION("accel", kACCEL) 
+    DEF_ACTION("sprint", kSPRINT)
 
-            DEF_ACTION("forward", kFWD) DEF_ACTION("back", kBACK) DEF_ACTION("lstrafe", kL_STRAFE) DEF_ACTION("rstrafe", kR_STRAFE)
+    DEF_ACTION("forward", kFWD) 
+    DEF_ACTION("back", kBACK)
+    DEF_ACTION("lstrafe", kL_STRAFE) 
+    DEF_ACTION("rstrafe", kR_STRAFE)
 
-                DEF_ACTION("llookout", kL_LOOKOUT) DEF_ACTION("rlookout", kR_LOOKOUT)
+    DEF_ACTION("llookout", kL_LOOKOUT) 
+    DEF_ACTION("rlookout", kR_LOOKOUT)
 
-                    DEF_ACTION("turn_engine", kENGINE)
+    DEF_ACTION("turn_engine", kENGINE)
 
-                        DEF_ACTION("cam_1", kCAM_1) DEF_ACTION("cam_2", kCAM_2) DEF_ACTION("cam_3", kCAM_3)
+    DEF_ACTION("cam_1", kCAM_1) 
+    DEF_ACTION("cam_2", kCAM_2) 
+    DEF_ACTION("cam_3", kCAM_3)
 
-                                DEF_ACTION("torch", kTORCH) DEF_ACTION("night_vision", kNIGHT_VISION) DEF_ACTION("wpn_1", kWPN_1) DEF_ACTION("wpn_2", kWPN_2)
-                                    DEF_ACTION("wpn_3", kWPN_3) DEF_ACTION("wpn_4", kWPN_4) DEF_ACTION("wpn_5", kWPN_5) DEF_ACTION("wpn_6", kWPN_6) DEF_ACTION("wpn_8", kWPN_8)
-                                        DEF_ACTION("laser_on", kLASER_ON) DEF_ACTION("wpn_next", kWPN_NEXT) DEF_ACTION("wpn_fire", kWPN_FIRE) DEF_ACTION("wpn_zoom", kWPN_ZOOM)
-                                            DEF_ACTION("wpn_zoom_inc", kWPN_ZOOM_INC) DEF_ACTION("wpn_zoom_dec", kWPN_ZOOM_DEC) DEF_ACTION("wpn_reload", kWPN_RELOAD) DEF_ACTION(
-                                                "wpn_func", kWPN_FUNC) DEF_ACTION("wpn_firemode_prev", kWPN_FIREMODE_PREV) DEF_ACTION("wpn_firemode_next", kWPN_FIREMODE_NEXT)
+    DEF_ACTION("torch", kTORCH)
 
-                                                DEF_ACTION("pause", kPAUSE) DEF_ACTION("drop", kDROP) DEF_ACTION("use", kUSE) DEF_ACTION("scores", kSCORES)
-                                                    DEF_ACTION("flashlight", kFLASHLIGHT) DEF_ACTION("screenshot", kSCREENSHOT)
-                                                        DEF_ACTION("quit", kQUIT) DEF_ACTION("console", kCONSOLE) DEF_ACTION("inventory", kINVENTORY)
-                                                            DEF_ACTION("active_jobs", kACTIVE_JOBS)
-                                                                DEF_ACTION("map", kMAP) DEF_ACTION("contacts", kCONTACTS) DEF_ACTION("ext_1", kEXT_1)
+    DEF_ACTION("wpn_1", kWPN_1) 
+    DEF_ACTION("wpn_2", kWPN_2)
+    DEF_ACTION("wpn_3", kWPN_3) 
+    DEF_ACTION("wpn_4", kWPN_4) 
+    DEF_ACTION("wpn_5", kWPN_5) 
+    DEF_ACTION("wpn_6", kWPN_6)
+    DEF_ACTION("wpn_7", kWPN_7)
+    DEF_ACTION("wpn_8", kWPN_8)
 
-                                                                            DEF_ACTION("next_slot", kNEXT_SLOT) DEF_ACTION("prev_slot", kPREV_SLOT)
+    DEF_ACTION("wpn_next", kWPN_NEXT) 
+    DEF_ACTION("wpn_fire", kWPN_FIRE) 
+    DEF_ACTION("wpn_zoom", kWPN_ZOOM)
+    DEF_ACTION("wpn_zoom_inc", kWPN_ZOOM_INC) 
+    DEF_ACTION("wpn_zoom_dec", kWPN_ZOOM_DEC) 
+    DEF_ACTION("wpn_reload", kWPN_RELOAD) 
+    DEF_ACTION("wpn_func", kWPN_FUNC) 
+    DEF_ACTION("wpn_firemode_prev", kWPN_FIREMODE_PREV) 
+    DEF_ACTION("wpn_firemode_next", kWPN_FIREMODE_NEXT)
 
-                                                                                                DEF_ACTION("use_bandage", kUSE_BANDAGE) DEF_ACTION("use_medkit", kUSE_MEDKIT)
+    DEF_ACTION("pause", kPAUSE) 
+    DEF_ACTION("drop", kDROP) 
+    DEF_ACTION("use", kUSE)
+    DEF_ACTION("screenshot", kSCREENSHOT)
+    DEF_ACTION("quit", kQUIT) 
+    DEF_ACTION("console", kCONSOLE)
 
-                                                                                                    DEF_ACTION("quick_save", kQUICK_SAVE) DEF_ACTION("quick_load", kQUICK_LOAD)
+    DEF_ACTION("active_jobs", kACTIVE_JOBS)
+    DEF_ACTION("map", kMAP) 
+    DEF_ACTION("contacts", kCONTACTS)
+    DEF_ACTION("journal", kJOURNAL)
 
-                                                                                                        DEF_ACTION("hide_hud", kHIDEHUD) DEF_ACTION("show_hud", kSHOWHUD)
+    DEF_ACTION("ext_1", kEXT_1)
+
+    DEF_ACTION("next_slot", kNEXT_SLOT)
+    DEF_ACTION("prev_slot", kPREV_SLOT)
+
+    DEF_ACTION("additional_action", kADDITIONAL_ACTION)
+
+    DEF_ACTION("show_hud", kSHOWHUD)
+    DEF_ACTION("hide_hud", kHIDEHUD)
 };
 
 xr_vector<_binding> g_key_bindings;

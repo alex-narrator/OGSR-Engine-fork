@@ -12,7 +12,8 @@ struct ZONE_TYPE_SHOC
     float max_freq;
     //звук реакции детектора на конкретную зону
     //	ref_sound	detect_snd;
-    HUD_SOUND detect_snds;
+    /*HUD_SOUND detect_snds;*/
+    HUD_SOUND_COLLECTION_LAYERED detect_snds{};
 
     shared_str zone_map_location;
     float m_fRadius;
@@ -54,13 +55,12 @@ public:
     virtual void feel_touch_delete(CObject* O);
     virtual BOOL feel_touch_contact(CObject* O);
 
-    void TurnOn();
-    void TurnOff();
-    bool IsWorking() { return m_bWorking; }
+    virtual bool IsPowerOn() const { return m_bWorking; }
+    virtual void Switch(bool);
 
-    virtual void OnMoveToSlot() override;
+    virtual void OnMoveToSlot(EItemPlace prevPlace) override;
     virtual void OnMoveToRuck(EItemPlace prevPlace) override;
-    virtual void OnMoveToBelt() override;
+    virtual void OnMoveToBelt(EItemPlace prevPlace) override;
 
 protected:
     void StopAllSounds();
@@ -100,6 +100,6 @@ public:
 class CSimpleDetectorSHOC : public CCustomDetectorSHOC
 {
 public:
-    CSimpleDetectorSHOC();
-    virtual ~CSimpleDetectorSHOC();
+    CSimpleDetectorSHOC() {};
+    virtual ~CSimpleDetectorSHOC() {};
 };

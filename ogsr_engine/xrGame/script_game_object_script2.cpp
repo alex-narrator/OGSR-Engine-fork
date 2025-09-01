@@ -60,7 +60,6 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .property("morale", &CScriptGameObject::GetMorale, &CScriptGameObject::SetMorale)
         // KD
         .property("alcohol", &CScriptGameObject::GetAlcohol, &CScriptGameObject::SetAlcohol)
-        .property("thirst", &CScriptGameObject::GetThirst, &CScriptGameObject::SetThirst)
         .property("max_power", &CScriptGameObject::GetMaxPower, &CScriptGameObject::SetMaxPower)
 
         // Actor State
@@ -83,6 +82,8 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .def("cost", &CScriptGameObject::Cost)
         .def("condition", &CScriptGameObject::GetCondition)
         .def("set_condition", &CScriptGameObject::SetCondition)
+        .def("change_condition", &CScriptGameObject::ChangeCondition)
+        .def("can_trade", &CScriptGameObject::CanTrade)
         .def("death_time", &CScriptGameObject::DeathTime)
         //		.def("armor",						&CScriptGameObject::Armor)
         .def("max_health", &CScriptGameObject::MaxHealth)
@@ -271,7 +272,12 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .def("active_slot", &CScriptGameObject::active_slot)
         .def("activate_slot", &CScriptGameObject::activate_slot)
 
+        .def("active_device", &CScriptGameObject::active_device)
+
         .def("switch_torch", &CScriptGameObject::SwitchTorch)
+
+        .def("switch_power", &CScriptGameObject::SwitchPower)
+        .def("is_power_on", &CScriptGameObject::IsPowerOn)
 
         .def("get_xform", &CScriptGameObject::GetXForm)
 

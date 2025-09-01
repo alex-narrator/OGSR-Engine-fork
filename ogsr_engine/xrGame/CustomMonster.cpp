@@ -600,7 +600,7 @@ void CCustomMonster::UpdateCamera()
 }
 #endif
 
-void CCustomMonster::HitSignal(float /**perc/**/, Fvector& /**vLocalDir/**/, CObject* /**who/**/) {}
+void CCustomMonster::HitSignal(float /**perc/**/, Fvector& /**vLocalDir/**/, CObject* /**who/**/, s16 element, int type) {}
 
 void CCustomMonster::Die(CObject* who)
 {

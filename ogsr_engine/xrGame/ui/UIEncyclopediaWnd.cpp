@@ -23,7 +23,7 @@
 #include "../object_broker.h"
 #include "../string_table.h"
 
-#define ENCYCLOPEDIA_DIALOG_XML "encyclopedia.xml"
+constexpr auto ENCYCLOPEDIA_DIALOG_XML = "encyclopedia.xml";
 
 CUIEncyclopediaWnd::CUIEncyclopediaWnd() { prevArticlesCount = 0; }
 

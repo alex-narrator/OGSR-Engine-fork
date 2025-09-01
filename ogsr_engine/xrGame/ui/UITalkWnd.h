@@ -13,7 +13,6 @@ class CActor;
 class CInventoryOwner;
 class CPhraseDialogManager;
 class CUITalkDialogWnd;
-class CUITradeWnd;
 ///////////////////////////////////////
 //
 ///////////////////////////////////////
@@ -49,7 +48,6 @@ public:
     void InitOthersStartDialog();
     virtual bool IR_OnKeyboardPress(int dik);
     virtual bool OnKeyboard(int dik, EUIMessages keyboard_action);
-    void SwitchToTrade();
     void AddAnswerScript(LPCSTR text, bool is_actor = false);
     void AddIconedMessage(LPCSTR text, LPCSTR texture_name, Frect texture_rect, LPCSTR templ_name);
 
@@ -65,12 +63,10 @@ public:
     void AddQuestion(const shared_str& text, const shared_str& id, int&);
     void AddAnswer(const shared_str& text, LPCSTR SpeakerName);
 
-    IC CUITradeWnd* GetTradeWnd() { return UITradeWnd; }
     IC CInventoryOwner* GetSecondTalker() { return m_pOthersInvOwner; }
 
 protected:
     //для режима торговли
-    CUITradeWnd* UITradeWnd;
     CUITalkDialogWnd* UITalkDialogWnd;
 
     //указатель на владельца инвентаря вызвавшего менюшку

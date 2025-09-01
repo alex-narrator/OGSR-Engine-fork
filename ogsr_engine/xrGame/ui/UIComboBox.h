@@ -68,10 +68,10 @@ protected:
     virtual void Update();
 
 protected:
-    bool m_bInited;
-    int m_iListHeight;
+    bool m_bInited{};
+    int m_iListHeight{};
     int m_itoken_id{};
-    E_COMBO_STATE m_eState;
+    E_COMBO_STATE m_eState{LIST_FONDED};
     int m_backup_itoken_id{};
 
     CUI_IB_FrameLineWnd m_frameLine;
@@ -79,11 +79,14 @@ protected:
     CUIFrameWindow m_frameWnd;
 
     u32 m_textColor[2];
+    bool b_SkipOption{};
 
 public:
     CUIListBox m_list;
     void SetTextColor(u32 color) { m_textColor[0] = color; };
     void SetTextColorD(u32 color) { m_textColor[1] = color; };
+
+    void SetSkipOption(bool b) { b_SkipOption = b; };
 
 protected:
     DECLARE_SCRIPT_REGISTER_FUNCTION

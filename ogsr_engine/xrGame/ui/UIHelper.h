@@ -34,6 +34,4 @@ public:
     static CUI3tButton* Create3tButton(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUICheckButton* CreateCheck(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
     static CUIEditBox* CreateEditBox(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
-
-    static CUIDragDropListEx* CreateDragDropListEx(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent, bool critical = true);
 };

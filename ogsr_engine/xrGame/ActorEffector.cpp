@@ -147,6 +147,12 @@ void RemoveEffector(CActor* A, int type)
     A->Cameras().RemovePPEffector((EEffectorPPType)type);
 }
 
+bool CheckEffector(CActor* A, int type)
+{
+    auto& cam = A->Cameras();
+    return cam.GetCamEffector((ECamEffectorType)type) || cam.GetPPEffector((EEffectorPPType)type);
+}
+
 CEffectorController::~CEffectorController() { R_ASSERT(!m_ce && !m_pe); }
 CAnimatorCamEffector::CAnimatorCamEffector()
 {

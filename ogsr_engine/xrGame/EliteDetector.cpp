@@ -5,9 +5,7 @@
 #include "ui/UIStatic.h"
 #include "ui/ArtefactDetectorUI.h"
 
-constexpr const char* AF_SIGN = "af_sign";
-
-CEliteDetector::CEliteDetector() { m_artefacts.m_af_rank = 3; }
+constexpr const char* DEFAULT_SIGN = "default_sign";
 
 void CEliteDetector::CreateUI()
 {
@@ -23,34 +21,133 @@ void CEliteDetector::UpdateAf()
     if (m_artefacts.m_ItemInfos.empty())
         return;
 
-    auto it_b = m_artefacts.m_ItemInfos.begin();
-    auto it_e = m_artefacts.m_ItemInfos.end();
-    auto it = it_b;
+    auto it = m_artefacts.m_ItemInfos.begin();
+    float min_dist = flt_max;
 
-    Fvector detector_pos = Position();
-    for (; it_b != it_e; ++it_b)
+    for (auto& item : m_artefacts.m_ItemInfos)
     {
-        CArtefact* pAf = it_b->first;
-        if (pAf->H_Parent())
+        auto pAf = item.first;
+        ui().RegisterItemToDraw(pAf->Position(), pAf->cNameSect());
+        TryMakeArtefactVisible(pAf);
+
+        float d = Position().distance_to(pAf->Position());
+        if (d < min_dist)
+        {
+            min_dist = d;
+            it = m_artefacts.m_ItemInfos.find(pAf);
+        }
+    }
+
+    ITEM_INFO& af_info = it->second;
+    ITEM_TYPE* item_type = af_info.curr_ref;
+
+    if (item_type->detect_snds.sounds.empty())
+        return;
+
+    float dist = min_dist;
+
+    float fRelPow = (dist / m_fArtefactRadius);
+    clamp(fRelPow, 0.f, 1.f);
+
+    // определить текущую частоту срабатывания сигнала
+    af_info.cur_period = item_type->freq.x + (item_type->freq.y - item_type->freq.x) * (fRelPow * fRelPow);
+
+    float min_snd_freq = 0.9f;
+    float max_snd_freq = 1.4f;
+
+    float snd_freq = min_snd_freq + (max_snd_freq - min_snd_freq) * (1.0f - fRelPow);
+
+    if (af_info.snd_time > af_info.cur_period)
+    {
+        af_info.snd_time = 0;
+        PlaySound(item_type->detect_snds, Position());
+        if (item_type->detect_snds.m_activeSnd)
+            item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
+    }
+    else
+        af_info.snd_time += Device.fTimeDelta;
+}
+
+void CEliteDetector::UpdateZones()
+{
+    if (m_zones.m_ItemInfos.empty())
+        return;
+
+    for (auto& item : m_zones.m_ItemInfos)
+    { // all
+        auto pZone = item.first;
+
+        if (pZone->distance_to_center(this) <= m_fDetectRadius)
+        {
+            ui().RegisterItemToDraw(pZone->Position(), pZone->cNameSect());
+        }
+
+        ITEM_INFO& zone_info = item.second;
+        ITEM_TYPE* item_type = zone_info.curr_ref;
+
+        if (item_type->detect_snds.sounds.empty())
             continue;
 
-        ui().RegisterItemToDraw(pAf->Position(), "af_sign");
+        CSpaceRestrictor* pSR = smart_cast<CSpaceRestrictor*>(pZone);
+        float dist = pSR->distance_to(Position());
+        if (dist < 0.f)
+            dist = 0.f;
 
-        if (pAf->CanBeInvisible())
+        float fRelPow = (dist / m_fDetectRadius);
+        clamp(fRelPow, 0.f, 1.f);
+
+        // current sound frequency
+        zone_info.cur_period = item_type->freq.x + (item_type->freq.y - item_type->freq.x) * (fRelPow * fRelPow);
+
+        // float min_snd_freq = 0.9f;
+        // float max_snd_freq = 1.4f;
+
+        // float snd_freq = min_snd_freq + (max_snd_freq - min_snd_freq) * (1.0f - fRelPow);
+
+        if (zone_info.snd_time > zone_info.cur_period)
         {
-            float d = detector_pos.distance_to(pAf->Position());
-            if (d < m_fAfVisRadius)
-                pAf->SwitchVisibility(true);
+            zone_info.snd_time = 0;
+            PlaySound(item_type->detect_snds, Position());
+            // if (item_type->detect_snds.m_activeSnd)
+            //     item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
         }
+        else
+            zone_info.snd_time += Device.fTimeDelta;
     }
 }
 
-bool CEliteDetector::render_item_3d_ui_query() { return IsWorking() && ui().m_wrk_area != nullptr; }
+void CEliteDetector::DisableUIDetection()
+{
+    if (m_ui)
+    {
+        ui().Clear();
+    }
+}
+
+bool CEliteDetector::render_item_3d_ui_query() { return IsPowerOn() && ui().m_wrk_area != nullptr; }
 void CEliteDetector::render_item_3d_ui()
 {
     R_ASSERT(HudItemData());
     inherited::render_item_3d_ui();
     ui().Draw();
+    //	Restore cull mode
+    UIRender->CacheSetCullMode(IUIRender::cmCCW);
+}
+
+static void fix_ws_wnd_size(CUIWindow* w, float kx)
+{
+    Fvector2 p = w->GetWndSize();
+    p.x /= kx;
+    w->SetWndSize(p);
+
+    p = w->GetWndPos();
+    p.x /= kx;
+    w->SetWndPos(p);
+
+    for (const auto child_wnd : w->GetChildWndList())
+    {
+        fix_ws_wnd_size(child_wnd, kx);
+    }
 }
 
 void CUIArtefactDetectorElite::construct(CEliteDetector* p)
@@ -94,8 +191,8 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
         else
         {
             CUIStatic* S = xr_new<CUIStatic>();
-            m_palette[AF_SIGN] = S;
-            CUIXmlInit::InitStatic(uiXml, AF_SIGN, 0, S);
+            m_palette[DEFAULT_SIGN] = S;
+            CUIXmlInit::InitStatic(uiXml, DEFAULT_SIGN, 0, S);
             S->SetAutoDelete(true);
             m_wrk_area->AttachChild(S);
             S->SetCustomDraw(true);
@@ -130,7 +227,12 @@ void CUIArtefactDetectorElite::Draw()
     Fmatrix LM;
     GetUILocatorMatrix(LM);
 
+    IUIRender::ePointType bk = UI()->m_currentPointType;
+
+    UI()->m_currentPointType = IUIRender::pttLIT;
+
     UIRender->CacheSetXformWorld(LM);
+    UIRender->CacheSetCullMode(IUIRender::cmNONE);
 
     CUIWindow::Draw();
 
@@ -139,8 +241,8 @@ void CUIArtefactDetectorElite::Draw()
     Fvector2 rp;
     m_wrk_area->GetAbsolutePos(rp);
 
-    Fmatrix M, Mc;
-    float h, p;
+    Fmatrix M{}, Mc{};
+    float h{}, p{};
     Device.vCameraDirection.getHP(h, p);
     Mc.setHPB(h, 0, 0);
     Mc.c.set(Device.vCameraPosition);
@@ -148,31 +250,29 @@ void CUIArtefactDetectorElite::Draw()
 
     UI()->ScreenFrustumLIT().CreateFromRect(Frect().set(rp.x, rp.y, wrk_sz.x, wrk_sz.y));
 
-    auto it = m_items_to_draw.cbegin();
-    auto it_e = m_items_to_draw.cend();
-    for (; it != it_e; ++it)
+    for (auto& item : m_items_to_draw)
     {
-        Fvector p = (*it).pos;
+        Fvector p = item.pos;
         Fvector pt3d;
         M.transform_tiny(pt3d, p);
-        float kz = wrk_sz.y / m_parent->m_fAfDetectRadius;
+        float kz = wrk_sz.y / m_parent->GetDetectionRadius();
         pt3d.x *= kz;
         pt3d.z *= kz;
 
         pt3d.x += wrk_sz.x / 2.0f;
         pt3d.z -= wrk_sz.y;
 
-        Fvector2 pos;
+        Fvector2 pos{};
         pos.set(pt3d.x, -pt3d.z);
         pos.sub(rp);
-        if (1 /* r.in(pos)*/)
+        // if (1 /* r.in(pos)*/)
         {
-            (*it).pStatic->SetWndPos(pos);
-            (*it).pStatic->Draw();
+            item.pStatic->SetWndPos(pos);
+            item.pStatic->Draw();
         }
     }
 
-    UI()->ScreenFrustumLIT().Clear();
+    UI()->m_currentPointType = bk;
 }
 
 void CUIArtefactDetectorElite::GetUILocatorMatrix(Fmatrix& _m)
@@ -190,7 +290,7 @@ void CUIArtefactDetectorElite::RegisterItemToDraw(const Fvector& p, const shared
     auto it = m_palette.find(palette_idx);
     if (it == m_palette.end())
     {
-        // Msg("! RegisterItemToDraw. static not found for [%s]", palette_idx.c_str());
+        Msg("! RegisterItemToDraw. static not found for [%s]", palette_idx.c_str());
         return;
     }
     CUIStatic* S = m_palette[palette_idx];
@@ -198,65 +298,18 @@ void CUIArtefactDetectorElite::RegisterItemToDraw(const Fvector& p, const shared
     m_items_to_draw.push_back(itm);
 }
 
-CScientificDetector::CScientificDetector() { m_artefacts.m_af_rank = 3; }
-CScientificDetector::~CScientificDetector() { m_zones.destroy(); }
-void CScientificDetector::Load(LPCSTR section)
-{
-    inherited::Load(section);
-    m_zones.load(section, "zone");
-}
+CScientificDetector::~CScientificDetector() {}
 
-void CScientificDetector::UpfateWork()
+void CScientificDetector::UpdateWork()
 {
     ui().Clear();
 
-    auto ait_b = m_artefacts.m_ItemInfos.begin();
-    auto ait_e = m_artefacts.m_ItemInfos.end();
-    auto ait = ait_b;
-    Fvector detector_pos = Position();
-    for (; ait_b != ait_e; ++ait_b)
+    for (const auto& item : m_creatures.m_ItemInfos)
     {
-        CArtefact* pAf = ait_b->first;
-        if (pAf->H_Parent())
-            continue;
-
-        ui().RegisterItemToDraw(pAf->Position(), pAf->cNameSect());
-
-        if (pAf->CanBeInvisible())
-        {
-            float d = detector_pos.distance_to(pAf->Position());
-            if (d < m_fAfVisRadius)
-                pAf->SwitchVisibility(true);
-        }
-    }
-
-    auto zit_b = m_zones.m_ItemInfos.begin();
-    auto zit_e = m_zones.m_ItemInfos.end();
-    auto zit = zit_b;
-
-    for (; zit_b != zit_e; ++zit_b)
-    {
-        CCustomZone* pZone = zit_b->first;
-        ui().RegisterItemToDraw(pZone->Position(), pZone->cNameSect());
+        auto pCreature = item.first;
+        const auto species = pSettings->r_string(pCreature->cNameSect(), "species");
+        ui().RegisterItemToDraw(pCreature->Position(), species);
     }
 
     m_ui->update();
-}
-
-void CScientificDetector::shedule_Update(u32 dt)
-{
-    inherited::shedule_Update(dt);
-
-    if (!H_Parent())
-        return;
-    Fvector P;
-    P.set(H_Parent()->Position());
-    m_zones.feel_touch_update(P, m_fAfDetectRadius);
-}
-
-void CScientificDetector::OnH_B_Independent(bool just_before_destroy)
-{
-    inherited::OnH_B_Independent(just_before_destroy);
-
-    m_zones.clear();
 }

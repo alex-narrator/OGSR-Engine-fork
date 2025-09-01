@@ -45,7 +45,6 @@ void init_game_globals()
     CInfoPortion::InitInternal();
     CEncyclopediaArticle::InitInternal();
     CPhraseDialog::InitInternal();
-    InventoryUtilities::CreateShaders();
     CCharacterInfo::InitInternal();
     CSpecificCharacter::InitInternal();
     CHARACTER_COMMUNITY::InitInternal();
@@ -57,11 +56,8 @@ void init_game_globals()
 extern CUIXml* g_gameTaskXml;
 extern CUIXml* g_uiSpotXml;
 
-extern void destroy_lua_wpn_params();
-
 void clean_game_globals()
 {
-    destroy_lua_wpn_params();
     // destroy ai space
     xr_delete(g_ai_space);
     // destroy object factory
@@ -81,7 +77,6 @@ void clean_game_globals()
     CPhraseDialog::DeleteSharedData();
     CPhraseDialog::DeleteIdToIndexData();
 
-    InventoryUtilities::DestroyShaders();
     CCharacterInfo::DeleteSharedData();
     CCharacterInfo::DeleteIdToIndexData();
 

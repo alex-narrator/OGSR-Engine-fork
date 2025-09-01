@@ -13,28 +13,32 @@ private:
     typedef CInventoryItemObject inherited;
 
 protected:
-    float fBrightness;
-    CLAItem* lanim;
-    float time2hide;
+    float fBrightness{1.f};
+    CLAItem* lanim{};
+    float time2hide{};
 
     u16 guid_bone{};
     shared_str light_trace_bone;
 
-    float m_delta_h;
-    Fvector2 m_prev_hp;
-    bool m_switched_on;
+    float m_delta_h{};
+    Fvector2 m_prev_hp{};
+    bool m_switched_on{};
     ref_light light_render;
     ref_light light_omni;
     ref_glow glow_render;
     Fvector m_focus;
     Fcolor m_color;
-    bool m_bind_to_camera;
+    bool m_bind_to_camera{};
     Fvector m_camera_torch_offset;
     Fvector m_camera_omni_offset;
-    float m_min_target_dist;
+    float m_min_target_dist{0.5f};
+    float m_fRange{};
 
 private:
     bool useVolumetric{}, useVolumetricForActor{};
+    shared_str m_light_descr_sect{};
+
+    void LoadLightDefinitions(shared_str light_sect);
 
 public:
     CTorch(void);
@@ -51,34 +55,19 @@ public:
     virtual void UpdateCL();
 
     void Switch();
-    void Switch(bool light_on);
+    void Switch(bool turn_on);
     bool torch_active() const;
 
     virtual bool can_be_attached() const;
     void calc_m_delta_h(float);
     float get_range() const;
 
-public:
-    void SwitchNightVision();
-    void SwitchNightVision(bool light_on);
-    void UpdateSwitchNightVision();
-
 protected:
-    bool m_bNightVisionEnabled{};
-    bool m_bNightVisionOn{};
-
-    HUD_SOUND m_NightVisionOnSnd;
-    HUD_SOUND m_NightVisionOffSnd;
-    HUD_SOUND m_NightVisionIdleSnd;
-    HUD_SOUND m_NightVisionBrokenSnd;
-    HUD_SOUND sndTurnOn;
-    HUD_SOUND sndTurnOff;
 
     enum EStats
     {
         eTorchActive = (1 << 0),
-        eNightVisionActive = (1 << 1),
-        eAttached = (1 << 2)
+        eAttached = (1 << 1)
     };
 
 public:

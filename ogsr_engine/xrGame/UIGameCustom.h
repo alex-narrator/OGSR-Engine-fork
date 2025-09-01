@@ -81,7 +81,6 @@ public:
     void RemoveDialogToRender(CUIWindow* pDialog);
 
     CUIDialogWnd* MainInputReceiver();
-    virtual void ReInitShownUI() = 0;
     virtual void HideShownDialogs(){};
 
     void AddCustomMessage(LPCSTR id, float x, float y, float font_size, CGameFont* pFont, u16 alignment, u32 color);

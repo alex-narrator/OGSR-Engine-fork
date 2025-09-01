@@ -244,17 +244,15 @@ bool CScriptGameObject::IsInvBoxEmpty()
 #include "Artifact.h"
 #include "medkit.h"
 #include "antirad.h"
-#include "scope.h"
-#include "silencer.h"
 #include "torch.h"
-#include "GrenadeLauncher.h"
+#include "Addons.h"
 #include "searchlight.h"
 #include "WeaponAmmo.h"
 #include "grenade.h"
 #include "BottleItem.h"
 #include "WeaponMagazinedWGrenade.h"
 #include "WeaponShotgun.h"
-#include "Actor.h"
+#include "helmet.h"
 #include "../xr_3da/CameraBase.h"
 
 #define TEST_OBJECT_CLASS(A, B) \
@@ -281,6 +279,7 @@ TEST_OBJECT_CLASS(CScriptGameObject::IsMedkit, CMedkit)
 TEST_OBJECT_CLASS(CScriptGameObject::IsEatableItem, CEatableItem)
 TEST_OBJECT_CLASS(CScriptGameObject::IsAntirad, CAntirad)
 TEST_OBJECT_CLASS(CScriptGameObject::IsCustomOutfit, CCustomOutfit)
+TEST_OBJECT_CLASS(CScriptGameObject::IsHelmet, CHelmet)
 TEST_OBJECT_CLASS(CScriptGameObject::IsScope, CScope)
 TEST_OBJECT_CLASS(CScriptGameObject::IsSilencer, CSilencer)
 TEST_OBJECT_CLASS(CScriptGameObject::IsGrenadeLauncher, CGrenadeLauncher)
@@ -385,22 +384,6 @@ float CScriptGameObject::GetCamFOV() { return g_fov; }
 
 void CScriptGameObject::SetCamFOV(float _fov) { g_fov = _fov; }
 
-#include "HudManager.h"
-#include "UIGameSP.h"
-void CScriptGameObject::OpenInvBox(CScriptGameObject* obj)
-{
-    CInventoryOwner* e = smart_cast<CInventoryOwner*>(&object());
-    IInventoryBox* trunk = smart_cast<IInventoryBox*>(&(obj->object()));
-    if (!e || !trunk)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member OpenInvBox!");
-        return;
-    }
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (pGameSP)
-        pGameSP->StartCarBody(e, trunk);
-}
-
 #include "script_ini_file.h"
 CInifile* CScriptGameObject::GetVisIni()
 {
@@ -480,27 +463,7 @@ u16 CScriptGameObject::GetBoneID(LPCSTR _bone_name)
     }
     return k->LL_BoneID(_bone_name);
 }
-#include "WeaponBinoculars.h"
-float CScriptGameObject::GetBinocZoomFactor()
-{
-    CWeaponBinoculars* k = smart_cast<CWeaponBinoculars*>(&object());
-    if (!k)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeaponBinoculars : cannot access class member GetBinocZoomFactor!");
-        return 0.f;
-    }
-    return k->GetZoomFactor();
-}
-void CScriptGameObject::SetBinocZoomFactor(float _zoom)
-{
-    CWeaponBinoculars* k = smart_cast<CWeaponBinoculars*>(&object());
-    if (!k)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeaponBinoculars : cannot access class member SetBinocZoomFactor!");
-        return;
-    }
-    k->SetZoomFactor(_zoom);
-}
+
 float CScriptGameObject::GetZoomFactor()
 {
     CWeapon* k = smart_cast<CWeapon*>(&object());
@@ -510,6 +473,23 @@ float CScriptGameObject::GetZoomFactor()
         return 0.f;
     }
     return k->GetZoomFactor();
+}
+void CScriptGameObject::ZoomOut()
+{
+    auto hi = smart_cast<CHudItem*>(&object());
+    if (hi)
+        hi->OnZoomOut();
+}
+void CScriptGameObject::ZoomIn()
+{
+    auto hi = smart_cast<CHudItem*>(&object());
+    if (hi)
+        hi->OnZoomIn();
+}
+bool CScriptGameObject::IsZoomed()
+{
+    auto hi = smart_cast<CHudItem*>(&object());
+    return hi ? hi->IsZoomed() : false;
 }
 u8 CScriptGameObject::GetAddonFlags()
 {
@@ -551,16 +531,7 @@ void CScriptGameObject::SetMagazineSize(int _size)
     }
     k->SetAmmoMagSize(_size);
 }
-bool CScriptGameObject::GrenadeLauncherAttachable()
-{
-    CWeapon* k = smart_cast<CWeapon*>(&object());
-    if (!k)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeapon : cannot access class member GrenadeLauncherAttachable!");
-        return false;
-    }
-    return k->GrenadeLauncherAttachable();
-}
+
 u32 CScriptGameObject::GetAmmoType()
 {
     CWeapon* k = smart_cast<CWeapon*>(&object());
@@ -657,54 +628,31 @@ void CScriptGameObject::ResetState()
     k->ResetStates();
 }
 
-void CScriptGameObject::ZeroEffects()
-{
-    CEatableItem* item = smart_cast<CEatableItem*>(&object());
-    if (!item)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CEatableItem : cannot access class member ZeroEffects!");
-        return;
-    }
-    item->ZeroAllEffects();
-}
-void CScriptGameObject::SetRadiationInfluence(float rad)
-{
-    CEatableItem* item = smart_cast<CEatableItem*>(&object());
-    if (!item)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CEatableItem : cannot access class member ZeroEffects!");
-        return;
-    }
-    item->SetRadiation(rad);
-}
-
-void CScriptGameObject::SetDrugRadProtection(float _prot)
-{
-    CActor* k = smart_cast<CActor*>(&object());
-    if (!k)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot access class member SetDrugRadProtection!");
-        return;
-    }
-    k->SetDrugRadProtection(_prot);
-}
-
-void CScriptGameObject::SetDrugPsyProtection(float _prot)
-{
-    CActor* k = smart_cast<CActor*>(&object());
-    if (!k)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CActor : cannot access class member SetDrugPsyProtection!");
-        return;
-    }
-    k->SetDrugPsyProtection(_prot);
-}
-
 u32 CScriptGameObject::GetHudItemState()
 {
     CHudItem* k = smart_cast<CHudItem*>(&object());
     ASSERT_FMT(k, "CHudItem : cannot access class member GetState!");
     return k->GetState();
+}
+
+bool CScriptGameObject::IsPending() const
+{
+    CHudItem* k = smart_cast<CHudItem*>(&object());
+    return k && k->IsPending();
+}
+
+void CScriptGameObject::StopAimInertion(bool val)
+{
+    CHudItem* k = smart_cast<CHudItem*>(&object());
+    if (k)
+        k->SetStopAimInertion(val);
+}
+
+void CScriptGameObject::ShowItemHud(bool val)
+{
+    CHudItem* k = smart_cast<CHudItem*>(&object());
+    if (k)
+        k->ShowHud(val);
 }
 
 float CScriptGameObject::GetRadius()

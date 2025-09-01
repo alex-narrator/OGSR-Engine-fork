@@ -114,12 +114,12 @@ void CUIProgressBar::Draw()
     case om_down: progress_rect.set(0, 0, GetWidth(), m_CurrentLength); break;
     case om_fromcenter: {
         const float center = GetWidth() / 2.f;
-        progress_rect.set(center - m_CurrentLength, 0, center + m_CurrentLength, GetHeight());
+        progress_rect.set(center - m_CurrentLength / 2.f, 0, center + m_CurrentLength / 2.f, GetHeight());
         break;
     }
     case om_vfromcenter: {
         const float center = GetHeight() / 2.f;
-        progress_rect.set(0, center - m_CurrentLength, GetWidth(), center + m_CurrentLength);
+        progress_rect.set(0, center - m_CurrentLength / 2.f, GetWidth(), center + m_CurrentLength / 2.f);
         break;
     }
     default: NODEFAULT; break;

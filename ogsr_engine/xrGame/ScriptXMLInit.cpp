@@ -18,6 +18,7 @@
 #include "ui\UIMMShniaga.h"
 #include "ui\UIScrollView.h"
 #include "ui\UIProgressBar.h"
+#include "ui\UIProgressShape.h"
 
 using namespace luabind;
 
@@ -261,6 +262,19 @@ CUIProgressBar* CScriptXmlInit::InitProgressBar(LPCSTR path, CUIWindow* parent)
     return pWnd;
 }
 
+CUIProgressShape* CScriptXmlInit::InitProgressShape(LPCSTR path, CUIWindow* parent)
+{
+    CUIProgressShape* pWnd = xr_new<CUIProgressShape>();
+    CUIXmlInit::InitProgressShape(m_xml, path, 0, pWnd);
+    pWnd->SetAutoDelete(true);
+    _attach_child(pWnd, parent);
+    return pWnd;
+}
+
+LPCSTR CScriptXmlInit::ReadAttrib(LPCSTR path, LPCSTR attrib, LPCSTR default_str_val) { return m_xml.ReadAttrib(path, 0, attrib, default_str_val); }
+int CScriptXmlInit::ReadAttribInt(LPCSTR path, LPCSTR attrib, int default_int_val) { return m_xml.ReadAttribInt(path, 0, attrib, default_int_val); }
+float CScriptXmlInit::ReadAttribFlt(LPCSTR path, LPCSTR attrib, float default_flt_val) { return m_xml.ReadAttribFlt(path, 0, attrib, default_flt_val); }
+
 
 void CScriptXmlInit::script_register(lua_State* L)
 {
@@ -290,5 +304,10 @@ void CScriptXmlInit::script_register(lua_State* L)
                   .def("InitMMShniaga", &CScriptXmlInit::InitMMShniaga)
                   .def("InitScrollView", &CScriptXmlInit::InitScrollView)
                   .def("InitAutoStaticGroup", &CScriptXmlInit::InitAutoStaticGroup)
-                  .def("InitProgressBar", &CScriptXmlInit::InitProgressBar)];
+                  .def("InitProgressBar", &CScriptXmlInit::InitProgressBar)
+                  .def("InitProgressShape", &CScriptXmlInit::InitProgressShape)
+                  .def("ReadAttrib", &CScriptXmlInit::ReadAttrib)
+                  .def("ReadAttribInt", &CScriptXmlInit::ReadAttribInt)
+                  .def("ReadAttribFlt", &CScriptXmlInit::ReadAttribFlt)
+    ];
 }

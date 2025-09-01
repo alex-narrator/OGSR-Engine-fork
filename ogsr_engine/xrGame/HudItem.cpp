@@ -15,18 +15,29 @@
 #include "../xr_3da/x_ray.h"
 #include "../../xr_3da/igame_persistent.h"
 #include "Pda.h"
+#include "ui\UIScriptWnd.h"
+#include "ui_base.h"
+#include "game_object_space.h"
+#include "script_game_object.h"
 
 ENGINE_API extern float psHUD_FOV_def;
+
+constexpr float PITCH_OFFSET_R = 0.0f; // Насколько сильно ствол смещается вбок (влево) при вертикальных поворотах камеры
+constexpr float PITCH_OFFSET_N = 0.0f; // Насколько сильно ствол поднимается\опускается при вертикальных поворотах камеры
+constexpr float PITCH_OFFSET_D = 0.02f; // Насколько сильно ствол приближается\отдаляется при вертикальных поворотах камеры
+constexpr float PITCH_LOW_LIMIT = -PI; // Минимальное значение pitch при использовании совместно с PITCH_OFFSET_N
+constexpr float ORIGIN_OFFSET = -0.03f; // Фактор влияния инерции на положение ствола (чем меньше, тем масштабней инерция)
+constexpr float ORIGIN_OFFSET_AIM = -0.02f; // (Для прицеливания)
+constexpr float TENDTO_SPEED = 5.f; // Скорость нормализации положения ствола
+constexpr float TENDTO_SPEED_AIM = 10.f; // (Для прицеливания)
 
 CHudItem::CHudItem()
 {
     m_huditem_flags.zero();
-    m_animation_slot = u32(-1);
 
     EnableHudInertion(TRUE);
     AllowHudInertion(TRUE);
     m_bobbing = std::make_unique<CWeaponBobbing>(this);
-    m_current_motion_def = nullptr;
 }
 
 DLL_Pure* CHudItem::_construct()
@@ -159,15 +170,6 @@ void CHudItem::Load(LPCSTR section)
     m_walk_offset[2].set(READ_IF_EXISTS(pSettings, r_bool, section, "walk_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "walk_transition_time", 0.25f), 0.f);
 
     //Загрузка параметров инерции --#SM+# Begin--
-    constexpr float PITCH_OFFSET_R = 0.0f; // Насколько сильно ствол смещается вбок (влево) при вертикальных поворотах камеры
-    constexpr float PITCH_OFFSET_N = 0.0f; // Насколько сильно ствол поднимается\опускается при вертикальных поворотах камеры
-    constexpr float PITCH_OFFSET_D = 0.02f; // Насколько сильно ствол приближается\отдаляется при вертикальных поворотах камеры
-    constexpr float PITCH_LOW_LIMIT = -PI; // Минимальное значение pitch при использовании совместно с PITCH_OFFSET_N
-    constexpr float ORIGIN_OFFSET = -0.03f; // Фактор влияния инерции на положение ствола (чем меньше, тем масштабней инерция)
-    constexpr float ORIGIN_OFFSET_AIM = -0.02f; // (Для прицеливания)
-    constexpr float TENDTO_SPEED = 5.f; // Скорость нормализации положения ствола
-    constexpr float TENDTO_SPEED_AIM = 10.f; // (Для прицеливания)
-
     inertion_data.m_pitch_offset_r = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_right", PITCH_OFFSET_R);
     inertion_data.m_pitch_offset_n = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_up", PITCH_OFFSET_N);
     inertion_data.m_pitch_offset_d = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_forward", PITCH_OFFSET_D);
@@ -178,9 +180,37 @@ void CHudItem::Load(LPCSTR section)
     inertion_data.m_tendto_speed = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_tendto_speed", TENDTO_SPEED);
     inertion_data.m_tendto_speed_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_tendto_speed", TENDTO_SPEED_AIM);
     //--#SM+# End--
+
+    m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME);
+
+	// Rezy - Custom Script 3D UI
+    if (script_ui_funct = READ_IF_EXISTS(pSettings, r_string, section, "custom_ui_func", nullptr))
+    {
+        script_ui_bone = READ_IF_EXISTS(pSettings, r_string, section, "custom_ui_bone", "wpn_body");
+
+        script_ui_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "custom_ui_pos", Fvector().set(0.f, 0.f, 0.f));
+        script_ui_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "custom_ui_rot", Fvector().set(0.f, 0.f, 0.f));
+    }
 }
 
-void CHudItem::PlaySound(HUD_SOUND& hud_snd, const Fvector& position, bool overlap) { HUD_SOUND::PlaySound(hud_snd, position, object().H_Root(), !!GetHUDmode(), false, overlap); }
+void CHudItem::PlaySound(HUD_SOUND& hud_snd, const Fvector& position, bool overlap)
+{
+    if (hud_snd.sounds.empty())
+        return;
+    HUD_SOUND::PlaySound(hud_snd, position, object().H_Root(), !!GetHUDmode(), false, overlap);
+}
+
+void CHudItem::PlaySound(LPCSTR alias, const Fvector& position, bool overlap) { m_sounds.PlaySound(alias, position, object().H_Root(), !!GetHUDmode(), false, overlap); }
+
+//void CHudItem::UpdateSoundPosition(LPCSTR alias, const Fvector& pos)
+//{
+//    auto snd = m_sounds.FindSoundItem(alias, false);
+//    if (snd && snd->playing())
+//        snd->set_position(pos);
+//}
+
+bool CHudItem::SoundExist(LPCSTR alias) { return !!m_sounds.FindSoundItem(alias, false); }
+
 
 void CHudItem::net_Destroy() { m_dwStateTime = 0; }
 
@@ -257,6 +287,9 @@ void CHudItem::OnStateSwitch(u32 S, u32 oldState)
         SprintType = false;
 
     g_player_hud->updateMovementLayerState();
+
+    if (auto actor = smart_cast<CActor*>(object().H_Parent()))
+        actor->callback(GameObject::eOnHudStateSwitch)(object().lua_game_object(), S, oldState);
 }
 
 bool CHudItem::Activate(bool now)
@@ -318,7 +351,8 @@ void CHudItem::UpdateCL()
 
     AllowHudBobbing((Core.Features.test(xrCore::Feature::wpn_bobbing) && allow_bobbing) || (g_actor && g_actor->PsyAuraAffect));
 
-    TimeLockAnimation();
+    if (script_ui)
+        script_ui->Update();
 }
 
 void CHudItem::OnH_A_Chield() {}
@@ -362,6 +396,53 @@ void CHudItem::on_a_hud_attach()
         //		Msg("no active motion");
 #endif // #ifdef DEBUG
     }
+
+    if (script_ui_funct && nullptr == script_ui)
+    {
+        luabind::functor<CUIDialogWndEx*> funct;
+        if (ai().script_engine().functor(script_ui_funct, funct))
+        {
+            CUIDialogWndEx* ret = funct(object().lua_game_object());
+            CUIWindow* pScriptWnd = ret ? smart_cast<CUIWindow*>(ret) : nullptr;
+            if (pScriptWnd)
+                script_ui = pScriptWnd;
+            else
+                Msg("[%s]: Failed to load script UI [%s]!", object().cNameSect().c_str(), script_ui_funct);
+        }
+        else
+            Msg("[%s]: Script UI functor [%s] does not exist!", object().cNameSect().c_str(), script_ui_funct);
+    }
+}
+
+void CHudItem::render_item_3d_ui()
+{
+    if (render_item_3d_ui_query() && script_ui)
+    {
+        Fmatrix LM;
+        Fmatrix trans = HudItemData()->m_item_transform;
+        u16 bid = HudItemData()->m_model->LL_BoneID(script_ui_bone);
+        Fmatrix ui_bone = HudItemData()->m_model->LL_GetTransform(bid);
+        LM.mul(trans, ui_bone);
+
+        Fmatrix script_ui_matrix;
+        script_ui_matrix.identity();
+        Fvector pos = script_ui_offset[0];
+        Fvector rot = script_ui_offset[1];
+        script_ui_matrix.setHPB(rot.x, rot.y, rot.z);
+        script_ui_matrix.translate_over(pos);
+        LM.mulB_43(script_ui_matrix);
+
+        IUIRender::ePointType bk = UI()->m_currentPointType;
+        UI()->m_currentPointType = IUIRender::pttLIT;
+        UIRender->CacheSetXformWorld(LM);
+        UIRender->CacheSetCullMode(IUIRender::cmNONE);
+        UI()->ScreenFrustumLIT().Clear();
+        script_ui->Draw();
+        UI()->m_currentPointType = bk;
+    }
+
+    //	Restore cull mode
+    UIRender->CacheSetCullMode(IUIRender::cmCCW);
 }
 
 u32 CHudItem::PlayHUDMotion(const char* M, const bool bMixIn, const u32 state, const bool randomAnim, float speed)
@@ -438,7 +519,7 @@ void CHudItem::StopCurrentAnimWithoutCallback()
     m_dwStateTime = 0;
 }
 
-BOOL CHudItem::GetHUDmode()
+BOOL CHudItem::GetHUDmode() const
 {
     if (object().H_Parent())
     {
@@ -449,7 +530,7 @@ BOOL CHudItem::GetHUDmode()
         return FALSE;
 }
 
-void CHudItem::PlayBlendAnm(LPCSTR name, float speed, float power, bool stop_old)
+void CHudItem::PlayBlendAnm(LPCSTR name, float speed, float power, bool stop_old) const
 {
     u8 part = (object().cast_weapon()->IsZoomed() ? 2 : (g_player_hud->attached_item(1) ? 0 : 2));
 
@@ -479,7 +560,7 @@ void CHudItem::PlayAnimSprintStart()
                  (wpn && wpn->IsMisfire()) ?
                      "_jammed" :
                      ((wpn && ((wpn->GetAmmoElapsed() == 0 && !wpn->IsGrenadeMode()) || (wpn->GetAmmoElapsed2() == 0 && wpn->IsGrenadeMode()))) ? "_empty" : ""),
-                 (wpn && wpn->IsGrenadeLauncherAttached()) ? (wpn && wpn->IsGrenadeMode() ? "_g" : "_w_gl") : "");
+                 (wpn && wpn->IsAddonAttached(eLauncher)) ? (wpn && wpn->IsGrenadeMode() ? "_g" : "_w_gl") : "");
     if (AnimationExist(guns_sprint_start_anm))
         PlayHUDMotion(guns_sprint_start_anm, true, GetState());
     else
@@ -497,7 +578,7 @@ void CHudItem::PlayAnimSprintEnd()
                  (wpn && wpn->IsMisfire()) ?
                      "_jammed" :
                      ((wpn && ((wpn->GetAmmoElapsed() == 0 && !wpn->IsGrenadeMode()) || (wpn->GetAmmoElapsed2() == 0 && wpn->IsGrenadeMode()))) ? "_empty" : ""),
-                 (wpn && wpn->IsGrenadeLauncherAttached()) ? (wpn && wpn->IsGrenadeMode() ? "_g" : "_w_gl") : "");
+                 (wpn && wpn->IsAddonAttached(eLauncher)) ? (wpn && wpn->IsGrenadeMode() ? "_g" : "_w_gl") : "");
     if (AnimationExist(guns_sprint_end_anm))
         PlayHUDMotion(guns_sprint_end_anm, true, GetState());
     else
@@ -695,7 +776,8 @@ bool CHudItem::used_cop_fire_point() const
 bool CHudItem::CollisionAllowed() const
 {
     //Если выкл реалистичный прицел или у ствола ТЧ-стайл фейр поинт или ствол в режиме зума - коллизия работать не будет.
-    return m_nearwall_on && psHUD_Flags.test(HUD_CROSSHAIR_HARD) && used_cop_fire_point();
+    /*return m_nearwall_on && psHUD_Flags.test(HUD_CROSSHAIR_HARD) && used_cop_fire_point();*/
+    return m_nearwall_on && used_cop_fire_point() && m_fZoomRotationFactor < 1.0f && (GetState() != eFire || psHUD_Flags.test(HUD_CROSSHAIR_HARD));
 }
 
 void CHudItem::UpdateCollision(Fmatrix& trans)
@@ -808,9 +890,17 @@ void CHudItem::UpdateInertion(Fmatrix& trans)
         float _tendto_speed, _origin_offset;
         if (GetCurrentHudOffsetIdx() > 0)
         { // Худ в режиме "Прицеливание"
-            float factor = GetInertionFactor();
-            _tendto_speed = inertion_data.m_tendto_speed_aim - (inertion_data.m_tendto_speed_aim - inertion_data.m_tendto_speed) * factor;
-            _origin_offset = inertion_data.m_origin_offset_aim - (inertion_data.m_origin_offset_aim - inertion_data.m_origin_offset) * factor;
+            //float factor = GetInertionFactor();
+            //_tendto_speed = inertion_data.m_tendto_speed_aim - (inertion_data.m_tendto_speed_aim - inertion_data.m_tendto_speed) * factor;
+            //_origin_offset = inertion_data.m_origin_offset_aim - (inertion_data.m_origin_offset_aim - inertion_data.m_origin_offset) * factor;
+            // float factor = GetInertionFactor();
+            _tendto_speed = inertion_data.m_tendto_speed_aim /* - (inertion_data.m_tendto_speed_aim - inertion_data.m_tendto_speed) * factor*/;
+            _origin_offset = inertion_data.m_origin_offset_aim /* - (inertion_data.m_origin_offset_aim - inertion_data.m_origin_offset) * factor*/;
+            // вплив адонів на інерцію у прицілюванні
+            clamp(m_fAimInertionK, -1.f, 1.f);
+            _origin_offset += (_origin_offset * m_fAimInertionK);
+            _tendto_speed -= (_tendto_speed * m_fAimInertionK);
+            _origin_offset *= !m_bStopAimInertion;
         }
         else
         { // Худ в режиме "От бедра"
@@ -856,26 +946,28 @@ void CHudItem::UpdateHudAdditional(Fmatrix& trans, const bool need_update_collis
     attachable_hud_item* hi = HudItemData();
     u8 idx = GetCurrentHudOffsetIdx();
     const bool b_aiming = idx != hud_item_measures::m_hands_offset_type_normal;
-    Fvector zr_offs = hi->m_measures.m_hands_offset[hud_item_measures::m_hands_offset_pos][idx];
-    Fvector zr_rot = hi->m_measures.m_hands_offset[hud_item_measures::m_hands_offset_rot][idx];
+    Fvector zr_offs = hi->hands_offset_pos(); // hi->m_measures.m_hands_offset[hud_item_measures::m_hands_offset_pos][idx];
+    Fvector zr_rot = hi->hands_offset_rot(); // hi->m_measures.m_hands_offset[hud_item_measures::m_hands_offset_rot][idx];
 
     //============= Поворот ствола во время аима =============//
     {
-        const float factor = Device.fTimeDelta / m_fZoomRotateTime;
+        const float factor = Device.fTimeDelta / GetZoomRotationTime();
+
+        const float factor_k = 2.f;
 
         // I AM DEAD - Dirty hack from delayed exit from aim
         if (IsZoomed())
-            m_fZoomRotationFactor += factor * 2.f;
+            m_fZoomRotationFactor += factor * factor_k;
         else
-            m_fZoomRotationFactor -= factor * 2.f;
+            m_fZoomRotationFactor -= factor * factor_k;
 
         clamp(m_fZoomRotationFactor, 0.f, 1.f);
 
         if (!zr_offs.similar(current_difference[0], EPS))
-            current_difference[0].lerp(current_difference[0], zr_offs, factor * 2.f);
+            current_difference[0].lerp(current_difference[0], zr_offs, factor * factor_k);
 
         if (!zr_rot.similar(current_difference[1], EPS))
-            current_difference[1].lerp(current_difference[1], zr_rot, factor * 2.f);
+            current_difference[1].lerp(current_difference[1], zr_rot, factor * factor_k);
 
         summary_offset.add(current_difference[0]);
     }
@@ -1198,6 +1290,17 @@ float CHudItem::GetHudFov()
     return m_nearwall_last_hud_fov;
 }
 
+#include "ActorEffector.h"
+void CHudItem::SetToScreenCenter(Fvector& dir, Fvector& pos, float distance) const
+{
+    auto pActor = smart_cast<CActor*>(object().H_Parent());
+    if (!pActor)
+        return;
+    dir = pActor->Cameras().Direction();
+    pos = pActor->Cameras().Position();
+    pos.mad(pos, dir, distance);
+}
+
 constexpr const char* BOBBING_SECT = "wpn_bobbing_effector";
 constexpr float SPEED_REMINDER = 5.f;
 CHudItem::CWeaponBobbing::CWeaponBobbing(CHudItem* parent) : parent_hud_item(parent)
@@ -1261,7 +1364,7 @@ void CHudItem::CWeaponBobbing::Update(Fmatrix& m, Fmatrix& m2)
             float zoom_factor = m_fZoomFactor;
 
             auto wpn = smart_cast<CWeapon*>(parent_hud_item);
-            if (wpn && wpn->IsScopeAttached() && !wpn->IsGrenadeMode())
+            if (wpn && wpn->IsAddonAttached(eScope) && !wpn->IsGrenadeMode())
                 zoom_factor = m_fScopeZoomFactor;
 
             k2 *= zoom_factor;
@@ -1353,30 +1456,6 @@ void CHudItem::CorrectDirFromWorldToHud(Fvector& worldPos)
     Fmatrix{Device.mView}.invert().transform_dir(worldPos);
 }
 
-void CHudItem::TimeLockAnimation()
-{
-    const u32 state = GetState();
-    if ((state == eDeviceSwitch || state == eReload) && GetHUDmode())
-    {
-        string128 anm_time_param;
-        xr_strconcat(anm_time_param, "lock_time_end_", m_current_motion.c_str());
-        const float time = READ_IF_EXISTS(pSettings, r_float, HudSection(), anm_time_param, 0) * 1000.f; // Читаем с конфига время анимации (например, lock_time_end_anm_reload)
-        const float current_time = Device.dwTimeGlobal - m_dwMotionStartTm;
-        if (time && current_time >= time)
-        {
-            if (state == eDeviceSwitch)
-            {
-                DeviceUpdate();
-            }
-            else if (state == eReload)
-            {
-                if (auto wpn = smart_cast<CWeapon*>(this))
-                    wpn->update_visual_bullet_textures();
-            }
-        }
-    }
-}
-
 void CHudItem::OnAnimationEnd(u32 state)
 {
     switch (state)
@@ -1393,3 +1472,46 @@ void CHudItem::OnAnimationEnd(u32 state)
 }
 
 bool CHudItem::AnmIdleMovingAllowed() const { return !HudBobbingAllowed() || Actor()->PsyAuraAffect; }
+
+void CHudItem::SetHudSection(shared_str sect)
+{
+    if (!xr_strcmp(hud_sect, sect))
+        return;
+    hud_sect = sect;
+
+    if (pSettings->line_exist(hud_sect, "allow_inertion"))
+        EnableHudInertion(pSettings->r_bool(hud_sect, "allow_inertion"));
+
+    if (pSettings->line_exist(hud_sect, "allow_bobbing"))
+        allow_bobbing = pSettings->r_bool(hud_sect, "allow_bobbing");
+
+    hud_recalc_koef = READ_IF_EXISTS(pSettings, r_float, hud_sect, "hud_recalc_koef",
+                                     1.35f); // На калаше при 1.35 вроде норм смотрится, другим стволам возможно придется подбирать другие значения.
+
+    inertion_data.m_pitch_offset_r = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_right", PITCH_OFFSET_R);
+    inertion_data.m_pitch_offset_n = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_up", PITCH_OFFSET_N);
+    inertion_data.m_pitch_offset_d = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_forward", PITCH_OFFSET_D);
+    inertion_data.m_pitch_low_limit = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_up_low_limit", PITCH_LOW_LIMIT);
+
+    inertion_data.m_origin_offset = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_origin_offset", ORIGIN_OFFSET);
+    inertion_data.m_origin_offset_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_origin_offset", ORIGIN_OFFSET_AIM);
+    inertion_data.m_tendto_speed = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_tendto_speed", TENDTO_SPEED);
+    inertion_data.m_tendto_speed_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_tendto_speed", TENDTO_SPEED_AIM);
+
+    m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME);
+
+    /*m_hidden_meshes_hud.clear();*/
+    //LPCSTR str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "hidden_meshes", nullptr);
+    //if (str)
+    //    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+    //    {
+    //        string128 mesh_num;
+    //        _GetItem(str, i, mesh_num);
+    //        m_hidden_meshes_hud.push_back(u8(atoi(mesh_num)));
+    //    }
+
+    auto hi = HudItemData();
+    if (hi)
+        hi->load(sect);
+    on_a_hud_attach();
+}

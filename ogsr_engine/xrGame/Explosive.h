@@ -4,7 +4,7 @@
 
 #pragma once
 
-#define SND_RIC_COUNT 5
+//class HUD_SOUND_COLLECTION_LAYERED;
 
 #include "..\xr_3da\render.h"
 #include "..\xr_3da\feel_touch.h"
@@ -14,6 +14,8 @@
 #include "DamageSource.h"
 #include "wallmark_manager.h"
 #include "ParticlesObject.h"
+#include "HudSound.h"
+
 class IRender_Light;
 DEFINE_VECTOR(CPhysicsShellHolder*, BLASTED_OBJECTS_V, BLASTED_OBJECTS_I);
 class CExplosive : public IDamageSource
@@ -24,8 +26,8 @@ private:
     collide::rq_results rq_storage;
 
 public:
-    CExplosive(void);
-    virtual ~CExplosive(void);
+    CExplosive(void) {};
+    virtual ~CExplosive(void) {};
 
     virtual void Load(LPCSTR section);
     virtual void Load(CInifile* ini, LPCSTR section);
@@ -69,7 +71,7 @@ public:
     bool IsReadyToExplode() { return !!m_explosion_flags.test(flReadyToExplode); };
 
 protected:
-    bool IsSoundPlaying() { return !!sndExplode._feedback(); }
+    bool IsSoundPlaying();
 
 private:
     void PositionUpdate();
@@ -84,30 +86,31 @@ private:
 protected:
     CWalmarkManager m_wallmark_manager;
     // ID персонажа который иницировал действие
-    u16 m_iCurrentParentID;
+    u16 m_iCurrentParentID{0xffff};
 
     // bool						m_bReadyToExplode;
     Fvector m_vExplodePos;
-    Fvector m_vExplodeSize;
+    Fvector m_vExplodeSize{0.001f, 0.001f, 0.001f};
     Fvector m_vExplodeDir;
 
     //параметры взрыва
-    float m_fBlastHit;
+    float m_fBlastHit{50.f};
     float m_fBlastHitImpulse;
-    float m_fBlastRadius;
+    float m_fBlastRadius{10.f};
 
     //параметры и количество осколков
-    float m_fFragsRadius;
-    float m_fFragHit;
-    float m_fFragHitImpulse;
-    int m_iFragsNum;
+    float m_fFragsRadius{30.f};
+    float m_fFragHit{50.f};
+    float m_fFragHitImpulse{};
+    int m_iFragsNum{20};
+    float m_fFragAP{};
 
     //типы наносимых хитов
-    ALife::EHitType m_eHitTypeBlast;
-    ALife::EHitType m_eHitTypeFrag;
+    ALife::EHitType m_eHitTypeBlast{ALife::eHitTypeExplosion};
+    ALife::EHitType m_eHitTypeFrag{ALife::eHitTypeFireWound};
 
     //фактор подпроса предмета вверх взрывной волной
-    float m_fUpThrowFactor;
+    float m_fUpThrowFactor{};
 
     //список пораженных объектов
     BLASTED_OBJECTS_V m_blasted_objects;
@@ -117,7 +120,7 @@ protected:
     //общее время взрыва
     float m_fExplodeDurationMax;
     //Время, через которое надо сделать взрывчатку невиимой, если она не становится невидимой во время взрыва
-    float m_fExplodeHideDurationMax;
+    float m_fExplodeHideDurationMax{};
     //флаг состояния взрыва
     enum
     {
@@ -126,10 +129,10 @@ protected:
         flReadyToExplode = 1 << 2,
         flExploded = 1 << 3
     };
-    Flags8 m_explosion_flags;
+    Flags8 m_explosion_flags{};
     ///////////////////////////////////////////////
     //Должен ли объект быть скрыт после взрыва: true - для всех кроме дымовой гранаты
-    BOOL m_bHideInExplosion;
+    bool m_bHideInExplosion{true};
     bool m_bAlreadyHidden;
     virtual void HideExplosive();
     // bool						m_bExploding;
@@ -140,8 +143,7 @@ protected:
     float m_fFragmentSpeed;
 
     //звуки
-    ref_sound sndExplode;
-    ESoundTypes m_eSoundExplode;
+    HUD_SOUND_COLLECTION_LAYERED m_sound{};
 
     //размер отметки на стенах
     float fWallmarkSize;
@@ -158,8 +160,8 @@ protected:
     virtual void StartLight();
     virtual void StopLight();
 
-    BOOL m_bDynamicParticles;
-    CParticlesObject* m_pExpParticle;
+    bool m_bDynamicParticles{};
+    CParticlesObject* m_pExpParticle{};
     virtual void UpdateExplosionParticles();
 
     // эффектор

@@ -243,7 +243,7 @@ BOOL CBaseMonster::feel_vision_isRelevant(CObject* O)
     return TRUE;
 }
 
-void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element)
+void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element, int type)
 {
     if (!g_Alive())
         return;
@@ -275,7 +275,7 @@ void CBaseMonster::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16
 
     Morale.on_hit();
 
-    callback(GameObject::eHit)(lua_game_object(), amount, vLocalDir, smart_cast<const CGameObject*>(who)->lua_game_object(), element);
+    callback(GameObject::eHit)(lua_game_object(), amount, vLocalDir, smart_cast<const CGameObject*>(who)->lua_game_object(), element, type);
 
     // если нейтрал - добавить как врага
     CEntityAlive* obj = smart_cast<CEntityAlive*>(who);

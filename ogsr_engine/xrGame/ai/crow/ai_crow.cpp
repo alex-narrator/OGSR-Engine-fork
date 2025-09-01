@@ -389,7 +389,7 @@ void CAI_Crow::net_Export(CSE_Abstract* E)
 }
 
 //---------------------------------------------------------------------
-void CAI_Crow::HitSignal(float /**HitAmount/**/, Fvector& /**local_dir/**/, CObject* who, s16 /**element/**/)
+void CAI_Crow::HitSignal(float /**HitAmount/**/, Fvector& /**local_dir/**/, CObject* who, s16 /**element/**/, int type)
 {
     // bool				first_time = !!g_Alive();
     //	bool				first_time = !PPhysicsShell();

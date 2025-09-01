@@ -137,8 +137,8 @@ void CTeleWhirlwindObject::release()
 
 bool CTeleWhirlwindObject::destroy_object(const Fvector dir, float val)
 {
-    if (object->story_id() != INVALID_STORY_ID)
-        return false;
+    //if (object->story_id() != INVALID_STORY_ID)
+    //    return false;
 
     CPHDestroyable* D = object->ph_destroyable();
     if (D)

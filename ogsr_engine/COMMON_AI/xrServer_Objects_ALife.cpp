@@ -499,11 +499,16 @@ void CSE_ALifeLevelChanger::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UP
 ////////////////////////////////////////////////////////////////////////////
 CSE_ALifeObjectPhysic::CSE_ALifeObjectPhysic(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection), CSE_PHSkeleton(caSection)
 {
-    type = epotSkeleton;
-    mass = 10.f;
-
     if (pSettings->section_exist(caSection) && pSettings->line_exist(caSection, "visual"))
+    {
         set_visual(pSettings->r_string(caSection, "visual"));
+
+        if (pSettings->line_exist(caSection, "startup_animation"))
+            startup_animation = pSettings->r_string(caSection, "startup_animation");
+    }
+
+    if (pSettings->line_exist(caSection, "fixed_bones"))
+        fixed_bones = pSettings->r_string(caSection, "fixed_bones");
 
     m_flags.set(flUseSwitches, FALSE);
     m_flags.set(flSwitchOffline, FALSE);
@@ -1203,3 +1208,9 @@ void CSE_ALifeSmartZone::update() {}
 float CSE_ALifeSmartZone::detect_probability() { return (0.f); }
 
 void CSE_ALifeSmartZone::smart_touch(CSE_ALifeMonsterAbstract* monster) {}
+
+// CSE_InventoryBox
+void CSE_InventoryBox::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited1::STATE_Read(tNetPacket, size); }
+void CSE_InventoryBox::STATE_Write(NET_Packet& tNetPacket) { inherited1::STATE_Write(tNetPacket); }
+void CSE_InventoryBox::UPDATE_Read(NET_Packet& tNetPacket) { inherited1::UPDATE_Read(tNetPacket); }
+void CSE_InventoryBox::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_Write(tNetPacket); }

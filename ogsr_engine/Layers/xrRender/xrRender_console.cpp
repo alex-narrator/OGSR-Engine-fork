@@ -57,9 +57,9 @@ float ps_r_dlss_3dss_scale_factor{2.f};
 
 u32 ps_r_sunshafts_mode = SS_SS_MANOWAR;
 constexpr xr_token sunshafts_mode_token[]{{"st_opt_off", SS_OFF},
-                                          {"volumetric", SS_VOLUMETRIC},
                                           {"ss_ogse", SS_SS_OGSE},
                                           {"ss_manowar", SS_SS_MANOWAR},
+                                          {"volumetric", SS_VOLUMETRIC},
                                           {"combined_ogse", SS_COMBINED_OGSE},
                                           {"combined_manowar", SS_COMBINED_MANOWAR},
                                           {}};

@@ -13,8 +13,13 @@ class CInventoryItem;
 struct attachable_hud_item;
 class motion_marks;
 class CMotionDef;
+class CUIWindow;
+//class HUD_SOUND_COLLECTION_LAYERED;
 
 #include "actor_defs.h"
+#include "hudsound.h"
+
+constexpr auto ROTATION_TIME = 0.25f;
 
 class CHUDState
 {
@@ -33,12 +38,16 @@ public:
         eSwitch,
         eSprintStart,
         eSprintEnd,
-        eBore,
-        eDeviceSwitch,
+        /*eBore,*/
         eThrowStart,
         eReady,
         eThrow,
         eThrowEnd,
+        eActivating,
+        eShutter,
+        eIdleZoom,
+        eIdleZoomIn,
+        eIdleZoomOut,
     };
 
 private:
@@ -84,7 +93,7 @@ protected: //чтоб нельзя было вызвать на прямую
     };
 
     // Motion data
-    const CMotionDef* m_current_motion_def;
+    const CMotionDef* m_current_motion_def{};
     shared_str m_current_motion;
     u32 m_dwMotionCurrTm;
     u32 m_dwMotionStartTm;
@@ -96,16 +105,21 @@ protected: //чтоб нельзя было вызвать на прямую
     bool BobbingEnable{};
     u32 m_dwStateTime{};
 
+	CUIWindow* script_ui{};
+    LPCSTR script_ui_funct{};
+    LPCSTR script_ui_bone{};
+
 public:
     virtual void Load(LPCSTR section);
     virtual CHudItem* cast_hud_item() { return this; }
 
     virtual void PlaySound(HUD_SOUND& snd, const Fvector& position, bool overlap = false);
+    virtual void PlaySound(LPCSTR alias, const Fvector& position, bool overlap = false);
 
     ///////////////////////////////////////////////
     // общие функции HUD
     ///////////////////////////////////////////////
-    virtual void StopHUDSounds(){};
+    virtual void StopHUDSounds() { m_sounds.StopAllSounds(); };
 
     //для предачи команд владельцем
     virtual bool Action(s32 cmd, u32 flags);
@@ -142,6 +156,8 @@ public:
     virtual void PlayAnimIdle();
     bool TryPlayAnimIdle();
     virtual bool IsZoomed() const { return false; }
+    virtual void OnZoomOut(bool = false) {};
+    virtual void OnZoomIn() {};
     // virtual void	PlayAnimBore		();
     virtual void PlayAnimIdleMoving();
     virtual void PlayAnimIdleMovingSlow();
@@ -150,7 +166,6 @@ public:
     virtual void PlayAnimSprintEnd();
     virtual void PlayAnimIdleMovingCrouch();
     virtual void PlayAnimIdleMovingCrouchSlow();
-    virtual void PlayAnimDeviceSwitch(){};
 
     virtual bool NeedBlendAnm();
 
@@ -174,18 +189,25 @@ public:
     virtual void on_a_hud_attach();
     virtual void on_b_hud_detach();
     const shared_str& HudSection() const { return hud_sect; }
+    void SetHudSection(shared_str sect);
 
-    BOOL GetHUDmode();
+    BOOL GetHUDmode() const;
     IC void SetPending(BOOL H) { m_huditem_flags.set(fl_pending, H); }
     IC BOOL IsPending() const { return !!m_huditem_flags.test(fl_pending); }
 
-    void PlayBlendAnm(LPCSTR name, float speed = 1.f, float power = 1.f, bool stop_old = true);
+    void PlayBlendAnm(LPCSTR name, float speed = 1.f, float power = 1.f, bool stop_old = true) const;
 
     virtual void render_hud_mode(u32 context_id, IRenderable* root){};
-    virtual bool need_renderable() { return true; };
-    virtual void render_item_3d_ui() {}
-    virtual bool render_item_3d_ui_query() { return false; }
+    virtual bool need_renderable() { return /*true*/ b_show_hud; };
+    virtual void render_item_3d_ui();
+    virtual bool render_item_3d_ui_query() { return true; }
     virtual bool CheckCompatibility(CHudItem*) { return true; }
+    virtual void SetStopAimInertion(bool val) { m_bStopAimInertion = val; };
+    void SetToScreenCenter(Fvector& dir, Fvector& pos, float distance = 0.1f) const;
+
+    Fvector script_ui_offset[2]{}; // pos, rot
+
+    void ShowHud(bool show) { b_show_hud = show; };
 
 protected:
     BOOL hud_mode;
@@ -196,7 +218,8 @@ protected:
     u32 dwXF_Frame;
 
 protected:
-    u32 m_animation_slot;
+    u32 m_animation_slot{u32(-1)};
+    HUD_SOUND_COLLECTION_LAYERED m_sounds{};
 
 public:
     IC u32 animation_slot() { return m_animation_slot; }
@@ -268,6 +291,11 @@ public:
     void CorrectDirFromWorldToHud(Fvector& dir);
     float GetLastHudFov() const { return m_nearwall_last_hud_fov; }
 
+    virtual float GetZoomRotationTime() const { return m_fZoomRotateTime; };
+
+    void UpdateSoundPosition(LPCSTR alias, const Fvector& pos);
+    bool SoundExist(LPCSTR alias);
+
 protected:
     enum CollisionWeaponType : size_t
     {
@@ -295,8 +323,8 @@ protected:
     u32 skip_updated_frame{};
     bool HudInertionAllowed() const { return m_huditem_flags.test(fl_inertion_allow); }
     void AllowHudInertion(BOOL B) { m_huditem_flags.set(fl_inertion_allow, B); }
-    void TimeLockAnimation();
-    virtual void DeviceUpdate(){};
+    float m_fAimInertionK{};
+    bool m_bStopAimInertion{};
 
 private:
     shared_str world_sect;
@@ -340,4 +368,6 @@ private:
     float GetInertionPowerFactor() const { return 0.5f; } //--#SM+#--
     bool HudInertionEnabled() const { return m_huditem_flags.test(fl_inertion_enable); }
     void EnableHudInertion(BOOL B) { m_huditem_flags.set(fl_inertion_enable, B); }
+
+    bool b_show_hud{true};
 };

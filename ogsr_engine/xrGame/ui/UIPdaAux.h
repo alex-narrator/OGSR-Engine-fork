@@ -37,6 +37,6 @@ enum part
     news = diary | (1 << 1),
     info = diary | (1 << 2),
     journal = diary | (1 << 3),
-
+    notes = diary | (1 << 4),
 };
 };

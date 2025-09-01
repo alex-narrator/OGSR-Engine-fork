@@ -57,8 +57,6 @@ public:
     void ResetOriginalRect() { m_UIStaticItem.ResetOriginalRect(); }
 
     virtual Frect GetOriginalRect() const { return m_UIStaticItem.GetOriginalRect(); }
-    //
-    void SetVTextAlignment(EVTextAlignment al);
 
     void SetNoShaderCache(bool v) { m_UIStaticItem.SetNoShaderCache(v); }
 
@@ -101,6 +99,10 @@ public:
     virtual void OnFocusReceive();
     virtual void OnFocusLost();
 
+    virtual void OnMouseMove();
+    virtual bool OnMouseDown(int mouse_btn);
+    virtual bool OnMouseUp(int mouse_btn);
+
     // IUITextControl
     virtual void SetText(LPCSTR str);
     void SetTextST(LPCSTR str_id);
@@ -111,6 +113,9 @@ public:
     virtual CGameFont* GetFont();
     virtual void SetTextAlignment(ETextAlignment alignment);
     virtual ETextAlignment GetTextAlignment();
+
+    virtual void SetVTextAlignment(EVTextAlignment alignment);
+    virtual EVTextAlignment GetVTextAlignment();
 
     // text additional
     void SetTextComplexMode(bool md);

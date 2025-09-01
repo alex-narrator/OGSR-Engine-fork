@@ -61,7 +61,7 @@ public:
     virtual void Die(CObject* who);
     virtual void g_WeaponBones(int& L, int& R1, int& R2) = 0;
     void set_lock_corpse(bool b_l_corpse);
-    bool is_locked_corpse();
+    bool is_locked_corpse() const;
 
     //	virtual float			GetfHealth				() const;
     //	virtual float			SetfHealth				(float value);

@@ -16,6 +16,7 @@
 #include "../alife_registry_wrappers.h"
 #include "../encyclopedia_article.h"
 #include "UIPdaAux.h"
+#include "UIInventoryUtilities.h"
 
 extern u32 g_pda_info_state;
 
@@ -146,8 +147,18 @@ void CUIDiaryWnd::Reload(EDiaryFilter new_filter)
 
     switch (m_currFilter)
     {
-    case eJournal: LoadJournalTab(); break;
-    case eNews: LoadNewsTab(); break;
+    case 
+        eJournal: LoadJournalTab(); 
+        InventoryUtilities::SendInfoToActor("ui_pda_journal");
+        break;
+    case eNews:
+        LoadNewsTab();
+        InventoryUtilities::SendInfoToActor("ui_pda_news");
+        break;
+    case eNotes: 
+        InventoryUtilities::SendInfoToActor("ui_pda_notes"); 
+        break;
+    default: Msg("%s - not registered button identifier [%d]", __FUNCTION__, m_currFilter);
     };
 }
 
@@ -243,6 +254,13 @@ void CUIDiaryWnd::Draw()
     pos = m_sign_places[eJournal];
     pos.add(tab_pos);
     if (g_pda_info_state & pda_section::journal)
+        draw_sign(m_updatedSectionImage, pos);
+    else
+        draw_sign(m_oldSectionImage, pos);
+
+    pos = m_sign_places[eNotes];
+    pos.add(tab_pos);
+    if (g_pda_info_state & pda_section::notes)
         draw_sign(m_updatedSectionImage, pos);
     else
         draw_sign(m_oldSectionImage, pos);

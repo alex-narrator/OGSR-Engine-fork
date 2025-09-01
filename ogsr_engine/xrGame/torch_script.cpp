@@ -130,11 +130,5 @@ void CTorch::script_register(lua_State* L)
                   .def("set_range", &CTorch::SetRange)
                   .def("set_texture", &CTorch::SetTexture)
                   .def("set_virtual_size", &CTorch::SetVirtualSize)
-                  // работа с ПНВ
-                  .def_readonly("nvd_on", &CTorch::m_bNightVisionOn)
-                  .def("enable_nvd", (void(CTorch::*)(bool))(&CTorch::SwitchNightVision))
-                  .def("switch_nvd", (void(CTorch::*)())(&CTorch::SwitchNightVision))
-
-                  ,
-              def("get_torch_obj", [](CScriptGameObject* script_obj) { return smart_cast<CTorch*>(&script_obj->object()); })];
+              ];
 }

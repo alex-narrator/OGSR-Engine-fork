@@ -4,11 +4,8 @@
 #include "../xr_3da/NET_Server_Trash/net_utils.h"
 #include "game_graph_space.h"
 
-class CUIInventoryWnd;
-class CUITradeWnd;
 class CUIPdaWnd;
 class CUITalkWnd;
-class CUICarBodyWnd;
 class CInventory;
 
 class game_cl_Single;
@@ -20,7 +17,7 @@ class CInventoryOwner;
 class CUIGameSP : public CUIGameCustom
 {
 private:
-    game_cl_Single* m_game;
+    game_cl_Single* m_game{};
     typedef CUIGameCustom inherited;
 
 public:
@@ -32,20 +29,15 @@ public:
     virtual void Render();
     virtual void SetClGame(game_cl_GameState* g);
     virtual bool IR_OnKeyboardPress(int dik);
-    virtual bool IR_OnKeyboardRelease(int dik);
+    /*virtual bool IR_OnKeyboardRelease(int dik);*/
 
     void StartTalk();
-    void StartCarBody(CInventoryOwner* pOurInv, CInventoryOwner* pOthers);
-    void StartCarBody(CInventoryOwner* pOurInv, IInventoryBox* pBox);
-    virtual void ReInitShownUI();
     void ChangeLevel(GameGraph::_GRAPH_ID game_vert_id, u32 level_vert_id, Fvector pos, Fvector ang, Fvector pos2, Fvector ang2, bool b);
 
     virtual void HideShownDialogs();
 
-    CUIInventoryWnd* InventoryMenu;
     CUIPdaWnd* PdaMenu;
     CUITalkWnd* TalkMenu;
-    CUICarBodyWnd* UICarBodyMenu;
     CChangeLevelWnd* UIChangeLevelWnd;
 
     void ShowHidePda(const bool show);

@@ -35,7 +35,7 @@ void CUITaskItem::Init()
     AddCallback("job_item", BUTTON_CLICKED, fastdelegate::MakeDelegate(this, &CUITaskItem::OnItemClicked));
 }
 
-void CUITaskItem::OnItemClicked(CUIWindow*, void*) { m_EventsWnd->ShowDescription(GameTask(), ObjectiveIdx()); }
+void CUITaskItem::OnItemClicked(CUIWindow*, void*) { m_EventsWnd->ShowDescription(GameTask(), Objective()->article_id.size() ? ObjectiveIdx() : 0); }
 
 CUITaskRootItem::CUITaskRootItem(CUIEventsWnd* w) : inherited(w) { Init(); }
 
@@ -55,16 +55,9 @@ void CUITaskRootItem::Init()
     m_remTimeStatic->SetAutoDelete(true);
     AttachChild(m_remTimeStatic);
 
-    m_switchDescriptionBtn = xr_new<CUI3tButton>();
-    m_switchDescriptionBtn->SetAutoDelete(true);
-    AttachChild(m_switchDescriptionBtn);
     m_captionTime = xr_new<CUI3tButton>();
     m_captionTime->SetAutoDelete(true);
     AttachChild(m_captionTime);
-
-    m_switchDescriptionBtn->SetWindowName("m_switchDescriptionBtn");
-    Register(m_switchDescriptionBtn);
-    AddCallback("m_switchDescriptionBtn", BUTTON_CLICKED, fastdelegate::MakeDelegate(this, &CUITaskRootItem::OnSwitchDescriptionClicked));
 
     CUIXmlInit xml_init;
     CUIXml& uiXml = m_EventsWnd->m_ui_task_item_xml;
@@ -74,8 +67,6 @@ void CUITaskRootItem::Init()
     xml_init.InitStatic(uiXml, "task_root_item:caption", 0, m_captionStatic);
     xml_init.InitStatic(uiXml, "task_root_item:caption_time", 0, m_captionTime);
     xml_init.InitStatic(uiXml, "task_root_item:rem_time", 0, m_remTimeStatic);
-
-    xml_init.Init3tButton(uiXml, "task_root_item:switch_description_btn", 0, m_switchDescriptionBtn);
 }
 
 void CUITaskRootItem::SetGameTask(CGameTask* gt, u16 obj_idx)
@@ -104,14 +95,7 @@ void CUITaskRootItem::SetGameTask(CGameTask* gt, u16 obj_idx)
     m_captionTime->SetWndPos(m_captionTime->GetWndPos().x, m_captionStatic->GetWndPos().y + m_captionStatic->GetHeight() + 3.0f);
 
     float h = _max(m_taskImage->GetWndPos().y + m_taskImage->GetHeight(), m_captionTime->GetWndPos().y + m_captionTime->GetHeight());
-    h = _max(h, m_switchDescriptionBtn->GetWndPos().y + m_switchDescriptionBtn->GetHeight());
     SetHeight(h);
-
-    m_curr_descr_mode = m_EventsWnd->GetDescriptionMode();
-    if (m_curr_descr_mode)
-        m_switchDescriptionBtn->InitTexture("ui_icons_newPDA_showtext");
-    else
-        m_switchDescriptionBtn->InitTexture("ui_icons_newPDA_showmap");
 
     m_remTimeStatic->Show(GameTask()->Objective(0).TaskState() == eTaskStateInProgress && (GameTask()->m_ReceiveTime != GameTask()->m_TimeToComplete));
 
@@ -133,17 +117,6 @@ void CUITaskRootItem::Update()
 {
     inherited::Update();
 
-    if (m_curr_descr_mode != m_EventsWnd->GetDescriptionMode())
-    {
-        m_curr_descr_mode = m_EventsWnd->GetDescriptionMode();
-        if (m_curr_descr_mode)
-            m_switchDescriptionBtn->InitTexture("ui_icons_newPDA_showtext");
-        else
-            m_switchDescriptionBtn->InitTexture("ui_icons_newPDA_showmap");
-    }
-
-    m_switchDescriptionBtn->SetButtonMode(m_EventsWnd->GetDescriptionMode() ? CUIButton::BUTTON_NORMAL : CUIButton::BUTTON_PUSHED);
-
     if (m_remTimeStatic->IsShown())
     {
         string512 buff, buff2;
@@ -154,14 +127,6 @@ void CUITaskRootItem::Update()
 }
 
 bool CUITaskRootItem::OnDbClick() { return true; }
-
-void CUITaskRootItem::OnSwitchDescriptionClicked(CUIWindow*, void*)
-{
-    m_switchDescriptionBtn->SetButtonMode(m_EventsWnd->GetDescriptionMode() ? CUIButton::BUTTON_PUSHED : CUIButton::BUTTON_NORMAL);
-
-    m_EventsWnd->SetDescriptionMode(!m_EventsWnd->GetDescriptionMode());
-    OnItemClicked(this, NULL);
-}
 
 void CUITaskRootItem::MarkSelected(bool b) {}
 
@@ -183,26 +148,25 @@ void CUITaskSubItem::Init()
     m_ActiveObjectiveStatic = xr_new<CUIStatic>();
     m_ActiveObjectiveStatic->SetAutoDelete(true);
     AttachChild(m_ActiveObjectiveStatic);
-    m_showDescriptionBtn = xr_new<CUI3tButton>();
-    m_showDescriptionBtn->SetAutoDelete(true);
-    AttachChild(m_showDescriptionBtn);
+    m_showtargetOnMapBtn = xr_new<CUI3tButton>();
+    m_showtargetOnMapBtn->SetAutoDelete(true);
+    AttachChild(m_showtargetOnMapBtn);
 
-    m_showDescriptionBtn->SetWindowName("m_showDescriptionBtn");
-    Register(m_showDescriptionBtn);
+    m_showtargetOnMapBtn->SetWindowName("m_showtargetOnMapBtn");
+    Register(m_showtargetOnMapBtn);
 
-    AddCallback("m_showDescriptionBtn", BUTTON_CLICKED, fastdelegate::MakeDelegate(this, &CUITaskSubItem::OnShowDescriptionClicked));
+    AddCallback("m_showtargetOnMapBtn", BUTTON_CLICKED, fastdelegate::MakeDelegate(this, &CUITaskSubItem::OnShowTargetOnMapClicked));
 
     CUIXmlInit xml_init;
     xml_init.InitWindow(uiXml, "task_sub_item", 0, this);
     xml_init.InitStatic(uiXml, "task_sub_item:state_image", 0, m_stateStatic);
     xml_init.InitStatic(uiXml, "task_sub_item:description", 0, m_descriptionStatic);
     xml_init.InitStatic(uiXml, "task_sub_item:active_objecttive_image", 0, m_ActiveObjectiveStatic);
-    xml_init.Init3tButton(uiXml, "task_sub_item:show_descr_btn", 0, m_showDescriptionBtn);
+    xml_init.Init3tButton(uiXml, "task_sub_item:show_on_map_btn", 0, m_showtargetOnMapBtn);
 
     m_active_color = xml_init.GetColor(uiXml, "task_sub_item:description:text_colors:active", 0, 0x00);
     m_failed_color = xml_init.GetColor(uiXml, "task_sub_item:description:text_colors:failed", 0, 0x00);
     m_accomplished_color = xml_init.GetColor(uiXml, "task_sub_item:description:text_colors:accomplished", 0, 0x00);
-    m_skiped_color = xml_init.GetColor(uiXml, "task_sub_item:description:text_colors:skiped", 0, 0x00);
 }
 
 void CUITaskSubItem::SetGameTask(CGameTask* gt, u16 obj_idx)
@@ -231,12 +195,6 @@ void CUITaskSubItem::SetGameTask(CGameTask* gt, u16 obj_idx)
         m_stateStatic->InitTexture("ui_icons_PDA_subtask_accomplished");
         m_descriptionStatic->SetTextColor(m_accomplished_color);
         break;
-    case eTaskStateSkiped:
-        m_stateStatic->InitTexture("ui_icons_PDA_subtask_skiped");
-        m_descriptionStatic->SetTextureColor(m_skiped_color);
-        break;
-
-
     default: NODEFAULT;
     };
 }
@@ -247,7 +205,8 @@ void CUITaskSubItem::Update()
     SGameTaskObjective* obj = &m_GameTask->m_Objectives.at(m_TaskObjectiveIdx);
     bool bIsActive = (Actor()->GameTaskManager().ActiveObjective() == obj);
     m_ActiveObjectiveStatic->Show(bIsActive);
-    m_showDescriptionBtn->Show(m_EventsWnd->ItemHasDescription(this));
+    auto ml = obj->LinkedMapLocation();
+    m_showtargetOnMapBtn->Show(ml && ml->SpotEnabled());
 }
 
 bool CUITaskSubItem::OnDbClick()
@@ -261,8 +220,6 @@ bool CUITaskSubItem::OnDbClick()
     return true;
 }
 
-void CUITaskSubItem::OnActiveObjectiveClicked() { m_EventsWnd->ShowDescription(GameTask(), ObjectiveIdx()); }
+void CUITaskSubItem::OnShowTargetOnMapClicked(CUIWindow*, void*) { m_EventsWnd->ShowTarget(GameTask(), ObjectiveIdx()); }
 
-void CUITaskSubItem::OnShowDescriptionClicked(CUIWindow*, void*) { m_EventsWnd->ShowDescription(GameTask(), ObjectiveIdx()); }
-
-void CUITaskSubItem::MarkSelected(bool b) { m_showDescriptionBtn->SetButtonMode(b ? CUIButton::BUTTON_PUSHED : CUIButton::BUTTON_NORMAL); }
+void CUITaskSubItem::MarkSelected(bool b) { m_showtargetOnMapBtn->SetButtonMode(b ? CUIButton::BUTTON_PUSHED : CUIButton::BUTTON_NORMAL); }

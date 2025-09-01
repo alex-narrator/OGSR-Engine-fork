@@ -20,19 +20,20 @@
 #include "../alife_registry_wrappers.h"
 #include "../encyclopedia_article.h"
 
+#include "UIGameSP.h"
+#include "UIPdaWnd.h"
+
+constexpr auto EVENTS = "pda_events.xml";
+
 CUIEventsWnd::CUIEventsWnd() { m_flags.zero(); }
 
-CUIEventsWnd::~CUIEventsWnd()
-{
-    delete_data(m_UIMapWnd);
-    delete_data(m_UITaskInfoWnd);
-}
+CUIEventsWnd::~CUIEventsWnd() { delete_data(m_UITaskInfoWnd); }
 
 void CUIEventsWnd::Init()
 {
     CUIXml uiXml;
-    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, "pda_events.xml");
-    R_ASSERT3(xml_result, "xml file not found", "pda_events.xml");
+    bool xml_result = uiXml.Init(CONFIG_PATH, UI_PATH, EVENTS);
+    R_ASSERT3(xml_result, "xml file not found: pda_events.xml", EVENTS);
 
     CUIXmlInit xml_init;
     xml_init.InitWindow(uiXml, "main_wnd", 0, this);
@@ -47,26 +48,20 @@ void CUIEventsWnd::Init()
     m_UILeftFrame->AttachChild(m_UILeftHeader);
     xml_init.InitFrameLine(uiXml, "main_wnd:left_frame:left_frame_header", 0, m_UILeftHeader);
 
-    if (uiXml.NavigateToNode("main_wnd:left_frame:left_frame_header:anim_static"))
-    {
-        m_UIAnimation = xr_new<CUIAnimatedStatic>();
-        m_UIAnimation->SetAutoDelete(true);
-        xml_init.InitAnimatedStatic(uiXml, "main_wnd:left_frame:left_frame_header:anim_static", 0, m_UIAnimation);
-        m_UILeftHeader->AttachChild(m_UIAnimation);
-    }
+    m_UIAnimation = xr_new<CUIAnimatedStatic>();
+    m_UIAnimation->SetAutoDelete(true);
+    xml_init.InitAnimatedStatic(uiXml, "main_wnd:left_frame:left_frame_header:anim_static", 0, m_UIAnimation);
+    m_UILeftHeader->AttachChild(m_UIAnimation);
 
     m_UIRightWnd = xr_new<CUIWindow>();
     m_UIRightWnd->SetAutoDelete(true);
     AttachChild(m_UIRightWnd);
     xml_init.InitWindow(uiXml, "main_wnd:right_frame", 0, m_UIRightWnd);
 
-    m_UIMapWnd = xr_new<CUIMapWnd>();
-    m_UIMapWnd->SetAutoDelete(false);
-    m_UIMapWnd->Init("pda_events.xml", "main_wnd:right_frame:map_wnd");
-
     m_UITaskInfoWnd = xr_new<CUITaskDescrWnd>();
     m_UITaskInfoWnd->SetAutoDelete(false);
     m_UITaskInfoWnd->Init(&uiXml, "main_wnd:right_frame:task_descr_view");
+    m_UIRightWnd->AttachChild(m_UITaskInfoWnd);
 
     m_ListWnd = xr_new<CUIScrollView>();
     m_ListWnd->SetAutoDelete(true);
@@ -82,7 +77,6 @@ void CUIEventsWnd::Init()
     AddCallback("filter_tab", TAB_CHANGED, fastdelegate::MakeDelegate(this, &CUIEventsWnd::OnFilterChanged));
 
     m_currFilter = eActiveTask;
-    SetDescriptionMode(true);
 
     m_ui_task_item_xml.Init(CONFIG_PATH, UI_PATH, "job_item.xml");
 }
@@ -105,8 +99,6 @@ void CUIEventsWnd::OnFilterChanged(CUIWindow* w, void*)
 {
     m_currFilter = (ETaskFilters)m_TaskFilter->GetActiveIndex();
     ReloadList(false);
-    if (!GetDescriptionMode())
-        SetDescriptionMode(true);
 }
 
 void CUIEventsWnd::Reload() { m_flags.set(flNeedReload, TRUE); }
@@ -140,15 +132,6 @@ void CUIEventsWnd::ReloadList(bool bClearOnly)
     for (const auto& task : game_tasks)
     {
         CUITaskItem* pTaskItem = NULL;
-        /*
-                if(task->m_Objectives[0].TaskState()==eTaskUserDefined)
-                {
-                    VERIFY				(task->m_Objectives.size()==1);
-                    pTaskItem			= xr_new<CUIUserTaskItem>(this);
-                    pTaskItem->SetGameTask			(task, 0);
-                    m_ListWnd->AddWindow			(pTaskItem,true);
-                }else
-        */
         u32 visible_objectives = 0;
         if (task->m_show_all_objectives || task->Objective(0).TaskState() != eTaskStateInProgress || task->m_Objectives.size() <= 2)
         {
@@ -187,17 +170,14 @@ void CUIEventsWnd::ReloadList(bool bClearOnly)
 void CUIEventsWnd::Show(bool status)
 {
     inherited::Show(status);
-
-    // хз почему, но если сделать Show для m_UIMapWnd, который не приаттачен к родителю - на нём пропадают LevelMap, причину не нашел, будет пока костыль
-
-    if (!GetDescriptionMode())
-        m_UIRightWnd->AttachChild(m_UIMapWnd);
-
-    m_UIMapWnd->Show(status);
     m_UITaskInfoWnd->Show(status);
 
-    if (!GetDescriptionMode())
-        m_UIRightWnd->DetachChild(m_UIMapWnd);
+    if (auto& tm = Actor()->GameTaskManager(); tm.ActiveTask())
+    {
+        auto objective = tm.ActiveObjective();
+        auto idx = objective && objective->article_id.size() ? objective->idx : 0;
+        ShowDescription(tm.ActiveTask(), idx);
+    }
 
     ReloadList(status == false);
 }
@@ -205,101 +185,68 @@ void CUIEventsWnd::Show(bool status)
 bool CUIEventsWnd::Filter(CGameTask* t)
 {
     ETaskState task_state = t->m_Objectives[0].TaskState();
-    //	bool bprimary_only			= m_primary_or_all_filter_btn->GetCheck();
 
     return (false /*m_currFilter==eOwnTask && task_state==eTaskUserDefined*/) ||
         ((true /*!bprimary_only || (bprimary_only && t->m_is_task_general)*/) &&
          ((m_currFilter == eAccomplishedTask && task_state == eTaskStateCompleted) || (m_currFilter == eFailedTask && task_state == eTaskStateFail) ||
-          (m_currFilter == eActiveTask && task_state == eTaskStateInProgress) || (m_currFilter == eSkipedTask && task_state == eTaskStateSkiped)));
+          (m_currFilter == eActiveTask && task_state == eTaskStateInProgress)));
 }
-
-void CUIEventsWnd::SetDescriptionMode(bool bMap)
-{
-    if (bMap)
-    {
-        m_UIRightWnd->DetachChild(m_UITaskInfoWnd);
-        m_UIRightWnd->AttachChild(m_UIMapWnd);
-    }
-    else
-    {
-        m_UIRightWnd->DetachChild(m_UIMapWnd);
-        m_UIRightWnd->AttachChild(m_UITaskInfoWnd);
-    }
-    m_flags.set(flMapMode, bMap);
-}
-
-bool CUIEventsWnd::GetDescriptionMode() { return !!m_flags.test(flMapMode); }
 
 void CUIEventsWnd::ShowDescription(CGameTask* t, int idx)
 {
-    if (GetDescriptionMode())
-    { // map
-        SGameTaskObjective& o = t->Objective(idx);
-        CMapLocation* ml = o.LinkedMapLocation();
+    SGameTaskObjective& o = t->Objective(idx);
 
-        if (ml && ml->SpotEnabled())
-            m_UIMapWnd->SetTargetMap(ml->LevelName(), ml->Position(), true);
+    int sz = m_ListWnd->GetSize();
 
-        int sz = m_ListWnd->GetSize();
+    for (int i = 0; i < sz; ++i)
+    {
+        CUITaskItem* itm = (CUITaskItem*)m_ListWnd->GetItem(i);
 
-        for (int i = 0; i < sz; ++i)
-        {
-            CUITaskItem* itm = (CUITaskItem*)m_ListWnd->GetItem(i);
-
-            if ((itm->GameTask() == t) && (itm->ObjectiveIdx() == idx))
-                itm->MarkSelected(true);
-            else
-                itm->MarkSelected(false);
-        }
+        if ((itm->GameTask() == t) && (itm->ObjectiveIdx() == idx))
+            itm->MarkSelected(true);
+        else
+            itm->MarkSelected(false);
     }
-    else
-    { // articles
-        SGameTaskObjective& o = t->Objective(0);
 
-        m_UITaskInfoWnd->ClearAll();
+    m_UITaskInfoWnd->ClearAll();
 
-        if (Actor()->encyclopedia_registry->registry().objects_ptr())
+    if (Actor()->encyclopedia_registry->registry().objects_ptr())
+    {
+        ARTICLE_VECTOR::const_iterator it = Actor()->encyclopedia_registry->registry().objects_ptr()->begin();
+
+        for (; it != Actor()->encyclopedia_registry->registry().objects_ptr()->end(); ++it)
         {
-            ARTICLE_VECTOR::const_iterator it = Actor()->encyclopedia_registry->registry().objects_ptr()->begin();
-
-            for (; it != Actor()->encyclopedia_registry->registry().objects_ptr()->end(); ++it)
+            if (ARTICLE_DATA::eTaskArticle == it->article_type)
             {
-                if (ARTICLE_DATA::eTaskArticle == it->article_type)
-                {
-                    CEncyclopediaArticle A;
-                    A.Load(it->article_id);
+                CEncyclopediaArticle A;
+                A.Load(it->article_id);
 
-                    if (t->m_ID == A.data()->group)
-                    {
-                        m_UITaskInfoWnd->AddArticle(&A);
-                    }
-                    else if (o.article_id.size() && it->article_id == o.article_id)
-                    {
-                        m_UITaskInfoWnd->AddArticle(&A);
-                    }
+                if (t->m_ID == A.data()->group)
+                {
+                    m_UITaskInfoWnd->AddArticle(&A);
+                }
+                else if (o.article_id.size() && it->article_id == o.article_id)
+                {
+                    m_UITaskInfoWnd->AddArticle(&A);
                 }
             }
         }
     }
 }
 
-bool CUIEventsWnd::ItemHasDescription(CUITaskItem* itm)
+void CUIEventsWnd::ShowTarget(CGameTask* t, int idx)
 {
-    if (itm->ObjectiveIdx() == 0) // root
+    SGameTaskObjective& o = t->Objective(idx);
+    CMapLocation* ml = o.LinkedMapLocation();
+
+    if (ml && ml->SpotEnabled())
     {
-        bool bHasLocation = itm->GameTask()->HasLinkedMapLocations();
-        return bHasLocation;
-    }
-    else
-    {
-        SGameTaskObjective* obj = itm->Objective();
-        CMapLocation* ml = obj->LinkedMapLocation();
-        bool bHasLocation = (NULL != ml);
-        bool bIsMapMode = GetDescriptionMode();
-        bool b = (bIsMapMode && bHasLocation && ml->SpotEnabled());
-        return b;
+        auto pda_menu = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame())->PdaMenu;
+        pda_menu->UIMapWnd->SetTargetMap(ml->LevelName(), ml->Position(), true);
+        pda_menu->SetActiveSubdialog(eptMap);
     }
 }
+
 void CUIEventsWnd::Reset()
 {
     inherited::Reset();

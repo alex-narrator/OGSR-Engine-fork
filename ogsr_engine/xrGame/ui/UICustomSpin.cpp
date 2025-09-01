@@ -12,8 +12,8 @@
 #include "UILines.h"
 #include "UICustomSpin.h"
 
-#define SPIN_HEIGHT 22
-#define BTN_SIZE 11
+constexpr auto SPIN_HEIGHT = 22;
+constexpr auto BTN_SIZE = 11;
 
 CUICustomSpin::CUICustomSpin()
 {

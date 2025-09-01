@@ -196,7 +196,6 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
     case CMissile::eReady: return (animation[1].A[1]);
     case CMissile::eThrow: return (animation[1].A[2]);
     case CMissile::eThrowEnd: return (animation[1].A[2]);
-    case CMissile::eBore: return (animation[1].A[2]);
     case CMissile::eIdle:
     case CMissile::eHidden:
     default: return (torso().select(animation[6].A));

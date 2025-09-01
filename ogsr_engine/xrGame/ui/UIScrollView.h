@@ -78,4 +78,5 @@ public:
     void UpdateChildrenLenght(); // set default width for all children
     float Scroll2ViewV(); // calculate scale for scroll position
     CUIScrollBar* ScrollBar() { return m_VScrollBar; }
+    Fvector2 GetPadSize();
 };

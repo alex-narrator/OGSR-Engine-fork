@@ -42,8 +42,6 @@ CScriptEngine::~CScriptEngine()
 
 void CScriptEngine::unload()
 {
-    extern void destroy_lua_wpn_params();
-    destroy_lua_wpn_params();
     if (MainMenu())
     {
         MainMenu()->DestroyInternal(true);

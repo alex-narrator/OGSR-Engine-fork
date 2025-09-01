@@ -1,8 +1,8 @@
 #pragma once
 
-#define CMD_START (1 << 0)
-#define CMD_STOP (1 << 1)
-#define CMD_OPT (1 << 2)
+constexpr auto CMD_START = (1 << 0);
+constexpr auto CMD_STOP = (1 << 1);
+constexpr auto CMD_OPT = (1 << 2);
 
 enum : u32
 {
@@ -16,15 +16,13 @@ enum : u32
     PDA_SLOT,
     DETECTOR_SLOT,
     TORCH_SLOT,
+    ARTEFACT_SLOT,
     HELMET_SLOT,
-    NIGHT_VISION_SLOT,
-    BIODETECTOR_SLOT,
+    BACKPACK_SLOT,
+    //
     SLOTS_TOTAL,
     NO_ACTIVE_SLOT = 255
 };
-
-#define RUCK_HEIGHT 280
-#define RUCK_WIDTH 7
 
 class CInventoryItem;
 class CInventory;
@@ -38,7 +36,6 @@ enum EItemPlace
     eItemPlaceSlot,
     eItemPlaceBelt,
     eItemPlaceRuck,
-    eItemPlaceBeltActor,
 };
 
 extern u32 INV_STATE_LADDER;

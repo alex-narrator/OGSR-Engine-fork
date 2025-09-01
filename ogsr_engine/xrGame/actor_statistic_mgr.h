@@ -19,4 +19,5 @@ public:
     s32 GetSectionCounts(const shared_str& key);
     void RemovePoints(const shared_str& key, const shared_str& detail_key);
     const vStatSectionData& GetCStorage();
+    s32 GetSectionKeyPoints(const shared_str& key, const shared_str& detail_key);
 };

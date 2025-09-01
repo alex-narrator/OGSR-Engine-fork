@@ -24,7 +24,7 @@ template <typename T>
 void RELATION_REGISTRY::SetRelationType(T from, T to, ALife::ERelationType new_relation)
 {
     static int goodwill_enemy = pSettings->r_s16(GAME_RELATIONS_SECT, "goodwill_enemy");
-    static int goodwill_neutral = pSettings->r_s16(GAME_RELATIONS_SECT, "goodwill_neutal");
+    static int goodwill_neutral = pSettings->r_s16(GAME_RELATIONS_SECT, "goodwill_neutral");
     static int goodwill_friend = pSettings->r_s16(GAME_RELATIONS_SECT, "goodwill_friend");
 
     switch (new_relation)
@@ -39,7 +39,7 @@ void RELATION_REGISTRY::SetRelationType(T from, T to, ALife::ERelationType new_r
 template <typename T>
 ALife::ERelationType RELATION_REGISTRY::GetRelationType(T from, T to) const
 {
-    static int attitude_neutral = pSettings->r_s16(GAME_RELATIONS_SECT, "attitude_neutal_threshold");
+    static int attitude_neutral = pSettings->r_s16(GAME_RELATIONS_SECT, "attitude_neutral_threshold");
     static int attitude_friend = pSettings->r_s16(GAME_RELATIONS_SECT, "attitude_friend_threshold");
 
     CHARACTER_GOODWILL attitude = GetAttitude(from, to);

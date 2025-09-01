@@ -110,7 +110,7 @@ BOOL CEffectorZoomInertion::ProcessCam(SCamEffectorInfo& info)
     bool camera_moved = false;
 
     //определяем двигал ли прицелом актер
-    if (!info.d.similar(m_vOldCameraDir, m_fCameraMoveEpsilon))
+    if (!info.d.similar(m_vOldCameraDir, m_fCameraMoveEpsilon) || m_bPauseEffect)
         camera_moved = true;
 
     /*
@@ -178,6 +178,7 @@ void CEffectorZoomInertion::script_register(lua_State* L)
             .def_readwrite("zoom_aim_disp_k", &CEffectorZoomInertion::m_fZoomAimingDispK)
             .def_readwrite("zoom_aim_speed_k", &CEffectorZoomInertion::m_fZoomAimingSpeedK)
             .def_readwrite("delta_time", &CEffectorZoomInertion::m_dwDeltaTime)
+            .def_readwrite("pause_effect", &CEffectorZoomInertion::m_bPauseEffect) // hack to stop effect processing
 
         // */
         ,

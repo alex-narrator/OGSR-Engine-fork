@@ -100,8 +100,8 @@ void setup_location_types(GameGraph::TERRAIN_VECTOR& m_vertex_types, CInifile* i
 
 //возможное отклонение от значения репутации
 //заданого в профиле и для конкретного персонажа
-#define REPUTATION_DELTA 10
-#define RANK_DELTA 10
+constexpr auto REPUTATION_DELTA = 10;
+constexpr auto RANK_DELTA = 10;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -114,13 +114,10 @@ CSE_ALifeTraderAbstract::CSE_ALifeTraderAbstract(LPCSTR caSection)
 {
     //	m_fCumulativeItemMass		= 0.f;
     //	m_iCumulativeItemVolume		= 0;
-    m_dwMoney = 0;
-    if (pSettings->line_exist(caSection, "money"))
-        m_dwMoney = pSettings->r_u32(caSection, "money");
+    m_dwMoney = READ_IF_EXISTS(pSettings, r_u32, caSection, "money", 0);
     m_fMaxItemMass = pSettings->r_float(caSection, "max_item_mass");
 
     m_sCharacterProfile = READ_IF_EXISTS(pSettings, r_string, caSection, "character_profile", "default");
-    m_SpecificCharacter = NULL;
 
 #ifdef XRGAME_EXPORTS
     m_community_index = NO_COMMUNITY_INDEX;
@@ -547,14 +544,10 @@ bool CSE_ALifeTrader::interactive() const { return (false); }
 ////////////////////////////////////////////////////////////////////////////
 CSE_ALifeCustomZone::CSE_ALifeCustomZone(LPCSTR caSection) : CSE_ALifeSpaceRestrictor(caSection)
 {
-    m_owner_id = u32(-1);
     if (pSettings->line_exist(caSection, "hit_type"))
         m_tHitType = ALife::g_tfString2HitType(pSettings->r_string(caSection, "hit_type"));
-    else
-        m_tHitType = ALife::eHitTypeMax;
-    m_enabled_time = 0;
-    m_disabled_time = 0;
-    m_start_time_shift = 0;
+
+    m_maxPower = pSettings->r_float(caSection, "max_start_power");
 }
 
 CSE_ALifeCustomZone::~CSE_ALifeCustomZone() {}
@@ -564,7 +557,7 @@ void CSE_ALifeCustomZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
     inherited::STATE_Read(tNetPacket, size);
 
     float tmp;
-    tNetPacket.r_float(tmp /*m_maxPower*/);
+    tNetPacket.r_float(/*m_maxPower*/ tmp);
 
     if (m_wVersion < 113)
     {
@@ -589,16 +582,25 @@ void CSE_ALifeCustomZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
     {
         tNetPacket.r_u32(m_start_time_shift);
     }
+    //
+    if (m_wVersion > 118)
+    {
+        tNetPacket.r_u32(m_zone_ttl);
+        tNetPacket.r_float(m_maxPower);
+    }
 }
 
 void CSE_ALifeCustomZone::STATE_Write(NET_Packet& tNetPacket)
 {
     inherited::STATE_Write(tNetPacket);
-    tNetPacket.w_float(0.0 /*m_maxPower*/);
+    tNetPacket.w_float(/*m_maxPower*/ 0.f);
     tNetPacket.w_u32(m_owner_id);
     tNetPacket.w_u32(m_enabled_time);
     tNetPacket.w_u32(m_disabled_time);
     tNetPacket.w_u32(m_start_time_shift);
+    //
+    tNetPacket.w_u32(m_zone_ttl);
+    tNetPacket.w_float(m_maxPower);
 }
 
 void CSE_ALifeCustomZone::UPDATE_Read(NET_Packet& tNetPacket)

@@ -22,6 +22,7 @@ class CUIDiaryWnd : public CUIWindow, public CUIWndCallback
     {
         eJournal = 0,
         eNews,
+        eNotes,
         eNone
     };
 

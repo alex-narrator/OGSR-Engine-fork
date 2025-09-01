@@ -84,6 +84,12 @@ public:
     virtual BOOL feel_touch_contact(CObject*);
     bool active_contact(u16) const;
     float distance_to(Fvector&);
+
+    DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
 #include "space_restrictor_inline.h"
+
+add_to_type_list(CSpaceRestrictor)
+#undef script_type_list
+#define script_type_list save_type_list(CSpaceRestrictor)

@@ -65,7 +65,7 @@ const CHitObject* CHitMemoryManager::hit(const CEntityAlive* object) const
     return (0);
 }
 
-void CHitMemoryManager::add(const CEntityAlive* entity_alive) { add(0, Fvector().set(0, 0, 1), entity_alive, 0); }
+void CHitMemoryManager::add(const CEntityAlive* entity_alive) { add(0, Fvector().set(0, 0, 1), entity_alive, 0, 0); }
 
 void CHitMemoryManager::Load(LPCSTR section) {}
 
@@ -83,7 +83,7 @@ void CHitMemoryManager::reload(LPCSTR section)
     m_max_hit_count = READ_IF_EXISTS(pSettings, r_s32, section, "DynamicHitCount", 1);
 }
 
-void CHitMemoryManager::add(float amount, const Fvector& vLocalDir, const CObject* who, s16 element)
+void CHitMemoryManager::add(float amount, const Fvector& vLocalDir, const CObject* who, s16 element, int type)
 {
 #ifndef MASTER_GOLD
     if (who && (who->CLS_ID == CLSID_OBJECT_ACTOR) && psAI_Flags.test(aiIgnoreActor))
@@ -100,7 +100,7 @@ void CHitMemoryManager::add(float amount, const Fvector& vLocalDir, const CObjec
     if (who && !fis_zero(amount))
         m_last_hit_object_id = who->ID();
 
-    object().callback(GameObject::eHit)(m_object->lua_game_object(), amount, vLocalDir, smart_cast<const CGameObject*>(who)->lua_game_object(), element);
+    object().callback(GameObject::eHit)(m_object->lua_game_object(), amount, vLocalDir, smart_cast<const CGameObject*>(who)->lua_game_object(), element, type);
 
     Fvector direction;
     m_object->XFORM().transform_dir(direction, vLocalDir);

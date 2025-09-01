@@ -4,12 +4,7 @@ namespace GameObject
 {
 enum ECallbackType
 {
-    eTradeStart = u32(0),
-    eTradeStop,
-    eTradeSellBuyItem,
-    eTradePerformTradeOperation,
-
-    eZoneEnter,
+    eZoneEnter = u32(0),
     eZoneExit,
     eExitLevelBorder,
     eEnterLevelBorder,
@@ -68,27 +63,25 @@ enum ECallbackType
     eOnUpdateHUDAddonsVisibiility,
     eOnAddonInit,
 
+    eOnHudStateSwitch,
+
     // Called when the player zooms their weapon in or out.
     eOnActorWeaponZoomIn,
     eOnActorWeaponZoomOut,
-
-    eCellItemFocus,
-    eCellItemFocusLost,
-    eCellItemSelect,
-    eOnCellItemMouse,
+    eOnActorWeaponZoomChange,
+    eOnActorWeaponScopeModeChange,
 
     eBeforeSave,
     ePostSave,
 
     eUIMapClick,
 
-    eUIPickUpItemShowing,
-    eUIGroupItems,
     eOnWpnShellDrop,
     eOnThrowGrenade,
     eOnGoodwillChange,
-    eUpdateArtefactsOnBelt,
     eLevelChangerAction,
+
+    eUpdateItemsEffect,
 
     eAttachVehicle,
     eDetachVehicle,

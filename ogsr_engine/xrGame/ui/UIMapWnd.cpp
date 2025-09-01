@@ -32,18 +32,9 @@ const int HSCROLLBAR_STEP = 20; // В пикселях
 
 static bool MAP_FLY_MODE = true;
 
-CUIMapWnd::CUIMapWnd()
-{
-    m_tgtMap = NULL;
-    m_GlobalMap = NULL;
-    m_flags.zero();
-    m_currentZoom = 1.0f;
-    m_hint = NULL;
-    m_text_hint = NULL;
-
-    m_UserSpotWnd = nullptr;
-    m_cur_location = nullptr;
-}
+//CUIMapWnd::CUIMapWnd()
+//{
+//}
 
 CUIMapWnd::~CUIMapWnd()
 {
@@ -524,6 +515,12 @@ void CUIMapWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             m_cur_location = nullptr;
             break;
         }
+        // Click on the custom actions
+        case MAP_SPOT_CUSTOM_ACTION: {
+            m_UIPropertiesBox->ProcessCustomActionsMapSpot(m_cur_location->ObjectID(), m_cur_location->GetType(), m_cur_location->LevelName().c_str(),
+                                                           m_cur_location->GetLastPosition());
+            break;
+        }
         }
     }
 }
@@ -797,6 +794,23 @@ void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
         m_UIPropertiesBox->AddItem("st_pda_change_spot_hint", w, MAP_CHANGE_SPOT_HINT_ACT);
         m_UIPropertiesBox->AddItem("st_pda_delete_spot", w, MAP_REMOVE_SPOT_ACT);
     }
+
+    m_UIPropertiesBox->CheckCustomActionsMapSpot(m_cur_location->ObjectID(), m_cur_location->GetType(), m_cur_location->LevelName().c_str(), m_cur_location->GetLastPosition());
+
+    if (m_UIPropertiesBox->GetItemsCount() > 0)
+    {
+        m_UIPropertiesBox->AutoUpdateSize();
+
+        Fvector2 cursor_pos;
+        Frect vis_rect;
+
+        GetAbsoluteRect(vis_rect);
+        cursor_pos = GetUICursor()->GetCursorPosition();
+        cursor_pos.sub(vis_rect.lt);
+        m_UIPropertiesBox->Show(vis_rect, cursor_pos);
+    }
+
+    m_UIPropertiesBox->CheckCustomActionsMapSpot(m_cur_location->ObjectID(), m_cur_location->GetType(), m_cur_location->LevelName().c_str(), m_cur_location->GetLastPosition());
 
     if (m_UIPropertiesBox->GetItemsCount() > 0)
     {

@@ -20,6 +20,7 @@ ENGINE_API CLoadScreenRenderer load_screen_renderer;
 ENGINE_API BOOL g_bRendering = FALSE;
 
 extern ENGINE_API float psHUD_FOV;
+extern float g_fov;
 
 u32 g_dwFPSlimit = 60;
 
@@ -173,12 +174,12 @@ void CRenderDevice::OnCameraUpdated(bool from_actor)
     ::Render->SetCacheXformOld(mView_old, mProject_old);
 
     mView_hud.build_camera_dir(Fvector{}, vCameraDirection, vCameraTop);
-    mProject_hud.build_projection(deg2rad(psHUD_FOV <= 1.f ? psHUD_FOV * Device.fFOV : psHUD_FOV), fASPECT, HUD_VIEWPORT_NEAR,
+    mProject_hud.build_projection(deg2rad(psHUD_FOV <= 1.f ? psHUD_FOV * /*Device.fFOV*/ g_fov : psHUD_FOV), fASPECT, HUD_VIEWPORT_NEAR,
                                   g_pGamePersistent->Environment().CurrentEnv->far_plane);
     mFullTransform_hud.mul(mProject_hud, mView_hud);
 
     mView_hud2.set(mView);
-    mProject_hud2.build_projection(deg2rad(psHUD_FOV <= 1.f ? psHUD_FOV * Device.fFOV : psHUD_FOV), fASPECT, HUD_VIEWPORT_NEAR,
+    mProject_hud2.build_projection(deg2rad(psHUD_FOV <= 1.f ? psHUD_FOV * /*Device.fFOV*/ g_fov : psHUD_FOV), fASPECT, HUD_VIEWPORT_NEAR,
                                    g_pGamePersistent->Environment().CurrentEnv->far_plane);
     mFullTransform_hud2.mul(mProject_hud2, mView_hud2);
 }

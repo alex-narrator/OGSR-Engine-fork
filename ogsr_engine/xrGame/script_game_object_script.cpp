@@ -59,9 +59,7 @@ void CScriptGameObject::script_register(lua_State* L)
 
            class_<enum_exporter<GameObject::ECallbackType>>("callback")
                .enum_("callback_types")
-                   [value("trade_start", int(GameObject::eTradeStart)), value("trade_stop", int(GameObject::eTradeStop)),
-                    value("trade_sell_buy_item", int(GameObject::eTradeSellBuyItem)), value("trade_perform_operation", int(GameObject::eTradePerformTradeOperation)),
-                    value("trader_global_anim_request", int(GameObject::eTraderGlobalAnimationRequest)),
+                   [value("trader_global_anim_request", int(GameObject::eTraderGlobalAnimationRequest)),
                     value("trader_head_anim_request", int(GameObject::eTraderHeadAnimationRequest)), value("trader_sound_end", int(GameObject::eTraderSoundEnd)),
                     value("zone_enter", int(GameObject::eZoneEnter)), value("zone_exit", int(GameObject::eZoneExit)), value("level_border_exit", int(GameObject::eExitLevelBorder)),
                     value("level_border_enter", int(GameObject::eEnterLevelBorder)), value("death", int(GameObject::eDeath)),
@@ -84,13 +82,14 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("update_addons_visibility", int(GameObject::eOnUpdateAddonsVisibiility)),
                     value("update_hud_addons_visibility", int(GameObject::eOnUpdateHUDAddonsVisibiility)), value("on_addon_init", int(GameObject::eOnAddonInit)),
 
-                    value("on_cell_item_focus", int(GameObject::eCellItemFocus)), value("on_cell_item_select", int(GameObject::eCellItemSelect)),
-                    value("on_cell_item_focus_lost", int(GameObject::eCellItemFocusLost)), value("on_cell_item_mouse", int(GameObject::eOnCellItemMouse)),
                     value("on_before_save", int(GameObject::eBeforeSave)), value("on_after_save", int(GameObject::ePostSave)),
-                    value("on_level_map_click", int(GameObject::eUIMapClick)), value("on_pickup_item_showing", int(GameObject::eUIPickUpItemShowing)),
-                    value("on_group_items", int(GameObject::eUIGroupItems)), value("on_weapon_shell_drop", int(GameObject::eOnWpnShellDrop)),
+                    value("on_level_map_click", int(GameObject::eUIMapClick)), value("on_weapon_shell_drop", int(GameObject::eOnWpnShellDrop)),
+                    value("on_actor_weapon_zoom_in", int(GameObject::eOnActorWeaponZoomIn)), value("on_actor_weapon_zoom_out", int(GameObject::eOnActorWeaponZoomOut)),
+                    value("on_actor_weapon_zoom_change", int(GameObject::eOnActorWeaponZoomChange)),
+                    value("on_actor_weapon_scope_mode_change", int(GameObject::eOnActorWeaponScopeModeChange)),
+
                     value("on_throw_grenade", int(GameObject::eOnThrowGrenade)), value("on_goodwill_change", int(GameObject::eOnGoodwillChange)),
-                    value("update_artefacts_on_belt", int(GameObject::eUpdateArtefactsOnBelt)), value("level_changer_action", int(GameObject::eLevelChangerAction)),
+                    value("level_changer_action", int(GameObject::eLevelChangerAction)), value("update_items_effect", int(GameObject::eUpdateItemsEffect)),
 
                     value("on_attach_vehicle", int(GameObject::eAttachVehicle)), value("on_detach_vehicle", int(GameObject::eDetachVehicle)),
                     value("on_use_vehicle", int(GameObject::eUseVehicle)),
@@ -98,15 +97,12 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("on_inv_box_item_take", int(GameObject::eOnInvBoxItemTake)), value("on_inv_box_item_drop", int(GameObject::eOnInvBoxItemDrop)),
                     value("on_inv_box_open", int(GameObject::eOnInvBoxOpen)),
 
-                    value("select_pda_contact", int(GameObject::eSelectPdaContact)),
+                    value("select_pda_contact", int(GameObject::eSelectPdaContact)), value("on_hud_state_switch", int(GameObject::eOnHudStateSwitch)),
 
-                    value("on_footstep", int(GameObject::eOnActorFootStep)),
+                    value("on_actor_footstep", int(GameObject::eOnActorFootStep)),
                     value("on_actor_land", int(GameObject::eOnActorLand)),
-                    value("on_actor_jump", int(GameObject::eOnActorJump))],
-
-           def("buy_condition", (void (*)(CInifile*, LPCSTR))(&::buy_condition)), def("buy_condition", (void (*)(float, float))(&::buy_condition)),
-           def("sell_condition", (void (*)(CInifile*, LPCSTR))(&::sell_condition)), def("sell_condition", (void (*)(float, float))(&::sell_condition)),
-           def("show_condition", &::show_condition)];
+                    value("on_actor_jump", int(GameObject::eOnActorJump))]
+        ];
 
     script_register_game_object4(L);
     CHitImmunity::script_register(L);

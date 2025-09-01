@@ -220,16 +220,12 @@ void CAI_Stalker::Hit(SHit* pHDS)
     HDS.power *= m_fRankImmunity;
     if (m_boneHitProtection && HDS.hit_type == ALife::eHitTypeFireWound)
     {
-#ifdef APPLY_ARMOR_PIERCING_TO_NPC
-        float BoneArmour = m_boneHitProtection->getBoneArmour(HDS.bone()) * (1 - pHDS->ap);
-#else
         float BoneArmour = m_boneHitProtection->getBoneArmour(HDS.bone());
-#endif // APPLY_ARMOR_PIERCING_TO_NPC
-        float NewHitPower = HDS.damage() - BoneArmour;
-        if (NewHitPower < HDS.power * m_boneHitProtection->m_fHitFrac)
-            HDS.power = HDS.power * m_boneHitProtection->m_fHitFrac;
-        else
-            HDS.power = NewHitPower;
+
+        if (pHDS->ap < BoneArmour)
+        { // броню не пробито, хіт тільки від умовного удару в броню
+            HDS.power *= m_boneHitProtection->m_fHitFrac;
+        }
 
         if (wounded())
             HDS.power = 1000.f;
@@ -302,13 +298,13 @@ void CAI_Stalker::Hit(SHit* pHDS)
     inherited::Hit(&HDS);
 }
 
-void CAI_Stalker::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element)
+void CAI_Stalker::HitSignal(float amount, Fvector& vLocalDir, CObject* who, s16 element, int type)
 {
     if (getDestroy())
         return;
 
     if (g_Alive())
-        memory().hit().add(amount, vLocalDir, who, element);
+        memory().hit().add(amount, vLocalDir, who, element, type);
     else if (!AlreadyDie())
     {
         const auto I = m_bones_body_parts.find(element);
@@ -326,9 +322,9 @@ void CAI_Stalker::OnItemTake(CInventoryItem* inventory_item)
     m_sell_info_actuality = false;
 }
 
-void CAI_Stalker::OnItemDrop(CInventoryItem* inventory_item)
+void CAI_Stalker::OnItemDrop(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
-    CObjectHandler::OnItemDrop(inventory_item);
+    CObjectHandler::OnItemDrop(inventory_item, previous_place);
 
     m_item_actuality = false;
     m_sell_info_actuality = false;

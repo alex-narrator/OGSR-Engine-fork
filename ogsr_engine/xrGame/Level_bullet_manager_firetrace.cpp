@@ -22,11 +22,11 @@
 
 //константы shoot_factor, определяющие
 //поведение пули при столкновении с объектом
-#define RICOCHET_THRESHOLD 0.1
-#define STUCK_THRESHOLD 0.4
+constexpr auto RICOCHET_THRESHOLD = 0.1;
+constexpr auto STUCK_THRESHOLD = 0.4;
 
 //расстояния не пролетев которого пуля не трогает того кто ее пустил
-#define PARENT_IGNORE_DIST 3.f
+constexpr auto PARENT_IGNORE_DIST = 3.f;
 
 // test callback функция
 //   object - object for testing
@@ -189,7 +189,7 @@ BOOL CBulletManager::firetrace_callback(collide::rq_result& result, LPVOID param
     }
 
     //проверить достаточно ли силы хита, чтобы двигаться дальше
-    if (bullet->speed < m_fMinBulletSpeed || bullet->flags.ricochet_was)
+    if (bullet->speed < Level().BulletManager().m_fMinBulletSpeed || bullet->flags.ricochet_was)
         return FALSE;
     else
         return TRUE;

@@ -95,7 +95,7 @@ void CHUDTarget::CursorOnFrame()
     Fvector p1 = Device.vCameraPosition;
     Fvector dir = Device.vCameraDirection;
 
-    if (auto Wpn = smart_cast<CHudItem*>(Actor->inventory().ActiveItem()))
+    if (auto Wpn = smart_cast<CHudItem*>(Actor->inventory().ActiveItem()); Wpn && !(psHUD_Flags.test(HUD_CROSSHAIR_CENTER) || Actor->m_bCenterCrosshair))
         Actor->g_fireParams(Wpn, p1, dir, true);
 
     // Render cursor
@@ -141,7 +141,7 @@ void CHUDTarget::Render()
 
     CInventoryOwner* our_inv_owner = smart_cast<CInventoryOwner*>(Level().CurrentEntity());
 
-    if (const auto Wpn = smart_cast<CWeapon*>(active_item); Wpn && (Wpn->IsLaserOn() || Wpn->GetState() == CHUDState::EHudStates::eReload))
+    if (const auto Wpn = smart_cast<CWeapon*>(active_item); Wpn && (/*Wpn->IsLaserOn() || */Wpn->GetState() == CHUDState::EHudStates::eReload))
     {
         need_to_show_cursor = false;
     }
@@ -156,7 +156,7 @@ void CHUDTarget::Render()
     Fvector p1 = Device.vCameraPosition;
     Fvector dir = Device.vCameraDirection;
 
-    if (const auto Wpn = smart_cast<CHudItem*>(active_item))
+    if (const auto Wpn = smart_cast<CHudItem*>(active_item); Wpn && !(psHUD_Flags.test(HUD_CROSSHAIR_CENTER) || Actor->m_bCenterCrosshair))
         Actor->g_fireParams(Wpn, p1, dir, true);
 
     // Render cursor
@@ -281,18 +281,18 @@ void CHUDTarget::Render()
 
                         if (psHUD_Flags.test(HUD_INFO_OVERHEAD))
                         {
-                            if (I->GetInvShowCondition())
+                            if (I->GetCondition())
                             {
-                                F->Out(x, y, "%s (%.0f%%)", draw_str, I->GetConditionToShow() * 100.f);
+                                F->Out(x, y, "%s (%.0f%%)", draw_str, I->GetCondition() * 100.f);
                             }
                             else
                                 F->Out(x, y, "%s", draw_str);
                         }
                         else
                         {
-                            if (I->GetInvShowCondition())
+                            if (I->GetCondition())
                             {
-                                F->OutNext("%s (%.0f%%)", draw_str, I->GetConditionToShow() * 100.f);
+                                F->OutNext("%s (%.0f%%)", draw_str, I->GetCondition() * 100.f);
                             }
                             else
                                 F->OutNext("%s", draw_str);

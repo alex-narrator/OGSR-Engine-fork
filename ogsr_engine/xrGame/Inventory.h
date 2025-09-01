@@ -9,19 +9,20 @@ class CInventoryOwner;
 class CInventorySlot
 {
 public:
-    CInventorySlot();
-    virtual ~CInventorySlot();
+    CInventorySlot() {};
+    virtual ~CInventorySlot() {};
 
     bool CanBeActivated() const;
     bool IsBlocked() const;
     bool maySwitchFast() const;
     void setSwitchFast(bool);
 
-    PIItem m_pIItem;
-    bool m_bPersistent;
-    bool m_bVisible;
-    int m_blockCounter;
-    bool m_maySwitchFast;
+    PIItem m_pIItem{};
+    bool m_bPersistent{};
+    bool m_bVisible{true};
+    int m_blockCounter{};
+    bool m_maySwitchFast{};
+    bool m_bNeedUnlock{};
 };
 enum EActivationReason
 {
@@ -55,7 +56,7 @@ public:
     bool InBelt(PIItem pIItem) const;
     bool InRuck(PIItem pIItem) const;
 
-    bool CanPutInSlot(PIItem pIItem) const;
+    bool CanPutInSlot(PIItem pIItem, bool = false) const;
     bool CanPutInSlot(PIItem pIItem, u8 slot) const;
     bool CanPutInBelt(PIItem pIItem);
     bool CanPutInRuck(PIItem pIItem) const;
@@ -68,41 +69,16 @@ public:
     PIItem ItemFromSlot(u32 slot) const;
     bool Action(s32 cmd, u32 flags);
     void Update();
-    // Ищет на поясе аналогичный IItem
-    PIItem Same(const PIItem pIItem, bool bSearchRuck) const;
-    // Ищет на поясе IItem для указанного слота
-    PIItem SameSlot(const u32 slot, PIItem pIItem, bool bSearchRuck) const;
-    // Ищет на поясе или в рюкзаке IItem с указанным именем (cName())
-    PIItem Get(const char* name, bool bSearchRuck) const;
-    // Ищет на поясе или в рюкзаке IItem с указанным именем (id)
-    PIItem Get(const u16 id, bool bSearchRuck) const;
-    // Ищет на поясе или в рюкзаке IItem с указанным CLS_ID
-    PIItem Get(CLASS_ID cls_id, bool bSearchRuck) const;
-    PIItem GetAny(const char* name) const;
-    PIItem GetAmmo(const char* name, bool forActor) const;
 
     void Iterate(bool, std::function<bool(const PIItem)>) const;
-    void IterateAmmo(bool, std::function<bool(const PIItem)>) const;
-    PIItem GetAmmoMaxCurr(const char*, bool) const;
-    PIItem GetAmmoMinCurr(const char*, bool) const;
-    int GetIndexOnBelt(PIItem) const;
-    void RestoreBeltOrder();
+    void IterateAmmo(std::function<bool(const PIItem)>) const;
+    PIItem GetAmmoByLimit(const char* sect, bool limit_max = false, xr_vector<shared_str>* magazines = nullptr) const;
 
-    // search both (ruck and belt)
-    PIItem item(CLASS_ID cls_id) const;
-
-    // get all the items with the same section name
-    virtual u32 dwfGetSameItemCount(LPCSTR caSection, bool SearchAll = false);
-    virtual u32 dwfGetGrenadeCount(LPCSTR caSection, bool SearchAll);
-    // get all the items with the same object id
-    virtual bool bfCheckForObject(ALife::_OBJECT_ID tObjectID);
-    PIItem get_object_by_id(ALife::_OBJECT_ID tObjectID);
-
-    u32 dwfGetObjectCount();
+    u32 dwfGetObjectCount() const;
     PIItem tpfGetObjectByIndex(int iIndex);
     PIItem GetItemFromInventory(LPCSTR caItemName);
 
-    bool Eat(PIItem pIItem);
+    bool Eat(PIItem pIItem, CInventoryOwner* eater = nullptr);
 
     u32 GetActiveSlot() const { return m_iActiveSlot; }
 
@@ -123,7 +99,7 @@ public:
     {
         IC bool operator()(const shared_str& x, const shared_str& y) const { return xr_strcmp(x, y) < 0; }
     };
-    xr_multimap<shared_str, PIItem, str_pred> m_allMap;
+    /*xr_multimap<shared_str, PIItem, str_pred> m_allMap;*/
 
     TIItemContainer m_all;
     TIItemContainer m_ruck, m_belt;
@@ -137,12 +113,10 @@ public:
     float GetMaxWeight() const { return m_fMaxWeight; }
     void SetMaxWeight(float weight) { m_fMaxWeight = weight; }
 
-    u32 BeltSlotsCount() const;
-
     inline CInventoryOwner* GetOwner() const { return m_pOwner; }
 
     // Объект на который наведен прицел
-    PIItem m_pTarget;
+    PIItem m_pTarget{};
 
     friend class CInventoryOwner;
 
@@ -155,28 +129,37 @@ public:
     // максимальный вес инвентаря
     float m_fMaxWeight;
 
+     bool m_bBlockDevice{};
+
+    u32 BeltSize() const { return m_iMaxBelt; }
+    bool IsAllItemsLoaded() const;
+
+    bool IsSlotAllowed(u32) const;
+    bool HasUnlockForSlot(u32) const;
+    bool HasLockForSlot(u32) const;
+
 protected:
     void UpdateDropTasks();
     void UpdateDropItem(PIItem pIItem);
 
     // Активный слот и слот который станет активным после смены
     //значения совпадают в обычном состоянии (нет смены слотов)
-    u32 m_iActiveSlot;
-    u32 m_iNextActiveSlot;
-    u32 m_iPrevActiveSlot;
-    u32 m_iLoadActiveSlot;
-    u32 m_iLoadActiveSlotFrame;
-    EActivationReason m_ActivationSlotReason;
+    u32 m_iActiveSlot{NO_ACTIVE_SLOT};
+    u32 m_iNextActiveSlot{NO_ACTIVE_SLOT};
+    u32 m_iPrevActiveSlot{NO_ACTIVE_SLOT};
+    u32 m_iLoadActiveSlot{NO_ACTIVE_SLOT};
+    u32 m_iLoadActiveSlotFrame{u32(-1)};
+    EActivationReason m_ActivationSlotReason{eGeneral};
 
-    CInventoryOwner* m_pOwner;
+    CInventoryOwner* m_pOwner{};
 
     //флаг, показывающий наличие пояса в инвенторе
-    bool m_bBeltUseful;
+    bool m_bBeltUseful{false};
     //флаг, допускающий использование слотов
-    bool m_bSlotsUseful;
+    bool m_bSlotsUseful{true};
 
     // текущий вес в инвентаре
-    float m_fTotalWeight;
+    float m_fTotalWeight{-1.f};
 
     // Максимальное кол-во объектов
     //на поясе
@@ -185,10 +168,10 @@ protected:
     float m_fTakeDist;
 
     //кадр на котором произошло последнее изменение в инвенторе
-    u32 m_dwModifyFrame;
+    u32 m_dwModifyFrame{};
 
-    bool m_drop_last_frame;
+    bool m_drop_last_frame{};
 
 private:
-    u32 UpdatesCount{};
+    bool m_bUpdated{};
 };

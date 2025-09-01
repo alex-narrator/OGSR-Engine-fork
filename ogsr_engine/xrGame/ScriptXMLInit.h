@@ -28,6 +28,7 @@ class CUITrackBar;
 class CUIMMShniaga;
 class CUIScrollView;
 class CUIProgressBar;
+class CUIProgressShape;
 
 class CScriptXmlInit
 {
@@ -65,6 +66,11 @@ public:
     CUIWindow* InitKeyBinding(LPCSTR path, CUIWindow* parent);
     CUIScrollView* InitScrollView(LPCSTR path, CUIWindow* parent);
     CUIProgressBar* InitProgressBar(LPCSTR path, CUIWindow* parent);
+    CUIProgressShape* InitProgressShape(LPCSTR path, CUIWindow* parent);
+
+    LPCSTR ReadAttrib(LPCSTR path, LPCSTR attrib, LPCSTR default_str_val = "");
+    int ReadAttribInt(LPCSTR path, LPCSTR attrib, int default_int_val = 0);
+    float ReadAttribFlt(LPCSTR path, LPCSTR attrib, float default_flt_val = 0.0f);
 
 protected:
     CUIXml m_xml;

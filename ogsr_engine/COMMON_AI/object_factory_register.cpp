@@ -91,9 +91,7 @@
 #include "WeaponMounted.h"
 #include "WeaponStatMgun.h"
 
-#include "scope.h"
-#include "silencer.h"
-#include "grenadelauncher.h"
+#include "Addons.h"
 
 #include "bolt.h"
 #include "medkit.h"
@@ -109,6 +107,8 @@
 #include "StalkerOutfit.h"
 #include "MilitaryOutfit.h"
 #include "ExoOutfit.h"
+
+#include "Helmet.h"
 
 #include "f1.h"
 #include "rgd5.h"
@@ -132,8 +132,12 @@
 #include "EliteDetector.h"
 #include "AdvancedDetector.h"
 
+#include "customdevice.h"
+
 #include "torch.h"
 #include "pda.h"
+
+#include "Flashlight.h"
 
 #include "searchlight.h"
 
@@ -260,6 +264,11 @@ void CObjectFactory::register_classes()
     ADD(CScope, CSE_ALifeItem, CLSID_OBJECT_W_SCOPE, "wpn_scope");
     ADD(CSilencer, CSE_ALifeItem, CLSID_OBJECT_W_SILENCER, "wpn_silencer");
     ADD(CGrenadeLauncher, CSE_ALifeItem, CLSID_OBJECT_W_GLAUNCHER, "wpn_grenade_launcher");
+    ADD(CLaser, CSE_ALifeItem, CLSID_OBJECT_W_LASER, "wpn_laser");
+    ADD(CAddonFlashlight, CSE_ALifeItem, CLSID_OBJECT_W_FLASHLIGHT, "wpn_flashlight");
+    ADD(CStock, CSE_ALifeItem, CLSID_OBJECT_W_STOCK, "wpn_stock");
+    ADD(CExtender, CSE_ALifeItem, CLSID_OBJECT_W_EXTENDER, "wpn_extender");
+    ADD(CForend, CSE_ALifeItem, CLSID_OBJECT_W_FOREND, "wpn_forend");
 
     // Inventory
     ADD(CBolt, CSE_ALifeItemBolt, CLSID_IITEM_BOLT, "obj_bolt");
@@ -279,6 +288,8 @@ void CObjectFactory::register_classes()
     ADD(CStalkerOutfit, CSE_ALifeItemCustomOutfit, CLSID_EQUIPMENT_STALKER, "equ_stalker");
     ADD(CMilitaryOutfit, CSE_ALifeItemCustomOutfit, CLSID_EQUIPMENT_MILITARY, "equ_military");
     ADD(CExoOutfit, CSE_ALifeItemCustomOutfit, CLSID_EQUIPMENT_EXO, "equ_exo");
+
+    ADD(CHelmet, CSE_ALifeItem, CLSID_HELMET, "obj_helmet");
 
     // Grenades
     ADD(CF1, CSE_ALifeItemGrenade, CLSID_GRENADE_F1, "wpn_grenade_f1");
@@ -317,6 +328,9 @@ void CObjectFactory::register_classes()
     // Devices
     ADD(CTorch, CSE_ALifeItemTorch, CLSID_DEVICE_TORCH, "device_torch");
     ADD(CPda, CSE_ALifeItemPDA, CLSID_DEVICE_PDA, "device_pda");
+
+    ADD(CFlashlight, CSE_ALifeItemDevice, CLSID_DEVICE_FLASHLIGHT, "device_flashlight");
+    ADD(CCustomDevice, CSE_ALifeItemDevice, CLSID_DEVICE_CUSTOM, "device_custom");
 
     // objects
     ADD(CProjector, CSE_ALifeObjectProjector, CLSID_OBJECT_PROJECTOR, "projector");

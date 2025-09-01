@@ -3,15 +3,13 @@
 #include "explosive.h"
 #include "..\xr_3da\feel_touch.h"
 
-#define SND_RIC_COUNT 5
-
 class CGrenade : public CMissile, public CExplosive
 {
     typedef CMissile inherited;
 
 public:
     CGrenade();
-    virtual ~CGrenade();
+    virtual ~CGrenade() {};
 
     virtual void Load(LPCSTR section);
 
@@ -31,7 +29,6 @@ public:
     virtual void Throw();
     virtual void Destroy();
 
-    virtual bool Action(s32 cmd, u32 flags);
     virtual bool Useful() const;
     virtual void State(u32 state, u32 oldState);
 
@@ -39,11 +36,7 @@ public:
 
     virtual void Hit(SHit* pHDS);
 
-    void PutNextToSlot();
-
     virtual void Deactivate(bool = false);
-    virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
-    virtual bool StopSprintOnFire() { return false; }
 
     virtual bool CanTake() const override;
 
@@ -53,7 +46,6 @@ protected:
     virtual size_t GetWeaponTypeForCollision() const override { return Knife_and_other; }
 
 private:
-    void TrySwitchGrenade(CGrenade* grenade = nullptr);
     float m_grenade_detonation_threshold_hit{};
     bool m_thrown{};
 
@@ -70,6 +62,8 @@ public:
 
     using destroy_callback = fastdelegate::FastDelegate<void(CGrenade*)>;
     void set_destroy_callback(destroy_callback callback) { m_destroy_callback = callback; }
+
+    virtual void Contact(CPhysicsShellHolder* obj);
 
 private:
     destroy_callback m_destroy_callback;

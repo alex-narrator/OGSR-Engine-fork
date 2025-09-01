@@ -40,11 +40,11 @@ public:
         lmZoomOut = (1 << 4),
         lmFirst = (1 << 5),
     };
-    Flags32 m_flags;
+    Flags32 m_flags{};
 
 private:
-    float m_currentZoom;
-    CUIGlobalMap* m_GlobalMap;
+    float m_currentZoom{1.f};
+    CUIGlobalMap* m_GlobalMap{};
     GameMaps m_GameMaps;
 
     CUIFrameWindow* m_UIMainFrame;
@@ -54,8 +54,8 @@ private:
     CMapActionPlanner* m_ActionPlanner;
     CUIFrameLineWnd* UIMainMapHeader;
     CUI3tButton* m_ToolBar[eMaxBtn];
-    CUIMapHint* m_hint;
-    CUIStatic* m_text_hint;
+    CUIMapHint* m_hint{};
+    CUIStatic* m_text_hint{};
 
     void OnScrollV(CUIWindow*, void*);
     void OnScrollH(CUIWindow*, void*);
@@ -74,9 +74,9 @@ public:
     //-qweasdd
     void ActivatePropertiesBox(CUIWindow* w);
 
-    CUICustomMap* m_tgtMap;
+    CUICustomMap* m_tgtMap{};
     Fvector2 m_tgtCenter;
-    CUIMapWnd();
+    CUIMapWnd() {};
     virtual ~CUIMapWnd();
 
     virtual void Init(LPCSTR xml_name, LPCSTR start_from);
@@ -102,8 +102,8 @@ public:
     void SetTargetMap(const shared_str& name, bool bZoomIn = false);
 
     CUIPropertiesBox* m_UIPropertiesBox;
-    CUIPdaSpot* m_UserSpotWnd;
-    CMapLocation* m_cur_location;
+    CUIPdaSpot* m_UserSpotWnd{};
+    CMapLocation* m_cur_location{};
     void ShowSettingsWindow(u16 id, Fvector position, shared_str levelName);
 
     Frect ActiveMapRect()

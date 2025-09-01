@@ -117,7 +117,7 @@ protected:
     xr_vector<_event> m_Events;
 
     //остаток времени, который не был учтен на предыдущем кадре
-    u32 m_dwTimeRemainder;
+    u32 m_dwTimeRemainder{};
 
     //отрисовка трассеров от пуль
     CTracer tracers;
@@ -125,7 +125,7 @@ protected:
     //фиксированное время шага просчета пули
     u32 m_dwStepTime;
     //минимальная скорость, на которой пуля еще считается
-    static float m_fMinBulletSpeed;
+    float m_fMinBulletSpeed{2.f};
 
     float m_fHPMaxDist;
 

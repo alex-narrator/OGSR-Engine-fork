@@ -376,8 +376,6 @@ void CHUDManager::OnScreenRatioChanged()
     pUI->UIMainIngameWnd->OnConnected(); //Перезагружаем здесь миникарту, чтобы она не пропадала при изменении разрешения экрана.
     pUI->UnLoad();
     pUI->Load(pUI->UIGame());
-    if (auto act = Actor())
-        act->UpdateArtefactPanel(); //Обновляем панель с артами на худе
 }
 
 void CHUDManager::OnDisconnected()

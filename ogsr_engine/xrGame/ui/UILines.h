@@ -30,8 +30,8 @@ public:
     virtual CGameFont* GetFont() { return m_pFont; }
     virtual void SetTextAlignment(ETextAlignment al) { m_eTextAlign = al; }
     virtual ETextAlignment GetTextAlignment() { return m_eTextAlign; }
-    void SetVTextAlignment(EVTextAlignment al) { m_eVTextAlign = al; }
-    EVTextAlignment GetVTextAlignment() { return m_eVTextAlign; }
+    virtual void SetVTextAlignment(EVTextAlignment al) { m_eVTextAlign = al; }
+    virtual EVTextAlignment GetVTextAlignment() { return m_eVTextAlign; }
 
     // additional
     void SetCursorColor(u32 color) { m_dwCursorColor = color; }
@@ -121,6 +121,8 @@ public:
     virtual CGameFont* GetFont() { return m_lines.GetFont(); }
     virtual void SetTextAlignment(ETextAlignment alignment) { m_lines.SetTextAlignment(alignment); }
     virtual ETextAlignment GetTextAlignment() { return m_lines.GetTextAlignment(); }
+    virtual void SetVTextAlignment(EVTextAlignment al) {m_lines.SetVTextAlignment(al); }
+    virtual EVTextAlignment GetVTextAlignment() { return m_lines.GetVTextAlignment(); }
 
     // IUITextControl : public IUIFontControl{
     virtual void SetText(LPCSTR text) { m_lines.SetText(text); }

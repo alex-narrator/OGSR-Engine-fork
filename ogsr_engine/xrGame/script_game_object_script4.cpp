@@ -47,6 +47,11 @@
 #include "ai_object_location.h"
 #include "clsid_game.h"
 
+#include "PDA.h"
+#include "CustomDetector.h"
+#include "WeaponAmmo.h"
+#include "Flashlight.h"
+
 template <typename T>
 T* script_game_object_cast(CScriptGameObject* script_obj)
 {
@@ -73,11 +78,6 @@ CHitImmunity* get_obj_immunities(CScriptGameObject* script_obj)
     CEntityCondition* cond = get_obj_conditions(script_obj);
     if (cond)
         return smart_cast<CHitImmunity*>(cond);
-
-    CGameObject* obj = &script_obj->object();
-    CArtefact* pArt = smart_cast<CArtefact*>(obj);
-    if (pArt)
-        return &pArt->m_ArtefactHitImmunities;
     return NULL;
 }
 
@@ -190,6 +190,11 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
         .def("get_weapon_gl", &script_game_object_cast<CWeaponMagazinedWGrenade>)
         .def("get_weapon_sg", &script_game_object_cast<CWeaponShotgun>)
         .def("get_weapon_shotgun", &script_game_object_cast<CWeaponShotgun>)
+
+        .def("get_pda", &script_game_object_cast<CPda>)
+        .def("get_detector", &script_game_object_cast<CCustomDetector>)
+        .def("get_weapon_ammo", &script_game_object_cast<CWeaponAmmo>)
+        .def("get_flashlight", &script_game_object_cast<CFlashlight>)
 
         .def("ph_capture_object", (void(CScriptGameObject::*)(CScriptGameObject*))(&CScriptGameObject::PHCaptureObject))
         .def("ph_capture_object", (void(CScriptGameObject::*)(CScriptGameObject*, LPCSTR))(&CScriptGameObject::PHCaptureObject))

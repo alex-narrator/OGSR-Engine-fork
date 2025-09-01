@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 #include "ai_trader.h"
-#include "../../trade.h"
 #include "../../script_entity_action.h"
 #include "../../script_game_object.h"
 #include "../../inventory.h"
@@ -131,8 +130,8 @@ BOOL CAI_Trader::net_Spawn(CSE_Abstract* DC)
     set_money(l_tpTrader->m_dwMoney, false);
 
     // Установка callback на кости
-    // CBoneInstance			*bone_head =	&smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head"));
-    // bone_head->set_callback	(bctCustom,BoneCallback,this);
+     CBoneInstance			*bone_head =	&smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head"));
+     bone_head->set_callback	(bctCustom,BoneCallback,this);
 
     shedule.t_min = 100;
     shedule.t_max = 2500; // This equaltiy is broken by Dima :-( // 30 * NET_Latency / 4;
@@ -285,18 +284,6 @@ void CAI_Trader::UpdateCL()
 
 BOOL CAI_Trader::UsedAI_Locations() { return (TRUE); }
 
-void CAI_Trader::OnStartTrade()
-{
-    m_busy_now = true;
-    callback(GameObject::eTradeStart)();
-}
-
-void CAI_Trader::OnStopTrade()
-{
-    m_busy_now = false;
-    callback(GameObject::eTradeStop)();
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 bool CAI_Trader::can_attach(const CInventoryItem* inventory_item) const { return (false); }
@@ -344,17 +331,6 @@ DLL_Pure* CAI_Trader::_construct()
     CScriptEntity::_construct();
 
     return (this);
-}
-
-bool CAI_Trader::AllowItemToTrade(CInventoryItem const* item, EItemPlace place) const
-{
-    if (!g_Alive())
-        return (true);
-
-    if (item->object().CLS_ID == CLSID_DEVICE_PDA)
-        return (false);
-
-    return (CInventoryOwner::AllowItemToTrade(item, place));
 }
 
 void CAI_Trader::dialog_sound_start(LPCSTR phrase) { animation().external_sound_start(phrase); }

@@ -10,7 +10,7 @@ int dik_to_bind(int dik) { return get_binded_action(dik); }
 
 int bind_to_dik(EGameActions bind) { return get_action_dik(bind); }
 
-BOOL key_state(int key) { return pInput->iGetAsyncKeyState(key); }
+bool key_state(int key) { return !!pInput->iGetAsyncKeyState(key); }
 
 void key_binding_registrator::script_register(lua_State* L)
 {

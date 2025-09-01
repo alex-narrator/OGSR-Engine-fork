@@ -24,7 +24,7 @@ void UIRegistrator::script_register(lua_State* L)
             .enum_("EVAlignment")[
                 value("valTop", int(EVTextAlignment::valTop)), 
                 value("valCenter", int(EVTextAlignment::valCenter)),
-                value("valBotton", int(EVTextAlignment::valBotton))
+                value("valBottom", int(EVTextAlignment::valBottom))
             ]
             .def("SizeOf", (float(CGameFont::*)(LPCSTR)) &CGameFont::SizeOf_)
             .def("CurrentHeight", & CGameFont::CurrentHeight_)

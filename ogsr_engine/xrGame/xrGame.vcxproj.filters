@@ -1399,27 +1399,6 @@
     <Filter Include="Core\Client\Objects\inventory\InventoryOwner\relation registry">
       <UniqueIdentifier>{53963a65-14cb-4092-abdc-962850451fe7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters">
-      <UniqueIdentifier>{ba1813d8-f0fb-48ad-9a3b-2fa7d66c2b3b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_bool_parameters">
-      <UniqueIdentifier>{336b093e-d74d-4806-bd3a-17fa2abb38e9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_factors">
-      <UniqueIdentifier>{cbd1a1c6-c22f-4166-beb2-098c22902f14}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_factor_parameters">
-      <UniqueIdentifier>{322d7372-bfaf-49e8-8f3a-eaa7bb24435d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_action_parameters">
-      <UniqueIdentifier>{88142f43-f738-4877-83c8-91ea9b0aaee5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_parameters">
-      <UniqueIdentifier>{28954a03-8b19-46de-bbab-08b4bf4c1fbd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\inventory\InventoryOwner\trade_parameters\purchase_list">
-      <UniqueIdentifier>{1fec23dd-35a1-4ad0-a2ab-e2d96482aa6e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\Client\Objects\inventory\PhysicItem">
       <UniqueIdentifier>{32f1e300-debe-4ad7-9e06-09e6d02a53f9}</UniqueIdentifier>
     </Filter>
@@ -1446,15 +1425,6 @@
     </Filter>
     <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons">
       <UniqueIdentifier>{58ac783e-18d3-44dd-af5d-e79e48ff887e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\Scope">
-      <UniqueIdentifier>{8902b69a-d2b3-4a5f-b6aa-a836b3301d46}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\Silencer">
-      <UniqueIdentifier>{46cd5b23-68c8-4743-9e6f-047f7d27ec5f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\GrenadeLauncher">
-      <UniqueIdentifier>{3c047853-8706-43c4-b486-06092b238748}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\RocketLauncher">
       <UniqueIdentifier>{26396f3a-142a-4659-b54d-51dffd72160a}</UniqueIdentifier>
@@ -1903,9 +1873,6 @@
     <Filter Include="AI\AScript\ScriptClasses\UI\Common">
       <UniqueIdentifier>{1ed124f7-98a2-4464-8996-9dd13989e6fa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\UI\Common\InventoryWnd">
-      <UniqueIdentifier>{52761f31-0b3f-4031-a68d-aa3f03b0188f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\TradeWnd">
       <UniqueIdentifier>{7897c4f1-1edb-4adb-b61e-80c1fd665488}</UniqueIdentifier>
     </Filter>
@@ -1917,9 +1884,6 @@
     </Filter>
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\TalkWnd">
       <UniqueIdentifier>{9e2f6e22-a582-42f9-8a2f-1941a0b49b94}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\UI\Common\CarBodyWnd">
-      <UniqueIdentifier>{11b5e050-1d4f-49c4-ad8d-173bbd79f774}</UniqueIdentifier>
     </Filter>
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\Diary">
       <UniqueIdentifier>{0b6df3fd-5eae-4f7a-9296-fa08c6f20f19}</UniqueIdentifier>
@@ -1950,12 +1914,6 @@
     </Filter>
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\CharacterInfo">
       <UniqueIdentifier>{59d4df16-9683-48b3-a413-3354099116c2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\UI\Common\ItemInfo">
-      <UniqueIdentifier>{8e7229ba-4bb3-4b1d-b0d1-5855c9d74615}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="AI\AScript\ScriptClasses\UI\Common\OutfitInfo">
-      <UniqueIdentifier>{cc430822-3497-44cc-88af-2f02a3eb44d5}</UniqueIdentifier>
     </Filter>
     <Filter Include="AI\AScript\ScriptClasses\UI\Common\InventoryUtilities">
       <UniqueIdentifier>{f576b05e-c597-48bd-b39c-03bbc578a094}</UniqueIdentifier>
@@ -4407,9 +4365,6 @@
     <ClInclude Include="inventory_item_impl.h">
       <Filter>Core\Client\Objects\inventory\InventoryItem</Filter>
     </ClInclude>
-    <ClInclude Include="inventory_item_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryItem</Filter>
-    </ClInclude>
     <ClInclude Include="inventory_item_object.h">
       <Filter>Core\Client\Objects\inventory\InventoryItemObject</Filter>
     </ClInclude>
@@ -4455,42 +4410,6 @@
     <ClInclude Include="relation_registry_inline.h">
       <Filter>Core\Client\Objects\inventory\InventoryOwner\relation registry</Filter>
     </ClInclude>
-    <ClInclude Include="trade_bool_parameters.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_bool_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_bool_parameters_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_bool_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_factors.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_factors</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_factors_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_factors</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_factor_parameters.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_factor_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_factor_parameters_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_factor_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_action_parameters.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_action_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_action_parameters_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_action_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_parameters.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="trade_parameters_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_parameters</Filter>
-    </ClInclude>
-    <ClInclude Include="purchase_list.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\purchase_list</Filter>
-    </ClInclude>
-    <ClInclude Include="purchase_list_inline.h">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\purchase_list</Filter>
-    </ClInclude>
     <ClInclude Include="physic_item.h">
       <Filter>Core\Client\Objects\inventory\PhysicItem</Filter>
     </ClInclude>
@@ -4520,15 +4439,6 @@
     </ClInclude>
     <ClInclude Include="WeaponMagazinedWGrenade.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Automatic</Filter>
-    </ClInclude>
-    <ClInclude Include="Scope.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\Scope</Filter>
-    </ClInclude>
-    <ClInclude Include="Silencer.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\Silencer</Filter>
-    </ClInclude>
-    <ClInclude Include="GrenadeLauncher.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\GrenadeLauncher</Filter>
     </ClInclude>
     <ClInclude Include="CustomRocket.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\RocketLauncher</Filter>
@@ -4721,9 +4631,6 @@
     </ClInclude>
     <ClInclude Include="searchlight.h">
       <Filter>Core\Client\Objects\searchlight</Filter>
-    </ClInclude>
-    <ClInclude Include="trade.h">
-      <Filter>Core\Client\Objects\Trade</Filter>
     </ClInclude>
     <ClInclude Include="CustomZone.h">
       <Filter>Core\Client\Objects\zones\CustomZone</Filter>
@@ -5256,15 +5163,6 @@
     <ClInclude Include="UIDialogHolder.h">
       <Filter>AI\AScript\ScriptClasses\UI</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIInventoryWnd.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIOutfitSlot.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UITradeWnd.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\TradeWnd</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIPdaAux.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
     </ClInclude>
@@ -5301,9 +5199,6 @@
     <ClInclude Include="ui\UITalkWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\TalkWnd</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UICarBodyWnd.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\CarBodyWnd</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIDiaryWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Diary</Filter>
     </ClInclude>
@@ -5319,19 +5214,10 @@
     <ClInclude Include="ui\UINewsWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Diary</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIArtefactPanel.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UICarPanel.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIMainIngameWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIMessagesWindow.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIMotionIcon.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIPdaMsgListItem.h">
@@ -5342,9 +5228,6 @@
     </ClInclude>
     <ClInclude Include="ui\UIColorAnimatorWrapper.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Animations</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIActorInfo.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\Statistics</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIStalkersRankingWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Statistics</Filter>
@@ -5384,18 +5267,6 @@
     </ClInclude>
     <ClInclude Include="ui\UICharacterInfo.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\CharacterInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\ui_af_params.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIItemInfo.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIWpnParams.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIOutfitInfo.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\OutfitInfo</Filter>
     </ClInclude>
     <ClInclude Include="ui\UIInventoryUtilities.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryUtilities</Filter>
@@ -5549,18 +5420,6 @@
     </ClInclude>
     <ClInclude Include="ui\UIVideoPlayerWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\UIWindows\VideoPlayer</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UICellCustomItems.h">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UICellItem.h">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UICellItemFactory.h">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIDragDropListEx.h">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
     </ClInclude>
     <ClInclude Include="ui\UILabel.h">
       <Filter>AI\AScript\ScriptClasses\UI\UIWindows\Label</Filter>
@@ -5865,9 +5724,6 @@
     <ClInclude Include="script_vars_storage.h">
       <Filter>AI\AScript\ScriptClasses\ScriptVarsStorage</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIIconParams.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common</Filter>
-    </ClInclude>
     <ClInclude Include="InventoryContainer.h">
       <Filter>Core\Client\Objects\inventory\InventoryContainer</Filter>
     </ClInclude>
@@ -6082,6 +5938,21 @@
     </ClInclude>
     <ClInclude Include="GeometryBits.h">
       <Filter>Core\Client\Objects\physics\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomDevice.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="Addons.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons</Filter>
+    </ClInclude>
+    <ClInclude Include="Flashlight.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="Helmet.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIActorInfo.h">
+      <Filter>AI\AScript\ScriptClasses\UI\Common\Statistics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -7573,12 +7444,6 @@
     <ClCompile Include="relation_registry_fights.cpp">
       <Filter>Core\Client\Objects\inventory\InventoryOwner\relation registry</Filter>
     </ClCompile>
-    <ClCompile Include="trade_parameters.cpp">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\trade_parameters</Filter>
-    </ClCompile>
-    <ClCompile Include="purchase_list.cpp">
-      <Filter>Core\Client\Objects\inventory\InventoryOwner\trade_parameters\purchase_list</Filter>
-    </ClCompile>
     <ClCompile Include="physic_item.cpp">
       <Filter>Core\Client\Objects\inventory\PhysicItem</Filter>
     </ClCompile>
@@ -7614,15 +7479,6 @@
     </ClCompile>
     <ClCompile Include="WeaponMagazinedWGrenade.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Automatic</Filter>
-    </ClCompile>
-    <ClCompile Include="Scope.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\Scope</Filter>
-    </ClCompile>
-    <ClCompile Include="Silencer.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\Silencer</Filter>
-    </ClCompile>
-    <ClCompile Include="GrenadeLauncher.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons\GrenadeLauncher</Filter>
     </ClCompile>
     <ClCompile Include="CustomRocket.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\RocketLauncher</Filter>
@@ -7849,12 +7705,6 @@
     <ClCompile Include="searchlight.cpp">
       <Filter>Core\Client\Objects\searchlight</Filter>
     </ClCompile>
-    <ClCompile Include="trade.cpp">
-      <Filter>Core\Client\Objects\Trade</Filter>
-    </ClCompile>
-    <ClCompile Include="trade2.cpp">
-      <Filter>Core\Client\Objects\Trade</Filter>
-    </ClCompile>
     <ClCompile Include="CustomZone.cpp">
       <Filter>Core\Client\Objects\zones\CustomZone</Filter>
     </ClCompile>
@@ -8078,9 +7928,6 @@
       <Filter>Core\Server\ServerEntities\objects_alife_items</Filter>
     </ClCompile>
     <ClCompile Include="..\COMMON_AI\xrServer_Objects_ALife_Items_script2.cpp">
-      <Filter>Core\Server\ServerEntities\objects_alife_items</Filter>
-    </ClCompile>
-    <ClCompile Include="..\COMMON_AI\xrServer_Objects_ALife_Items_script3.cpp">
       <Filter>Core\Server\ServerEntities\objects_alife_items</Filter>
     </ClCompile>
     <ClCompile Include="..\COMMON_AI\xrServer_Objects_ALife_Monsters.cpp">
@@ -8365,21 +8212,6 @@
     <ClCompile Include="UIDialogHolder.cpp">
       <Filter>AI\AScript\ScriptClasses\UI</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UIInventoryWnd.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\uiinventorywnd2.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIInventoryWnd3.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIOutfitSlot.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryWnd</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UITradeWnd.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\TradeWnd</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UIPdaAux.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
     </ClCompile>
@@ -8413,9 +8245,6 @@
     <ClCompile Include="ui\UITalkWnd.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\TalkWnd</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UICarBodyWnd.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\CarBodyWnd</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UIDiaryWnd2.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Diary</Filter>
     </ClCompile>
@@ -8431,19 +8260,10 @@
     <ClCompile Include="ui\UINewsWnd.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Diary</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UIArtefactPanel.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UICarPanel.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UIMainIngameWnd.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIMessagesWindow.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIMotionIcon.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIPdaMsgListItem.cpp">
@@ -8454,9 +8274,6 @@
     </ClCompile>
     <ClCompile Include="ui\UIColorAnimatorWrapper.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Animations</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIActorInfo.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\Statistics</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIStalkersRankingWnd.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Statistics</Filter>
@@ -8496,18 +8313,6 @@
     </ClCompile>
     <ClCompile Include="ui\UICharacterInfo.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\CharacterInfo</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\ui_af_params.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIItemInfo.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIWpnParams.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\ItemInfo</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIOutfitInfo.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\OutfitInfo</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIInventoryUtilities.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\InventoryUtilities</Filter>
@@ -8671,18 +8476,6 @@
     <ClCompile Include="ui\UISubLine.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\UIWindows\Lines</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UICellCustomItems.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UICellItem.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UICellItemFactory.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIDragDropListEx.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\DragDrop2</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UILabel.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\UIWindows\Label</Filter>
     </ClCompile>
@@ -8785,9 +8578,6 @@
     <ClCompile Include="script_vars_storage.cpp">
       <Filter>AI\AScript\ScriptClasses\ScriptVarsStorage</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UIIconParams.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common</Filter>
-    </ClCompile>
     <ClCompile Include="InventoryContainer.cpp">
       <Filter>Core\Client\Objects\inventory\InventoryContainer</Filter>
     </ClCompile>
@@ -8887,6 +8677,45 @@
     </ClCompile>
     <ClCompile Include="GeometryBits.cpp">
       <Filter>Core\Client\Objects\physics\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomDevice.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="Addons.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Addons</Filter>
+    </ClCompile>
+    <ClCompile Include="Flashlight.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="flashlight_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="Helmet.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClCompile>
+    <ClCompile Include="missile_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Grenades &amp; Missiles</Filter>
+    </ClCompile>
+    <ClCompile Include="inventory_item_script.cpp">
+      <Filter>Core\Client\Objects\inventory\InventoryItem</Filter>
+    </ClCompile>
+    <ClCompile Include="eatable_item_script.cpp">
+      <Filter>Core\Client\Objects\inventory\EatableItem</Filter>
+    </ClCompile>
+    <ClCompile Include="space_restrictor_script.cpp">
+      <Filter>Core\Client\Objects\zones\SpaceRestrictor</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomZone_script.cpp">
+      <Filter>Core\Client\Objects\zones\CustomZone</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponAmmo_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Ammo</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIActorInfo.cpp">
+      <Filter>AI\AScript\ScriptClasses\UI\Common\Statistics</Filter>
+    </ClCompile>
+    <ClCompile Include="inventory_item_object_script.cpp">
+      <Filter>Core\Client\Objects\inventory\InventoryItemObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

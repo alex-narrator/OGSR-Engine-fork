@@ -34,39 +34,12 @@
 #include "..\Include/xrRender/Kinematics.h"
 #include "../xr_3da/IGame_Persistent.h"
 
-#define EFFECTOR_RADIUS 30.f
+#include "HudSound.h"
+
+constexpr auto EFFECTOR_RADIUS = 30.f;
 const u16 TEST_RAYS_PER_OBJECT = 5;
 const u16 BLASTED_OBJ_PROCESSED_PER_FRAME = 3;
-const float exp_dist_extinction_factor =
-    3.f; //(>1.f, 1.f -means no dist change of exp effect)	on the dist of m_fBlastRadius exp. wave effect in exp_dist_extinction_factor times less than maximum
-
-CExplosive::CExplosive(void)
-{
-    m_fBlastHit = 50.f;
-    m_fBlastRadius = 10.f;
-    m_iFragsNum = 20;
-    m_fFragsRadius = 30.f;
-    m_fFragHit = 50;
-    m_fUpThrowFactor = 0.f;
-
-    m_eSoundExplode = ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING);
-
-    m_eHitTypeBlast = ALife::eHitTypeExplosion;
-    m_eHitTypeFrag = ALife::eHitTypeFireWound;
-
-    m_iCurrentParentID = 0xffff;
-
-    //	m_bReadyToExplode		= false;
-    //	m_bExploding			= false;
-    //	m_bExplodeEventSent		= false;
-    m_explosion_flags.assign(0);
-    m_vExplodeSize.set(0.001f, 0.001f, 0.001f);
-
-    m_bHideInExplosion = TRUE;
-    m_fExplodeHideDurationMax = 0;
-    m_bDynamicParticles = FALSE;
-    m_pExpParticle = NULL;
-}
+const float exp_dist_extinction_factor = 3.f; //(>1.f, 1.f -means no dist change of exp effect)	on the dist of m_fBlastRadius exp. wave effect in exp_dist_extinction_factor times less than maximum
 
 void CExplosive::LightCreate()
 {
@@ -76,8 +49,6 @@ void CExplosive::LightCreate()
 }
 
 void CExplosive::LightDestroy() { m_pLight.destroy(); }
-
-CExplosive::~CExplosive(void) { sndExplode.destroy(); }
 
 void CExplosive::Load(LPCSTR section) { Load(pSettings, section); }
 
@@ -100,6 +71,8 @@ void CExplosive::Load(CInifile* ini, LPCSTR section)
     m_eHitTypeBlast = ALife::g_tfString2HitType(ini->r_string(section, "hit_type_blast"));
     m_eHitTypeFrag = ALife::g_tfString2HitType(ini->r_string(section, "hit_type_frag"));
 
+    m_fFragAP = READ_IF_EXISTS(ini, r_float, section, "frags_ap", 0.f);
+
     m_fUpThrowFactor = ini->r_float(section, "up_throw_factor");
 
     fWallmarkSize = ini->r_float(section, "wm_size");
@@ -114,8 +87,7 @@ void CExplosive::Load(CInifile* ini, LPCSTR section)
     //трассы для разлета осколков
     m_fFragmentSpeed = ini->r_float(section, "fragment_speed");
 
-    LPCSTR snd_name = ini->r_string(section, "snd_explode");
-    sndExplode.create(snd_name, st_Effect, m_eSoundExplode);
+    m_sound.LoadSound(section, "snd_explode", "sndExplode", SOUND_TYPE_WEAPON_SHOOTING);
 
     m_fExplodeDurationMax = ini->r_float(section, "explode_duration");
 
@@ -342,7 +314,9 @@ void CExplosive::Explode()
     {
         who = Level().Objects.net_Find(Initiator());
     }
-    Sound->play_at_pos(sndExplode, who, pos, false);
+    //Sound->play_at_pos(sndExplode, who, pos, false);
+    //PlaySound("sndExplode", Position());
+    m_sound.PlaySound("sndExplode", pos, smart_cast<CObject*>(this), false);
 
     //показываем эффекты
 
@@ -386,6 +360,7 @@ void CExplosive::Explode()
         cartridge.m_kHit = 1.f;
         cartridge.m_kImpulse = 1.f;
         cartridge.m_kPierce = 1.f;
+        cartridge.m_kAP = m_fFragAP;
         cartridge.fWallmarkSize = fWallmarkSize;
         cartridge.bullet_material_idx = GMLib.GetMaterialIdx(WEAPON_MATERIAL_NAME);
         cartridge.m_flags.set(CCartridge::cfTracer, FALSE);
@@ -780,3 +755,5 @@ void CExplosive::UpdateExplosionParticles()
 }
 
 bool CExplosive::Useful() const { return m_explosion_flags.flags == 0; }
+
+bool CExplosive::IsSoundPlaying() { return !!m_sound.FindSoundItem("sndExplode", true)->playing(); }

@@ -3,7 +3,6 @@
 #include "entity_alive.h"
 #include "pda.h"
 #include "actor.h"
-#include "trade.h"
 #include "inventory.h"
 #include "xrserver_objects_alife_items.h"
 #include "character_info.h"
@@ -21,49 +20,33 @@
 #include "script_callback_ex.h"
 #include "game_object_space.h"
 #include "AI/Monsters/BaseMonster/base_monster.h"
-#include "trade_parameters.h"
-#include "purchase_list.h"
 #include "clsid_game.h"
 #include "Artifact.h"
 
 #include "alife_object_registry.h"
 
 #include "CustomOutfit.h"
+#include "InventoryContainer.h"
 
 CInventoryOwner::CInventoryOwner()
 {
-    m_pTrade = NULL;
-    m_trade_parameters = 0;
-
     m_inventory = xr_new<CInventory>();
     m_pCharacterInfo = xr_new<CCharacterInfo>();
-
+    m_known_info_registry = xr_new<CInfoPortionWrapper>();
     EnableTalk();
     EnableTrade();
-
-    m_known_info_registry = xr_new<CInfoPortionWrapper>();
-    m_tmp_active_slot_num = NO_ACTIVE_SLOT;
-    m_need_osoznanie_mode = FALSE;
-
-    m_tmp_next_item_slot = NO_ACTIVE_SLOT;
 }
 
 DLL_Pure* CInventoryOwner::_construct()
 {
-    m_trade_parameters = 0;
-    m_purchase_list = 0;
-
     return (smart_cast<DLL_Pure*>(this));
 }
 
 CInventoryOwner::~CInventoryOwner()
 {
     xr_delete(m_inventory);
-    xr_delete(m_pTrade);
     xr_delete(m_pCharacterInfo);
     xr_delete(m_known_info_registry);
-    xr_delete(m_trade_parameters);
-    xr_delete(m_purchase_list);
 }
 
 void CInventoryOwner::Load(LPCSTR section)
@@ -71,14 +54,7 @@ void CInventoryOwner::Load(LPCSTR section)
     if (pSettings->line_exist(section, "inv_max_weight"))
         m_inventory->SetMaxWeight(pSettings->r_float(section, "inv_max_weight"));
 
-    if (pSettings->line_exist(section, "need_osoznanie_mode"))
-    {
-        m_need_osoznanie_mode = pSettings->r_bool(section, "need_osoznanie_mode");
-    }
-    else
-    {
-        m_need_osoznanie_mode = FALSE;
-    }
+    m_need_osoznanie_mode = READ_IF_EXISTS(pSettings, r_bool, section, "need_osoznanie_mode", false);
 }
 
 void CInventoryOwner::reload(LPCSTR section)
@@ -104,14 +80,6 @@ void CInventoryOwner::reinit()
 // call this after CGameObject::net_Spawn
 BOOL CInventoryOwner::net_Spawn(CSE_Abstract* DC)
 {
-    if (!m_pTrade)
-        m_pTrade = xr_new<CTrade>(this);
-
-    if (m_trade_parameters)
-        xr_delete(m_trade_parameters);
-
-    m_trade_parameters = xr_new<CTradeParameters>(trade_section());
-
     //получить указатель на объект, InventoryOwner
     // m_inventory->setSlotsBlocked(false);
     CGameObject* pThis = smart_cast<CGameObject*>(this);
@@ -191,8 +159,6 @@ void CInventoryOwner::load(IReader& input_packet)
 void CInventoryOwner::UpdateInventoryOwner(u32 deltaT)
 {
     inventory().Update();
-    if (m_pTrade)
-        m_pTrade->UpdateTrade();
 
     if (IsTalking())
     {
@@ -213,12 +179,6 @@ void CInventoryOwner::UpdateInventoryOwner(u32 deltaT)
 
 //достать PDA из специального слота инвентаря
 CPda* CInventoryOwner::GetPDA() const { return (CPda*)(m_inventory->m_slots[PDA_SLOT].m_pIItem); }
-
-CTrade* CInventoryOwner::GetTrade()
-{
-    R_ASSERT2(m_pTrade, "trade for object does not init yet");
-    return m_pTrade;
-}
 
 //состояние диалога
 
@@ -252,10 +212,6 @@ void CInventoryOwner::StartTalk(CInventoryOwner* talk_partner, bool start_trade)
 {
     m_bTalking = true;
     m_pTalkPartner = talk_partner;
-
-    //тут же включаем торговлю
-    if (start_trade)
-        GetTrade()->StartTrade(talk_partner);
 }
 #include "UIGameSP.h"
 #include "HUDmanager.h"
@@ -265,8 +221,6 @@ void CInventoryOwner::StopTalk()
 {
     m_pTalkPartner = NULL;
     m_bTalking = false;
-
-    GetTrade()->StopTrade();
 
     CUIGameSP* ui_sp = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
     if (ui_sp && ui_sp->TalkMenu->IsShown())
@@ -306,14 +260,30 @@ float CInventoryOwner::GetCarryWeight() const { return inventory().TotalWeight()
 //максимальный переносимы вес
 float CInventoryOwner::MaxCarryWeight() const
 {
-    float ret = inventory().GetMaxWeight();
+    float res{inventory().GetMaxWeight()}, base_weight{inventory().GetMaxWeight()};
 
-    const CCustomOutfit* outfit = GetOutfit();
-    if (outfit)
-        ret += outfit->m_additional_weight2;
+    auto outfit = GetOutfit();
+    if (outfit && !fis_zero(outfit->GetCondition()))
+        res += (base_weight * outfit->GetItemEffect(CInventoryItem::eAdditionalWeight));
 
-    ret += ArtefactsAddWeight(false);
-    return ret;
+    auto backpack = GetBackpack();
+    if (backpack && !fis_zero(backpack->GetCondition()))
+        res += (base_weight * backpack->GetItemEffect(CInventoryItem::eAdditionalWeight));
+
+    if (smart_cast<CActor*>(inventory().GetOwner()))
+    {
+        for (const auto& item : inventory().m_all)
+        {
+            auto artefact = smart_cast<CArtefact*>(item);
+            if (artefact && artefact->CanAffect())
+                res += (base_weight * artefact->GetItemEffect(CInventoryItem::eAdditionalWeight));
+            auto container = smart_cast<CInventoryContainer*>(item);
+            if (container)
+                res += (base_weight * container->GetContainmentArtefactEffect(CInventoryItem::eAdditionalWeight));
+        }
+    }
+
+    return res;
 }
 
 void CInventoryOwner::spawn_supplies()
@@ -410,11 +380,11 @@ void CInventoryOwner::SetReputation(CHARACTER_REPUTATION_VALUE reputation)
 
 void CInventoryOwner::ChangeReputation(CHARACTER_REPUTATION_VALUE delta) { SetReputation(Reputation() + delta); }
 
-void CInventoryOwner::OnItemDrop(CInventoryItem* inventory_item)
+void CInventoryOwner::OnItemDrop(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
-    object->callback(GameObject::eOnItemDrop)(inventory_item->object().lua_game_object());
+    object->callback(GameObject::eOnItemDrop)(inventory_item->object().lua_game_object(), previous_place);
 
     detach(inventory_item);
 }
@@ -425,20 +395,20 @@ void CInventoryOwner::OnItemBelt(CInventoryItem* inventory_item, EItemPlace prev
 {
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
-    object->callback(GameObject::eOnItemToBelt)(inventory_item->object().lua_game_object());
+    object->callback(GameObject::eOnItemToBelt)(inventory_item->object().lua_game_object(), previous_place);
 }
 void CInventoryOwner::OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
-    object->callback(GameObject::eOnItemToRuck)(inventory_item->object().lua_game_object());
+    object->callback(GameObject::eOnItemToRuck)(inventory_item->object().lua_game_object(), previous_place);
     detach(inventory_item);
 }
 void CInventoryOwner::OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place)
 {
     CGameObject* object = smart_cast<CGameObject*>(this);
     VERIFY(object);
-    object->callback(GameObject::eOnItemToSlot)(inventory_item->object().lua_game_object());
+    object->callback(GameObject::eOnItemToSlot)(inventory_item->object().lua_game_object(), previous_place);
     attach(inventory_item);
 }
 
@@ -449,57 +419,6 @@ void CInventoryOwner::on_weapon_shot_start(CWeapon* weapon) {}
 void CInventoryOwner::on_weapon_shot_stop(CWeapon* weapon) {}
 
 void CInventoryOwner::on_weapon_hide(CWeapon* weapon) {}
-
-LPCSTR CInventoryOwner::trade_section() const
-{
-    const CGameObject* game_object = smart_cast<const CGameObject*>(this);
-    VERIFY(game_object);
-    return (READ_IF_EXISTS(pSettings, r_string, game_object->cNameSect(), "trade_section", "trade"));
-}
-
-float CInventoryOwner::deficit_factor(const shared_str& section) const
-{
-    if (!m_purchase_list)
-        return (1.f);
-
-    return (m_purchase_list->deficit(section));
-}
-
-void CInventoryOwner::buy_supplies(CInifile& ini_file, LPCSTR section)
-{
-    if (!m_purchase_list)
-        m_purchase_list = xr_new<CPurchaseList>();
-
-    m_purchase_list->process(ini_file, section, *this);
-}
-
-void CInventoryOwner::sell_useless_items()
-{
-    CGameObject* object = smart_cast<CGameObject*>(this);
-
-    TIItemContainer::iterator I = inventory().m_all.begin();
-    TIItemContainer::iterator E = inventory().m_all.end();
-    for (; I != E; ++I)
-    {
-        if ((*I)->object().CLS_ID == CLSID_IITEM_BOLT)
-            continue;
-
-        if ((*I)->object().CLS_ID == CLSID_DEVICE_PDA)
-        {
-            CPda* pda = smart_cast<CPda*>(*I);
-            VERIFY(pda);
-            if (pda->GetOriginalOwnerID() == object->ID())
-                continue;
-        }
-
-        (*I)->object().DestroyObject();
-    }
-}
-
-bool CInventoryOwner::AllowItemToTrade(CInventoryItem const* item, EItemPlace place) const
-{
-    return (trade_parameters().enabled(CTradeParameters::action_sell(0), item->object().cNameSect()));
-}
 
 void CInventoryOwner::set_money(u32 amount, bool bSendEvent)
 {
@@ -521,6 +440,23 @@ void CInventoryOwner::set_money(u32 amount, bool bSendEvent)
     }
 }
 
+void CInventoryOwner::SetName(LPCSTR name)
+{
+    CEntityAlive* EA = smart_cast<CEntityAlive*>(this);
+    VERIFY(EA);
+
+    CSE_Abstract* e_entity = ai().alife().objects().object(EA->ID(), false);
+    if (!e_entity)
+        return;
+
+    CSE_ALifeTraderAbstract* trader = smart_cast<CSE_ALifeTraderAbstract*>(e_entity);
+    if (!trader)
+        return;
+
+    m_game_name = name;
+    trader->m_character_name = name;
+}
+
 bool CInventoryOwner::use_default_throw_force() { return (true); }
 
 float CInventoryOwner::missile_throw_force()
@@ -532,19 +468,6 @@ float CInventoryOwner::missile_throw_force()
 }
 
 bool CInventoryOwner::use_throw_randomness() { return (true); }
-
-float CInventoryOwner::ArtefactsAddWeight(bool first) const
-{
-    float add_weight = 0.f;
-    for (const auto& it : inventory().m_belt)
-    {
-        CArtefact* artefact = smart_cast<CArtefact*>(it);
-
-        if (artefact && (!Core.Features.test(xrCore::Feature::af_zero_condition) || !fis_zero(artefact->GetCondition())))
-            add_weight += first ? artefact->m_additional_weight : artefact->m_additional_weight2;
-    }
-    return add_weight;
-}
 
 void CInventoryOwner::SetNextItemSlot(u32 slot) { m_tmp_next_item_slot = slot; }
 

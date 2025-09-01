@@ -34,6 +34,7 @@
 #include "level_graph.h"
 #include "cameralook.h"
 #include "ai_object_location.h"
+#include "ui/UIStatic.h"
 
 #ifdef DEBUG
 #include "PHDebug.h"
@@ -95,8 +96,7 @@ extern BOOL b_death_anim_velocity;
 #endif
 int g_AI_inactive_time = 0;
 
-extern int g_dof_zoom_far;
-extern int g_dof_zoom_near;
+extern float g_fForceGrowSpeed;
 
 void get_files_list(xr_vector<shared_str>& files, LPCSTR dir, LPCSTR file_ext)
 {
@@ -1464,10 +1464,8 @@ void CCC_RegisterCommands()
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
     CMD1(CCC_GameLanguage, "g_language");
 
-    CMD3(CCC_Mask, "g_dof_zoom", &psActorFlags, AF_DOF_ZOOM);
-    CMD3(CCC_Mask, "g_dof_reload", &psActorFlags, AF_DOF_RELOAD);
-
-    CMD3(CCC_Mask, "wpn_aim_toggle", &psActorFlags, AF_WPN_AIM_TOGGLE);
+    CMD3(CCC_Mask, "g_hold_to_aim", &psActorFlags, AF_HOLD_TO_AIM);
+    CMD3(CCC_Mask, "g_hold_to_crouch", &psActorFlags, AF_HOLD_TO_CROUCH);
 
     // alife
 #ifdef DEBUG
@@ -1498,6 +1496,8 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "hud_crosshair", &psHUD_Flags, HUD_CROSSHAIR);
     CMD3(CCC_Mask, "hud_crosshair_dist", &psHUD_Flags, HUD_CROSSHAIR_DIST);
     CMD3(CCC_Mask, "hud_info_overhead", &psHUD_Flags, HUD_INFO_OVERHEAD);
+
+    CMD3(CCC_Mask, "hud_crosshair_center", &psHUD_Flags, HUD_CROSSHAIR_CENTER);
 
     if (IS_OGSR_GA)
         psHUD_FOV_def = 0.65f;
@@ -1568,9 +1568,9 @@ void CCC_RegisterCommands()
     CMD1(CCC_TuneAttachableItem, "dbg_adjust_attachable_item");
     CMD1(CCC_TuneAttachableItemInSlot, "dbg_adjust_attachable_item_in_slot");
     // adjust mode support
-    CMD4(CCC_Integer, "hud_adjust_mode", &g_bHudAdjustMode, 0, 11);
-    CMD4(CCC_Float, "hud_adjust_delta_value", &g_bHudAdjustDeltaPos, 0.00005f, 1.f);
-    CMD4(CCC_Float, "hud_adjust_delta_rot", &g_bHudAdjustDeltaRot, 0.00005f, 10.f);
+    CMD4(CCC_Integer, "hud_adjust_mode", &g_bHudAdjustMode, 0, 19);
+    CMD4(CCC_Float, "hud_adjust_delta_pos", &g_bHudAdjustDeltaPos, 0.00001f, 1.f);
+    CMD4(CCC_Float, "hud_adjust_delta_rot", &g_bHudAdjustDeltaRot, 0.00001f, 10.f);
 
     CMD4(CCC_Float, "adjust_delta_pos", &adj_delta_pos, -10.f, 10.f);
     CMD4(CCC_Float, "adjust_delta_rot", &adj_delta_rot, -10.f, 10.f);
@@ -1603,7 +1603,6 @@ void CCC_RegisterCommands()
     CMD1(CCC_SpawnToInventory, "g_spawn_to_inventory");
     CMD3(CCC_Mask, "g_god", &psActorFlags, AF_GODMODE);
     CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
-    CMD3(CCC_Mask, "g_ammunition_on_belt", &psActorFlags, AF_AMMO_ON_BELT);
 
     CMD3(CCC_Mask, "g_3d_scopes", &psActorFlags, AF_3D_SCOPES);
 
@@ -1629,7 +1628,6 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_vertex_dbg", &psActorFlags, AF_VERTEX_DBG);
     CMD3(CCC_Mask, "keypress_on_start", &psActorFlags, AF_KEYPRESS_ON_START);
     CMD3(CCC_Mask, "g_effects_on_demorecord", &psActorFlags, AF_EFFECTS_ON_DEMORECORD);
-    CMD3(CCC_Mask, "g_lock_reload", &psActorFlags, AF_LOCK_RELOAD);
 
     CMD4(CCC_Integer, "g_cop_death_anim", &g_bCopDeathAnim, 0, 1);
 
@@ -1725,6 +1723,9 @@ void CCC_RegisterCommands()
     CMD4(CCC_Float, "g_cam_lookout_speed", &cam_LookoutSpeed, 1.0f, 4.0f);
 
     CMD3(CCC_Mask, "g_actor_shadow", &psActorFlags, AF_ACTOR_SHADOW);
+
+    CMD4(CCC_Float, "missile_force_grow_speed", &g_fForceGrowSpeed, 1.0f, 50.0f); // скорость замаха гранатой/болтом
+    CMD3(CCC_Mask, "g_bloodmarks_on_dynamics", &psActorFlags, AF_BLOODMARKS_ON_DYNAMIC);
 
 #ifdef USE_MEMORY_VALIDATOR
     CMD4(CCC_Integer, "g_enable_memory_debug", &g_enable_memory_debug, 0, 1);

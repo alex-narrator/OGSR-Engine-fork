@@ -31,24 +31,15 @@
 #include "player_hud.h"
 #include "../../xr_3da/XR_IOConsole.h"
 #include "inventory.h"
+#include "UIScriptWnd.h"
 
-#define PDA_XML "pda.xml"
-u32 g_pda_info_state = 0;
+constexpr auto PDA_XML = "pda.xml";
+u32 g_pda_info_state{};
 
 void RearrangeTabButtons(CUITabControl* pTab, xr_vector<Fvector2>& vec_sign_places);
 
 CUIPdaWnd::CUIPdaWnd()
 {
-    UIMapWnd = NULL;
-    UIPdaContactsWnd = NULL;
-    UIEncyclopediaWnd = NULL;
-    UIDiaryWnd = NULL;
-    UIActorInfo = NULL;
-    UIStalkersRanking = NULL;
-    UIEventsWnd = NULL;
-    m_updatedSectionImage = NULL;
-    m_oldSectionImage = NULL;
-
     last_cursor_pos.set(UI_BASE_WIDTH / 2.f, UI_BASE_HEIGHT / 2.f);
 
     Init();
@@ -94,12 +85,6 @@ void CUIPdaWnd::Init()
     UIMainButtonsBackground->SetAutoDelete(true);
     UIMainPdaFrame->AttachChild(UIMainButtonsBackground);
     xml_init.InitFrameLine(uiXml, "mbbackground_frame_line", 0, UIMainButtonsBackground);
-
-    // Timer background
-    UITimerBackground = xr_new<CUIFrameLineWnd>();
-    UITimerBackground->SetAutoDelete(true);
-    UIMainPdaFrame->AttachChild(UITimerBackground);
-    xml_init.InitFrameLine(uiXml, "timer_frame_line", 0, UITimerBackground);
 
     // Oкно карты
     UIMapWnd = xr_new<CUIMapWnd>();
@@ -156,8 +141,8 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     else
     {
-        R_ASSERT(m_pActiveDialog);
-        m_pActiveDialog->SendMessage(pWnd, msg, pData);
+        if (m_pActiveDialog)
+            m_pActiveDialog->SendMessage(pWnd, msg, pData);
     }
 }
 
@@ -189,7 +174,8 @@ bool CUIPdaWnd::OnMouse(float x, float y, EUIMessages mouse_action)
     case WINDOW_RBUTTON_DOWN:
         if (auto pda = Actor()->GetPDA(); pda && pda->Is3DPDA() && psActorFlags.test(AF_3D_PDA))
         {
-            pda->m_bZoomed = false;
+            /*pda->m_bZoomed = false;*/
+            pda->OnZoomOut();
             HUD().GetUI()->SetMainInputReceiver(nullptr, false);
             return true;
         }
@@ -286,43 +272,20 @@ void CUIPdaWnd::MouseMovement(float x, float y)
 
 void CUIPdaWnd::Show()
 {
-    if (Core.Features.test(xrCore::Feature::more_hide_weapon))
-        Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);
-
     InventoryUtilities::SendInfoToActor("ui_pda");
-
     inherited::Show();
 }
 
 void CUIPdaWnd::Hide()
 {
     inherited::Hide();
-
     InventoryUtilities::SendInfoToActor("ui_pda_hide");
-    HUD().GetUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, false);
-
-    if (Core.Features.test(xrCore::Feature::more_hide_weapon))
-        Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, false);
-}
-
-void CUIPdaWnd::UpdateDateTime()
-{
-    static shared_str prevStrTime = " ";
-    xr_string strTime = *InventoryUtilities::GetGameTimeAsString(InventoryUtilities::etpTimeToMinutes);
-    strTime += " ";
-    strTime += *InventoryUtilities::GetGameDateAsString(InventoryUtilities::edpDateToDay);
-
-    if (xr_strcmp(strTime.c_str(), prevStrTime))
+    if (m_pActiveDialog)
     {
-        UITimerBackground->UITitleText.SetText(strTime.c_str());
-        prevStrTime = strTime.c_str();
+        m_pActiveDialog->Show(false);
+        m_pActiveDialog = smart_cast<CUIWindow*>(UIEventsWnd); // hack for script window
+        m_pActiveSection = eptNoActiveTab;
     }
-}
-
-void CUIPdaWnd::Update()
-{
-    inherited::Update();
-    UpdateDateTime();
 }
 
 void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
@@ -332,7 +295,8 @@ void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
 
     if (m_pActiveDialog)
     {
-        UIMainPdaFrame->DetachChild(m_pActiveDialog);
+        if (UIMainPdaFrame->IsChild(m_pActiveDialog))
+            UIMainPdaFrame->DetachChild(m_pActiveDialog);
         m_pActiveDialog->Show(false);
     }
 
@@ -340,7 +304,7 @@ void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
     {
     case eptDiary:
         m_pActiveDialog = smart_cast<CUIWindow*>(UIDiaryWnd);
-        InventoryUtilities::SendInfoToActor("ui_pda_events");
+        InventoryUtilities::SendInfoToActor("ui_pda_diary");
         g_pda_info_state &= ~pda_section::diary;
         break;
     case eptContacts:
@@ -371,15 +335,30 @@ void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
         m_pActiveDialog = smart_cast<CUIWindow*>(UIEventsWnd);
         g_pda_info_state &= ~pda_section::quests;
         break;
-    default: Msg("not registered button identifier [%d]", UITabControl->GetActiveIndex());
+    default: // Msg("not registered button identifier [%d]", UITabControl->GetActiveIndex());
+        if (pSettings->line_exist("engine_callbacks", "on_pda_custom_tab"))
+        {
+            const char* callback = pSettings->r_string("engine_callbacks", "on_pda_custom_tab");
+            if (luabind::functor<CUIDialogWndEx*> lua_function; ai().script_engine().functor(callback, lua_function))
+            {
+                CUIDialogWndEx* res = lua_function(section);
+                if (res)
+                    m_pActiveDialog = smart_cast<CUIWindow*>(res);
+            }
+        }
     }
-    UIMainPdaFrame->AttachChild(m_pActiveDialog);
-    m_pActiveDialog->Show(true);
 
-    if (UITabControl->GetActiveIndex() != section)
-        UITabControl->SetNewActiveTab(section);
+    if (m_pActiveDialog)
+    {
+        if (!UIMainPdaFrame->IsChild(m_pActiveDialog))
+            UIMainPdaFrame->AttachChild(m_pActiveDialog);
+        m_pActiveDialog->Show(true);
 
-    m_pActiveSection = section;
+        if (UITabControl->GetActiveIndex() != section)
+            UITabControl->SetNewActiveTab(section);
+
+        m_pActiveSection = section;
+    }
 }
 
 void CUIPdaWnd::Draw()
@@ -420,7 +399,6 @@ void CUIPdaWnd::PdaContentsChanged(pda_section::part type, bool flash)
     if (flash)
     {
         g_pda_info_state |= type;
-        HUD().GetUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, true);
     }
 }
 void draw_sign(CUIStatic* s, Fvector2& pos)
@@ -569,9 +547,9 @@ bool CUIPdaWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
                         Console->Execute("main_menu");
                         return false;
                     }
-                    else if (pda->m_bZoomed)
+                    else if (pda->IsZoomed())
                     {
-                        pda->m_bZoomed = false;
+                        pda->OnZoomOut();
                         HUD().GetUI()->SetMainInputReceiver(nullptr, false);
                         return true;
                     }

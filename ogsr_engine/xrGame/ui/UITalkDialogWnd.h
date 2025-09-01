@@ -7,7 +7,6 @@
 #include "../InfoPortion.h"
 
 #include "UICharacterInfo.h"
-#include "UIItemInfo.h"
 
 #include "UIWndCallback.h"
 
@@ -37,25 +36,18 @@ public:
 
     shared_str m_ClickedQuestionID;
 
-    //список вопросов, которые мы можем задавать персонажу
+    // список вопросов, которые мы можем задавать персонажу
 
-    //элементы интерфейса диалога
-    CUIFrameLineWnd UIDialogFrame;
-    CUIFrameLineWnd UIOurPhrasesFrame;
+    // элементы интерфейса диалога
+    CUIStatic UIDialog;
+    CUIStatic UIOurPhrases;
 
-    CUIStatic UIStaticTop;
-    CUIStatic UIStaticBottom;
-
-    CUI3tButton UIToTradeButton;
-
-    //информация о персонажах
-    CUIStatic UIOurIcon;
-    CUIStatic UIOthersIcon;
+    // информация о персонажах
     CUICharacterInfo UICharacterInfoLeft;
     CUICharacterInfo UICharacterInfoRight;
 
     void AddQuestion(LPCSTR str, LPCSTR value, int);
-    void AddAnswer(LPCSTR SpeakerName, LPCSTR str, bool bActor);
+    void AddAnswer(LPCSTR SpeakerName, const char* str, bool bActor);
     void AddIconedAnswer(LPCSTR text, LPCSTR texture_name, Frect texture_rect, LPCSTR templ_name);
     void ClearAll();
     void ClearQuestions();
@@ -63,17 +55,6 @@ public:
     void SetOsoznanieMode(bool b);
 
 private:
-    enum eSndAction
-    {
-        eTalkSndOpen = 0,
-        eTalkSndClose,
-        eTalkSndSay,
-        eTalkSndMax
-    };
-
-    ref_sound sounds[eTalkSndMax];
-    void PlaySnd(eSndAction a);
-
     CUIScrollView* UIQuestionsList;
     CUIScrollView* UIAnswersList;
 
@@ -83,7 +64,6 @@ private:
     // Цвет тeкста и шрифт наших реплик
     u32 m_uOurReplicsColor;
 
-    void OnTradeClicked(CUIWindow* w, void*);
     void OnQuestionClicked(CUIWindow* w, void*);
 };
 
@@ -93,7 +73,7 @@ class CUIQuestionItem : public CUIWindow, public CUIWndCallback
     float m_min_height;
 
 public:
-    CUIStatic* m_num_text{};
+    CUIStatic* m_num_text;
     CUI3tButton* m_text;
     shared_str m_s_value;
     CUIQuestionItem(CUIXml* xml_doc, LPCSTR path);

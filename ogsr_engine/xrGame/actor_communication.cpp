@@ -166,11 +166,12 @@ void CActor::OnDisableInfo(shared_str info_id) const
 {
     CInventoryOwner::OnDisableInfo(info_id);
 
-#ifdef REMOVE_ARTICLES_ON_DISABLE_INFO
-    CInfoPortion info_portion;
-    info_portion.Load(info_id);
-    AddEncyclopediaArticle(&info_portion, true);
-#endif
+    if (Core.Features.test(xrCore::Feature::remove_articles_on_disable_info))
+    {
+        CInfoPortion info_portion;
+        info_portion.Load(info_id);
+        AddEncyclopediaArticle(&info_portion, true);
+    }
 
     if (!HUD().GetUI())
         return;
@@ -256,7 +257,7 @@ void CActor::RunTalkDialog(CInventoryOwner* talk_partner)
 void CActor::StartTalk(CInventoryOwner* talk_partner, bool)
 {
     if (auto det = smart_cast<CCustomDetector*>(inventory().ItemFromSlot(DETECTOR_SLOT)))
-        det->HideDetector(true);
+        det->Hide(true);
 
     CInventoryOwner::StartTalk(talk_partner);
 }
@@ -282,9 +283,6 @@ void CActor::UpdateContact		(u16 contact_id)
 */
 void CActor::NewPdaContact(CInventoryOwner* pInvOwner)
 {
-    bool b_alive = !!(smart_cast<CEntityAlive*>(pInvOwner))->g_Alive();
-    HUD().GetUI()->UIMainIngameWnd->AnimateContacts(b_alive);
-
     Level().MapManager().AddRelationLocation(pInvOwner);
 
     if (HUD().GetUI())

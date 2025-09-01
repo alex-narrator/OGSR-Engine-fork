@@ -2,51 +2,47 @@
 #include "weaponBM16.h"
 #include "../xr_3da/x_ray.h"
 
-CWeaponBM16::~CWeaponBM16() 
-{ 
-    HUD_SOUND::DestroySound(m_sndReload1);
-}
+//CWeaponBM16::~CWeaponBM16() 
+//{ 
+//    HUD_SOUND::DestroySound(m_sndReload1);
+//}
 
 void CWeaponBM16::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    HUD_SOUND::LoadSound(section, "snd_reload_1", m_sndReload1, m_eSoundReload);
+    /*HUD_SOUND::LoadSound(section, "snd_reload_1", m_sndReload1, m_eSoundReload);*/
+    m_sounds.LoadSound(section, "snd_reload_1", "m_sndReload1", SOUND_TYPE_WEAPON_RECHARGING);
 }
 
 void CWeaponBM16::PlayReloadSound()
 {
     if (m_magazine.size() == 1 || !HaveCartridgeInInventory(2))
-        PlaySound((IsMisfire() && !sndReloadJammed.sounds.empty()) ? sndReloadJammed : m_sndReload1, get_LastFP());
+        PlaySound((IsMisfire() && SoundExist("sndReloadJammed")) ? "sndReloadJammed" : "m_sndReload1", get_LastFP());
     else
-        PlaySound((IsMisfire() && !sndReloadJammed.sounds.empty()) ? sndReloadJammed : sndReload, get_LastFP());
+        PlaySound((IsMisfire() && SoundExist("sndReloadJammed")) ? "sndReloadJammed" : "sndReload", get_LastFP());
 }
 
-void CWeaponBM16::UpdateSounds()
-{
-    inherited::UpdateSounds();
-
-    if (m_sndReload1.playing())
-        m_sndReload1.set_position(get_LastFP());
-}
+//void CWeaponBM16::UpdateSounds()
+//{
+//    inherited::UpdateSounds();
+//    UpdateSoundPosition("m_sndReload1", get_LastFP());
+//}
 
 void CWeaponBM16::OnShot()
 {
-    // Если актор бежит - останавливаем его
-    if (ParentIsActor())
-        Actor()->set_state_wishful(Actor()->get_state_wishful() & (~mcSprint));
-
     AddShotEffector();
     PlayAnimShoot();
 
     if (IsMisfire())
     {
-        if (!m_sndBreechJammed.sounds.empty())
-            PlaySound(m_sndBreechJammed, get_LastFP());
+        if (SoundExist("sndBreechJammed"))
+            PlaySound("sndBreechJammed", get_LastFP());
     }
     else
     {
-        PlaySound(*m_pSndShotCurrent, get_LastFP(), true);
+        /*PlaySound(*m_pSndShotCurrent, get_LastFP(), true);*/
+        PlayShotSound();
 
         Fvector vel;
         PHGetLinearVell(vel);
@@ -253,7 +249,7 @@ const char* CWeaponBM16::GetAnimAimName()
         {
             if (const u32 state = pActor->get_state(); state & mcAnyMove)
             {
-                if (IsScopeAttached())
+                if (IsAddonAttached(eScope))
                     return xr_strconcat(guns_bm_aim_anm, "anm_idle_aim_scope_moving", IsMisfire() ? "_jammed_" : "_");
                 else
                     return xr_strconcat(guns_bm_aim_anm, "anm_idle_aim_moving", (state & mcFwd) ? "_forward" : ((state & mcBack) ? "_back" : ""),
@@ -278,7 +274,7 @@ void CWeaponBM16::PlayAnimIdle()
             if (AnimationExist(guns_bm_aim_anm))
             {
                 PlayHUDMotion(guns_bm_aim_anm, true, GetState());
-                PlaySound(sndAimStart, get_LastFP());
+                PlaySound("sndAimStart", get_LastFP());
                 return;
             }
         }
@@ -310,7 +306,7 @@ void CWeaponBM16::PlayAnimIdle()
             if (AnimationExist(guns_aim_anm))
             {
                 PlayHUDMotion(guns_aim_anm, true, GetState());
-                PlaySound(sndAimEnd, get_LastFP());
+                PlaySound("sndAimEnd", get_LastFP());
                 return;
             }
         }
@@ -334,18 +330,44 @@ void CWeaponBM16::PlayAnimCheckMisfire()
         SwitchState(eIdle);
 }
 
-void CWeaponBM16::PlayAnimDeviceSwitch()
+void CWeaponBM16::PlayAnimShutter()
 {
-    PlaySound((HeadLampSwitch || NightVisionSwitch) ? sndItemOn : sndTactItemOn, get_LastFP());
-
-    string128 guns_device_anm;
-    xr_strconcat(guns_device_anm, LaserSwitch ? "anm_laser_on" : (TorchSwitch ? "anm_torch_on" : ((HeadLampSwitch || NightVisionSwitch) ? "anm_headlamp_on" : "")),
-                 IsMisfire() ? "_jammed_" : "_", std::to_string(m_magazine.size()).c_str());
-    if (AnimationExist(guns_device_anm))
-        PlayHUDMotion(guns_device_anm, true, GetState());
-    else
+    switch (m_magazine.size())
     {
-        DeviceUpdate();
-        SwitchState(eIdle);
+    case 0: AnimationExist("anm_shutter_0") ? PlayHUDMotion("anm_shutter_0", true, GetState()) : PlayHUDMotion({"anim_draw_0", "anim_draw", "anm_show_0"}, true, GetState()); break;
+    case 1: AnimationExist("anm_shutter_1") ? PlayHUDMotion("anm_shutter_1", true, GetState()) : PlayHUDMotion({"anim_draw_1", "anim_draw", "anm_show_1"}, true, GetState()); break;
+    case 2: AnimationExist("anm_shutter_2") ? PlayHUDMotion("anm_shutter_2", true, GetState()) : PlayHUDMotion({"anim_draw_2", "anim_draw", "anm_show_2"}, true, GetState()); break;
     }
+    PlaySound("sndShutter", get_LastFP());
+}
+void CWeaponBM16::PlayAnimShutterMisfire()
+{
+    switch (m_magazine.size())
+    {
+    case 0:
+        if (AnimationExist("anm_shutter_misfire_0"))
+        {
+            PlayHUDMotion("anm_shutter_misfire_0", true, GetState());
+            PlaySound("sndShutterMisfire", get_LastFP());
+            return;
+        }
+        break;
+    case 1:
+        if (AnimationExist("anm_shutter_misfire_1"))
+        {
+            PlayHUDMotion("anm_shutter_misfire_1", true, GetState());
+            PlaySound("sndShutterMisfire", get_LastFP());
+            return;
+        }
+        break;
+    case 2:
+        if (AnimationExist("anm_shutter_misfire_2"))
+        {
+            PlayHUDMotion("anm_shutter_misfire_2", true, GetState());
+            PlaySound("sndShutterMisfire", get_LastFP());
+            return;
+        }
+        break;
+    }
+    PlayAnimShutter();
 }

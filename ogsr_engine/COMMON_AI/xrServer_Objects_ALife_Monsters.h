@@ -28,7 +28,7 @@ enum eTraderFlags
 };
 //	float							m_fCumulativeItemMass;
 //	int								m_iCumulativeItemVolume;
-u32 m_dwMoney;
+u32 m_dwMoney{};
 float m_fMaxItemMass;
 Flags32 m_trader_flags;
 
@@ -56,7 +56,7 @@ void SetRank(CHARACTER_RANK_VALUE val);
 #endif
 
 shared_str m_sCharacterProfile;
-shared_str m_SpecificCharacter;
+shared_str m_SpecificCharacter{};
 
 //буферный вектор проверенных персонажей
 xr_vector<shared_str> m_CheckedCharacters;
@@ -112,11 +112,14 @@ add_to_type_list(CSE_ALifeTrader)
 
     SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeCustomZone, CSE_ALifeSpaceRestrictor)
 
-        ALife::EHitType m_tHitType;
-u32 m_owner_id;
-u32 m_enabled_time;
-u32 m_disabled_time;
-u32 m_start_time_shift;
+ALife::EHitType m_tHitType{ALife::eHitTypeMax};
+u32 m_owner_id{u32(-1)};
+u32 m_enabled_time{};
+u32 m_disabled_time{};
+u32 m_start_time_shift{};
+
+f32 m_maxPower;
+u32 m_zone_ttl{u32(-1)};
 
 CSE_ALifeCustomZone(LPCSTR caSection);
 virtual ~CSE_ALifeCustomZone();

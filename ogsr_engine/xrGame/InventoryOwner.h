@@ -13,7 +13,6 @@
 class CSE_Abstract;
 class CInventory;
 class CInventoryItem;
-class CTrade;
 class CPda;
 class CGameObject;
 class CEntityAlive;
@@ -22,10 +21,10 @@ class CInfoPortionWrapper;
 class NET_Packet;
 class CCharacterInfo;
 class CSpecificCharacter;
-class CTradeParameters;
-class CPurchaseList;
 class CWeapon;
 class CCustomOutfit;
+class CHelmet;
+class CInventoryContainer;
 
 class CInventoryOwner : public CAttachmentOwner
 {
@@ -64,10 +63,7 @@ public:
     ////////////////////////////////////
     //торговля и общение с персонажем
 
-    virtual bool AllowItemToTrade(CInventoryItem const* item, EItemPlace place) const;
     virtual void OnFollowerCmd(int cmd){}; // redefine for CAI_Stalkker
-    //инициализация объекта торговли
-    CTrade* GetTrade();
 
     //для включения разговора
     virtual bool OfferTalk(CInventoryOwner* talk_partner);
@@ -91,22 +87,21 @@ public:
     virtual LPCSTR Name() const;
     u32 get_money() const { return m_money; }
     void set_money(u32 amount, bool bSendEvent);
-    void SetName(LPCSTR name) { m_game_name = name; };
+    void SetName(LPCSTR name)/* { m_game_name = name; }*/;
 
 protected:
     u32 m_money;
-    // торговля
-    CTrade* m_pTrade;
+
     bool m_bTalking;
     CInventoryOwner* m_pTalkPartner;
 
     bool m_bAllowTalk;
     bool m_bAllowTrade;
 
-    u32 m_tmp_active_slot_num;
+    u32 m_tmp_active_slot_num{NO_ACTIVE_SLOT};
 
 public:
-    u32 m_tmp_next_item_slot;
+    u32 m_tmp_next_item_slot{NO_ACTIVE_SLOT};
     //////////////////////////////////////////////////////////////////////////
     // сюжетная информация
 public:
@@ -142,12 +137,13 @@ public:
 
     //возвращает текуший разброс стрельбы (в радианах) с учетом движения
     virtual float GetWeaponAccuracy() const;
-    virtual float ArtefactsAddWeight(bool = true) const;
     //максимальный переносимы вес
     virtual float GetCarryWeight() const;
     virtual float MaxCarryWeight() const;
 
-    virtual CCustomOutfit* GetOutfit() const { return NULL; };
+    virtual CCustomOutfit* GetOutfit() const { return nullptr; };
+    virtual CInventoryContainer* GetBackpack() const { return nullptr; };
+    virtual CHelmet* GetHelmet() const { return nullptr; };
 
     //////////////////////////////////////////////////////////////////////////
     //игровые характеристики персонажа
@@ -173,6 +169,11 @@ public:
     CHARACTER_RANK_VALUE Rank() const { return CharacterInfo().Rank().value(); };
     CHARACTER_REPUTATION_VALUE Reputation() const { return CharacterInfo().Reputation().value(); };
 
+    // іконка персонажа
+    virtual void SetIcon(LPCSTR icon) { CharacterInfo().SetIcon(icon); };
+    virtual LPCSTR GetIcon() { return CharacterInfo().GetIcon(); };
+    virtual LPCSTR GetDefaultIcon() { return CharacterInfo().GetDefaultIcon(); };
+
 protected:
     CCharacterInfo* m_pCharacterInfo;
     xr_string m_game_name;
@@ -185,7 +186,7 @@ public:
     virtual void OnItemRuck(CInventoryItem* inventory_item, EItemPlace previous_place);
     virtual void OnItemSlot(CInventoryItem* inventory_item, EItemPlace previous_place);
 
-    virtual void OnItemDrop(CInventoryItem* inventory_item);
+    virtual void OnItemDrop(CInventoryItem* inventory_item, EItemPlace previous_place);
 
     virtual void OnItemDropUpdate();
     virtual bool use_bolts() const { return (true); }
@@ -206,7 +207,7 @@ public:
     IC const u32& ammo_in_box_to_spawn() const { return m_ammo_in_box_to_spawn; }
 
 public:
-    virtual bool unlimited_ammo() = 0;
+    virtual bool unlimited_ammo() const = 0;
     virtual void on_weapon_shot_start(CWeapon* weapon);
     virtual void on_weapon_shot_stop(CWeapon* weapon);
     virtual void on_weapon_hide(CWeapon* weapon);
@@ -215,18 +216,9 @@ public:
     virtual bool use_simplified_visual() const { return (false); };
 
 private:
-    CTradeParameters* m_trade_parameters;
-    CPurchaseList* m_purchase_list;
-    BOOL m_need_osoznanie_mode;
+    BOOL m_need_osoznanie_mode{};
 
 public:
-    IC CTradeParameters& trade_parameters() const;
-    virtual LPCSTR trade_section() const;
-    float deficit_factor(const shared_str& section) const;
-    void buy_supplies(CInifile& ini_file, LPCSTR section);
-    void sell_useless_items();
-    virtual void on_before_sell(CInventoryItem* item) {}
-    virtual void on_before_buy(CInventoryItem* item) {}
     virtual bool use_default_throw_force();
     virtual float missile_throw_force();
     virtual bool use_throw_randomness();

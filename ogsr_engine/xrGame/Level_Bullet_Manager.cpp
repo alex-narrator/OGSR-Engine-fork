@@ -15,10 +15,6 @@
 #include "debug_renderer.h"
 #endif
 
-#define HIT_POWER_EPSILON 0.05f
-#define WALLMARK_SIZE 0.04f
-
-float CBulletManager::m_fMinBulletSpeed = 2.f;
 
 SBullet::SBullet() : m_on_bullet_hit(false) {}
 
@@ -29,16 +25,16 @@ void SBullet::Init(const Fvector& position, const Fvector& direction, float star
 {
     flags._storage = 0;
     pos = position;
-    speed = max_speed = starting_speed * cartridge.m_kSpeed;
+    speed = max_speed = starting_speed + (starting_speed * cartridge.m_kSpeed); // * cartridge.m_kSpeed;
     VERIFY(speed > 0);
 
     VERIFY(direction.magnitude() > 0);
     dir.normalize(direction);
 
-    hit_power = power * cartridge.m_kHit;
-    hit_impulse = impulse * cartridge.m_kImpulse;
+    hit_power = power + (power * cartridge.m_kHit); //* cartridge.m_kHit;
+    hit_impulse = impulse + (impulse * cartridge.m_kImpulse); //	* cartridge.m_kImpulse;
 
-    max_dist = maximum_distance * cartridge.m_kDist;
+    max_dist = maximum_distance + (maximum_distance * cartridge.m_kDist); // * cartridge.m_kDist;
     fly_dist = 0;
 
     parent_id = sender_id;
@@ -67,11 +63,7 @@ void SBullet::Init(const Fvector& position, const Fvector& direction, float star
 //////////////////////////////////////////////////////////
 //
 
-CBulletManager::CBulletManager()
-{
-    m_Bullets.reserve(1000);
-    m_dwTimeRemainder = 0;
-}
+CBulletManager::CBulletManager() { m_Bullets.reserve(1000); }
 
 CBulletManager::~CBulletManager()
 {
@@ -80,7 +72,7 @@ CBulletManager::~CBulletManager()
     m_Events.clear();
 }
 
-#define BULLET_MANAGER_SECTION "bullet_manager"
+constexpr auto BULLET_MANAGER_SECTION = "bullet_manager";
 
 void CBulletManager::Load()
 {

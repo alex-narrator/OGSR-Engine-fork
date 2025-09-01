@@ -21,8 +21,8 @@
 #include "material_manager.h"
 #include "game_base_space.h"
 
-#define SMALL_ENTITY_RADIUS 0.6f
-#define BLOOD_MARKS_SECT "bloody_marks"
+constexpr auto SMALL_ENTITY_RADIUS = 0.6f;
+constexpr auto BLOOD_MARKS_SECT = "bloody_marks";
 
 //отметки крови на стенах
 FactoryPtr<IWallMarkArray>* CEntityAlive::m_pBloodMarksVector = nullptr;
@@ -385,6 +385,7 @@ void CEntityAlive::BloodyWallmarks(float P, const Fvector& dir, s16 element, con
     PlaceBloodWallmark(dir, start_pos, m_fBloodMarkDistance, wallmark_size, &**m_pBloodMarksVector);
 }
 
+#include "Actor_Flags.h"
 void CEntityAlive::PlaceBloodWallmark(const Fvector& dir, const Fvector& start_pos, float trace_dist, float wallmark_size, IWallMarkArray* pwallmarks_vector)
 {
     collide::rq_result result;
@@ -397,19 +398,21 @@ void CEntityAlive::PlaceBloodWallmark(const Fvector& dir, const Fvector& start_p
     end_point.set(0, 0, 0);
     end_point.mad(start_pos, dir, result.range);
 
-    if (result.O)
+    if (result.O && psActorFlags.test(AF_BLOODMARKS_ON_DYNAMIC))
     { // Dynamic object
-        /*
-                const auto pK = smart_cast<IKinematics*>(result.O->Visual());
-                if (!pK)
-                    return;
+        
+        const auto pK = smart_cast<IKinematics*>(result.O->Visual());
+        if (!pK)
+            return;
 
-                const auto& bone_data = pK->LL_GetData((u16)result.element);
-                auto pMaterial = GMLib.GetMaterialByIdx(bone_data.game_mtl_idx);
+        const auto& bone_data = pK->LL_GetData((u16)result.element);
+        auto pMaterial = GMLib.GetMaterialByIdx(bone_data.game_mtl_idx);
+        
+        Fvector _dir{dir};
 
-                if (pMaterial->Flags.is(SGameMtl::flBloodmark))
-                    ::Render->add_SkeletonWallmark(&result.O->renderable.xform, pK, pwallmarks_vector, end_point, dir, wallmark_size);
-        */
+        if (pMaterial->Flags.is(SGameMtl::flBloodmark))
+            ::Render->add_SkeletonWallmark(&result.O->renderable.xform, pK, pwallmarks_vector, end_point, _dir, wallmark_size);
+        
     }
     else
     { //если кровь долетела до статического объекта
@@ -525,11 +528,12 @@ void CEntityAlive::UpdateBloodDrops()
     if (m_BloodWounds.empty())
         return;
 
-    if (!g_Alive())
-    {
-        m_BloodWounds.clear();
-        return;
-    }
+    // спробуємо не зупиняти кровотечу мерців
+    //if (!g_Alive())
+    //{
+    //    m_BloodWounds.clear();
+    //    return;
+    //}
 
     //	WOUND_VECTOR_IT last_it;
 
@@ -657,7 +661,7 @@ void CEntityAlive::set_lock_corpse(bool b_l_corpse)
     b_eating = b_l_corpse;
 }
 
-bool CEntityAlive::is_locked_corpse()
+bool CEntityAlive::is_locked_corpse() const
 {
     if (!b_eating)
     {

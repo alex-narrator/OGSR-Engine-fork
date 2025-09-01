@@ -117,15 +117,29 @@ void CObjectScript::script_register(lua_State* L)
                                             value("flGroupBehaviour", int(CSE_ALifeObject::flGroupBehaviour)), value("flCanSave", int(CSE_ALifeObject::flCanSave)),
                                             value("flVisibleForMap", int(CSE_ALifeObject::flVisibleForMap)), value("flUseSmartTerrains", int(CSE_ALifeObject::flUseSmartTerrains)),
                                             value("flCheckForSeparator", int(CSE_ALifeObject::flCheckForSeparator))]
-                  .enum_("weapon_states")[value("eIdle", int(CHudItem::EHudStates::eIdle)), value("eSprintStart", int(CHudItem::EHudStates::eSprintStart)),
-                                          value("eSprintEnd", int(CHudItem::EHudStates::eSprintEnd)), value("eShowing", int(CHudItem::EHudStates::eShowing)),
-                                          value("eHiding", int(CHudItem::EHudStates::eHiding)), value("eHidden", int(CHudItem::EHudStates::eHidden)),
-                                          value("eBore", int(CHudItem::EHudStates::eBore)), value("eFire", int(CHudItem::EHudStates::eFire)),
-                                          value("eFire2", int(CHudItem::EHudStates::eFire2)), value("eReload", int(CHudItem::EHudStates::eReload)),
-                                          value("eMisfire", int(CHudItem::EHudStates::eMisfire)), value("eMagEmpty", int(CHudItem::EHudStates::eMagEmpty)),
-                                          value("eSwitch", int(CHudItem::EHudStates::eSwitch)), value("eDeviceSwitch", int(CHudItem::EHudStates::eDeviceSwitch)),
-                                          value("eThrowStart", int(CHudItem::EHudStates::eThrowStart)), value("eReady", int(CHudItem::EHudStates::eReady)),
-                                          value("eThrow", int(CHudItem::EHudStates::eThrow)), value("eThrowEnd", int(CHudItem::EHudStates::eThrowEnd))]
+                  .enum_("weapon_states")[
+                      value("eIdle", int(CHudItem::EHudStates::eIdle)), 
+                      value("eFire", int(CHudItem::EHudStates::eFire)),
+                      value("eFire2", int(CHudItem::EHudStates::eFire2)),
+                      value("eReload", int(CHudItem::EHudStates::eReload)),
+                      value("eShowing", int(CHudItem::EHudStates::eShowing)),
+                      value("eHiding", int(CHudItem::EHudStates::eHiding)),
+                      value("eHidden", int(CHudItem::EHudStates::eHidden)),
+                      value("eMisfire", int(CHudItem::EHudStates::eMisfire)),
+                      value("eMagEmpty", int(CHudItem::EHudStates::eMagEmpty)),
+                      value("eSwitch", int(CHudItem::EHudStates::eSwitch)),
+                      value("eSprintStart", int(CHudItem::EHudStates::eSprintStart)), 
+                      value("eSprintEnd", int(CHudItem::EHudStates::eSprintEnd)),
+                      value("eThrowStart", int(CHudItem::EHudStates::eThrowStart)),
+                      value("eReady", int(CHudItem::EHudStates::eReady)),
+                      value("eThrow", int(CHudItem::EHudStates::eThrow)),
+                      value("eThrowEnd", int(CHudItem::EHudStates::eThrowEnd)),
+                      value("eActivating", int(CHudItem::EHudStates::eActivating)),
+                      value("eShutter", int(CHudItem::EHudStates::eShutter)),
+                      value("eIdleZoom", int(CHudItem::EHudStates::eIdleZoom)),
+                      value("eIdleZoomIn", int(CHudItem::EHudStates::eIdleZoomIn)),
+                      value("eIdleZoomOut", int(CHudItem::EHudStates::eIdleZoomOut))
+                  ]
                   .enum_("RestrictionSpace")
                       [value("eDefaultRestrictorTypeNone", int(RestrictionSpace::eDefaultRestrictorTypeNone)),
                        value("eDefaultRestrictorTypeOut", int(RestrictionSpace::eDefaultRestrictorTypeOut)),

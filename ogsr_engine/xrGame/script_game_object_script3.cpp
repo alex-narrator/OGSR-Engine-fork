@@ -128,6 +128,7 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 
         .def("give_info_portion", &CScriptGameObject::GiveInfoPortion)
         .def("disable_info_portion", &CScriptGameObject::DisableInfoPortion)
+        .def("get_known_info", &CScriptGameObject::GetKnownInfo)
         .def("give_game_news", &GiveGameNews)
 
         .def("give_phrase", &AddTalkMessage)
@@ -140,6 +141,9 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("get_task_state", &CScriptGameObject::GetGameTaskState)
         .def("set_task_state", &CScriptGameObject::SetGameTaskState)
         .def("give_task", &CScriptGameObject::GiveTaskToActor, adopt<2>())
+        .def("set_task_selected", &CScriptGameObject::SetTaskSelected)
+        .def("get_active_task", &CScriptGameObject::GetActiveTask)
+        .def("get_active_objective", &CScriptGameObject::GetActiveObjective)
         .def("is_talking", &CScriptGameObject::IsTalking)
         .def("stop_talk", &CScriptGameObject::StopTalk)
         .def("enable_talk", &CScriptGameObject::EnableTalk)
@@ -158,8 +162,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("money", &CScriptGameObject::Money)
         .def("set_money", &CScriptGameObject::SetMoney)
 
-        .def("switch_to_trade", &CScriptGameObject::SwitchToTrade)
-        .def("switch_to_talk", &CScriptGameObject::SwitchToTalk)
         .def("run_talk_dialog", &CScriptGameObject::RunTalkDialog)
 
         .def("hide_weapon", &CScriptGameObject::HideWeapon)
@@ -188,6 +190,12 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("change_character_reputation", &CScriptGameObject::ChangeCharacterReputation)
         .def("character_community", &CScriptGameObject::CharacterCommunity)
         .def("set_character_community", &CScriptGameObject::SetCharacterCommunity)
+
+        .def("set_character_icon", &CScriptGameObject::SetCharacterIcon)
+        .def("get_character_icon", &CScriptGameObject::GetCharacterIcon)
+        .def("get_default_character_icon", &CScriptGameObject::GetDefaultCharacterIcon)
+
+        .def("infinitive_money", &CScriptGameObject::InfinitiveMoney)
 
         .def("get_actor_relation_flags", &CScriptGameObject::get_actor_relation_flags)
         .def("set_actor_relation_flags", &CScriptGameObject::set_actor_relation_flags)
@@ -231,13 +239,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 
         .def("make_object_visible_somewhen", &CScriptGameObject::make_object_visible_somewhen)
 
-        .def("buy_condition", (void(CScriptGameObject::*)(CInifile*, LPCSTR))(&CScriptGameObject::buy_condition))
-        .def("buy_condition", (void(CScriptGameObject::*)(float, float))(&CScriptGameObject::buy_condition))
-        .def("show_condition", &CScriptGameObject::show_condition)
-        .def("sell_condition", (void(CScriptGameObject::*)(CInifile*, LPCSTR))(&CScriptGameObject::sell_condition))
-        .def("sell_condition", (void(CScriptGameObject::*)(float, float))(&CScriptGameObject::sell_condition))
-        .def("buy_supplies", &CScriptGameObject::buy_supplies)
-
         .def("sound_prefix", (LPCSTR(CScriptGameObject::*)() const)(&CScriptGameObject::sound_prefix))
         .def("sound_prefix", (void(CScriptGameObject::*)(LPCSTR))(&CScriptGameObject::sound_prefix))
 
@@ -252,6 +253,8 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("mark_item_dropped", &CScriptGameObject::MarkItemDropped)
         .def("marked_dropped", &CScriptGameObject::MarkedDropped)
         .def("unload_magazine", &CScriptGameObject::UnloadMagazine)
+        .def("is_direct_reload", &CScriptGameObject::IsDirectReload)
+        .def("unload_magazine_full", &CScriptGameObject::UnloadMagazineFull)
 
         .def("sight_params", &CScriptGameObject::sight_params)
 
@@ -264,12 +267,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         // инвентарь
         .def("get_actor_max_weight", &CScriptGameObject::GetActorMaxWeight)
         .def("set_actor_max_weight", &CScriptGameObject::SetActorMaxWeight)
-        .def("get_actor_max_walk_weight", &CScriptGameObject::GetActorMaxWalkWeight)
-        .def("set_actor_max_walk_weight", &CScriptGameObject::SetActorMaxWalkWeight)
-        .def("get_additional_max_weight", &CScriptGameObject::GetAdditionalMaxWeight)
-        .def("set_additional_max_weight", &CScriptGameObject::SetAdditionalMaxWeight)
-        .def("get_additional_max_walk_weight", &CScriptGameObject::GetAdditionalMaxWalkWeight)
-        .def("set_additional_max_walk_weight", &CScriptGameObject::SetAdditionalMaxWalkWeight)
         .def("get_total_weight", &CScriptGameObject::GetTotalWeight)
         .def("weight", &CScriptGameObject::Weight)
         /*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
@@ -296,6 +293,9 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("ruck_count", &CScriptGameObject::RuckSize)
         .def("invalidate_inventory", &CScriptGameObject::InvalidateInventory)
         .def("get_slot", &CScriptGameObject::GetSlot)
+        .def("set_slot", &CScriptGameObject::SetSlot)
+        .def("can_put_in_slot", &CScriptGameObject::CanPutInSlot)
+        .def("can_put_in_belt", &CScriptGameObject::CanPutInBelt)
 
         // functions for CInventoryItem class
         .def("set_inventory_item_flags", &CScriptGameObject::SetIIFlags)
@@ -320,6 +320,7 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("is_eatable_item", &CScriptGameObject::IsEatableItem)
         .def("is_antirad", &CScriptGameObject::IsAntirad)
         .def("is_outfit", &CScriptGameObject::IsCustomOutfit)
+        .def("is_helmet", &CScriptGameObject::IsHelmet)
         .def("is_scope", &CScriptGameObject::IsScope)
         .def("is_silencer", &CScriptGameObject::IsSilencer)
         .def("is_grenade_launcher", &CScriptGameObject::IsGrenadeLauncher)
@@ -351,21 +352,18 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("add_wounds", &CScriptGameObject::AddWound)
         .def("get_weight", &CScriptGameObject::GetItemWeight)
         .def("inv_box_count", &CScriptGameObject::InvBoxCount)
-        .def("open_inventory_box", &CScriptGameObject::OpenInvBox)
         .def("object_from_inv_box", &CScriptGameObject::ObjectFromInvBox)
         .def("get_camera_fov", &CScriptGameObject::GetCamFOV)
         .def("set_camera_fov", &CScriptGameObject::SetCamFOV)
 
         .def("set_max_weight", &CScriptGameObject::SetMaxWeight)
-        .def("set_max_walk_weight", &CScriptGameObject::SetMaxWalkWeight)
         .def("get_max_weight", &CScriptGameObject::GetMaxWeight)
-        .def("get_max_walk_weight", &CScriptGameObject::GetMaxWalkWeight)
         .def("get_inventory_weight", &CScriptGameObject::GetInventoryWeight)
-        .def("calculate_item_price", &CScriptGameObject::CalcItemPrice)
 
         .def("get_shape_radius", &CScriptGameObject::GetShapeRadius)
 
         .def("get_visual_name", &CScriptGameObject::GetVisualName)
+        .def("set_visual_name", &CScriptGameObject::SetVisualName)
         .def("get_visual_ini", &CScriptGameObject::GetVisIni)
 
         .def("set_bone_visible", &CScriptGameObject::SetBoneVisible)
@@ -374,14 +372,17 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("get_hud_bone_visible", &CScriptGameObject::GetHudBoneVisible)
         .def("get_bone_id", &CScriptGameObject::GetBoneID)
 
-        .def("get_binoc_zoom_factor", &CScriptGameObject::GetBinocZoomFactor)
-        .def("set_binoc_zoom_factor", &CScriptGameObject::SetBinocZoomFactor)
+        .def("get_hud_sect", &CScriptGameObject::GetHudSect)
+        .def("set_hud_sect", &CScriptGameObject::SetHudSect)
+
         .def("get_zoom_factor", &CScriptGameObject::GetZoomFactor)
+        .def("zoom_in", &CScriptGameObject::ZoomIn)
+        .def("zoom_out", &CScriptGameObject::ZoomOut)
+        .def("is_zoomed", &CScriptGameObject::IsZoomed)
         .def("get_addon_flags", &CScriptGameObject::GetAddonFlags)
         .def("set_addon_flags", &CScriptGameObject::SetAddonFlags)
         .def("get_magazine_size", &CScriptGameObject::GetMagazineSize)
         .def("set_magazine_size", &CScriptGameObject::SetMagazineSize)
-        .def("get_grenade_launcher_status", &CScriptGameObject::GrenadeLauncherAttachable)
         .def("get_ammo_type", &CScriptGameObject::GetAmmoType)
         .def("get_underbarrel_ammo_type", &CScriptGameObject::GetUnderbarrelAmmoType)
         .def("get_ammo_in_magazine2", &CScriptGameObject::GetAmmoElapsed2)
@@ -399,20 +400,15 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("zoom_mode", &CScriptGameObject::ZoomMode)
         .def("reset_state", &CScriptGameObject::ResetState)
 
-        // для CEatableItem
-        .def("zero_effects", &CScriptGameObject::ZeroEffects)
-        .def("set_radiation_influence", &CScriptGameObject::SetRadiationInfluence)
-        // для актора - иммунитеты
-        .def("set_additional_radiation_protection", &CScriptGameObject::SetDrugRadProtection)
-        .def("set_additional_telepatic_protection", &CScriptGameObject::SetDrugPsyProtection)
-
         // KD
 
         // by Real Wolf 11.07.2014
-        .def("get_cell_item", &CScriptGameObject::GetCellItem)
         .def("get_bone_name", &CScriptGameObject::GetBoneName)
 
         .def("get_hud_item_state", &CScriptGameObject::GetHudItemState)
+        .def("is_pending", &CScriptGameObject::IsPending)
+        .def("stop_aim_inertion", &CScriptGameObject::StopAimInertion)
+        .def("show_item_hud", &CScriptGameObject::ShowItemHud)
         .def("radius", &CScriptGameObject::GetRadius)
         .def("play_hud_motion", (u32(CScriptGameObject::*)(LPCSTR))(&CScriptGameObject::play_hud_animation))
         .def("play_hud_motion", (u32(CScriptGameObject::*)(LPCSTR, bool, u32, float))(&CScriptGameObject::play_hud_animation))

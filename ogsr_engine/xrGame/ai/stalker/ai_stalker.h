@@ -184,7 +184,7 @@ public:
 
     virtual void g_WeaponBones(int& L, int& R1, int& R2);
     virtual void g_fireParams(CHudItem* pHudItem, Fvector& P, Fvector& D, const bool for_cursor = false) override;
-    virtual void HitSignal(float P, Fvector& vLocalDir, CObject* who, s16 element);
+    virtual void HitSignal(float P, Fvector& vLocalDir, CObject* who, s16 element, int type);
     virtual void Die(CObject* who);
 
     virtual void OnEvent(NET_Packet& P, u16 type);
@@ -242,7 +242,7 @@ public:
     //////////////////////////////////////////////////////////////////////////
 public:
     virtual void OnItemTake(CInventoryItem* inventory_item);
-    virtual void OnItemDrop(CInventoryItem* inventory_item);
+    virtual void OnItemDrop(CInventoryItem* inventory_item, EItemPlace previous_place);
     bool item_to_kill();
     bool item_can_kill();
     bool remember_item_to_kill();
@@ -251,7 +251,7 @@ public:
     bool ready_to_detour();
     void update_best_item_info();
     virtual float GetWeaponAccuracy() const;
-    virtual bool unlimited_ammo();
+    virtual bool unlimited_ammo() const;
     virtual void spawn_supplies();
     CAgentManager& agent_manager() const;
 
@@ -339,7 +339,6 @@ protected:
     void update_conflicted(CInventoryItem* item, const CWeapon* new_weapon);
     void remove_personal_only_ammo(const CInventoryItem* item);
     void on_after_take(const CGameObject* object);
-    virtual bool AllowItemToTrade(CInventoryItem const* item, EItemPlace place) const;
 
 public:
     IC CStalkerAnimationManager& animation() const;

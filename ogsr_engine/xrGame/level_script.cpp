@@ -36,6 +36,9 @@
 #include "EffectorBobbing.h"
 #include "LevelDebugScript.h"
 
+#include "postprocessanimator.h"
+#include "actoreffector.h"
+
 using namespace luabind;
 
 LPCSTR command_line() { return (Core.Params); }
@@ -286,30 +289,16 @@ void remove_dialog_to_render(CUIDialogWnd* pDialog) { HUD().GetUI()->RemoveDialo
 
 CUIDialogWnd* main_input_receiver() { return HUD().GetUI()->MainInputReceiver(); }
 
+Fvector2 get_cursor_pos() { return GetUICursor()->GetCursorPosition(); }
+
+void set_cursor_pos(const Fvector2& pos) { GetUICursor()->SetUICursorPosition(pos); }
+
 #include "UIGameCustom.h"
-#include "ui/UIInventoryWnd.h"
-#include "ui/UITradeWnd.h"
 #include "ui/UITalkWnd.h"
-#include "ui/UICarBodyWnd.h"
 #include "UIGameSP.h"
-#include "HUDManager.h"
 #include "HUDTarget.h"
 #include "InventoryBox.h"
 
-CUIWindow* GetInventoryWindow()
-{
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return nullptr;
-    return (CUIWindow*)pGameSP->InventoryMenu;
-}
-CUIWindow* GetTradeWindow()
-{
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return nullptr;
-    return (CUIWindow*)pGameSP->TalkMenu->GetTradeWnd();
-}
 CUIWindow* GetTalkWindow()
 {
     CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
@@ -319,13 +308,8 @@ CUIWindow* GetTalkWindow()
 }
 CScriptGameObject* GetSecondTalker()
 {
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return nullptr;
-    CUITalkWnd* wnd = pGameSP->TalkMenu;
-    if (wnd == nullptr)
-        return nullptr;
-    return smart_cast<CGameObject*>(wnd->GetSecondTalker())->lua_game_object();
+    auto talk_partner = Actor()->GetTalkPartner();
+    return talk_partner ? smart_cast<CGameObject*>(talk_partner)->lua_game_object() : nullptr;
 }
 CUIWindow* GetPdaWindow()
 {
@@ -333,27 +317,6 @@ CUIWindow* GetPdaWindow()
     if (!pGameSP)
         return nullptr;
     return (CUIWindow*)pGameSP->PdaMenu;
-}
-CUIWindow* GetCarBodyWindow()
-{
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return nullptr;
-    return (CUIWindow*)pGameSP->UICarBodyMenu;
-}
-CScriptGameObject* GetCarBodyTarget()
-{
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return nullptr;
-    CUICarBodyWnd* wnd = pGameSP->UICarBodyMenu;
-    if (wnd == nullptr)
-        return nullptr;
-    if (wnd->m_pOthersObject != nullptr)
-        return smart_cast<CGameObject*>(wnd->m_pOthersObject)->lua_game_object();
-    if (wnd->m_pInventoryBox != nullptr)
-        return (wnd->m_pInventoryBox->object().lua_game_object());
-    return nullptr;
 }
 
 CUIWindow* GetUIChangeLevelWnd()
@@ -556,7 +519,6 @@ void iterate_sounds2(LPCSTR prefix, u32 max_count, const luabind::object& object
     iterate_sounds(prefix, max_count, temp);
 }
 
-#include "actoreffector.h"
 float add_cam_effector(LPCSTR fn, int id, bool cyclic, LPCSTR cb_func)
 {
     CAnimatorCamEffectorScriptCB* e = xr_new<CAnimatorCamEffectorScriptCB>(cb_func);
@@ -589,22 +551,30 @@ void set_snd_volume(float v)
 }
 #include "actor_statistic_mgr.h"
 void add_actor_points(LPCSTR sect, LPCSTR detail_key, int cnt, int pts) { return Actor()->StatisticMgr().AddPoints(sect, detail_key, cnt, pts); }
-
 void add_actor_points_str(LPCSTR sect, LPCSTR detail_key, LPCSTR str_value) { return Actor()->StatisticMgr().AddPoints(sect, detail_key, str_value); }
-
 int get_actor_points(LPCSTR sect) { return Actor()->StatisticMgr().GetSectionPoints(sect); }
-
 void remove_actor_points(LPCSTR sect, LPCSTR detail_key) { Actor()->StatisticMgr().RemovePoints(sect, detail_key); }
+int get_actor_points_key(LPCSTR key, LPCSTR sect) { return Actor()->StatisticMgr().GetSectionKeyPoints(key, sect); }
+
 extern int get_actor_ranking();
 extern void add_human_to_top_list(u16 id);
 extern void remove_human_from_top_list(u16 id);
 
-#include "ActorEffector.h"
 void add_complex_effector(LPCSTR section, int id) { AddEffector(Actor(), id, section); }
+void add_complex_effector2(LPCSTR section, int id, float factor) { AddEffector(Actor(), id, section, factor); }
 
 void remove_complex_effector(int id) { RemoveEffector(Actor(), id); }
 
-#include "postprocessanimator.h"
+bool check_complex_effector(int id) { return CheckEffector(Actor(), id); };
+
+void set_complex_effector_factor(int id, float factor)
+{
+    if (auto pp = smart_cast<CPostprocessAnimator*>(Actor()->Cameras().GetPPEffector((EEffectorPPType)id)))
+        pp->SetCurrentFactor(factor);
+    if (auto ce = smart_cast<CAnimatorCamLerpEffectorConst*>(Actor()->Cameras().GetCamEffector((ECamEffectorType)id)))
+        ce->SetFactor(factor);
+}
+
 void add_pp_effector(LPCSTR fn, int id, bool cyclic)
 {
     CPostprocessAnimator* pp = xr_new<CPostprocessAnimator>(id, cyclic);
@@ -731,15 +701,6 @@ u32 vertex_id(const Fvector& vec) { return ai().level_graph().vertex_id(vec); }
 u32 vertex_id(u32 node, const Fvector& vec) { return ai().level_graph().vertex_id(node, vec); }
 
 u32 nearest_vertex_id(const Fvector& vec) { return ai().level_graph().nearest_vertex_id(vec); }
-
-void update_inventory_window() { HUD().GetUI()->UIGame()->ReInitShownUI(); }
-
-void update_inventory_weight()
-{
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (pGameSP)
-        pGameSP->InventoryMenu->UpdateWeight();
-}
 
 void change_level(GameGraph::_GRAPH_ID game_vertex_id, u32 level_vertex_id, Fvector pos, Fvector dir)
 {
@@ -1092,12 +1053,14 @@ void CLevel::script_register(lua_State* L)
             def("demo_record_get_HPB", &demo_record_get_HPB), def("demo_record_set_HPB", &demo_record_set_HPB),
             def("demo_record_set_direct_input", &demo_record_set_direct_input),
 
-            def("add_complex_effector", &add_complex_effector), def("remove_complex_effector", &remove_complex_effector),
+            def("add_complex_effector", &add_complex_effector), def("add_complex_effector", &add_complex_effector2),
+            def("set_complex_effector_factor", &set_complex_effector_factor), def("remove_complex_effector", &remove_complex_effector),
+            def("check_complex_effector", &check_complex_effector),
 
             def("game_id", &GameID), def("set_ignore_game_state_update", &set_ignore_game_state_update),
 
-            def("get_inventory_wnd", &GetInventoryWindow), def("get_talk_wnd", &GetTalkWindow), def("get_trade_wnd", &GetTradeWindow), def("get_pda_wnd", &GetPdaWindow),
-            def("get_car_body_wnd", &GetCarBodyWindow), def("get_second_talker", &GetSecondTalker), def("get_car_body_target", &GetCarBodyTarget),
+            def("get_talk_wnd", &GetTalkWindow), def("get_pda_wnd", &GetPdaWindow),
+            def("get_second_talker", &GetSecondTalker),
             def("get_change_level_wnd", &GetUIChangeLevelWnd),
 
             def("ray_query", &PerformRayQuery),
@@ -1121,12 +1084,15 @@ void CLevel::script_register(lua_State* L)
 
             def("get_effector_bobbing", &get_effector_bobbing), def("is_ray_intersect_sphere", &is_ray_intersect_sphere),
 
+            def("get_cursor_pos", &get_cursor_pos), def("set_cursor_pos", &set_cursor_pos),
+
             def("block_action", [](EGameActions action) { Level().block_action(action); }),
             def("unblock_action", [](EGameActions action) { Level().unblock_action(action); })
     ],
 
         module(L, "actor_stats")[def("add_points", &add_actor_points), def("add_points_str", &add_actor_points_str), def("get_points", &get_actor_points),
-                                 def("remove_points", &remove_actor_points), def("add_to_ranking", &add_human_to_top_list), def("remove_from_ranking", &remove_human_from_top_list),
+                                     def("remove_points", &remove_actor_points), def("get_points_key", &get_actor_points_key), def("add_to_ranking", &add_human_to_top_list),
+                                     def("remove_from_ranking", &remove_human_from_top_list),
                                  def("get_actor_ranking", &get_actor_ranking)];
 
     module(L)[def("command_line", &command_line)];
@@ -1137,11 +1103,9 @@ void CLevel::script_register(lua_State* L)
                                    def("clear_personal_goodwill", &g_clear_personal_goodwill), def("clear_personal_relations", &g_clear_personal_relations)];
     //установка параметров для шейдеров из скриптов
     module(L)[def("set_artefact_slot", &g_set_artefact_position), def("set_anomaly_slot", &g_set_anomaly_position), def("set_detector_mode", &g_set_detector_params),
-              def("set_pda_params", [](const Fvector& p) { shader_exports.set_pda_params(p); }), def("update_inventory_window", &update_inventory_window),
+              def("set_pda_params", [](const Fvector& p) { shader_exports.set_pda_params(p); }),
 
            def("set_dof_params", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_dof_params(p1, p2, p3, p4); }),
-
-              def("update_inventory_weight", &update_inventory_weight),
 
               class_<enum_exporter<collide::rq_target>>("rq_target")
                   .enum_("rq_target")[value("rqtNone", int(collide::rqtNone)), value("rqtObject", int(collide::rqtObject)), value("rqtStatic", int(collide::rqtStatic)),

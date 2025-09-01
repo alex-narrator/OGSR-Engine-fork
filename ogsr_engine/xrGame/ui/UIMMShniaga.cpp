@@ -25,28 +25,16 @@ CUIMMShniaga::CUIMMShniaga()
     m_magnifier = xr_new<CUIStatic>();
     m_shniaga->AttachChild(m_magnifier);
     m_magnifier->SetPPMode();
-    m_gratings[0] = xr_new<CUIStatic>();
-    m_shniaga->AttachChild(m_gratings[0]);
-    m_gratings[1] = xr_new<CUIStatic>();
-    m_shniaga->AttachChild(m_gratings[1]);
     m_anims[0] = xr_new<CUIStatic>();
     m_shniaga->AttachChild(m_anims[0]);
     m_anims[1] = xr_new<CUIStatic>();
     m_shniaga->AttachChild(m_anims[1]);
-
-    m_mag_pos = 0;
-
-    m_selected = NULL;
-
-    m_start_time = 0;
-    m_origin = 0;
-    m_destination = 0;
-    m_run_time = 0;
+    m_gratings[0] = xr_new<CUIStatic>();
+    m_shniaga->AttachChild(m_gratings[0]);
+    m_gratings[1] = xr_new<CUIStatic>();
+    m_shniaga->AttachChild(m_gratings[1]);
 
     m_flags.zero();
-
-    m_selected_btn = -1;
-    m_page = -1;
 }
 
 CUIMMShniaga::~CUIMMShniaga()
@@ -112,18 +100,17 @@ void CUIMMShniaga::Init(CUIXml& xml_doc, LPCSTR path)
 
     m_wheel_size[0] = m_anims[0]->GetWndSize();
 
-    m_wheel_size[1].set(m_wheel_size[0]);
-    m_wheel_size[1].x /= 1.33f;
+    // m_wheel_size[1].set(m_wheel_size[0]);
+    // m_wheel_size[1].x	/= 1.33f;
 }
 
 void CUIMMShniaga::OnDeviceReset()
 {
-    if (UI()->is_widescreen())
-    {
-        m_anims[0]->SetWndSize(m_wheel_size[1]);
-        m_anims[1]->SetWndSize(m_wheel_size[1]);
-    }
-    else
+    // if(UI()->is_widescreen())
+    //{
+    //	m_anims[0]->SetWndSize(m_wheel_size[1]);
+    //	m_anims[1]->SetWndSize(m_wheel_size[1]);
+    // }else
     {
         m_anims[0]->SetWndSize(m_wheel_size[0]);
         m_anims[1]->SetWndSize(m_wheel_size[0]);
@@ -149,9 +136,16 @@ void CUIMMShniaga::CreateList(xr_vector<CUIStatic*>& lst, CUIXml& xml_doc, LPCST
     XML_NODE* tab_node = xml_doc.NavigateToNode(path, 0);
     xml_doc.SetLocalRoot(tab_node);
 
+    CUIStatic* st;
+
     for (int i = 0; i < nodes_num; ++i)
     {
-        CUIStatic* st = xr_new<CUIStatic>();
+        //		if (0 == xr_strcmp("btn_lastsave",xml_doc.ReadAttrib("btn", i, "name")))
+        //		{
+        //			if (g_actor && Actor()->g_Alive())
+        //				continue;
+        //		}
+        st = xr_new<CUIStatic>();
         st->Init(0, 0, m_view->GetDesiredChildWidth(), height);
         st->SetTextComplexMode(false);
         st->SetTextST(xml_doc.ReadAttrib("btn", i, "caption"));
@@ -159,7 +153,8 @@ void CUIMMShniaga::CreateList(xr_vector<CUIStatic*>& lst, CUIXml& xml_doc, LPCST
             st->SetFont(pF);
         st->SetTextColor(color);
         st->SetTextAlignment(CGameFont::alCenter);
-        st->SetVTextAlignment(valCenter);
+        //		st->SetTextAlignment(CGameFont::alLeft);
+        st->SetVTextAlignment(EVTextAlignment::valCenter);
         st->SetWindowName(xml_doc.ReadAttrib("btn", i, "name"));
         st->SetMessageTarget(this);
 

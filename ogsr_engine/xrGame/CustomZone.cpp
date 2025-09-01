@@ -29,40 +29,9 @@ extern Fvector4 ps_ssfx_int_grass_params_1;
 
 CCustomZone::CCustomZone(void)
 {
-    m_fMaxPower = 100.f;
-    m_fAttenuation = 1.f;
-    m_dwPeriod = 1100;
-    m_fEffectiveRadius = 0.75f;
-    m_bZoneActive = false;
-    m_eHitTypeBlowout = ALife::eHitTypeWound;
-    m_pLocalActor = NULL;
-    m_pIdleParticles = NULL;
-    m_pLight = NULL;
-    m_pIdleLight = NULL;
-    m_pIdleLAnim = NULL;
-
     m_StateTime.resize(eZoneStateMax);
     for (int i = 0; i < eZoneStateMax; i++)
         m_StateTime[i] = 0;
-
-    m_dwAffectFrameNum = 0;
-    m_fArtefactSpawnProbability = 0.f;
-    m_fThrowOutPower = 0.f;
-    m_fArtefactSpawnHeight = 0.f;
-    m_fBlowoutWindPowerMax = m_fStoreWindPower = 0.f;
-    m_fDistanceToCurEntity = flt_max;
-    m_ef_weapon_type = u32(-1);
-    m_owner_id = u32(-1);
-
-    m_effector = NULL;
-    m_bIdleObjectParticlesDontStop = FALSE;
-    m_b_always_fastmode = false;
-
-    m_bBornOnBlowoutFlag = false;
-    m_keep_update = false;
-    m_pBlowoutParticles = nullptr;
-    m_pAccumParticles = nullptr;
-    m_pAwakingParticles = nullptr;
 }
 
 CCustomZone::~CCustomZone(void)
@@ -384,6 +353,20 @@ void CCustomZone::Load(LPCSTR section)
     DestroyAfterBlowout = READ_IF_EXISTS(pSettings, r_bool, section, "DestroyAfterBlowout", false);
 
     m_b_always_fastmode = READ_IF_EXISTS(pSettings, r_bool, section, "always_fast_mode", false);
+
+
+    // custom ignore
+    if (pSettings->line_exist(section, "ignored_sects"))
+    {
+        LPCSTR str = pSettings->r_string(section, "ignored_sects");
+        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
+        {
+            string128 _section;
+            _GetItem(str, i, _section);
+            ASSERT_FMT(pSettings->section_exist(_section), "ignored_sects section [%s] not found!", _section);
+            m_ignored_sects.push_back(_section);
+        }
+    }
 }
 
 BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
@@ -395,14 +378,18 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
     const CSE_ALifeCustomZone* Z = smart_cast<CSE_ALifeCustomZone*>(e);
     VERIFY(Z);
 
-    m_fMaxPower = pSettings->r_float(cNameSect(), "max_start_power");
+    m_fMaxPower = Z->m_maxPower; // pSettings->r_float(cNameSect(), "max_start_power");
     m_fAttenuation = pSettings->r_float(cNameSect(), "attenuation");
     m_dwPeriod = pSettings->r_u32(cNameSect(), "period");
     m_owner_id = Z->m_owner_id;
-    if (m_owner_id != u32(-1))
-        m_ttl = Device.dwTimeGlobal + 40000; // 40 sec
+    m_zone_ttl = Z->m_zone_ttl;
+    if (m_owner_id != u32(-1) && m_zone_ttl != u32(-1))
+    {
+        m_ttl = Device.dwTimeGlobal + 1000 * m_zone_ttl; // ttl in seconds
+        //Msg("anomaly [%s] spawned with ttl [%d], m_fMaxPower [%.4f]", Name_script(), m_zone_ttl, m_fMaxPower);
+    }
     else
-        m_ttl = u32(-1);
+        m_ttl = m_zone_ttl;
 
     m_TimeToDisable = Z->m_disabled_time * 1000;
     m_TimeToEnable = Z->m_enabled_time * 1000;
@@ -694,7 +681,7 @@ void CCustomZone::shedule_Update(u32 dt)
 
     UpdateOnOffState();
 
-    if (LastBlowoutTime && (Device.dwTimeGlobal - LastBlowoutTime) > 300)
+    if (m_ttl != u32(-1) && Device.dwTimeGlobal > m_ttl || LastBlowoutTime && (Device.dwTimeGlobal - LastBlowoutTime) > 300)
         DestroyObject();
 }
 
@@ -729,12 +716,13 @@ void CCustomZone::feel_touch_new(CObject* O)
     else
         object_info.nonalive_object = true;
 
-    if (pGameObject->Radius() < SMALL_OBJECT_RADIUS)
+    if (pGameObject->Radius() < SMALL_OBJECT_RADIUS || pGameObject->spawn_ini() && pGameObject->spawn_ini()->line_exist("collide", "small_object"))
         object_info.small_object = true;
     else
         object_info.small_object = false;
 
-    if (IgnoreAny || (object_info.small_object && IgnoreSmall) || (object_info.nonalive_object && IgnoreNonAlive) || (pArtefact && IgnoreArtefact))
+    if (IgnoreAny || (object_info.small_object && IgnoreSmall) || (object_info.nonalive_object && IgnoreNonAlive) || (pArtefact && IgnoreArtefact) ||
+        std::find(m_ignored_sects.begin(), m_ignored_sects.end(), pGameObject->cNameSect()) != m_ignored_sects.end())
         object_info.zone_ignore = true;
     else
         object_info.zone_ignore = false;
