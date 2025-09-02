@@ -24,6 +24,7 @@ void CGrenade::Load(LPCSTR section)
 
     m_grenade_detonation_threshold_hit = READ_IF_EXISTS(pSettings, r_float, section, "detonation_threshold_hit", 100.f);
     b_impact_fuze = READ_IF_EXISTS(pSettings, r_bool, section, "impact_fuze", false);
+    m_dwImpactFuzeTimeMax = READ_IF_EXISTS(pSettings, r_u32, section, "impact_fuze_time", 1500);
 }
 
 void CGrenade::Hit(SHit* pHDS)
@@ -110,6 +111,8 @@ void CGrenade::Throw()
         pGrenade->set_destroy_time(m_dwDestroyTimeMax);
         //установить ID того кто кинул гранату
         pGrenade->SetInitiator(H_Parent()->ID());
+
+        pGrenade->set_impact_fuze_time(m_dwImpactFuzeTimeMax);
     }
     inherited::Throw();
 
@@ -226,7 +229,7 @@ void CGrenade::Contact(CPhysicsShellHolder* obj)
     inherited::Contact(obj);
     if (Initiator() == u16(-1) || !b_impact_fuze)
         return;
-    if (m_dwDestroyTime <= Level().timeServer())
+    if (m_dwImpactFuzeTime <= Level().timeServer())
     {
         VERIFY(!m_pCurrentInventory);
         Destroy();

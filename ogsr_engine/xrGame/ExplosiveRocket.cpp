@@ -27,7 +27,7 @@ void CExplosiveRocket::Load(LPCSTR section)
     inherited::Load(section);
     CInventoryItem::Load(section);
     CExplosive::Load(section);
-    m_safe_dist_to_explode = READ_IF_EXISTS(pSettings, r_float, section, "safe_dist_to_explode", 0);
+    m_destroy_time_max = READ_IF_EXISTS(pSettings, r_u32, section, "destroy_time", 0);
 }
 
 BOOL CExplosiveRocket::net_Spawn(CSE_Abstract* DC)
@@ -48,17 +48,15 @@ void CExplosiveRocket::Contact(const Fvector& pos, const Fvector& normal)
     if (eCollide == m_eState)
         return;
 
-    bool safe_to_explode = true;
     if (m_bLaunched)
     {
+        bool safe_to_explode{true};
         if (m_pOwner)
         {
-            float dist = m_pOwner->Position().distance_to(pos);
-            if (dist < m_safe_dist_to_explode)
+            if (Device.dwTimeGlobal < m_destroy_time)
             {
                 safe_to_explode = false;
-                CActor* pActor = smart_cast<CActor*>(m_pOwner);
-                if (pActor)
+                if (smart_cast<CActor*>(m_pOwner))
                 {
                     u32 lvid = UsedAI_Locations() ? ai_location().level_vertex_id() : ai().level_graph().nearest_vertex_id(pos);
                     CSE_Abstract* object = Level().spawn_item(real_grenade_name.c_str(), pos, lvid, 0xffff, true);

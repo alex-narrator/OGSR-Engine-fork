@@ -108,6 +108,13 @@ void CHelicopter::ExplodeHelicopter()
     CExplosive::SetInitiator(ID());
     CExplosive::GenExplodeEvent(Position(), Fvector().set(0.f, 1.f, 0.f));
     m_brokenSound.stop();
+
+    auto explode_snd = READ_IF_EXISTS(pSettings, r_string, cNameSect().c_str(), "explode_snd", nullptr);
+    if (explode_snd)
+    {
+        m_explodeSound.create(explode_snd, st_Effect, sg_SourceType);
+        m_explodeSound.play_at_pos(0, XFORM().c);
+    }
 }
 
 void CHelicopter::SetDestPosition(Fvector* pos)
@@ -257,7 +264,7 @@ void CHelicopter::DieHelicopter()
 
     m_engineSound.stop();
 
-    m_brokenSound.create(pSettings->r_string(*cNameSect(), "broken_snd"), st_Effect, sg_SourceType);
+    m_brokenSound.create(pSettings->r_string(cNameSect().c_str(), "broken_snd"), st_Effect, sg_SourceType);
     m_brokenSound.play_at_pos(0, XFORM().c, sm_Looped);
 
     IKinematics* K = smart_cast<IKinematics*>(Visual());
@@ -359,12 +366,12 @@ void CHelicopter::UseFireTrail(bool val)
     m_enemy.bUseFireTrail = val;
     if (val)
     {
-        fireDispersionBase = pSettings->r_float(*cNameSect(), "fire_dispersion_null");
+        fireDispersionBase = pSettings->r_float(cNameSect().c_str(), "fire_dispersion_null");
         fireDispersionBase = deg2rad(fireDispersionBase);
     }
     else
     {
-        fireDispersionBase = pSettings->r_float(*cNameSect(), "fire_dispersion_base");
+        fireDispersionBase = pSettings->r_float(cNameSect().c_str(), "fire_dispersion_base");
         fireDispersionBase = deg2rad(fireDispersionBase);
     }
 }

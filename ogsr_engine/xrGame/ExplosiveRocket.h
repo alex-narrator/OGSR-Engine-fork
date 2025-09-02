@@ -68,9 +68,11 @@ public:
     virtual bool Useful() const;
 
 protected:
-    float m_safe_dist_to_explode;
+    u32 m_destroy_time{};
     shared_str real_grenade_name;
 
 public:
     void SetRealGrenadeName(shared_str name) { real_grenade_name = name; };
+    void SetDestroyTime(u32 delta) { m_destroy_time = delta + Device.dwTimeGlobal; };
+    u32 m_destroy_time_max{};
 };

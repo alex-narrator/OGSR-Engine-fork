@@ -65,8 +65,12 @@ protected:
     bool HeadLampSwitch{}, NightVisionSwitch{};
 
     //время уничтожения
-    u32 m_dwDestroyTime;
-    u32 m_dwDestroyTimeMax;
+    u32 m_dwDestroyTime{};
+    u32 m_dwDestroyTimeMax{};
+
+    // час зведення для ударних гранат
+    u32 m_dwImpactFuzeTime{};
+    u32 m_dwImpactFuzeTimeMax{};
 
     Fvector m_throw_direction;
     Fmatrix m_throw_matrix;
@@ -109,6 +113,11 @@ public:
     virtual void setup_physic_shell();
     virtual void create_physic_shell();
     IC void set_destroy_time(u32 delta_destroy_time) { m_dwDestroyTime = delta_destroy_time + Device.dwTimeGlobal; }
+    IC void set_impact_fuze_time(u32 delta_impact_fuze_time)
+    {
+        if (b_impact_fuze)
+            m_dwImpactFuzeTime = delta_impact_fuze_time + Device.dwTimeGlobal;
+    }
 
 protected:
     u32 m_ef_weapon_type;

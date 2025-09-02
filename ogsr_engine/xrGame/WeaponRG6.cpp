@@ -125,6 +125,7 @@ void CWeaponRG6::LaunchGrenade(const Fvector& p1, const Fvector& d1)
         VERIFY(pGrenade);
         pGrenade->SetInitiator(H_Parent()->ID());
         pGrenade->SetRealGrenadeName(m_ammoTypes[m_ammoType]);
+        pGrenade->SetDestroyTime(pGrenade->m_destroy_time_max);
 
         {
             NET_Packet P;

@@ -41,8 +41,6 @@ public:
     virtual bool CanTake() const override;
 
 protected:
-    HUD_SOUND sndCheckout;
-    ESoundTypes m_eSoundCheckout;
     virtual size_t GetWeaponTypeForCollision() const override { return Knife_and_other; }
 
 private:
