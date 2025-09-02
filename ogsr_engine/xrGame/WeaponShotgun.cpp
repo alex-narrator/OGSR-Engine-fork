@@ -278,16 +278,21 @@ bool CWeaponShotgun::Action(s32 cmd, u32 flags)
         }
     }
 
-    if (inherited::Action(cmd, flags))
+    //if (inherited::Action(cmd, flags))
+    //    return true;
+
+    const bool stop_reload = m_bTriStateReload && GetState() == eReload && !IsMisfire() && (flags & CMD_START) && (m_sub_state == eSubstateReloadInProcess || m_sub_state == eSubstateReloadBegin);
+
+    if (inherited::Action(cmd, flags) && !(cmd == kWPN_ZOOM && stop_reload))
         return true;
 
-    if (m_bTriStateReload && GetState() == eReload && !IsMisfire() && (flags & CMD_START) && (m_sub_state == eSubstateReloadInProcess || m_sub_state == eSubstateReloadBegin))
+    if (stop_reload)
     {
         switch (cmd)
         {
         case kWPN_FIRE:
         case kWPN_NEXT:
-        //case kWPN_RELOAD:
+        case kWPN_RELOAD:
         case kWPN_ZOOM:
             // остановить перезарядку
             m_stop_triStateReload = true;
