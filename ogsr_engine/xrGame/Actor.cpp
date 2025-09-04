@@ -822,12 +822,14 @@ void CActor::UpdateCL()
     }
 
     {
-        float outfit_cond{-1.f}, wpn_cond{-1.f};
-        if (auto outfit = inventory().ItemFromSlot(OUTFIT_SLOT))
+        float outfit_cond{-1.f}, /*wpn_cond{-1.f}*/ helmet_cond{-1.f};
+        if (auto outfit = GetOutfit())
             outfit_cond = outfit->GetCondition();
-        if (auto wpn = inventory().ActiveItem())
-            wpn_cond = wpn->GetCondition();
-        shader_exports.set_actor_params(Fvector{this->conditions().GetHealth(), outfit_cond, wpn_cond});
+        //if (auto wpn = inventory().ActiveItem())
+        //    wpn_cond = wpn->GetCondition();
+        if (auto helmet = GetHelmet())
+            helmet_cond = helmet->GetCondition();
+        shader_exports.set_actor_params(Fvector{this->conditions().GetHealth(), outfit_cond, /*wpn_cond*/ helmet_cond});
     }
 
     // Обновление позиции актора для коллизии с травой/кустами

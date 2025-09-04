@@ -1896,7 +1896,7 @@ void CWeaponMagazined::OnZoomChanged()
 {
     PlaySound("sndZoomChange", get_LastFP());
     //if (!Is3dssEnabled())
-        m_fRTZoomFactor = m_fZoomFactor; // store current
+        //m_fRTZoomFactor = m_fZoomFactor; // store current
 
     if (auto pActor = smart_cast<CActor*>(H_Parent()))
         pActor->callback(GameObject::eOnActorWeaponZoomChange)(lua_game_object());

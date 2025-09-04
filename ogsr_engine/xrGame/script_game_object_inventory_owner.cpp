@@ -967,7 +967,7 @@ u32 CScriptGameObject::active_slot()
     return inventory_owner->inventory().GetActiveSlot();
 }
 
-void CScriptGameObject::activate_slot(u8 slot_id)
+void CScriptGameObject::activate_slot(u8 slot_id, bool now)
 {
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
@@ -975,7 +975,13 @@ void CScriptGameObject::activate_slot(u8 slot_id)
         ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CInventoryOwner : cannot access class member activate_slot!");
         return;
     }
-    inventory_owner->inventory().Activate(slot_id);
+
+    if (!inventory_owner->inventory().Activate(slot_id, eGeneral, false, now))
+        if (smart_cast<CActor*>(inventory_owner) && slot_id == DETECTOR_SLOT)
+        {
+            if (auto dev = smart_cast<CCustomDevice*>(inventory_owner->inventory().ItemFromSlot(DETECTOR_SLOT)))
+                dev->ToggleDevice(now);
+        }
 }
 
 void CScriptGameObject::SwitchTorch(bool enable)

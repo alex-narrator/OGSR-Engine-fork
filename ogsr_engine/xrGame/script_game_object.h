@@ -609,7 +609,7 @@ public:
 
     CScriptGameObject* item_in_slot(u8 slot_id) const;
     u32 active_slot();
-    void activate_slot(u8 slot_id);
+    void activate_slot(u8 slot_id, bool now = false);
 
     CScriptGameObject* active_device() const;
 
