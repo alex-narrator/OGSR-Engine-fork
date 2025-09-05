@@ -15,7 +15,11 @@
 #include "level_bullet_manager.h"
 #include "../xr_3da/IGame_Persistent.h"
 
-float CWeapon::GetWeaponDeterioration() { return conditionDecreasePerShot; };
+float CWeapon::GetWeaponDeterioration()
+{
+    float silencer_dec_k = IsAddonAttached(eSilencer) && AddonAttachable(eSilencer) ? conditionDecreasePerShotSilencer : 0.f;
+    return (conditionDecreasePerShot + conditionDecreasePerShot * silencer_dec_k);
+};
 
 void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
 {
@@ -33,14 +37,9 @@ void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
     //повысить изношенность оружия с учетом влияния конкретного патрона
     //	float Deterioration = GetWeaponDeterioration();
     //	Msg("Deterioration = %f", Deterioration);
-    if (Core.Features.test(xrCore::Feature::npc_simplified_shooting))
-    {
-        CActor* actor = smart_cast<CActor*>(H_Parent());
-        if (actor)
-            ChangeCondition(-GetWeaponDeterioration() * l_cartridge.m_impair);
-    }
-    else
-        ChangeCondition(-GetWeaponDeterioration() * l_cartridge.m_impair);
+    float deterioration = GetWeaponDeterioration() + (GetWeaponDeterioration() * l_cartridge.m_impair);
+    if (!Core.Features.test(xrCore::Feature::npc_simplified_shooting) || smart_cast<CActor*>(H_Parent()))
+        ChangeCondition(-deterioration);
 
     float fire_disp = GetFireDispersion(true);
 

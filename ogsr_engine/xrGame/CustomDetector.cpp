@@ -45,10 +45,9 @@ void CCustomDetector::shedule_Update(u32 dt)
         return;
     }
 
-    Position().set(H_Parent()->Position());
+    Fvector P{H_Parent()->Position()};
 
-    Fvector P{};
-    P.set(H_Parent()->Position());
+    Position().set(P);
 
     m_artefacts.feel_touch_update(P, m_fArtefactRadius);
     m_zones.feel_touch_update(P, m_fDetectRadius);
