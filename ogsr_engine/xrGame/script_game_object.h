@@ -360,8 +360,8 @@ public:
 
     void RunTalkDialog(CScriptGameObject* pToWho) const;
 
-    void HideWeapon();
-    void RestoreWeapon();
+    void HideWeapon(bool = false);
+    void RestoreWeapon(bool = false);
 
     LPCSTR ProfileName();
     LPCSTR CharacterName();

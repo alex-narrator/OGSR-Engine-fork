@@ -895,9 +895,9 @@ bool CScriptGameObject::attachable_item_enabled() const
     return (attachable_item->enabled());
 }
 
-void CScriptGameObject::RestoreWeapon() { Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, false); }
+void CScriptGameObject::RestoreWeapon(bool now) { Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, false, now); }
 
-void CScriptGameObject::HideWeapon() { Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true); }
+void CScriptGameObject::HideWeapon(bool now) { Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true, now); }
 
 int CScriptGameObject::animation_slot() const
 {
