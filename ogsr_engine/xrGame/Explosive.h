@@ -104,6 +104,7 @@ protected:
     float m_fFragHitImpulse{};
     int m_iFragsNum{20};
     float m_fFragAP{};
+    float m_FragPierce{};
 
     //типы наносимых хитов
     ALife::EHitType m_eHitTypeBlast{ALife::eHitTypeExplosion};

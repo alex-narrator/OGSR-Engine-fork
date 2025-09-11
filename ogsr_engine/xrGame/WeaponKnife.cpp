@@ -60,6 +60,7 @@ void CWeaponKnife::KnifeStrike(u32 state, const Fvector& pos, const Fvector& dir
     ALife::EHitType cur_eHitType = ALife::eHitTypeBurn;
     float cur_fHitImpulse = 0;
     float cur_fHit = 0;
+    float cur_fHitAP = 0;
     bool apply = false;
 
     switch (state)
@@ -77,6 +78,7 @@ void CWeaponKnife::KnifeStrike(u32 state, const Fvector& pos, const Fvector& dir
             cur_fHit = fvHitPower_1[egdMaster];
         }
         cur_fHitImpulse = fHitImpulse_1;
+        cur_fHitAP = fHitAP_1;
         apply = true;
         //-------------------------------------------
     }
@@ -94,6 +96,7 @@ void CWeaponKnife::KnifeStrike(u32 state, const Fvector& pos, const Fvector& dir
             cur_fHit = fvHitPower_2[egdMaster];
         }
         cur_fHitImpulse = fHitImpulse_2;
+        cur_fHitAP = fHitAP_2;
         apply = true;
         //-------------------------------------------
     }
@@ -109,7 +112,7 @@ void CWeaponKnife::KnifeStrike(u32 state, const Fvector& pos, const Fvector& dir
         cartridge.m_kHit = 1;
         cartridge.m_kImpulse = 1;
         cartridge.m_kPierce = 1;
-        cartridge.m_kAP = state == eFire ? fHitAP_1 : fHitAP_2;
+        cartridge.m_kAP = cur_fHitAP;
         cartridge.m_flags.set(CCartridge::cfTracer, FALSE);
         cartridge.m_flags.set(CCartridge::cfRicochet, FALSE);
         cartridge.fWallmarkSize = fWallmarkSize;

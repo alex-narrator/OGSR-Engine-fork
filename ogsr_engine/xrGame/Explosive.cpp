@@ -72,6 +72,7 @@ void CExplosive::Load(CInifile* ini, LPCSTR section)
     m_eHitTypeFrag = ALife::g_tfString2HitType(ini->r_string(section, "hit_type_frag"));
 
     m_fFragAP = READ_IF_EXISTS(ini, r_float, section, "frags_ap", 0.f);
+    m_FragPierce = READ_IF_EXISTS(ini, r_float, section, "frags_pierce", 1.f);
 
     m_fUpThrowFactor = ini->r_float(section, "up_throw_factor");
 
@@ -359,7 +360,7 @@ void CExplosive::Explode()
         cartridge.m_kDist = 1.f;
         cartridge.m_kHit = 1.f;
         cartridge.m_kImpulse = 1.f;
-        cartridge.m_kPierce = 1.f;
+        cartridge.m_kPierce = m_FragPierce;
         cartridge.m_kAP = m_fFragAP;
         cartridge.fWallmarkSize = fWallmarkSize;
         cartridge.bullet_material_idx = GMLib.GetMaterialIdx(WEAPON_MATERIAL_NAME);
