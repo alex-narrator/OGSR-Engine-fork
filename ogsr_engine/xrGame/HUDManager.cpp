@@ -330,7 +330,7 @@ void CHUDManager::RenderUI()
     {
         HitMarker.Render();
 
-        if (psHUD_Flags.is(HUD_CROSSHAIR | HUD_CROSSHAIR_RT | HUD_CROSSHAIR_RT2))
+        if (psHUD_Flags.is(HUD_CROSSHAIR | HUD_CROSSHAIR_RT | HUD_CROSSHAIR_RT2) || psActorFlags.test(AF_CROSSHAIR_DBG))
             m_pHUDTarget->Render();
     }
 

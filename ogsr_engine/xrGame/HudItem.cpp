@@ -418,23 +418,22 @@ void CHudItem::render_item_3d_ui()
 {
     if (render_item_3d_ui_query() && script_ui)
     {
-        Fmatrix LM;
-        Fmatrix trans = HudItemData()->m_item_transform;
-        u16 bid = HudItemData()->m_model->LL_BoneID(script_ui_bone);
-        Fmatrix ui_bone = HudItemData()->m_model->LL_GetTransform(bid);
-        LM.mul(trans, ui_bone);
+        Fmatrix m_res{};
+        auto visual = HudItemData()->m_model;
+        u16 bone_id = visual->LL_BoneID(script_ui_bone);
+        Fmatrix bone_trans = visual->LL_GetTransform(bone_id);
 
-        Fmatrix script_ui_matrix;
-        script_ui_matrix.identity();
+        Fmatrix offset{};
         Fvector pos = script_ui_offset[0];
         Fvector rot = script_ui_offset[1];
-        script_ui_matrix.setHPB(rot.x, rot.y, rot.z);
-        script_ui_matrix.translate_over(pos);
-        LM.mulB_43(script_ui_matrix);
+        offset.setHPB(rot.x, rot.y, rot.z);
+        offset.translate_over(pos);
+        m_res.mul(bone_trans, offset);
+        m_res.mulA_43(HudItemData()->m_item_transform);
 
         IUIRender::ePointType bk = UI()->m_currentPointType;
         UI()->m_currentPointType = IUIRender::pttLIT;
-        UIRender->CacheSetXformWorld(LM);
+        UIRender->CacheSetXformWorld(m_res);
         UIRender->CacheSetCullMode(IUIRender::cmNONE);
         UI()->ScreenFrustumLIT().Clear();
         script_ui->Draw();

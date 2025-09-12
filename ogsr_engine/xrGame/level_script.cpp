@@ -847,7 +847,7 @@ void demo_record_set_direct_input(bool f)
 
 CEffectorBobbing* get_effector_bobbing() { return Actor()->GetEffectorBobbing(); }
 
-void iterate_nearest(const Fvector& pos, float radius, luabind::functor<bool> functor)
+void iterate_nearest(const Fvector& pos, float radius, const luabind::functor<bool>& functor)
 {
     xr_vector<CObject*> m_nearest;
     Level().ObjectSpace.GetNearest(m_nearest, pos, radius, NULL);
@@ -855,14 +855,15 @@ void iterate_nearest(const Fvector& pos, float radius, luabind::functor<bool> fu
     if (!m_nearest.size())
         return;
 
-    xr_vector<CObject*>::iterator it = m_nearest.begin();
-    xr_vector<CObject*>::iterator it_e = m_nearest.end();
-    for (; it != it_e; it++)
+	// demonized: sort nearest by distance first
+    std::sort(m_nearest.begin(), m_nearest.end(), [&pos](CObject* o1, CObject* o2) { return o1->Position().distance_to_sqr(pos) < o2->Position().distance_to_sqr(pos); });
+
+    for (const auto& obj : m_nearest)
     {
-        CGameObject* obj = smart_cast<CGameObject*>(*it);
-        if (!obj)
+        auto go = smart_cast<CGameObject*>(obj);
+        if (!go || go->getDestroy())
             continue;
-        if (functor(obj->lua_game_object()))
+        if (functor(go->lua_game_object()))
             break;
     }
 }

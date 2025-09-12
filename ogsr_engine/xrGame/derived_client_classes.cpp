@@ -179,6 +179,7 @@ void CWeaponScript::set_hit_power(CWeapon* wpn, luabind::object const& t)
 
 LPCSTR get_addon_name(CWeapon* I, u32 addon) { return I->GetAddonName(addon).c_str(); }
 LPCSTR get_ammo_sect(CWeapon* I) { return !I->m_magazine.empty() ? I->m_magazine.back().m_ammoSect.c_str() : nullptr; }
+float fire_dispertion(CWeapon* I, bool with_cartridge) { return I->GetFireDispersion(with_cartridge); }
 
 void CWeaponScript::script_register(lua_State* L)
 {
@@ -263,7 +264,8 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("aim_alt_mode", &CWeapon::IsAimAltMode)
                   .def("try_to_get_ammo", &CWeapon::TryToGetAmmo)
                   .def("get_next_ammo_type", &CWeapon::GetNextAmmoType)
-                  .def_readwrite("next_ammo_type", &CWeapon::m_set_next_ammoType_on_reload),
+                  .def_readwrite("next_ammo_type", &CWeapon::m_set_next_ammoType_on_reload)
+                  .def("get_fire_dispertion", &fire_dispertion),
 
               class_<CWeaponMagazined, CWeapon>("CWeaponMagazined")
                   .def_readonly("shot_num", &CWeaponMagazined::m_iShotNum)

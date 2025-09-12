@@ -317,6 +317,17 @@ void FAKE_CALifeSimulator__teleport_object(CALifeSimulator*, const char*, Fvecto
     FATAL("INCORRECT ARGUMENTS! Must be: alife():teleport_object(id, position, lvid, gvid)");
 }
 
+// demonized: iterate alife objects
+void CALifeSimulator__iterate_objects(const CALifeSimulator* self, const luabind::functor<bool>& functor)
+{
+    const CALifeObjectRegistry& objects = self->objects();
+    for (const auto& se_obj : objects.objects())
+    {
+        if (functor(se_obj.second))
+            break;
+    }
+}
+
 u32 get_level_id(CALifeSimulator* self) { return (self->graph().level().level_id()); }
 
 u32 get_level_id_by_name(CALifeSimulator* self, LPCSTR level_name)
@@ -437,6 +448,9 @@ void CALifeSimulator::script_register(lua_State* L)
                   .def("use_ai_locations", &CALifeSimulator__use_ai_locations)
                   .property("save_name", &get_save_name)
                   .property("loaded_save_name", &get_loaded_save)
+
+		// demonized: iterate alife objects
+                  .def("iterate_objects", &CALifeSimulator__iterate_objects)
 
                   ,
               def("alife", &alife)];
