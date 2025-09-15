@@ -734,7 +734,7 @@ public:
     Flags16 GetIIFlags();
     u32 GetHudItemState();
     bool IsPending() const;
-    void StopAimInertion(bool);
+    void SetAimInertion(float);
     float GetRadius();
     void ShowItemHud(bool);
 

@@ -262,6 +262,8 @@ protected:
     float m_fZoomHudFov{};
     //Целевой HUD FOV для линзы
     float m_f3dssHudFov{};
+    // кастомний коефіцієнт для скриптів
+    float m_fZoomHudFovK{1.f};
 
     bool m_bScopeShowIndicators{true};
 

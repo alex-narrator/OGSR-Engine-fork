@@ -202,7 +202,7 @@ public:
     virtual void render_item_3d_ui();
     virtual bool render_item_3d_ui_query() { return true; }
     virtual bool CheckCompatibility(CHudItem*) { return true; }
-    virtual void SetStopAimInertion(bool val) { m_bStopAimInertion = val; };
+    virtual void SetAimInertion(float val) { m_fAimInertionControl = val; };
     void SetToScreenCenter(Fvector& dir, Fvector& pos, float distance = 0.1f) const;
 
     Fvector script_ui_offset[2]{}; // pos, rot
@@ -324,7 +324,7 @@ protected:
     bool HudInertionAllowed() const { return m_huditem_flags.test(fl_inertion_allow); }
     void AllowHudInertion(BOOL B) { m_huditem_flags.set(fl_inertion_allow, B); }
     float m_fAimInertionK{};
-    bool m_bStopAimInertion{};
+    float m_fAimInertionControl{1.f};
 
 private:
     shared_str world_sect;

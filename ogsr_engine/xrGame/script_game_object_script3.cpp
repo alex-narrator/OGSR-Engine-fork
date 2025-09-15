@@ -407,7 +407,7 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
 
         .def("get_hud_item_state", &CScriptGameObject::GetHudItemState)
         .def("is_pending", &CScriptGameObject::IsPending)
-        .def("stop_aim_inertion", &CScriptGameObject::StopAimInertion)
+        .def("set_aim_inertion", &CScriptGameObject::SetAimInertion)
         .def("show_item_hud", &CScriptGameObject::ShowItemHud)
         .def("radius", &CScriptGameObject::GetRadius)
         .def("play_hud_motion", (u32(CScriptGameObject::*)(LPCSTR))(&CScriptGameObject::play_hud_animation))

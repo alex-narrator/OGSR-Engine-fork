@@ -641,11 +641,11 @@ bool CScriptGameObject::IsPending() const
     return k && k->IsPending();
 }
 
-void CScriptGameObject::StopAimInertion(bool val)
+void CScriptGameObject::SetAimInertion(float val)
 {
     CHudItem* k = smart_cast<CHudItem*>(&object());
     if (k)
-        k->SetStopAimInertion(val);
+        k->SetAimInertion(val);
 }
 
 void CScriptGameObject::ShowItemHud(bool val)

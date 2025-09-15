@@ -2096,14 +2096,15 @@ float CWeapon::GetHudFov()
         {
             // В линзе зума
             const float fDiff = last_nw_hf - m_f3dssHudFov;
-            return m_f3dssHudFov + (fDiff * (1 - m_fZoomRotationFactor));
+            return m_f3dssHudFov * m_fZoomHudFovK + (fDiff * (1 - m_fZoomRotationFactor));
         }
-        if ((m_eScopeStatus == CSE_ALifeItemWeapon::eAddonDisabled || IsAddonAttached(eScope)) && !IsGrenadeMode() && m_fZoomHudFov > 0.0f)
+        if ((m_eScopeStatus == CSE_ALifeItemWeapon::eAddonDisabled || IsAddonAttached(eScope)) && !IsAimAltMode() && !IsGrenadeMode() && m_fZoomHudFov > 0.0f)
         {
             // В процессе зума
             const float fDiff = last_nw_hf - m_fZoomHudFov;
-            return m_fZoomHudFov + (fDiff * (1 - m_fZoomRotationFactor));
+            return m_fZoomHudFov * m_fZoomHudFovK + (fDiff * (1 - m_fZoomRotationFactor));
         }
+        return last_nw_hf * m_fZoomHudFovK;
     }
 
     return last_nw_hf;

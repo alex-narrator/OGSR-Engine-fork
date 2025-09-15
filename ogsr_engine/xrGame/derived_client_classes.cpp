@@ -234,6 +234,7 @@ void CWeaponScript::script_register(lua_State* L)
 
                   .def_readwrite("scope_zoom_hud_fov", &CWeapon::m_fZoomHudFov)
                   .def_readwrite("scope_lense_hud_fov", &CWeapon::m_f3dssHudFov)
+                  .def_readwrite("zoom_hud_fov_k", &CWeapon::m_fZoomHudFovK)
 
                   .def_readonly("zoom_mode", &CWeapon::m_bZoomMode)
 
