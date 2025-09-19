@@ -526,7 +526,8 @@ u8 CWeaponShotgun::AddCartridge(u8 cnt)
         --cnt;
         ++iAmmoElapsed;
         l_cartridge.m_LocalAmmoType = u8(m_ammoType);
-        m_magazine.push_back(l_cartridge);
+        /*m_magazine.push_back(l_cartridge);*/
+        m_magazine.insert(m_magazine.begin(), l_cartridge);
     }
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
@@ -563,22 +564,17 @@ u8 CWeaponShotgun::AddCartridge(u8 cnt)
 //    }
 //}
 
-//void CWeaponShotgun::ReloadMagazine()
-//{ //Используется только при отключенном tri_state_reload
-//    m_dwAmmoCurrentCalcFrame = 0;
-//
-//    if (IsMisfire())
-//        SwitchMisfire(false);
-//    else
-//    {
-//        if (!m_pCurrentInventory)
-//            return;
-//
-//        u8 cnt = AddCartridge(1);
-//        while (cnt == 0)
-//            cnt = AddCartridge(1);
-//    }
-//}
+void CWeaponShotgun::ReloadMagazine()
+{ //Используется только при отключенном tri_state_reload
+    m_dwAmmoCurrentCalcFrame = 0;
+
+    if (!m_pCurrentInventory)
+        return;
+
+    u8 cnt = AddCartridge(1);
+    while (cnt == 0)
+        cnt = AddCartridge(1);
+}
 
 //void CWeaponShotgun::StopHUDSounds()
 //{

@@ -1017,6 +1017,9 @@ bool CInventory::IsAllItemsLoaded() const { return m_bUpdated; }
 
 bool CInventory::IsSlotAllowed(u32 slot) const
 {
+    if (slot >= m_slots.size())
+        return false;    
+
     if (!smart_cast<CActor*>(m_pOwner) || !IsAllItemsLoaded())
         return true;
 

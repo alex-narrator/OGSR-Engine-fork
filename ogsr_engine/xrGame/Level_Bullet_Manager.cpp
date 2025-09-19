@@ -40,7 +40,7 @@ void SBullet::Init(const Fvector& position, const Fvector& direction, float star
     parent_id = sender_id;
     flags.allow_sendhit = SendHit;
     weapon_id = sendersweapon_id;
-    hit_type = e_hit_type;
+    hit_type = cartridge.m_eHitType < ALife::eHitTypeMax ? cartridge.m_eHitType : e_hit_type;
 
     pierce = cartridge.m_kPierce;
     ap = cartridge.m_kAP;
@@ -53,11 +53,12 @@ void SBullet::Init(const Fvector& position, const Fvector& direction, float star
 
     flags.allow_tracer = !!cartridge.m_flags.test(CCartridge::cfTracer);
     flags.allow_ricochet = !!cartridge.m_flags.test(CCartridge::cfRicochet);
-    flags.explosive = !!cartridge.m_flags.test(CCartridge::cfExplosive);
+    flags.hit_fx = !!cartridge.m_flags.test(CCartridge::cfHitFx);
+    flags.shoot_mark = !!cartridge.m_flags.test(CCartridge::cfShootMark);
     flags.skipped_frame = 0;
 
     targetID = 0;
-    m_ExplodeParticles = cartridge.m_ExplodeParticles;
+    m_HitFxParticles = cartridge.m_HitFxParticles;
 }
 
 //////////////////////////////////////////////////////////
@@ -97,17 +98,19 @@ void CBulletManager::Load()
         m_WhineSounds.back().create(_GetItem(whine_sounds, k, tmp), st_Effect, sg_SourceType);
     }
 
-    LPCSTR explode_particles = pSettings->r_string(BULLET_MANAGER_SECTION, "explode_particles");
-    cnt = _GetItemCount(explode_particles);
+    LPCSTR hit_fx_particles = pSettings->r_string(BULLET_MANAGER_SECTION, "hit_fx_particles");
+    cnt = _GetItemCount(hit_fx_particles);
     for (int k = 0; k < cnt; ++k)
-        m_ExplodeParticles.emplace_back(_GetItem(explode_particles, k, tmp));
+        m_HitFxParticles.emplace_back(_GetItem(hit_fx_particles, k, tmp));
+
+    m_bHitFxOnDynamics = READ_IF_EXISTS(pSettings, r_bool, BULLET_MANAGER_SECTION, "hit_fx_on_dynamics", true);
 }
 
-void CBulletManager::PlayExplodePS(const Fmatrix& xf, RStringVec& m_ExplodeParticles)
+void CBulletManager::PlayHitFx(const Fmatrix& xf, RStringVec& m_HitFxParticles)
 {
-    if (!m_ExplodeParticles.empty())
+    if (!m_HitFxParticles.empty())
     {
-        const shared_str& ps_name = m_ExplodeParticles[Random.randI(0, m_ExplodeParticles.size())];
+        const shared_str& ps_name = m_HitFxParticles[Random.randI(0, m_HitFxParticles.size())];
 
         CParticlesObject* ps = CParticlesObject::Create(*ps_name, TRUE);
         ps->UpdateParent(xf, {});

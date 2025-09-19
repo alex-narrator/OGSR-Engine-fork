@@ -15,12 +15,13 @@ struct SBullet
         struct
         {
             u16 ricochet_was : 1; //пуля срикошетила
-            u16 explosive : 1; // special explosive mode for particles
+            u16 hit_fx : 1; // special mode for hit effect particles
             u16 allow_tracer : 1;
             u16 allow_ricochet : 1; //разрешить рикошет
             u16 allow_sendhit : 1; // statistics
             u16 skipped_frame : 1; //пропуск первой отрисовки
             u16 aim_bullet : 1; //прицеленная пуля( вылетевшая первой после длительного молчания оружия (1-3 сек.))
+            u16 shoot_mark : 1;
         };
         u16 _storage;
     } flags;
@@ -48,7 +49,7 @@ struct SBullet
     float wallmark_size;
     //-------------------------------------------------------------------
     u8 m_u8ColorID;
-    RStringVec m_ExplodeParticles;
+    RStringVec m_HitFxParticles;
 
     //тип наносимого хита
     ALife::EHitType hit_type;
@@ -110,7 +111,7 @@ private:
 
 protected:
     xr_vector<ref_sound> m_WhineSounds;
-    RStringVec m_ExplodeParticles;
+    RStringVec m_HitFxParticles;
 
     BulletVec m_Bullets; // working set, locked
     BulletVec m_BulletsRendered; // copy for rendering
@@ -141,9 +142,11 @@ protected:
     float m_fTracerLengthMax;
     float m_fTracerLengthMin;
 
+    bool m_bHitFxOnDynamics{};
+
 protected:
     void PlayWhineSound(SBullet* bullet, CObject* object, const Fvector& pos);
-    void PlayExplodePS(const Fmatrix& xf, RStringVec&);
+    void PlayHitFx(const Fmatrix& xf, RStringVec&);
     //функция обработки хитов объектов
     static BOOL test_callback(const collide::ray_defs& rd, CObject* object, LPVOID params);
     static BOOL firetrace_callback(collide::rq_result& result, LPVOID params);

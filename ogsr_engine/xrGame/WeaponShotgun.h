@@ -47,7 +47,7 @@ protected:
 
     bool HaveCartridgeInInventory(u8 cnt);
     virtual u8 AddCartridge(u8 cnt);
-    /*virtual void ReloadMagazine();*/
+    virtual void ReloadMagazine();
 
     virtual void PlayAnimShutter();
     virtual void PlayAnimShutterMisfire();

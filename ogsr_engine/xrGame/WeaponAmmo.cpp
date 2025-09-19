@@ -38,24 +38,22 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     m_impair = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "impair", 0.f);
     fWallmarkSize = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "wm_size", 0.05f);
 
-    m_flags.set(cfCanBeUnlimited, TRUE);
-
     bool allow_ricochet = READ_IF_EXISTS(pSettings, r_bool, BULLET_MANAGER_SECTION, "allow_ricochet", true);
     m_flags.set(cfRicochet, READ_IF_EXISTS(pSettings, r_bool, m_ammoSect, "allow_ricochet", allow_ricochet));
 
-    if (pSettings->line_exist(m_ammoSect, "can_be_unlimited"))
-        m_flags.set(cfCanBeUnlimited, pSettings->r_bool(m_ammoSect, "can_be_unlimited"));
+    m_flags.set(cfCanBeUnlimited, READ_IF_EXISTS(pSettings, r_bool, m_ammoSect, "can_be_unlimited", true));
 
-    if (pSettings->line_exist(m_ammoSect, "explosive"))
-        m_flags.set(cfExplosive, pSettings->r_bool(m_ammoSect, "explosive"));
+    m_flags.set(cfShootMark, READ_IF_EXISTS(pSettings, r_bool, m_ammoSect, "shoot_mark", true));
 
-    if (pSettings->line_exist(m_ammoSect, "explode_particles"))
+    m_flags.set(cfHitFx, READ_IF_EXISTS(pSettings, r_bool, m_ammoSect, "hit_fx", false));
+
+    if (pSettings->line_exist(m_ammoSect, "hit_fx_particles"))
     {
-        LPCSTR explode_particles = pSettings->r_string(m_ammoSect, "explode_particles");
-        int cnt = _GetItemCount(explode_particles);
+        LPCSTR hit_fx_particles = pSettings->r_string(m_ammoSect, "hit_fx_particles");
+        int cnt = _GetItemCount(hit_fx_particles);
         xr_string tmp;
         for (int k = 0; k < cnt; ++k)
-            m_ExplodeParticles.push_back(_GetItem(explode_particles, k, tmp));
+            m_HitFxParticles.push_back(_GetItem(hit_fx_particles, k, tmp));
     }
 
     bullet_material_idx = GMLib.GetMaterialIdx(WEAPON_MATERIAL_NAME);
@@ -65,6 +63,20 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     m_InvShortName = CStringTable().translate(pSettings->r_string(m_ammoSect, "inv_name_short"));
     //
     m_misfireProbability = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "misfire_probability", 0.f);
+
+    if (pSettings->line_exist(m_ammoSect, "hit_type"))
+        m_eHitType = ALife::g_tfString2HitType(pSettings->r_string(m_ammoSect, "hit_type"));
+
+    if (pSettings->line_exist(m_ammoSect, "shot_particles"))
+    {
+        LPCSTR shot_particles = pSettings->r_string(m_ammoSect, "shot_particles");
+        int cnt = _GetItemCount(shot_particles);
+        xr_string tmp;
+        for (int k = 0; k < cnt; ++k)
+            m_sShotParticles.push_back(_GetItem(shot_particles, k, tmp));
+    }
+
+    m_bShotLight = READ_IF_EXISTS(pSettings, r_bool, m_ammoSect, "shot_light", false);
 }
 
 float CCartridge::Weight() const
@@ -145,6 +157,20 @@ void CWeaponAmmo::Load(LPCSTR section)
     R_ASSERT(fWallmarkSize > 0);
     //
     m_misfireProbability = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "misfire_probability", 0.0f);
+
+    if (pSettings->line_exist(m_ammoSect, "hit_type"))
+        m_eHitType = ALife::g_tfString2HitType(pSettings->r_string(m_ammoSect, "hit_type"));
+
+    if (pSettings->line_exist(m_ammoSect, "shot_particles"))
+    {
+        LPCSTR shot_particles = pSettings->r_string(m_ammoSect, "shot_particles");
+        int cnt = _GetItemCount(shot_particles);
+        xr_string tmp;
+        for (int k = 0; k < cnt; ++k)
+            m_sShotParticles.push_back(_GetItem(shot_particles, k, tmp));
+    }
+
+    m_bShotLight = READ_IF_EXISTS(pSettings, r_bool, m_ammoSect, "shot_light", false);
 }
 
 BOOL CWeaponAmmo::net_Spawn(CSE_Abstract* DC)
@@ -226,6 +252,10 @@ bool CWeaponAmmo::Get(CCartridge& cartridge)
     cartridge.m_InvShortName = m_InvShortName;
     //
     cartridge.m_misfireProbability = m_misfireProbability;
+    cartridge.m_eHitType = m_eHitType;
+    cartridge.m_sShotParticles = m_sShotParticles;
+    cartridge.m_bShotLight = m_bShotLight;
+
     --m_boxCurr;
     if (m_pCurrentInventory)
         m_pCurrentInventory->InvalidateState();

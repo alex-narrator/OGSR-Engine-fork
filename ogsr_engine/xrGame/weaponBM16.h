@@ -31,7 +31,7 @@ protected:
     virtual void PlayAnimSprintStart() override;
     virtual void PlayAnimSprintEnd() override;
     virtual void PlayReloadSound();
-    virtual void OnShot();
+    /*virtual void OnShot();*/
     /*virtual void UpdateSounds() override;*/
 
     virtual size_t GetWeaponTypeForCollision() const override { return BM_16; }

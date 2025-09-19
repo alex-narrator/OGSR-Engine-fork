@@ -14,9 +14,12 @@ public:
         cfTracer = (1 << 0),
         cfRicochet = (1 << 1),
         cfCanBeUnlimited = (1 << 2),
-        cfExplosive = (1 << 3),
+        cfHitFx = (1 << 3),
+        cfShootMark = (1 << 4),
     };
     float m_kDist{}, m_kDisp{}, m_kHit{}, m_kImpulse{}, m_kPierce{}, m_kAP{}, m_kAirRes{}, m_kSpeed{}, m_impair{}, fWallmarkSize{}, m_misfireProbability{};
+    
+    ALife::EHitType m_eHitType{ALife::eHitTypeMax};
 
     int m_buckShot{1};
 
@@ -27,7 +30,10 @@ public:
     Flags8 m_flags;
 
     shared_str m_InvShortName;
-    RStringVec m_ExplodeParticles;
+    RStringVec m_HitFxParticles;
+
+    RStringVec m_sShotParticles{};
+    bool m_bShotLight{};
 };
 
 class CWeaponAmmo : public CInventoryItemObject
@@ -60,6 +66,8 @@ public:
         // вірогідність затримки магазину
         m_misfireProbabilityBox{};
 
+    ALife::EHitType m_eHitType{ALife::eHitTypeMax};
+
     int m_buckShot{1};
 
     u8 m_u8ColorID{};
@@ -69,6 +77,9 @@ public:
     bool m_tracer{};
     //
     shared_str m_ammoSect{}, m_InvShortName{};
+
+    RStringVec m_sShotParticles{};
+    bool m_bShotLight{};
 
     xr_vector<shared_str> m_ammoTypes;
     u8 m_cur_ammo_type{};

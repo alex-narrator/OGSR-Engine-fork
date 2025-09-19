@@ -242,7 +242,9 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
     SGameMtl* tgt_mtl = GMLib.GetMaterialByIdx(target_material);
     BOOL bStatic = !tgt_mtl->Flags.test(SGameMtl::flDynamic);
 
-    if ((ps_name && ShowMark) || (bullet->flags.explosive && bStatic))
+    static bool play_hit_fx = bStatic || m_bHitFxOnDynamics;
+
+    if ((ps_name && ShowMark) || (bullet->flags.hit_fx && play_hit_fx))
     {
         Fmatrix pos;
         pos.k.normalize(particle_dir);
@@ -257,16 +259,16 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
             GamePersistent().ps_needtoplay.push_back(ps);
         }
 
-        if (bullet->flags.explosive && bStatic)
-            PlayExplodePS(pos, bullet->m_ExplodeParticles.empty() ? m_ExplodeParticles : bullet->m_ExplodeParticles);
+        if (bullet->flags.hit_fx && play_hit_fx)
+            PlayHitFx(pos, bullet->m_HitFxParticles.empty() ? m_HitFxParticles : bullet->m_HitFxParticles);
     }
 }
 
 void CBulletManager::StaticObjectHit(CBulletManager::_event& E)
 {
     //	Fvector hit_normal;
-    FireShotmark(&E.bullet, E.bullet.dir, E.point, E.R, E.tgt_material, E.normal,
-                 (E.bullet.hit_type == ALife::eHitTypeFireWound || E.bullet.hit_type == ALife::eHitTypeWound || E.bullet.hit_type == ALife::eHitTypeWound_2));
+    FireShotmark(&E.bullet, E.bullet.dir, E.point, E.R, E.tgt_material, E.normal, E.bullet.flags.shoot_mark);
+                 //(E.bullet.hit_type == ALife::eHitTypeFireWound || E.bullet.hit_type == ALife::eHitTypeWound || E.bullet.hit_type == ALife::eHitTypeWound_2));
     //	ObjectHit	(&E.bullet,					E.point, E.R, E.tgt_material, hit_normal);
 }
 
@@ -278,8 +280,8 @@ void CBulletManager::DynamicObjectHit(CBulletManager::_event& E)
     if (g_clear)
         E.Repeated = false;
     E.Repeated = false;
-    bool NeedShootmark =
-        (E.bullet.hit_type == ALife::eHitTypeFireWound || E.bullet.hit_type == ALife::eHitTypeWound || E.bullet.hit_type == ALife::eHitTypeWound_2); // true;//!E.Repeated;
+    bool NeedShootmark = E.bullet.flags.shoot_mark;
+        //(E.bullet.hit_type == ALife::eHitTypeFireWound || E.bullet.hit_type == ALife::eHitTypeWound || E.bullet.hit_type == ALife::eHitTypeWound_2); // true;//!E.Repeated;
 
     if (smart_cast<CActor*>(E.R.O))
     {

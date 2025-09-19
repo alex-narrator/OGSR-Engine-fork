@@ -734,6 +734,19 @@ void CWeaponMagazined::OnShot()
     // Огонь из ствола
     if (ShouldPlayFlameParticles())
     {
+        const auto& ammo = m_magazine.back();
+        const auto& shot_particles = ammo.m_sShotParticles;
+        // якщо в набої вказано партікли пострілу - використовувати їх
+        if (!shot_particles.empty())
+            m_sFlameParticlesCurrent = shot_particles[Random.randI(0, shot_particles.size())];
+        else
+            m_sFlameParticlesCurrent = IsAddonAttached(eSilencer) ? m_sSilencerFlameParticles : m_sFlameParticles;
+
+        if (ammo.m_bShotLight)
+            LoadLights(ammo.m_ammoSect.c_str(), "");
+        else
+            LoadLights(cNameSect().c_str(), IsAddonAttached(eSilencer) ? "silencer_" : "");
+
         StartFlameParticles();
         ForceUpdateFireParticles();
     }
@@ -757,10 +770,6 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
     case eReload:
         ReloadMagazine();
         HandleCartridgeInChamber();
-        //HUD_SOUND::StopSound(sndReload);
-        //HUD_SOUND::StopSound(sndReloadPartly);
-        //HUD_SOUND::StopSound(sndReloadJammed);
-        //HUD_SOUND::StopSound(sndReloadJammedLast);
         m_sounds.StopSound("sndReload");
         m_sounds.StopSound("sndReloadPartly");
         m_sounds.StopSound("sndReloadJammed");

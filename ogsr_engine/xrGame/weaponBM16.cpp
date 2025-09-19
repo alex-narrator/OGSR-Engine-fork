@@ -29,34 +29,33 @@ void CWeaponBM16::PlayReloadSound()
 //    UpdateSoundPosition("m_sndReload1", get_LastFP());
 //}
 
-void CWeaponBM16::OnShot()
-{
-    AddShotEffector();
-    PlayAnimShoot();
-
-    if (IsMisfire())
-    {
-        if (SoundExist("sndBreechJammed"))
-            PlaySound("sndBreechJammed", get_LastFP());
-    }
-    else
-    {
-        /*PlaySound(*m_pSndShotCurrent, get_LastFP(), true);*/
-        PlayShotSound();
-
-        Fvector vel;
-        PHGetLinearVell(vel);
-        OnShellDrop(get_LastSP(), vel);
-
-        if (ShouldPlayFlameParticles())
-        {
-            StartFlameParticles();
-            ForceUpdateFireParticles();
-        }
-
-        StartSmokeParticles(get_LastFP(), vel);
-    }
-}
+//void CWeaponBM16::OnShot()
+//{
+//    AddShotEffector();
+//    PlayAnimShoot();
+//
+//    if (IsMisfire())
+//    {
+//        if (SoundExist("sndBreechJammed"))
+//            PlaySound("sndBreechJammed", get_LastFP());
+//    }
+//    else
+//    {
+//        PlayShotSound();
+//
+//        Fvector vel;
+//        PHGetLinearVell(vel);
+//        OnShellDrop(get_LastSP(), vel);
+//
+//        if (ShouldPlayFlameParticles())
+//        {
+//            StartFlameParticles();
+//            ForceUpdateFireParticles();
+//        }
+//
+//        StartSmokeParticles(get_LastFP(), vel);
+//    }
+//}
 
 void CWeaponBM16::PlayAnimShoot()
 {
