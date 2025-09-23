@@ -809,19 +809,4 @@ void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
         cursor_pos.sub(vis_rect.lt);
         m_UIPropertiesBox->Show(vis_rect, cursor_pos);
     }
-
-    m_UIPropertiesBox->CheckCustomActionsMapSpot(m_cur_location->ObjectID(), m_cur_location->GetType(), m_cur_location->LevelName().c_str(), m_cur_location->GetLastPosition());
-
-    if (m_UIPropertiesBox->GetItemsCount() > 0)
-    {
-        m_UIPropertiesBox->AutoUpdateSize();
-
-        Fvector2 cursor_pos;
-        Frect vis_rect;
-
-        GetAbsoluteRect(vis_rect);
-        cursor_pos = GetUICursor()->GetCursorPosition();
-        cursor_pos.sub(vis_rect.lt);
-        m_UIPropertiesBox->Show(vis_rect, cursor_pos);
-    }
 }

@@ -46,6 +46,7 @@ void CWeaponShotgun::Load(LPCSTR section)
     //    m_bTriStateReload = !!pSettings->r_bool(section, "tri_state_reload");
     //}
     m_bTriStateReload = READ_IF_EXISTS(pSettings, r_bool, section, "tri_state_reload", false);
+    m_bDrumMagazineReload = READ_IF_EXISTS(pSettings, r_bool, section, "drum_magazine_reload", false);
 
     if (m_bTriStateReload)
     {
@@ -158,9 +159,9 @@ void CWeaponShotgun::OnShotBoth()
     if (ParentIsActor())
     {
         CParticlesObject* pSmokeParticles = NULL;
-        CShootingObject::StartParticles(pSmokeParticles, *m_sSmokeParticlesCurrent, get_LastFP(), {}, true);
+        CShootingObject::StartParticles(pSmokeParticles, m_sSmokeParticlesCurrent.c_str(), get_LastFP(), {}, true);
         pSmokeParticles = NULL;
-        CShootingObject::StartParticles(pSmokeParticles, *m_sSmokeParticlesCurrent, get_LastFP2(), {}, true);
+        CShootingObject::StartParticles(pSmokeParticles, m_sSmokeParticlesCurrent.c_str(), get_LastFP2(), {}, true);
     }
 }
 
@@ -520,14 +521,18 @@ u8 CWeaponShotgun::AddCartridge(u8 cnt)
     {
         if (!unlimited_ammo())
         {
-            if (!m_pAmmo->Get(l_cartridge))
+            if (!m_pAmmo->GetCartridge())
                 break; //-V595
         }
         --cnt;
         ++iAmmoElapsed;
-        l_cartridge.m_LocalAmmoType = u8(m_ammoType);
+        //l_cartridge.m_LocalAmmoType = u8(m_ammoType);
+        l_cartridge.Load(m_ammoTypes[m_ammoType].c_str(), u8(m_ammoType));
         /*m_magazine.push_back(l_cartridge);*/
-        m_magazine.insert(m_magazine.begin(), l_cartridge);
+        if (!m_magazine.size() || m_bDrumMagazineReload)
+            m_magazine.push_back(l_cartridge);
+        else
+            m_magazine.insert(m_magazine.end() - 1, l_cartridge);
     }
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
@@ -663,7 +668,8 @@ void CWeaponShotgun::InitAddons()
 
 bool CWeaponShotgun::CanBeReloaded()
 {
-    if (m_bTriStateReload)
-        return iAmmoElapsed < iMagazineSize;
-    return inherited::CanBeReloaded();
+    //if (m_bTriStateReload)
+    //    return iAmmoElapsed < iMagazineSize;
+    //return inherited::CanBeReloaded();
+    return iAmmoElapsed < iMagazineSize;
 }

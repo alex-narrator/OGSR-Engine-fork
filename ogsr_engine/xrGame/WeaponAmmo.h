@@ -58,28 +58,15 @@ public:
     virtual float Weight() const;
 
     virtual u32 Cost() const;
-    bool Get(CCartridge& cartridge);
+    bool GetCartridge();
 
-    float m_kDist{}, m_kDisp{}, m_kHit{}, m_kImpulse{}, m_kPierce{}, m_kAP{}, m_kAirRes{}, m_kSpeed{}, m_impair{}, fWallmarkSize{},
-        // вірогідність затримки набою
-        m_misfireProbability{},
-        // вірогідність затримки магазину
-        m_misfireProbabilityBox{};
-
-    ALife::EHitType m_eHitType{ALife::eHitTypeMax};
-
-    int m_buckShot{1};
-
-    u8 m_u8ColorID{};
+    // вірогідність затримки магазину
+    float m_misfireProbabilityBox{};
 
     u16 m_boxSize{};
     u16 m_boxCurr{};
-    bool m_tracer{};
     //
     shared_str m_ammoSect{}, m_InvShortName{};
-
-    RStringVec m_sShotParticles{};
-    bool m_bShotLight{};
 
     xr_vector<shared_str> m_ammoTypes;
     u8 m_cur_ammo_type{};

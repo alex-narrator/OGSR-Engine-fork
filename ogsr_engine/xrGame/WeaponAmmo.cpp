@@ -47,6 +47,7 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
 
     m_flags.set(cfHitFx, READ_IF_EXISTS(pSettings, r_bool, m_ammoSect, "hit_fx", false));
 
+    m_HitFxParticles.clear();
     if (pSettings->line_exist(m_ammoSect, "hit_fx_particles"))
     {
         LPCSTR hit_fx_particles = pSettings->r_string(m_ammoSect, "hit_fx_particles");
@@ -67,6 +68,7 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     if (pSettings->line_exist(m_ammoSect, "hit_type"))
         m_eHitType = ALife::g_tfString2HitType(pSettings->r_string(m_ammoSect, "hit_type"));
 
+    m_sShotParticles.clear();
     if (pSettings->line_exist(m_ammoSect, "shot_particles"))
     {
         LPCSTR shot_particles = pSettings->r_string(m_ammoSect, "shot_particles");
@@ -136,41 +138,6 @@ void CWeaponAmmo::Load(LPCSTR section)
     m_ammoSect = section;
 
     m_InvShortName = CStringTable().translate(pSettings->r_string(m_ammoSect, "inv_name_short"));
-    //
-
-    m_kDist = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "k_dist", 0.f);
-    m_kDisp = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "k_disp", 0.f);
-    m_kHit = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "k_hit", 0.f);
-    m_kImpulse = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "k_impulse", 0.f);
-    m_kPierce = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "k_pierce", 1.0f);
-    m_kAP = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "k_ap", 0.0f);
-    m_kSpeed = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "k_speed", 0.f);
-    m_u8ColorID = READ_IF_EXISTS(pSettings, r_u8, m_ammoSect, "tracer_color_ID", 0);
-
-    m_kAirRes = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "k_air_resistance", pSettings->r_float(BULLET_MANAGER_SECTION, "air_resistance_k"));
-
-    m_tracer = READ_IF_EXISTS(pSettings, r_bool, m_ammoSect, "tracer", false);
-    m_buckShot = READ_IF_EXISTS(pSettings, r_s32, m_ammoSect, "buck_shot", 1);
-    m_impair = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "impair", 0.f);
-    fWallmarkSize = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "wm_size", 0.05f);
-
-    R_ASSERT(fWallmarkSize > 0);
-    //
-    m_misfireProbability = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "misfire_probability", 0.0f);
-
-    if (pSettings->line_exist(m_ammoSect, "hit_type"))
-        m_eHitType = ALife::g_tfString2HitType(pSettings->r_string(m_ammoSect, "hit_type"));
-
-    if (pSettings->line_exist(m_ammoSect, "shot_particles"))
-    {
-        LPCSTR shot_particles = pSettings->r_string(m_ammoSect, "shot_particles");
-        int cnt = _GetItemCount(shot_particles);
-        xr_string tmp;
-        for (int k = 0; k < cnt; ++k)
-            m_sShotParticles.push_back(_GetItem(shot_particles, k, tmp));
-    }
-
-    m_bShotLight = READ_IF_EXISTS(pSettings, r_bool, m_ammoSect, "shot_light", false);
 }
 
 BOOL CWeaponAmmo::net_Spawn(CSE_Abstract* DC)
@@ -231,31 +198,10 @@ bool CWeaponAmmo::Useful() const
 
 bool CWeaponAmmo::IsBoxReloadable() const { return !m_ammoTypes.empty() && cNameSect() != m_ammoSect; }
 
-bool CWeaponAmmo::Get(CCartridge& cartridge)
+bool CWeaponAmmo::GetCartridge()
 {
     if (!m_boxCurr)
         return false;
-    cartridge.m_ammoSect = m_ammoSect;
-    cartridge.m_kDist = m_kDist;
-    cartridge.m_kDisp = m_kDisp;
-    cartridge.m_kHit = m_kHit;
-    cartridge.m_kImpulse = m_kImpulse;
-    cartridge.m_kPierce = m_kPierce;
-    cartridge.m_kAP = m_kAP;
-    cartridge.m_kAirRes = m_kAirRes;
-    cartridge.m_u8ColorID = m_u8ColorID;
-    cartridge.m_flags.set(CCartridge::cfTracer, m_tracer);
-    cartridge.m_buckShot = m_buckShot;
-    cartridge.m_impair = m_impair;
-    cartridge.fWallmarkSize = fWallmarkSize;
-    cartridge.bullet_material_idx = GMLib.GetMaterialIdx(WEAPON_MATERIAL_NAME);
-    cartridge.m_InvShortName = m_InvShortName;
-    //
-    cartridge.m_misfireProbability = m_misfireProbability;
-    cartridge.m_eHitType = m_eHitType;
-    cartridge.m_sShotParticles = m_sShotParticles;
-    cartridge.m_bShotLight = m_bShotLight;
-
     --m_boxCurr;
     if (m_pCurrentInventory)
         m_pCurrentInventory->InvalidateState();
@@ -367,10 +313,9 @@ void CWeaponAmmo::ReloadBox(LPCSTR ammo_sect)
 
     while (m_boxCurr < m_boxSize)
     {
-        CCartridge l_cartridge;
         auto m_pAmmo = smart_cast<CWeaponAmmo*>(m_pCurrentInventory->GetAmmoByLimit(ammo_sect));
 
-        if (!m_pAmmo || !m_pAmmo->Get(l_cartridge))
+        if (!m_pAmmo || !m_pAmmo->GetCartridge())
             break;
 
         ++m_boxCurr;
@@ -449,9 +394,7 @@ bool CWeaponAmmo::IsDirectReload(CWeaponAmmo* ammo_to_load)
 
     while (m_boxCurr < m_boxSize)
     {
-        CCartridge l_cartridge;
-
-        if (!ammo_to_load || !ammo_to_load->Get(l_cartridge))
+        if (!ammo_to_load || !ammo_to_load->GetCartridge())
             break;
 
         ++m_boxCurr;

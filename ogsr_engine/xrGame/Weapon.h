@@ -141,6 +141,7 @@ public:
 
 protected:
     bool m_bTriStateReload{};
+    bool m_bDrumMagazineReload{};
     u8 m_sub_state{eSubstateReloadBegin};
     u8 m_idle_state{eIdle};
     // Weapon fires now

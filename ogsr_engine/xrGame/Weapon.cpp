@@ -288,7 +288,7 @@ void CWeapon::Load(LPCSTR section)
     m_fPDM_disp_crouch_no_acc = READ_IF_EXISTS(pSettings, r_float, section, "PDM_disp_crouch_no_acc", 1.0f);
     //  [8/2/2005]
 
-    m_bCamRecoilCompensation = !!READ_IF_EXISTS(pSettings, r_bool, section, "cam_recoil_compensation", true);
+    m_bCamRecoilCompensation = READ_IF_EXISTS(pSettings, r_bool, section, "cam_recoil_compensation", true);
 
     fireDispersionConditionFactor = pSettings->r_float(section, "fire_dispersion_condition_factor");
     misfireProbability = pSettings->r_float(section, "misfire_probability");
@@ -2360,7 +2360,7 @@ bool CWeapon::IsDirectReload(CWeaponAmmo* ammo)
 
 bool CWeapon::CanBeReloaded()
 {
-    return (iAmmoElapsed < iMagazineSize || IsMisfire() || AddonAttachable(eMagazine) || m_pAmmo && m_pAmmo->m_boxCurr && m_pAmmo->m_ammoSect != m_magazine.back().m_ammoSect);
+    return iAmmoElapsed < iMagazineSize || IsMisfire() || AddonAttachable(eMagazine) || m_pAmmo && m_pAmmo->m_boxCurr && m_pAmmo->m_ammoSect != m_magazine.back().m_ammoSect;
 }
 
 bool CWeapon::CanBeUnloaded() { return GetAmmoElapsed() || GetAmmoElapsed2() || IsAddonAttached(eMagazine) && AddonAttachable(eMagazine); }

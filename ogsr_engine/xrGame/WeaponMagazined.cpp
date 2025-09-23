@@ -462,11 +462,12 @@ void CWeaponMagazined::ReloadMagazine()
     {
         if (!unlimited_ammo())
         {
-            if (!m_pAmmo->Get(l_cartridge))
+            if (!m_pAmmo->GetCartridge())
                 break;
         }
         ++iAmmoElapsed;
-        l_cartridge.m_LocalAmmoType = u8(m_ammoType);
+        l_cartridge.Load(m_ammoTypes[m_ammoType].c_str(), u8(m_ammoType));
+        //l_cartridge.m_LocalAmmoType = u8(m_ammoType);
         m_magazine.push_back(l_cartridge);
     }
 
