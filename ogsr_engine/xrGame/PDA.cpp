@@ -507,6 +507,7 @@ void CPda::JoystickCallback(CBoneInstance* B)
 void CPda::OnMoveToRuck(EItemPlace prevPlace)
 {
     inherited::OnMoveToRuck(prevPlace);
+    Switch(false);
 
     if (!this_is_3d_pda || !smart_cast<CActor*>(H_Parent()))
         return;
