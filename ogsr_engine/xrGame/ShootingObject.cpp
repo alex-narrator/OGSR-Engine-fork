@@ -434,3 +434,5 @@ void CShootingObject::FireBullet(const Fvector& pos, const Fvector& shot_dir, fl
 
 void CShootingObject::FireStart() { bWorking = true; }
 void CShootingObject::FireEnd() { bWorking = false; }
+
+bool CShootingObject::ParentIsActor() const { return Actor()->ID() == m_iCurrentParentID; }

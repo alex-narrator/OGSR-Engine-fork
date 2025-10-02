@@ -146,6 +146,8 @@ CMapLocation* CMapManager::AddRelationLocation(CInventoryOwner* pInvOwner)
     {
         CMapLocation* l = xr_new<CRelationMapLocation>(*key.spot_id, key.object_id, pActor->object_id(), pInvOwner->object_id());
         Locations().emplace_back(key.spot_id, key.object_id).location = l;
+        if (g_actor)
+            Actor()->callback(GameObject::eMapRelationLocationAdded)(sname.c_str(), pInvOwner->object_id());
         return l;
     }
     else

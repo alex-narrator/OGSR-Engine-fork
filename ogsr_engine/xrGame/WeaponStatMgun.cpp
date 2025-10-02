@@ -94,6 +94,11 @@ BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
     U16Vec fixed_bones;
     fixed_bones.push_back(K->LL_GetBoneRoot());
     PPhysicsShell() = P_build_Shell(this, false, fixed_bones);
+    K->CalculateBones_Invalidate();
+    K->CalculateBones();
+
+    // правка стац. пулемета
+    m_pPhysicsShell->GetGlobalTransformDynamic(&XFORM());
 
     CBoneData& bdX = K->LL_GetData(m_rotate_x_bone);
     VERIFY(bdX.IK_data.type == jtJoint);

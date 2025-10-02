@@ -183,6 +183,13 @@ bool CUIXmlInit::InitStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* 
     InitTextureOffset(xml_doc, path, index, pWnd);
 
     pWnd->EnableHeading(!!xml_doc.ReadAttribInt(path, index, "heading", 0));
+    float heading_angle = xml_doc.ReadAttribFlt(path, index, "heading_angle", 0.0f);
+    if (!fis_zero(heading_angle))
+    {
+        pWnd->EnableHeading(true);
+        pWnd->SetConstHeading(true);
+        pWnd->SetHeading(deg2rad(heading_angle));
+    }
 
     LPCSTR str_flag = xml_doc.ReadAttrib(path, index, "light_anim", "");
     int flag_cyclic = xml_doc.ReadAttribInt(path, index, "la_cyclic", 1);
@@ -371,6 +378,13 @@ bool CUIXmlInit::Init3tButton(CUIXml& xml_doc, const char* path, int index, CUI3
     InitSound(xml_doc, path, index, pWnd);
 
     pWnd->EnableHeading(!!xml_doc.ReadAttribInt(path, index, "heading", 0));
+    float heading_angle = xml_doc.ReadAttribFlt(path, index, "heading_angle", 0.0f);
+    if (!fis_zero(heading_angle))
+    {
+        pWnd->EnableHeading(true);
+        pWnd->SetConstHeading(true);
+        pWnd->SetHeading(deg2rad(heading_angle));
+    }
     pWnd->SetStretchTexture(!!xml_doc.ReadAttribInt(path, index, "stretch"));
 
     LPCSTR accel = xml_doc.ReadAttrib(path, index, "accel", NULL);

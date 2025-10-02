@@ -180,6 +180,9 @@ public:
         m_lanim_xform.m_lanimFlags.set((1 << 4), b);
     }
 
+	void SetConstHeading(bool b) { m_bConstHeading = b; };
+    bool GetConstHeading() { return m_bConstHeading; }
+
     // will be need by CUI3tButton
     // Don't change order!!!!!
     typedef enum
@@ -214,6 +217,7 @@ protected:
 
     bool m_bHeading;
     float m_fHeading;
+    bool m_bConstHeading{};
 
     // Для вывода текстуры с обрезанием по маске используем CUIFrameWindow
     CUIFrameWindow* m_pMask;
