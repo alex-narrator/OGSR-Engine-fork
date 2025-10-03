@@ -51,6 +51,7 @@ public:
     int GetPortionsNum() const { return m_iPortionsNum; };
 
     virtual float GetItemInfluence(int) const;
+    virtual void SetItemInfluence(int, float);
 
 protected:
     svector<float, eInfluenceMax> m_ItemInfluence{};

@@ -136,7 +136,9 @@ float CEatableItem::GetItemInfluence(int influence) const
 {
     if (influence == eRadiationInfluence)
     {
-        return (m_ItemInfluence[influence] + GetItemEffect(eRadiationRestoreSpeed) * m_fSelfRadiationInfluence) /* * GetCondition()*/;
+        return (m_ItemInfluence[influence] + GetItemEffect(eRadiationRestoreSpeed) * m_fSelfRadiationInfluence);
     }
-    return m_ItemInfluence[influence] /* * GetCondition()*/;
+    return m_ItemInfluence[influence];
 }
+
+void CEatableItem::SetItemInfluence(int influence, float val) { m_ItemInfluence[influence] = val; }

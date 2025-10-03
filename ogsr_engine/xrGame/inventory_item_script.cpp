@@ -34,10 +34,10 @@ void CInventoryItem::script_register(lua_State* L)
                   .def_readwrite("inv_weight", &CInventoryItem::m_weight)
                   .def_readwrite("m_flags", &CInventoryItem::m_flags)
 
-                  .def("hit_type_protection", &CInventoryItem::GetHitTypeProtection, (void(CInventoryItem::*)(int, float)) & CInventoryItem::SetHitTypeProtection)
-                  /*.def("hit_type_protection", (void(CInventoryItem::*)(int, float)) & CInventoryItem::SetHitTypeProtection)*/
-                  .def("item_effect", &CInventoryItem::GetItemEffect, (void(CInventoryItem::*)(int, float)) & CInventoryItem::SetItemEffect)
-                  /*.def("item_effect", (void(CInventoryItem::*)(int, float)) & CInventoryItem::SetItemEffect)*/
+                  .def("hit_type_protection", &CInventoryItem::GetHitTypeProtection)
+                  .def("hit_type_protection", (void(CInventoryItem::*)(int, float)) & CInventoryItem::SetHitTypeProtection)
+                  .def("item_effect", &CInventoryItem::GetItemEffect)
+                  .def("item_effect", (void(CInventoryItem::*)(int, float)) & CInventoryItem::SetItemEffect)
 
                   .def_readwrite("power_loss", &CInventoryItem::m_fPowerLoss)
                   .property("bone_protection_sect", &get_bone_protection_sect, &set_bone_protection_sect)

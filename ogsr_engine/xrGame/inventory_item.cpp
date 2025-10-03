@@ -680,7 +680,7 @@ float CInventoryItem::GetHitTypeProtection(int hit_type) const { return m_HitTyp
 float CInventoryItem::GetItemEffect(int effect) const
 {
     // на випромінення радіації стан предмету не впливає
-    float condition_k = (effect == eRadiationRestoreSpeed) ? 1.f : GetCondition();
+    float condition_k = (effect == eRadiationRestoreSpeed && m_ItemEffect[effect] > 0) ? 1.f : GetCondition();
     return m_ItemEffect[effect] * condition_k;
 }
 
