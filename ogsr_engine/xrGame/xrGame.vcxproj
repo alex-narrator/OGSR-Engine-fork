@@ -1245,7 +1245,6 @@
     <ClInclude Include="..\COMMON_AI\object_item_single.h" />
     <ClInclude Include="..\COMMON_AI\object_item_single_inline.h" />
     <ClInclude Include="..\COMMON_AI\shared_data.h" />
-    <ClInclude Include="..\COMMON_AI\smart_cast.h" />
     <ClInclude Include="string_table.h" />
     <ClInclude Include="string_table_defs.h" />
     <ClInclude Include="..\COMMON_AI\associative_vector.h" />
@@ -1550,7 +1549,6 @@
     <ClCompile Include="sound_memory_manager.cpp" />
     <ClCompile Include="steering_behaviour.cpp" />
     <ClCompile Include="trajectories.cpp" />
-    <ClCompile Include="ui\ArtefactDetectorUI.cpp" />
     <ClCompile Include="ui\UIHelper.cpp" />
     <ClCompile Include="ui\UIIconParams.cpp" />
     <ClCompile Include="ui\UILoadingScreen.cpp" />

@@ -140,10 +140,8 @@ void CRenderTarget::accum_spot(CBackend& cmd_list, light* L)
         u32 _id = 0;
         if (L->flags.bShadow)
         {
-            bool bFullSize = (L->X.S.size == u32(RImplementation.o.smapsize));
-            if (L->X.S.transluent)
-                _id = SE_L_TRANSLUENT;
-            else if (bFullSize)
+            bool bFullSize = (L->X.S.size == static_cast<u32>(RImplementation.o.smapsize));
+            if (bFullSize)
                 _id = SE_L_FULLSIZE;
             else
                 _id = SE_L_NORMAL;
@@ -172,8 +170,6 @@ void CRenderTarget::accum_spot(CBackend& cmd_list, light* L)
         draw_volume(cmd_list, L);
     }
 
-    cmd_list.set_Scissor(nullptr);
-    // CHK_DX		(HW.pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE));
     // dwLightMarkerID					+=	2;	// keep lowest bit always setted up
     increment_light_marker(cmd_list);
 
@@ -372,12 +368,5 @@ void CRenderTarget::accum_volumetric(CBackend& cmd_list, light* L)
         cmd_list.Render(D3DPT_TRIANGLELIST, 0, 0, VOLUMETRIC_SLICES * 4, 0, VOLUMETRIC_SLICES * 2);
 
         cmd_list.set_ColorWriteEnable();
-
-        //	Restore clip planes
-        // HW.pDevice->SetRenderState(D3DRS_CLIPPLANEENABLE, 0);
-        cmd_list.set_ClipPlanes(FALSE, (Fmatrix*)nullptr, 0);
     }
-
-    // CHK_DX		(HW.pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE));
-    cmd_list.set_Scissor(nullptr);
 }

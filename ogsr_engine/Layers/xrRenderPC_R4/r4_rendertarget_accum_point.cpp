@@ -77,10 +77,8 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
         u32 _id = 0;
         if (L->flags.bShadow)
         {
-            bool bFullSize = (L->X.S.size == u32(RImplementation.o.smapsize));
-            if (L->X.S.transluent)
-                _id = SE_L_TRANSLUENT;
-            else if (bFullSize)
+            bool bFullSize = (L->X.S.size == static_cast<u32>(RImplementation.o.smapsize));
+            if (bFullSize)
                 _id = SE_L_FULLSIZE;
             else
                 _id = SE_L_NORMAL;
@@ -101,9 +99,6 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
         cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
         draw_volume(cmd_list, L);
     }
-
-    // CHK_DX		(HW.pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE,FALSE));
-    cmd_list.set_Scissor(nullptr);
 
     // dwLightMarkerID					+=	2;	// keep lowest bit always setted up
     increment_light_marker(cmd_list);

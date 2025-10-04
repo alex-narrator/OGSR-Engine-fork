@@ -13,18 +13,13 @@ void dxUIRender::CreateUIGeom()
 
 void dxUIRender::DestroyUIGeom()
 {
-    for (auto& it : g_UIShadersCache)
-        it.second.destroy();
-
-    g_UIShadersCache.clear();
-
     hGeom_TL = nullptr;
     hGeom_LIT = nullptr;
 }
 
 void dxUIRender::SetShader(IUIShader& shader)
 {
-    dxUIShader* pShader = (dxUIShader*)&shader;
+    dxUIShader* pShader = smart_cast<dxUIShader*>(&shader);
     VERIFY(&pShader);
     VERIFY(pShader->hShader);
     RCache.set_Shader(pShader->hShader);

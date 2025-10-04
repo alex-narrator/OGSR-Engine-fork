@@ -3,7 +3,7 @@
 
 #include "dxUIShader.h"
 
-void dxWallMarkArray::Copy(IWallMarkArray& _in) { *this = *(dxWallMarkArray*)&_in; }
+void dxWallMarkArray::Copy(IWallMarkArray& _in) { *this = *smart_cast<dxWallMarkArray*>(&_in); }
 
 dxWallMarkArray::~dxWallMarkArray()
 {
@@ -14,7 +14,7 @@ dxWallMarkArray::~dxWallMarkArray()
 void dxWallMarkArray::AppendMark(LPCSTR s_textures)
 {
     ref_shader s;
-    s.create(strstr(s_textures, "wm_blood_") ? "effects\\wallmark_blood" : "effects\\wallmark", s_textures);
+    s = GetCachedShader(strstr(s_textures, "wm_blood_") ? "effects\\wallmark_blood" : "effects\\wallmark", s_textures);
     m_CollideMarks.push_back(s);
 }
 
@@ -26,7 +26,7 @@ wm_shader dxWallMarkArray::GenerateWallmark()
 {
     wm_shader res;
     if (!m_CollideMarks.empty())
-        ((dxUIShader*)&*res)->hShader = m_CollideMarks[::Random.randI(0, m_CollideMarks.size())];
+        smart_cast<dxUIShader*>(&*res)->hShader = m_CollideMarks[::Random.randI(0, m_CollideMarks.size())];
     return res;
 }
 

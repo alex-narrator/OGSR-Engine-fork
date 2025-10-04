@@ -11,7 +11,7 @@ CPortalTraverser::CPortalTraverser() { i_marker = 0xffffffff; }
 xr_vector<IRender_Sector*> dbg_sectors;
 #endif
 
-void CPortalTraverser::traverse(IRender_Sector* start, CFrustum& F, Fvector& vBase, Fmatrix& mXFORM, u32 options)
+void CPortalTraverser::traverse(IRender_Sector* start, CFrustum& F, const Fvector& vBase, const Fmatrix& mXFORM, const u32 options)
 {
     if (options & VQ_FADE)
     {
@@ -21,7 +21,7 @@ void CPortalTraverser::traverse(IRender_Sector* start, CFrustum& F, Fvector& vBa
 
     R_ASSERT(start);
 
-    i_start = (CSector*)start;
+    i_start = smart_cast<CSector*>(start);
     i_vBase = vBase;
     i_mXFORM = mXFORM;
     i_options = options;

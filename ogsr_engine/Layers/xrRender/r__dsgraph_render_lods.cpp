@@ -7,7 +7,7 @@
 extern float r_ssaLOD_A;
 extern float r_ssaLOD_B;
 
-ICF bool pred_dot(const std::pair<float, u32>& _1, const std::pair<float, u32>& _2) { return _1.first < _2.first; }
+ICF bool static pred_dot(const std::pair<float, u32>& _1, const std::pair<float, u32>& _2) { return _1.first < _2.first; }
 
 void R_dsgraph_structure::r_dsgraph_render_lods()
 {
@@ -15,17 +15,12 @@ void R_dsgraph_structure::r_dsgraph_render_lods()
 
     PIX_EVENT_CTX(cmd_list, dsgraph_render_lods);
 
-    if (mapLOD.empty())
-        return;
-
-    mapLOD.get_left_right(lstLODs); // front-to-back
-
     if (lstLODs.empty())
         return;
 
     // *** Fill VB and generate groups
     const u32 shid = SE_R1_LMODELS;
-    FLOD* firstV = (FLOD*)lstLODs[0].pVisual;
+    FLOD* firstV = smart_cast<FLOD*>(lstLODs[0].pVisual);
     ref_selement cur_S = firstV->shader->E[shid];
     float ssaRange = r_ssaLOD_A - r_ssaLOD_B;
     if (ssaRange < EPS_S)
@@ -70,7 +65,7 @@ void R_dsgraph_structure::r_dsgraph_render_lods()
             const u32 uA = u32(clampr(iA, 0, 255));
 
             // calculate direction and shift
-            FLOD* lodV = (FLOD*)P.pVisual;
+            FLOD* lodV = smart_cast<FLOD*>(P.pVisual);
             Fvector Ldir, shift;
             Ldir.sub(lodV->getVisData().sphere.P, Device.vCameraPosition).normalize();
             shift.mul(Ldir, -.5f * lodV->getVisData().sphere.R);
@@ -141,5 +136,4 @@ void R_dsgraph_structure::r_dsgraph_render_lods()
     }
 
     lstLODs.clear();
-    mapLOD.clear();
 }

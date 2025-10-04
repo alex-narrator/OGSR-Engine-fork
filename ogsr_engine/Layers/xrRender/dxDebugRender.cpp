@@ -93,25 +93,13 @@ void dxDebugRender::add_lines(Fvector const* vertices, u32 const& vertex_count, 
     }
 }
 
-void dxDebugRender::ZEnable(bool bEnable)
-{
-    // CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE,bEnable));
-    RCache.set_Z(bEnable);
-}
-
 void dxDebugRender::OnFrameEnd() { RCache.OnFrameEnd(); }
 
-void dxDebugRender::SetShader(const debug_shader& shader) { RCache.set_Shader(((dxUIShader*)&*shader)->hShader); }
+void dxDebugRender::SetShader(const debug_shader& shader) { RCache.set_Shader(smart_cast<dxUIShader*>(&*shader)->hShader); }
 
 void dxDebugRender::CacheSetXformWorld(const Fmatrix& M) { RCache.set_xform_world(M); }
 
 void dxDebugRender::CacheSetCullMode(CullMode m) { RCache.set_CullMode(CULL_NONE + m); }
-
-void dxDebugRender::SetAmbient(u32 colour)
-{
-    //	TODO: DX10: Check if need this for DX10
-    VERIFY(!"Not implemented for DX10");
-}
 
 void dxDebugRender::SetDebugShader(dbgShaderHandle shdHandle)
 {

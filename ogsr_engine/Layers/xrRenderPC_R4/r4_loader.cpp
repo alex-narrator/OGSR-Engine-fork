@@ -192,8 +192,9 @@ void CRender::level_Unload()
         id.unload();
     }
 
+    sector_portals_structure.unload();
+
     //*** Lights
-    // Glows.Unload			();
     Lights.Unload();
 
     //*** Visuals
@@ -384,7 +385,7 @@ void CRender::LoadSectors(IReader* fs)
 
             // Search for default sector - assume "default" or "outdoor" sector is the largest one
             // XXX: hack: need to know real outdoor sector
-            auto* V = static_cast<dxRender_Visual*>(RImplementation.getVisual(sector_data.root_id));
+            auto* V = smart_cast<dxRender_Visual*>(RImplementation.getVisual(sector_data.root_id));
             const float vol = V->getVisData().box.getvolume();
             if (vol > largest_sector_vol)
             {
@@ -439,7 +440,7 @@ void CRender::LoadSectors(IReader* fs)
     Msg("Level sector data:");
     for (const auto& sector_data : sectors_data)
     {
-        auto* V = static_cast<dxRender_Visual*>(RImplementation.getVisual(sector_data.root_id));
+        auto* V = smart_cast<dxRender_Visual*>(RImplementation.getVisual(sector_data.root_id));
         const float vol = V->getVisData().box.getvolume();
 
         Msg("root_id=[%d] volume=[%f]", sector_data.root_id, vol);
@@ -449,17 +450,14 @@ void CRender::LoadSectors(IReader* fs)
     //	for (int d=0; d<Sectors.size(); d++)
     //		Sectors[d]->DebugDump	();
 
-    for (int id = 0; id < R__NUM_PARALLEL_CONTEXTS; ++id)
+    for (auto& dsgraph : contexts_pool)
     {
-        auto& dsgraph = contexts_pool[id];
         dsgraph.reset();
         dsgraph.load(sectors_data, portals_data);
-        contexts_used.set(id, false);
     }
+    ZeroMemory(&contexts_used, sizeof contexts_used);
 
-    auto& dsgraph = get_imm_context();
-    dsgraph.reset();
-    dsgraph.load(sectors_data, portals_data);
+    sector_portals_structure.load(sectors_data, portals_data);
 
     last_sector_id = IRender_Sector::INVALID_SECTOR_ID;
 }
@@ -512,6 +510,8 @@ void CRender::Load3DFluid()
 
         if (version == 3)
         {
+            xrXRC xrc;
+
             const u32 cnt = F->r_u32();
             for (u32 i = 0; i < cnt; ++i)
             {
@@ -522,11 +522,9 @@ void CRender::Load3DFluid()
 
                 Msg("~ Loading fog volume with profile [%s]. Position x=[%f] y=[%f] z=[%f]", pVolume->getProfileName().c_str(), v.x, v.y, v.z);
 
-                 auto& dsgraph = get_imm_context();
-
                 //	Attach to sector's static geometry
-                const auto sector_id = dsgraph.detect_sector(pVolume->getVisData().sphere.P);
-                auto* pSector = dynamic_cast<CSector*>(dsgraph.get_sector(sector_id));
+                const auto sector_id = RImplementation.detect_sector(xrc, pVolume->getVisData().sphere.P);
+                auto* pSector = smart_cast<CSector*>(RImplementation.get_sector(sector_id));
                 if (!pSector)
                 {
                     Msg("Cannot find sector for fog volume. Position x=[%f] y=[%f] z=[%f]!", v.x, v.y, v.z);
@@ -544,7 +542,7 @@ void CRender::Load3DFluid()
                 R_ASSERT(pRoot);
                 R_ASSERT(pRoot->getType() == MT_HIERRARHY);
 
-                ((FHierrarhyVisual*)pRoot)->children.push_back(pVolume);
+                smart_cast<FHierrarhyVisual*>(pRoot)->children.push_back(pVolume);
             }
         }
 

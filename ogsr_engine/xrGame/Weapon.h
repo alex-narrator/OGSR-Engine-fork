@@ -604,16 +604,16 @@ public:
     inline bool IsLaserOn() const { return m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonLaserOn; }
 
     Fvector flashlight_attach_offset{}, flashlight_pos{};
+    Fvector flashlight_omni_attach_offset{}, flashlight_world_attach_offset{}, flashlight_omni_world_attach_offset{};
 
 protected:
     bool has_flashlight{};
 
 private:
     shared_str flashlight_attach_bone;
-    Fvector flashlight_omni_attach_offset{}, flashlight_world_attach_offset{}, flashlight_omni_world_attach_offset{};
     ref_light flashlight_render;
     ref_light flashlight_omni;
-    ref_glow flashlight_glow;
+
     CLAItem* flashlight_lanim{};
     float flashlight_fBrightness{1.f};
 

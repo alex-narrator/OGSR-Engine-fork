@@ -20,24 +20,6 @@ float OLES_SUN_LIMIT_27_01_07 = 100.f;
 
 CRender RImplementation;
 
-//////////////////////////////////////////////////////////////////////////
-class CGlow : public IRender_Glow
-{
-public:
-    bool bActive;
-
-public:
-    CGlow() : bActive(false) {}
-    virtual void set_active(bool b) { bActive = b; }
-    virtual bool get_active() { return bActive; }
-    virtual void set_position(const Fvector& P) {}
-    virtual void set_direction(const Fvector& D) {}
-    virtual void set_radius(float R) {}
-    virtual void set_texture(LPCSTR name) {}
-    virtual void set_color(const Fcolor& C) {}
-    virtual void set_color(float r, float g, float b) {}
-};
-
 float r_dtex_paralax_range = 50.f;
 //////////////////////////////////////////////////////////////////////////
 ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq, bool hud, u32 phase)
@@ -141,8 +123,10 @@ void CRender::destroy()
 #endif
 
     lstRenderables.clear();
+    lstLights.clear();
     lstParticlesCalculation.clear();
     lstBonesCalculation.clear();
+    lstUpdateSector.clear();
 
     HWOCC.occq_destroy();
     xr_delete(Models);
@@ -250,12 +234,12 @@ IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return xr_new
 void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
 IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }
 IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return Models->CreateChild(name, data); }
-IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return Models->Instance_Duplicate((dxRender_Visual*)V); }
+IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return Models->Instance_Duplicate(smart_cast<dxRender_Visual*>(V)); }
 void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
 {
     if (V)
     {
-        dxRender_Visual* pVisual = (dxRender_Visual*)V;
+        dxRender_Visual* pVisual = smart_cast<dxRender_Visual*>(V);
         Models->Delete(pVisual, bDiscard);
         V = nullptr;
     }
@@ -335,7 +319,6 @@ FSlideWindowItem* CRender::getSWI(int id)
 IRender_Target* CRender::getTarget() { return Target; }
 
 IRender_Light* CRender::light_create() { return Lights.Create(); }
-IRender_Glow* CRender::glow_create() { return xr_new<CGlow>(); }
 
 //BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
 //BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
@@ -345,7 +328,7 @@ void CRender::add_Visual(u32 context_id, IRenderable* root, IRenderVisual* V, Fm
 {
     // TODO: this whole function should be replaced by a list of renderables+xforms returned from `renderable_Render` call
     auto& dsgraph = get_context(context_id);
-    dsgraph.add_leafs_dynamic(root, (dxRender_Visual*)V, m);
+    dsgraph.add_leafs_dynamic(root, smart_cast<dxRender_Visual*>(V), m);
 }
 
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
@@ -358,7 +341,7 @@ void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::
 
 void CRender::add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
 {
-    dxWallMarkArray* pWMA = (dxWallMarkArray*)pArray;
+    dxWallMarkArray* pWMA = smart_cast<dxWallMarkArray*>(pArray);
     ref_shader* pShader = pWMA->dxGenerateWallmark();
     if (pShader)
         add_StaticWallmark(*pShader, P, s, T, V);
@@ -366,7 +349,7 @@ void CRender::add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float
 
 void CRender::add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
 {
-    dxUIShader* pShader = (dxUIShader*)&*S;
+    dxUIShader* pShader = smart_cast<dxUIShader*>(&*S);
     add_StaticWallmark(pShader->hShader, P, s, T, V);
 }
 
@@ -379,10 +362,10 @@ void CRender::add_SkeletonWallmark(Fmatrix* xf, CKinematics* obj, ref_shader& sh
 
 void CRender::add_SkeletonWallmark(Fmatrix* xf, IKinematics* obj, IWallMarkArray* pArray, Fvector& start, Fvector& dir, float size)
 {
-    dxWallMarkArray* pWMA = (dxWallMarkArray*)pArray;
+    dxWallMarkArray* pWMA = smart_cast<dxWallMarkArray*>(pArray);
     ref_shader* pShader = pWMA->dxGenerateWallmark();
     if (pShader)
-        add_SkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
+        add_SkeletonWallmark(xf, smart_cast<CKinematics*>(obj), *pShader, start, dir, size);
 }
 
 void CRender::clear_static_wallmarks() { Wallmarks->Clear(); }
@@ -863,7 +846,7 @@ void CRender::SetCacheXformOld(Fmatrix& mView, Fmatrix& mProject)
 
 void CRender::OnDeviceCreate()
 {
-    for (int id = 0; id < R__NUM_CONTEXTS; ++id)
+    for (u32 id{}; id < std::size(contexts_pool); ++id)
     {
         contexts_pool[id].cmd_list.context_id = id;
         contexts_pool[id].cmd_list.OnDeviceCreate();
@@ -902,8 +885,6 @@ void CRender::Begin()
     for (auto& id : contexts_pool)
     {
         id.cmd_list.OnFrameBegin();
-        id.cmd_list.set_CullMode(CULL_CW);
-        id.cmd_list.set_CullMode(CULL_CCW);
     }
 
     Vertex.Flush();
