@@ -11,7 +11,7 @@
 #include "embedded_editor_helper.h"
 #include "../../XR_3DA/device.h"
 #include "../player_hud.h"
-#include "../Weapon.h"
+#include "../WeaponMagazined.h"
 #include "../Inventory.h"
 
 void ShowHudEditor(bool& show)
@@ -25,7 +25,7 @@ void ShowHudEditor(bool& show)
 
     bool showSeparator = true;
     auto item = g_player_hud->attached_item(0);
-    auto Wpn = smart_cast<CWeapon*>(Actor()->inventory().ActiveItem());
+    auto Wpn = smart_cast<CWeaponMagazined*>(Actor()->inventory().ActiveItem());
 
     static float drag_intensity = 0.0001f;
 

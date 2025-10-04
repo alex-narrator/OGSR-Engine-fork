@@ -12,15 +12,12 @@ CFlashlight::CFlashlight()
     light_omni = ::Render->light_create();
     light_omni->set_type(IRender_Light::POINT);
     light_omni->set_shadow(false);
-
-    glow_render = ::Render->glow_create();
 }
 
 CFlashlight::~CFlashlight()
 {
     light_render.destroy();
     light_omni.destroy();
-    glow_render.destroy();
 }
 
 void CFlashlight::Load(LPCSTR section)
@@ -74,10 +71,6 @@ void CFlashlight::LoadLightDefinitions(shared_str light_sect)
 
     light_render->set_cone(deg2rad(pSettings->r_float(light_sect, "spot_angle")));
     light_render->set_texture(READ_IF_EXISTS(pSettings, r_string, light_sect, "spot_texture", nullptr));
-
-    glow_render->set_texture(READ_IF_EXISTS(pSettings, r_string, light_sect, "glow_texture", nullptr));
-    glow_render->set_color(m_color);
-    glow_render->set_radius(pSettings->r_float(light_sect, "glow_radius"));
 }
 
 void CFlashlight::UpdateWork()
@@ -89,13 +82,11 @@ void CFlashlight::UpdateWork()
 
         light_render->set_position(dep.vLastFP);
         light_omni->set_position(dep.vLastFP);
-        glow_render->set_position(dep.vLastFP);
 
         Fvector dir = dep.m_FireParticlesXForm.k;
 
         light_render->set_rotation(dir, dep.m_FireParticlesXForm.i);
         light_omni->set_rotation(dir, dep.m_FireParticlesXForm.i);
-        glow_render->set_direction(dir);
 
         if (useVolumetric)
         {
@@ -111,11 +102,9 @@ void CFlashlight::UpdateWork()
 
         light_render->set_position(last_pos);
         light_omni->set_position(last_pos);
-        glow_render->set_position(last_pos);
 
         light_render->set_rotation(light_direction, Fvector{});
         light_omni->set_rotation(light_direction, Fvector{});
-        glow_render->set_direction(light_direction);
     }
 
     // calc color animator
@@ -131,7 +120,6 @@ void CFlashlight::UpdateWork()
     fclr.mul_rgb(fBrightness);
     light_render->set_color(fclr);
     light_omni->set_color(fclr);
-    glow_render->set_color(fclr);
 }
 
 void CFlashlight::Switch(bool turn_on)
@@ -140,5 +128,4 @@ void CFlashlight::Switch(bool turn_on)
 
     light_render->set_active(turn_on);
     light_omni->set_active(turn_on);
-    glow_render->set_active(turn_on);
 }

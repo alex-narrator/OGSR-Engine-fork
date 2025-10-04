@@ -890,11 +890,6 @@ void CWeaponMagazined::switch2_Reload()
 {
     CWeapon::FireEnd();
 
-    //if (iAmmoElapsed > 0 && CartridgeInTheChamberEnabled)
-    //    CartridgeInTheChamber = 1;
-    //else
-    //    CartridgeInTheChamber = 0;
-
     PlayReloadSound();
     PlayAnimReload();
     SetPending(TRUE);
@@ -916,10 +911,6 @@ void CWeaponMagazined::switch2_Hidden()
 {
     CWeapon::FireEnd();
 
-    //HUD_SOUND::StopSound(sndReload);
-    //HUD_SOUND::StopSound(sndReloadPartly);
-    //HUD_SOUND::StopSound(sndReloadJammed);
-    //HUD_SOUND::StopSound(sndReloadJammedLast);
     m_sounds.StopSound("sndReload");
     m_sounds.StopSound("sndReloadPartly");
     m_sounds.StopSound("sndReloadJammed");
@@ -1175,39 +1166,6 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
     else
         return inherited::Detach(item_section_name, b_spawn_item, item_condition);
 }
-
-//void CWeaponMagazined::InitZoomParams(LPCSTR section, bool useTexture)
-//{
-//    m_fMinZoomK = def_min_zoom_k;
-//    m_fZoomStepCount = def_zoom_step_count;
-//
-//    LPCSTR dynamicZoomParams = READ_IF_EXISTS(pSettings, r_string, section, "scope_dynamic_zoom", NULL);
-//    if (dynamicZoomParams)
-//    {
-//        int num_zoom_param = _GetItemCount(dynamicZoomParams);
-//
-//        ASSERT_FMT(num_zoom_param >= 1, "!![%s] : Invalid scope_dynamic_zoom parameter in section [%s]", __FUNCTION__, section);
-//
-//        string128 tmp;
-//        m_bScopeDynamicZoom = CInifile::IsBOOL(_GetItem(dynamicZoomParams, 0, tmp));
-//
-//        if (num_zoom_param > 1)
-//            m_fZoomStepCount = atof(_GetItem(dynamicZoomParams, 1, tmp));
-//
-//        if (num_zoom_param > 2)
-//            m_fMinZoomK = atof(_GetItem(dynamicZoomParams, 2, tmp));
-//    }
-//    else
-//        m_bScopeDynamicZoom = false;
-//
-//    m_fScopeInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "scope_inertion_factor", m_fControlInertionFactor);
-//    clamp(m_fScopeInertionFactor, m_fControlInertionFactor, m_fScopeInertionFactor);
-//
-//    m_fScopeZoomFactor = pSettings->r_float(section, "scope_zoom_factor");
-//
-//    m_fZoomHudFov = READ_IF_EXISTS(pSettings, r_float, section, "scope_zoom_hud_fov", 0.0f);
-//    m_f3dssHudFov = READ_IF_EXISTS(pSettings, r_float, section, "scope_lense_hud_fov", 0.0f);
-//}
 
 void CWeaponMagazined::InitAddons()
 {
@@ -1517,11 +1475,6 @@ void CWeaponMagazined::LoadFlashlightParams(LPCSTR section)
     const float orange = READ_IF_EXISTS(pSettings, r_float, m_light_section, b_r2 ? "omni_range_r2" : "omni_range", 0.25f);
     flashlight_omni->set_range(orange);
 
-    flashlight_glow = ::Render->glow_create();
-    flashlight_glow->set_texture(READ_IF_EXISTS(pSettings, r_string, m_light_section, "glow_texture", "glow\\glow_torch_r2"));
-    flashlight_glow->set_color(clr);
-    flashlight_glow->set_radius(READ_IF_EXISTS(pSettings, r_float, m_light_section, "glow_radius", 0.3f));
-
     //m_sounds.StopSound("sndFlashlightSwitch");
     //if (pSettings->line_exist(section, "snd_flashlight_switch"))
     //    m_sounds.LoadSound(section, "snd_flashlight_switch", "sndFlashlightSwitch", SOUND_TYPE_ITEM_USING);
@@ -1602,14 +1555,12 @@ void CWeaponMagazined::UpdateFlashlight()
         {
             flashlight_render->set_active(true);
             flashlight_omni->set_active(true);
-            flashlight_glow->set_active(true);
             UpdateAddonsVisibility();
         }
         else if (flashlight_render->get_active() && (!IsFlashlightOn() || !(!H_Parent() || (io && this == io->inventory().ActiveItem()))))
         {
             flashlight_render->set_active(false);
             flashlight_omni->set_active(false);
-            flashlight_glow->set_active(false);
             UpdateAddonsVisibility();
         }
 
@@ -1649,9 +1600,6 @@ void CWeaponMagazined::UpdateFlashlight()
             flashlight_render->set_position(flashlight_pos);
             flashlight_render->set_rotation(flashlightXForm.k, flashlightXForm.i);
 
-            flashlight_glow->set_position(flashlight_pos);
-            flashlight_glow->set_direction(flashlightXForm.k);
-
             Fmatrix flashlightomniXForm{};
             flashlightomniXForm.identity();
             flashlightomniXForm.k.set(flashlight_dir_omni);
@@ -1669,7 +1617,6 @@ void CWeaponMagazined::UpdateFlashlight()
                 fclr.mul_rgb(flashlight_fBrightness / 255.f);
                 flashlight_render->set_color(fclr);
                 flashlight_omni->set_color(fclr);
-                flashlight_glow->set_color(fclr);
             }
         }
     }
@@ -2222,7 +2169,6 @@ void CWeaponMagazined::SwitchFlashlight(bool on)
     {
         flashlight_render->set_active(false);
         flashlight_omni->set_active(false);
-        flashlight_glow->set_active(false);
     }
 }
 
@@ -2379,10 +2325,6 @@ void CWeaponMagazined::SetFlashlightRange(float range, int target)
         if (flashlight_omni)
             flashlight_omni->set_range(range);
         break;
-    case 2:
-        if (flashlight_glow)
-            flashlight_glow->set_radius(range);
-        break;
     }
 }
 void CWeaponMagazined::SetFlashlightAngle(float angle, int target)
@@ -2414,10 +2356,6 @@ void CWeaponMagazined::SetFlashlightRGB(float r, float g, float b, int target)
     case 1:
         if (flashlight_omni)
             flashlight_omni->set_color(c);
-        break;
-    case 2:
-        if (flashlight_glow)
-            flashlight_glow->set_color(c);
         break;
     }
 }

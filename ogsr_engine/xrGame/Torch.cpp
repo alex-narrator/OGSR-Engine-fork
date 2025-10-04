@@ -37,8 +37,6 @@ CTorch::CTorch(void)
     light_omni->set_shadow(false);
     light_omni->set_moveable(true);
 
-    glow_render = ::Render->glow_create();
-
     // Disabling shift by x and z axes for 1st render,
     // because we don't have dynamic lighting in it.
     if (g_current_renderer == 1)
@@ -55,7 +53,6 @@ CTorch::~CTorch(void)
 {
     light_render.destroy();
     light_omni.destroy();
-    glow_render.destroy();
 }
 
 void CTorch::Load(LPCSTR section)
@@ -77,7 +74,6 @@ void CTorch::Switch(bool turn_on)
     m_switched_on = turn_on;
     light_render->set_active(turn_on);
     light_omni->set_active(turn_on);
-    glow_render->set_active(turn_on);
 
     if (!!light_trace_bone)
     {
@@ -236,11 +232,8 @@ void CTorch::UpdateCL()
                 light_omni->set_position(offset);
             }
 
-			glow_render->set_position( pos );
-
 			light_render->set_rotation( dir, right );
 			light_omni->set_rotation( dir, right );
-			glow_render->set_direction( dir );
 		}// if(actor)
 		else 
 		{
@@ -253,9 +246,6 @@ void CTorch::UpdateCL()
             offset.mad(M.k, OMNI_OFFSET.z);
             light_omni->set_position(M.c);
             light_omni->set_rotation(M.k, M.i);
-
-            glow_render->set_position(M.c);
-            glow_render->set_direction(M.k);
         }
     }
     else
@@ -280,7 +270,6 @@ void CTorch::UpdateCL()
                 m_switched_on = false;
                 light_render->set_active(false);
                 light_omni->set_active(false);
-                glow_render->set_active(false);
             }
         } // if (getVisible() && m_pPhysicsShell)
     }
@@ -302,7 +291,6 @@ void CTorch::UpdateCL()
 
     light_render->set_color(fclr);
     light_omni->set_color(fclr);
-    glow_render->set_color(fclr);
 }
 
 void CTorch::create_physic_shell() { CPhysicsShellHolder::create_physic_shell(); }
@@ -383,10 +371,6 @@ void CTorch::LoadLightDefinitions(shared_str light_sect)
 
     light_render->set_cone(deg2rad(pSettings->r_float(light_sect, "spot_angle")));
     light_render->set_texture(pSettings->r_string(light_sect, "spot_texture"));
-
-    glow_render->set_texture(pSettings->r_string(light_sect, "glow_texture"));
-    glow_render->set_color(m_color);
-    glow_render->set_radius(pSettings->r_float(light_sect, "glow_radius"));
 
     calc_m_delta_h(m_fRange);
 

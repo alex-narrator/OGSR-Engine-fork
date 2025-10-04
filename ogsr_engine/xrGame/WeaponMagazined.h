@@ -53,10 +53,8 @@ protected:
     // flashlight
     float flashlight_attach_aim_dist{};
     shared_str flashlight_attach_bone;
-    Fvector flashlight_omni_attach_offset{}, flashlight_world_attach_offset{}, flashlight_omni_world_attach_offset{};
     ref_light flashlight_render;
     ref_light flashlight_omni;
-    ref_glow flashlight_glow;
     CLAItem* flashlight_lanim{};
     float flashlight_fBrightness{1.f};
     void UpdateFlashlight();
@@ -125,7 +123,6 @@ public:
     virtual bool CanDetach(const char* item_section_name);
 
     virtual void InitAddons();
-    /*virtual void InitZoomParams(LPCSTR section, bool useTexture);*/
 
     virtual bool Action(s32 cmd, u32 flags);
     virtual void UnloadMagazine(bool spawn_ammo = true);
@@ -176,6 +173,7 @@ public:
     }
     Fvector laserdot_attach_offset{}, laser_pos{};
     Fvector flashlight_attach_offset{}, flashlight_pos{};
+    Fvector flashlight_omni_attach_offset{}, flashlight_world_attach_offset{}, flashlight_omni_world_attach_offset{};
 
     float m_fZoomRotateTime_K{}; // коефіцієнт часу повороту прицілу
 

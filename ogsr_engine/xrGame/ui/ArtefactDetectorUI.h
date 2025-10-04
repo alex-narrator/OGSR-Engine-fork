@@ -1,4 +1,5 @@
 #pragma once
+#include "UIWindow.h"
 
 class CUIStatic;
 class CSimpleDetector;

@@ -36,10 +36,6 @@ void CFlashlight::SetColor(const Fcolor& color, int target)
         if (light_omni)
             light_omni->set_color(color);
         break;
-    case 2:
-        if (glow_render)
-            glow_render->set_color(color);
-        break;
     }
 }
 
@@ -77,10 +73,6 @@ void CFlashlight::SetRange(float range, int target)
         if (light_omni)
             light_omni->set_range(range);
         break;
-    case 2:
-        if (glow_render)
-            glow_render->set_radius(range);
-        break;
     }
 }
 
@@ -92,10 +84,6 @@ void CFlashlight::SetTexture(LPCSTR texture, int target)
     case 1:
         if (light_omni)
             light_omni->set_texture(texture);
-        break;
-    case 2:
-        if (glow_render)
-            glow_render->set_texture(texture);
         break;
     }
 }
