@@ -16,6 +16,7 @@
 #include "..\xr_3da\IGame_Persistent.h"
 #include "game_cl_base.h"
 #include "ui/UIDialogWnd.h"
+#include "ui/UIPdaWnd.h"
 #include "date_time.h"
 #include "ai_space.h"
 #include "level_graph.h"
@@ -317,6 +318,26 @@ CUIWindow* GetPdaWindow()
     if (!pGameSP)
         return nullptr;
     return (CUIWindow*)pGameSP->PdaMenu;
+}
+
+int get_active_pda_tab_idx()
+{
+    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+    if (!pGameSP)
+        return 0;
+    if (!pGameSP->PdaMenu)
+        return 0;
+    return pGameSP->PdaMenu->m_pActiveSection;
+}
+
+void set_active_pda_tab_idx(EPdaTabs idx)
+{
+    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
+    if (!pGameSP)
+        return;
+    if (!pGameSP->PdaMenu)
+        return;
+    pGameSP->PdaMenu->SetActiveSubdialog(idx);
 }
 
 CUIWindow* GetUIChangeLevelWnd()
@@ -665,6 +686,8 @@ static void g_set_anomaly_position(const u32 i, const float x, const float y, co
 }
 
 static void g_set_detector_params(const int _one, const int _two) { shader_exports.set_detector_params(Ivector2{_one, _two}); }
+
+const Fvector& g_get_pda_params() { return shader_exports.get_pda_params(); }
 
 #include "game_sv_single.h"
 void AdvanceGameTime(u32 _ms)
@@ -1064,6 +1087,8 @@ void CLevel::script_register(lua_State* L)
             def("get_second_talker", &GetSecondTalker),
             def("get_change_level_wnd", &GetUIChangeLevelWnd),
 
+            def("get_active_pda_tab_idx", &get_active_pda_tab_idx), def("set_active_pda_tab_idx", &set_active_pda_tab_idx),
+
             def("ray_query", &PerformRayQuery),
 
             // Real Wolf 07.07.2014
@@ -1104,7 +1129,7 @@ void CLevel::script_register(lua_State* L)
                                    def("clear_personal_goodwill", &g_clear_personal_goodwill), def("clear_personal_relations", &g_clear_personal_relations)];
     //установка параметров для шейдеров из скриптов
     module(L)[def("set_artefact_slot", &g_set_artefact_position), def("set_anomaly_slot", &g_set_anomaly_position), def("set_detector_mode", &g_set_detector_params),
-              def("set_pda_params", [](const Fvector& p) { shader_exports.set_pda_params(p); }),
+              def("set_pda_params", [](const Fvector& p) { shader_exports.set_pda_params(p); }), def("get_pda_params", &g_get_pda_params),
 
            def("set_dof_params", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_dof_params(p1, p2, p3, p4); }),
 
