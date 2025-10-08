@@ -47,10 +47,6 @@ protected:
     CGameFont* m_pTreeItemFont;
     u32 m_uTreeItemColor;
 
-    xr_vector<Fvector2> m_sign_places;
-    CUIStatic* m_updatedSectionImage;
-    CUIStatic* m_oldSectionImage;
-
     xr_vector<CEncyclopediaArticle> m_ArticlesDB;
 
     void OnFilterChanged(CUIWindow*, void*);

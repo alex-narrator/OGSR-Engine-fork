@@ -32,8 +32,6 @@ CUIDiaryWnd::~CUIDiaryWnd()
     delete_data(m_SrcListWnd);
     delete_data(m_DescrView);
     m_ArticlesDB.clear();
-    delete_data(m_updatedSectionImage);
-    delete_data(m_oldSectionImage);
 }
 
 void CUIDiaryWnd::Show(bool status)
@@ -119,14 +117,6 @@ void CUIDiaryWnd::Init()
     m_DescrView = xr_new<CUIScrollView>();
     m_DescrView->SetAutoDelete(false);
     xml_init.InitScrollView(uiXml, "main_wnd:right_frame:work_area:scroll_view", 0, m_DescrView);
-
-    m_updatedSectionImage = xr_new<CUIStatic>();
-    xml_init.InitStatic(uiXml, "updated_section_static", 0, m_updatedSectionImage);
-
-    m_oldSectionImage = xr_new<CUIStatic>();
-    xml_init.InitStatic(uiXml, "old_section_static", 0, m_oldSectionImage);
-
-    RearrangeTabButtons(m_FilterTab, m_sign_places);
 }
 
 void CUIDiaryWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
@@ -236,34 +226,14 @@ void CUIDiaryWnd::Draw()
 {
     inherited::Draw();
 
-    m_updatedSectionImage->Update();
-    m_oldSectionImage->Update();
-
-    Fvector2 tab_pos;
-    m_FilterTab->GetAbsolutePos(tab_pos);
-
-    Fvector2 pos;
-
-    pos = m_sign_places[eNews];
-    pos.add(tab_pos);
     if (g_pda_info_state & pda_section::news)
-        draw_sign(m_updatedSectionImage, pos);
-    else
-        draw_sign(m_oldSectionImage, pos);
+        m_FilterTab->GetButtonByIndex(eNews)->DrawHighlightedText();
 
-    pos = m_sign_places[eJournal];
-    pos.add(tab_pos);
     if (g_pda_info_state & pda_section::journal)
-        draw_sign(m_updatedSectionImage, pos);
-    else
-        draw_sign(m_oldSectionImage, pos);
+        m_FilterTab->GetButtonByIndex(eJournal)->DrawHighlightedText();
 
-    pos = m_sign_places[eNotes];
-    pos.add(tab_pos);
     if (g_pda_info_state & pda_section::notes)
-        draw_sign(m_updatedSectionImage, pos);
-    else
-        draw_sign(m_oldSectionImage, pos);
+        m_FilterTab->GetButtonByIndex(eNotes)->DrawHighlightedText();
 }
 
 void CUIDiaryWnd::Reset()

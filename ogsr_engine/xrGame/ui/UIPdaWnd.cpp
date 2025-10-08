@@ -36,8 +36,6 @@
 constexpr auto PDA_XML = "pda.xml";
 u32 g_pda_info_state{};
 
-void RearrangeTabButtons(CUITabControl* pTab, xr_vector<Fvector2>& vec_sign_places);
-
 CUIPdaWnd::CUIPdaWnd()
 {
     last_cursor_pos.set(UI_BASE_WIDTH / 2.f, UI_BASE_HEIGHT / 2.f);
@@ -54,8 +52,6 @@ CUIPdaWnd::~CUIPdaWnd()
     delete_data(UIActorInfo);
     delete_data(UIStalkersRanking);
     delete_data(UIEventsWnd);
-    delete_data(m_updatedSectionImage);
-    delete_data(m_oldSectionImage);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -119,15 +115,7 @@ void CUIPdaWnd::Init()
     xml_init.InitTabControl(uiXml, "tab", 0, UITabControl);
     UITabControl->SetMessageTarget(this);
 
-    m_updatedSectionImage = xr_new<CUIStatic>();
-    xml_init.InitStatic(uiXml, "updated_section_static", 0, m_updatedSectionImage);
-
-    m_oldSectionImage = xr_new<CUIStatic>();
-    xml_init.InitStatic(uiXml, "old_section_static", 0, m_oldSectionImage);
-
     m_pActiveSection = eptNoActiveTab;
-
-    RearrangeTabButtons(UITabControl, m_sign_places_main);
 }
 
 void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
@@ -417,62 +405,26 @@ void draw_sign(CUIStatic* s, Fvector2& pos)
 
 void CUIPdaWnd::DrawUpdatedSections()
 {
-    m_updatedSectionImage->Update();
-    m_oldSectionImage->Update();
-
-    Fvector2 tab_pos;
-    UITabControl->GetAbsolutePos(tab_pos);
-
-    Fvector2 pos;
-
-    pos = m_sign_places_main[eptQuests];
-    pos.add(tab_pos);
     if (g_pda_info_state & pda_section::quests)
-        draw_sign(m_updatedSectionImage, pos);
-    else
-        draw_sign(m_oldSectionImage, pos);
+        UITabControl->GetButtonByIndex(eptQuests)->DrawHighlightedText();
 
-    pos = m_sign_places_main[eptMap];
-    pos.add(tab_pos);
     if (g_pda_info_state & pda_section::map)
-        draw_sign(m_updatedSectionImage, pos);
-    else
-        draw_sign(m_oldSectionImage, pos);
+        UITabControl->GetButtonByIndex(eptMap)->DrawHighlightedText();
 
-    pos = m_sign_places_main[eptDiary];
-    pos.add(tab_pos);
     if (g_pda_info_state & pda_section::diary)
-        draw_sign(m_updatedSectionImage, pos);
-    else
-        draw_sign(m_oldSectionImage, pos);
+        UITabControl->GetButtonByIndex(eptDiary)->DrawHighlightedText();
 
-    pos = m_sign_places_main[eptContacts];
-    pos.add(tab_pos);
     if (g_pda_info_state & pda_section::contacts)
-        draw_sign(m_updatedSectionImage, pos);
-    else
-        draw_sign(m_oldSectionImage, pos);
+        UITabControl->GetButtonByIndex(eptContacts)->DrawHighlightedText();
 
-    pos = m_sign_places_main[eptRanking];
-    pos.add(tab_pos);
     if (g_pda_info_state & pda_section::ranking)
-        draw_sign(m_updatedSectionImage, pos);
-    else
-        draw_sign(m_oldSectionImage, pos);
+        UITabControl->GetButtonByIndex(eptRanking)->DrawHighlightedText();
 
-    pos = m_sign_places_main[eptActorStatistic];
-    pos.add(tab_pos);
     if (g_pda_info_state & pda_section::statistics)
-        draw_sign(m_updatedSectionImage, pos);
-    else
-        draw_sign(m_oldSectionImage, pos);
+        UITabControl->GetButtonByIndex(eptActorStatistic)->DrawHighlightedText();
 
-    pos = m_sign_places_main[eptEncyclopedia];
-    pos.add(tab_pos);
     if (g_pda_info_state & pda_section::encyclopedia)
-        draw_sign(m_updatedSectionImage, pos);
-    else
-        draw_sign(m_oldSectionImage, pos);
+        UITabControl->GetButtonByIndex(eptEncyclopedia)->DrawHighlightedText();
 }
 
 void CUIPdaWnd::Reset()
@@ -494,49 +446,6 @@ void CUIPdaWnd::Reset()
         UIEventsWnd->Reset();
 }
 
-void RearrangeTabButtons(CUITabControl* pTab, xr_vector<Fvector2>& vec_sign_places)
-{
-    TABS_VECTOR* btn_vec = pTab->GetButtonsVector();
-    TABS_VECTOR::iterator it = btn_vec->begin();
-    TABS_VECTOR::iterator it_e = btn_vec->end();
-    vec_sign_places.clear();
-    vec_sign_places.resize(btn_vec->size());
-
-    Fvector2 pos;
-    pos.set((*it)->GetWndPos());
-    Fvector2 sign_sz;
-    sign_sz.set(9.0f + 3.0f, 11.0f);
-    u32 idx = 0;
-    float btn_text_len = 0.0f;
-    CUIStatic* st = NULL;
-
-    for (; it != it_e; ++it, ++idx)
-    {
-        if (idx != 0)
-        {
-            st = xr_new<CUIStatic>();
-            st->SetAutoDelete(true);
-            pTab->AttachChild(st);
-            st->SetFont((*it)->GetFont());
-            st->SetTextColor(color_rgba(90, 90, 90, 255));
-            st->SetText("//");
-            st->SetWndSize((*it)->GetWndSize());
-            st->AdjustWidthToText();
-            st->SetWndPos(pos);
-            pos.x += st->GetWndSize().x;
-        }
-
-        vec_sign_places[idx].set(pos);
-        vec_sign_places[idx].y += iFloor(((*it)->GetWndSize().y - sign_sz.y) / 2.0f);
-        vec_sign_places[idx].y = (float)iFloor(vec_sign_places[idx].y);
-        pos.x += sign_sz.x;
-
-        (*it)->SetWndPos(pos);
-        (*it)->AdjustWidthToText();
-        btn_text_len = (*it)->GetWndSize().x;
-        pos.x += btn_text_len + 3.0f;
-    }
-}
 bool CUIPdaWnd::OnKeyboard(int dik, EUIMessages keyboard_action)
 {
     if (WINDOW_KEY_PRESSED == keyboard_action && IsShown())

@@ -34,12 +34,9 @@ protected:
 protected:
     // Бэкграунд
     CUIStatic* UIMainPdaFrame{};
-    CUIStatic* m_updatedSectionImage{};
-    CUIStatic* m_oldSectionImage{};
 
     // Текущий активный диалог
     CUIWindow* m_pActiveDialog{};
-    xr_vector<Fvector2> m_sign_places_main;
 
 public:
     EPdaTabs m_pActiveSection;
