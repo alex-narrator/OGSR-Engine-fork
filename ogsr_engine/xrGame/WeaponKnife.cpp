@@ -115,6 +115,7 @@ void CWeaponKnife::KnifeStrike(u32 state, const Fvector& pos, const Fvector& dir
         cartridge.m_kAP = cur_fHitAP;
         cartridge.m_flags.set(CCartridge::cfTracer, FALSE);
         cartridge.m_flags.set(CCartridge::cfRicochet, FALSE);
+        cartridge.m_flags.set(CCartridge::cfShootMark, TRUE);
         cartridge.fWallmarkSize = fWallmarkSize;
         cartridge.bullet_material_idx = knife_material_idx;
 
