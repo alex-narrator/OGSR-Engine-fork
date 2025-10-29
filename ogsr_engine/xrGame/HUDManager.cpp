@@ -330,8 +330,7 @@ void CHUDManager::RenderUI()
     {
         HitMarker.Render();
 
-        if (psHUD_Flags.is(HUD_CROSSHAIR | HUD_CROSSHAIR_RT | HUD_CROSSHAIR_RT2) || psActorFlags.test(AF_CROSSHAIR_DBG))
-            m_pHUDTarget->Render();
+        m_pHUDTarget->Render();
     }
 
     if (pUI)
@@ -358,10 +357,6 @@ void CHUDManager::RenderUI()
 void CHUDManager::OnEvent(EVENT E, u64 P1, u64 P2) {}
 
 collide::rq_result& CHUDManager::GetCurrentRayQuery() { return m_pHUDTarget->RQ; }
-
-void CHUDManager::SetCrosshairDisp(float dispf, float disps) { m_pHUDTarget->HUDCrosshair.SetDispersion(psHUD_Flags.test(HUD_CROSSHAIR_DYNAMIC) ? dispf : disps); }
-
-void CHUDManager::ShowCrosshair(bool show) { m_pHUDTarget->m_bShowCrosshair = show; }
 
 void CHUDManager::Hit(int idx, float power, const Fvector& dir) { HitMarker.Hit(idx, dir); }
 

@@ -21,7 +21,6 @@ CUI::CUI(CHUDManager* p)
     pUIGame = NULL;
 
     ShowGameIndicators();
-    ShowCrosshair();
 }
 //--------------------------------------------------------------------
 
@@ -227,11 +226,5 @@ void CUI::HideGameIndicators()
     m_bShowGameIndicators = false;
     hud_disabled_by_user = false;
 }
-
-void CUI::ShowCrosshair() { psHUD_Flags.set(HUD_CROSSHAIR_RT, TRUE); }
-
-void CUI::HideCrosshair() { psHUD_Flags.set(HUD_CROSSHAIR_RT, FALSE); }
-
-bool CUI::CrosshairShown() { return !!psHUD_Flags.test(HUD_CROSSHAIR_RT); }
 
 void CUI::OnConnected() { UIMainIngameWnd->OnConnected(); }

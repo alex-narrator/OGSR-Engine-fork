@@ -36,6 +36,7 @@
 #include "GamePersistent.h"
 #include "EffectorBobbing.h"
 #include "LevelDebugScript.h"
+#include "hudtarget.h"
 
 #include "postprocessanimator.h"
 #include "actoreffector.h"
@@ -294,6 +295,8 @@ Fvector2 get_cursor_pos() { return GetUICursor()->GetCursorPosition(); }
 
 void set_cursor_pos(const Fvector2& pos) { GetUICursor()->SetUICursorPosition(pos); }
 
+Fvector2 get_crosshair_pos() { return ((CHUDManager*)g_hud)->GetTarget()->GetCrosshairPos(); }
+
 #include "UIGameCustom.h"
 #include "ui/UITalkWnd.h"
 #include "UIGameSP.h"
@@ -388,16 +391,10 @@ CScriptGameObject* GetTargetObj()
 void hide_indicators()
 {
     HUD().GetUI()->UIGame()->HideShownDialogs();
-
     HUD().GetUI()->HideGameIndicators();
-    HUD().GetUI()->HideCrosshair();
 }
 
-void show_indicators()
-{
-    HUD().GetUI()->ShowGameIndicators();
-    HUD().GetUI()->ShowCrosshair();
-}
+void show_indicators() { HUD().GetUI()->ShowGameIndicators(); }
 
 bool game_indicators_shown() { return HUD().GetUI()->GameIndicatorsShown(); }
 
@@ -1110,7 +1107,7 @@ void CLevel::script_register(lua_State* L)
 
             def("get_effector_bobbing", &get_effector_bobbing), def("is_ray_intersect_sphere", &is_ray_intersect_sphere),
 
-            def("get_cursor_pos", &get_cursor_pos), def("set_cursor_pos", &set_cursor_pos),
+            def("get_cursor_pos", &get_cursor_pos), def("set_cursor_pos", &set_cursor_pos), def("get_crosshair_pos", &get_crosshair_pos),
 
             def("block_action", [](EGameActions action) { Level().block_action(action); }),
             def("unblock_action", [](EGameActions action) { Level().unblock_action(action); })

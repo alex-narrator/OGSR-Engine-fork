@@ -13,8 +13,6 @@ class CBloodsuckerAlien
     CAlienEffector* m_effector;
     CAlienEffectorPP* m_effector_pp;
 
-    bool m_crosshair_show;
-
 public:
     CBloodsuckerAlien();
     ~CBloodsuckerAlien() = default;

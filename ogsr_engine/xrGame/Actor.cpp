@@ -734,7 +734,6 @@ void CActor::UpdateCL()
 
     if (Level().CurrentEntity() && this->ID() == Level().CurrentEntity()->ID())
     {
-        psHUD_Flags.set(HUD_CROSSHAIR_RT2, true);
         psHUD_Flags.set(HUD_DRAW_RT, true);
     }
 
@@ -745,27 +744,16 @@ void CActor::UpdateCL()
     {
         if (pWeapon->IsZoomed())
         {
-            /*float full_fire_disp = pWeapon->GetFireDispersion(true);*/
-
             if (auto ezi = smart_cast<CEffectorZoomInertion*>(Cameras().GetCamEffector(eCEZoom)))
                 ezi->SetParams(pWeapon->GetControlInertionFactor() / GetExoFactor());
 
             m_bZoomAimingMode = true;
-
-            /*Is3dssZoomed = !pWeapon->IsRotatingToZoom() && pWeapon->Is3dssEnabled();*/
         }
 
         Is3dssZoomed = pWeapon->IsAiming() && pWeapon->Is3dssEnabled();
 
         if (Level().CurrentEntity() && this->ID() == Level().CurrentEntity()->ID())
         {
-            float fire_disp_full = pWeapon->GetFireDispersion(true);
-
-            HUD().SetCrosshairDisp(fire_disp_full, 0.02f);
-
-            HUD().ShowCrosshair(!psHUD_Flags.test(HUD_CROSSHAIR_BUILD) && pWeapon->use_crosshair());
-
-            psHUD_Flags.set(HUD_CROSSHAIR_RT2, pWeapon->show_crosshair());
             psHUD_Flags.set(HUD_DRAW_RT, pWeapon->show_indicators());
 
             // Обновляем информацию об оружии в шейдерах
@@ -777,9 +765,6 @@ void CActor::UpdateCL()
     {
         if (Level().CurrentEntity() && this->ID() == Level().CurrentEntity()->ID())
         {
-            HUD().SetCrosshairDisp(0.f);
-            HUD().ShowCrosshair(false);
-
             // Очищаем информацию об оружии в шейдерах
             shader_exports.set_hud_params({});
         }

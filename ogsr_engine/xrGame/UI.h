@@ -45,10 +45,6 @@ public:
     void HideGameIndicators();
     bool GameIndicatorsShown() { return m_bShowGameIndicators; };
 
-    void ShowCrosshair();
-    void HideCrosshair();
-    bool CrosshairShown();
-
     SDrawStaticStruct* AddInfoMessage(LPCSTR message_static, LPCSTR message_text, bool translate = true);
     void OnConnected();
 };

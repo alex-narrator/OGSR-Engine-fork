@@ -116,7 +116,6 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
         if (Pda && Pda->Is3DPDA() && psActorFlags.test(AF_3D_PDA) && PdaMenu->IsShown() && (!MainInputReceiver() || MainInputReceiver() != PdaMenu))
         {
             Flags8 IRFlags{};
-            IRFlags.set(recvItem::eCrosshair, psHUD_Flags.test(HUD_CROSSHAIR_RT));
             IRFlags.set(recvItem::eIndicators, HUD().GetUI()->GameIndicatorsShown());
 
             HUD().GetUI()->SetMainInputReceiver(PdaMenu, false, IRFlags);

@@ -14,15 +14,14 @@ enum
     AF_3D_SCOPES                = 1 << 9,
     AF_ZONES_DBG                = 1 << 10,
     AF_VERTEX_DBG               = 1 << 11,
-    AF_CROSSHAIR_DBG            = 1 << 12,
-    AF_CAM_COLLISION            = 1 << 13,
-    AF_MOUSE_WHEEL_SWITCH_SLOTS = 1 << 14,
-    AF_3D_PDA                   = 1 << 15,
-    AF_AI_VOLUMETRIC_LIGHTS     = 1 << 16,
-    AF_EFFECTS_ON_DEMORECORD    = 1 << 17,
-    AF_FIRST_PERSON_DEATH       = 1 << 18,
-    AF_CAM_COLLISION_COP        = 1 << 19,
-    AF_ACTOR_SHADOW             = 1 << 20,
+    AF_CAM_COLLISION            = 1 << 12,
+    AF_MOUSE_WHEEL_SWITCH_SLOTS = 1 << 13,
+    AF_3D_PDA                   = 1 << 14,
+    AF_AI_VOLUMETRIC_LIGHTS     = 1 << 15,
+    AF_EFFECTS_ON_DEMORECORD    = 1 << 16,
+    AF_FIRST_PERSON_DEATH       = 1 << 17,
+    AF_CAM_COLLISION_COP        = 1 << 18,
+    AF_ACTOR_SHADOW             = 1 << 19,
 };
 
 //enum

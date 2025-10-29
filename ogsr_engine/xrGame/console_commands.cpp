@@ -1484,20 +1484,12 @@ void CCC_RegisterCommands()
     CMD1(CCC_ALifeSwitchFactor, "al_switch_factor"); // set switch factor
 #endif // MASTER_GOLD
 
-    CMD3(CCC_Mask, "hud_info", &psHUD_Flags, HUD_INFO);
     CMD3(CCC_Mask, "hud_draw", &psHUD_Flags, HUD_DRAW);
-    CMD3(CCC_Mask, "hud_crosshair_build", &psHUD_Flags, HUD_CROSSHAIR_BUILD); // билдокурсор
 
     if (IS_OGSR_GA)
         psHUD_Flags.set(HUD_CROSSHAIR_HARD, TRUE);
     else
         CMD3(CCC_Mask, "hud_crosshair_hard", &psHUD_Flags, HUD_CROSSHAIR_HARD);
-
-    CMD3(CCC_Mask, "hud_crosshair", &psHUD_Flags, HUD_CROSSHAIR);
-    CMD3(CCC_Mask, "hud_crosshair_dist", &psHUD_Flags, HUD_CROSSHAIR_DIST);
-    CMD3(CCC_Mask, "hud_info_overhead", &psHUD_Flags, HUD_INFO_OVERHEAD);
-
-    CMD3(CCC_Mask, "hud_crosshair_center", &psHUD_Flags, HUD_CROSSHAIR_CENTER);
 
     if (IS_OGSR_GA)
         psHUD_FOV_def = 0.65f;
@@ -1606,7 +1598,6 @@ void CCC_RegisterCommands()
 
     CMD3(CCC_Mask, "g_3d_scopes", &psActorFlags, AF_3D_SCOPES);
 
-    CMD3(CCC_Mask, "g_crosshair_dbg", &psActorFlags, AF_CROSSHAIR_DBG);
     CMD3(CCC_Mask, "g_camera_collision", &psActorFlags, AF_CAM_COLLISION);
     CMD3(CCC_Mask, "g_camera_collision_cop_mode", &psActorFlags, AF_CAM_COLLISION_COP);
 
@@ -1689,7 +1680,6 @@ void CCC_RegisterCommands()
     CMD1(CCC_DumpCreatures, "dump_creatures");
 #endif
 
-    CMD3(CCC_Mask, "cl_dynamiccrosshair", &psHUD_Flags, HUD_CROSSHAIR_DYNAMIC);
     CMD1(CCC_MainMenu, "main_menu");
 
 #ifndef MASTER_GOLD

@@ -5463,9 +5463,6 @@
     <ClInclude Include="ui\UIGameLog.h">
       <Filter>AI\AScript\ScriptClasses\UI\Multiplayer\HUD\GameLog</Filter>
     </ClInclude>
-    <ClInclude Include="HUDCrosshair.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Cursor</Filter>
-    </ClInclude>
     <ClInclude Include="HUDTarget.h">
       <Filter>AI\AScript\ScriptClasses\UI\Cursor</Filter>
     </ClInclude>
@@ -8517,9 +8514,6 @@
     </ClCompile>
     <ClCompile Include="ui\UIGameLog.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Multiplayer\HUD\GameLog</Filter>
-    </ClCompile>
-    <ClCompile Include="HUDCrosshair.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Cursor</Filter>
     </ClCompile>
     <ClCompile Include="HUDTarget.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Cursor</Filter>

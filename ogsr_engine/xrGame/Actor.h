@@ -746,8 +746,6 @@ public:
     float GetTotalArtefactsEffect(int);
 
     bool IsFreeHands() const;
-    bool m_bHideCrosshair{};
-    bool m_bCenterCrosshair{};
 
     float GetVisibility();
     void ResetVisibility();

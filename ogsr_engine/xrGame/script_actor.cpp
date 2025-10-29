@@ -215,9 +215,6 @@ void CScriptActor::script_register(lua_State* L)
                .def("get_artefacts_protection", &CActor::GetArtefactsProtection)
                .def("get_items_effect", &CActor::GetItemBoostedParams)
                .def("update_items_effect", &CActor::UpdateItemsEffect)
-               
-               .def_readwrite("center_crosshair", &CActor::m_bCenterCrosshair)
-               .def_readwrite("hide_crosshair", &CActor::m_bHideCrosshair)
                 ,
 
                 //move commands

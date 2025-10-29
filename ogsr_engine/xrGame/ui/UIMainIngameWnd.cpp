@@ -69,12 +69,12 @@ void CUIMainIngameWnd::Update()
 
 bool CUIMainIngameWnd::OnKeyboardPress(int dik)
 {
-    const bool shift = pInput->iGetAsyncKeyState(DIK_LSHIFT) || pInput->iGetAsyncKeyState(DIK_RSHIFT);
+    const bool is_add_act = pInput->iGetAsyncKeyState(get_action_dik(kADDITIONAL_ACTION));
     const auto bind = get_binded_action(dik);
 
     if (bind == kHIDEHUD)
     {
-        if (shift)
+        if (is_add_act)
         {
             UIZoneMap->ZoomOut();
         }
@@ -87,7 +87,7 @@ bool CUIMainIngameWnd::OnKeyboardPress(int dik)
     }
     else if (bind == kSHOWHUD)
     {
-        if (shift)
+        if (is_add_act)
         {
             UIZoneMap->ZoomIn();
         }

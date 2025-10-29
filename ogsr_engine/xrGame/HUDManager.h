@@ -74,10 +74,6 @@ public:
     //текущий предмет на который смотрит HUD
     collide::rq_result& GetCurrentRayQuery();
 
-    //устанвка внешнего вида прицела в зависимости от текущей дисперсии
-    void SetCrosshairDisp(float dispf, float disps = 0.f);
-    void ShowCrosshair(bool show);
-
     void SetHitmarkType(LPCSTR tex_name);
     virtual void OnScreenRatioChanged();
     virtual void OnDisconnected();

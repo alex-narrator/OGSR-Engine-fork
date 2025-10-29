@@ -540,8 +540,6 @@ void CWeapon::Load(LPCSTR section)
 
     InitAddons();
 
-    m_bHideCrosshairInZoom = READ_IF_EXISTS(pSettings, r_bool, hud_sect, "zoom_hide_crosshair", true);
-
     m_bZoomInertionAllow = READ_IF_EXISTS(pSettings, r_bool, hud_sect, "allow_zoom_inertion", READ_IF_EXISTS(pSettings, r_bool, "features", "default_allow_zoom_inertion", true));
     m_bScopeZoomInertionAllow = READ_IF_EXISTS(pSettings, r_bool, hud_sect, "allow_scope_zoom_inertion", READ_IF_EXISTS(pSettings, r_bool, "features", "default_allow_scope_zoom_inertion", true));
 
@@ -1942,8 +1940,6 @@ void CWeapon::Show(bool now)
         SwitchState(eShowing);
 }
 
-bool CWeapon::show_crosshair() { return psActorFlags.test(AF_CROSSHAIR_DBG) || !(IsZoomed() && ZoomHideCrosshair()); }
-
 bool CWeapon::show_indicators() { return !(IsZoomed() && !IsRotatingToZoom() && !m_bScopeShowIndicators); }
 
 bool CWeapon::ParentIsActor() const
@@ -2276,14 +2272,6 @@ bool CWeapon::CanBeReloaded()
 }
 
 bool CWeapon::CanBeUnloaded() { return GetAmmoElapsed() || GetAmmoElapsed2() || IsAddonAttached(eMagazine) && AddonAttachable(eMagazine); }
-
-bool CWeapon::ZoomHideCrosshair()
-{
-    auto* pA = smart_cast<CActor*>(H_Parent());
-    if (pA && pA->active_cam() == eacLookAt)
-        return false;
-    return m_bHideCrosshairInZoom;
-}
 
 Fvector CWeapon::GetPositionForCollision() { return psHUD_Flags.test(HUD_CROSSHAIR_HARD) ? get_LastShootPoint() : inherited::GetPositionForCollision(); }
 Fvector CWeapon::GetDirectionForCollision() { return psHUD_Flags.test(HUD_CROSSHAIR_HARD) ? get_LastFD() : inherited::GetDirectionForCollision(); }

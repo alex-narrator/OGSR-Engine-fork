@@ -190,7 +190,6 @@ void CBloodsuckerAlien::init_external(CAI_Bloodsucker* obj) { m_object = obj; }
 void CBloodsuckerAlien::reinit()
 {
     m_active = false;
-    m_crosshair_show = false;
 }
 
 void CBloodsuckerAlien::activate()
@@ -207,11 +206,6 @@ void CBloodsuckerAlien::activate()
 
     //.	Actor()->inventory().setSlotsBlocked			(true);
     Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);
-
-    // hide crosshair
-    m_crosshair_show = !!psHUD_Flags.is(HUD_CROSSHAIR_RT);
-    if (m_crosshair_show)
-        psHUD_Flags.set(HUD_CROSSHAIR_RT, FALSE);
 
     // Start effector
     m_effector_pp = xr_new<CAlienEffectorPP>(m_object->pp_vampire_effector, EFFECTOR_ID_GEN(EEffectorPPType));
@@ -235,8 +229,6 @@ void CBloodsuckerAlien::deactivate()
     m_object->CControlledActor::release();
 
     Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, false);
-    if (m_crosshair_show)
-        psHUD_Flags.set(HUD_CROSSHAIR_RT, TRUE);
 
     // Stop camera effector
     Actor()->Cameras().RemoveCamEffector(EFFECTOR_ID_GEN(ECamEffectorType));

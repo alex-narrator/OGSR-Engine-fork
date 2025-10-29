@@ -253,8 +253,6 @@ protected:
     float m_fScopeZoomFactorAlt{1.f};
     //когда режим приближения включен
     bool m_bZoomMode{};
-    //прятать перекрестие в режиме прицеливания
-    bool m_bHideCrosshairInZoom;
     //разрешить инерцию оружия в режиме прицеливания
     bool m_bZoomInertionAllow;
     // или в режиме прицеливания через оптику
@@ -290,7 +288,6 @@ public:
     virtual void OnZoomOut(bool rezoom = false);
     bool IsZoomed() const override { return m_bZoomMode; }
     bool IsAiming() const;
-    bool ZoomHideCrosshair();
 
     virtual void OnZoomChanged() {}
 
@@ -565,7 +562,6 @@ protected:
 public:
     virtual void modify_holder_params(float& range, float& fov) const;
     virtual bool use_crosshair() const { return true; }
-    bool show_crosshair();
     bool show_indicators();
     virtual bool ParentIsActor() const override;
 
