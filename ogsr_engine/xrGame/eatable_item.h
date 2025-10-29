@@ -32,8 +32,6 @@ public:
     virtual void UseBy(CEntityAlive* npc);
     bool Empty() const { return m_iPortionsNum == 0; };
 
-    bool m_bCanBeEaten{true};
-
 protected:
     //количество порций еды,
     //-1 - порция одна и больше не бывает (чтоб не выводить надпись в меню)

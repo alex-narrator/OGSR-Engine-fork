@@ -160,6 +160,7 @@ CActor::~CActor()
 
     m_HeavyBreathSnd.destroy();
     m_BloodSnd.destroy();
+    m_HitSnd.destroy();
 
     xr_delete(m_pActorEffector);
 
@@ -420,18 +421,18 @@ void CActor::Hit(SHit* pHDS)
 
     if (!sndHit[HDS.hit_type].empty() && (ALife::eHitTypeTelepatic != HDS.hit_type))
     {
-        ref_sound& S = sndHit[HDS.hit_type][Random.randI(sndHit[HDS.hit_type].size())];
+        m_HitSnd = sndHit[HDS.hit_type][Random.randI(sndHit[HDS.hit_type].size())];
         bool b_snd_hit_playing = sndHit[HDS.hit_type].end() != std::find_if(sndHit[HDS.hit_type].begin(), sndHit[HDS.hit_type].end(), playing_pred());
 
         if (ALife::eHitTypeExplosion == HDS.hit_type)
         {
             if (this == Level().CurrentControlEntity())
             {
-                S.set_volume(10.0f);
+                m_HitSnd.set_volume(10.0f);
                 if (!m_sndShockEffector)
                 {
                     m_sndShockEffector = xr_new<SndShockEffector>();
-                    m_sndShockEffector->Start(this, float(S.get_length_sec() * 1000.0f), HDS.damage());
+                    m_sndShockEffector->Start(this, float(m_HitSnd.get_length_sec() * 1000.0f), HDS.damage());
                 }
             }
             else
@@ -439,9 +440,7 @@ void CActor::Hit(SHit* pHDS)
         }
         if (bPlaySound && !b_snd_hit_playing)
         {
-            Fvector point = Position();
-            point.y += CameraHeight();
-            S.play_at_pos(this, point);
+            m_HitSnd.play(this, sm_2D);
         };
     }
 
@@ -615,6 +614,7 @@ void CActor::Die(CObject* who)
 
     m_HeavyBreathSnd.stop();
     m_BloodSnd.stop();
+    m_HitSnd.stop();
 
     start_tutorial("game_over");
     xr_delete(m_sndShockEffector);
@@ -990,13 +990,7 @@ void CActor::shedule_Update(u32 DT)
         if (conditions().IsLimping() && g_Alive())
         {
             if (!m_HeavyBreathSnd._feedback())
-            {
-                m_HeavyBreathSnd.play_at_pos(this, Fvector().set(0, ACTOR_HEIGHT, 0), sm_Looped | sm_2D);
-            }
-            else
-            {
-                m_HeavyBreathSnd.set_position(Fvector().set(0, ACTOR_HEIGHT, 0));
-            }
+                m_HeavyBreathSnd.play(this, sm_Looped | sm_2D);
         }
         else if (m_HeavyBreathSnd._feedback())
         {
@@ -1006,12 +1000,8 @@ void CActor::shedule_Update(u32 DT)
         float bs = conditions().BleedingSpeed();
         if (bs > 0.6f)
         {
-            Fvector snd_pos;
-            snd_pos.set(0, ACTOR_HEIGHT, 0);
             if (!m_BloodSnd._feedback())
-                m_BloodSnd.play_at_pos(this, snd_pos, sm_Looped | sm_2D);
-            else
-                m_BloodSnd.set_position(snd_pos);
+                m_BloodSnd.play(this, sm_Looped | sm_2D);
 
             float v = bs + 0.25f;
 

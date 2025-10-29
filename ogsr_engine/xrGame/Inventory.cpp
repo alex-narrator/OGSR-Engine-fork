@@ -673,9 +673,6 @@ bool CInventory::Eat(PIItem pIItem, CInventoryOwner* eater)
     if (Actor()->m_inventory == this)
         Actor()->callback(GameObject::eOnBeforeUseItem)(lua_go);
 
-    if (!pItemToEat->m_bCanBeEaten)
-        return false;
-
     pItemToEat->UseBy(entity_alive);
 
     if (Actor()->m_inventory == this)

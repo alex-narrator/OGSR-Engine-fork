@@ -10,7 +10,6 @@ void CEatableItem::script_register(lua_State* L)
     module(L)[class_<CEatableItem, CInventoryItem>("CEatableItem")
                   .def_readwrite("eat_portions_num", &CEatableItem::m_iPortionsNum)
                   .def_readwrite("eat_start_portions_num", &CEatableItem::m_iStartPortionsNum)
-                  .def_readwrite("can_be_eaten", &CEatableItem::m_bCanBeEaten)
                   .def("influence", &CEatableItem::GetItemInfluence)
                   .def("influence", (void(CEatableItem::*)(int, float)) & CEatableItem::SetItemInfluence),
 

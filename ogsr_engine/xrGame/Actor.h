@@ -216,8 +216,9 @@ public:
 
 protected:
     //звук тяжелого дыхания
-    ref_sound m_HeavyBreathSnd;
-    ref_sound m_BloodSnd;
+    ref_sound m_HeavyBreathSnd{};
+    ref_sound m_BloodSnd{};
+    ref_sound m_HitSnd{};
 
     /////////////////////////////////////////////////////////////////
     // misc properties
