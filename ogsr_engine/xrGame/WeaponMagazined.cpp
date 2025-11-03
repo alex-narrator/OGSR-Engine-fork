@@ -26,43 +26,13 @@
 #include "../xr_3da/xr_input.h"
 #include "../xr_3da/LightAnimLibrary.h"
 
-CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapon(name)
-{
-    //m_eSoundShow = ESoundTypes(SOUND_TYPE_ITEM_TAKING | eSoundType);
-    //m_eSoundHide = ESoundTypes(SOUND_TYPE_ITEM_HIDING | eSoundType);
-    //m_eSoundShot = ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING | eSoundType);
-    //m_eSoundEmptyClick = ESoundTypes(SOUND_TYPE_WEAPON_EMPTY_CLICKING | eSoundType);
-    //m_eSoundReload = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
-}
+CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapon(name) {}
 
 CWeaponMagazined::~CWeaponMagazined()
 {
     if (m_binoc_vision)
         xr_delete(m_binoc_vision);
 }
-
-//void CWeaponMagazined::StopHUDSounds()
-//{
-//    HUD_SOUND::StopSound(sndShow);
-//    HUD_SOUND::StopSound(sndHide);
-//
-//    HUD_SOUND::StopSound(sndEmptyClick);
-//    HUD_SOUND::StopSound(sndReload);
-//    HUD_SOUND::StopSound(sndReloadPartly);
-//    HUD_SOUND::StopSound(sndReloadJammed);
-//    HUD_SOUND::StopSound(sndReloadJammedLast);
-//    HUD_SOUND::StopSound(sndFireModes);
-//    HUD_SOUND::StopSound(sndZoomChange);
-//    HUD_SOUND::StopSound(sndTactItemOn);
-//    HUD_SOUND::StopSound(sndItemOn);
-//    HUD_SOUND::StopSound(sndAimStart);
-//    HUD_SOUND::StopSound(sndAimEnd);
-//
-//    HUD_SOUND::StopSound(sndShot);
-//    HUD_SOUND::StopSound(sndSilencerShot);
-//
-//    inherited::StopHUDSounds();
-//}
 
 void CWeaponMagazined::net_Destroy()
 {
@@ -102,11 +72,6 @@ void CWeaponMagazined::Load(LPCSTR section)
     inherited::Load(section);
 
     // Sounds
-    //HUD_SOUND::LoadSound(section, "snd_draw", sndShow, m_eSoundShow);
-    //HUD_SOUND::LoadSound(section, "snd_holster", sndHide, m_eSoundHide);
-    //HUD_SOUND::LoadSound(section, "snd_shoot", sndShot, m_eSoundShot);
-    //HUD_SOUND::LoadSound(section, "snd_empty", sndEmptyClick, m_eSoundEmptyClick);
-
     m_sounds.LoadSound(section, "snd_draw", "sndShow", SOUND_TYPE_ITEM_TAKING);
     m_sounds.LoadSound(section, "snd_holster", "sndHide", SOUND_TYPE_ITEM_HIDING);
     m_sounds.LoadSound(section, "snd_shoot", "sndShot", SOUND_TYPE_WEAPON_SHOOTING);
@@ -118,43 +83,30 @@ void CWeaponMagazined::Load(LPCSTR section)
      if (pSettings->line_exist(section, "snd_shoot_silencer_actor"))
          m_sounds.LoadSound(section, "snd_shoot_silencer_actor", "sndShotSilencerActor", SOUND_TYPE_WEAPON_SHOOTING);
 
-    //if (pSettings->line_exist(section, "snd_reload_empty"))
-    //    HUD_SOUND::LoadSound(section, "snd_reload_empty", sndReload, m_eSoundReload);
-    //else
-    //    HUD_SOUND::LoadSound(section, "snd_reload", sndReload, m_eSoundReload);
-
     if (pSettings->line_exist(section, "snd_reload_empty"))
         m_sounds.LoadSound(section, "snd_reload_empty", "sndReload", SOUND_TYPE_WEAPON_RECHARGING);
     else
         m_sounds.LoadSound(section, "snd_reload", "sndReload", SOUND_TYPE_WEAPON_RECHARGING);
 
     if (pSettings->line_exist(section, "snd_reload_jammed"))
-        /*HUD_SOUND::LoadSound(section, "snd_reload_jammed", sndReloadJammed, m_eSoundReload);*/
         m_sounds.LoadSound(section, "snd_reload_jammed", "sndReloadJammed", SOUND_TYPE_WEAPON_RECHARGING);
 
     if (pSettings->line_exist(section, "snd_reload_jammed_last"))
-        /*HUD_SOUND::LoadSound(section, "snd_reload_jammed_last", sndReloadJammedLast, m_eSoundReload);*/
         m_sounds.LoadSound(section, "snd_reload_jammed_last", "sndReloadJammedLast", SOUND_TYPE_WEAPON_RECHARGING);
 
     if (pSettings->line_exist(section, "snd_reload_empty")) // OpenXRay-style неполная перезарядка
-        //HUD_SOUND::LoadSound(section, "snd_reload", sndReloadPartly, m_eSoundReload);
         m_sounds.LoadSound(section, "snd_reload", "sndReloadPartly", SOUND_TYPE_WEAPON_RECHARGING);
     else if (pSettings->line_exist(section, "snd_reload_partly")) // OGSR-style неполная перезарядка
-        //HUD_SOUND::LoadSound(section, "snd_reload_partly", sndReloadPartly, m_eSoundReload);
         m_sounds.LoadSound(section, "snd_reload_partly", "sndReloadPartly", SOUND_TYPE_WEAPON_RECHARGING);
 
     if (pSettings->line_exist(section, "snd_fire_modes"))
-        /*HUD_SOUND::LoadSound(section, "snd_fire_modes", sndFireModes, m_eSoundEmptyClick);*/
         m_sounds.LoadSound(section, "snd_fire_modes", "sndFireModes", SOUND_TYPE_WEAPON_EMPTY_CLICKING);
     if (pSettings->line_exist(section, "snd_zoom_change"))
-        /*HUD_SOUND::LoadSound(section, "snd_zoom_change", sndZoomChange, m_eSoundEmptyClick);*/
         m_sounds.LoadSound(section, "snd_zoom_change", "sndZoomChange", SOUND_TYPE_WEAPON_EMPTY_CLICKING);
 
     if (pSettings->line_exist(section, "snd_aim_start"))
-        /*HUD_SOUND::LoadSound(section, "snd_aim_start", sndAimStart, m_eSoundShow);*/
         m_sounds.LoadSound(section, "snd_aim_start", "sndAimStart", SOUND_TYPE_ITEM_TAKING);
     if (pSettings->line_exist(section, "snd_aim_end"))
-        /*HUD_SOUND::LoadSound(section, "snd_aim_end", sndAimEnd, m_eSoundHide);*/
         m_sounds.LoadSound(section, "snd_aim_end", "sndAimEnd", SOUND_TYPE_ITEM_HIDING);
 
     //
@@ -174,7 +126,6 @@ void CWeaponMagazined::Load(LPCSTR section)
             m_sSilencerFlameParticles = pSettings->r_string(section, "silencer_flame_particles");
         if (pSettings->line_exist(section, "silencer_smoke_particles"))
             m_sSilencerSmokeParticles = pSettings->r_string(section, "silencer_smoke_particles");
-        /*HUD_SOUND::LoadSound(section, "snd_silncer_shot", sndSilencerShot, m_eSoundShot);*/
         m_sounds.LoadSound(section, "snd_silncer_shot", "sndSilencerShot", SOUND_TYPE_WEAPON_SHOOTING);
     }
     //  [7/20/2005]
@@ -208,8 +159,6 @@ void CWeaponMagazined::Load(LPCSTR section)
 
     m_bHasChamber = READ_IF_EXISTS(pSettings, r_bool, section, "has_chamber", true);
     m_fShellDropDelay = READ_IF_EXISTS(pSettings, r_float, section, "shell_drop_delay", 0.f);
-
-    /*CartridgeInTheChamberEnabled = READ_IF_EXISTS(pSettings, r_bool, section, "CartridgeInTheChamberEnabled", false);*/
 
     if (pSettings->line_exist(section, "bullet_bones"))
     {
@@ -260,18 +209,6 @@ void CWeaponMagazined::FireStart()
     else if (eReload != GetState() && eMisfire != GetState())
         OnMagazineEmpty();
 }
-
-//void CWeaponMagazined::FireEnd()
-//{
-//    inherited::FireEnd();
-//
-//    if (Core.Features.test(xrCore::Feature::autoreload_wpn))
-//    {
-//        auto actor = smart_cast<CActor*>(H_Parent());
-//        if (!iAmmoElapsed && actor && GetState() != eReload)
-//            Reload();
-//    }
-//}
 
 int CWeaponMagazined::CheckAmmoBeforeReload(u32& v_ammoType)
 {
@@ -679,8 +616,6 @@ void CWeaponMagazined::state_Fire(float dt)
     UpdateSounds();
 }
 
-//void CWeaponMagazined::SetDefaults() { CWeapon::SetDefaults(); }
-
 void CWeaponMagazined::PlayShotSound()
 {
     if (ParentIsActor())
@@ -707,13 +642,6 @@ void CWeaponMagazined::PlayShotSound()
 
 void CWeaponMagazined::OnShot()
 {
-    // Если актор бежит - останавливаем его
-    //if (ParentIsActor())
-    //    Actor()->set_state_wishful(Actor()->get_state_wishful() & (~mcSprint));
-
-    // Sound
-    /*PlaySound(*m_pSndShotCurrent, get_LastFP(), true);*/
-    /*PlaySound(m_sSndShotCurrent.c_str(), get_LastFP(), true);*/
     PlayShotSound();
 
     // Camera
@@ -832,25 +760,9 @@ void CWeaponMagazined::switch2_Fire()
         return;
 #endif // DEBUG
 
-    //
-    //	VERIFY2(
-    //		io && (ii == io->inventory().ActiveItem()),
-    //		make_string(
-    //			"item[%s], parent[%s]",
-    //			*cName(),
-    //			H_Parent() ? *H_Parent()->cName() : "no_parent"
-    //		)
-    //	);
-
     m_bStopedAfterQueueFired = false;
     m_bFireSingleShot = true;
     m_iShotNum = 0;
-
-    /*	if(SingleShotMode())
-        {
-            m_bFireSingleShot = true;
-            bWorking = false;
-        }*/
 }
 void CWeaponMagazined::switch2_Empty(const bool empty_click_anim_play)
 {
@@ -1208,12 +1120,8 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
 
     m_fIronSightZoomFactor = READ_IF_EXISTS(pSettings, r_float, section, "ironsight_zoom_factor", 1.0f);
     m_fScopeInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "scope_inertion_factor", 1.f);
-    /*m_fSecondVPZoomFactor = 0.f;*/ // READ_IF_EXISTS(pSettings, r_float, section, "scope_lense_fov_factor", 0.f);
-    /*m_bSecondVPEnabled = READ_IF_EXISTS(pSettings, r_bool, section, "second_vp_enabled", false);*/
     m_fZoomHudFov = READ_IF_EXISTS(pSettings, r_float, section, "scope_zoom_hud_fov", 0.0f);
     m_f3dssHudFov = READ_IF_EXISTS(pSettings, r_float, section, "scope_lense_hud_fov", 0.0f);
-
-    /*m_fConstZoomHudFov = READ_IF_EXISTS(pSettings, r_float, section, "const_zoom_hud_fov", 0.0f);*/
 
     // second scope mode
     m_bHasAimAlt = READ_IF_EXISTS(pSettings, r_bool, section, "aim_alt", false) && !READ_IF_EXISTS(pSettings, r_bool, cNameSect(), "ignore_aim_alt", false) ||
@@ -1253,8 +1161,6 @@ void CWeaponMagazined::LoadScopeParams(LPCSTR section)
         string128 tmp;
         m_fScopeZoomFactor = atof(_GetItem(scope_zoom_line, 0, tmp));
         m_fRTZoomFactor = m_fScopeZoomFactor;
-        //if (m_bSecondVPEnabled)
-        //    m_fRTZoomFactor = m_fSecondVPZoomFactor = m_fScopeZoomFactor;
         if (_count > 1)
         {
             m_fMaxScopeZoomFactor = atof(_GetItem(scope_zoom_line, 1, tmp));
@@ -1404,14 +1310,16 @@ void CWeaponMagazined::LoadLaserParams(LPCSTR section)
         return;
 
     shared_str wpn_sect = cNameSect();
-    laserdot_attach_bone = READ_IF_EXISTS(pSettings, r_string, wpn_sect, "laserdot_attach_bone", nullptr);
-    laserdot_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "laserdot_attach_offset", Fvector{});
-    laserdot_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "laserdot_world_attach_offset", Fvector{});
-    laserdot_attach_aim_dist = READ_IF_EXISTS(pSettings, r_float, wpn_sect, "laserdot_attach_aim_dist", 0.f);
+    laserdot_hud_attach_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "laserdot_attach_bone", "wpn_body");
+    laserdot_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "laserdot_attach_offset", Fvector{});
+    laserdot_aim_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "laserdot_aim_attach_offset", laserdot_hud_attach_offset);
+
+    laserdot_world_attach_bone = READ_IF_EXISTS(pSettings, r_string, wpn_sect, "laserdot_attach_bone", "wpn_body");
+    laserdot_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "laserdot_attach_offset", Fvector{});
 
     const bool b_r2 = true;
 
-    const char* m_light_section = pSettings->r_string(section, "laser_light_section");
+    const char* m_light_section = pSettings->r_string(section, "laser_light_definition");
 
     laser_lanim = LALib.FindItem(READ_IF_EXISTS(pSettings, r_string, m_light_section, "color_animator", ""));
 
@@ -1427,10 +1335,6 @@ void CWeaponMagazined::LoadLaserParams(LPCSTR section)
     laser_cone_angle = deg2rad(READ_IF_EXISTS(pSettings, r_float, m_light_section, "spot_angle", 1.f));
     laser_light_render->set_cone(laser_cone_angle);
     laser_light_render->set_texture(READ_IF_EXISTS(pSettings, r_string, m_light_section, "spot_texture", nullptr));
-
-    //m_sounds.StopSound("sndLaserSwitch");
-    //if (pSettings->line_exist(section, "snd_laser_switch"))
-    //    m_sounds.LoadSound(section, "snd_laser_switch", "sndLaserSwitch", SOUND_TYPE_ITEM_USING);
 }
 
 void CWeaponMagazined::LoadFlashlightParams(LPCSTR section)
@@ -1439,12 +1343,15 @@ void CWeaponMagazined::LoadFlashlightParams(LPCSTR section)
         return;
 
     shared_str wpn_sect = cNameSect();
-    flashlight_attach_bone = READ_IF_EXISTS(pSettings, r_string, wpn_sect, "torch_light_bone", "wpn_body");
-    flashlight_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "torch_attach_offset", Fvector{});
-    flashlight_omni_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "torch_omni_attach_offset", Fvector{});
-    flashlight_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "torch_world_attach_offset", Fvector{});
-    flashlight_omni_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "torch_omni_world_attach_offset", Fvector{});
-    flashlight_attach_aim_dist = READ_IF_EXISTS(pSettings, r_float, wpn_sect, "torch_attach_aim_dist", 0.5f);
+    flashlight_hud_attach_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "flashlight_light_bone", "wpn_body");
+    flashlight_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "flashlight_attach_offset", Fvector{});
+    flashlight_aim_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "flashlight_aim_attach_offset", flashlight_hud_attach_offset);
+    flashlight_omni_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "flashlight_omni_attach_offset", Fvector{});
+    flashlight_aim_omni_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "flashlight_aim_omni_attach_offset", flashlight_omni_hud_attach_offset);
+
+    flashlight_world_attach_bone = READ_IF_EXISTS(pSettings, r_string, wpn_sect, "flashlight_light_bone", "wpn_body");
+    flashlight_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "flashlight_attach_offset", Fvector{});
+    flashlight_omni_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "flashlight_omni_world_attach_offset", Fvector{});
 
     const bool b_r2 = true;
 
@@ -1474,10 +1381,6 @@ void CWeaponMagazined::LoadFlashlightParams(LPCSTR section)
     flashlight_omni->set_color(oclr);
     const float orange = READ_IF_EXISTS(pSettings, r_float, m_light_section, b_r2 ? "omni_range_r2" : "omni_range", 0.25f);
     flashlight_omni->set_range(orange);
-
-    //m_sounds.StopSound("sndFlashlightSwitch");
-    //if (pSettings->line_exist(section, "snd_flashlight_switch"))
-    //    m_sounds.LoadSound(section, "snd_flashlight_switch", "sndFlashlightSwitch", SOUND_TYPE_ITEM_USING);
 }
 
 void CWeaponMagazined::UpdateLaser()
@@ -1499,25 +1402,17 @@ void CWeaponMagazined::UpdateLaser()
         if (laser_light_render->get_active())
         {
             laser_pos = get_LastFP();
-            Fvector laser_dir = get_LastFD();
+            Fvector laser_dir{get_LastFD()};
 
-            auto desire_cone = (GetHUDmode() && Actor()->active_cam() == eacFirstEye) ?
-                //laser_cone_angle / (Is3dssEnabled() ? shader_exports.get_custom_params("s3ds_param_2").w : GetZoomFactor()) :
-                laser_cone_angle / GetZoomFactor() :
-                laser_cone_angle;
+            auto desire_cone = (GetHUDmode() && Actor()->active_cam() == eacFirstEye) ? laser_cone_angle / GetZoomFactor() : laser_cone_angle;
+
             laser_light_render->set_cone(desire_cone);
 
             if (GetHUDmode())
             {
-                if (IsZoomed() && !IsRotatingToZoom() && laserdot_attach_aim_dist > 0.f)
-                {
-                    SetToScreenCenter(laser_dir, laser_pos, laserdot_attach_aim_dist);
-                }
-                else if (laserdot_attach_bone.size())
-                {
-                    GetBoneOffsetPosDir(laserdot_attach_bone, laser_pos, laser_dir, laserdot_attach_offset);
-                    CorrectDirFromWorldToHud(laser_dir);
-                }
+                auto& attach_offset = IsAiming() ? laserdot_aim_hud_attach_offset : laserdot_hud_attach_offset;
+                GetBoneOffsetPosDir(laserdot_hud_attach_bone, laser_pos, laser_dir, attach_offset);
+                CorrectDirFromWorldToHud(laser_dir);
             }
             else
             {
@@ -1566,30 +1461,27 @@ void CWeaponMagazined::UpdateFlashlight()
 
         if (flashlight_render->get_active())
         {
-            Fvector flashlight_pos_omni{}, flashlight_dir{}, flashlight_dir_omni{};
+            flashlight_pos = get_LastFP();
+            Fvector flashlight_dir{get_LastFD()}, 
+                flashlight_pos_omni{get_LastFP()}, 
+                flashlight_dir_omni{get_LastFD()};
 
             if (GetHUDmode())
             {
-                if (IsZoomed() && !IsRotatingToZoom())
-                {
-                    SetToScreenCenter(flashlight_dir, flashlight_pos, flashlight_attach_aim_dist);
-                    SetToScreenCenter(flashlight_dir_omni, flashlight_pos_omni, flashlight_attach_aim_dist);
-                }
-                else
-                {
-                    GetBoneOffsetPosDir(flashlight_attach_bone, flashlight_pos, flashlight_dir, flashlight_attach_offset);
-                    CorrectDirFromWorldToHud(flashlight_dir);
+                const auto b_aiming = IsAiming();
 
-                    GetBoneOffsetPosDir(flashlight_attach_bone, flashlight_pos_omni, flashlight_dir_omni, flashlight_omni_attach_offset);
-                    CorrectDirFromWorldToHud(flashlight_dir_omni);
-                }
+                auto& attach_offset = b_aiming ? flashlight_aim_hud_attach_offset : flashlight_hud_attach_offset;
+                GetBoneOffsetPosDir(flashlight_hud_attach_bone, flashlight_pos, flashlight_dir, attach_offset);
+                CorrectDirFromWorldToHud(flashlight_dir);
+
+                auto& omni_attach_offset = b_aiming ? flashlight_aim_omni_hud_attach_offset : flashlight_omni_hud_attach_offset;
+                GetBoneOffsetPosDir(flashlight_hud_attach_bone, flashlight_pos_omni, flashlight_dir_omni, omni_attach_offset);
+                CorrectDirFromWorldToHud(flashlight_dir_omni);
             }
             else
             {
-                flashlight_dir = get_LastFD();
                 XFORM().transform_tiny(flashlight_pos, flashlight_world_attach_offset);
 
-                flashlight_dir_omni = get_LastFD();
                 XFORM().transform_tiny(flashlight_pos_omni, flashlight_omni_world_attach_offset);
             }
 
@@ -1852,8 +1744,6 @@ void CWeaponMagazined::OnZoomOut(bool rezoom)
 void CWeaponMagazined::OnZoomChanged()
 {
     PlaySound("sndZoomChange", get_LastFP());
-    //if (!Is3dssEnabled())
-        //m_fRTZoomFactor = m_fZoomFactor; // store current
 
     if (auto pActor = smart_cast<CActor*>(H_Parent()))
         pActor->callback(GameObject::eOnActorWeaponZoomChange)(lua_game_object());
@@ -2131,11 +2021,7 @@ float CWeaponMagazined::Weight() const
     return res;
 }
 
-float CWeaponMagazined::GetZoomRotationTime() const
-{
-    /*const auto res = (IsAimAltMode() || IsGrenadeMode()) ? READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME) : m_fZoomRotateTime;*/
-    return m_fZoomRotateTime + m_fZoomRotateTime * m_fZoomRotateTime_K;
-}
+float CWeaponMagazined::GetZoomRotationTime() const { return m_fZoomRotateTime + m_fZoomRotateTime * m_fZoomRotateTime_K; }
 
 void CWeaponMagazined::SwitchLaser(bool on)
 {

@@ -49,6 +49,7 @@
 
 #include "PDA.h"
 #include "CustomDetector.h"
+#include "customdevice.h"
 #include "WeaponAmmo.h"
 #include "Flashlight.h"
 
@@ -193,6 +194,7 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
 
         .def("get_pda", &script_game_object_cast<CPda>)
         .def("get_detector", &script_game_object_cast<CCustomDetector>)
+        .def("get_device", &script_game_object_cast<CCustomDevice>)
         .def("get_weapon_ammo", &script_game_object_cast<CWeaponAmmo>)
         .def("get_flashlight", &script_game_object_cast<CFlashlight>)
 

@@ -22,23 +22,18 @@ private:
 
 protected:
     //звук текущего выстрела
-    /*HUD_SOUND* m_pSndShotCurrent{};*/
     shared_str m_sSndShotCurrent;
-
-    /*virtual void StopHUDSounds();*/
 
     //дополнительная информация о глушителе
     LPCSTR m_sSilencerFlameParticles{};
     LPCSTR m_sSilencerSmokeParticles{};
-    /*HUD_SOUND sndSilencerShot;*/
 
     // General
     //кадр момента пересчета UpdateSounds
     u32 dwUpdateSounds_Frame;
 
     // laser
-    float laserdot_attach_aim_dist{};
-    shared_str laserdot_attach_bone;
+    shared_str laserdot_world_attach_bone, laserdot_hud_attach_bone;
     Fvector laserdot_world_attach_offset{};
     ref_light laser_light_render;
     CLAItem* laser_lanim{};
@@ -51,8 +46,7 @@ protected:
     void SetLaserRGB(float, float, float);
 
     // flashlight
-    float flashlight_attach_aim_dist{};
-    shared_str flashlight_attach_bone;
+    shared_str flashlight_world_attach_bone, flashlight_hud_attach_bone;
     ref_light flashlight_render;
     ref_light flashlight_omni;
     CLAItem* flashlight_lanim{};
@@ -171,9 +165,9 @@ public:
         UpdateFlashlight();
         inherited::processing_deactivate();
     }
-    Fvector laserdot_attach_offset{}, laser_pos{};
-    Fvector flashlight_attach_offset{}, flashlight_pos{};
-    Fvector flashlight_omni_attach_offset{}, flashlight_world_attach_offset{}, flashlight_omni_world_attach_offset{};
+    Fvector laserdot_hud_attach_offset{}, laserdot_aim_hud_attach_offset{}, laser_pos{};
+    Fvector flashlight_hud_attach_offset{}, flashlight_aim_hud_attach_offset{}, flashlight_pos{};
+    Fvector flashlight_omni_hud_attach_offset{}, flashlight_aim_omni_hud_attach_offset{}, flashlight_world_attach_offset{}, flashlight_omni_world_attach_offset{};
 
     float m_fZoomRotateTime_K{}; // коефіцієнт часу повороту прицілу
 
@@ -253,10 +247,6 @@ protected:
     virtual void PlayAnimHide();
     virtual void PlayAnimReload();
     virtual void PlayAnimIdle();
-
-    bool LaserSwitch{}, TorchSwitch{}, HeadLampSwitch{}, NightVisionSwitch{};
-    /*bool CartridgeInTheChamberEnabled{};*/
-    /*u32 CartridgeInTheChamber{};*/
 
 private:
     string128 guns_aim_anm;

@@ -956,21 +956,7 @@ void CWeapon::renderable_Render(u32 context_id, IRenderable* root)
     {
         if (!world_attach_visual[i])
             continue;
-        Fmatrix m_res{};
-        auto visual = Visual()->dcast_PKinematics();
-        u16 bone_id = visual->LL_BoneID(world_attach_bone_name[i]);
-        Fmatrix bone_trans = visual->LL_GetTransform(bone_id);
-
-        Fmatrix offset{};
-        Fvector pos = world_attach_visual_offset[i][0];
-        Fvector rot = world_attach_visual_offset[i][1];
-        float scale = world_attach_visual_scale[i];
-        if (!fis_zero(scale))
-            bone_trans.scale(scale, scale, scale);
-        offset.setHPB(rot.x, rot.y, rot.z);
-        offset.translate_over(pos);
-        m_res.mul(bone_trans, offset);
-        m_res.mulA_43(XFORM());
+        Fmatrix m_res = GetBoneTransformPosDir(world_attach_bone_name[i], world_attach_visual_offset[i][0], world_attach_visual_offset[i][1], world_attach_visual_scale[i]);
 
         ::Render->add_Visual(context_id, root, world_attach_visual[i], m_res);
     }
@@ -986,21 +972,7 @@ void CWeapon::render_hud_mode(u32 context_id, IRenderable* root)
     {
         if (!hud_attach_visual[i])
             continue;
-        Fmatrix m_res{};
-        auto visual = HudItemData()->m_model;
-        u16 bone_id = visual->LL_BoneID(hud_attach_bone_name[i]);
-        Fmatrix bone_trans = visual->LL_GetTransform(bone_id);
-
-        Fmatrix offset{};
-        Fvector pos = hud_attach_visual_offset[i][0];
-        Fvector rot = hud_attach_visual_offset[i][1];
-        float scale = hud_attach_visual_scale[i];
-        if (!fis_zero(scale))
-            bone_trans.scale(scale, scale, scale);
-        offset.setHPB(rot.x, rot.y, rot.z);
-        offset.translate_over(pos);
-        m_res.mul(bone_trans, offset);
-        m_res.mulA_43(HudItemData()->m_item_transform);
+        Fmatrix m_res = GetBoneTransformPosDir(hud_attach_bone_name[i], hud_attach_visual_offset[i][0], hud_attach_visual_offset[i][1], hud_attach_visual_scale[i]);
 
         ::Render->add_Visual(context_id, root, hud_attach_visual[i], m_res);
     }
@@ -1313,6 +1285,7 @@ void CWeapon::UpdateHUDAddonsVisibility()
         {
             SetHudSection(scope_hud_sect);
             InitAddonsVisualHud();
+            InitAddons();
             /*LoadAddonMeshesHud();*/
         }
 

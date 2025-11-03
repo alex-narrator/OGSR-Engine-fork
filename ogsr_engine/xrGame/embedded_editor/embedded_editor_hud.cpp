@@ -52,16 +52,16 @@ void ShowHudEditor(bool& show)
         if (Wpn)
         {
             // Laser light offsets
-            if (pSettings->line_exist(Wpn->cNameSect(), "laser_light_section"))
+            if (pSettings->line_exist(Wpn->cNameSect(), "laser_light_definition"))
             {
-                ImGui::DragFloat3("laserdot_attach_offset 0", (float*)&Wpn->laserdot_attach_offset, drag_intensity, NULL, NULL, "%.6f");
+                ImGui::DragFloat3("laserdot_attach_offset 0", (float*)&Wpn->laserdot_hud_attach_offset, drag_intensity, NULL, NULL, "%.6f");
             }
 
             // Torch light offsets
-            if (pSettings->line_exist(Wpn->cNameSect(), "flashlight_section"))
+            if (pSettings->line_exist(Wpn->cNameSect(), "light_definition"))
             {
-                ImGui::DragFloat3("torch_attach_offset 0", (float*)&Wpn->flashlight_attach_offset, drag_intensity, NULL, NULL, "%.6f");
-                ImGui::DragFloat3("torch_omni_attach_offset 0", (float*)&Wpn->flashlight_omni_attach_offset, drag_intensity, NULL, NULL, "%.6f");
+                ImGui::DragFloat3("flashlight_attach_offset 0", (float*)&Wpn->flashlight_hud_attach_offset, drag_intensity, NULL, NULL, "%.6f");
+                ImGui::DragFloat3("flashlight_omni_attach_offset 0", (float*)&Wpn->flashlight_omni_hud_attach_offset, drag_intensity, NULL, NULL, "%.6f");
             }
         }
     }

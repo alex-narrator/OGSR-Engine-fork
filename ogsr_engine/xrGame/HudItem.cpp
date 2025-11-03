@@ -418,18 +418,7 @@ void CHudItem::render_item_3d_ui()
 {
     if (render_item_3d_ui_query() && script_ui)
     {
-        Fmatrix m_res{};
-        auto visual = HudItemData()->m_model;
-        u16 bone_id = visual->LL_BoneID(script_ui_bone);
-        Fmatrix bone_trans = visual->LL_GetTransform(bone_id);
-
-        Fmatrix offset{};
-        Fvector pos = script_ui_offset[0];
-        Fvector rot = script_ui_offset[1];
-        offset.setHPB(rot.x, rot.y, rot.z);
-        offset.translate_over(pos);
-        m_res.mul(bone_trans, offset);
-        m_res.mulA_43(HudItemData()->m_item_transform);
+        Fmatrix m_res = GetBoneTransformPosDir(script_ui_bone, script_ui_offset[0], script_ui_offset[1]);
 
         IUIRender::ePointType bk = UI()->m_currentPointType;
         UI()->m_currentPointType = IUIRender::pttLIT;
@@ -1439,6 +1428,25 @@ void CHudItem::GetBoneOffsetPosDir(const shared_str& bone_name, Fvector& dest_po
     dest_dir.set(0.f, 0.f, 1.f);
     HudItemData()->m_item_transform.transform_dir(dest_dir);
 }
+
+ Fmatrix CHudItem::GetBoneTransformPosDir(const shared_str bone_name, const Fvector pos, const Fvector rot, const float scale) const
+ {
+     Fmatrix res{};
+     const auto visual = GetHUDmode() ? HudItemData()->m_model : object().Visual() -> dcast_PKinematics();
+     const auto transform = GetHUDmode() ? HudItemData()->m_item_transform : object().XFORM();
+
+     u16 bone_id = visual->LL_BoneID(bone_name);
+     Fmatrix bone_trans = visual->LL_GetTransform(bone_id);
+
+     Fmatrix offset{};
+     if (!fis_zero(scale))
+         bone_trans.scale(scale, scale, scale);
+     offset.setHPB(rot.x, rot.y, rot.z);
+     offset.translate_over(pos);
+     res.mul(bone_trans, offset);
+     res.mulA_43(transform);
+     return res;
+ }
 
 extern ENGINE_API float psHUD_FOV;
 

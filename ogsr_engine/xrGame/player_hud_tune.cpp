@@ -21,7 +21,7 @@ enum HUD_ADJUST_MODE : int
     SHELL_POINT,
     ADJUST_DELTA_POS,
     ADJUST_DELTA_ROT,
-    LASETDOT_POS,
+    LASERDOT_POS,
     FLASHLIGHT_POS,
     //
     SCRIPT_UI_POS,
@@ -156,15 +156,6 @@ void attachable_hud_item::tune(const Ivector& values)
             calc_cam_diff_pos(m_item_transform, diff, d);
             m_measures.m_item_attach[1].add(d);
         }
-
-        //if ((values.x) || (values.y) || (values.z))
-        //{
-        //    Log("####################################");
-        //    Msg("[%s]", m_sect_name.c_str());
-        //    Msg("item_position = %g,%g,%g", m_measures.m_item_attach[0].x, m_measures.m_item_attach[0].y, m_measures.m_item_attach[0].z);
-        //    Msg("item_orientation = %g,%g,%g", m_measures.m_item_attach[1].x, m_measures.m_item_attach[1].y, m_measures.m_item_attach[1].z);
-        //    Log("####################################");
-        //}
     }
 
     if (g_bHudAdjustMode == SCRIPT_UI_POS || g_bHudAdjustMode == SCRIPT_UI_ROT)
@@ -253,7 +244,7 @@ void attachable_hud_item::tune(const Ivector& values)
         }
     }
 
-    if (g_bHudAdjustMode == FIRE_POINT || g_bHudAdjustMode == FIRE_POINT2 || g_bHudAdjustMode == SHELL_POINT || g_bHudAdjustMode == LASETDOT_POS ||
+    if (g_bHudAdjustMode == FIRE_POINT || g_bHudAdjustMode == FIRE_POINT2 || g_bHudAdjustMode == SHELL_POINT || g_bHudAdjustMode == LASERDOT_POS ||
         g_bHudAdjustMode == FLASHLIGHT_POS)
     {
         if (values.x)
@@ -269,31 +260,26 @@ void attachable_hud_item::tune(const Ivector& values)
             m_measures.m_fire_point2_offset.add(diff);
         else if (g_bHudAdjustMode == SHELL_POINT)
             m_measures.m_shell_point_offset.add(diff);
-        else if (g_bHudAdjustMode == LASETDOT_POS)
+        else if (g_bHudAdjustMode == LASERDOT_POS)
         {
             if (auto Wpn = smart_cast<CWeaponMagazined*>(m_parent_hud_item))
-                Wpn->laserdot_attach_offset.add(diff);
+            {
+                if (Wpn->IsAiming())
+                    Wpn->laserdot_aim_hud_attach_offset.add(diff);
+                else
+                    Wpn->laserdot_hud_attach_offset.add(diff);
+            }
         }
         else if (g_bHudAdjustMode == FLASHLIGHT_POS)
         {
             if (auto Wpn = smart_cast<CWeaponMagazined*>(m_parent_hud_item))
-                Wpn->flashlight_attach_offset.add(diff);
+            {
+                if (Wpn->IsAiming())
+                    Wpn->flashlight_aim_hud_attach_offset.add(diff);
+                else
+                    Wpn->flashlight_hud_attach_offset.add(diff);
+            }
         }
-
-        //if ((values.x) || (values.y) || (values.z))
-        //{
-        //    Log("####################################");
-        //    Msg("[%s]", m_sect_name.c_str());
-        //    Msg("fire_point = %g,%g,%g", m_measures.m_fire_point_offset.x, m_measures.m_fire_point_offset.y, m_measures.m_fire_point_offset.z);
-        //    Msg("fire_point2 = %g,%g,%g", m_measures.m_fire_point2_offset.x, m_measures.m_fire_point2_offset.y, m_measures.m_fire_point2_offset.z);
-        //    Msg("shell_point = %g,%g,%g", m_measures.m_shell_point_offset.x, m_measures.m_shell_point_offset.y, m_measures.m_shell_point_offset.z);
-        //    if (auto Wpn = smart_cast<CWeaponMagazined*>(m_parent_hud_item))
-        //    {
-        //        Msg("laserdot_attach_offset = %g,%g,%g", Wpn->laserdot_attach_offset.x, Wpn->laserdot_attach_offset.y, Wpn->laserdot_attach_offset.z);
-        //        Msg("torch_attach_offset = %g,%g,%g", Wpn->flashlight_attach_offset.x, Wpn->flashlight_attach_offset.y, Wpn->flashlight_attach_offset.z);
-        //    }
-        //    Log("####################################");
-        //}
     }
 }
 
@@ -301,7 +287,7 @@ void attachable_hud_item::debug_draw_firedeps()
 {
     const bool bForce = g_bHudAdjustMode == ITM_POS || g_bHudAdjustMode == ITM_ROT;
 
-    if (g_bHudAdjustMode == FIRE_POINT || g_bHudAdjustMode == FIRE_POINT2 || g_bHudAdjustMode == SHELL_POINT || g_bHudAdjustMode == LASETDOT_POS ||
+    if (g_bHudAdjustMode == FIRE_POINT || g_bHudAdjustMode == FIRE_POINT2 || g_bHudAdjustMode == SHELL_POINT || g_bHudAdjustMode == LASERDOT_POS ||
         g_bHudAdjustMode == FLASHLIGHT_POS || bForce)
     {
         auto& render = Level().debug_renderer();
@@ -322,7 +308,7 @@ void attachable_hud_item::debug_draw_firedeps()
         {
             render.draw_aabb(fd.vLastSP, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(0, 255, 0), true);
         }
-        else if (g_bHudAdjustMode == LASETDOT_POS)
+        else if (g_bHudAdjustMode == LASERDOT_POS)
         {
             if (auto Wpn = smart_cast<CWeaponMagazined*>(m_parent_hud_item))
                 render.draw_aabb(Wpn->laser_pos, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(125, 0, 0));
@@ -380,70 +366,6 @@ void player_hud::tune(const Ivector& _values)
 
             rot_.add(diff);
         }
-
-        //if ((values.x) || (values.y) || (values.z))
-        //{
-        //    if (idx == hud_item_measures::m_hands_offset_type_normal)
-        //    {
-        //        Log("####################################");
-        //        Msg("[%s]", m_attached_items[g_bHudAdjustItemIdx]->m_sect_name.c_str());
-        //        Msg("hands_position%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-        //        Msg("hands_orientation%s = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
-        //        Log("####################################");
-        //    }
-        //    else if (idx == hud_item_measures::m_hands_offset_type_aim)
-        //    {
-        //        Log("####################################");
-        //        Msg("[%s]", m_attached_items[g_bHudAdjustItemIdx]->m_sect_name.c_str());
-        //        Msg("aim_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-        //        Msg("aim_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
-        //        Log("####################################");
-        //    }
-        //    else if (idx == hud_item_measures::m_hands_offset_type_gl)
-        //    {
-        //        Log("####################################");
-        //        Msg("[%s]", m_attached_items[g_bHudAdjustItemIdx]->m_sect_name.c_str());
-        //        Msg("gl_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-        //        Msg("gl_hud_offset_rot%s	 = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
-        //        Log("####################################");
-        //    }
-        //    else if (idx == hud_item_measures::m_hands_offset_type_aim_scope)
-        //    {
-        //        Log("####################################");
-        //        Msg("[%s]", m_attached_items[g_bHudAdjustItemIdx]->m_sect_name.c_str());
-        //        Msg("scope_zoom_offset%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-        //        Msg("scope_zoom_rotate_x%s = %g", is_16x9 ? "_16x9" : "", rot_.x);
-        //        Msg("scope_zoom_rotate_y%s = %g", is_16x9 ? "_16x9" : "", rot_.y);
-        //        Log("####################################");
-        //    }
-        //    else if (idx == hud_item_measures::m_hands_offset_type_gl_scope)
-        //    {
-        //        Log("####################################");
-        //        Msg("[%s]", m_attached_items[g_bHudAdjustItemIdx]->m_sect_name.c_str());
-        //        Msg("scope_grenade_zoom_offset%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-        //        Msg("scope_grenade_zoom_rotate_x%s = %g", is_16x9 ? "_16x9" : "", rot_.x);
-        //        Msg("scope_grenade_zoom_rotate_y%s = %g", is_16x9 ? "_16x9" : "", rot_.y);
-        //        Log("####################################");
-        //    }
-        //    else if (idx == hud_item_measures::m_hands_offset_type_aim_gl_normal)
-        //    {
-        //        Log("####################################");
-        //        Msg("[%s]", m_attached_items[g_bHudAdjustItemIdx]->m_sect_name.c_str());
-        //        Msg("grenade_normal_zoom_offset%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-        //        Msg("grenade_normal_zoom_rotate_x%s = %g", is_16x9 ? "_16x9" : "", rot_.x);
-        //        Msg("grenade_normal_zoom_rotate_y%s = %g", is_16x9 ? "_16x9" : "", rot_.y);
-        //        Log("####################################");
-        //    }
-        //    else if (idx == hud_item_measures::m_hands_offset_type_gl_normal_scope)
-        //    {
-        //        Log("####################################");
-        //        Msg("[%s]", m_attached_items[g_bHudAdjustItemIdx]->m_sect_name.c_str());
-        //        Msg("scope_grenade_normal_zoom_offset%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-        //        Msg("scope_grenade_normal_zoom_rotate_x%s = %g", is_16x9 ? "_16x9" : "", rot_.x);
-        //        Msg("scope_grenade_normal_zoom_rotate_y%s = %g", is_16x9 ? "_16x9" : "", rot_.y);
-        //        Log("####################################");
-        //    }
-        //}
     }
     else if (g_bHudAdjustMode == ADJUST_DELTA_POS || g_bHudAdjustMode == ADJUST_DELTA_ROT)
     {
@@ -585,7 +507,7 @@ void player_hud::DumpParamsToLog()
                 }
             }
         }
-        else if (g_bHudAdjustMode == FIRE_POINT || g_bHudAdjustMode == FIRE_POINT2 || g_bHudAdjustMode == SHELL_POINT || g_bHudAdjustMode == LASETDOT_POS ||
+        else if (g_bHudAdjustMode == FIRE_POINT || g_bHudAdjustMode == FIRE_POINT2 || g_bHudAdjustMode == SHELL_POINT || g_bHudAdjustMode == LASERDOT_POS ||
                  g_bHudAdjustMode == FLASHLIGHT_POS)
         {
             Log("####################################");
@@ -595,8 +517,14 @@ void player_hud::DumpParamsToLog()
             Msg("shell_point = %g,%g,%g", measures.m_shell_point_offset.x, measures.m_shell_point_offset.y, measures.m_shell_point_offset.z);
             if (auto Wpn = smart_cast<CWeaponMagazined*>(m_attached_items[g_bHudAdjustItemIdx]->m_parent_hud_item))
             {
-                Msg("laserdot_attach_offset = %g,%g,%g", Wpn->laserdot_attach_offset.x, Wpn->laserdot_attach_offset.y, Wpn->laserdot_attach_offset.z);
-                Msg("torch_attach_offset = %g,%g,%g", Wpn->flashlight_attach_offset.x, Wpn->flashlight_attach_offset.y, Wpn->flashlight_attach_offset.z);
+                const auto laser_offset = Wpn->laserdot_hud_attach_offset;
+                const auto laser_aim_offset = Wpn->laserdot_aim_hud_attach_offset;
+                const auto flashlight_offset = Wpn->flashlight_hud_attach_offset;
+                const auto flashlight_aim_offset = Wpn->flashlight_aim_hud_attach_offset;
+                Msg("laserdot_attach_offset = %g,%g,%g", laser_offset.x, laser_offset.y, laser_offset.z);
+                Msg("laserdot_aim_attach_offset = %g,%g,%g", laser_aim_offset.x, laser_aim_offset.y, laser_aim_offset.z);
+                Msg("flashlight_attach_offset = %g,%g,%g", flashlight_offset.x, flashlight_offset.y, flashlight_offset.z);
+                Msg("flashlight_aim_attach_offset = %g,%g,%g", flashlight_aim_offset.x, flashlight_aim_offset.y, flashlight_aim_offset.z);
             }
             Log("####################################");
         }

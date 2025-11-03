@@ -287,6 +287,7 @@ public:
     bool AnmIdleMovingAllowed() const;
     void AllowHudBobbing(BOOL B) { m_huditem_flags.set(fl_bobbing_allow, B); }
     void GetBoneOffsetPosDir(const shared_str& bone_name, Fvector& dest_pos, Fvector& dest_dir, const Fvector& offset);
+    Fmatrix GetBoneTransformPosDir(const shared_str bone_name, const Fvector pos, const Fvector rot, const float scale = 0.f) const;
     //Функция из ганслингера для приблизительной коррекции разности фовов худа и мира. Так себе на самом деле, но более годных способов я не нашел.
     void CorrectDirFromWorldToHud(Fvector& dir);
     float GetLastHudFov() const { return m_nearwall_last_hud_fov; }
