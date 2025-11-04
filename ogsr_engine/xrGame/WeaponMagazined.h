@@ -33,7 +33,7 @@ protected:
     u32 dwUpdateSounds_Frame;
 
     // laser
-    shared_str laserdot_world_attach_bone, laserdot_hud_attach_bone;
+    shared_str laserdot_hud_attach_bone;
     Fvector laserdot_world_attach_offset{};
     ref_light laser_light_render;
     CLAItem* laser_lanim{};
@@ -46,7 +46,7 @@ protected:
     void SetLaserRGB(float, float, float);
 
     // flashlight
-    shared_str flashlight_world_attach_bone, flashlight_hud_attach_bone;
+    shared_str flashlight_hud_attach_bone;
     ref_light flashlight_render;
     ref_light flashlight_omni;
     CLAItem* flashlight_lanim{};

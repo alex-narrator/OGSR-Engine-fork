@@ -1432,7 +1432,7 @@ void CHudItem::GetBoneOffsetPosDir(const shared_str& bone_name, Fvector& dest_po
  Fmatrix CHudItem::GetBoneTransformPosDir(const shared_str bone_name, const Fvector pos, const Fvector rot, const float scale) const
  {
      Fmatrix res{};
-     const auto visual = GetHUDmode() ? HudItemData()->m_model : object().Visual() -> dcast_PKinematics();
+     const auto visual = GetHUDmode() ? HudItemData()->m_model : object().Visual()->dcast_PKinematics();
      const auto transform = GetHUDmode() ? HudItemData()->m_item_transform : object().XFORM();
 
      u16 bone_id = visual->LL_BoneID(bone_name);

@@ -1314,7 +1314,6 @@ void CWeaponMagazined::LoadLaserParams(LPCSTR section)
     laserdot_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "laserdot_attach_offset", Fvector{});
     laserdot_aim_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "laserdot_aim_attach_offset", laserdot_hud_attach_offset);
 
-    laserdot_world_attach_bone = READ_IF_EXISTS(pSettings, r_string, wpn_sect, "laserdot_attach_bone", "wpn_body");
     laserdot_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "laserdot_attach_offset", Fvector{});
 
     const bool b_r2 = true;
@@ -1349,7 +1348,6 @@ void CWeaponMagazined::LoadFlashlightParams(LPCSTR section)
     flashlight_omni_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "flashlight_omni_attach_offset", Fvector{});
     flashlight_aim_omni_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "flashlight_aim_omni_attach_offset", flashlight_omni_hud_attach_offset);
 
-    flashlight_world_attach_bone = READ_IF_EXISTS(pSettings, r_string, wpn_sect, "flashlight_light_bone", "wpn_body");
     flashlight_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "flashlight_attach_offset", Fvector{});
     flashlight_omni_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "flashlight_omni_world_attach_offset", Fvector{});
 
