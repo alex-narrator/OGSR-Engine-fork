@@ -34,13 +34,11 @@ protected:
 
     // laser
     shared_str laserdot_hud_attach_bone;
-    Fvector laserdot_world_attach_offset{};
     ref_light laser_light_render;
     CLAItem* laser_lanim{};
     float laser_fBrightness{1.f};
     float laser_cone_angle{};
     void UpdateLaser();
-    bool laser_flashlight{};
     void SetLaserRange(float);
     void SetLaserAngle(float);
     void SetLaserRGB(float, float, float);
@@ -165,9 +163,10 @@ public:
         UpdateFlashlight();
         inherited::processing_deactivate();
     }
-    Fvector laserdot_hud_attach_offset{}, laserdot_aim_hud_attach_offset{}, laser_pos{};
-    Fvector flashlight_hud_attach_offset{}, flashlight_aim_hud_attach_offset{}, flashlight_pos{};
-    Fvector flashlight_omni_hud_attach_offset{}, flashlight_aim_omni_hud_attach_offset{}, flashlight_world_attach_offset{}, flashlight_omni_world_attach_offset{};
+    bool laser_flashlight{};
+    Fvector laserdot_hud_attach_offset{}, laserdot_aim_hud_attach_offset{}, laserdot_world_attach_offset{}, laser_pos{};
+    Fvector flashlight_hud_attach_offset{}, flashlight_aim_hud_attach_offset{}, flashlight_world_attach_offset{}, flashlight_pos{};
+    Fvector flashlight_omni_hud_attach_offset{}, flashlight_aim_omni_hud_attach_offset{}, flashlight_omni_world_attach_offset{};
 
     float m_fZoomRotateTime_K{}; // коефіцієнт часу повороту прицілу
 

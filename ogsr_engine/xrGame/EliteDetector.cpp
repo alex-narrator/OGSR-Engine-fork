@@ -205,8 +205,8 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
         Msg("!![%s] xml file [ui_detector_artefact.xml] not found!", __FUNCTION__);
     }
 
-    Fvector _map_attach_p = pSettings->r_fvector3(m_parent->cNameSect(), "ui_p");
-    Fvector _map_attach_r = pSettings->r_fvector3(m_parent->cNameSect(), "ui_r");
+    Fvector _map_attach_p = pSettings->r_fvector3(m_parent->HudSection(), "ui_pos");
+    Fvector _map_attach_r = pSettings->r_fvector3(m_parent->HudSection(), "ui_rot");
 
     _map_attach_r.mul(PI / 180.f);
     m_map_attach_offset.setHPB(_map_attach_r.x, _map_attach_r.y, _map_attach_r.z);

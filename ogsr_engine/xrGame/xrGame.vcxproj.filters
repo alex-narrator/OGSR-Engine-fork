@@ -5945,6 +5945,9 @@
     <ClInclude Include="ui\UIActorInfo.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Statistics</Filter>
     </ClInclude>
+    <ClInclude Include="embedded_editor\embedded_editor_world.h">
+      <Filter>EmbeddedEditor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -8701,6 +8704,9 @@
     </ClCompile>
     <ClCompile Include="inventory_item_object_script.cpp">
       <Filter>Core\Client\Objects\inventory\InventoryItemObject</Filter>
+    </ClCompile>
+    <ClCompile Include="embedded_editor\embedded_editor_world.cpp">
+      <Filter>EmbeddedEditor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

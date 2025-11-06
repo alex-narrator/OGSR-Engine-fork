@@ -184,12 +184,12 @@ void CHudItem::Load(LPCSTR section)
     m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME);
 
 	// Rezy - Custom Script 3D UI
-    if (script_ui_funct = READ_IF_EXISTS(pSettings, r_string, section, "custom_ui_func", nullptr))
+    if (script_ui_funct = READ_IF_EXISTS(pSettings, r_string, hud_sect, "custom_ui_func", nullptr))
     {
-        script_ui_bone = READ_IF_EXISTS(pSettings, r_string, section, "custom_ui_bone", "wpn_body");
+        script_ui_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "custom_ui_bone", "wpn_body");
 
-        script_ui_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "custom_ui_pos", Fvector().set(0.f, 0.f, 0.f));
-        script_ui_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "custom_ui_rot", Fvector().set(0.f, 0.f, 0.f));
+        script_ui_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "custom_ui_pos", Fvector().set(0.f, 0.f, 0.f));
+        script_ui_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "custom_ui_rot", Fvector().set(0.f, 0.f, 0.f));
     }
 }
 
@@ -1506,6 +1506,14 @@ void CHudItem::SetHudSection(shared_str sect)
     inertion_data.m_tendto_speed_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_tendto_speed", TENDTO_SPEED_AIM);
 
     m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME);
+
+    if (script_ui_funct = READ_IF_EXISTS(pSettings, r_string, hud_sect, "custom_ui_func", nullptr))
+    {
+        script_ui_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "custom_ui_bone", "wpn_body");
+
+        script_ui_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "custom_ui_pos", Fvector().set(0.f, 0.f, 0.f));
+        script_ui_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "custom_ui_rot", Fvector().set(0.f, 0.f, 0.f));
+    }
 
     /*m_hidden_meshes_hud.clear();*/
     //LPCSTR str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "hidden_meshes", nullptr);

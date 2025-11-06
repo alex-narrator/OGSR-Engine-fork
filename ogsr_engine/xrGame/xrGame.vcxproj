@@ -252,6 +252,7 @@
     <ClInclude Include="embedded_editor\embedded_editor_sound_env.h" />
     <ClInclude Include="embedded_editor\embedded_editor_weather.h" />
     <ClInclude Include="ActorCameraCollision.h" />
+    <ClInclude Include="embedded_editor\embedded_editor_world.h" />
     <ClInclude Include="Flashlight.h" />
     <ClInclude Include="GeometryBits.h" />
     <ClInclude Include="ai\monsters\group_states\group_state_attack.h" />
@@ -1479,6 +1480,7 @@
     <ClCompile Include="embedded_editor\embedded_editor_sound_env.cpp" />
     <ClCompile Include="embedded_editor\embedded_editor_weather.cpp" />
     <ClCompile Include="ActorCameraCollision.cpp" />
+    <ClCompile Include="embedded_editor\embedded_editor_world.cpp" />
     <ClCompile Include="Flashlight.cpp" />
     <ClCompile Include="flashlight_script.cpp" />
     <ClCompile Include="GeometryBits.cpp" />
