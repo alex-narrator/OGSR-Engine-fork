@@ -195,13 +195,13 @@ void ShowHudEditor(bool& show)
 
                 for (int i = 0; i < eMaxAddon; ++i)
                 {
-                    if (Wpn->world_attach_visual[i])
+                    if (Wpn->hud_attach_visual[i])
                     {
-                        pos = Wpn->world_attach_visual_offset[i][0];
-                        Msg("%s_attach_pos = %g,%g,%g", Wpn->world_attach_addon_name[i], pos.x, pos.y, pos.z);
-                        pos = Wpn->world_attach_visual_offset[i][1];
-                        Msg("%s_attach_rot = %g,%g,%g", Wpn->world_attach_addon_name[i], pos.x, pos.y, pos.z);
-                        Msg("%s_attach_scale = %g", Wpn->world_attach_addon_name[i], Wpn->world_attach_visual_scale[i]);
+                        pos = Wpn->hud_attach_visual_offset[i][0];
+                        Msg("%s_attach_pos = %g,%g,%g", Wpn->hud_attach_addon_name[i], pos.x, pos.y, pos.z);
+                        pos = Wpn->hud_attach_visual_offset[i][1];
+                        Msg("%s_attach_rot = %g,%g,%g", Wpn->hud_attach_addon_name[i], pos.x, pos.y, pos.z);
+                        Msg("%s_attach_scale = %g", Wpn->hud_attach_addon_name[i], Wpn->hud_attach_visual_scale[i]);
                     }
                 }
             }
