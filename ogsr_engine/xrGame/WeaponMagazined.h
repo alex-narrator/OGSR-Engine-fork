@@ -42,6 +42,7 @@ protected:
     void SetLaserRange(float);
     void SetLaserAngle(float);
     void SetLaserRGB(float, float, float);
+    void SetLaserType(int type);
 
     // flashlight
     shared_str flashlight_hud_attach_bone;
@@ -53,6 +54,7 @@ protected:
     void SetFlashlightRange(float, int = 0);
     void SetFlashlightAngle(float, int = 0);
     void SetFlashlightRGB(float, float, float, int = 0);
+    void SetFlashlightType(int type, int target = 0);
 
 protected:
     virtual void OnMagazineEmpty();

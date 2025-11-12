@@ -98,6 +98,17 @@ void CFlashlight::SetVirtualSize(float size, int target)
     }
 }
 
+void CFlashlight::SetType(int type, int target)
+{
+    switch (target)
+    {
+    case 0: light_render->set_type((IRender_Light::LT)type);
+    case 1:
+        if (light_omni)
+            light_omni->set_type((IRender_Light::LT)type);
+    }
+}
+
 using namespace luabind;
 #pragma optimize("s", on)
 void CFlashlight::script_register(lua_State* L)
@@ -116,5 +127,7 @@ void CFlashlight::script_register(lua_State* L)
                   .def("set_rgb", &CFlashlight::SetRGB)
                   .def("set_range", &CFlashlight::SetRange)
                   .def("set_texture", &CFlashlight::SetTexture)
-                  .def("set_virtual_size", &CFlashlight::SetVirtualSize)];
+                  .def("set_virtual_size", &CFlashlight::SetVirtualSize)
+                  .def("set_type", &CFlashlight::SetType)
+    ];
 }

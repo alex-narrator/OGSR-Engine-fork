@@ -45,6 +45,7 @@ public:
     void SetRange(float range, int target = 0);
     void SetTexture(LPCSTR texture, int target = 0);
     void SetVirtualSize(float size, int target = 0);
+    void SetType(int type, int target = 0);
 
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };

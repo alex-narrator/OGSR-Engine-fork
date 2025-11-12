@@ -99,6 +99,17 @@ void CTorch::SetVirtualSize(float size, int target)
     }
 }
 
+void CTorch::SetType(int type, int target)
+{
+    switch (target)
+    {
+    case 0: light_render->set_type((IRender_Light::LT)type);
+    case 1:
+        if (light_omni)
+            light_omni->set_type((IRender_Light::LT)type);
+    }
+}
+
 using namespace luabind;
 
 void CTorch::script_register(lua_State* L)
@@ -118,5 +129,6 @@ void CTorch::script_register(lua_State* L)
                   .def("set_range", &CTorch::SetRange)
                   .def("set_texture", &CTorch::SetTexture)
                   .def("set_virtual_size", &CTorch::SetVirtualSize)
+                  .def("set_type", &CTorch::SetType)
               ];
 }

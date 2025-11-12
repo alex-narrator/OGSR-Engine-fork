@@ -378,4 +378,7 @@ void CTorch::LoadLightDefinitions(shared_str light_sect)
     m_camera_torch_offset = READ_IF_EXISTS(pSettings, r_fvector3, light_sect, "camera_torch_offset", TORCH_OFFSET);
     m_camera_omni_offset = READ_IF_EXISTS(pSettings, r_fvector3, light_sect, "camera_omni_offset", OMNI_OFFSET);
     m_min_target_dist = READ_IF_EXISTS(pSettings, r_float, light_sect, "camera_min_target_dist", m_min_target_dist);
+
+	light_render->set_type((IRender_Light::LT)(READ_IF_EXISTS(pSettings, r_u8, light_sect, "type", IRender_Light::SPOT)));
+    light_omni->set_type((IRender_Light::LT)(READ_IF_EXISTS(pSettings, r_u8, light_sect, "omni_type", IRender_Light::POINT)));
 }

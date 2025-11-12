@@ -71,29 +71,38 @@ void CFlashlight::LoadLightDefinitions(shared_str light_sect)
 
     light_render->set_cone(deg2rad(pSettings->r_float(light_sect, "spot_angle")));
     light_render->set_texture(READ_IF_EXISTS(pSettings, r_string, light_sect, "spot_texture", nullptr));
+
+	light_render->set_type((IRender_Light::LT)(READ_IF_EXISTS(pSettings, r_u8, light_sect, "type", IRender_Light::SPOT)));
+    light_omni->set_type((IRender_Light::LT)(READ_IF_EXISTS(pSettings, r_u8, light_sect, "omni_type", IRender_Light::POINT)));
 }
 
 void CFlashlight::UpdateWork()
 {
-    if (HudItemData())
+    if (auto actor = smart_cast<CActor*>(H_Parent()))
     {
-        firedeps dep;
-        HudItemData()->setup_firedeps(dep);
-
-        light_render->set_position(dep.vLastFP);
-        light_omni->set_position(dep.vLastFP);
-
-        Fvector dir = dep.m_FireParticlesXForm.k;
-
-        light_render->set_rotation(dir, dep.m_FireParticlesXForm.i);
-        light_omni->set_rotation(dir, dep.m_FireParticlesXForm.i);
-
-        if (useVolumetric)
+        if (HudItemData())
         {
-            if (smart_cast<CActor*>(H_Parent()))
-                light_render->set_volumetric(useVolumetricForActor);
-            else
-                light_render->set_volumetric(psActorFlags.test(AF_AI_VOLUMETRIC_LIGHTS));
+            firedeps dep;
+            HudItemData()->setup_firedeps(dep);
+
+            light_render->set_position(dep.vLastFP);
+            light_omni->set_position(dep.vLastFP);
+
+            Fvector dir = dep.m_FireParticlesXForm.k;
+
+            light_render->set_rotation(dir, dep.m_FireParticlesXForm.i);
+            light_omni->set_rotation(dir, dep.m_FireParticlesXForm.i);
+        }
+        else
+        {
+            Fvector pos{actor->Position()};
+            pos.y += actor->CameraHeight();
+            light_render->set_position(pos);
+            light_omni->set_position(pos);
+
+            Fvector dir{Device.vCameraDirection};
+            light_render->set_rotation(dir, Fvector{});
+            light_omni->set_rotation(dir, Fvector{});
         }
     }
     else if (!H_Parent())
@@ -105,6 +114,14 @@ void CFlashlight::UpdateWork()
 
         light_render->set_rotation(light_direction, Fvector{});
         light_omni->set_rotation(light_direction, Fvector{});
+    }
+
+    if (useVolumetric)
+    {
+        if (smart_cast<CActor*>(H_Parent()))
+            light_render->set_volumetric(useVolumetricForActor);
+        else
+            light_render->set_volumetric(psActorFlags.test(AF_AI_VOLUMETRIC_LIGHTS));
     }
 
     // calc color animator

@@ -1370,9 +1370,7 @@ void CWeaponMagazined::LoadFlashlightParams(LPCSTR section)
     flashlight_render->set_texture(READ_IF_EXISTS(pSettings, r_string, m_light_section, "spot_texture", nullptr));
 
     flashlight_omni = ::Render->light_create();
-    flashlight_omni->set_type(
-        (IRender_Light::LT)(READ_IF_EXISTS(pSettings, r_u8, m_light_section, "omni_type",
-                                           2))); // KRodin: вообще omni это обычно поинт, но поинт светит во все стороны от себя, поэтому тут спот используется по умолчанию.
+    flashlight_omni->set_type((IRender_Light::LT)(READ_IF_EXISTS(pSettings, r_u8, m_light_section, "omni_type",IRender_Light::SPOT))); // KRodin: вообще omni это обычно поинт, но поинт светит во все стороны от себя, поэтому тут спот используется по умолчанию.
     flashlight_omni->set_shadow(false);
 
     const Fcolor oclr = READ_IF_EXISTS(pSettings, r_fcolor, m_light_section, b_r2 ? "omni_color_r2" : "omni_color", (Fcolor{1.0f, 1.0f, 1.0f, 0.0f}));
@@ -2194,6 +2192,12 @@ void CWeaponMagazined::SetLaserRGB(float r, float g, float b)
     c.b = b;
     laser_light_render->set_color(c);
 }
+void CWeaponMagazined::SetLaserType(int type)
+{
+    if (!laser_light_render)
+        return;
+    laser_light_render->set_type((IRender_Light::LT)type);
+}
 
 void CWeaponMagazined::SetFlashlightRange(float range, int target)
 {
@@ -2241,6 +2245,18 @@ void CWeaponMagazined::SetFlashlightRGB(float r, float g, float b, int target)
         if (flashlight_omni)
             flashlight_omni->set_color(c);
         break;
+    }
+}
+void CWeaponMagazined::SetFlashlightType(int type, int target)
+{
+    if (!flashlight_render)
+        return;
+    switch (target)
+    {
+    case 0: flashlight_render->set_type((IRender_Light::LT)type);
+    case 1:
+        if (flashlight_omni)
+            flashlight_omni->set_type((IRender_Light::LT)type);
     }
 }
 
