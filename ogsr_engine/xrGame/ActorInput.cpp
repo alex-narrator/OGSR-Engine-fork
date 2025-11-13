@@ -122,10 +122,10 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
     break;
     case kUSE: ActorUse(); break;
-    case kDROP:
-        b_DropActivated = TRUE;
-        f_DropPower = 0;
-        break;
+    //case kDROP:
+    //    b_DropActivated = TRUE;
+    //    f_DropPower = 0;
+    //    break;
     case kNEXT_SLOT: {
         OnNextWeaponSlot();
     }
@@ -199,10 +199,10 @@ void CActor::IR_OnKeyboardRelease(int cmd)
         switch (cmd)
         {
         case kJUMP: mstate_wishful &= ~mcJump; break;
-        case kDROP:
-            if (GAME_PHASE_INPROGRESS == Game().Phase())
-                g_PerformDrop();
-            break;
+        //case kDROP:
+        //    if (GAME_PHASE_INPROGRESS == Game().Phase())
+        //        g_PerformDrop();
+        //    break;
         case kCROUCH:
             if (psActorFlags.test(AF_HOLD_TO_CROUCH))
                 b_ClearCrouch = true;

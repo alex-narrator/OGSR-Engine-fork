@@ -939,15 +939,15 @@ void CActor::shedule_Update(u32 DT)
         feel_touch_update(C, R);
 
         // Dropping
-        if (b_DropActivated)
-        {
-            f_DropPower += dt * 0.1f;
-            clamp(f_DropPower, 0.f, 1.f);
-        }
-        else
-        {
-            f_DropPower = 0.f;
-        }
+        //if (b_DropActivated)
+        //{
+        //    f_DropPower += dt * 0.1f;
+        //    clamp(f_DropPower, 0.f, 1.f);
+        //}
+        //else
+        //{
+        //    f_DropPower = 0.f;
+        //}
 
         {
             //-----------------------------------------------------
@@ -1134,36 +1134,36 @@ BOOL CActor::renderable_ShadowReceive()
     return TRUE;
 }
 
-void CActor::g_PerformDrop()
-{
-    b_DropActivated = FALSE;
-
-    PIItem pItem{};
-
-    if (pInput->iGetAsyncKeyState(get_action_dik(kADDITIONAL_ACTION)))
-    {
-        auto huditem = g_player_hud->attached_item(1)->m_parent_hud_item;
-        if (!huditem || !huditem->GetHUDmode())
-            return;
-
-        pItem = smart_cast<CInventoryItem*>(huditem);
-        if (inventory().m_slots[pItem->GetSlot()].m_bPersistent)
-            return;
-
-        pItem->SetDropManual(TRUE);
-        return;
-    }
-
-    pItem = inventory().ActiveItem();
-    if (!pItem)
-        return;
-
-    u32 s = inventory().GetActiveSlot();
-    if (inventory().m_slots[s].m_bPersistent)
-        return;
-
-    pItem->SetDropManual(TRUE);
-}
+//void CActor::g_PerformDrop()
+//{
+//    b_DropActivated = FALSE;
+//
+//    PIItem pItem{};
+//
+//    if (pInput->iGetAsyncKeyState(get_action_dik(kADDITIONAL_ACTION)))
+//    {
+//        auto huditem = g_player_hud->attached_item(1)->m_parent_hud_item;
+//        if (!huditem || !huditem->GetHUDmode())
+//            return;
+//
+//        pItem = smart_cast<CInventoryItem*>(huditem);
+//        if (inventory().m_slots[pItem->GetSlot()].m_bPersistent)
+//            return;
+//
+//        pItem->SetDropManual(TRUE);
+//        return;
+//    }
+//
+//    pItem = inventory().ActiveItem();
+//    if (!pItem)
+//        return;
+//
+//    u32 s = inventory().GetActiveSlot();
+//    if (inventory().m_slots[s].m_bPersistent)
+//        return;
+//
+//    pItem->SetDropManual(TRUE);
+//}
 
 #ifdef DEBUG
 extern BOOL g_ShowAnimationInfo;

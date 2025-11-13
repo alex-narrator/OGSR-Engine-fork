@@ -54,7 +54,7 @@ xr_vector<_action> actions = {
     DEF_ACTION("wpn_firemode_next", kWPN_FIREMODE_NEXT)
 
     DEF_ACTION("pause", kPAUSE) 
-    DEF_ACTION("drop", kDROP) 
+    /*DEF_ACTION("drop", kDROP) */
     DEF_ACTION("use", kUSE)
     DEF_ACTION("screenshot", kSCREENSHOT)
     DEF_ACTION("quit", kQUIT) 

@@ -426,17 +426,17 @@ void CActor::g_SetAnimation(u32 mstate_rl)
             {
                 VERIFY(H->animation_slot() <= _total_anim_slots_);
                 STorsoWpn* TW = &ST->m_torso[H->animation_slot() - 1];
-                if (!b_DropActivated && !fis_zero(f_DropPower))
-                {
-                    M_torso = TW->drop;
-                    if (!M_torso)
-                    {
-                        Msg("! drop animation for %s", *(H->object().cName()));
-                        M_torso = ST->m_torso_idle;
-                    };
-                    m_bAnimTorsoPlayed = TRUE;
-                }
-                else
+                //if (!b_DropActivated && !fis_zero(f_DropPower))
+                //{
+                //    M_torso = TW->drop;
+                //    if (!M_torso)
+                //    {
+                //        Msg("! drop animation for %s", *(H->object().cName()));
+                //        M_torso = ST->m_torso_idle;
+                //    };
+                //    m_bAnimTorsoPlayed = TRUE;
+                //}
+                //else
                 {
                     if (!m_bAnimTorsoPlayed)
                     {

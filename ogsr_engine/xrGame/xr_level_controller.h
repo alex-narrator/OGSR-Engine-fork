@@ -44,7 +44,7 @@ enum EGameActions
     kWPN_FIREMODE_NEXT,
 
     kPAUSE,
-    kDROP,
+    /*kDROP,*/
     kUSE,
     kSCREENSHOT,
     kQUIT,

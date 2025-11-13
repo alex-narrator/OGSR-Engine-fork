@@ -207,7 +207,7 @@ public:
     virtual float GetMass();
     virtual float GetCarryWeight() const;
     virtual float Radius() const;
-    virtual void g_PerformDrop();
+    /*virtual void g_PerformDrop();*/
 
     virtual bool unlimited_ammo() const;
 
@@ -240,8 +240,8 @@ protected:
     bool b_ClearCrouch{true};
 
     // Dropping
-    BOOL b_DropActivated{};
-    float f_DropPower{};
+    //BOOL b_DropActivated{};
+    //float f_DropPower{};
 
     bool m_bOutBorder{};
     //сохраняет счетчик объектов в feel_touch, для которых необходимо обновлять размер колижена с актером
