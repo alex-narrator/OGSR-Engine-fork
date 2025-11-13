@@ -531,9 +531,7 @@ void CWeaponMagazined::UpdateSounds()
         return;
 
     dwUpdateSounds_Frame = Device.dwFrame;
-
-    const auto &pos = get_LastFP();
-    m_sounds.UpdateAllSoundsPositions(pos);
+    m_sounds.UpdateAllSoundsPositions(get_LastFP());
 }
 
 void CWeaponMagazined::state_Fire(float dt)
@@ -773,7 +771,7 @@ void CWeaponMagazined::switch2_Empty(const bool empty_click_anim_play)
         return;
     }
 
-    OnZoomOut();
+    /*OnZoomOut();*/
 
     if (!TryReload())
     {
@@ -1642,8 +1640,8 @@ void CWeaponMagazined::PlayAnimCheckMisfire()
     xr_strconcat(guns_fakeshoot_anm, "anm_fakeshoot", IsMisfire() ? "_jammed" : "", IsAddonAttached(eLauncher) ? (!IsGrenadeMode() ? "_w_gl" : "_g") : "");
     if (AnimationExist(guns_fakeshoot_anm))
     {
-        if (IsZoomed())
-            OnZoomOut();
+        //if (IsZoomed())
+        //    OnZoomOut();
 
         PlayHUDMotion(guns_fakeshoot_anm, true, GetState());
         
@@ -1930,8 +1928,8 @@ void CWeaponMagazined::OnShutter() { SwitchState(eShutter); }
 //
 void CWeaponMagazined::switch2_Shutter()
 {
-    if (IsZoomed())
-        OnZoomOut();
+    //if (IsZoomed())
+    //    OnZoomOut();
     IsMisfire() ? PlayAnimShutterMisfire() : PlayAnimShutter();
     SetPending(TRUE);
 }

@@ -391,7 +391,7 @@ protected:
 
     virtual void Fire2Start();
     virtual void Fire2End();
-    virtual void Reload() { OnZoomOut(); };
+    virtual void Reload() { /*OnZoomOut();*/ };
     void StopShooting();
 
     virtual void Misfire() {}

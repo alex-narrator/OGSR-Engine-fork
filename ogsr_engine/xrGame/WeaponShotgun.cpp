@@ -347,7 +347,7 @@ void CWeaponShotgun::OnAnimationEnd(u32 state)
 
 void CWeaponShotgun::Reload()
 {
-    OnZoomOut();
+    /*OnZoomOut();*/
     if (m_bTriStateReload)
     {
         m_stop_triStateReload = false;
