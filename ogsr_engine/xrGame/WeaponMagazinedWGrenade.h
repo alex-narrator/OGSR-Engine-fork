@@ -15,16 +15,9 @@ public:
     virtual void Load(LPCSTR section);
 
     virtual BOOL net_Spawn(CSE_Abstract* DC);
-    /*virtual void net_Destroy();*/
     virtual void net_Export(CSE_Abstract* E);
 
-    /*virtual void OnDrawUI();*/
-    /*virtual void net_Relcase(CObject* object);*/
-
     virtual void OnH_B_Independent(bool just_before_destroy);
-
-    //virtual void save(NET_Packet& output_packet);
-    //virtual void load(IReader& input_packet);
 
     virtual bool Attach(PIItem pIItem, bool b_send_event);
     virtual bool Detach(const char* item_section_name, bool b_spawn_item, float item_condition = 1.f);
@@ -45,9 +38,6 @@ public:
 
     virtual bool Action(s32 cmd, u32 flags);
 
-    /*virtual void UpdateSounds();*/
-    /*virtual void StopHUDSounds();*/
-
     //переключение в режим подствольника
     virtual bool SwitchMode();
     void PerformSwitchGL();
@@ -63,10 +53,6 @@ public:
     virtual void PlayAnimShoot();
     virtual void PlayAnimModeSwitch();
 
-    //HUD_SOUND sndShotG;
-    //HUD_SOUND sndReloadG;
-    //HUD_SOUND sndSwitch;
-
     //дополнительные параметры патронов
     //для подствольника
     CWeaponAmmo* m_pAmmo2{};
@@ -75,7 +61,6 @@ public:
     u32 m_ammoType2{};
     int iMagazineSize2{};
     xr_vector<CCartridge> m_magazine2;
-    bool m_bGrenadeMode{};
 
     CCartridge m_DefaultCartridge2;
 
@@ -89,13 +74,7 @@ public:
     int GetAmmoElapsed2() const override { return iAmmoElapsed2; }
     virtual float Weight() const;
 
-    bool IsPartlyReloading() const override
-    {
-        if (m_bGrenadeMode)
-            return m_set_next_ammoType_on_reload == u32(-1) && iAmmoElapsed2 > 0 && !IsMisfire();
-        else
-            return inherited::IsPartlyReloading();
-    }
+    virtual bool IsPartlyReloading() const override;
 
     virtual float GetWeaponDeterioration();
 

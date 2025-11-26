@@ -560,7 +560,7 @@ bool CScriptGameObject::GetGLMode()
         ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CWeaponMagazinedWGrenade : cannot access class member GetGLMode!");
         return false;
     }
-    return k->m_bGrenadeMode;
+    return k->IsGrenadeMode();
 }
 u32 CScriptGameObject::GetCurrAmmo()
 {
