@@ -27,6 +27,8 @@
 #include <regex>
 #include "../xr_3da/x_ray.h"
 
+CUIXml* g_wpnScopeXml = NULL;
+
 CWeaponMagazined::CWeaponMagazined(LPCSTR name, ESoundTypes eSoundType) : CWeapon(name)
 {
     m_eSoundShow = ESoundTypes(SOUND_TYPE_ITEM_TAKING | eSoundType);
@@ -575,13 +577,26 @@ void CWeaponMagazined::OnStateSwitch(u32 S, u32 oldState)
         const bool need_play_empty_click = (oldState != eFire && oldState != eFire2) || !dont_interrupt_shot_anm;
         switch2_Empty(need_play_empty_click);
 
+        if (auto parent = smart_cast<CActor*>(H_Parent()))
+        {
+            parent->callback(GameObject::eOnActorWeaponEmpty)(lua_game_object());
+        }
+
         if (GetNextState() != eReload && need_play_empty_click)
         {
             SwitchState(eIdle);
         }
         break;
     }
-    case eReload: switch2_Reload(); break;
+    case eReload: {
+        switch2_Reload();
+
+        if (auto parent = smart_cast<CActor*>(H_Parent()))
+        {
+            parent->callback(GameObject::eOnActorWeaponReload)(lua_game_object());
+        }
+        break;
+    }
     case eShowing: switch2_Showing(); break;
     case eHiding: switch2_Hiding(); break;
     case eHidden: switch2_Hidden(); break;
@@ -644,12 +659,12 @@ void CWeaponMagazined::UpdateCL()
                 fTime = 0;
             break;
         case eFire:
-            if (!IsMisfire() && iAmmoElapsed > 0)
+            if ((!IsMisfire() || IsGrenadeMode()) && GetAmmoElapsed() > 0)
                 state_Fire(dt);
 
             if (fTime <= 0)
             {
-                if (!IsMisfire() && GetAmmoElapsed() == 0)
+                if ((!IsMisfire() || IsGrenadeMode()) && GetAmmoElapsed() == 0)
                     OnMagazineEmpty();
                 StopShooting();
             }
@@ -768,11 +783,18 @@ void CWeaponMagazined::state_Fire(float dt)
 
         ++m_iShotNum;
 
-        CheckForMisfire();
+        if (!IsGrenadeMode())
+            CheckForMisfire();
+
         OnShot();
 
         if (smart_cast<CWeaponBM16*>(this) && IsMisfire())
             return;
+
+        if (auto parent = smart_cast<CActor*>(H_Parent()))
+        {
+            parent->callback(GameObject::eOnActorWeaponFire)(lua_game_object());
+        }
 
         if (m_iShotNum > m_iShootEffectorStart)
             FireTrace(p1, d);
@@ -865,6 +887,8 @@ void CWeaponMagazined::switch2_Idle()
 #include "ai\stalker\ai_stalker.h"
 #include "object_handler_planner.h"
 #endif
+#include <ui/UIXmlInit.h>
+
 void CWeaponMagazined::switch2_Fire()
 {
     CInventoryOwner* io = smart_cast<CInventoryOwner*>(H_Parent());
@@ -1044,6 +1068,8 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
     }
     break;
     case kTORCH: {
+        if (!Core.Features.test(xrCore::Feature::busy_actor_restrictions))
+            return false;
         auto pActorTorch = smart_cast<CActor*>(H_Parent())->inventory().ItemFromSlot(TORCH_SLOT);
         if ((flags & CMD_START) && pActorTorch && GetState() == eIdle)
         {
@@ -1054,6 +1080,8 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
     }
     break;
     case kNIGHT_VISION: {
+        if (!Core.Features.test(xrCore::Feature::busy_actor_restrictions))
+            return false;
         auto pActor = smart_cast<CActor*>(H_Parent());
         auto pActorNv = pActor->inventory().ItemFromSlot(IS_OGSR_GA ? NIGHT_VISION_SLOT : TORCH_SLOT);
         if ((flags & CMD_START) && pActorNv && GetState() == eIdle && !pActor->IsZoomAimingMode())
@@ -1183,7 +1211,6 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item)
     }
     else
         return inherited::Detach(item_section_name, b_spawn_item);
-    ;
 }
 
 void CWeaponMagazined::InitZoomParams(LPCSTR section, bool useTexture)
@@ -1226,11 +1253,52 @@ void CWeaponMagazined::InitZoomParams(LPCSTR section, bool useTexture)
         shared_str scope_tex_name = READ_IF_EXISTS(pSettings, r_string, section, "scope_texture", "");
         const bool scope_tex_autoresize = READ_IF_EXISTS(pSettings, r_bool, section, "scope_texture_autoresize", true);
 
-        if (scope_tex_name.size() > 0)
+        if (scope_tex_name.size() > 0 && !scope_tex_name.equal("none"))
         {
-            m_UIScope = xr_new<CUIStaticItem>();
-            m_UIScope->Init(scope_tex_name.c_str(), (Core.Features.test(xrCore::Feature::scope_textures_autoresize) && scope_tex_autoresize) ? "hud\\scope" : "hud\\default", 0, 0,
-                            alNone);
+            m_UIScope = xr_new<CUIWindow>();
+
+            bool was_set = false;
+
+            if (Core.Features.test(xrCore::Feature::cop_style_scope_texture))
+            {
+                if (!g_wpnScopeXml)
+                {
+                    g_wpnScopeXml = xr_new<CUIXml>();
+                    g_wpnScopeXml->Init(CONFIG_PATH, UI_PATH, "scopes.xml");
+                }
+
+                if (g_wpnScopeXml->NavigateToNode(scope_tex_name.c_str()))
+                {
+                    CUIXmlInit::InitWindow(*g_wpnScopeXml, scope_tex_name.c_str(), 0, m_UIScope);
+
+                    was_set = true;
+                }
+                else if (g_wpnScopeXml->NavigateToNode("wpn_crosshair_fallback") && READ_IF_EXISTS(pSettings, r_bool, section, "wpn_crosshair_fallback", true))
+                {
+                    CUIXmlInit::InitWindow(*g_wpnScopeXml, "wpn_crosshair_fallback", 0, m_UIScope);
+
+                    was_set = true;
+
+                    CUIWindow* scope_wnd = m_UIScope->FindChild("scope_texture");
+                    if (scope_wnd && smart_cast<CUIStatic*>(scope_wnd))
+                    {
+                        smart_cast<CUIStatic*>(scope_wnd)->InitTexture(scope_tex_name.c_str());
+                    }
+                }
+            }
+            
+            if (!was_set)
+            {
+                m_UIScope->SetWndRect(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
+
+                // legacy mode
+                CUIStatic* inner = xr_new<CUIStatic>();
+                inner->SetAutoDelete(true);
+                inner->SetWndRect(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
+                inner->SetStretchTexture(true);
+                inner->GetStaticItem()->Init(scope_tex_name.c_str(), (Core.Features.test(xrCore::Feature::scope_textures_autoresize) && scope_tex_autoresize) ? "hud\\scope" : "hud\\default", 0, 0, alNone);
+                m_UIScope->AttachChild(inner);
+            }
         }
     }
 }

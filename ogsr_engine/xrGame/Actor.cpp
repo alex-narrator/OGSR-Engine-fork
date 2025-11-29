@@ -73,18 +73,8 @@ constexpr const char* m_sInventoryItemUseAction = "inventory_item_use";
 constexpr const char* m_sInventoryItemUseOrDragAction = "inventory_item_use_or_drag";
 constexpr const char* m_sGameObjectDragAction = "game_object_drag";
 
-const u32 patch_frames = 50;
-const float respawn_delay = 1.f;
-const float respawn_auto = 7.f;
-
 static float IReceived = 0;
 static float ICoincidenced = 0;
-
-// skeleton
-static Fbox bbStandBox;
-static Fbox bbCrouchBox;
-static Fvector vFootCenter;
-static Fvector vFootExt;
 
 Flags32 psActorFlags{AF_KEYPRESS_ON_START | AF_CAM_COLLISION | AF_CAM_COLLISION_COP | AF_AI_VOLUMETRIC_LIGHTS | AF_DOF_ZOOM | AF_DOF_RELOAD | AF_3D_PDA | AF_ALWAYSRUN | AF_FIRST_PERSON_DEATH};
 
@@ -766,7 +756,7 @@ float CActor::currentFOV()
 {
     const auto pWeapon = smart_cast<CWeapon*>(inventory().ActiveItem());
 
-    if (eacFirstEye == cam_active && pWeapon && pWeapon->IsZoomed() && (!pWeapon->ZoomTexture() || (!pWeapon->IsRotatingToZoom() && pWeapon->ZoomTexture())))
+    if (eacFirstEye == cam_active && pWeapon && pWeapon->IsZoomed() && (!pWeapon->UseScopeTexture() || (!pWeapon->IsRotatingToZoom() && pWeapon->UseScopeTexture())))
         if (Core.Features.test(xrCore::Feature::ogse_wpn_zoom_system))
             return atanf(tanf(g_fov * (0.5f * PI / 180.f)) / pWeapon->GetZoomFactor()) / (0.5f * PI / 180.f);
         else
@@ -912,6 +902,15 @@ void CActor::UpdateCL()
     else
         grass_shader_data.pos[0].set(0.f, 0.f, 0.f, -1.f);
     grass_shader_data.dir[0].set(0.0f, -99.0f, 0.0f, 1.0f);
+
+    if (m_pending_car)
+    {
+        if (m_pending_car_frames-- < 0)
+        {
+            attach_Vehicle(m_pending_car);
+            m_pending_car = {};
+        }
+    }
 }
 
 constexpr u32 TASKS_UPDATE_TIME = 1u;

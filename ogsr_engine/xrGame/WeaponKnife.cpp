@@ -11,8 +11,8 @@
 #include "ai_sounds.h"
 #include "game_cl_single.h"
 #include "game_object_space.h"
-#include "Level_Bullet_Manager.h"
 #include "../xr_3da/x_ray.h"
+#include "script_game_object.h"
 
 #define KNIFE_MATERIAL_NAME "objects\\knife"
 
@@ -225,9 +225,14 @@ void CWeaponKnife::switch2_Attacking(u32 state)
     else // eFire2
         PlayHUDMotion({"anim_shoot2_start", "anm_attack2"}, false, state);
 
-    m_attackMotionMarksAvailable = !m_current_motion_def->marks.empty();
+    m_attackMotionMarksAvailable = m_current_motion_def && !m_current_motion_def->marks.empty();
     m_attackStart = true;
     SetPending(TRUE);
+
+    if (auto parent = smart_cast<CActor*>(H_Parent()))
+    {
+        parent->callback(GameObject::eOnActorWeaponFire)(lua_game_object());
+    }
 }
 
 void CWeaponKnife::switch2_Idle()
@@ -285,6 +290,8 @@ bool CWeaponKnife::Action(s32 cmd, u32 flags)
             Fire2End();
         return true;
     case kTORCH: {
+        if (!Core.Features.test(xrCore::Feature::busy_actor_restrictions))
+            return false;
         auto pActorTorch = smart_cast<CActor*>(H_Parent())->inventory().ItemFromSlot(TORCH_SLOT);
         if ((flags & CMD_START) && pActorTorch && GetState() == eIdle)
         {
@@ -295,6 +302,8 @@ bool CWeaponKnife::Action(s32 cmd, u32 flags)
     }
     break;
     case kNIGHT_VISION: {
+        if (!Core.Features.test(xrCore::Feature::busy_actor_restrictions))
+            return false;
         auto pActorNv = smart_cast<CActor*>(H_Parent())->inventory().ItemFromSlot(IS_OGSR_GA ? NIGHT_VISION_SLOT : TORCH_SLOT);
         if ((flags & CMD_START) && pActorNv && GetState() == eIdle)
         {

@@ -126,6 +126,7 @@ void InitConsole()
     CORE_FEATURE_SET(show_inv_item_condition, "features");
     CORE_FEATURE_SET(remove_alt_keybinding, "features");
     CORE_FEATURE_SET(binoc_firing, "features");
+    CORE_FEATURE_SET(cop_style_scope_texture, "features");    
     CORE_FEATURE_SET(stop_anim_playing, "features");
     CORE_FEATURE_SET(corpses_collision, "features");
     CORE_FEATURE_SET(more_hide_weapon, "features");
@@ -685,7 +686,7 @@ void generate_logo_path(string_path& path, pcstr level_name, int num = -1)
 
     string16 buff;
     xr_strcat(path, sizeof(path), "_");
-    xr_strcat(path, sizeof(path), itoa(num + 1, buff, 10));
+    xr_strcat(path, sizeof(path), _itoa(num + 1, buff, 10));
 }
 
 // Taken from OpenXray/xray-16 and refactored
@@ -745,7 +746,7 @@ int CApplication::Level_ID(LPCSTR name)
     strconcat(sizeof(buffer), buffer, name, "\\");
     for (u32 I = 0; I < Levels.size(); I++)
     {
-        if (0 == stricmp(buffer, Levels[I].folder))
+        if (0 == _stricmp(buffer, Levels[I].folder))
             return int(I);
     }
     return -1;

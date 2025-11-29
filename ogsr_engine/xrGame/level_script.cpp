@@ -179,11 +179,27 @@ u32 get_time_minutes()
     return mins;
 }
 
+float high_cover_in_direction(u32 level_vertex_id, const Fvector& direction)
+{
+    float y, p;
+    direction.getHP(y, p);
+    return (ai().level_graph().high_cover_in_direction(y, level_vertex_id));
+}
+
+float low_cover_in_direction(u32 level_vertex_id, const Fvector& direction)
+{
+    float y, p;
+    direction.getHP(y, p);
+    return (ai().level_graph().low_cover_in_direction(y, level_vertex_id));
+}
+
 float cover_in_direction(u32 level_vertex_id, const Fvector& direction)
 {
     float y, p;
     direction.getHP(y, p);
-    return (ai().level_graph().cover_in_direction(y, level_vertex_id));
+    const float high_cover_value = ai().level_graph().high_cover_in_direction(y, level_vertex_id);
+    const float low_cover_value = ai().level_graph().low_cover_in_direction(y, level_vertex_id);
+    return std::min(high_cover_value, low_cover_value);
 }
 
 float rain_factor() { return g_pGamePersistent->Environment().CurrentEnv->rain_density; }
@@ -938,7 +954,7 @@ void remove_object(u16 id)
 DBG_ScriptObject* add_object(u16 id, DebugRenderType type)
 {
     remove_object(id);
-    DBG_ScriptObject* dbg_obj;
+    DBG_ScriptObject* dbg_obj{};
 
     switch (type)
     {
@@ -1042,7 +1058,8 @@ void CLevel::script_register(lua_State* L)
 
             def("get_time_days", &get_time_days), def("get_time_hours", &get_time_hours), def("get_time_minutes", &get_time_minutes),
 
-            def("cover_in_direction", &cover_in_direction), def("vertex_in_direction", &vertex_in_direction), def("rain_factor", &rain_factor), def("rain_hemi", rain_hemi),
+            def("high_cover_in_direction", &high_cover_in_direction), def("low_cover_in_direction", &low_cover_in_direction), def("cover_in_direction", &cover_in_direction),
+            def("vertex_in_direction", &vertex_in_direction), def("rain_factor", &rain_factor), def("rain_hemi", rain_hemi),
             def("rain_wetness", [] { return g_pGamePersistent->Environment().wetness_factor; }),
             def("set_rain_wetness", [](float val) {
                 clamp(val, 0.f, 1.f);

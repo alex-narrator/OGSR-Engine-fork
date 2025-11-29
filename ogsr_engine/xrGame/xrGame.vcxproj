@@ -64,7 +64,7 @@
       </ExceptionHandling>
       <SmallerTypeCheck>false</SmallerTypeCheck>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
@@ -122,7 +122,7 @@
       </ExceptionHandling>
       <SmallerTypeCheck>false</SmallerTypeCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
@@ -211,6 +211,7 @@
     <ClInclude Include="..\COMMON_AI\GRAPH\level_graph_inline.h" />
     <ClInclude Include="..\COMMON_AI\GRAPH\level_graph_space.h" />
     <ClInclude Include="..\COMMON_AI\GRAPH\level_graph_vertex_inline.h" />
+    <ClInclude Include="..\COMMON_AI\GRAPH\level_graph_vertex_storage.h" />
     <ClInclude Include="..\COMMON_AI\LevelGameDef.h" />
     <ClInclude Include="..\COMMON_AI\PATH\cover_point.h" />
     <ClInclude Include="..\COMMON_AI\PATH\cover_point_inline.h" />
