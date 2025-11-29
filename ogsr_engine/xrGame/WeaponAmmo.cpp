@@ -65,8 +65,7 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     //
     m_misfireProbability = READ_IF_EXISTS(pSettings, r_float, m_ammoSect, "misfire_probability", 0.f);
 
-    if (pSettings->line_exist(m_ammoSect, "hit_type"))
-        m_eHitType = ALife::g_tfString2HitType(pSettings->r_string(m_ammoSect, "hit_type"));
+    m_eHitType = pSettings->line_exist(m_ammoSect, "hit_type") ? ALife::g_tfString2HitType(pSettings->r_string(m_ammoSect, "hit_type")) : ALife::eHitTypeMax;
 
     m_sShotParticles.clear();
     if (pSettings->line_exist(m_ammoSect, "shot_particles"))

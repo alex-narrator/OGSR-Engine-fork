@@ -43,7 +43,6 @@ xr_vector<_action> actions = {
     DEF_ACTION("wpn_7", kWPN_7)
     DEF_ACTION("wpn_8", kWPN_8)
 
-    DEF_ACTION("wpn_next", kWPN_NEXT) 
     DEF_ACTION("wpn_fire", kWPN_FIRE) 
     DEF_ACTION("wpn_zoom", kWPN_ZOOM)
     DEF_ACTION("wpn_zoom_inc", kWPN_ZOOM_INC) 
@@ -53,8 +52,7 @@ xr_vector<_action> actions = {
     DEF_ACTION("wpn_firemode_prev", kWPN_FIREMODE_PREV) 
     DEF_ACTION("wpn_firemode_next", kWPN_FIREMODE_NEXT)
 
-    DEF_ACTION("pause", kPAUSE) 
-    /*DEF_ACTION("drop", kDROP) */
+    DEF_ACTION("pause", kPAUSE)
     DEF_ACTION("use", kUSE)
     DEF_ACTION("screenshot", kSCREENSHOT)
     DEF_ACTION("quit", kQUIT) 

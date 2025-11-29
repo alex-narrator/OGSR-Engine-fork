@@ -58,6 +58,7 @@ void SBullet::Init(const Fvector& position, const Fvector& direction, float star
     flags.skipped_frame = 0;
 
     targetID = 0;
+    m_HitFxParticles.clear();
     m_HitFxParticles = cartridge.m_HitFxParticles;
 }
 
@@ -98,6 +99,7 @@ void CBulletManager::Load()
         m_WhineSounds.back().create(_GetItem(whine_sounds, k, tmp), st_Effect, sg_SourceType);
     }
 
+    m_HitFxParticles.clear();
     LPCSTR hit_fx_particles = pSettings->r_string(BULLET_MANAGER_SECTION, "hit_fx_particles");
     cnt = _GetItemCount(hit_fx_particles);
     for (int k = 0; k < cnt; ++k)

@@ -30,7 +30,7 @@ public:
     Flags8 m_flags;
 
     shared_str m_InvShortName;
-    RStringVec m_HitFxParticles;
+    RStringVec m_HitFxParticles{};
 
     RStringVec m_sShotParticles{};
     bool m_bShotLight{};

@@ -390,7 +390,6 @@ void CActor::ActorUse()
 
     if (character_physics_support()->movement()->PHCapture())
     {
-        /*ActorThrow();*/
         character_physics_support()->movement()->PHReleaseObject();
         return;
     }
@@ -435,10 +434,7 @@ void CActor::ActorUse()
             {
                 if (object->ActorCanCapture())
                 {
-                    if (!conditions().IsCantWalk())
-                        character_physics_support()->movement()->PHCaptureObject(object, (u16)RQ.element);
-                    else
-                        HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
+                    character_physics_support()->movement()->PHCaptureObject(object, (u16)RQ.element);
                 }
                 return;
             }
@@ -562,41 +558,4 @@ void CActor::set_input_external_handler(CActorInputHandler* handler)
 
     // set handler
     m_input_external_handler = handler;
-}
-
-#include "PHCapture.h"
-void CActor::ActorThrow()
-{
-    CPHCapture* capture = character_physics_support()->movement()->PHCapture();
-    if (!capture->taget_object())
-        return;
-    if (conditions().IsCantWalk())
-    {
-        HUD().GetUI()->AddInfoMessage("actor_state", "cant_walk");
-        return;
-    }
-
-    float mass_f = capture->taget_object()->GetMass();
-    if (auto io = smart_cast<CInventoryOwner*>(capture->taget_object()))
-        mass_f += io->GetCarryWeight();
-
-    bool drop_not_throw = pInput->iGetAsyncKeyState(get_action_dik(kADDITIONAL_ACTION)); // отпустить или отбросить предмет
-
-    float throw_impulse = drop_not_throw ? 0.5f : // отпустить
-                                           m_fThrowImpulse * conditions().GetPower() * GetExoFactor(); // бросить
-
-    Fvector dir = Direction(); // направлении взгляда актора
-    if (drop_not_throw)
-        dir = {0, -1, 0}; // если отпускаем а не бросаем то вектор просто вниз
-
-    dir.normalize();
-
-    float real_imp = throw_impulse * mass_f;
-
-    capture->taget_object()->PPhysicsShell()->applyImpulse(dir, real_imp); // придадим предмету импульс в заданном направлении
-    // Msg("throw_impulse [%f], real_imp [%f]", throw_impulse, real_imp);
-
-    if (!GodMode() && !drop_not_throw)
-        conditions().ConditionJump(mass_f / 50);
-    // Msg("power decreased on [%f]", mass_f / 50);
 }

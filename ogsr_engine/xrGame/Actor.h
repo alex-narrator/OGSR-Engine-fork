@@ -739,9 +739,6 @@ public:
     bool is_actor_moving() const;
 
     bool IsDetectorActive() const;
-    void ActorThrow();
-
-	float m_fThrowImpulse; // сила с которой актор отбрасывает предмет
 
     float GetItemBoostedParams(int);
     float GetTotalArtefactsEffect(int);

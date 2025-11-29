@@ -13,20 +13,13 @@ public:
 
     virtual void Load(LPCSTR section);
 
-    /*virtual void net_Destroy();*/
-    /*virtual void net_Export(CSE_Abstract* E);*/
-
     virtual void Reload();
-    /*void TryReload();*/
     virtual void Fire2Start();
     virtual void Fire2End();
     virtual void OnShot();
     virtual void OnShotBoth();
     virtual void switch2_Fire();
     virtual void switch2_Fire2();
-    /*virtual void StopHUDSounds();*/
-
-    /*virtual void UpdateSounds();*/
 
     virtual void UpdateCL();
 
@@ -51,16 +44,6 @@ protected:
 
     virtual void PlayAnimShutter();
     virtual void PlayAnimShutterMisfire();
-
-    //HUD_SOUND sndShotBoth;
-    //ESoundTypes m_eSoundShotBoth;
-
-    //ESoundTypes m_eSoundOpen{};
-    //ESoundTypes m_eSoundAddCartridge;
-    //ESoundTypes m_eSoundClose;
-    //HUD_SOUND m_sndOpen;
-    //HUD_SOUND m_sndAddCartridge, m_sndAddCartridgeSecond, m_sndAddCartridgeStart, m_sndAddCartridgeEmpty;
-    //HUD_SOUND m_sndClose, m_sndCloseEmpty, m_sndBreech, m_sndBreechJammed;
 
     bool m_stop_triStateReload{};
     bool has_anm_reload_jammed{};

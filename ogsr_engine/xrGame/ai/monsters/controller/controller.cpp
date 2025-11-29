@@ -653,10 +653,6 @@ void CController::HitEntity(const CEntity* pEntity, float fDamage, float impulse
         Actor()->conditions().PowerHit(m_stamina_hit, false);
         if (Actor()->conditions().GetPower() < m_stamina_hit)
         {
-            //if (!Actor()->inventory().Action((u16)kDROP, CMD_STOP))
-            //{
-            //    Actor()->g_PerformDrop();
-            //}
             if (Actor()->inventory().ActiveItem())
                 Actor()->inventory().ActiveItem()->SetDropManual(TRUE);
         }

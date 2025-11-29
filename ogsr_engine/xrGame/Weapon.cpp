@@ -1017,26 +1017,6 @@ bool CWeapon::Action(s32 cmd, u32 flags)
         };
     }
         return true;
-    case kWPN_NEXT: {
-        if (IsPending())
-        {
-            return false;
-        }
-
-        if (flags & CMD_START)
-        {
-            u32 next_ammo_type = GetNextAmmoType();
-            if (next_ammo_type != u32(-1) && TryToGetAmmo(next_ammo_type))
-            {
-                m_set_next_ammoType_on_reload = next_ammo_type;
-                LPCSTR ammo_sect = pSettings->r_string(m_ammoTypes[m_set_next_ammoType_on_reload].c_str(), "inv_name_short");
-                string1024 str;
-                sprintf(str, "%s: %s", CStringTable().translate("st_next_ammo_type").c_str(), CStringTable().translate(ammo_sect).c_str());
-                HUD().GetUI()->AddInfoMessage("item_usage", str, false);
-            }
-        }
-    }
-        return true;
 
     case kWPN_ZOOM: {
         if (IsZoomEnabled())

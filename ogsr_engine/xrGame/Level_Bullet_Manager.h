@@ -49,7 +49,7 @@ struct SBullet
     float wallmark_size;
     //-------------------------------------------------------------------
     u8 m_u8ColorID;
-    RStringVec m_HitFxParticles;
+    RStringVec m_HitFxParticles{};
 
     //тип наносимого хита
     ALife::EHitType hit_type;
@@ -111,7 +111,7 @@ private:
 
 protected:
     xr_vector<ref_sound> m_WhineSounds;
-    RStringVec m_HitFxParticles;
+    RStringVec m_HitFxParticles{};
 
     BulletVec m_Bullets; // working set, locked
     BulletVec m_BulletsRendered; // copy for rendering

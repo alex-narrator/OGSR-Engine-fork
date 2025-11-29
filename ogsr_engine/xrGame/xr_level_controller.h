@@ -33,7 +33,6 @@ enum EGameActions
     kWPN_6,
     kWPN_7, // kARTEFACT
     kWPN_8, // kDETECTOR
-    kWPN_NEXT,
     kWPN_FIRE,
     kWPN_ZOOM,
     kWPN_ZOOM_INC,
@@ -44,7 +43,6 @@ enum EGameActions
     kWPN_FIREMODE_NEXT,
 
     kPAUSE,
-    /*kDROP,*/
     kUSE,
     kSCREENSHOT,
     kQUIT,

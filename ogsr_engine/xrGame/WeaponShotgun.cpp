@@ -8,64 +8,20 @@
 #include "actor.h"
 #include "../xr_3da/x_ray.h"
 
-CWeaponShotgun::CWeaponShotgun(void) : CWeaponCustomPistol("TOZ34")
-{
-    //m_eSoundShotBoth = ESoundTypes(SOUND_TYPE_WEAPON_SHOOTING);
-    //m_eSoundClose = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING);
-    //m_eSoundAddCartridge = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING);
-    //m_bLockType = true; // Запрещает заряжать в дробовики патроны разного типа
-}
-
-//CWeaponShotgun::~CWeaponShotgun(void)
-//{
-//    // sounds
-//    HUD_SOUND::DestroySound(sndShotBoth);
-//    HUD_SOUND::DestroySound(m_sndOpen);
-//    HUD_SOUND::DestroySound(m_sndAddCartridge);
-//    HUD_SOUND::DestroySound(m_sndAddCartridgeSecond);
-//    HUD_SOUND::DestroySound(m_sndAddCartridgeStart);
-//    HUD_SOUND::DestroySound(m_sndAddCartridgeEmpty);
-//    HUD_SOUND::DestroySound(m_sndClose);
-//    HUD_SOUND::DestroySound(m_sndCloseEmpty);
-//    HUD_SOUND::DestroySound(m_sndBreech);
-//    HUD_SOUND::DestroySound(m_sndBreechJammed);
-//}
-
-//void CWeaponShotgun::net_Destroy() { inherited::net_Destroy(); }
+CWeaponShotgun::CWeaponShotgun(void) : CWeaponCustomPistol("TOZ34") {}
 
 void CWeaponShotgun::Load(LPCSTR section)
 {
     inherited::Load(section);
 
     // Звук и анимация для выстрела дуплетом
-    /*HUD_SOUND::LoadSound(section, "snd_shoot_duplet", sndShotBoth, m_eSoundShotBoth);*/
     m_sounds.LoadSound(section, "snd_shoot_duplet", "sndShotBoth", SOUND_TYPE_WEAPON_SHOOTING);
 
-    //if (pSettings->line_exist(section, "tri_state_reload"))
-    //{
-    //    m_bTriStateReload = !!pSettings->r_bool(section, "tri_state_reload");
-    //}
     m_bTriStateReload = READ_IF_EXISTS(pSettings, r_bool, section, "tri_state_reload", false);
     m_bDrumMagazineReload = READ_IF_EXISTS(pSettings, r_bool, section, "drum_magazine_reload", false);
 
     if (m_bTriStateReload)
     {
-        /*HUD_SOUND::LoadSound(section, "snd_open_weapon", m_sndOpen, m_eSoundOpen);*/
-        /*HUD_SOUND::LoadSound(section, "snd_add_cartridge", m_sndAddCartridge, m_eSoundAddCartridge);*/
-        //if (pSettings->line_exist(section, "snd_add_cartridge_second"))
-        //    HUD_SOUND::LoadSound(section, "snd_add_cartridge_second", m_sndAddCartridgeSecond, m_eSoundAddCartridge);
-        //if (pSettings->line_exist(section, "snd_add_cartridge_empty"))
-        //    HUD_SOUND::LoadSound(section, "snd_add_cartridge_empty", m_sndAddCartridgeEmpty, m_eSoundAddCartridge);
-        //if (pSettings->line_exist(section, "snd_add_cartridge_start"))
-        //    HUD_SOUND::LoadSound(section, "snd_add_cartridge_start", m_sndAddCartridgeStart, m_eSoundAddCartridge);
-        /*HUD_SOUND::LoadSound(section, "snd_close_weapon", m_sndClose, m_eSoundClose);*/
-        //if (pSettings->line_exist(section, "snd_close_weapon_empty"))
-        //    HUD_SOUND::LoadSound(section, "snd_close_weapon_empty", m_sndCloseEmpty, m_eSoundClose);
-        //if (pSettings->line_exist(section, "snd_breechblock"))
-        //    HUD_SOUND::LoadSound(section, "snd_breechblock", m_sndBreech, m_eSoundClose);
-        //if (pSettings->line_exist(section, "snd_jam"))
-        //    HUD_SOUND::LoadSound(section, "snd_jam", m_sndBreechJammed, m_eSoundClose);
-
         m_sounds.LoadSound(section, "snd_open_weapon", "sndOpen", SOUND_TYPE_WEAPON_RECHARGING);
         m_sounds.LoadSound(section, "snd_add_cartridge", "sndAddCartridge", SOUND_TYPE_WEAPON_RECHARGING);
         m_sounds.LoadSound(section, "snd_close_weapon", "sndClose", SOUND_TYPE_WEAPON_RECHARGING);
@@ -243,21 +199,6 @@ void CWeaponShotgun::switch2_Fire2()
     }
 }
 
-//void CWeaponShotgun::UpdateSounds()
-//{
-//    inherited::UpdateSounds();
-//    const auto& pos = get_LastFP();
-//    UpdateSoundPosition("sndShotBoth", pos);
-//    UpdateSoundPosition("sndOpen", pos);
-//    UpdateSoundPosition("sndAddCartridge", pos);
-//    UpdateSoundPosition("sndAddCartridgeSecond", pos);
-//    UpdateSoundPosition("sndAddCartridgeEmpty", pos);
-//    UpdateSoundPosition("sndClose", pos);
-//    UpdateSoundPosition("sndCloseEmpty", pos);
-//    UpdateSoundPosition("sndBreech", pos);
-//    UpdateSoundPosition("sndBreechJammed", pos);
-//}
-
 bool CWeaponShotgun::Action(s32 cmd, u32 flags)
 {
     if (GetCurrentFireMode() == 2)
@@ -292,7 +233,6 @@ bool CWeaponShotgun::Action(s32 cmd, u32 flags)
         switch (cmd)
         {
         case kWPN_FIRE:
-        case kWPN_NEXT:
         case kWPN_RELOAD:
         case kWPN_ZOOM:
             // остановить перезарядку
@@ -544,31 +484,6 @@ u8 CWeaponShotgun::AddCartridge(u8 cnt)
     return cnt;
 }
 
-//void CWeaponShotgun::net_Export(CSE_Abstract* E)
-//{
-//    inherited::net_Export(E);
-//    CSE_ALifeItemWeaponShotGun* sg = smart_cast<CSE_ALifeItemWeaponShotGun*>(E);
-//    sg->m_AmmoIDs.clear();
-//    for (u32 i = 0; i < m_magazine.size(); i++)
-//    {
-//        CCartridge& l_cartridge = *(m_magazine.begin() + i);
-//        sg->m_AmmoIDs.push_back(l_cartridge.m_LocalAmmoType);
-//    }
-//}
-
-//void CWeaponShotgun::TryReload()
-//{
-//    if (m_pCurrentInventory)
-//    {
-//        if (HaveCartridgeInInventory(1) || unlimited_ammo() || (IsMisfire() && iAmmoElapsed))
-//        {
-//            SetPending(TRUE);
-//            SwitchState(eReload);
-//            return;
-//        }
-//    }
-//}
-
 void CWeaponShotgun::ReloadMagazine()
 { //Используется только при отключенном tri_state_reload
     m_dwAmmoCurrentCalcFrame = 0;
@@ -580,21 +495,6 @@ void CWeaponShotgun::ReloadMagazine()
     while (cnt == 0)
         cnt = AddCartridge(1);
 }
-
-//void CWeaponShotgun::StopHUDSounds()
-//{
-//    HUD_SOUND::StopSound(m_sndOpen);
-//    HUD_SOUND::StopSound(m_sndAddCartridge);
-//    HUD_SOUND::StopSound(m_sndAddCartridgeSecond);
-//    HUD_SOUND::StopSound(m_sndAddCartridgeStart);
-//    HUD_SOUND::StopSound(m_sndAddCartridgeEmpty);
-//    HUD_SOUND::StopSound(m_sndClose);
-//    HUD_SOUND::StopSound(m_sndCloseEmpty);
-//    HUD_SOUND::StopSound(m_sndBreech);
-//    HUD_SOUND::StopSound(m_sndBreechJammed);
-//
-//    inherited::StopHUDSounds();
-//}
 
 bool CWeaponShotgun::CanAttach(PIItem pIItem)
 {
@@ -666,10 +566,4 @@ void CWeaponShotgun::InitAddons()
     inherited::InitAddons();
 }
 
-bool CWeaponShotgun::CanBeReloaded()
-{
-    //if (m_bTriStateReload)
-    //    return iAmmoElapsed < iMagazineSize;
-    //return inherited::CanBeReloaded();
-    return iAmmoElapsed < iMagazineSize;
-}
+bool CWeaponShotgun::CanBeReloaded() { return iAmmoElapsed < iMagazineSize; }

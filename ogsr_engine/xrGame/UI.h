@@ -45,6 +45,6 @@ public:
     void HideGameIndicators();
     bool GameIndicatorsShown() { return m_bShowGameIndicators; };
 
-    SDrawStaticStruct* AddInfoMessage(LPCSTR message_static, LPCSTR message_text, bool translate = true);
+    SDrawStaticStruct* AddInfoMessage(LPCSTR message);
     void OnConnected();
 };
