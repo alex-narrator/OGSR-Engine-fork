@@ -82,12 +82,6 @@ constexpr const char* m_sGameObjectDropAction = "game_object_drop"; // Відп�
 static float IReceived = 0;
 static float ICoincidenced = 0;
 
-// skeleton
-static Fbox bbStandBox;
-static Fbox bbCrouchBox;
-static Fvector vFootCenter;
-static Fvector vFootExt;
-
 Flags32 psActorFlags{AF_KEYPRESS_ON_START | AF_CAM_COLLISION | AF_CAM_COLLISION_COP | AF_AI_VOLUMETRIC_LIGHTS | AF_3D_PDA | AF_ALWAYSRUN | AF_FIRST_PERSON_DEATH};
 
 static bool updated{};
