@@ -129,7 +129,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         m_vs.insert(mk_pair(_vs->set_name(name), _vs));
         //_vs->vs				= NULL;
         //_vs->signature		= NULL;
-        if (0 == stricmp(_name, "null"))
+        if (0 == _stricmp(_name, "null"))
         {
             return _vs;
         }
@@ -224,7 +224,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
         SPS* _ps = xr_new<SPS>();
         _ps->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_ps.insert(mk_pair(_ps->set_name(name), _ps));
-        if (0 == stricmp(_name, "null"))
+        if (0 == _stricmp(_name, "null"))
         {
             _ps->sh = nullptr;
             return _ps;
@@ -423,7 +423,7 @@ SGeometry* CResourceManager::CreateGeom(const D3DVERTEXELEMENT9* decl, ID3DVerte
 SGeometry* CResourceManager::CreateGeom(u32 FVF, ID3DVertexBuffer* vb, ID3DIndexBuffer* ib)
 {
     auto dcl = xr_vector<D3DVERTEXELEMENT9>(MAXD3DDECLLENGTH + 1);
-    CHK_DX(FVF::CreateDeclFromFVF(FVF, dcl));
+    R_ASSERT(FVF::CreateDeclFromFVF(FVF, dcl));
     SGeometry* g = CreateGeom(dcl.data(), vb, ib);
     return g;
 }

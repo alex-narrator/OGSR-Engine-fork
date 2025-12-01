@@ -238,8 +238,8 @@ void initialize_bindings()
     {
         u32 action_count = pSettings->line_count(keyboard_section);
 
-        LPCSTR name;
-        LPCSTR value;
+        LPCSTR name{};
+        LPCSTR value{};
 
         size_t id = actions.size();
 
@@ -319,7 +319,7 @@ _action* action_name_to_ptr(LPCSTR _name)
     int idx = 0;
     while (actions[idx].action_name)
     {
-        if (!stricmp(_name, actions[idx].action_name))
+        if (!_stricmp(_name, actions[idx].action_name))
             return &actions[idx];
         ++idx;
     }
@@ -366,7 +366,7 @@ _keyboard* keyname_to_ptr(LPCSTR _name)
     while (keyboards[idx].key_name)
     {
         _keyboard& kb = keyboards[idx];
-        if (!stricmp(_name, kb.key_name))
+        if (!_stricmp(_name, kb.key_name))
             return &keyboards[idx];
         ++idx;
     }

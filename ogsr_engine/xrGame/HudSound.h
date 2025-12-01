@@ -55,7 +55,7 @@ struct HUD_SOUND
     SSnd* m_activeSnd;
     xr_vector<SSnd> sounds;
     shared_str m_alias;
-    bool operator==(LPCSTR alias) const { return 0 == stricmp(m_alias.c_str(), alias); }
+    bool operator==(LPCSTR alias) const { return 0 == _stricmp(m_alias.c_str(), alias); }
 };
 
 class HUD_SOUND_COLLECTION

@@ -84,6 +84,11 @@ gd_master_only = false
 ; Текстуры сеток будут автоматически подстраиваться под любое разрешение экрана.
 scope_textures_autoresize = true
 
+; Поддержка текстурных прицелов в ЗП стиле, когда scope_texture указывает на структуру в scopes.xml
+; Поддержка расширена в виде wpn_crosshair_fallback, который будет использоваться для всех прицелов, который не нашли в scopes.xml
+; для конкретных прицелов fallback можно отключить через wpn_crosshair_fallback = false в секции прицела или оружия
+cop_style_scope_texture = false
+
 ; Включает слоты ножа, бинокля, шлема, биорадара, ПНВ, детектора артефактов, фонаря
 ogse_new_slots = false
 
@@ -214,6 +219,12 @@ equipped_untradable = false
 select_mode_1342 = true
 
 
+;кастомизация цвета индикаторов типа radiation_static в maingame
+;[warning_icon_color]
+;min = 255, 255, 105, 180 ;ARGB
+;max = 255, 0, 180, 255 ;ARGB
+
+
 [user_spots]
 ; Переопределить тип метки, используемой для пользовательских меток на карте. По умолчанию используется red_location
 ;spot_type = red_location
@@ -229,7 +240,7 @@ run_speed      = 6.74
 walk_amplitude = 0.005
 walk_speed     = 6.26
 crouch_k = 0.75
-;zoom_k   = 0.1
+zoom_k   = 0.1
 scope_zoom_k = 0.1
 
 

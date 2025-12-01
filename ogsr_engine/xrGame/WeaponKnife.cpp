@@ -11,7 +11,6 @@
 #include "ai_sounds.h"
 #include "game_cl_single.h"
 #include "game_object_space.h"
-#include "Level_Bullet_Manager.h"
 #include "../xr_3da/x_ray.h"
 
 constexpr auto KNIFE_MATERIAL_NAME = "objects\\knife";

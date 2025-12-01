@@ -275,7 +275,7 @@ bool SelectTexture(const char* label, shared_str& texName)
             strconcat(100, tex, curr_dir, filtered[cur].c_str());
 
             const LPSTR ext = strext(tex);
-            if (ext && (0 == stricmp(ext, ".tga") || 0 == stricmp(ext, ".dds") || 0 == stricmp(ext, ".bmp") || 0 == stricmp(ext, ".ogm")))
+            if (ext && (0 == _stricmp(ext, ".tga") || 0 == _stricmp(ext, ".dds") || 0 == _stricmp(ext, ".bmp") || 0 == _stricmp(ext, ".ogm")))
             {
                 *ext = 0;
             }
@@ -394,7 +394,8 @@ void ShowWeatherEditor(bool& show)
 
     if (SelectTexture("clouds_texture", cur->clouds_texture_name))
     {
-        cur->on_device_create();
+        cur->on_unload();
+        cur->on_prepare();
         changed = true;
     }
 
@@ -441,7 +442,8 @@ void ShowWeatherEditor(bool& show)
         string1024 buf;
         xr_strconcat(buf, cur->sky_texture_name.data(), "#small");
         cur->sky_texture_env_name = buf;
-        cur->on_device_create();
+        cur->on_unload();
+        cur->on_prepare();
         changed = true;
     }
 

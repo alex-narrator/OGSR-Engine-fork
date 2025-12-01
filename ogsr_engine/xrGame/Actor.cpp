@@ -79,10 +79,6 @@ constexpr const char* m_sInventoryBoxUseAction = "inventory_box_use"; // обш�
 constexpr const char* m_sGameObjectThrowDropAction = "game_object_throw_drop"; // Відкинути/відпустити предмет
 constexpr const char* m_sGameObjectDropAction = "game_object_drop"; // Відпустити предмет
 
-const u32 patch_frames = 50;
-const float respawn_delay = 1.f;
-const float respawn_auto = 7.f;
-
 static float IReceived = 0;
 static float ICoincidenced = 0;
 

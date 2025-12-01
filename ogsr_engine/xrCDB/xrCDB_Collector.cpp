@@ -74,72 +74,73 @@ void Collector::add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fv
 #pragma pack(push, 1)
 struct edge
 {
-    u32 face_id : 30;
-    u32 edge_id : 2;
-    u16 vertex_id0;
-    u16 vertex_id1;
+    u32 face_id;
+    u32 edge_id;
+    u32 vertex_id0;
+    u32 vertex_id1;
+
+    static_assert(std::is_same_v<decltype(vertex_id0), std::remove_all_extents_t<decltype(TRI::verts)>>);
+    static_assert(std::is_same_v<decltype(vertex_id1), std::remove_all_extents_t<decltype(TRI::verts)>>);
 };
 #pragma pack(pop)
 
-struct sort_predicate
-{
-    IC bool operator()(const edge& edge0, const edge& edge1) const
-    {
-        if (edge0.vertex_id0 < edge1.vertex_id0)
-            return (true);
-
-        if (edge1.vertex_id0 < edge0.vertex_id0)
-            return (false);
-
-        if (edge0.vertex_id1 < edge1.vertex_id1)
-            return (true);
-
-        if (edge1.vertex_id1 < edge0.vertex_id1)
-            return (false);
-
-        return (edge0.face_id < edge1.face_id);
-    }
-};
-
 void Collector::calc_adjacency(xr_vector<u32>& dest)
 {
-#if 1
-    VERIFY(faces.size() < 65536);
-    const u32 edge_count = faces.size() * 3;
-    edge* edges = (edge*)_alloca(edge_count * sizeof(edge));
+    ZoneScoped;
+
+    const size_t edge_count = faces.size() * 3;
+
+    xr_vector<edge> _edges(edge_count);
+    edge* edges = _edges.data();
+
     edge* i = edges;
-    xr_vector<TRI>::const_iterator B = faces.begin(), I = B;
-    xr_vector<TRI>::const_iterator E = faces.end();
+
+    const auto B = faces.cbegin(), E = faces.cend();
+    auto I = B;
     for (; I != E; ++I)
     {
-        u32 face_id = u32(I - B);
+        const u32 face_id = u32(I - B);
 
-        (*i).face_id = face_id;
-        (*i).edge_id = 0;
-        (*i).vertex_id0 = (u16)(*I).verts[0];
-        (*i).vertex_id1 = (u16)(*I).verts[1];
-        if ((*i).vertex_id0 > (*i).vertex_id1)
-            std::swap((*i).vertex_id0, (*i).vertex_id1);
+        i->face_id = face_id;
+        i->edge_id = 0;
+        i->vertex_id0 = I->verts[0];
+        i->vertex_id1 = I->verts[1];
+        if (i->vertex_id0 > i->vertex_id1)
+            std::swap(i->vertex_id0, i->vertex_id1);
         ++i;
 
-        (*i).face_id = face_id;
-        (*i).edge_id = 1;
-        (*i).vertex_id0 = (u16)(*I).verts[1];
-        (*i).vertex_id1 = (u16)(*I).verts[2];
-        if ((*i).vertex_id0 > (*i).vertex_id1)
-            std::swap((*i).vertex_id0, (*i).vertex_id1);
+        i->face_id = face_id;
+        i->edge_id = 1;
+        i->vertex_id0 = I->verts[1];
+        i->vertex_id1 = I->verts[2];
+        if (i->vertex_id0 > i->vertex_id1)
+            std::swap(i->vertex_id0, i->vertex_id1);
         ++i;
 
-        (*i).face_id = face_id;
-        (*i).edge_id = 2;
-        (*i).vertex_id0 = (u16)(*I).verts[2];
-        (*i).vertex_id1 = (u16)(*I).verts[0];
-        if ((*i).vertex_id0 > (*i).vertex_id1)
-            std::swap((*i).vertex_id0, (*i).vertex_id1);
+        i->face_id = face_id;
+        i->edge_id = 2;
+        i->vertex_id0 = I->verts[2];
+        i->vertex_id1 = I->verts[0];
+        if (i->vertex_id0 > i->vertex_id1)
+            std::swap(i->vertex_id0, i->vertex_id1);
         ++i;
     }
 
-    std::sort(edges, edges + edge_count, sort_predicate());
+    std::sort(_edges.begin(), _edges.end(), [](const edge& edge0, const edge& edge1) {
+        if (edge0.vertex_id0 < edge1.vertex_id0)
+            return true;
+
+        if (edge1.vertex_id0 < edge0.vertex_id0)
+            return false;
+
+        if (edge0.vertex_id1 < edge1.vertex_id1)
+            return true;
+
+        if (edge1.vertex_id1 < edge0.vertex_id1)
+            return false;
+
+        return edge0.face_id < edge1.face_id;
+    });
 
     dest.assign(edge_count, u32(-1));
 
@@ -153,94 +154,16 @@ void Collector::calc_adjacency(xr_vector<u32>& dest)
 
             J = I + 1;
 
-            if ((*I).vertex_id0 != (*J).vertex_id0)
+            if (I->vertex_id0 != J->vertex_id0)
                 continue;
 
-            if ((*I).vertex_id1 != (*J).vertex_id1)
+            if (I->vertex_id1 != J->vertex_id1)
                 continue;
 
-            dest[(*I).face_id * 3 + (*I).edge_id] = (*J).face_id;
-            dest[(*J).face_id * 3 + (*J).edge_id] = (*I).face_id;
+            dest[I->face_id * 3 + I->edge_id] = J->face_id;
+            dest[J->face_id * 3 + J->edge_id] = I->face_id;
         }
     }
-#if 0
-		xr_vector<u32>	test = dest;
-
-		dest.assign		(faces.size()*3,0xffffffff);
-		// Dumb algorithm O(N^2) :)
-		for (u32 f=0; f<faces.size(); f++)
-		{
-			for (u32 t=0; t<faces.size(); t++)
-			{
-				if (t==f)	continue;
-
-				for (u32 f_e=0; f_e<3; f_e++)
-				{
-					u32 f1	= faces[f].verts[(f_e+0)%3];
-					u32 f2	= faces[f].verts[(f_e+1)%3];
-					if (f1>f2)	std::swap(f1,f2);
-
-					for (u32 t_e=0; t_e<3; t_e++)
-					{
-						u32 t1	= faces[t].verts[(t_e+0)%3];
-						u32 t2	= faces[t].verts[(t_e+1)%3];
-						if (t1>t2)	std::swap(t1,t2);
-
-						if (f1==t1 && f2==t2)
-						{
-							// f.edge[f_e] linked to t.edge[t_e]
-							dest[f*3+f_e]	= t;
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		{
-			xr_vector<u32>::const_iterator	I = test.begin();
-			xr_vector<u32>::const_iterator	E = test.end();
-			xr_vector<u32>::const_iterator	J = dest.begin();
-			for ( ; I != E; ++I, ++J) {
-				VERIFY	(*I == *J);
-			}
-		}
-#endif
-#else
-    dest.assign(faces.size() * 3, 0xffffffff);
-    // Dumb algorithm O(N^2) :)
-    for (u32 f = 0; f < faces.size(); f++)
-    {
-        for (u32 t = 0; t < faces.size(); t++)
-        {
-            if (t == f)
-                continue;
-
-            for (u32 f_e = 0; f_e < 3; f_e++)
-            {
-                u32 f1 = faces[f].verts[(f_e + 0) % 3];
-                u32 f2 = faces[f].verts[(f_e + 1) % 3];
-                if (f1 > f2)
-                    std::swap(f1, f2);
-
-                for (u32 t_e = 0; t_e < 3; t_e++)
-                {
-                    u32 t1 = faces[t].verts[(t_e + 0) % 3];
-                    u32 t2 = faces[t].verts[(t_e + 1) % 3];
-                    if (t1 > t2)
-                        std::swap(t1, t2);
-
-                    if (f1 == t1 && f2 == t2)
-                    {
-                        // f.edge[f_e] linked to t.edge[t_e]
-                        dest[f * 3 + f_e] = t;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-#endif
 }
 
 IC BOOL similar(TRI& T1, TRI& T2)

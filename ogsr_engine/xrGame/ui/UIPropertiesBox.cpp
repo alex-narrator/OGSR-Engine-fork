@@ -22,7 +22,7 @@ CUIPropertiesBox::CUIPropertiesBox()
     if (pSettings->section_exist(custom_action_sect))
     {
         u32 action_count = pSettings->line_count(custom_action_sect);
-        LPCSTR name, value;
+        LPCSTR name{}, value{};
         string128 str{};
         for (u32 i = 0; i < action_count; ++i)
         {

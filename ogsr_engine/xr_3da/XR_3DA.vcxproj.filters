@@ -340,6 +340,7 @@
       <Filter>Interfaces\Physics</Filter>
     </ClInclude>
     <ClInclude Include="defines.h" />
+    <ClInclude Include="xrLevel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -572,9 +573,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="stalker.ico">
-      <Filter>General\Resources</Filter>
-    </None>
     <None Include="Effects description.txt" />
     <None Include="features.txt" />
     <None Include="TODO.txt" />
@@ -584,6 +582,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="ui_splash3.png">
+      <Filter>General\Resources</Filter>
+    </Image>
+    <Image Include="stalker.ico">
       <Filter>General\Resources</Filter>
     </Image>
   </ItemGroup>

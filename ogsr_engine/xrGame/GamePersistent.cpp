@@ -490,7 +490,7 @@ void CGamePersistent::start_game_intro()
     if (g_pGameLevel && g_pGameLevel->bReady && Device.dwPrecacheFrame <= 2)
     {
         m_intro_event.bind(this, &CGamePersistent::update_game_intro);
-        if (0 == stricmp(m_game_params.m_new_or_load, "new"))
+        if (0 == _stricmp(m_game_params.m_new_or_load, "new"))
         {
             VERIFY(NULL == m_intro);
             m_intro = xr_new<CUISequencer>();
@@ -513,6 +513,7 @@ void CGamePersistent::update_game_intro()
 #include "holder_custom.h"
 extern CUISequencer* g_tutorial;
 extern CUISequencer* g_tutorial2;
+extern bool RESET_SECTORS_HACK;
 
 void CGamePersistent::OnFrame()
 {
@@ -546,6 +547,8 @@ void CGamePersistent::OnFrame()
         {
             load_screen_renderer.stop();
         }
+
+        RESET_SECTORS_HACK = true;
 
         Discord.Update(CStringTable().translate(Level().name()).c_str(), Level().name().c_str());
     }

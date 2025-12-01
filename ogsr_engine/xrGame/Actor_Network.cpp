@@ -34,6 +34,7 @@
 #include "ui/UIPDAWnd.h"
 #include "ui/UIEncyclopediaWnd.h"
 #include "ui/UIDiaryWnd.h"
+#include "Car.h"
 
 #ifdef DEBUG
 #include "debug_renderer.h"
@@ -267,6 +268,7 @@ void CActor::net_Destroy()
 void CActor::net_Relcase(CObject* O)
 {
     VERIFY(O);
+
     CGameObject* GO = smart_cast<CGameObject*>(O);
     if (GO && m_pObjectWeLookingAt == GO)
     {
@@ -282,6 +284,13 @@ void CActor::net_Relcase(CObject* O)
         m_holder->detach_Actor();
         m_holder = NULL;
     }
+
+    if (m_pending_car == O)
+    {
+        m_pending_car = {};
+        m_pending_car_frames = 0;
+    }
+
     inherited::net_Relcase(O);
 
     memory().remove_links(O);

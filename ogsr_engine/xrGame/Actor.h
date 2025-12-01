@@ -63,6 +63,8 @@ class CLocationManager;
 
 class CActorCameraManager;
 
+class CCar;
+
 struct ActorRestoreParams
 {
     float HealthRestoreSpeed;
@@ -181,7 +183,7 @@ public:
     CGameNewsRegistryWrapper* game_news_registry;
     CCharacterPhysicsSupport* m_pPhysics_support;
 
-    virtual LPCSTR Name() const { return CInventoryOwner::Name(); }
+    LPCSTR Name() override { return CInventoryOwner::Name(); }
 
 public:
     // PhraseDialogManager
@@ -269,6 +271,10 @@ protected:
     bool use_Vehicle(CHolderCustom* object);
     bool use_MountedWeapon(CHolderCustom* object);
     void ActorUse();
+
+private:
+    CCar* m_pending_car{};
+    int m_pending_car_frames{};
 
     /////////////////////////////////////////////////////////
     // actor model & animations
