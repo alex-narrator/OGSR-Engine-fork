@@ -209,10 +209,6 @@ protected:
 
     bool m_bHasChamber{true};
 
-    // затримка перед викиданням гільзи
-    float m_fShellDropDelay{};
-    u32 m_iShellDropTime{};
-
     //переменная блокирует использование
     //только разных типов патронов
     bool m_bLockType{};

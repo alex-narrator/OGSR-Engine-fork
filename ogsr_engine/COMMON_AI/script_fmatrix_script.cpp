@@ -11,7 +11,12 @@
 
 using namespace luabind;
 
-void get_matrix_hpb(Fmatrix* self, float* h, float* p, float* b) { self->getHPB(*h, *p, *b); }
+Fvector get_matrix_hpb(Fmatrix* self)
+{
+    Fvector temp;
+    self->getHPB(temp);
+    return temp;
+}
 void matrix_transform(Fmatrix* self, Fvector* v) { self->transform(*v); }
 
 

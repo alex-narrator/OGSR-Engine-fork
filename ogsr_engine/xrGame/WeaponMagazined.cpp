@@ -158,7 +158,6 @@ void CWeaponMagazined::Load(LPCSTR section)
     m_fire_zoomout_time = READ_IF_EXISTS(pSettings, r_u32, section, "fire_zoomout_time", u32(-1));
 
     m_bHasChamber = READ_IF_EXISTS(pSettings, r_bool, section, "has_chamber", true);
-    m_fShellDropDelay = READ_IF_EXISTS(pSettings, r_float, section, "shell_drop_delay", 0.f);
 
     if (pSettings->line_exist(section, "bullet_bones"))
     {
@@ -511,14 +510,6 @@ void CWeaponMagazined::UpdateCL()
     if (H_Parent() && IsZoomed() && !IsRotatingToZoom() && m_binoc_vision)
         m_binoc_vision->Update();
 
-    if (m_iShellDropTime > 0 && Device.dwTimeGlobal >= m_iShellDropTime)
-    {
-        m_iShellDropTime = 0;
-        Fvector vel;
-        PHGetLinearVell(vel);
-        OnShellDrop(get_LastSP(), vel);
-    }
-
     UpdateSounds();
     UpdateLaser();
     UpdateFlashlight();
@@ -651,13 +642,8 @@ void CWeaponMagazined::OnShot()
 
     // Shell Drop
     Fvector vel;
-    if (fis_zero(m_fShellDropDelay))
-    {
-        PHGetLinearVell(vel);
-        OnShellDrop(get_LastSP(), vel);
-    }
-    else
-        m_iShellDropTime = Device.dwTimeGlobal + m_fShellDropDelay * 1000;
+    PHGetLinearVell(vel);
+    OnShellDrop(get_LastSP(), vel);
 
     // Огонь из ствола
     if (ShouldPlayFlameParticles())

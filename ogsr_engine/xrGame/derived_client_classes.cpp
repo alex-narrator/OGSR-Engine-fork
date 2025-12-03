@@ -254,6 +254,7 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("get_particles_xform", &CWeapon::get_ParticlesXFORM)
                   .def("get_fire_point", &CWeapon::get_CurrentFirePoint)
                   .def("get_fire_point2", &CWeapon::get_CurrentFirePoint2)
+                  .def("get_shell_point", &CWeapon::get_LastSP)
                   .def("get_fire_direction", &CWeapon::get_LastFD)
                   .def("ready_to_kill", &CWeapon::ready_to_kill)
         
@@ -297,8 +298,7 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("set_flashlight_type", &CWeaponMagazined::SetFlashlightType)
                   .def("set_flashlight_on", &CWeaponMagazined::SetFlashlightOn)
                   .def("is_flashlight_on", &CWeaponMagazined::IsFlashlightOn)
-                  .def("switch_flashlight", &CWeaponMagazined::SwitchFlashlight)
-                  .def_readwrite("shell_drop_delay", &CWeaponMagazined::m_fShellDropDelay),
+                  .def("switch_flashlight", &CWeaponMagazined::SwitchFlashlight),
 
               class_<CWeaponMagazinedWGrenade, CWeaponMagazined>("CWeaponMagazinedWGrenade")
                   .def_readwrite("gren_mag_size", &CWeaponMagazinedWGrenade::iMagazineSize2)
