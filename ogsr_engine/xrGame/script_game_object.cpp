@@ -151,6 +151,14 @@ CPhysicsShell* CScriptGameObject::get_physics_shell() const
     return ph_shell_holder->PPhysicsShell();
 }
 
+bool CScriptGameObject::actor_can_capture() const
+{
+    CPhysicsShellHolder* ph_shell_holder = smart_cast<CPhysicsShellHolder*>(&object());
+    if (!ph_shell_holder)
+        return false;
+    return ph_shell_holder->ActorCanCapture();
+}
+
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////

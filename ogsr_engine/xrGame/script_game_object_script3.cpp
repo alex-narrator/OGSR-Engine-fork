@@ -226,6 +226,8 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("set_nonscript_usable", &CScriptGameObject::SetNonscriptUsable)
         .def("get_nonscript_usable", &CScriptGameObject::GetNonscriptUsable)
 
+        .def("actor_can_capture", &CScriptGameObject::actor_can_capture)
+
         // Script Zone
         .def("active_zone_contact", &CScriptGameObject::active_zone_contact)
         .def("inside", (bool(CScriptGameObject::*)(const Fvector&, float) const)(&CScriptGameObject::inside))

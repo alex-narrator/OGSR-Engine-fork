@@ -582,6 +582,7 @@ public:
     Fvector bone_position(LPCSTR bone_name) const;
     bool is_body_turning() const;
     CPhysicsShell* get_physics_shell() const;
+    bool actor_can_capture() const;
     bool weapon_strapped() const;
     bool weapon_unstrapped() const;
     void eat(CScriptGameObject* item);
