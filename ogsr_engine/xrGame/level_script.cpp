@@ -603,8 +603,8 @@ bool check_complex_effector(int id) { return CheckEffector(Actor(), id); };
 
 void set_complex_effector_factor(int id, float factor)
 {
-    if (auto pp = smart_cast<CPostprocessAnimator*>(Actor()->Cameras().GetPPEffector((EEffectorPPType)id)))
-        pp->SetCurrentFactor(factor);
+    if (auto pp = smart_cast<CPostprocessAnimatorLerpConst*>(Actor()->Cameras().GetPPEffector((EEffectorPPType)id)))
+        pp->SetPower(factor);
     if (auto ce = smart_cast<CAnimatorCamLerpEffectorConst*>(Actor()->Cameras().GetCamEffector((ECamEffectorType)id)))
         ce->SetFactor(factor);
 }
