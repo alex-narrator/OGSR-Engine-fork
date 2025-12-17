@@ -201,6 +201,7 @@ void CScriptActor::script_register(lua_State* L)
                .def("set_state_wishful", &CActor::set_state_wishful)
 
                .def_readwrite("clear_crouch", &CActor::b_ClearCrouch)
+               .def_readwrite("clear_accel", &CActor::b_ClearAccel)
 
                .def("IsDetectorActive", &CActor::IsDetectorActive)
                .def_readonly("sound_noise", &CActor::m_snd_noise)

@@ -240,6 +240,7 @@ protected:
     float m_fFallTime;
     float m_fCamHeightFactor{0.87f};
     bool b_ClearCrouch{true};
+    bool b_ClearAccel{true};
 
     // Dropping
     //BOOL b_DropActivated{};

@@ -97,6 +97,13 @@ void CActor::IR_OnKeyboardPress(int cmd)
             mstate_wishful ^= mcCrouch;
     }
     break;
+    case kACCEL: {
+        if (!psActorFlags.test(AF_HOLD_TO_ACCEL))
+            b_ClearAccel = !b_ClearAccel;
+        if (!b_ClearAccel)
+            mstate_wishful ^= mcAccel;
+    }
+    break;
     case kSPRINT: {
         if (IsZoomAimingMode())
         {
@@ -106,6 +113,9 @@ void CActor::IR_OnKeyboardPress(int cmd)
 
         if (!psActorFlags.test(AF_HOLD_TO_CROUCH) && !b_ClearCrouch)
             b_ClearCrouch = true;
+
+        if (!psActorFlags.test(AF_HOLD_TO_ACCEL) && !b_ClearAccel)
+            b_ClearAccel = true;
 
         if (mstate_wishful & mcSprint)
             mstate_wishful &= ~mcSprint;
@@ -207,6 +217,10 @@ void CActor::IR_OnKeyboardRelease(int cmd)
             if (psActorFlags.test(AF_HOLD_TO_CROUCH))
                 b_ClearCrouch = true;
             break;
+        case kACCEL:
+            if (psActorFlags.test(AF_HOLD_TO_ACCEL))
+                b_ClearAccel = true;
+            break;
         }
     }
 }
@@ -263,7 +277,10 @@ void CActor::IR_OnKeyboardHold(int cmd)
         if (eacFreeLook != cam_active)
             cam_Active()->Move(cmd, 0, LookFactor);
         break;
-    case kACCEL: mstate_wishful |= mcAccel; break;
+    case kACCEL:
+        if (psActorFlags.test(AF_HOLD_TO_ACCEL))
+            mstate_wishful |= mcAccel; 
+        break;
     case kL_STRAFE: mstate_wishful |= mcLStrafe; break;
     case kR_STRAFE: mstate_wishful |= mcRStrafe; break;
     case kL_LOOKOUT: mstate_wishful |= mcLLookout; break;
