@@ -56,10 +56,8 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
     XML_NODE* pNode = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
     THROW3(pNode, "encyclopedia article id=", *item_data.id);
 
-    int pic_width{}, pic_height{}, pic_min_size{};
-    pic_width = pXML->ReadAttribInt(pNode, "pic_width", 0);
-    pic_height = pXML->ReadAttribInt(pNode, "pic_height", 0);
-    pic_min_size = pXML->ReadAttribInt(pNode, "pic_min_size", 65);
+    float pic_scale = pXML->ReadAttribFlt(pNode, "pic_scale", 1);
+    bool auto_kx = !!pXML->ReadAttribInt(pNode, "pic_auto_kx", 0);
 
     // текст
     data()->text = pXML->Read(pNode, "text", 0, "");
@@ -82,29 +80,11 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
         Frect r = data()->image.GetUIStaticItem().GetOriginalRect();
         data()->image.SetAutoDelete(false);
 
-        // Сначала устанавливаем если надо минимально допустимые размеры иконки
-        if (r.width() < pic_min_size)
-        {
-            float dx = pic_min_size - r.width();
-            r.x2 += dx;
-            data()->image.SetTextureOffset(dx / 2, data()->image.GetTextureOffeset()[1]);
-        }
-
-        if (r.height() < pic_min_size)
-        {
-            float dy = pic_min_size - r.height();
-            r.y2 += dy;
-            data()->image.SetTextureOffset(data()->image.GetTextureOffeset()[0], dy / 2);
-        }
-
-        if (pic_width && pic_height)
-        {
-            float dx = pic_width - r.width();
-            float dy = pic_height - r.height();
-            r.x2 += dx;
-            r.y2 += dy;
-            data()->image.SetTextureOffset(dx / 2, dy / 2);
-        }
+        float dx = r.width() * pic_scale * (auto_kx ? UI()->get_current_kx() : 1) - r.width();
+        float dy = r.height() * pic_scale - r.height();
+        r.x2 += dx;
+        r.y2 += dy;
+        data()->image.SetTextureOffset(dx / 2, dy / 2);
 
         data()->image.SetWndRect(0, 0, r.width(), r.height());
     };
