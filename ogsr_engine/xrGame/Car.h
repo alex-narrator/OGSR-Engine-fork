@@ -11,6 +11,7 @@
 #include "phcollisiondamagereceiver.h"
 #include "CarDamageParticles.h"
 #include "xrserver_objects_alife.h"
+#include "CarDamageParticles.h"
 #include "hit_immunity.h"
 #include "Explosive.h"
 #include "PHDestroyable.h"
@@ -379,8 +380,6 @@ private:
 
     Fvector m_camera_position;
 
-    bool m_b_weapon_allowed{};
-
 public:
     IC CCameraBase* get_active_camera() { return active_camera; };
 
@@ -519,7 +518,7 @@ private:
     bool DoorHit(float P, s16 element, ALife::EHitType hit_type);
 
 public:
-    virtual bool allowWeapon() const { return m_b_weapon_allowed; }; //	{return true;};
+    virtual bool allowWeapon() const { return false; }; //	{return true;};
     virtual bool HUDView() const;
     virtual Fvector ExitPosition() { return m_exit_position; }
     virtual Fvector ExitVelocity();
@@ -579,8 +578,7 @@ public:
     virtual float SetfHealth(float value) { return CEntity::SetfHealth(value); };
 
     // Hits
-    virtual void HitSignal(float /**HitAmount/**/, Fvector& /**local_dir/**/, CObject* /**who/**/, s16 /**element/**/, int type) {};
-    virtual void HitImpulse(float /**amount/**/, Fvector& /**vWorldDir/**/, Fvector& /**vLocalDir/**/){};
+    virtual void HitSignal(float /**HitAmount/**/, Fvector& /**local_dir/**/, CObject* /**who/**/, s16 /**element/**/){};
     virtual void g_fireParams(CHudItem* /**pHudItem/**/, Fvector& /**P/**/, Fvector& /**D/**/, const bool for_cursor = false) override {}
     virtual u16 Initiator();
     // HUD

@@ -77,6 +77,7 @@
 #include <string>
 #include <functional>
 #include <mutex>
+#include <shared_mutex>
 #include <typeinfo>
 #pragma warning(pop)
 
@@ -162,6 +163,14 @@ public:
     destructor(T* p) { ptr = p; }
     ~destructor() { xr_delete(ptr); }
     IC T& operator()() { return *ptr; }
+};
+
+class Noncopyable
+{
+public:
+    Noncopyable() = default;
+    Noncopyable(const Noncopyable&) = delete;
+    Noncopyable& operator=(const Noncopyable&) = delete;
 };
 
 // ********************************************** The Core definition

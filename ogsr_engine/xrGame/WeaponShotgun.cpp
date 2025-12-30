@@ -387,6 +387,7 @@ void CWeaponShotgun::OnStateSwitch(u32 S, u32 oldState)
         PlayHUDMotion({IsMisfire() ? "anm_close_jammed" : (SecondCartridge ? "anm_close_empty" : "nullptr"), "anim_close_weapon", "anm_close"}, true, GetState());
         PlaySound(((IsMisfire() || SecondCartridge) && SoundExist("sndCloseEmpty")) ? "sndCloseEmpty" : "sndClose", get_LastFP());
         SetPending(TRUE);
+        SecondCartridge = false;
         break;
     }
     };

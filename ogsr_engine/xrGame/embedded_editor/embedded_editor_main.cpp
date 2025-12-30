@@ -5,6 +5,7 @@
 #include "imgui.h"
 
 #include "../../XR_3DA/xr_input.h"
+#include "../../XR_3DA/IGame_Persistent.h"
 #include "xr_level_controller.h"
 
 #include "embedded_editor_main.h"
@@ -63,7 +64,7 @@ void ShowMain()
 
     ImGui::Text("OGSR Editor");
 
-    if (ImGui::Button("Weather"))
+    if (g_pGamePersistent->Environment().USED_COP_WEATHER && ImGui::Button("Weather"))
         show_weather_window = !show_weather_window;
     if (ImGui::Button("Position Informer"))
         show_position_informer = !show_position_informer;
@@ -135,7 +136,7 @@ void ShowEditor()
     //     }
     //     ImGui::End();
     // }
-    if (show_weather_window)
+    if (g_pGamePersistent->Environment().USED_COP_WEATHER && show_weather_window)
         ShowWeatherEditor(show_weather_window);
     if (show_position_informer)
         ShowPositionInformer(show_position_informer);

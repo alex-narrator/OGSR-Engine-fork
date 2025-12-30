@@ -18,7 +18,6 @@ class CScriptGameObject;
 class CLAItem;
 class CHelicopterMovManager;
 class CHelicopter;
-//class HUD_SOUND_COLLECTION_LAYERED;
 
 enum EHeliHuntState
 {
@@ -180,10 +179,8 @@ public:
     u32 m_time_between_rocket_attack;
     bool m_syncronize_rocket;
     float m_barrel_dir_tolerance;
-    //HUD_SOUND m_sndShot;
-    //HUD_SOUND m_sndShotRocket;
-
-    HUD_SOUND_COLLECTION_LAYERED m_sounds{};
+    HUD_SOUND m_sndShot;
+    HUD_SOUND m_sndShotRocket;
 
     Fvector m_fire_dir, m_fire_pos;
 
@@ -244,14 +241,14 @@ protected:
     // sound, light, particles...
     ref_sound m_engineSound;
     ref_sound m_brokenSound;
-    ref_sound m_explodeSound;
-    ref_light m_light_render{};
-    CLAItem* m_lanim{};
+    //	ref_sound						m_explodeSound;
+    ref_light m_light_render;
+    CLAItem* m_lanim;
     u16 m_light_bone, m_smoke_bone;
     float m_light_range, m_light_brightness;
     Fcolor m_light_color;
     shared_str m_smoke_particle;
-    CParticlesObject* m_pParticle{};
+    CParticlesObject* m_pParticle;
     Fmatrix m_particleXFORM;
 
     void StartFlame();
@@ -276,7 +273,7 @@ public:
     void ExplodeHelicopter();
 
     CHelicopter();
-    virtual ~CHelicopter() {};
+    virtual ~CHelicopter();
 
     CHelicopter::EHeliState state() { return m_curState; };
     int state_script() { return m_curState; };
@@ -312,8 +309,7 @@ public:
     virtual void Hit(SHit* pHDS);
     virtual void PHHit(SHit& H);
     // CEntity
-    virtual void HitSignal(float P, Fvector& local_dir, CObject* who, s16 element, int type) { ; }
-    virtual void HitImpulse(float P, Fvector& vWorldDir, Fvector& vLocalDir) { ; }
+    virtual void HitSignal(float P, Fvector& local_dir, CObject* who, s16 element) { ; }
 
     virtual const Fmatrix& get_ParticlesXFORM();
     virtual const Fvector& get_CurrentFirePoint();
