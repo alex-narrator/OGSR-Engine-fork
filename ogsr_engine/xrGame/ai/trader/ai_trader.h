@@ -54,7 +54,7 @@ public:
 
     virtual void Die(CObject* who);
     virtual void Think();
-    virtual void HitSignal(float /**P/**/, Fvector& /**local_dir/**/, CObject* /**who/**/, s16 /**element/**/){};
+    virtual void HitSignal(float /**P/**/, Fvector& /**local_dir/**/, CObject* /**who/**/, s16 /**element/**/, int type) {};
     virtual void Hit(SHit* pHDS);
     virtual void UpdateCL();
 
@@ -82,10 +82,7 @@ public:
     static void BoneCallback(CBoneInstance* B);
     void LookAtActor(CBoneInstance* B);
 
-    void OnStartTrade();
-    void OnStopTrade();
-
-    //игровое имя
+    // игровое имя
     LPCSTR Name() override { return CInventoryOwner::Name(); }
 
     virtual bool can_attach(const CInventoryItem* inventory_item) const;
@@ -107,10 +104,9 @@ public:
         VERIFY(m_sound_player);
         return (*m_sound_player);
     }
-    virtual bool unlimited_ammo() { return false; };
+    virtual bool unlimited_ammo() const { return false; };
     virtual bool natural_weapon() const { return false; }
     virtual bool natural_detector() const { return false; }
-    virtual bool AllowItemToTrade(CInventoryItem const* item, EItemPlace place) const;
 
     void dialog_sound_start(LPCSTR phrase);
     void dialog_sound_stop();

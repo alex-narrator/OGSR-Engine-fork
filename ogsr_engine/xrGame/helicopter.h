@@ -84,7 +84,7 @@ struct SHeliMovementState
     {
         Fvector point;
         float dir_h;
-        STmpPt(const Fvector& p, const float h) : point(p), dir_h(h){};
+        STmpPt(const Fvector& p, const float h) : point(p), dir_h(h) {};
     };
     ~SHeliMovementState();
     CHelicopter* parent;
@@ -179,8 +179,8 @@ public:
     u32 m_time_between_rocket_attack;
     bool m_syncronize_rocket;
     float m_barrel_dir_tolerance;
-    HUD_SOUND m_sndShot;
-    HUD_SOUND m_sndShotRocket;
+
+    HUD_SOUND_COLLECTION_LAYERED m_sounds{};
 
     Fvector m_fire_dir, m_fire_pos;
 
@@ -241,14 +241,14 @@ protected:
     // sound, light, particles...
     ref_sound m_engineSound;
     ref_sound m_brokenSound;
-    //	ref_sound						m_explodeSound;
-    ref_light m_light_render;
-    CLAItem* m_lanim;
+    ref_sound m_explodeSound;
+    ref_light m_light_render{};
+    CLAItem* m_lanim{};
     u16 m_light_bone, m_smoke_bone;
     float m_light_range, m_light_brightness;
     Fcolor m_light_color;
     shared_str m_smoke_particle;
-    CParticlesObject* m_pParticle;
+    CParticlesObject* m_pParticle{};
     Fmatrix m_particleXFORM;
 
     void StartFlame();
@@ -257,9 +257,9 @@ protected:
     void TurnLighting(bool bOn);
     void TurnEngineSound(bool bOn);
     // explosive
-    virtual void OnAfterExplosion(){};
+    virtual void OnAfterExplosion() {};
     virtual void GetRayExplosionSourcePos(Fvector& pos) { random_point_in_object_box(pos, this); }
-    virtual void ActivateExplosionBox(const Fvector& size, Fvector& in_out_pos){};
+    virtual void ActivateExplosionBox(const Fvector& size, Fvector& in_out_pos) {};
     // general
     EHeliState m_curState;
 
@@ -273,7 +273,7 @@ public:
     void ExplodeHelicopter();
 
     CHelicopter();
-    virtual ~CHelicopter();
+    virtual ~CHelicopter() {};
 
     CHelicopter::EHeliState state() { return m_curState; };
     int state_script() { return m_curState; };
@@ -289,7 +289,7 @@ public:
 
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual void net_Export(CSE_Abstract* E){};
+    virtual void net_Export(CSE_Abstract* E) {};
     virtual void net_Relcase(CObject* O);
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
@@ -309,7 +309,7 @@ public:
     virtual void Hit(SHit* pHDS);
     virtual void PHHit(SHit& H);
     // CEntity
-    virtual void HitSignal(float P, Fvector& local_dir, CObject* who, s16 element) { ; }
+    virtual void HitSignal(float P, Fvector& local_dir, CObject* who, s16 element, int type) { ; }
 
     virtual const Fmatrix& get_ParticlesXFORM();
     virtual const Fvector& get_CurrentFirePoint();

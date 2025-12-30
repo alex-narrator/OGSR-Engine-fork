@@ -80,7 +80,7 @@ public:
     virtual void shedule_Update(u32 DT);
     virtual void UpdateCL();
 
-    virtual void HitSignal(float HitAmount, Fvector& local_dir, CObject* who, s16 element) {}
+    virtual void HitSignal(float HitAmount, Fvector& local_dir, CObject* who, s16 element, int type) {}
     virtual void Hit(SHit* pHDS);
 
     virtual BOOL IsVisibleForHUD() { return false; }
