@@ -159,9 +159,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cl_intersect.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRenderDX10\DXCommonTypes.h">
       <Filter>Kernel</Filter>
     </ClInclude>
@@ -826,9 +823,6 @@
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r4_rendertarget_draw_volume.cpp">
-      <Filter>Core_Target</Filter>
-    </ClCompile>
-    <ClCompile Include="r4_rendertarget_enable_scissor.cpp">
       <Filter>Core_Target</Filter>
     </ClCompile>
     <ClCompile Include="r4_rendertarget_phase_accumulator.cpp">

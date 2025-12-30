@@ -2,7 +2,7 @@
 #include "xr_area.h"
 #include "xr_collide_form.h"
 #include "xr_object.h"
-#include "cl_intersect.h"
+#include "../xrCDB/cl_intersect.h"
 
 #include "igame_level.h"
 #include "x_ray.h"
@@ -164,6 +164,8 @@ BOOL CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
 {
     ZoneScoped;
 
+    ZoneValue(R.range);
+
     // initialize query
     r_dest.r_clear();
     collide::rq_results r_temp;
@@ -207,6 +209,7 @@ BOOL CObjectSpace::_RayQuery(collide::rq_results& r_dest, const collide::ray_def
             }
         }
     }
+
     if (r_temp.r_count())
     {
         r_temp.r_sort();

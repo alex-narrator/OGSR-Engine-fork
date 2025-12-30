@@ -24,6 +24,8 @@ float psSoundTimeFactor = 1.0f; //--#SM+#--
 float psSoundVMusic = 1.f;
 int psSoundCacheSizeMB = 32;
 
+BOOL snd_enable_float_pcm{TRUE};
+
 CSoundRender_Core* SoundRender = 0;
 CSound_manager_interface* Sound = 0;
 
@@ -96,7 +98,7 @@ void CSoundRender_Core::_initialize(int stage)
     env_load();
 
     // Cache
-    cache_bytes_per_line = (sdef_target_block / 8) * 276400 / 1000;
+    cache_bytes_per_line = (sdef_target_block / 8) * 352800 / 1000;
     cache.initialize(psSoundCacheSizeMB * 1024, cache_bytes_per_line);
 }
 
@@ -256,7 +258,7 @@ void CSoundRender_Core::set_geometry_som(IReader* I)
             CL.add_face_packed_D(P.v3, P.v2, P.v1, *(size_t*)&P.occ, 0.01f);
     }
     geom_SOM = xr_new<CDB::MODEL>();
-    geom_SOM->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()), nullptr, nullptr, false);
+    geom_SOM->build(CL.getV(), CL.getVS(), CL.getT(), CL.getTS());
 
     geom->close();
 }
@@ -490,7 +492,7 @@ CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
             CDB::RESULT* r = geom_DB.r_begin();
 
             CDB::TRI* T = geom_ENV->get_tris() + r->id;
-            Fvector* V = geom_ENV->get_verts();
+            const Fvector* V = geom_ENV->get_verts();
 
             Fvector tri_norm;
             tri_norm.mknormal(V[T->verts[0]], V[T->verts[1]], V[T->verts[2]]);
