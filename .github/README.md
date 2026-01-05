@@ -26,7 +26,7 @@
 ### [Write here](https://github.com/OGSR/OGSR-Engine/discussions) your suggestions, questions and everything else ###
 
 ### Build requirements:
-* Latest version of Visual Studio 2022 with Desktop C++ workload setup
+* Latest version of Visual Studio 2022 or 2026 with Desktop C++ workload setup
 * [Git](https://git-scm.com/)
 ### Compilation guide: ###
 * Clone repository locally
@@ -68,7 +68,7 @@ And everyone else whose work has been used. If you are not mentioned, send a mes
 ### Предложения, вопросы и прочее можно писать [сюда](https://github.com/OGSR/OGSR-Engine/discussions) ###
 
 ### Требования для сборки:
-* Актуальная версия Visual Studio 2022 с рабочей нагрузкой "Разработка классических приложений на C++"
+* Актуальная версия Visual Studio 2022 или 2026 с рабочей нагрузкой "Разработка классических приложений на C++"
 * [Git](https://git-scm.com/)
 ### Инструкции по сборке: ###
 * Склонировать репозиторий локально
