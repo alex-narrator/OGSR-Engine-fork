@@ -653,6 +653,14 @@ bool CHudItem::AnimationExist(const char* anim_name) const
     return false;
 }
 
+bool CHudItem::AnimationExist(std::initializer_list<const char*> Ms) const
+{
+    for (const auto* M : Ms)
+        if (AnimationExist(M))
+            return true;
+    return false;
+}
+
 void CHudItem::PlayAnimIdleMoving()
 {
     auto wpn = smart_cast<CWeapon*>(this);

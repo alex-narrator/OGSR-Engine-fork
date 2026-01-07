@@ -65,12 +65,12 @@ void CActor::g_fireParams(CHudItem* pHudItem, Fvector& fire_pos, Fvector& fire_d
     fire_dir = Cameras().Direction();
     fire_pos = Cameras().Position();
 
-    if (smart_cast<CMissile*>(pHudItem) && !for_cursor)
+    if (auto pMissile = smart_cast<CMissile*>(pHudItem); pMissile && !for_cursor)
     {
         Fvector offset;
-        XFORM().transform_dir(offset, m_vMissileOffset);
+        // XFORM().transform_dir(offset, m_vMissileOffset);
         // KRodin: TODO: В ЗП здесь код отличается. В ТЧ юзается m_vMissileOffset, в ЗП - pMissile->throw_point_offset().
-        // XFORM().transform_dir(offset, pMissile->throw_point_offset());
+        XFORM().transform_dir(offset, pMissile->throw_point_offset());
         fire_pos.add(offset);
     }
     else if (auto weapon = smart_cast<CWeapon*>(pHudItem);

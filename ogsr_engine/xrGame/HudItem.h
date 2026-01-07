@@ -182,6 +182,7 @@ public:
     u32 PlayHUDMotion_noCB(const shared_str& M, const bool bMixIn, const bool randomAnim = true, float speed = 1.f);
 
     bool AnimationExist(const char* M) const;
+    bool AnimationExist(std::initializer_list<const char*> Ms) const;
     void StopCurrentAnimWithoutCallback();
 
     attachable_hud_item* HudItemData() const;

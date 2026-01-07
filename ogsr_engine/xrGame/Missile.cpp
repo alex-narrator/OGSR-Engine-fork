@@ -40,10 +40,12 @@ void CMissile::Load(LPCSTR section)
 
     m_fMinForce = pSettings->r_float(section, "force_min");
     m_fMaxForce = pSettings->r_float(section, "force_max");
+    m_fConstForce = READ_IF_EXISTS(pSettings, r_float, section, "force_const", (m_fMinForce + m_fMaxForce) * 0.5f);
 
     m_dwDestroyTimeMax = pSettings->r_u32(section, "destroy_time");
 
     m_vThrowPoint = pSettings->r_fvector3(section, "throw_point");
+    m_vThrowPointAlt = READ_IF_EXISTS(pSettings, r_fvector3, section, "throw_point_alt", m_vThrowPoint);
     m_vThrowDir = pSettings->r_fvector3(section, "throw_dir");
     m_vHudThrowPoint = pSettings->r_fvector3(*hud_sect, "throw_point");
     m_vHudThrowDir = pSettings->r_fvector3(*hud_sect, "throw_dir");
@@ -217,18 +219,27 @@ void CMissile::State(u32 state, u32 oldState)
     case eThrowStart: {
         SetPending(TRUE);
         m_fThrowForce = m_fMinForce;
-        PlayHUDMotion({"anim_throw_begin", "anm_throw_begin"}, true, GetState());
+        if (!m_constpower && AnimationExist({"anim_throw_begin_alt", "anm_throw_begin_alt"}))
+            PlayHUDMotion({"anim_throw_begin_alt", "anm_throw_begin_alt"}, true, GetState());
+        else
+            PlayHUDMotion({"anim_throw_begin", "anm_throw_begin"}, true, GetState());
         PlaySound("sndThrow", Position());
     }
     break;
     case eReady: {
-        PlayHUDMotion({"anim_throw_idle", "anm_throw_idle"}, true, GetState());
+        if (!m_constpower && AnimationExist({"anim_throw_idle_alt", "anm_throw_idle_alt"}))
+            PlayHUDMotion({"anim_throw_idle_alt", "anm_throw_idle_alt"}, true, GetState());
+        else
+            PlayHUDMotion({"anim_throw_idle", "anm_throw_idle"}, true, GetState());
     }
     break;
     case eThrow: {
         SetPending(TRUE);
         m_throw = false;
-        PlayHUDMotion({"anim_throw_act", "anm_throw"}, true, GetState());
+        if (!m_constpower && AnimationExist({"anim_throw_act_alt", "anm_throw_alt"}))
+            PlayHUDMotion({"anim_throw_act_alt", "anm_throw_alt"}, true, GetState());
+        else
+            PlayHUDMotion({"anim_throw_act", "anm_throw"}, true, GetState());
         m_throwMotionMarksAvailable = m_current_motion_def && !m_current_motion_def->marks.empty();
     }
     break;
@@ -430,10 +441,7 @@ void CMissile::Throw()
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(H_Parent());
     VERIFY(inventory_owner);
     if (inventory_owner->use_default_throw_force())
-    {
-        float f_const_force = (m_fMinForce + m_fMaxForce) / 2;
-        m_fake_missile->m_fThrowForce = m_constpower ? f_const_force : m_fThrowForce;
-    }
+        m_fake_missile->m_fThrowForce = m_constpower ? m_fConstForce : m_fThrowForce;
     else
         m_fake_missile->m_fThrowForce = inventory_owner->missile_throw_force();
 
