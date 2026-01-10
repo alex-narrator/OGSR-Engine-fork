@@ -13,6 +13,7 @@ struct ECORE_API STextureParams
         ttTerrain,
         ttForceU32 = u32(-1)
     };
+
     enum ETFormat
     {
         tfDXT1 = 0,
@@ -31,6 +32,7 @@ struct ECORE_API STextureParams
         tfA8L8,
         tfForceU32 = u32(-1)
     };
+
     enum ETBumpMode
     {
         tbmResereved = 0,
@@ -39,6 +41,7 @@ struct ECORE_API STextureParams
         tbmUseParallax,
         tbmForceU32 = u32(-1)
     };
+
     enum ETMaterial
     {
         tmOrenNayar_Blin = 0,
@@ -47,6 +50,7 @@ struct ECORE_API STextureParams
         tmMetal_OrenNayar,
         tmForceU32 = u32(-1)
     };
+
     enum
     {
         kMIPFilterAdvanced = 5,
@@ -80,8 +84,6 @@ struct ECORE_API STextureParams
         flFadeToAlpha = (1 << 7),
         flDitherColor = (1 << 8),
         flDitherEachMIPLevel = (1 << 9),
-        //		flGreyScale			= (1<<10),	// obsolette
-
         flDiffuseDetail = (1 << 23),
         flImplicitLighted = (1 << 24),
         flHasAlpha = (1 << 25),
@@ -116,7 +118,6 @@ struct ECORE_API STextureParams
     STextureParams() { Clear(); }
 
     IC void destroy_shared_str(shared_str& object) { object.~shared_str(); }
-
     IC void construct_shared_str(shared_str& object) { ::new (&object) shared_str(); }
 
     IC void Clear()
@@ -141,33 +142,10 @@ struct ECORE_API STextureParams
         bump_virtual_height = 0.05f;
     }
 
-    IC BOOL HasAlpha() const
-    {
-        // исходная текстура содержит альфа канал
-        return flags.is(flHasAlpha);
-    }
-    IC BOOL HasAlphaChannel() // игровая текстура содержит альфа канал
-    {
-        switch (fmt)
-        {
-        case tfADXT1:
-        case tfDXT3:
-        case tfDXT5:
-        case tf4444:
-        case tf1555:
-        case tfRGBA: return TRUE;
-        default: return FALSE;
-        }
-    }
     void Load(IReader& F, const char* dbg_name);
     void Save(IWriter& F);
 };
 #pragma pack(pop)
-
-struct xr_token;
-extern xr_token tparam_token[];
-extern xr_token tfmt_token[];
-extern xr_token ttype_token[];
 
 //----------------------------------------------------
 #define THM_CHUNK_VERSION 0x0810

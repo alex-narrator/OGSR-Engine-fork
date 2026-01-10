@@ -61,12 +61,13 @@ void light::vis_prepare(CBackend& cmd_list)
     //	Hack: Igor. Light is visible if it's frutum is visible. (Only for volumetric)
     //	Hope it won't slow down too much since there's not too much volumetric lights
     //	TODO: sort for performance improvement if this technique hurts
-    if ((flags.type == IRender_Light::SPOT) && flags.bShadow && flags.bVolumetric && ps_ssfx_volumetric.x > 0)
+    if ((flags.type == IRender_Light::SPOT) && flags.bShadow && flags.bVolumetric)
         cmd_list.set_Stencil(FALSE);
     else
         cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);
 
-    RImplementation.Target->draw_volume(cmd_list, this);
+    RImplementation.Target->geom_volume(cmd_list, this);
+    RImplementation.Target->render_volume(cmd_list, this);
     RImplementation.occq_end(vis.query_id, cmd_list.context_id);
 }
 

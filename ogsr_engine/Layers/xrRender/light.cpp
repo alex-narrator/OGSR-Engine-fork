@@ -23,8 +23,6 @@ light::light(void) : ISpatial(g_SpatialSpace)
     cone = deg2rad(60.f);
     color.set(1, 1, 1, 1);
 
-    m_volumetric_quality = 1;
-    // m_volumetric_quality	= 0.5;
     m_volumetric_intensity = 0.3;
     m_volumetric_distance = 1;
 
@@ -90,13 +88,11 @@ void light::set_texture(LPCSTR name)
         // default shaders
         s_spot.destroy();
         s_point.destroy();
-        s_volumetric.destroy();
         return;
     }
 
     s_spot = GetCachedShader("accum_spot", name);
     s_point = GetCachedShader("accum_omni", name);
-    s_volumetric = GetCachedShader("accum_volumetric", name);
 }
 
 void light::set_active(bool b)
@@ -463,11 +459,9 @@ void light::export_to(light_Package& package)
 
                 L->s_spot = s_spot;
                 L->s_point = s_point;
-                L->s_volumetric = s_volumetric;
 
                 //	Igor: add volumetric support
                 L->flags.bVolumetric = flags.bVolumetric;
-                L->set_volumetric_quality(m_volumetric_quality);
                 L->set_volumetric_intensity(m_volumetric_intensity);
                 L->set_volumetric_distance(m_volumetric_distance);
 

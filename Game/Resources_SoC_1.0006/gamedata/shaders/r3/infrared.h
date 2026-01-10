@@ -4,15 +4,7 @@
 #include "common.h"
 #include "night_vision.h"
 
-#ifdef USE_MSAA
-#ifndef SM_5
-Texture2DMS<float4, MSAA_SAMPLES> s_heat;
-#else
-Texture2DMS<float4> s_heat;
-#endif
-#else
 Texture2D s_heat;
-#endif
 
 uniform float4 heat_vision_steps;
 uniform float4 heat_vision_blurring;
@@ -68,7 +60,7 @@ float3 greyscale(float3 img)
     return float3(Y, Y, Y);
 }
 
-float3 infrared(gbuffer_data gbd, float3 original, float depth, float2 HPos, float2 Tex0)
+float3 infrared(float3 N, float3 original, float depth, float2 HPos, float2 Tex0)
 {
     // r_pnv_mode = 0 - disable
     // r_pnv_mode = 1 - normal pnv
@@ -101,7 +93,7 @@ float3 infrared(gbuffer_data gbd, float3 original, float depth, float2 HPos, flo
         }
         else
         {
-            float projection = dot(normalize(gbd.N), float3(0.0, 0.0, -1.0));
+            float projection = dot(normalize(N), float3(0.0, 0.0, -1.0));
             mixed = lerp(color_background_min, color_background_max, projection);
         }
     }
@@ -150,7 +142,7 @@ float3 infrared(gbuffer_data gbd, float3 original, float depth, float2 HPos, flo
         }
         else
         {
-            float projection = dot(normalize(gbd.N), float3(0.0, 0.0, -1.0));
+            float projection = dot(normalize(N), float3(0.0, 0.0, -1.0));
 
             float FADE_DISTANCE_START = heat_fade_distance.x; // shader_param_fade_distance.x; // 5.0f;   // 13.0
             float FADE_DISTANCE_END = heat_fade_distance.y; // shader_param_fade_distance.y; // 10.0f;     // 20.0

@@ -37,23 +37,17 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
     cmd_list.set_xform_view(Device.mView);
     cmd_list.set_xform_project(Device.mProject);
 
-    // *****************************	Mask by stencil		*************************************
-    // *** similar to "Carmack's reverse", but assumes convex, non intersecting objects,
-    // *** thus can cope without stencil clear with 127 lights
-    // *** in practice, 'cause we "clear" it back to 0x1 it usually allows us to > 200 lights :)
-    cmd_list.set_Element(s_accum_mask->E[SE_MASK_POINT]); // masker
-    //	Done in blender!
-    // cmd_list.set_ColorWriteEnable		(FALSE);
+    cmd_list.set_Element(s_accum_mask->E[SE_MASK_POINT]);
+    geom_volume(cmd_list, L);
 
-    // backfaces: if (1<=stencil && zfail)	stencil = light_id
     cmd_list.set_CullMode(CULL_CW);
     cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0x01, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE);
-    draw_volume(cmd_list, L);
+    render_volume(cmd_list, L);
 
     // frontfaces: if (1<=stencil && zfail)	stencil = 0x1
     cmd_list.set_CullMode(CULL_CCW);
     cmd_list.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE);
-    draw_volume(cmd_list, L);
+    render_volume(cmd_list, L);
 
     // *****************************	Minimize overdraw	*************************************
     // Select shader (front or back-faces), *** back, if intersect near plane
@@ -96,7 +90,7 @@ void CRenderTarget::accum_point(CBackend& cmd_list, light* L)
         cmd_list.set_CullMode(CULL_CW); // back
         // Render if (light_id <= stencil && z-pass)
         cmd_list.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
-        draw_volume(cmd_list, L);
+        render_volume(cmd_list, L);
     }
 
     // dwLightMarkerID					+=	2;	// keep lowest bit always setted up

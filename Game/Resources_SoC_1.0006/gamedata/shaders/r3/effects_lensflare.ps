@@ -34,10 +34,7 @@ float4 main(flare I) : SV_Target
     final.rgb = (glow + flare) * (1.0 - flare_params.x);
 
     float2 tcProj = I.tc2.xy / I.tc2.w;
-    gbuffer_data gbd = gbuffer_load_data(tcProj, I.hpos);
-    float4 _P = float4(gbd.P, gbd.mtl);
-
-    float spaceDepth = gbd.P.z;
+    float spaceDepth = gbuffer_load_depth(tcProj);
     if (spaceDepth < 0.01f)
         spaceDepth = 100000.0f; //  filter for skybox
 

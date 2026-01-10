@@ -1,10 +1,9 @@
 local function elemets(shader, t_base, t_second, t_detail, s_image)
-	shader:begin("stub_screen_space", "ogsr_blur")
+	shader:begin("ogsr_blur", "ogsr_blur")
 		:fog(false)
 		:zb(false, false)
 	shader:dx10texture("s_image", s_image)
 	shader:dx10texture("s_position", "$user$position")
-	//shader:dx10texture("s_lut_atlas", "shaders\\lut_atlas")
 
 	shader:dx10sampler("smp_nofilter")
 	shader:dx10sampler("smp_rtlinear")

@@ -70,36 +70,6 @@ IC bool pred_energy(const CROS_impl::Light& L1, const CROS_impl::Light& L2) { re
 #pragma warning(push)
 #pragma warning(disable : 4305)
 
-// const float		hdir		[lt_hemisamples][3] =
-// {
-// 	{0.00000,	1.00000,	0.00000	},
-// 	{0.52573,	0.85065,	0.00000	},
-// 	{0.16246,	0.85065,	0.50000	},
-// 	{-0.42533,	0.85065,	0.30902	},
-// 	{-0.42533,	0.85065,	-0.30902},
-// 	{0.16246,	0.85065,	-0.50000},
-// 	{0.89443,	0.44721,	0.00000	},
-// 	{0.27639,	0.44721,	0.85065	},
-// 	{-0.72361,	0.44721,	0.52573	},
-// 	{-0.72361,	0.44721,	-0.52573},
-// 	{0.27639,	0.44721,	-0.85065},
-// 	{0.68819,	0.52573,	0.50000	},
-// 	{-0.26287,	0.52573,	0.80902	},
-// 	{-0.85065,	0.52573,	-0.00000},
-// 	{-0.26287,	0.52573,	-0.80902},
-// 	{0.68819,	0.52573,	-0.50000},
-// 	{0.95106,	0.00000,	0.30902	},
-// 	{0.58779,	0.00000,	0.80902	},
-// 	{-0.00000,	0.00000,	1.00000	},
-// 	{-0.58779,	0.00000,	0.80902	},
-// 	{-0.95106,	0.00000,	0.30902	},
-// 	{-0.95106,	0.00000,	-0.30902},
-// 	{-0.58779,	0.00000,	-0.80902},
-// 	{0.00000,	0.00000,	-1.00000},
-// 	{0.58779,	0.00000,	-0.80902},
-// 	{0.95106,	0.00000,	-0.30902}
-// };
-
 const float hdir[lt_hemisamples][3] = {
     {-0.26287, 0.52573, 0.80902},  {0.27639, 0.44721, 0.85065},   {-0.95106, 0.00000, 0.30902},
     {-0.95106, 0.00000, -0.30902}, {0.58779, 0.00000, -0.80902},  {0.58779, 0.00000, 0.80902},
@@ -116,24 +86,6 @@ const float hdir[lt_hemisamples][3] = {
     {-0.42533, 0.85065, -0.30902}, {0.68819, 0.52573, 0.50000},
 };
 #pragma warning(pop)
-
-// inline CROS_impl::CubeFaces CROS_impl::get_cube_face(Fvector3& dir)
-//{
-//	float x2 = dir.x*dir.x;
-//	float y2 = dir.y*dir.y;
-//	float z2 = dir.z*dir.z;
-//
-//	if (x2 >= y2 + z2)
-//	{
-//		return (dir.x > 0) ? CUBE_FACE_POS_X : CUBE_FACE_NEG_X;
-//	}
-//	else if (y2 >= z2 + x2)
-//	{
-//		return (dir.y > 0) ? CUBE_FACE_POS_Y : CUBE_FACE_NEG_Y;
-//	}
-//	/*else*/
-//	return (dir.z > 0) ? CUBE_FACE_POS_Z : CUBE_FACE_NEG_Z;
-// }
 
 inline void CROS_impl::accum_hemi(float* hemi_cube, const Fvector3& dir, const float scale)
 {
@@ -163,11 +115,7 @@ void CROS_impl::update(IRenderable* O)
     if (!dwFrame.compare_exchange_strong(expected_frame, Device.dwFrame) || expected_frame == Device.dwFrame)
         return;
 
-    // clip & verify
-
-    if (nullptr == O)
-        return;
-    if (nullptr == O->renderable.visual)
+    if (!O || !O->renderable.visual)
         return;
 
     VERIFY(smart_cast<CROS_impl*>(O->renderable_ROS()));

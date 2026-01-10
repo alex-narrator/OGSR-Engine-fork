@@ -629,8 +629,6 @@ dxRender_Visual* CModelPool::CreateParticles(LPCSTR name, BOOL bNoPool)
             Model = it->second;
             Model->Spawn();
             Pool.erase(it);
-
-            //Msg("used pool model [%s]", name);
         }
 
         ModelsPool_lock.unlock();
@@ -664,8 +662,6 @@ dxRender_Visual* CModelPool::CreateParticles(LPCSTR name, BOOL bNoPool)
 
 dxRender_Visual* CModelPool::CreateParticleEffect(LPCSTR name)
 {
-    // disabled polling for direct effects
-
     ZoneScoped;
 
     string_path low_name;
@@ -673,31 +669,11 @@ dxRender_Visual* CModelPool::CreateParticleEffect(LPCSTR name)
 
     dxRender_Visual* Model{};
 
-    //{
-    //    ModelsPool_lock.lock();
-
-    //    // 0. Search POOL
-    //    const POOL_IT it = Pool.find(low_name);
-    //    if (it != Pool.end())
-    //    {
-    //        // 1. Instance found
-    //        Model = it->second;
-    //        Model->Spawn();
-    //        Pool.erase(it);
-    //    }
-
-    //    ModelsPool_lock.unlock();
-    //}
-
     if (!Model)
     {
         PS::CPEDef* effect = RImplementation.PSLibrary.FindPED(name);
         R_ASSERT(effect, "Particle effect doesn't exist", name);
         Model = CreatePE(effect);
-
-        //Registry_lock.lock();
-        //Registry.emplace(Model, low_name);
-        //Registry_lock.unlock();
     }
 
     return Model;

@@ -957,7 +957,7 @@
 		<text>This setting adjusts the viewing angle at which shadows are normally drawn. If this angle is not sufficient, extra triangular shadows will be constantly visible at the edges of the screen. It is recommended to keep the setting at maximum.</text>
 	</string>
 	<string id="video_settings_desc_24">
-		<text>This effect may not look good on all ground textures because correct heightmaps are required for all ground textures.</text>
+		<text>Enables the parallax effect on terrain with puddles in depressions. %c[red] For proper work, you'll need to adjust the terrain settings, textures, and their bumps, and adjust the ssfx_terrain_offset for each texture. For details, see the OGSR WIKI.</text>
 	</string>
 	<string id="video_settings_desc_25">
 		<text>This setting enables the HDR Tone mapping effect. It improves the image by accentuating details that would not be sufficiently contrasting without this effect - small elements, edges, while not making the image excessively bright.</text>

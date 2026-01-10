@@ -279,14 +279,12 @@ protected:
     bool IdleLight{};
     bool IdleLightShadow{};
     bool IdleLightVolumetric{};
-    float IdleLightVolumetricQuality{};
     float IdleLightVolumetricIntensity{};
     float IdleLightVolumetricDistance{};
 
     bool BlowoutLight{};
     bool BlowoutLightShadow{};
     bool BlowLightVolumetric{};
-    float BlowLightVolumetricQuality{};
     float BlowLightVolumetricIntensity{};
     float BlowLightVolumetricDistance{};
 

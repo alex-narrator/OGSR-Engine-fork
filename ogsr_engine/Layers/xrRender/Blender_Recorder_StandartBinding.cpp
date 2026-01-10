@@ -628,6 +628,16 @@ static class ssfx_pom: public R_constant_setup
     void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, ps_ssfx_pom); }
 } ssfx_pom;
 
+static class ssfx_terrain_pom final : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, ps_ssfx_terrain_pom); }
+} ssfx_terrain_pom;
+
+static class ssfx_terrain_offset final : public R_constant_setup
+{
+    void setup(CBackend& cmd_list, R_constant* C) override { cmd_list.set_c(C, ps_ssfx_terrain_offset); }
+} ssfx_terrain_offset;
+
 static class cl_taa_jitter final : public R_constant_setup
 {
     void setup(CBackend& cmd_list, R_constant* C) override
@@ -869,7 +879,10 @@ void CBlender_Compile::SetMapping() const
 
     r_Constant("ssfx_bloom_1", &ssfx_bloom_1);
     r_Constant("ssfx_bloom_2", &ssfx_bloom_2);
+
     r_Constant("ssfx_pom", &ssfx_pom);
+    r_Constant("ssfx_terrain_pom", &ssfx_terrain_pom);
+    r_Constant("ssfx_terrain_offset", &ssfx_terrain_offset);
 
     r_Constant("pnv_param_1", &pnv_param_1);
     r_Constant("pnv_param_2", &pnv_param_2);

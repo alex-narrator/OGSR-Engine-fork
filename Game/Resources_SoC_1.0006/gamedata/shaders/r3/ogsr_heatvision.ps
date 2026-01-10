@@ -22,8 +22,7 @@ float4 main(p_screen I) : SV_Target
                                frac(sin(dot(I.tc0 - fmod(I.tc0, float2(3.0, 3.0) / screen_res.xy), float2(12.0, 78.0) + (timers.x))) * 78372.0),
                                frac(sin(dot(I.tc0, float2(12.0, 78.0) + (timers.x))) * 37857.0));
 
-        gbuffer_data gbd = gbuffer_load_data(I.tc0, I.hpos, 0);
-        image.rgb = infrared(gbd, image, gbd.P.z, I.hpos, I.tc0);
+        image.rgb = infrared(gbuffer_load_normal(I.tc0), image, gbuffer_load_depth(I.tc0), I.hpos, I.tc0);
 
         // APPLY CRT EFFECT
         // image = lerp(image,make_crt_ified(half_res_blur, I.tc0),pnv_param_3.y); // Adds a CRT effect that I think looks better than draw_scanlines

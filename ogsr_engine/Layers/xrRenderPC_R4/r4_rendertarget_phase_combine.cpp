@@ -66,24 +66,6 @@ void CRenderTarget::phase_combine(CBackend& cmd_list)
             sundir.set(L_dir.x, L_dir.y, L_dir.z, 0);
         }
 
-        // Fill VB
-        float scale_X = float(Device.dwWidth) / float(TEX_jitter);
-        float scale_Y = float(Device.dwHeight) / float(TEX_jitter);
-
-        u32 Offset{};
-
-        // Fill vertex buffer
-        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
-        pv->set(-1, 1, 0, 1, 0, 0, scale_Y);
-        pv++;
-        pv->set(-1, -1, 0, 0, 0, 0, 0);
-        pv++;
-        pv->set(1, 1, 1, 1, 0, scale_X, scale_Y);
-        pv++;
-        pv->set(1, -1, 1, 0, 0, scale_X, 0);
-        pv++;
-        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
-
         dxEnvDescriptorMixerRender& envdescren = *smart_cast<dxEnvDescriptorMixerRender*>(&*envdesc.m_pDescriptorMixer);
 
         // Setup textures
@@ -94,7 +76,7 @@ void CRenderTarget::phase_combine(CBackend& cmd_list)
 
         // Draw
         cmd_list.set_Element(s_combine->E[0]);
-        cmd_list.set_Geometry(g_combine);
+        cmd_list.set_Geometry(TriangleGeom);
 
         cmd_list.set_c("m_inv_v", Device.mInvView);
 
@@ -107,11 +89,41 @@ void CRenderTarget::phase_combine(CBackend& cmd_list)
         cmd_list.set_c("env_color", envclr);
         cmd_list.set_c("fog_color", fogclr);
 
-        cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
+        cmd_list.Render(D3DPT_TRIANGLELIST, 0, 0, 3, 0, 1);
     }
 
     // Copy rt_Generic_0 to new RT
     HW.get_context(cmd_list.context_id)->CopyResource(rt_Generic_0_temp->pSurface, rt_Generic_0->pSurface);
+
+    if (ps_r2_ls_flags_ext.test(R2FLAGEXT_SSLR) && !fis_zero(g_pGamePersistent->Environment().wetness_factor))
+    {
+        PIX_EVENT(PHASE_SSR_BLUR);
+
+        Fmatrix m_previous{}, m_current{};
+        {
+            static Fmatrix m_saved_viewproj;
+
+            m_previous.mul(m_saved_viewproj, Device.mInvView);
+            m_current.set(Device.mProject);
+            m_saved_viewproj.set(Device.mFullTransform);
+        }
+
+        RenderScreenTriangle(cmd_list, rt_ssr2, s_ssr->E[0], [&]() {
+            cmd_list.set_c("ssr_setup", ps_ssfx_ssr_1);
+            cmd_list.set_c("ssfx_ssr_2", ps_ssfx_ssr_2);
+            cmd_list.set_c("m_current", m_current);
+            cmd_list.set_c("m_previous", m_previous);
+        });
+
+        HW.get_context(CHW::IMM_CTX_ID)->CopyResource(rt_ssr1->pSurface, rt_ssr2->pSurface);
+
+        RenderScreenTriangle(cmd_list, rt_Generic_combine, s_ssr->E[1], [&]() {
+            cmd_list.set_c("ssr_setup", ps_ssfx_ssr_1);
+            cmd_list.set_c("ssfx_ssr_2", ps_ssfx_ssr_2);
+        });
+
+        HW.get_context(CHW::IMM_CTX_ID)->CopyResource(rt_Generic_0->pSurface, rt_Generic_combine->pSurface);
+    }
 
     // Forward rendering
     {
@@ -151,7 +163,7 @@ void CRenderTarget::phase_combine(CBackend& cmd_list)
 
         {
             PIX_EVENT(combine_distort);
-            RenderScreenQuad(cmd_list, Device.dwWidth, Device.dwHeight, rt_Generic_combine, s_combine->E[1]);
+            RenderScreenTriangle(cmd_list, rt_Generic_combine, s_combine->E[1]);
             HW.get_context(cmd_list.context_id)->CopyResource(rt_Generic_0->pSurface, rt_Generic_combine->pSurface);
         }
     }
@@ -164,27 +176,23 @@ void CRenderTarget::phase_combine(CBackend& cmd_list)
 
     {
         PIX_EVENT(combine_tonemap);
-        RenderScreenQuad(cmd_list, Device.dwWidth, Device.dwHeight, rt_Generic_combine, s_combine->E[2]);
+        RenderScreenTriangle(cmd_list, rt_Generic_combine, s_combine->E[2]);
         HW.get_context(cmd_list.context_id)->CopyResource(rt_Generic_0->pSurface, rt_Generic_combine->pSurface);
     }
 
     const bool need_heatvision = (ps_pnv_mode == 2 || ps_pnv_mode == 3);
     const bool need_3dss = !dsgraph.mapScopeHUDSorted.empty();
-    bool upscaled_3dss{};
 
     if (need_heatvision) // должен быть до 3DSS
     {
         phase_heatvision(cmd_list);
     }
 
+    const bool upscaled_3dss = (!need_heatvision && need_3dss && Phase3DSSUpscale(cmd_list));
+
     if (ps_r_pp_aa_mode) // должно быть перед 3DSS
     {
-        upscaled_3dss = (!need_heatvision && need_3dss && Phase3DSSUpscale(cmd_list));
-
-        if (!upscaled_3dss || ps_r2_ls_flags_ext.test(R2FLAGEXT_DLSS_3DSS_USE_SECOND_PASS))
-        {
-            PhaseAA(cmd_list); // anti - aliasing
-        }
+        PhaseAA(cmd_list); // anti - aliasing
     }
 
     if (!need_heatvision) // должны быть до 3DSS
@@ -260,7 +268,7 @@ void CRenderTarget::phase_combine(CBackend& cmd_list)
             m_blur_scale.set(scale, -scale).div(12.f);
         }
 
-        RenderScreenQuad(cmd_list, Device.dwWidth, Device.dwHeight, rt_Generic_combine, s_combine->E[3], [&]() {
+        RenderScreenTriangle(cmd_list, rt_Generic_combine, s_combine->E[3], [&]() {
             cmd_list.set_c("m_current", m_current);
             cmd_list.set_c("m_previous", m_previous);
             cmd_list.set_c("m_blur", m_blur_scale.x, m_blur_scale.y, 0, 0);
@@ -363,35 +371,15 @@ void CRenderTarget::phase_combine_volumetric(CBackend& cmd_list)
 {
     PIX_EVENT(phase_combine_volumetric);
 
-    u32 Offset = 0;
-
     u_setrt(cmd_list, rt_Generic_0, rt_Generic_1, nullptr, nullptr, rt_Base_Depth->pZRT[cmd_list.context_id]);
 
     //	Sets limits to both render targets
     cmd_list.set_ColorWriteEnable(D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
-    {
-        // Fill VB
-        float scale_X = float(Device.dwWidth) / float(TEX_jitter);
-        float scale_Y = float(Device.dwHeight) / float(TEX_jitter);
 
-        // Fill vertex buffer
-        FVF::TL* pv = (FVF::TL*)RImplementation.Vertex.Lock(4, g_combine->vb_stride, Offset);
-        pv->set(-1, 1, 0, 1, 0, 0, scale_Y);
-        pv++;
-        pv->set(-1, -1, 0, 0, 0, 0, 0);
-        pv++;
-        pv->set(1, 1, 1, 1, 0, scale_X, scale_Y);
-        pv++;
-        pv->set(1, -1, 1, 0, 0, scale_X, 0);
-        pv++;
-        RImplementation.Vertex.Unlock(4, g_combine->vb_stride);
-
-        // Draw
-        cmd_list.set_Element(s_combine_volumetric->E[0]);
-        // cmd_list.set_Geometry			(g_combine_VP		);
-        cmd_list.set_Geometry(g_combine);
-        cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
-    }
+    // Draw
+    cmd_list.set_Element(s_combine_volumetric->E[0]);
+    cmd_list.set_Geometry(TriangleGeom);
+    cmd_list.Render(D3DPT_TRIANGLELIST, 0, 0, 3, 0, 1);
     cmd_list.set_ColorWriteEnable();
 }
 

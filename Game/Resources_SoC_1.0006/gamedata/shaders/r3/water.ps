@@ -52,23 +52,20 @@ float4 main(vf I) : SV_Target
     float3 basenormal = ((n0 + n1) * 0.5f) * 2.0f - 1.0f;
     basenormal += float3(0.1f, 0.1f, 0.1f); // Offset the normal to "center" the textures again
 
-    // Load Data
     float2 PosTc = I.tctexgen.xy / I.tctexgen.z;
-    gbuffer_data gbd = gbuffer_load_data(PosTc, I.hpos.xy);
-    float4 _P = float4(gbd.P, 1.0f);
 
     // Water Surface to world space
     float3 w_s = mul(m_inv_V, Pv);
 
     // Trick to check if rain can fall on the water, gloss include the rain_apply_gloss
-    float rain_cover = step(0.035f * (-0.4f + rain_params.x), gbd.gloss - 0.04f);
+    float rain_cover = step(0.035f * (-0.4f + rain_params.x), s_diffuse.Sample(smp_nofilter, PosTc).w - 0.04f);
 
     // Rain intensity. Fadeout and rain cover
     half is_raining = rain_params.x > 0 ? 1.0f : 0.0f;
     float RainInt = clamp(rain_params.x * 1.6f, 0.65f * is_raining, 1.0f);
 
     // Ripples normal
-    float2 Ripples = ssfx_rain_ripples(s_rainsplash, (w_s.xz + eye_position.xz) * 0.13f, float3(RainInt, G_SSR_WATER_RAIN, 15.0f), _P.z);
+    float2 Ripples = ssfx_rain_ripples(s_rainsplash, (w_s.xz + eye_position.xz) * 0.13f, float3(RainInt, G_SSR_WATER_RAIN, 15.0f), gbuffer_load_depth(PosTc));
     basenormal += float3(Ripples, 0) * is_raining;
 
     // Water wave intensity
@@ -84,11 +81,7 @@ float4 main(vf I) : SV_Target
     float2 Refraction_UV = N_Scr * Refraction_Discard;
 
     // Shadows to do some tricks
-#ifndef USE_MSAA
     float water_shadows = saturate(s_accumulator.Sample(smp_nofilter, PosTc + Refraction_UV).r * 2000);
-#else
-    float water_shadows = saturate(s_accumulator.Load(int3((PosTc + Refraction_UV) * screen_res.xy, 0), 0).r * 2000);
-#endif
 
     float3 Nw = mul(float3x3(I.M1, I.M2, I.M3), Navg);
     Nw = normalize(Nw);

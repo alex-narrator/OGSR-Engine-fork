@@ -27,7 +27,6 @@ constexpr xr_token pp_aa_mode_token[] = {
 };
 
 u32 ps_r_dlss_preset = NVSDK_NGX_DLSS_Hint_Render_Preset_F;
-u32 ps_r_dlss_3dss_preset = NVSDK_NGX_DLSS_Hint_Render_Preset_F;
 constexpr xr_token dlss_mode_token[]{
     {"st_opt_dlss_default", NVSDK_NGX_DLSS_Hint_Render_Preset_Default}, // default behavior, may or may not change after OTA
     {"st_opt_dlss_f", NVSDK_NGX_DLSS_Hint_Render_Preset_F},
@@ -36,19 +35,7 @@ constexpr xr_token dlss_mode_token[]{
     {},
 };
 
-#pragma todo("Simp : что-то не вижу вообще никакой разницы от изменения этой настройки."
-u32 ps_r_dlss_3dss_quality = NVSDK_NGX_PerfQuality_Value_DLAA;
-constexpr xr_token dlss_quality_token[]{
-    {"st_opt_dlss_max_perf", NVSDK_NGX_PerfQuality_Value_MaxPerf},
-    {"st_opt_dlss_balanced", NVSDK_NGX_PerfQuality_Value_Balanced},
-    {"st_opt_dlss_max_quality", NVSDK_NGX_PerfQuality_Value_MaxQuality},
-    {"st_opt_dlss_ultra_performance", NVSDK_NGX_PerfQuality_Value_UltraPerformance},
-    {"st_opt_dlss_ultra_quality", NVSDK_NGX_PerfQuality_Value_UltraQuality},
-    {"st_opt_dlss_dlaa", NVSDK_NGX_PerfQuality_Value_DLAA},
-    {},
-};
-
-float ps_r_dlss_3dss_scale_factor{2.f};
+float ps_r_dlss_3dss_scale_factor{1.0f};
 
 u32 ps_r_sunshafts_mode = SS_SS_MANOWAR;
 constexpr xr_token sunshafts_mode_token[]{{"st_opt_off", SS_OFF},
@@ -150,12 +137,9 @@ Flags64 ps_r2_ls_flags = {
     R2FLAG_EXP_MT_SUN |
     R2FLAG_EXP_MT_PARTICLES |
     R2FLAG_EXP_MT_LIGHTS |
-    R2FLAG_EXP_MT_BONES |
-    R2FLAG_LIGHT_NO_DIST_SHADOWS
-};
-
-Flags64 ps_r2_ls_flags_ext = {
-    R2FLAGEXT_ENABLE_TESSELLATION | 
+    R2FLAG_EXP_MT_BONES
+    // | R2FLAG_LIGHT_NO_DIST_SHADOWS //SIMP: по дефолту пусть будет выключено, чтоб волюметрики не вырубались с расстоянием
+    | R2FLAGEXT_ENABLE_TESSELLATION | 
 //    R2FLAGEXT_RAIN_DROPS | 
 //    R2FLAGEXT_RAIN_DROPS_CONTROL | 
 //    R2FLAGEXT_MASK | 
@@ -164,6 +148,8 @@ Flags64 ps_r2_ls_flags_ext = {
     R2FLAGEXT_SSLR |
     R2FLAGEXT_SSFX_INTER_GRASS |
     R2FLAGEXT_FONT_SHADOWS
+    | R2FLAGEXT_SSFX_SHADOWS
+    | R2FLAGEXT_SSFX_SSS
 };
 
 BOOL ps_no_scale_on_fade = 0; // Alundaio
@@ -174,13 +160,8 @@ float ps_r2_tonemap_middlegray = 1.f; // r2-only
 float ps_r2_tonemap_adaptation = 1.f; // r2-only
 float ps_r2_tonemap_low_lum = 0.0001f; // r2-only
 float ps_r2_tonemap_amount = 0.7f; // r2-only
-float ps_r2_ls_bloom_kernel_g = 3.f; // r2-only
-float ps_r2_ls_bloom_kernel_b = .7f; // r2-only
 float ps_r2_ls_bloom_speed = 100.f; // r2-only
 float ps_r2_ls_bloom_kernel_scale = .7f; // r2-only	// gauss
-float ps_r2_ls_dsm_kernel = .7f; // r2-only
-float ps_r2_ls_psm_kernel = .7f; // r2-only
-float ps_r2_ls_ssm_kernel = .7f; // r2-only
 float ps_r2_ls_bloom_threshold = .00001f; // r2-only
 float ps_r2_mblur = .0f; // .5f
 float ps_r2_ls_depth_scale = 1.00001f; // 1.00001f
@@ -219,14 +200,15 @@ Fvector3 ps_ssfx_shadows{
            // Maximum shadow map resolution. When lights are closer, the resolution increases to improve the image quality of shadows ( at the cost of performance ).
 Fvector3 ps_ssfx_shadow_bias{0.4f, 0.03f, 0.0f};
 
-Fvector3 ps_ssfx_volumetric = {1.0f, 1.0f, 0.0f};
-
 int ps_ssfx_bloom_use_presets = 0;
 Fvector4 ps_ssfx_bloom_1 = {4.f, 4.f, 0.f, 0.5f}; // Threshold, Exposure, -, Sky
 Fvector4 ps_ssfx_bloom_2 = {1.7f, 0.7f, 0.5f, 0.5f}; // Blur Radius, Vibrance, Lens, Dirt
 
-int ps_ssfx_pom_refine = 0;
+BOOL ps_ssfx_pom_refine{TRUE}, ps_ssfx_terrain_pom_refine{TRUE};
 Fvector4 ps_ssfx_pom = {16, 12, 0.035f, 0.4f}; // Samples , Range, Height, AO
+Fvector4 ps_ssfx_terrain_pom{12, 20, 0.04f, 1.0f}; // Samples, Range, Height, Water Limit
+Fvector4 ps_ssfx_terrain_offset{};
+Fvector4 ps_ssfx_ssr_1{1.f, 0.f, 0.f, 0.f}, ps_ssfx_ssr_2{1.f, 1.f, 0.2f, 0.015f};
 
 // Screen Space Shaders Stuff
 Fvector4 ps_ssfx_wind_grass{9.5f, 1.4f, 1.5f, 0.4f}; // Anim Speed, Turbulence, Push, Wave
@@ -766,15 +748,9 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_tonemap_amount", &ps_r2_tonemap_amount, 0.0000f, 1.0f);
 
     CMD4(CCC_Float, "r2_ls_bloom_kernel_scale", &ps_r2_ls_bloom_kernel_scale, 0.5f, 2.f);
-    CMD4(CCC_Float, "r2_ls_bloom_kernel_g", &ps_r2_ls_bloom_kernel_g, 1.f, 7.f);
-    CMD4(CCC_Float, "r2_ls_bloom_kernel_b", &ps_r2_ls_bloom_kernel_b, 0.01f, 1.f);
     CMD4(CCC_Float, "r2_ls_bloom_threshold", &ps_r2_ls_bloom_threshold, 0.f, 1.f);
     CMD4(CCC_Float, "r2_ls_bloom_speed", &ps_r2_ls_bloom_speed, 0.f, 100.f);
-    CMD3(CCC_Mask64, "r2_ls_bloom_fast", &ps_r2_ls_flags, R2FLAG_FASTBLOOM);
 
-    CMD4(CCC_Float, "r2_ls_dsm_kernel", &ps_r2_ls_dsm_kernel, .1f, 3.f);
-    CMD4(CCC_Float, "r2_ls_psm_kernel", &ps_r2_ls_psm_kernel, .1f, 3.f);
-    CMD4(CCC_Float, "r2_ls_ssm_kernel", &ps_r2_ls_ssm_kernel, .1f, 3.f);
     CMD4(CCC_Float, "r2_ls_squality", &ps_r2_ls_squality, .5f, 3.f);
 
     //- Mad Max
@@ -810,8 +786,7 @@ void xrRender_initconsole()
 
     CMD3(CCC_Mask64, "r_sslr_enable", &ps_r2_ls_flags_ext, R2FLAGEXT_SSLR);
 
-    #pragma todo("Simp: заменить на новый ссс-стайл параллакс с поддержкой луж")
-    // CMD3(CCC_Mask, "r_terrain_parallax_enable", &ps_r2_ls_flags_ext, R2FLAGEXT_TERRAIN_PARALLAX);
+    CMD3(CCC_Mask64, "r_terrain_parallax_enable", &ps_r2_ls_flags_ext, R2FLAGEXT_TERRAIN_PARALLAX);
 
     CMD3(CCC_Mask64, "r_mt_texload", &ps_r2_ls_flags_ext, R2FLAGEXT_MT_TEXLOAD);
 
@@ -871,6 +846,7 @@ void xrRender_initconsole()
     CMD3(CCC_Mask64, "r_mt_bones", &ps_r2_ls_flags, R2FLAG_EXP_MT_BONES);
 
     CMD3(CCC_Mask64, "r2_volumetric_lights", &ps_r2_ls_flags, R2FLAG_VOLUMETRIC_LIGHTS);
+    CMD3(CCC_Mask64, "r2_volumetric_lights_blur", &ps_r2_ls_flags, R2FLAG_VOLUMETRIC_LIGHTS_BLUR);
 
     // Sunshafts
     CMD3(CCC_Token, "r_sunshafts_mode", &ps_r_sunshafts_mode, sunshafts_mode_token);
@@ -902,10 +878,8 @@ void xrRender_initconsole()
 
     CMD3(CCC_Token, "r_aa_mode", &ps_r_pp_aa_mode, pp_aa_mode_token);
     //CMD3(CCC_Token, "r_aa_dlss_preset", &ps_r_dlss_preset, dlss_mode_token);
-    //CMD3(CCC_Token, "r_3dss_dlss_preset", &ps_r_dlss_3dss_preset, dlss_mode_token);
-    //CMD3(CCC_Token, "r_3dss_dlss_quality", &ps_r_dlss_3dss_quality, dlss_quality_token);
+
     CMD4(CCC_Float, "r_3dss_scale_factor", &ps_r_dlss_3dss_scale_factor, 1.f, 2.5f);
-    CMD3(CCC_Mask64, "r_3dss_use_second_pass", &ps_r2_ls_flags_ext, R2FLAGEXT_DLSS_3DSS_USE_SECOND_PASS);
 
     CMD4(CCC_Integer, "r__no_scale_on_fade", &ps_no_scale_on_fade, 0, 1); // Alundaio
 
@@ -969,7 +943,6 @@ void xrRender_initconsole()
 
     // Screen Space Shaders
     CMD4(CCC_Vector3, "ssfx_shadows", &ps_ssfx_shadows, Fvector3().set(128, 1536, 0), Fvector3().set(1536, 4096, 0));
-    CMD4(CCC_Vector3, "ssfx_volumetric", &ps_ssfx_volumetric, Fvector3().set(0, 0, 0), Fvector3().set(1.0, 10.0, 1.0));
 
     CMD4(CCC_Vector3, "ssfx_shadow_bias", &ps_ssfx_shadow_bias, Fvector3().set(0, 0, 0), Fvector3().set(1.0, 1.0, 1.0));
     CMD4(CCC_Vector4, "ssfx_lut", &ps_ssfx_lut, Fvector4().set(0.0, 0.0, 0.0, 0.0), tw2_max);
@@ -1015,6 +988,9 @@ void xrRender_initconsole()
     CMD3(CCC_Mask64, "ssfx_sky_debanding", &ps_r2_ls_flags, R2FLAG_SSFX_SKY_DEBANDING);
     CMD3(CCC_Mask64, "ssfx_indirect_light", &ps_r2_ls_flags, R2FLAG_SSFX_INDIRECT_LIGHT);
  //   CMD3(CCC_Mask64, "ssfx_bloom", &ps_r2_ls_flags, R2FLAG_SSFX_BLOOM);
+    CMD3(CCC_Mask64, "ssfx_use_aces", &ps_r2_ls_flags, R2FLAGEXT_USE_ACES);
+    CMD3(CCC_Mask64, "ssfx_shadows_enable", &ps_r2_ls_flags, R2FLAGEXT_SSFX_SHADOWS);
+    CMD3(CCC_Mask64, "ssfx_sss_enable", &ps_r2_ls_flags, R2FLAGEXT_SSFX_SSS);
 
     CMD3(CCC_Mask64, "ssfx_inter_grass", &ps_r2_ls_flags_ext, R2FLAGEXT_SSFX_INTER_GRASS);
     CMD3(CCC_Mask64, "r_font_shadows", &ps_r2_ls_flags_ext, R2FLAGEXT_FONT_SHADOWS);
@@ -1023,11 +999,13 @@ void xrRender_initconsole()
     CMD4(CCC_Vector4, "ssfx_bloom_1", &ps_ssfx_bloom_1, (Fvector4{1, 1, 0, 0}), (Fvector4{10, 100, 100, 10}));
     CMD4(CCC_Vector4, "ssfx_bloom_2", &ps_ssfx_bloom_2, (Fvector4{1, 0, 0, 0}), (Fvector4{5, 10, 10, 10}));
 
-    CMD4(CCC_Integer, "ssfx_pom_refine", &ps_ssfx_pom_refine, 0, 1);
+    CMD2(CCC_Bool, "ssfx_pom_refine", &ps_ssfx_pom_refine);
+    CMD2(CCC_Bool, "ssfx_terrain_pom_refine", &ps_ssfx_terrain_pom_refine);
     CMD4(CCC_Vector4, "ssfx_pom", &ps_ssfx_pom, Fvector4().set(0, 0, 0, 0), Fvector4().set(36, 60, 1, 1));
-
-    CMD3(CCC_Mask64, "reflections_only_on_terrain", &ps_r2_ls_flags_ext, R2FLAGEXT_REFLECTIONS_ONLY_ON_TERRAIN);
-    CMD3(CCC_Mask64, "reflections_only_on_puddles", &ps_r2_ls_flags_ext, R2FLAGEXT_REFLECTIONS_ONLY_ON_PUDDLES);
+    CMD4(CCC_Vector4, "ssfx_terrain_pom", &ps_ssfx_terrain_pom, (Fvector4{}), (Fvector4{36, 60, 1, 2}));
+    CMD4(CCC_Vector4, "ssfx_terrain_offset", &ps_ssfx_terrain_offset, (Fvector4{-1.f, -1.f, -1.f, -1.f}), (Fvector4{1.f, 1.f, 1.f, 1.f}));
+    CMD4(CCC_Vector4, "ssfx_ssr_1", &ps_ssfx_ssr_1, (Fvector4{1.f, 0.f, 0.f, 0.f}), (Fvector4{2.f, 1.f, 1.f, 1.f}));
+    CMD4(CCC_Vector4, "ssfx_ssr_2", &ps_ssfx_ssr_2, (Fvector4{}), (Fvector4{2.f, 2.f, 2.f, 2.f}));
 
     CMD4(CCC_Float, "ssfx_exposure", &ps_r2_img_exposure, 0.5f, 1.5f);
     CMD4(CCC_Float, "ssfx_gamma", &ps_r2_img_gamma, 0.5f, 1.5f);

@@ -1,20 +1,16 @@
 #include "common.h"
 
 Texture2D noise_tex;
-Texture2D s_vollight;
+Texture2D s_vollight1;
+Texture2D s_vollight2;
 
-struct _input
+float4 main(p_screen I) : SV_Target
 {
-    float2 tc0 : TEXCOORD0;
-};
-
-//    TODO: DX10: Use load instead of sample
-float4 main(_input I) : SV_Target
-{
-    float4 color = s_vollight.SampleLevel(smp_linear, I.tc0.xy, 0);
+    float4 color = s_vollight1.SampleLevel(smp_linear, I.tc0.xy, 0);
+    color += s_vollight2.SampleLevel(smp_linear, I.tc0.xy, 0);
 
     // Read Depth
-    float _depth = s_position.Sample(smp_nofilter, I.tc0.xy).z;
+    float _depth = gbuffer_load_depth(I.tc0);
 
     // Noise TC
     float2 uv_noise = I.tc0.xy;

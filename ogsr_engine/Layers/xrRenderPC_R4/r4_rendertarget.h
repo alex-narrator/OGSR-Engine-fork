@@ -4,9 +4,7 @@
 
 class light;
 
-#define VOLUMETRIC_SLICES 100
-
-static void dummy(){};
+static void dummy(){}
 
 class CRenderTarget : public IRender_Target
 {
@@ -17,12 +15,6 @@ private:
     u32 dwFlareClearMark;
 
 public:
-    enum eStencilOptimizeMode
-    {
-        SO_Light = 0, //	Default
-        SO_Combine, //	Default
-    };
-
     u32 dwLightMarkerID;
 
 #ifdef DEBUG
@@ -82,10 +74,14 @@ public:
 
     //	Igor: for volumetric lights
     ref_rt rt_Generic_2; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
+    ref_rt rt_Generic_3; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
+    ref_rt rt_accum_ssfx;
+
     ref_rt rt_Bloom_1; // 32bit, dim/4	(r,g,b,?)
-    ref_rt rt_Bloom_2; // 32bit, dim/4	(r,g,b,?)
     ref_rt rt_LUM_64; // 64bit, 64x64,	log-average in all components
     ref_rt rt_LUM_8; // 64bit, 8x8,		log-average in all components
+
+    ref_rt rt_ssr1, rt_ssr2;
 
     ref_rt rt_LUM_pool[2]; // 1xfp32,1x1, exp-result -> scaler
 
@@ -126,8 +122,6 @@ private:
     ref_geom g_accum_point;
     ref_geom g_accum_spot;
     ref_geom g_accum_omnipart;
-    ref_geom g_accum_volumetric;
-
     ref_geom g_flare;
 
     ID3DVertexBuffer* g_accum_point_vb;
@@ -138,9 +132,6 @@ private:
 
     ID3DVertexBuffer* g_accum_spot_vb;
     ID3DIndexBuffer* g_accum_spot_ib;
-
-    ID3DVertexBuffer* g_accum_volumetric_vb;
-    ID3DIndexBuffer* g_accum_volumetric_ib;
 
     // Bloom
     ref_geom g_bloom_build;
@@ -157,6 +148,11 @@ private:
     ref_shader s_luminance;
     float f_luminance_adapt;
 
+    // ScreenTriangle
+    ref_geom TriangleGeom;
+    ID3DVertexBuffer* TriangleVB{};
+    ID3DIndexBuffer* TriangleIB{};
+
     // Combine
     ref_geom g_combine;
     ref_geom g_combine_2UV;
@@ -165,6 +161,8 @@ private:
     ref_shader s_combine_volumetric;
 
     ref_shader s_blur;
+    ref_shader s_volumetric_blur;
+    ref_shader s_ssr;
     ref_shader s_dof;
     ref_shader s_lut;
     ref_shader s_taa;
@@ -220,8 +218,6 @@ public:
     void accum_omnip_geom_destroy();
     void accum_spot_geom_create();
     void accum_spot_geom_destroy();
-    void accum_volumetric_geom_create();
-    void accum_volumetric_geom_destroy();
 
     void u_compute_texgen_screen(CBackend& cmd_list, Fmatrix& dest);
     void u_compute_texgen_jitter(CBackend& cmd_list, Fmatrix& dest);
@@ -241,15 +237,15 @@ public:
 
     void phase_scene_prepare();
     void phase_scene_begin(CBackend& cmd_list);
-    void phase_scene_end(CBackend& cmd_list);
     void phase_occq(CBackend& cmd_list);
     void phase_wallmarks(CBackend& cmd_list);
     void phase_smap_direct(CBackend& cmd_list, light* L, u32 sub_phase);
     void phase_smap_spot_clear(CBackend& cmd_list);
     void phase_smap_spot(CBackend& cmd_list, light* L) const;
     void phase_accumulator(CBackend& cmd_list);
-    void phase_vol_accumulator(CBackend& cmd_list);
+    void phase_vol_accumulator(CBackend& cmd_list, bool cascade);
     void phase_blur(CBackend& cmd_list);
+    void phase_volumetric_blur(CBackend& cmd_list);
     void phase_dof(CBackend& cmd_list);
     void phase_lut(CBackend& cmd_list);
     void phase_gasmask_dudv(CBackend& cmd_list);
@@ -260,7 +256,8 @@ public:
 
     bool need_to_render_sunshafts();
 
-    void draw_volume(CBackend& cmd_list, light* L);
+    void geom_volume(CBackend& cmd_list, light* L);
+    void render_volume(CBackend& cmd_list, light* L);
     void accum_direct_cascade(CBackend& cmd_list, u32 sub_phase, Fmatrix& xform, Fmatrix& xform_prev, float fBias);
     void accum_direct_blend(CBackend& cmd_list);
     void accum_direct_volumetric(CBackend& cmd_list, u32 sub_phase, u32 Offset, u32 i_offset, const Fmatrix& mShadow);
@@ -318,7 +315,8 @@ public:
 #endif
 
 private:
-    void RenderScreenQuad(CBackend& cmd_list, u32 w, u32 h, const ref_rt& rt, ref_selement& sh, const std::function<void()>& lambda = dummy);
+    void RenderScreenTriangle(CBackend& cmd_list, const ref_rt& rt, ref_selement& sh, const std::function<void()>& lambda = dummy);
+    void RenderScreenQuad(CBackend& cmd_list, const u32 w, u32 const h, const ref_rt& rt, ref_selement& sh, const std::function<void()>& lambda = dummy);
 
     // Anti Aliasing
     ref_shader s_pp_antialiasing;
@@ -333,7 +331,6 @@ private:
 
     void InitDLSS();
     bool ProcessDLSS();
-    bool ProcessDLSS_3DSS(const bool need_reset);
     void DestroyDLSS();
 
     void InitFSR();
@@ -343,7 +340,7 @@ private:
 
     bool reset_3dss_rendertarget(const bool need_reset = false);
 
-    void ProcessCAS(CBackend& cmd_list, ref_selement& sh, const bool force = false);
+    void ProcessCAS(CBackend& cmd_list);
 
     void PhaseSSSS(CBackend& cmd_list);
 

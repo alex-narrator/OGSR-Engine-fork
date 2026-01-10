@@ -27,13 +27,14 @@
 #define r2_RT_generic_combine_scope "$user$generic_combine_scope"
 
 #define r2_RT_generic1 "$user$generic1" // ---
-#define r2_RT_generic2 "$user$generic2" // ---	//	Igor: for volumetric lights
+#define r2_RT_generic2 "$user$generic2" // ---	//	for volumetric lights
+#define r2_RT_generic3 "$user$generic3" // ---	//	for volumetric lights
+#define r2_RT_accum_ssfx "$user$accum_ssfx" // [ SSS ] Full res - D3DFMT_A16B16G16R16F
 #define r2_RT_generic0_temp "$user$generic_temp" // Temporal RT for water reflections
 
 #define r2_RT_scopert "$user$scopeRT" // crookr
 
 #define r2_RT_bloom1 "$user$bloom1" // ---
-#define r2_RT_bloom2 "$user$bloom2" // ---
 
 #define r2_RT_luminance_t64 "$user$lum_t64" // --- temp
 #define r2_RT_luminance_t8 "$user$lum_t8" // --- temp
@@ -80,6 +81,9 @@
 #define r2_RT_SunShaftsPass0 "$user$SunShaftsPass0"
 
 #define r2_RT_flares "$user$flares" // KD lensflares
+
+#define r2_RT_ssr1 "$user$ssr1" // [Ascii1457] SSS new Phase
+#define r2_RT_ssr2 "$user$ssr2" // [ SSS ] Full res - D3DFMT_A8B8G8R8F
 
 constexpr const char* c_sbase = "s_base";
 

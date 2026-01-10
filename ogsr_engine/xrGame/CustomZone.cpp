@@ -290,13 +290,10 @@ void CCustomZone::Load(LPCSTR section)
         BlowLightVolumetric = READ_IF_EXISTS(pSettings, r_bool, section, "light_volumetric_enable", false);
         if (BlowLightVolumetric)
         {
-            BlowLightVolumetricQuality = READ_IF_EXISTS(pSettings, r_float, section, "light_volumetric_quality", 1.0f);
-            BlowLightVolumetricQuality = std::clamp(BlowLightVolumetricQuality, 0.f, 1.f);
+            BlowLightVolumetricIntensity = READ_IF_EXISTS(pSettings, r_float, section, "light_volumetric_intensity", 0.25f);
+            BlowLightVolumetricIntensity = std::clamp(BlowLightVolumetricIntensity, 0.f, 1.f);
 
-            BlowLightVolumetricIntensity = READ_IF_EXISTS(pSettings, r_float, section, "light_volumetric_intensity", 0.15f);
-            BlowLightVolumetricIntensity = std::clamp(BlowLightVolumetricIntensity, 0.f, 10.f);
-
-            BlowLightVolumetricDistance = READ_IF_EXISTS(pSettings, r_float, section, "light_volumetric_distance", 0.45f);
+            BlowLightVolumetricDistance = READ_IF_EXISTS(pSettings, r_float, section, "light_volumetric_distance", 1.f);
             BlowLightVolumetricDistance = std::clamp(BlowLightVolumetricDistance, 0.f, 1.f);
         }
     }
@@ -314,13 +311,10 @@ void CCustomZone::Load(LPCSTR section)
         IdleLightVolumetric = READ_IF_EXISTS(pSettings, r_bool, section, "idle_light_volumetric_enable", false);
         if (IdleLightVolumetric)
         {
-            IdleLightVolumetricQuality = READ_IF_EXISTS(pSettings, r_float, section, "idle_light_volumetric_quality", 1.0f);
-            IdleLightVolumetricQuality = std::clamp(IdleLightVolumetricQuality, 0.f, 1.f);
+            IdleLightVolumetricIntensity = READ_IF_EXISTS(pSettings, r_float, section, "idle_light_volumetric_intensity", 0.25f);
+            IdleLightVolumetricIntensity = std::clamp(IdleLightVolumetricIntensity, 0.f, 1.f);
 
-            IdleLightVolumetricIntensity = READ_IF_EXISTS(pSettings, r_float, section, "idle_light_volumetric_intensity", 0.15f);
-            IdleLightVolumetricIntensity = std::clamp(IdleLightVolumetricIntensity, 0.f, 10.f);
-
-            IdleLightVolumetricDistance = READ_IF_EXISTS(pSettings, r_float, section, "idle_light_volumetric_distance", 0.45f);
+            IdleLightVolumetricDistance = READ_IF_EXISTS(pSettings, r_float, section, "idle_light_volumetric_distance", 1.0f);
             IdleLightVolumetricDistance = std::clamp(IdleLightVolumetricDistance, 0.f, 1.f);
         }
 
@@ -416,7 +410,6 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
         if (IdleLightVolumetric)
         {
             m_pIdleLight->set_volumetric(true);
-            m_pIdleLight->set_volumetric_quality(IdleLightVolumetricQuality);
             m_pIdleLight->set_volumetric_intensity(IdleLightVolumetricIntensity);
             m_pIdleLight->set_volumetric_distance(IdleLightVolumetricDistance);
         }
@@ -432,7 +425,6 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
         if (BlowLightVolumetric)
         {
             m_pLight->set_volumetric(true);
-            m_pLight->set_volumetric_quality(BlowLightVolumetricQuality);
             m_pLight->set_volumetric_intensity(BlowLightVolumetricIntensity);
             m_pLight->set_volumetric_distance(BlowLightVolumetricDistance);
         }

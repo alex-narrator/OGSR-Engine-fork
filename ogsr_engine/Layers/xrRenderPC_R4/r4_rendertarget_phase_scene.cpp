@@ -38,8 +38,3 @@ void CRenderTarget::phase_scene_begin(CBackend& cmd_list)
     cmd_list.set_CullMode(CULL_CCW);
     cmd_list.set_ColorWriteEnable();
 }
-
-// end
-void CRenderTarget::phase_scene_end(CBackend& cmd_list)
-{
-}

@@ -32,14 +32,15 @@ void CRenderTarget::phase_accumulator(CBackend& cmd_list)
     RImplementation.rmNormal(cmd_list);
 }
 
-void CRenderTarget::phase_vol_accumulator(CBackend& cmd_list)
+void CRenderTarget::phase_vol_accumulator(CBackend& cmd_list, bool cascade)
 {
-    u_setrt(cmd_list, rt_Generic_2, nullptr, nullptr, nullptr, rt_Base_Depth->pZRT[cmd_list.context_id]);
+    u_setrt(cmd_list, cascade ? rt_Generic_2 : rt_Generic_3, nullptr, nullptr, nullptr, rt_Base_Depth->pZRT[cmd_list.context_id]);
 
     if (!m_bHasActiveVolumetric)
     {
         m_bHasActiveVolumetric = true;
         cmd_list.ClearRT(rt_Generic_2, {}); // black
+        cmd_list.ClearRT(rt_Generic_3, {}); // black
     }
 
     cmd_list.set_Stencil(FALSE);
