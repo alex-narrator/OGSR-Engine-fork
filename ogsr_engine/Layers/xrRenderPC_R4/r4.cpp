@@ -70,7 +70,6 @@ void CRender::create()
 
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 10000);
 
-    m_skinning = -1;
     m_SMAPSize = 0; //этому параметру присваивается нужное значение непосредственно перед компиляцией нужного шейдера, т.к. в каждом шейдере теперь используется разный размер smap
 
     // options (smap-pool-size)
@@ -709,22 +708,22 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
 
     // skinning
     // SKIN_NONE
-    appendShaderOption(m_skinning < 0, "SKIN_NONE", "1");
+    appendShaderOption(shader_option_skinning() < 0, "SKIN_NONE", "1");
 
     // SKIN_0
-    appendShaderOption(0 == m_skinning, "SKIN_0", "1");
+    appendShaderOption(0 == shader_option_skinning(), "SKIN_0", "1");
 
     // SKIN_1
-    appendShaderOption(1 == m_skinning, "SKIN_1", "1");
+    appendShaderOption(1 == shader_option_skinning(), "SKIN_1", "1");
 
     // SKIN_2
-    appendShaderOption(2 == m_skinning, "SKIN_2", "1");
+    appendShaderOption(2 == shader_option_skinning(), "SKIN_2", "1");
 
     // SKIN_3
-    appendShaderOption(3 == m_skinning, "SKIN_3", "1");
+    appendShaderOption(3 == shader_option_skinning(), "SKIN_3", "1");
 
     // SKIN_4
-    appendShaderOption(4 == m_skinning, "SKIN_4", "1");
+    appendShaderOption(4 == shader_option_skinning(), "SKIN_4", "1");
 
     // Soft water
     appendShaderOption(TRUE, "USE_SOFT_WATER", "1");

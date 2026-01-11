@@ -109,20 +109,13 @@ void CResourceManager::_DeletePass(const SPass* P)
 //--------------------------------------------------------------------------------------------------------------
 SVS* CResourceManager::_CreateVS(LPCSTR _name)
 {
-    string_path name;
-    xr_strcpy(name, _name);
-    if (0 == RImplementation.m_skinning)
-        xr_strcat(name, "_0");
-    if (1 == RImplementation.m_skinning)
-        xr_strcat(name, "_1");
-    if (2 == RImplementation.m_skinning)
-        xr_strcat(name, "_2");
-    if (3 == RImplementation.m_skinning)
-        xr_strcat(name, "_3");
-    if (4 == RImplementation.m_skinning)
-        xr_strcat(name, "_4");
-    const LPSTR N = LPSTR(name);
-    const map_VS::iterator I = m_vs.find(N);
+    xr_string res_name = _name;
+    if (Render->shader_option_skinning() >= 0)
+        res_name += "_" + std::to_string(Render->shader_option_skinning());
+    //res_name += RImplementation.GetShaderOptions();
+
+    LPCSTR name = res_name.c_str();
+    auto I = m_vs.find(name);
     if (I != m_vs.end())
         return I->second;
     else

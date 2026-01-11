@@ -559,11 +559,11 @@ void CModelPool::Prefetch()
             fname.sprintf("%s.ogf", low_name.c_str());
             if (FS.exist(fsgame::game_meshes, fname.c_str()))
             {
-                ::Render->hud_loading = val2 == 2.f;
-                //if (::Render->hud_loading)
+                ::Render->shader_option_hud_loading(val2 == 2.f);
+                //if (::Render->shader_option_hud_loading())
                 //    Msg("--[%s] loading hud model [%s]", __FUNCTION__, fname.c_str());
                 dxRender_Visual* V = Create(low_name.c_str());
-                ::Render->hud_loading = false;
+                ::Render->shader_option_hud_loading(false);
                 Delete(V, FALSE);
                 cnt++;
             }

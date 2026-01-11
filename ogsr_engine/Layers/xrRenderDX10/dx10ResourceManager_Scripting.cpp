@@ -631,7 +631,7 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     C.BT = nullptr;
     C.bEditor = FALSE;
     C.bDetail = FALSE;
-    C.HudElement = RImplementation.hud_loading;
+    C.HudElement = RImplementation.shader_option_hud_loading();
 
     // Prepare
     _ParseList(C.L_textures, s_textures);

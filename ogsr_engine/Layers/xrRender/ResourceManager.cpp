@@ -150,7 +150,7 @@ Shader* CResourceManager::_cpp_Create(IBlender* B, LPCSTR s_shader, LPCSTR s_tex
     C.BT = B;
     C.bEditor = FALSE;
     C.bDetail = FALSE;
-    C.HudElement = RImplementation.hud_loading;
+    C.HudElement = RImplementation.shader_option_hud_loading();
 
     // Parse names
     _ParseList(C.L_textures, s_textures);
