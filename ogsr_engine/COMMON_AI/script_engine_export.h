@@ -168,4 +168,5 @@
 #include "flashlight.h"
 #include "inventory_item.h"
 #include "inventory_item_object.h"
+#include "script_light.h"
 #endif

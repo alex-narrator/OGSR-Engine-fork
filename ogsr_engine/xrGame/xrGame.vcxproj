@@ -64,7 +64,6 @@
       </ExceptionHandling>
       <SmallerTypeCheck>false</SmallerTypeCheck>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
@@ -122,7 +121,6 @@
       </ExceptionHandling>
       <SmallerTypeCheck>false</SmallerTypeCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
@@ -310,6 +308,7 @@
     <ClInclude Include="pose_extrapolation.h" />
     <ClInclude Include="script_actor.h" />
     <ClInclude Include="script_game_object_impl.h" />
+    <ClInclude Include="script_light.h" />
     <ClInclude Include="script_rq_result.h" />
     <ClInclude Include="script_vars_storage.h" />
     <ClInclude Include="SimpleDetectorSHOC.h" />
@@ -1517,6 +1516,8 @@
     <ClCompile Include="property_evaluator_script.cpp" />
     <ClCompile Include="script_actor.cpp" />
     <ClCompile Include="script_game_object_script4.cpp" />
+    <ClCompile Include="script_light.cpp" />
+    <ClCompile Include="script_light_script.cpp" />
     <ClCompile Include="script_property_evaluator_wrapper.cpp" />
     <ClCompile Include="material_manager.cpp" />
     <ClCompile Include="memory_manager.cpp" />
