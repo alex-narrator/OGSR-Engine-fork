@@ -1543,3 +1543,5 @@ void CActor::SetPickUpItem(CInventoryItem* pickup_item)
 void CActor::block_action(EGameActions cmd) { m_blocked_actor_actions.insert(cmd); }
 
 void CActor::unblock_action(EGameActions cmd) { m_blocked_actor_actions.erase(cmd); }
+
+bool CActor::is_action_blocked(EGameActions cmd) const { return m_blocked_actor_actions.find(cmd) != m_blocked_actor_actions.end(); }

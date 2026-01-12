@@ -731,6 +731,7 @@ public:
     // Real Wolf. Start. 14.10.2014
     void block_action(EGameActions cmd);
     void unblock_action(EGameActions cmd);
+    bool is_action_blocked(EGameActions cmd) const;
     // Real Wolf. End. 14.10.2014
 
     bool is_actor_normal() const;
