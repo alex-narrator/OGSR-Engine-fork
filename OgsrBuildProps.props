@@ -4,7 +4,10 @@
   <PropertyGroup>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
 
-    <PlatformToolset>v143</PlatformToolset>
+    <!-- Если сборка ведётся из VS2026 (VisualStudioVersion == 18.0) — используем v145 -->
+    <PlatformToolset Condition="'$(VisualStudioVersion)' == '18.0'">v145</PlatformToolset>
+    <!-- Иначе — используем v143 -->
+    <PlatformToolset Condition="'$(PlatformToolset)'==''">v143</PlatformToolset>
 
     <!--CopyCppRuntimeToOutputDir>true</CopyCppRuntimeToOutputDir-->
   </PropertyGroup>
