@@ -34,7 +34,6 @@ CInventoryOwner::CInventoryOwner()
     m_pCharacterInfo = xr_new<CCharacterInfo>();
     m_known_info_registry = xr_new<CInfoPortionWrapper>();
     EnableTalk();
-    EnableTrade();
 }
 
 DLL_Pure* CInventoryOwner::_construct()

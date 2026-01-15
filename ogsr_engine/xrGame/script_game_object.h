@@ -318,10 +318,6 @@ public:
     void DisableTalk();
     bool IsTalkEnabled();
 
-    void EnableTrade();
-    void DisableTrade();
-    bool IsTradeEnabled();
-
     void IterateInventory(const luabind::functor<void>& functor, const luabind::object& object);
     void IterateBelt(const luabind::functor<void>& functor, const luabind::object& object);
     void IterateRuck(const luabind::functor<void>& functor, const luabind::object& object);

@@ -187,28 +187,6 @@ bool CScriptGameObject::IsTalkEnabled()
     return pInventoryOwner->IsTalkEnabled();
 }
 
-void CScriptGameObject::EnableTrade()
-{
-    CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
-    if (!pInventoryOwner)
-        return;
-    pInventoryOwner->EnableTrade();
-}
-void CScriptGameObject::DisableTrade()
-{
-    CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
-    if (!pInventoryOwner)
-        return;
-    pInventoryOwner->DisableTrade();
-}
-bool CScriptGameObject::IsTradeEnabled()
-{
-    CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
-    if (!pInventoryOwner)
-        return false;
-    return pInventoryOwner->IsTradeEnabled();
-}
-
 void CScriptGameObject::ForEachInventoryItems(const luabind::functor<void>& functor)
 {
     auto owner = smart_cast<CInventoryOwner*>(&object());

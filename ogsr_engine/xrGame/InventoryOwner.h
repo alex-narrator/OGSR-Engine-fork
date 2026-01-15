@@ -75,10 +75,6 @@ public:
     virtual void DisableTalk() { m_bAllowTalk = false; }
     virtual bool IsTalkEnabled() { return m_bAllowTalk; }
 
-    void EnableTrade() { m_bAllowTrade = true; }
-    void DisableTrade() { m_bAllowTrade = false; }
-    bool IsTradeEnabled() { return m_bAllowTrade; }
-
     CInventoryOwner* GetTalkPartner() { return m_pTalkPartner; }
     virtual void NewPdaContact(CInventoryOwner*);
     virtual void LostPdaContact(CInventoryOwner*);
@@ -96,7 +92,6 @@ protected:
     CInventoryOwner* m_pTalkPartner;
 
     bool m_bAllowTalk;
-    bool m_bAllowTrade;
 
     u32 m_tmp_active_slot_num{NO_ACTIVE_SLOT};
 
