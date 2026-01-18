@@ -235,14 +235,14 @@ Fvector vertex_position(u32 level_vertex_id) { return (ai().level_graph().vertex
 void map_add_object_spot(u16 id, LPCSTR spot_type, LPCSTR text)
 {
     CMapLocation* ml = Level().MapManager().AddMapLocation(spot_type, id);
-    if (xr_strlen(text))
+    if (text && xr_strlen(text))
         ml->SetHint(text);
 }
 
 void map_add_object_spot_ser(u16 id, LPCSTR spot_type, LPCSTR text)
 {
     CMapLocation* ml = Level().MapManager().AddMapLocation(spot_type, id);
-    if (xr_strlen(text))
+    if (text && xr_strlen(text))
         ml->SetHint(text);
 
     ml->SetSerializable(true);

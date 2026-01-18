@@ -300,6 +300,7 @@ public:
     ETaskState GetGameTaskState(LPCSTR task_id, int objective_num);
     void SetGameTaskState(ETaskState state, LPCSTR task_id, int objective_num);
     void GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExisting);
+    LPCSTR GetArticleText(LPCSTR article_id);  
 
     bool IsTalking();
     void StopTalk();

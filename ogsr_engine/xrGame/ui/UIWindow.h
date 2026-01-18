@@ -158,7 +158,13 @@ public:
     IC bool GetCustomDraw() const { return m_bCustomDraw; }
     IC void SetCustomDraw(bool b) { m_bCustomDraw = b; }
 
+    IC void SetPriority(int index) { priority_index = index; }
+    IC int GetPriority() const { return priority_index; }
+    void SortByPriority();
+
 protected:
+    int priority_index{};
+    
     bool m_bCustomDraw{};
 
     shared_str m_windowName;
