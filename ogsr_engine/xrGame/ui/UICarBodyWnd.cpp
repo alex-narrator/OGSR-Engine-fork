@@ -154,7 +154,7 @@ void CUICarBodyWnd::Init()
         create_ui_snd(sounds[eInvDetachAddon], uiXml.Read("snd_detach_addon", 0, nullptr));
         create_ui_snd(sounds[eInvItemUse], uiXml.Read("snd_item_use", 0, nullptr));
         create_ui_snd(sounds[eInvItemMove], uiXml.Read("snd_item_move", 0, nullptr));
-
+        create_ui_snd(sounds[eInvUnloadWpn], uiXml.Read("snd_unload_wpn", 0, nullptr));
         uiXml.SetLocalRoot(stored_root);
     }
 }
@@ -336,6 +336,7 @@ void CUICarBodyWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
                 auto itm = CurrentItem();
                 ProcessUnload(itm->m_pData);
+                PlaySnd(eInvUnloadWpn);
 
                 for (u32 i = 0; i < itm->ChildsCount(); ++i)
                 {

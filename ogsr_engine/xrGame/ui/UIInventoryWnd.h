@@ -66,6 +66,7 @@ protected:
         eInvAttachAddon,
         eInvDetachAddon,
         eInvItemUse,
+        eInvUnloadWpn,
         eInvSndMax
     };
 
