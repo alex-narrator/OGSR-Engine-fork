@@ -48,8 +48,8 @@ class_<CScriptGameObject> script_register_game_object1(class_<CScriptGameObject>
         .enum_("EPathType")[value("game_path", int(MovementManager::ePathTypeGamePath)), value("level_path", int(MovementManager::ePathTypeLevelPath)),
                             value("patrol_path", int(MovementManager::ePathTypePatrolPath)), value("no_path", int(MovementManager::ePathTypeNoPath))]
 
-        //		.property("visible",				&CScriptGameObject::getVisible,			&CScriptGameObject::setVisible)
-        //		.property("enabled",				&CScriptGameObject::getEnabled,			&CScriptGameObject::setEnabled)
+        .property("visible",				&CScriptGameObject::getVisible,			&CScriptGameObject::setVisible)
+        .property("enabled",				&CScriptGameObject::getEnabled,			&CScriptGameObject::setEnabled)
 
         //		.def_readonly("health",				&CScriptGameObject::GetHealth,			&CScriptGameObject::SetHealth)
         .property("health", &CScriptGameObject::GetHealth, &CScriptGameObject::SetHealth)
