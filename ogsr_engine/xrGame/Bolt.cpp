@@ -4,6 +4,11 @@
 #include "PhysicsShell.h"
 #include "xr_level_controller.h"
 
+#include "game_object_space.h"
+#include "actor.h"
+#include "script_callback_ex.h"
+#include "script_game_object.h"
+
 CBolt::CBolt(void)
 {
     m_weight = .1f;
@@ -40,6 +45,8 @@ void CBolt::Throw()
     l_pBolt->set_destroy_time(u32(m_dwDestroyTimeMax / phTimefactor));
     inherited::Throw();
     spawn_fake_missile();
+    if (g_actor)
+        g_actor->callback(GameObject::eOnActorBoltThrow)(this->lua_game_object());
 }
 
 bool CBolt::Useful() const { return false; }

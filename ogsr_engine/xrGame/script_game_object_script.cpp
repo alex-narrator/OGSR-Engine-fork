@@ -106,7 +106,9 @@ void CScriptGameObject::script_register(lua_State* L)
 
                     value("on_footstep", int(GameObject::eOnActorFootStep)),
                     value("on_actor_land", int(GameObject::eOnActorLand)),
-                    value("on_actor_jump", int(GameObject::eOnActorJump))],
+                    value("on_actor_jump", int(GameObject::eOnActorJump)), 
+                    value("on_actor_boltthrow", int(GameObject::eOnActorBoltThrow))
+           ],
 
            def("buy_condition", (void (*)(CInifile*, LPCSTR))(&::buy_condition)), def("buy_condition", (void (*)(float, float))(&::buy_condition)),
            def("sell_condition", (void (*)(CInifile*, LPCSTR))(&::sell_condition)), def("sell_condition", (void (*)(float, float))(&::sell_condition)),
