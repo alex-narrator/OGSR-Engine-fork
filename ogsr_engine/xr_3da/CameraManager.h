@@ -133,10 +133,10 @@ public:
     // demonized: removecameffector by pointer
     void RemoveCamEffector(CEffectorCam* ef);
 
-    IC Fvector Position() const { return m_cam_info.p; }
-    IC Fvector Direction() const { return m_cam_info.d; }
-    IC Fvector Up() const { return m_cam_info.n; }
-    IC Fvector Right() const { return m_cam_info.r; }
+    IC const Fvector& Position() const { return m_cam_info.p; }
+    IC const Fvector& Direction() const { return m_cam_info.d; }
+    IC const Fvector& Up() const { return m_cam_info.n; }
+    IC const Fvector& Right() const { return m_cam_info.r; }
 
     IC float Fov() const { return m_cam_info.fFov; }
 

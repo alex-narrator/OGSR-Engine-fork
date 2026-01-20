@@ -387,6 +387,7 @@ public:
     void update_script_item();
 
     IKinematicsAnimated* Model() { return m_model; }
+    const Fmatrix& XFORM() const { return m_transform; }
 
 private:
     static void Thumb0Callback(CBoneInstance* B);
