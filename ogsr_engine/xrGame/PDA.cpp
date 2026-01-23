@@ -552,6 +552,9 @@ void CPda::OnActiveItem()
     auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
     pGameSP->ShowHidePda(true);
 
+    if (pGameSP->PdaMenu->m_pActiveSection == eptNoActiveTab)
+        pGameSP->PdaMenu->SetActiveSubdialog((EPdaTabs)eptQuests);
+
     m_fZoomRotationFactor = 0.f;
 }
 
