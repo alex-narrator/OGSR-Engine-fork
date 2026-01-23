@@ -288,7 +288,7 @@ void CHUDManager::Render_Actor_Shadow(u32 context_id) // added by KD
         return;
 */
     const auto torch = smart_cast<CTorch*>(A->inventory().ItemFromSlot(TORCH_SLOT));
-    if (torch && torch->torch_active())
+    if (torch && torch->IsPowerOn())
         return;
 
     const auto wpn = smart_cast<CWeapon*>(A->inventory().ActiveItem());

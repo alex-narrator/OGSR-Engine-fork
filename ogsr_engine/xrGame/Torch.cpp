@@ -86,7 +86,7 @@ void CTorch::Switch(bool turn_on)
     }
 }
 
-bool CTorch::torch_active() const { return (m_switched_on); }
+bool CTorch::IsPowerOn() const { return (m_switched_on); }
 
 BOOL CTorch::net_Spawn(CSE_Abstract* DC)
 {
