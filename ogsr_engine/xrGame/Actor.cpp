@@ -789,6 +789,8 @@ void CActor::UpdateCL()
     m_pPhysics_support->in_UpdateCL();
     VERIFY2(_valid(renderable.xform), *cName());
 
+    Visual()->dcast_PKinematics()->CalculateBones(TRUE);
+
     if (g_Alive())
         PickupModeUpdate();
 

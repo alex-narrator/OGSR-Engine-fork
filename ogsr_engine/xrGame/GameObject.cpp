@@ -817,7 +817,22 @@ void CGameObject::DestroyObject()
 
 void CGameObject::shedule_Update(u32 dt)
 {
-    // Msg							("-SUB-:[%x][%s] CGameObject::shedule_Update",smart_cast<void*>(this),*cName());
+    ZoneScoped;
+
+    CCF_Skeleton* skeleton = smart_cast<CCF_Skeleton*>(CFORM());
+    if (skeleton && skeleton->NeedInitialCalculate())
+    {
+        if (IKinematics* K = PKinematics(Visual()))
+        {
+            K->CalculateBones_InvalidateSkeleton();
+            K->CalculateBones(TRUE);
+        }
+
+        skeleton->Calculate();
+    }
+
+    // Msg("-SUB-:[%x][%s] CGameObject::shedule_Update",smart_cast<void*>(this),cName().c_str());
+
     inherited::shedule_Update(dt);
     FeelTouchAddonsUpdate();
     CScriptBinder::shedule_Update(dt);
