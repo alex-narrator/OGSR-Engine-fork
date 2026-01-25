@@ -327,6 +327,8 @@ public:
     virtual void OnHUDDraw(CCustomHUD* hud, u32 context_id, IRenderable* root) override;
     BOOL HUDview() const;
 
+    BOOL NeedModelVisible() const;
+
     // visiblity
     virtual float ffGetFov() const { return 90.f; }
     virtual float ffGetRange() const { return 500.f; }
