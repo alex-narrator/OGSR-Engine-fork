@@ -8,6 +8,8 @@
 
 #include "stdafx.h"
 #include "debug_renderer.h"
+#include "HUDManager.h"
+#include "Actor_Flags.h"
 
 void CDebugRenderer::add_lines(Fvector const* vertices, u32 const& vertex_count, u16 const* pairs, u32 const& pair_count, u32 const& color, bool hud_mode)
 {
@@ -102,4 +104,91 @@ void CDebugRenderer::draw_ellipse(const Fmatrix& matrix, const u32& color, bool 
         matrix.transform_tiny(*I, Fvector().set(*I));
 
     add_lines((Fvector*)&vertices[0], sizeof(vertices) / sizeof(Fvector), &pairs[0], sizeof(pairs) / (2 * sizeof(u16)), color, hud_mode); //-V706
+}
+
+//-- Static Debug Items
+void CDebugRenderer::add_static_line(CStaticDebugLine& line) { m_StaticLines.push_back(line); }
+void CDebugRenderer::add_static_line(const Fvector& pos_start, const Fvector& pos_end, u32 color)
+{
+    CStaticDebugLine line;
+    line.mStartPos = pos_start;
+    line.mEndPos = pos_end;
+    line.mColor = color;
+    line.mDrawMask = m_StaticDrawFlag;
+    add_static_line(line);
+}
+
+void CDebugRenderer::add_static_box(CStaticDebugBox& box) { m_StaticBoxes.push_back(box); }
+void CDebugRenderer::add_static_box(const Fmatrix& xform, const Fvector& half_size, u32 color, shared_str text)
+{
+    CStaticDebugBox box;
+
+    box.mXFORM = xform;
+    box.mHalfSize = half_size;
+    box.mColor = color;
+    box.mText = text;
+    box.mDrawMask = m_StaticDrawFlag;
+    add_static_box(box);
+}
+
+void CDebugRenderer::add_static_sphere(CStaticDebugSphere& sphere) { m_StaticSpheres.push_back(sphere); }
+void CDebugRenderer::add_static_sphere(const Fmatrix& xform, u32 color, shared_str text) { 
+    CStaticDebugSphere sphere; 
+    sphere.mXFORM = xform;
+    sphere.mColor = color;
+    sphere.mText = text;
+    sphere.mDrawMask = m_StaticDrawFlag;
+    add_static_sphere(sphere);
+}
+
+extern ENGINE_API CCustomHUD* g_hud;
+
+void CDebugRenderer::OnRenderStaticItems()
+{
+    CHUDManager& HUD = *((CHUDManager*)g_hud);
+    //-- draw text
+    auto draw_text = [&HUD](const Fvector& position, const shared_str& text, const float& clamp_dist, u32& color) {
+        if (text.size() && Device.vCameraPosition.distance_to(position) < clamp_dist)
+        {
+            Fvector4 v_res;
+            Device.mFullTransform.transform(v_res, position);
+            if (v_res.z < 0 || v_res.w < 0)
+                return;
+            if (v_res.x < -1.f || v_res.x > 1.f || v_res.y < -1.f || v_res.y > 1.f)
+                return;
+            float x = (1.f + v_res.x) / 2.f * (Device.dwWidth);
+            float y = (1.f - v_res.y) / 2.f * (Device.dwHeight);
+            HUD.Font().pFontMedium->SetColor(color);
+            HUD.Font().pFontMedium->OutSet(x, y);
+            HUD.Font().pFontMedium->OutNext("%s", text.c_str());
+        }
+    };
+
+    //-- draw static lines
+    for (auto& line : m_StaticLines)
+    {
+        if (!psActorFlags.test(line.mDrawMask) && line.mDrawMask != 0xFFFFFFFF)
+            continue;
+        draw_line(Fidentity, line.mStartPos, line.mEndPos, line.mColor);
+        draw_text(line.mStartPos, line.mText, line.mNameDist, line.mTextColor);
+        draw_text(line.mEndPos, line.mTextEnd, line.mNameDist, line.mTextColor);
+    }
+
+    //-- draw static boxes
+    for (auto& box : m_StaticBoxes)
+    {
+        if (!psActorFlags.test(box.mDrawMask) && box.mDrawMask != 0xFFFFFFFF)
+            continue;
+        draw_aabb(box.mXFORM.c, VPUSH(box.mHalfSize), box.mColor);
+        draw_text(box.mXFORM.c, box.mText, box.mNameDist, box.mTextColor);
+    }
+
+    //-- draw static spheres
+    for (auto& sphere : m_StaticSpheres)
+    {
+        if (!psActorFlags.test(sphere.mDrawMask) && sphere.mDrawMask != 0xFFFFFFFF)
+            continue;
+        draw_ellipse(sphere.mXFORM, sphere.mColor);
+        draw_text(sphere.mXFORM.c, sphere.mText, sphere.mNameDist, sphere.mTextColor);
+    }
 }

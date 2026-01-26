@@ -36,11 +36,8 @@
 #include "ui/UIPDAWnd.h"
 #include "ui/UIEncyclopediaWnd.h"
 #include "ui/UIDiaryWnd.h"
-#include "Car.h"
 
-#ifdef DEBUG
 #include "debug_renderer.h"
-#endif
 
 CActor* g_actor = NULL;
 
@@ -215,6 +212,8 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     spatial.type |= STYPE_REACTTOSOUND;
 
     g_player_hud->load_default();
+
+    Level().debug_renderer().ClearDebugContainer();
 
     return TRUE;
 }
