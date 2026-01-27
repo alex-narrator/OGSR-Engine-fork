@@ -1008,7 +1008,7 @@ void CActor::shedule_Update(u32 DT)
 
     //если в режиме HUD, то сама модель актера не рисуется
     if (!character_physics_support()->IsRemoved() && !m_holder)
-        setVisible(NeedModelVisible());
+        setVisible(!HUDview());
 
     //что актер видит перед собой
     collide::rq_result& RQ = HUD().GetCurrentRayQuery();
@@ -1108,7 +1108,7 @@ void CActor::renderable_Render(u32 context_id, IRenderable* root)
     {
         inherited::renderable_Render(context_id, root);
 
-        if (NeedModelVisible())
+        if (!HUDview())
         {
             CInventoryOwner::renderable_Render(context_id, root);
         }
@@ -1545,5 +1545,3 @@ void CActor::block_action(EGameActions cmd) { m_blocked_actor_actions.insert(cmd
 void CActor::unblock_action(EGameActions cmd) { m_blocked_actor_actions.erase(cmd); }
 
 bool CActor::is_action_blocked(EGameActions cmd) const { return m_blocked_actor_actions.find(cmd) != m_blocked_actor_actions.end(); }
-
-BOOL CActor::NeedModelVisible() const { return !HUDview() || psActorFlags.test(AF_ACTOR_SHADOW); }
