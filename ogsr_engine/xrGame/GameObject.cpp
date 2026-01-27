@@ -124,8 +124,8 @@ void CGameObject::net_Destroy()
     xr_delete(m_ini_file);
 
     m_script_clsid = -1;
-    if (Visual() && smart_cast<IKinematics*>(Visual()))
-        smart_cast<IKinematics*>(Visual())->Callback(0, 0);
+
+    SetKinematicsCallback(false);
 
     inherited::net_Destroy();
     setReady(FALSE);
@@ -870,7 +870,6 @@ void CGameObject::add_visual_callback(visual_callback* callback)
 
     if (m_visual_callback.empty())
         SetKinematicsCallback(true);
-    //		smart_cast<IKinematics*>(Visual())->Callback(VisualCallback,this);
     m_visual_callback.push_back(callback);
 }
 
@@ -881,7 +880,6 @@ void CGameObject::remove_visual_callback(visual_callback* callback)
     m_visual_callback.erase(I);
     if (m_visual_callback.empty())
         SetKinematicsCallback(false);
-    //		smart_cast<IKinematics*>(Visual())->Callback(0,0);
 }
 
 void CGameObject::SetKinematicsCallback(bool set)
@@ -934,7 +932,22 @@ void CGameObject::DestroyObject()
 
 void CGameObject::shedule_Update(u32 dt)
 {
-    // Msg							("-SUB-:[%x][%s] CGameObject::shedule_Update",smart_cast<void*>(this),*cName());
+    ZoneScoped;
+
+    CCF_Skeleton* skeleton = smart_cast<CCF_Skeleton*>(CFORM());
+    if (skeleton && skeleton->NeedInitialCalculate())
+    {
+        if (IKinematics* K = PKinematics(Visual()))
+        {
+            K->CalculateBones_InvalidateSkeleton();
+            K->CalculateBones(TRUE);
+        }
+
+        skeleton->Calculate();
+    }
+
+    // Msg("-SUB-:[%x][%s] CGameObject::shedule_Update",smart_cast<void*>(this),cName().c_str());
+
     inherited::shedule_Update(dt);
     FeelTouchAddonsUpdate();
     CScriptBinder::shedule_Update(dt);

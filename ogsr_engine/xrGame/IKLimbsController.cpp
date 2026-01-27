@@ -308,12 +308,19 @@ void _stdcall CIKLimbsController::IKVisualCallback(IKinematics* K)
         return;
 #endif
 
-    CGameObject* O = ((CGameObject*)K->GetUpdateCallbackParam());
-    CPhysicsShellHolder* Sh = smart_cast<CPhysicsShellHolder*>(O);
-    VERIFY(Sh);
-    CIKLimbsController* ik = Sh->character_ik_controller();
-    VERIFY(ik);
-    ik->Calculate();
+    CGameObject* o = static_cast<CGameObject*>(K->GetUpdateCallbackParam());
+    CPhysicsShellHolder* sh = smart_cast<CPhysicsShellHolder*>(o);
+
+    CIKLimbsController* ik = sh->character_ik_controller();
+    R_ASSERT(ik);
+
+    if (Device.dwFrame != ik->update_frame)
+    {
+        ik->Calculate();
+        ik->Update(o);
+
+        ik->update_frame = Device.dwFrame;
+    }
 }
 
 void CIKLimbsController::PlayLegs(CBlend* b)
@@ -330,34 +337,50 @@ void CIKLimbsController::PlayLegs(CBlend* b)
         Msg("!![%s] No foot stseps for animation: animation name: [%s], animation set: [%s]", __FUNCTION__, anim_name, anim_set_name);
      */
 }
-void CIKLimbsController::Update()
+
+constexpr float IK_CALC_DIST = 100.f;
+constexpr float IK_ALWAYS_CALC_DIST = 20.f;
+
+void CIKLimbsController::Update(CGameObject* O)
 {
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(phDbgIKOff))
         return;
 #endif
-    IKinematicsAnimated* skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
-    VERIFY(skeleton_animated);
 
-    skeleton_animated->UpdateTracks();
-    update_blend(m_legs_blend);
+    vis_data& vis = O->Visual()->getVisData();
 
-    _pose_extrapolation.update(m_object->XFORM());
-    xr_vector<CIKLimb>::iterator i = _bone_chains.begin(), e = _bone_chains.end();
-    for (; e != i; ++i)
-        LimbUpdate(*i);
+    Fvector p;
+    O->XFORM().transform_tiny(p, vis.sphere.P);
 
-    /*
-    Fmatrix predict;
-    _pose_extrapolation.extrapolate( predict, Device.fTimeGlobal  );
+    float dist = Device.vCameraPosition.distance_to(p);
 
+    if (dist < IK_CALC_DIST)
+    {
+        // CFrustum& view_frust = ::Render->ViewBase;
+        if (/*view_frust.testSphere_dirty(p, vis.sphere.R) || */ dist < IK_ALWAYS_CALC_DIST)
+        {
+            IKinematicsAnimated* skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
+            VERIFY(skeleton_animated);
 
+            skeleton_animated->UpdateTracks();
+            update_blend(m_legs_blend);
 
+            _pose_extrapolation.update(m_object->XFORM());
+            xr_vector<CIKLimb>::iterator i = _bone_chains.begin(), e = _bone_chains.end();
+            for (; e != i; ++i)
+                LimbUpdate(*i);
 
-    DBG_DrawMatrix( m_object->XFORM(), 1 );
-    DBG_DrawMatrix( predict, 1 );
+            /*
+            Fmatrix predict;
+            _pose_extrapolation.extrapolate( predict, Device.fTimeGlobal  );
 
-    _pose_extrapolation.extrapolate( predict, Device.fTimeGlobal + 1  );
-    DBG_DrawMatrix( predict, 1 );
-    */
+            DBG_DrawMatrix( m_object->XFORM(), 1 );
+            DBG_DrawMatrix( predict, 1 );
+
+            _pose_extrapolation.extrapolate( predict, Device.fTimeGlobal + 1  );
+            DBG_DrawMatrix( predict, 1 );
+            */
+        }
+    }
 }
