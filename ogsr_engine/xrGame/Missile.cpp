@@ -45,7 +45,6 @@ void CMissile::Load(LPCSTR section)
     m_dwDestroyTimeMax = pSettings->r_u32(section, "destroy_time");
 
     m_vThrowPoint = pSettings->r_fvector3(section, "throw_point");
-    m_vThrowPointAlt = READ_IF_EXISTS(pSettings, r_fvector3, section, "throw_point_alt", m_vThrowPoint);
     m_vThrowDir = pSettings->r_fvector3(section, "throw_dir");
     m_vHudThrowPoint = pSettings->r_fvector3(*hud_sect, "throw_point");
     m_vHudThrowDir = pSettings->r_fvector3(*hud_sect, "throw_dir");

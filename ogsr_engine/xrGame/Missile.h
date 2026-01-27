@@ -92,7 +92,7 @@ protected:
 
 protected:
     //относительная точка и направление вылета гранаты
-    Fvector m_vThrowPoint, m_vThrowPointAlt;
+    Fvector m_vThrowPoint;
     Fvector m_vThrowDir;
     //для HUD
     Fvector m_vHudThrowPoint;
@@ -108,7 +108,7 @@ protected:
     void setup_throw_params();
 
 public:
-    Fvector const& throw_point_offset() const { return m_constpower ? m_vThrowPoint : m_vThrowPointAlt; }
+    Fvector const& throw_point_offset() const { return m_vThrowPoint; }
     virtual void activate_physic_shell();
     virtual void setup_physic_shell();
     virtual void create_physic_shell();
