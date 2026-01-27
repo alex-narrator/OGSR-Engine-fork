@@ -20,10 +20,10 @@ public:
 
 public:
     void PlayLegs(CBlend* b);
-    void Update();
     float Shift() { return _object_shift.shift(); }
 
 private:
+    void Update(CGameObject* O);
     void Calculate();
     void LimbCalculate(SCalculateData& cd);
     void ShiftObject(const SCalculateData cd[max_size]);
@@ -43,6 +43,7 @@ private:
     xr_vector<CIKLimb> _bone_chains;
     object_shift _object_shift;
     extrapolation::points _pose_extrapolation;
+    u32 update_frame{};
 
 #ifdef DEBUG
     LPCSTR anim_name;

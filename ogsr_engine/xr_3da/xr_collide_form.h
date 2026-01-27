@@ -163,6 +163,7 @@ public:
     const ElementVec& _GetElements() { return elements; }
 
     void Calculate();
+    bool NeedInitialCalculate() const { return (dwFrame == 0 ) || (dwFrameTL == 0); }
 
     void _dbg_refresh()
     {
