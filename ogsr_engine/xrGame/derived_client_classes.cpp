@@ -257,7 +257,7 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("get_fire_direction", &CWeapon::get_LastFD)
                   .def("ready_to_kill", &CWeapon::ready_to_kill)
         
-                  .def("is_misfire", &CWeapon::IsMisfire)
+                  .property("misfire", &CWeapon::IsMisfire, &CWeapon::SetMisfire)
                   .def("is_addon_attached", &CWeapon::IsAddonAttached)
                   .def("addon_attachable", &CWeapon::AddonAttachable)
                   .def("get_addon_name", &get_addon_name)

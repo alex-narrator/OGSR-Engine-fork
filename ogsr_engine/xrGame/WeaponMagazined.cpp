@@ -489,8 +489,8 @@ void CWeaponMagazined::UpdateCL()
 
             if (fTime <= 0)
             {
-                if ((!IsMisfire() || IsGrenadeMode()) && GetAmmoElapsed() == 0)
-                    OnMagazineEmpty();
+                //if ((!IsMisfire() || IsGrenadeMode()) && GetAmmoElapsed() == 0)
+                //    OnMagazineEmpty();
                 StopShooting();
             }
             else
