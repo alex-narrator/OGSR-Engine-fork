@@ -49,6 +49,7 @@ protected:
     bool has_anm_reload_jammed{};
     bool SecondCartridge{};
     bool StartCartridge{};
+    bool m_bIsTriStateReloadPartly{};
 
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };

@@ -19,6 +19,7 @@ void CWeaponShotgun::Load(LPCSTR section)
 
     m_bTriStateReload = READ_IF_EXISTS(pSettings, r_bool, section, "tri_state_reload", false);
     m_bDrumMagazineReload = READ_IF_EXISTS(pSettings, r_bool, section, "drum_magazine_reload", false);
+    m_bTriStateReloadPartly = READ_IF_EXISTS(pSettings, r_bool, section, "tri_state_reload_partly", false);
 
     if (m_bTriStateReload)
     {
@@ -291,6 +292,7 @@ void CWeaponShotgun::Reload()
     if (m_bTriStateReload)
     {
         m_stop_triStateReload = false;
+        m_bIsTriStateReloadPartly = m_bTriStateReloadPartly && IsPartlyReloading();
         TriStateReload();
     }
     else
@@ -384,10 +386,18 @@ void CWeaponShotgun::OnStateSwitch(u32 S, u32 oldState)
         break;
     }
     case eSubstateReloadEnd: {
-        PlayHUDMotion({IsMisfire() ? "anm_close_jammed" : (SecondCartridge ? "anm_close_empty" : "nullptr"), "anim_close_weapon", "anm_close"}, true, GetState());
-        PlaySound(((IsMisfire() || SecondCartridge) && SoundExist("sndCloseEmpty")) ? "sndCloseEmpty" : "sndClose", get_LastFP());
-        SetPending(TRUE);
-        SecondCartridge = false;
+        if (m_bIsTriStateReloadPartly)
+        {
+            m_bIsTriStateReloadPartly = false;
+            OnAnimationEnd(eReload);
+        }
+        else
+        {
+            PlayHUDMotion({IsMisfire() ? "anm_close_jammed" : (SecondCartridge ? "anm_close_empty" : "nullptr"), "anim_close_weapon", "anm_close"}, true, GetState());
+            PlaySound(((IsMisfire() || SecondCartridge) && SoundExist("sndCloseEmpty")) ? "sndCloseEmpty" : "sndClose", get_LastFP());
+            SetPending(TRUE);
+            SecondCartridge = false;
+        }
         break;
     }
     };
