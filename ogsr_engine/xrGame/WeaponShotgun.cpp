@@ -274,7 +274,11 @@ void CWeaponShotgun::OnAnimationEnd(u32 state)
     case eSubstateReloadInProcess: {
         AddCartridge(1);
         if (m_stop_triStateReload || !HaveCartridgeInInventory(1) || m_magazine.size() >= iMagazineSize)
+        {
             m_sub_state = eSubstateReloadEnd;
+            if (m_bDirectReload)
+                m_bDirectReload = false;
+        }
 
         SwitchState(eReload);
         break;
@@ -460,7 +464,11 @@ u8 CWeaponShotgun::AddCartridge(u8 cnt)
     }
 
     if (m_magazine.size() >= (u32)iMagazineSize || !HaveCartridgeInInventory(1))
+    {
+        if (m_bDirectReload)
+            m_bDirectReload = false;        
         return cnt;
+    }
 
     VERIFY((u32)iAmmoElapsed == m_magazine.size());
 
@@ -506,7 +514,11 @@ void CWeaponShotgun::ReloadMagazine()
     while (cnt == 0)
     {
         if (m_magazine.size() >= (u32)iMagazineSize || !HaveCartridgeInInventory(1))
+        {
+            if (m_bDirectReload)
+                m_bDirectReload = false;            
             break;
+        }
         cnt = AddCartridge(1);
     }
 }

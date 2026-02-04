@@ -258,6 +258,7 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("ready_to_kill", &CWeapon::ready_to_kill)
         
                   .property("misfire", &CWeapon::IsMisfire, &CWeapon::SetMisfire)
+                  .def_readwrite("direct_reload", &CWeapon::m_bDirectReload)
                   .def("is_addon_attached", &CWeapon::IsAddonAttached)
                   .def("addon_attachable", &CWeapon::AddonAttachable)
                   .def("get_addon_name", &get_addon_name)
