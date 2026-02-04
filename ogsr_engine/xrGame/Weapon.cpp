@@ -578,6 +578,21 @@ void CWeapon::Load(LPCSTR section)
         flashlight_render->set_moveable(true);
 
         const Fcolor clr = READ_IF_EXISTS(pSettings, r_fcolor, m_light_section, b_r2 ? "color_r2" : "color", (Fcolor{0.6f, 0.55f, 0.55f, 1.0f}));
+
+        bool useVolumetric = READ_IF_EXISTS(pSettings, r_bool, m_light_section, "volumetric_enabled", false);
+        if (useVolumetric)
+        {
+            flashlight_render->set_volumetric(useVolumetric);
+
+            float volIntensity = READ_IF_EXISTS(pSettings, r_float, m_light_section, "volumetric_intensity", 0.2f);
+            volIntensity = std::clamp(volIntensity, 0.f, 1.f);
+            flashlight_render->set_volumetric_intensity(volIntensity);
+
+            float volDistance = READ_IF_EXISTS(pSettings, r_float, m_light_section, "volumetric_distance", 1.f);
+            volDistance = std::clamp(volDistance, 0.f, 1.f);
+            flashlight_render->set_volumetric_distance(volDistance);
+        }
+
         flashlight_fBrightness = clr.intensity();
         flashlight_render->set_color(clr);
         const float range = READ_IF_EXISTS(pSettings, r_float, m_light_section, b_r2 ? "range_r2" : "range", 50.f);

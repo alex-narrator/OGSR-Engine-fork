@@ -1,14 +1,12 @@
 #include "stdafx.h"
 
-constexpr u32 max_3dss_width{6880}, max_3dss_height{2880};
-
 void CRenderTarget::ProcessSMAA(CBackend& cmd_list)
 {
     PIX_EVENT(SMAA);
 
-    RenderScreenQuad(cmd_list, Device.dwWidth, Device.dwHeight, rt_smaa_edgetex, s_pp_antialiasing->E[2]);
-    RenderScreenQuad(cmd_list, Device.dwWidth, Device.dwHeight, rt_smaa_blendtex, s_pp_antialiasing->E[3]);
-    RenderScreenQuad(cmd_list, Device.dwWidth, Device.dwHeight, rt_Generic_combine, s_pp_antialiasing->E[4]);
+    RenderScreenTriangle(cmd_list, rt_smaa_edgetex, s_pp_antialiasing->E[2]);
+    RenderScreenTriangle(cmd_list, rt_smaa_blendtex, s_pp_antialiasing->E[3]);
+    RenderScreenTriangle(cmd_list, rt_Generic_combine, s_pp_antialiasing->E[4]);
 
     HW.get_context(cmd_list.context_id)->CopyResource(rt_Generic_0->pSurface, rt_Generic_combine->pSurface);
 }
@@ -17,7 +15,7 @@ void CRenderTarget::ProcessTAA(CBackend& cmd_list)
 {
     PIX_EVENT(TAA);
 
-    RenderScreenQuad(cmd_list, Device.dwWidth, Device.dwHeight, rt_Generic_combine, s_taa->E[0]);
+    RenderScreenTriangle(cmd_list, rt_Generic_combine, s_taa->E[0]);
     HW.get_context(cmd_list.context_id)->CopyResource(rt_Generic_0->pSurface, rt_Generic_combine->pSurface);
 
     HW.get_context(cmd_list.context_id)->CopyResource(rt_Generic_0_prev->pSurface, rt_Generic_combine->pSurface);
@@ -235,7 +233,7 @@ public:
     }
 
     ~NGXWrapper() { Destroy(); }
-} NGXWrapper, NGXWrapperScope;
+} NGXWrapper;
 
 static float saved_3dss_scale_factor{};
 bool CRenderTarget::reset_3dss_rendertarget(const bool need_reset)
@@ -259,7 +257,7 @@ bool CRenderTarget::reset_3dss_rendertarget(const bool need_reset)
     {
         w = static_cast<u32>(std::ceil(static_cast<float>(Device.dwWidth) * i));
         h = static_cast<u32>(std::ceil(static_cast<float>(Device.dwHeight) * i));
-        if (w <= max_3dss_width && h <= max_3dss_height)
+        if (w < D3D11_REQ_TEXTURE2D_U_OR_V_DIMENSION && h < D3D11_REQ_TEXTURE2D_U_OR_V_DIMENSION)
             break;
     }
     constexpr Flags32 flg{CRT::CreateUAV};
@@ -273,7 +271,6 @@ bool CRenderTarget::reset_3dss_rendertarget(const bool need_reset)
 void CRenderTarget::InitDLSS()
 {
     NGXWrapper.Destroy();
-    NGXWrapperScope.Destroy();
 
     const NGXWrapper::Uvector2 RenderParams{Device.dwWidth, Device.dwHeight};
     if (!NGXWrapper.Create(20082024151405ull, RenderParams, RenderParams, rt_Generic_combine, NVSDK_NGX_PerfQuality_Value_DLAA, ps_r_dlss_preset))
@@ -281,19 +278,11 @@ void CRenderTarget::InitDLSS()
         if (ps_r_pp_aa_mode == DLSS)
             ps_r_pp_aa_mode = FSR2;
     }
-    else
-    {
-        reset_3dss_rendertarget();
-
-        const NGXWrapper::Uvector2 DisplayParams{rt_Generic_combine_scope->dwWidth, rt_Generic_combine_scope->dwHeight};
-        R_ASSERT(NGXWrapperScope.Create(20082024849605ull, RenderParams, DisplayParams, rt_Generic_combine_scope, ps_r_dlss_3dss_quality, ps_r_dlss_3dss_preset));
-    }
 }
 
 void CRenderTarget::DestroyDLSS()
 {
     NGXWrapper.Destroy();
-    NGXWrapperScope.Destroy();
 }
 
 bool CRenderTarget::ProcessDLSS()
@@ -315,35 +304,17 @@ bool CRenderTarget::ProcessDLSS()
     return true;
 }
 
-bool CRenderTarget::ProcessDLSS_3DSS(const bool need_reset)
-{
-    PIX_EVENT(3D_SCOPE_DLSS);
-
-    if (need_reset || ps_r_dlss_3dss_preset != NGXWrapperScope.dlssPreset || ps_r_dlss_3dss_quality != NGXWrapperScope.dlssQuality)
-    {
-        InitDLSS();
-    }
-
-    if (!NGXWrapperScope.Draw())
-    {
-        Msg("!![%s] FAILED 3D SCOPE DLSS DRAW!", __FUNCTION__);
-        return false;
-    }
-
-    return true;
-}
-
 //*****************************************************************************************************
 
-void CRenderTarget::ProcessCAS(CBackend& cmd_list, ref_selement& sh, const bool force)
+void CRenderTarget::ProcessCAS(CBackend& cmd_list)
 {
-    if (!force && fis_zero(ps_r_cas))
+    if (fis_zero(ps_r_cas))
         return;
 
     PIX_EVENT(CAS);
 
     const Fvector4 params{std::max(ps_r_cas, 0.01f), 0.f, 0.f, 0.f};
-    RenderScreenQuad(cmd_list, Device.dwWidth, Device.dwHeight, rt_Generic_combine, sh, [&]() { cmd_list.set_c("f_cas_intensity", params); });
+    RenderScreenTriangle(cmd_list, rt_Generic_combine, s_cas->E[0], [&]() { cmd_list.set_c("f_cas_intensity", params); });
     HW.get_context(cmd_list.context_id)->CopyResource(rt_Generic_0->pSurface, rt_Generic_combine->pSurface);
 }
 
@@ -565,7 +536,7 @@ void CRenderTarget::PhaseAA(CBackend& cmd_list)
     }
 
     if (ps_r_pp_aa_mode != SMAA)
-        ProcessCAS(cmd_list, s_cas->E[0]);
+        ProcessCAS(cmd_list);
 }
 
 //*****************************************************************************************************
@@ -575,34 +546,15 @@ bool CRenderTarget::Phase3DSSUpscale(CBackend& cmd_list)
     if (ps_r_dlss_3dss_scale_factor <= 1.f)
         return false;
 
+    // Проверки на сглаживание для того, что для апскейлинга нам нужен taa джиттер
+    if (ps_r_pp_aa_mode != DLSS && ps_r_pp_aa_mode != FSR2 && ps_r_pp_aa_mode != TAA)
+        return false;
+
     bool need_reset = reset_3dss_rendertarget();
-    bool rendered{};
+    if (!need_reset)
+        need_reset = (Fsr2WrapperScope.saved_w != rt_Generic_combine_scope->dwWidth || Fsr2WrapperScope.saved_h != rt_Generic_combine_scope->dwHeight);
 
-    if (ps_r_pp_aa_mode == DLSS)
-    {
-        if (!need_reset)
-            need_reset = (NGXWrapperScope.saved_w != rt_Generic_combine_scope->dwWidth || NGXWrapperScope.saved_h != rt_Generic_combine_scope->dwHeight);
-        rendered = ProcessDLSS_3DSS(need_reset);
-    }
-    else if (ps_r_pp_aa_mode == FSR2)
-    {
-        if (!need_reset)
-            need_reset = (Fsr2WrapperScope.saved_w != rt_Generic_combine_scope->dwWidth || Fsr2WrapperScope.saved_h != rt_Generic_combine_scope->dwHeight);
-        rendered = ProcessFSR_3DSS(need_reset);
-    }
-
-    if (rendered)
-    {
-        if (!ps_r2_ls_flags_ext.test(R2FLAGEXT_DLSS_3DSS_USE_SECOND_PASS))
-        {
-            // вместо того чтобы два раза дергать dlss для прицела и для экрана, используем в cas и далее текстуру из rt_Generic_scope
-            // это сэкономит немного фпс почти без потери качества
-            ProcessCAS(cmd_list, s_cas->E[1], true);
-        }
-        return true;
-    }
-
-    return false;
+    return ProcessFSR_3DSS(need_reset);
 }
 
 //*****************************************************************************************************

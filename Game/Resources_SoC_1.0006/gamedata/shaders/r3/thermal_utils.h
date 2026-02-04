@@ -53,11 +53,10 @@ float3 greyscale(float3 img)
     return float3(Y, Y, Y);
 }
 
-float3 infrared(gbuffer_data gbd, float2 HPos, float2 Tex0)
+float3 infrared(float3 N, float depth, float2 HPos, float2 Tex0)
 {
     int BW = 1;
 
-    float depth = gbd.P.z;
     float3 hotness = s_heat.Load(int3(Tex0 * screen_res.xy, 0), 0);
     float3 mixed;
 
@@ -101,7 +100,7 @@ float3 infrared(gbuffer_data gbd, float2 HPos, float2 Tex0)
         }
         else
         {
-            float projection = dot(normalize(gbd.N), float3(0.0, 0.0, -1.0));
+            float projection = dot(normalize(N), float3(0.0, 0.0, -1.0));
             mixed = lerp(color_background_min, color_background_max, projection);
         }
     }
@@ -111,7 +110,7 @@ float3 infrared(gbuffer_data gbd, float2 HPos, float2 Tex0)
     }
     else
     {
-        float projection = dot(normalize(gbd.N), float3(0.0, 0.0, -1.0));
+        float projection = dot(normalize(N), float3(0.0, 0.0, -1.0));
 
         if (depth <= 0)
         {

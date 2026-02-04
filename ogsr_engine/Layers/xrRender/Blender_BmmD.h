@@ -27,4 +27,7 @@ public:
 
     CBlender_BmmD();
     virtual ~CBlender_BmmD();
+
+private:
+    void CompileOLD(CBlender_Compile& C);
 };

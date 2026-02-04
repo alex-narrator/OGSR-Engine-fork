@@ -8,9 +8,9 @@ void CRenderTarget::phase_dof(CBackend& cmd_list)
 
     PIX_EVENT(phase_DOF);
 
-	RenderScreenQuad(cmd_list, Device.dwWidth, Device.dwHeight, rt_dof, s_dof->E[0]);
-    RenderScreenQuad(cmd_list, Device.dwWidth, Device.dwHeight, rt_Generic_combine, s_dof->E[1]);
+    RenderScreenTriangle(cmd_list, rt_dof, s_dof->E[0]);
+    RenderScreenTriangle(cmd_list, rt_Generic_combine, s_dof->E[1]);
 
 	//Resolve RT
     HW.get_context(cmd_list.context_id)->CopyResource(rt_Generic_0->pSurface, rt_Generic_combine->pSurface);
-};
+}

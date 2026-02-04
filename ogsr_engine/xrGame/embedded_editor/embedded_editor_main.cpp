@@ -17,6 +17,8 @@
 
 bool bShowWindow = true;
 
+#include "../Layers/xrRender/Debug/dxPixEvents.h"
+
 bool show_test_window = false;
 bool show_weather_window = false;
 bool show_hud_editor = false;
@@ -103,7 +105,26 @@ void ShowMain()
 
     ImGui::Text("TPS %.3f ms/frame (%.1f FPS)", 1000.0f / framerate, framerate);
 
-    ImGui::PlotHistogram("", &frames[0], frames.size(), 0, NULL, 0.0f, 300.0f, ImVec2(300, 100));
+    ImGui::PlotHistogram("", &frames[0], frames.size(), 0, nullptr, 0.0f, 300.0f, ImVec2(300, 100));
+
+#ifdef TRACY_ENABLE
+    ImGui::Separator();
+
+    static int stack_levels = 3;
+    ImGui::SliderInt("Depth", &stack_levels, 0, 8);
+
+    auto& perf = PIXEventsStatistics();
+    for (size_t i = 0; i < perf.count; i++)
+    {
+        auto& event = perf.events[i];
+        if (event.stack < static_cast<u64>(stack_levels))
+        {
+            u64 time_micros = (event.end - event.begin) / (event.freq / 1000000);
+            float time_milliseconds = (float)time_micros * 0.001f;
+            ImGui::Text("%*s%s: %.3fms", event.stack * 2, " ", event.name.c_str(), time_milliseconds);
+        }
+    }
+#endif
 }
 
 void ShowEditor()

@@ -260,6 +260,7 @@
     <ClInclude Include="blender_deffer_aref.h" />
     <ClInclude Include="blender_deffer_flat.h" />
     <ClInclude Include="blender_deffer_model.h" />
+    <ClInclude Include="..\xrRender\Debug\dxPixEvents.h" />
     <ClInclude Include="HUDInitializer.h" />
     <ClInclude Include="light_smapvis.h" />
     <ClInclude Include="r2_types.h" />
@@ -409,6 +410,7 @@
     <ClCompile Include="blender_deffer_aref.cpp" />
     <ClCompile Include="blender_deffer_flat.cpp" />
     <ClCompile Include="blender_deffer_model.cpp" />
+    <ClCompile Include="..\xrRender\Debug\dxPixEvents.cpp" />
     <ClCompile Include="HUDInitializer.cpp" />
     <ClCompile Include="light_smapvis.cpp" />
     <ClCompile Include="light_vis.cpp" />

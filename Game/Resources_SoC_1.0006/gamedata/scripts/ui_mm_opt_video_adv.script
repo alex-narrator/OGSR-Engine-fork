@@ -13,7 +13,7 @@ local adv_vid_opt_params = {
 	--
 	{ "aa",                    "list",  0, hint_colors.green , "video_settings_name_19", "video_settings_desc_19" },
 	{ "cas",                   "track", 0, hint_colors.green , "video_settings_name_20", "video_settings_desc_20" },
-	{ "3dss_scale_factor",     "track", 0, hint_colors.yellow, "video_settings_name_69", "video_settings_desc_69" },
+--	{ "3dss_scale_factor",     "track", 0, hint_colors.yellow, "video_settings_name_69", "video_settings_desc_69" },
 	--
 	{ "vis_dist",              "track", 0, hint_colors.yellow, "video_settings_name_2" , "video_settings_desc_2"  },
 	{ "geometry_lod",          "track", 0, hint_colors.yellow, "video_settings_name_3" , "video_settings_desc_3"  },
@@ -41,7 +41,7 @@ local adv_vid_opt_params = {
 	{ "r2_sun_details",        "check", 0, hint_colors.yellow, "video_settings_name_12", "video_settings_desc_12" },
 	--
 	{ "r2_steep_parallax",     "check", 0, hint_colors.yellow, "video_settings_name_39", "video_settings_desc_39" },
---	{ "terrain_parallax",      "check", 1, hint_colors.yellow, "video_settings_name_24", "video_settings_desc_24" }, --TODO: заменить на ссс-стайл
+	{ "terrain_parallax",      "check", 1, hint_colors.yellow, "video_settings_name_24", "video_settings_desc_24" },
 	--
 	{ "volumetric_light",      "check", 0, hint_colors.yellow, "video_settings_name_50", "video_settings_desc_50" },
 	{ "npc_torch",             "check", 0, hint_colors.yellow, "video_settings_name_14", "video_settings_desc_14" },

@@ -1733,6 +1733,8 @@ void CCC_RegisterCommands()
 
     CMD3(CCC_Mask, "g_actor_shadow", &psActorFlags, AF_ACTOR_SHADOW);
 
+    CMD3(CCC_Mask, "g_throw_dbg", &psActorFlags, AF_THROW_DEBUG);
+
 #ifdef USE_MEMORY_VALIDATOR
     CMD4(CCC_Integer, "g_enable_memory_debug", &g_enable_memory_debug, 0, 1);
     CMD1(CCC_DbgMemoryDump, "dbg_memory_dump");

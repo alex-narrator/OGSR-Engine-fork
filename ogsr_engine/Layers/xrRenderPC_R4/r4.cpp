@@ -670,6 +670,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     char c_sun_quality[10]{};
     char c_rain_quality[10]{};
     char c_ssfx_pom_refine[10]{};
+    char c_ssfx_terrain_pom_refine[10]{};
 
     {
         sprintf_s(c_smapsize, "%d", m_SMAPSize);
@@ -766,11 +767,11 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
 
     appendShaderOption(ps_r2_ls_flags.test(R2FLAG_SSFX_BLOOM), "SSFX_BLOOM", "1");
 
-    appendShaderOption(ps_r2_ls_flags_ext.test(R2FLAGEXT_TERRAIN_PARALLAX), "TERRAIN_PARALLAX_ENABNLED", "1");
+    appendShaderOption(ps_r2_ls_flags.test(R2FLAGEXT_USE_ACES), "USE_ACES", "1");
 
-    appendShaderOption(ps_r2_ls_flags_ext.test(R2FLAGEXT_REFLECTIONS_ONLY_ON_TERRAIN), "REFLECTIONS_ONLY_ON_TERRAIN", "1");
+    appendShaderOption(ps_r2_ls_flags.test(R2FLAGEXT_SSFX_SHADOWS), "SSFX_SHADOWS", "1");
 
-    appendShaderOption(ps_r2_ls_flags_ext.test(R2FLAGEXT_REFLECTIONS_ONLY_ON_PUDDLES), "REFLECTIONS_ONLY_ON_PUDDLES", "1");
+    appendShaderOption(ps_r2_ls_flags.test(R2FLAGEXT_SSFX_SSS), "SSFX_SSS", "1");
 
     if (ps_ssfx_rain_1.w > 0.f)
     {
@@ -784,6 +785,12 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         defines.emplace_back("SSFX_POM_REFINE", c_ssfx_pom_refine);
     }
 
+    if (ps_ssfx_terrain_pom_refine)
+    {
+        sprintf_s(c_ssfx_terrain_pom_refine, "%d", ps_ssfx_terrain_pom_refine);
+        defines.emplace_back("SSFX_TERRA_POM_REFINE", c_ssfx_terrain_pom_refine);
+    }
+    
     // finish
     defines.emplace_back(nullptr, nullptr);
 
@@ -890,6 +897,8 @@ void CRender::Begin()
 
     Vertex.Flush();
     Index.Flush();
+
+    PIX_FRAME_START();
 }
 
 void CRender::Clear()
@@ -963,6 +972,8 @@ void CRender::End()
 
         s_LastPresentTime = std::chrono::high_resolution_clock::now();
     }
+
+    PIX_FRAME_END();
 
     {
         ZoneScopedN("Present");

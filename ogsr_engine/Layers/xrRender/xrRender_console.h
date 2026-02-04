@@ -4,7 +4,7 @@
 extern ECORE_API u32 r2_SmapSize;
 
 extern ECORE_API u32 ps_r_pp_aa_mode;
-extern ECORE_API u32 ps_r_dlss_preset, ps_r_dlss_3dss_preset, ps_r_dlss_3dss_quality;
+extern ECORE_API u32 ps_r_dlss_preset;
 extern float ps_r_dlss_3dss_scale_factor;
 
 extern ECORE_API u32 ps_r_sun_shafts;
@@ -49,18 +49,14 @@ extern ECORE_API float ps_r__tf_Mipbias;
 extern float ps_r2_no_details_radius;
 extern float ps_r2_no_rain_radius;
 
-enum
-{
-    R1FLAG_DLIGHTS = 1 << 0,
-};
-
 // R2
 extern ECORE_API float ps_r2_ssaLOD_A;
 extern ECORE_API float ps_r2_ssaLOD_B;
 
 // R2-specific
 extern ECORE_API Flags64 ps_r2_ls_flags; // r2-only
-extern ECORE_API Flags64 ps_r2_ls_flags_ext;
+#define ps_r2_ls_flags_ext ps_r2_ls_flags
+
 extern ECORE_API float ps_r2_df_parallax_h; // r2-only
 extern ECORE_API float ps_r2_df_parallax_range; // r2-only
 extern ECORE_API float ps_r2_gmaterial; // r2-only
@@ -69,13 +65,8 @@ extern ECORE_API float ps_r2_tonemap_adaptation; // r2-only
 extern ECORE_API float ps_r2_tonemap_low_lum; // r2-only
 extern ECORE_API float ps_r2_tonemap_amount; // r2-only
 extern ECORE_API float ps_r2_ls_bloom_kernel_scale; // r2-only	// gauss
-extern ECORE_API float ps_r2_ls_bloom_kernel_g; // r2-only	// gauss
-extern ECORE_API float ps_r2_ls_bloom_kernel_b; // r2-only	// bilinear
 extern ECORE_API float ps_r2_ls_bloom_threshold; // r2-only
 extern ECORE_API float ps_r2_ls_bloom_speed; // r2-only
-extern ECORE_API float ps_r2_ls_dsm_kernel; // r2-only
-extern ECORE_API float ps_r2_ls_psm_kernel; // r2-only
-extern ECORE_API float ps_r2_ls_ssm_kernel; // r2-only
 extern ECORE_API float ps_r2_mblur; // .5f
 extern ECORE_API float ps_r2_ls_depth_scale; // 1.0f
 extern ECORE_API float ps_r2_ls_depth_bias; // -0.0001f
@@ -136,7 +127,6 @@ extern Fvector4 ps_ssfx_int_grass_params_1;
 extern ECORE_API Fvector4 ps_ssfx_grass_shadows;
 extern Fvector3 ps_ssfx_shadow_cascades;
 extern ECORE_API Fvector3 ps_ssfx_shadows;
-extern ECORE_API Fvector3 ps_ssfx_volumetric;
 extern Fvector4 ps_ssfx_wind_grass, ps_ssfx_wind_trees;
 extern ECORE_API Fvector4 ps_ssfx_rain_1;
 extern ECORE_API Fvector4 ps_ssfx_rain_2;
@@ -154,8 +144,9 @@ extern ECORE_API int ps_ssfx_bloom_use_presets;
 extern ECORE_API Fvector4 ps_ssfx_bloom_1;
 extern ECORE_API Fvector4 ps_ssfx_bloom_2;
 
-extern ECORE_API int ps_ssfx_pom_refine;
-extern ECORE_API Fvector4 ps_ssfx_pom;
+extern BOOL ps_ssfx_pom_refine, ps_ssfx_terrain_pom_refine;
+extern ECORE_API Fvector4 ps_ssfx_pom, ps_ssfx_terrain_pom, ps_ssfx_terrain_offset;
+extern Fvector4 ps_ssfx_ssr_1, ps_ssfx_ssr_2;
 
 // textures
 extern ECORE_API int psTextureLOD;
@@ -170,24 +161,24 @@ extern int r_back_buffer_count;
 enum : u64
 {
     R2FLAG_SUN = 1ull << 0,
-    // = 1ull << 1,
-    // = 1ull << 2,
+    R2FLAGEXT_DISABLE_STATIC_LOD = 1ull << 1,
+    R2FLAGEXT_DISABLE_STATIC_TREE = 1ull << 2,
     R2FLAG_SUN_DETAILS = 1ull << 3,
     R2FLAG_TONEMAP = 1ull << 4,
-    // = 1ull << 5,
-    //R2FLAG_GI = 1ull << 6,
-    R2FLAG_FASTBLOOM = 1ull << 7,
+    R2FLAGEXT_ENABLE_TESSELLATION = 1ull << 5,
+    R2FLAGEXT_WIREFRAME = 1ull << 6,
+    R2FLAGEXT_HOM_DEPTH_DRAW = 1ull << 7,
     R2FLAG_GLOBALMATERIAL = 1ull << 8,
-    //R2FLAG_ZFILL = 1ull << 9,
-    //R2FLAG_R1LIGHTS = 1ull << 10,
-    // = 1ull << 11,
-    //R3FLAG_USE_DX10_1 = 1ull << 12,
-    // = 1ull << 13,
+    R2FLAGEXT_DISABLE_DYNAMIC = 1ull << 9,
+    R2FLAGEXT_DISABLE_PARTICLES = 1ull << 10,
+    R2FLAGEXT_DISABLE_HOM = 1ull << 11,
+    R2FLAGEXT_RAIN_DROPS = 1ull << 12,
+    R2FLAGEXT_RAIN_DROPS_CONTROL = 1ull << 13,
     R2FLAG_EXP_DONT_TEST_UNSHADOWED = 1ull << 14,
     R2FLAG_EXP_DONT_TEST_SHADOWED = 1ull << 15,
-
     R2FLAG_DBG_TAA_JITTER_ENABLE = 1 << 16,
     R2FLAG_HAT = 1 << 17,
+    R2FLAGEXT_TERRAIN_PARALLAX = 1ull << 18,
 
     R2FLAG_SSFX_HEIGHT_FOG = 1ull << 19,
     R2FLAG_SSFX_SKY_DEBANDING = 1ull << 20,
@@ -196,7 +187,7 @@ enum : u64
 
     R2FLAG_STEEP_PARALLAX = 1ull << 22,
 
-    // = 1ull << 23,
+    R2FLAG_VOLUMETRIC_LIGHTS_BLUR = 1ull << 23,
     R2FLAG_EXP_MT_BONES = 1ull << 24,
     R2FLAG_DETAIL_BUMP = 1ull << 25,
 
@@ -214,50 +205,34 @@ enum : u64
     R2FLAG_LIGHT_NO_DIST_SHADOWS = 1ull << 34,
 
     R2FLAG_EXP_MT_LIGHTS = 1ull << 35,
-};
 
-enum : u64
-{
-    R2FLAGEXT_DISABLE_STATIC_NORMAL = 1ull << 0,
-    R2FLAGEXT_DISABLE_STATIC_LOD = 1ull << 1,
-    R2FLAGEXT_DISABLE_STATIC_TREE = 1ull << 2,
-    R2FLAGEXT_DISABLE_STATIC_TREE_PROGRESSIVE = 1ull << 3,
-    R2FLAGEXT_DISABLE_STATIC_PROGRESSIVE = 1ull << 4,
+    R2FLAGEXT_DISABLE_STATIC_NORMAL = 1ull << 36,
+    R2FLAGEXT_DISABLE_STATIC_TREE_PROGRESSIVE = 1ull << 37,
+    R2FLAGEXT_DISABLE_STATIC_PROGRESSIVE = 1ull << 38,
 
-    R2FLAGEXT_ENABLE_TESSELLATION = 1ull << 5,
-    R2FLAGEXT_WIREFRAME = 1ull << 6,
+    R2FLAGEXT_SUN_ZCULLING = 1ull << 39,
+    R2FLAGEXT_SSLR = 1ull << 40,
+    R2FLAGEXT_VISOR_REFL = 1ull << 41,
+    R2FLAGEXT_VISOR_REFL_CONTROL = 1ull << 42,
+    R2FLAGEXT_MASK = 1ull << 43,
+    R2FLAGEXT_MASK_CONTROL = 1ull << 44,
+    R2FLAGEXT_MT_TEXLOAD = 1ull << 45,
+    // = 1ull << 46,
+    R2FLAGEXT_MOTION_BLUR = 1ull << 47,
+    R2FLAGEXT_DISABLE_SECTORS = 1ull << 48,
+    R2FLAGEXT_SSFX_INTER_GRASS = 1ull << 49,
+    R2FLAGEXT_FONT_SHADOWS = 1ull << 50,
+    R2FLAGEXT_DISABLE_LIGHT = 1ull << 51,
 
-    R2FLAGEXT_HOM_DEPTH_DRAW = 1ull << 7,
-    R2FLAGEXT_SUN_ZCULLING = 1ull << 8,
-    R2FLAGEXT_DISABLE_DYNAMIC = 1ull << 9,
-    R2FLAGEXT_DISABLE_PARTICLES = 1ull << 10,
-    R2FLAGEXT_DISABLE_HOM = 1ull << 11,
-    R2FLAGEXT_RAIN_DROPS = 1ull << 12,
-    R2FLAGEXT_RAIN_DROPS_CONTROL = 1ull << 13,
-    // = 1ull << 14,
-    R2FLAGEXT_SSLR = 1ull << 15,
-    R2FLAGEXT_VISOR_REFL = 1ull << 16,
-    R2FLAGEXT_VISOR_REFL_CONTROL = 1ull << 17,
-    R2FLAGEXT_TERRAIN_PARALLAX = 1ull << 18,
-    R2FLAGEXT_MASK = 1ull << 19,
-    R2FLAGEXT_MASK_CONTROL = 1ull << 20,
-    R2FLAGEXT_MT_TEXLOAD = 1ull << 21,
-    R2FLAGEXT_DLSS_3DSS_USE_SECOND_PASS = 1ull << 22,
-    // = 1ull << 23,
-    R2FLAGEXT_REFLECTIONS_ONLY_ON_TERRAIN = 1ull << 24,
-    R2FLAGEXT_REFLECTIONS_ONLY_ON_PUDDLES = 1ull << 25,
-    R2FLAGEXT_MOTION_BLUR = 1ull << 26,
-    R2FLAGEXT_DISABLE_SECTORS = 1ull << 27,
-    R2FLAGEXT_SSFX_INTER_GRASS = 1ull << 28,
-    R2FLAGEXT_FONT_SHADOWS = 1ull << 29,
-    // = 1ull << 30,
-    R2FLAGEXT_DISABLE_LIGHT = 1ull << 31,
+    R2FLAGEXT_SHADER_DBG = 1ull << 52,
+    R2FLAGEXT_LENS_FLARE = 1ull << 53,
+    // R2FLAGEXT_RENDER_ON_PREFETCH = 1ull << 54,
 
-    R2FLAGEXT_SHADER_DBG = 1ull << 32,
-    R2FLAGEXT_LENS_FLARE = 1ull << 33,
-    // R2FLAGEXT_RENDER_ON_PREFETCH = 1ull << 34,
+    R2FLAGEXT_DISABLE_SMAPVIS = 1ull << 55,
 
-    R2FLAGEXT_DISABLE_SMAPVIS = 1ull << 35,
+    R2FLAGEXT_USE_ACES = 1ull << 56,
+    R2FLAGEXT_SSFX_SHADOWS = 1ull << 57,
+    R2FLAGEXT_SSFX_SSS = 1ull << 58,
 };
 
 extern void xrRender_initconsole();

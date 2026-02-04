@@ -1,15 +1,7 @@
 #include "common.h"
 #include "lmodel.h"
 
-#ifndef ISAMPLE
-#define ISAMPLE 0
-#endif
-
-#ifndef USE_MSAA
 Texture2D s_patched_normal;
-#else
-TEXTURE2DMS(float4, MSAA_SAMPLES) s_patched_normal;
-#endif
 
 float4 main(float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1) : SV_Target
 {

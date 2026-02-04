@@ -239,7 +239,7 @@ void render_rain::render()
                 dsgraph.cmd_list.set_xform_world(Fidentity);
                 dsgraph.cmd_list.set_xform_view(Fidentity);
                 dsgraph.cmd_list.set_xform_project(RainLight.X.D[0].combine);
-                dsgraph.r_dsgraph_render_graph(0);
+                dsgraph.r_dsgraph_render_graph(0, true);
             }
         }
     }

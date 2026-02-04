@@ -50,6 +50,9 @@ public:
     virtual void State(u32 state, u32 oldState);
     virtual void OnStateSwitch(u32 S, u32 oldState);
     virtual void PlayAnimIdle();
+    virtual void PlayAnimThrowStart();
+    virtual void PlayAnimThrow();
+    virtual void PlayAnimThrowEnd();
     virtual void PlayAnimDeviceSwitch() override;
     virtual void GetBriefInfo(xr_string& str_name, xr_string& icon_sect_name, xr_string& str_count);
 
@@ -96,25 +99,35 @@ protected:
 
     bool has_already_contact{};
 
-protected:
     //относительная точка и направление вылета гранаты
     Fvector m_vThrowPoint;
-    Fvector m_vThrowDir;
-    //для HUD
-    Fvector m_vHudThrowPoint;
-    Fvector m_vHudThrowDir;
-
-    //звук анимации "играния"
-    HUD_SOUND sndPlaying;
-    HUD_SOUND sndItemOn;
 
     bool m_throwMotionMarksAvailable;
 
+    //-- Sounds
 protected:
+    //звук анимации "играния"
+    HUD_SOUND sndPlaying;
+    HUD_SOUND sndItemOn;
+    HUD_SOUND sndShow;
+    HUD_SOUND sndHide;
+    HUD_SOUND sndThrowStart;
+    HUD_SOUND sndThrow;
+    HUD_SOUND sndThrowEnd;
+
+    u32 dwUpdateSounds_Frame{};
+    virtual void StopHUDSounds() override;
+    virtual bool UpdateHUDSounds();
+
+private:
     void setup_throw_params();
+   
+public:
+    bool m_bThrowPointUpdated{};
+    shared_str m_sThrowPointBoneName{};
+    virtual bool g_ThrowPointParams(Fvector& FirePos, Fvector& FireDir);
 
 public:
-    Fvector const& throw_point_offset() const { return m_vThrowPoint; }
     virtual void activate_physic_shell();
     virtual void setup_physic_shell();
     virtual void create_physic_shell();

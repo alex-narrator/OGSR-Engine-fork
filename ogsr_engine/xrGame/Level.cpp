@@ -534,6 +534,9 @@ void CLevel::OnRender()
         }
     }
 
+    //-- static shown debug items
+    Level().debug_renderer().OnRenderStaticItems();
+
 #else
 
     ph_world->OnRender();

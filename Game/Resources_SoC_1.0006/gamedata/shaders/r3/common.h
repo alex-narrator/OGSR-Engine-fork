@@ -4,7 +4,6 @@
 #include "shared\common.h"
 
 #include "common_defines.h"
-#include "common_policies.h"
 #include "common_iostructs.h"
 #include "common_samplers.h"
 #include "common_cbuffers.h"

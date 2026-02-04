@@ -274,6 +274,7 @@ void CUIInventoryWnd::ProcessPropertiesBoxClicked()
 
             auto itm = CurrentItem();
             ProcessUnload(itm->m_pData);
+            PlaySnd(eInvUnloadWpn);
 
             for (u32 i = 0; i < itm->ChildsCount(); ++i)
             {

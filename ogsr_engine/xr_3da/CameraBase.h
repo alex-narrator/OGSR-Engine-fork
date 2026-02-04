@@ -36,10 +36,10 @@ public:
     float f_fov;
     float f_aspect;
 
-    IC Fvector Position() const { return vPosition; }
-    IC Fvector Direction() const { return vDirection; }
-    IC Fvector Up() const { return vNormal; }
-    IC Fvector Right() const { return Fvector().crossproduct(vNormal, vDirection); }
+    IC const Fvector& Position() const { return vPosition; }
+    IC const Fvector& Direction() const { return vDirection; }
+    IC const Fvector& Up() const { return vNormal; }
+    IC const Fvector& Right() const { return Fvector().crossproduct(vNormal, vDirection); }
     IC float Fov() const { return f_fov; }
     IC float Aspect() const { return f_aspect; }
 

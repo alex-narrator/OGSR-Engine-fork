@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-bool check_grass_shadow(light* L, CFrustum VB)
+static bool check_grass_shadow(const light* L, const CFrustum& VB)
 {
     // Inside the range?
     if (L->vis.distance > ps_ssfx_grass_shadows.z)

@@ -2,6 +2,7 @@
 
 #include "../xrRender/resourcemanager.h"
 #include "../xrRender/dxRenderDeviceRender.h"
+#include "../xrRenderDX10/dx10BufferUtils.h"
 
 void CRenderTarget::u_setrt(CBackend& cmd_list, const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, const ref_rt& _4, ID3DDepthStencilView* zb)
 {
@@ -238,6 +239,8 @@ CRenderTarget::CRenderTarget()
 
         rt_Generic_1.create(r2_RT_generic1, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
         rt_Generic_2.create(r2_RT_generic2, w, h, DXGI_FORMAT_R16G16B16A16_FLOAT);
+        rt_Generic_3.create(r2_RT_generic3, w, h, DXGI_FORMAT_R16G16B16A16_FLOAT);
+        rt_accum_ssfx.create(r2_RT_accum_ssfx, w, h, DXGI_FORMAT_R16G16B16A16_FLOAT); // Temp RT 16B
 
         // RT Blur
         rt_blur_h_2.create(r2_RT_blur_h_2, u32(w / 2), u32(h / 2), DXGI_FORMAT_R8G8B8A8_UNORM);
@@ -274,6 +277,9 @@ CRenderTarget::CRenderTarget()
         rt_heat.create(r2_RT_heat, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
         rt_mask_drops_blur.create(r2_RT_mask_drops_blur, w, h, DXGI_FORMAT_R8G8B8A8_UNORM); // Create RT, full resolution
 
+        rt_ssr1.create(r2_RT_ssr1, w, h, DXGI_FORMAT_R8G8B8A8_UNORM); // Generic RT
+        rt_ssr2.create(r2_RT_ssr2, w, h, DXGI_FORMAT_R8G8B8A8_UNORM); // Temp RT 8B
+
         rt_flares.create(r2_RT_flares, w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 
         rt_Velocity.create(r2_RT_velocity, w, h, DXGI_FORMAT_R16G16_FLOAT);
@@ -297,6 +303,7 @@ CRenderTarget::CRenderTarget()
     s_occq.create("dumb");
 
     s_blur.create("ogsr_blur");
+    s_volumetric_blur.create("ogsr_volumetric_blur");
     s_dof.create("ogsr_dof");
     s_gasmask_dudv.create("ogsr_gasmask");
     s_fakescope.create("ogsr_fakescope"); // crookr
@@ -304,6 +311,7 @@ CRenderTarget::CRenderTarget()
     s_heatvision.create("ogsr_heatvision");
     s_flare.create("effects\\lensflare", "shaders\\lensflare");
     s_lut.create("ogsr_lut");
+    s_ssr.create("ogsr_ssr");
 
     s_ssfx_bloom.create("ogsr_bloom");
     s_ssfx_bloom_lens.create("ogsr_bloom_flares");
@@ -351,9 +359,7 @@ CRenderTarget::CRenderTarget()
 
     // VOLUME
     {
-        s_accum_volume.create("accum_volumetric", "lights\\lights_spot01");
-        accum_volumetric_geom_create();
-        g_accum_volumetric.create(D3DFVF_XYZ, g_accum_volumetric_vb, g_accum_volumetric_ib);
+        s_accum_volume.create("accum_volumetric");
     }
 
     // BLOOM
@@ -364,7 +370,6 @@ CRenderTarget::CRenderTarget()
         constexpr u32 fvf_filter = (u32)D3DFVF_XYZRHW | D3DFVF_TEX8 | D3DFVF_TEXCOORDSIZE4(0) | D3DFVF_TEXCOORDSIZE4(1) | D3DFVF_TEXCOORDSIZE4(2) | D3DFVF_TEXCOORDSIZE4(3) |
             D3DFVF_TEXCOORDSIZE4(4) | D3DFVF_TEXCOORDSIZE4(5) | D3DFVF_TEXCOORDSIZE4(6) | D3DFVF_TEXCOORDSIZE4(7);
         rt_Bloom_1.create(r2_RT_bloom1, w, h, fmt);
-        rt_Bloom_2.create(r2_RT_bloom2, w, h, fmt);
         g_bloom_build.create(fvf_build, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
         g_bloom_filter.create(fvf_filter, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
         s_bloom.create("bloom_filter");
@@ -499,7 +504,17 @@ CRenderTarget::CRenderTarget()
     s_postprocess.create("postprocess");
     g_postprocess.create(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RImplementation.Vertex.Buffer(), RImplementation.QuadIB);
 
-    //
+    {
+        constexpr u32 color{color_rgba(0, 0, 0, 255)};
+        constexpr FVF::TL verts[]{{-1.0, 1.0, 1.0, 1.0, color, 0.0, 0.0}, {3.0, 1.0, 1.0, 1.0, color, 2.0, 0.0}, {-1.0, -3.0, 1.0, 1.0, color, 0.0, 2.0}};
+        constexpr u16 indices[]{0, 1, 2};
+
+        dx10BufferUtils::CreateVertexBuffer(&TriangleVB, verts, sizeof(verts), true);
+        dx10BufferUtils::CreateIndexBuffer(&TriangleIB, indices, sizeof(indices), true);
+
+        TriangleGeom.create(FVF::F_TL, TriangleVB, TriangleIB);
+    }
+
     reset_target_dimensions();
 }
 
@@ -542,11 +557,12 @@ CRenderTarget::~CRenderTarget()
         _RELEASE(t_noise_surf[it]);
     }
 
-    //
     accum_spot_geom_destroy();
     accum_omnip_geom_destroy();
     accum_point_geom_destroy();
-    accum_volumetric_geom_destroy();
+
+    _RELEASE(TriangleVB);
+    _RELEASE(TriangleIB);
 
     DestroyDLSS();
     DestroyFSR();

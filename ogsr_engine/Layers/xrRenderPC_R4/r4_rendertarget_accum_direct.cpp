@@ -256,7 +256,7 @@ void CRenderTarget::accum_direct_volumetric(CBackend& cmd_list, u32 sub_phase, c
     if ((sub_phase != SE_SUN_NEAR) && (sub_phase != SE_SUN_MIDDLE) && (sub_phase != SE_SUN_FAR))
         return;
 
-    phase_vol_accumulator(cmd_list);
+    phase_vol_accumulator(cmd_list, true);
 
     cmd_list.set_ColorWriteEnable();
 

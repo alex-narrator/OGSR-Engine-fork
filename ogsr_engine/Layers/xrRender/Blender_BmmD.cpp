@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 
-
+#include "uber_deffer.h"
 #include "blender_BmmD.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -85,8 +85,73 @@ void CBlender_BmmD::LoadIni(CInifile* ini_file, LPCSTR section)
 //////////////////////////////////////////////////////////////////////////
 // R3
 //////////////////////////////////////////////////////////////////////////
-#include "uber_deffer.h"
 void CBlender_BmmD::Compile(CBlender_Compile& C)
+{
+    if (!ps_r2_ls_flags_ext.test(R2FLAGEXT_TERRAIN_PARALLAX))
+    {
+        CompileOLD(C);
+        return;
+    }
+
+    IBlender::Compile(C);
+
+    string256 mask;
+    string_path fn;
+    LPSTR LodTexture = strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_lod_textures");
+
+    strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_mask");
+    switch (C.iElement)
+    {
+    case SE_R2_NORMAL_HQ: // deffer
+        uber_deffer(C, true, "terrain", "terrain_high", false, oT2_Name[0] ? oT2_Name : 0);
+
+        C.r_dx10Texture("s_mask", mask);
+        C.r_dx10Texture("s_dt_r", oR_Name);
+        C.r_dx10Texture("s_dt_g", oG_Name);
+        C.r_dx10Texture("s_dt_b", oB_Name);
+        C.r_dx10Texture("s_dt_a", oA_Name);
+        C.r_dx10Texture("s_dn_r", strconcat(sizeof(mask), mask, oR_Name, "_bump"));
+        C.r_dx10Texture("s_dn_g", strconcat(sizeof(mask), mask, oG_Name, "_bump"));
+        C.r_dx10Texture("s_dn_b", strconcat(sizeof(mask), mask, oB_Name, "_bump"));
+        C.r_dx10Texture("s_dn_a", strconcat(sizeof(mask), mask, oA_Name, "_bump"));
+        C.r_dx10Texture("s_puddles_mask", strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_puddles_mask"));
+        C.r_dx10Texture("s_puddles_normal", "fx\\water_normal");
+        C.r_dx10Texture("s_rainsplash", "fx\\water_sbumpvolume");
+
+        C.r_dx10Sampler("smp_base");
+        C.r_dx10Sampler("smp_linear");
+
+        C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+        C.r_StencilRef(0x01);
+        C.r_End();
+        break;
+    case SE_R2_NORMAL_LQ: // deffer
+        uber_deffer(C, false, "base", "terrain_mid", false, oT2_Name[0] ? oT2_Name : 0);
+        C.r_dx10Texture("s_mask", mask);
+
+        if (FS.exist(fn, fsgame::game_textures, LodTexture, ".dds"))
+            C.r_dx10Texture("s_lod_texture", LodTexture);
+        else
+            C.r_dx10Texture("s_lod_texture", "terrain\\default_lod_textures");
+
+        C.r_dx10Sampler("smp_base");
+        C.r_dx10Sampler("smp_linear");
+        C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
+        C.r_StencilRef(0x01);
+        C.r_End();
+        break;
+    case SE_R2_SHADOW: // smap
+        C.r_Pass("shadow_direct_terrain", "shadow_direct_base", FALSE, TRUE, TRUE, FALSE);
+        C.r_dx10Texture("s_base", C.L_textures[0]);
+        C.r_dx10Sampler("smp_base");
+        C.r_dx10Sampler("smp_linear");
+        C.r_ColorWriteEnable(false, false, false, false);
+        C.r_End();
+        break;
+    }
+}
+
+void CBlender_BmmD::CompileOLD(CBlender_Compile& C)
 {
     IBlender::Compile(C);
     // codepath is the same, only the shaders differ
@@ -110,13 +175,12 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         C.r_dx10Texture("s_dn_g", strconcat(sizeof(mask), mask, oG_Name, "_bump"));
         C.r_dx10Texture("s_dn_b", strconcat(sizeof(mask), mask, oB_Name, "_bump"));
         C.r_dx10Texture("s_dn_a", strconcat(sizeof(mask), mask, oA_Name, "_bump"));
-
+        /*
         C.r_dx10Texture("s_dnE_r", strconcat(sizeof(mask), mask, oR_Name, "_bump#"));
         C.r_dx10Texture("s_dnE_g", strconcat(sizeof(mask), mask, oG_Name, "_bump#"));
         C.r_dx10Texture("s_dnE_b", strconcat(sizeof(mask), mask, oB_Name, "_bump#"));
         C.r_dx10Texture("s_dnE_a", strconcat(sizeof(mask), mask, oA_Name, "_bump#"));
-
-
+        */
         C.r_dx10Texture("s_puddles_normal", "fx\\water_normal");
         C.r_dx10Texture("s_puddles_perlin", "fx\\puddles_perlin");
         C.r_dx10Texture("s_puddles_mask", strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_puddles_mask"));
@@ -132,7 +196,6 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         break;
     case SE_R2_NORMAL_LQ: // deffer
         uber_deffer(C, false, "base", "impl", false, oT2_Name[0] ? oT2_Name : nullptr, true);
-        // C.r_Sampler		("s_lmap",	C.L_textures[1]);
         C.r_dx10Texture("s_lmap", C.L_textures[1]);
         C.r_dx10Sampler("smp_linear");
 
@@ -143,7 +206,6 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
         break;
     case SE_R2_SHADOW: // smap
         C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);
-        // C.r_Sampler		("s_base",C.L_textures[0]);
         C.r_dx10Texture("s_base", C.L_textures[0]);
         C.r_dx10Sampler("smp_base");
         C.r_dx10Sampler("smp_linear");

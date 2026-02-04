@@ -11,7 +11,7 @@ extern float ps_r__LOD_k;
 
 using namespace R_dsgraph;
 
-void R_dsgraph_structure::r_dsgraph_render_graph_static(const u32 _priority)
+void R_dsgraph_structure::r_dsgraph_render_graph_static(const u32 _priority, const bool for_rain_smap)
 {
     Device.Statistic->RenderDUMP.Begin();
 
@@ -99,6 +99,8 @@ void R_dsgraph_structure::r_dsgraph_render_graph_static(const u32 _priority)
                     const float lod = 1.f; // fixed lod for shaders
                     cmd_list.lod.set_lod(lod);
 
+                    cmd_list.set_c("rain_smap", static_cast<int>(for_rain_smap));
+
                     for (const auto& tree : *items.trees)
                     {
                         {
@@ -179,11 +181,11 @@ void R_dsgraph_structure::r_dsgraph_render_graph_dynamic(u32 _priority)
     Device.Statistic->RenderDUMP.End();
 }
 
-void R_dsgraph_structure::r_dsgraph_render_graph(u32 _priority)
+void R_dsgraph_structure::r_dsgraph_render_graph(const u32 _priority, const bool for_rain_smap)
 {    
     PIX_EVENT_CTX(cmd_list, dsgraph_render_graph);
 
-    r_dsgraph_render_graph_static(_priority);
+    r_dsgraph_render_graph_static(_priority, for_rain_smap);
     r_dsgraph_render_graph_dynamic(_priority);
 }
 

@@ -3,10 +3,7 @@
 
 #include "ResourceManager.h"
 
-#ifndef _EDITOR
 #include "../../xr_3da/render.h"
-#endif
-
 #include "../../xr_3da/tntQAVI.h"
 #include "../../xr_3da/xrTheora_Surface.h"
 
@@ -176,14 +173,12 @@ void CTexture::Load(const char* Name)
     }
 
     Preload(Name);
-//#ifndef		DEDICATED_SERVER
-#ifndef _EDITOR
+
     if (!g_dedicated_server)
-#endif
     {
         // Check for OGM
         string_path fn;
-        if (FS.exist(fn, "$game_textures$", Name, ".ogm"))
+        if (FS.exist(fn, fsgame::game_textures, Name, ".ogm"))
         {
             // AVI
             pTheora = xr_new<CTheoraSurface>();
@@ -217,7 +212,7 @@ void CTexture::Load(const char* Name)
                 }
             }
         }
-        else if (FS.exist(fn, "$game_textures$", Name, ".avi"))
+        else if (FS.exist(fn, fsgame::game_textures, Name, ".avi"))
         {
             // AVI
             pAVI = xr_new<CAviPlayerCustom>();
@@ -244,7 +239,7 @@ void CTexture::Load(const char* Name)
                 }
             }
         }
-        else if (FS.exist(fn, "$game_textures$", Name, ".seq"))
+        else if (FS.exist(fn, fsgame::game_textures, Name, ".seq"))
         {
             // Sequence
             string256 buffer;

@@ -105,8 +105,9 @@ public:
     void AddOnCompleteFunc_script(LPCSTR _str);
     void AddOnFailFunc_script(LPCSTR _str);
     void AddOnSkipedFunc_script(LPCSTR _str);
-    LPCSTR GetDescription_script() { return *description; };
+    LPCSTR GetDescription_script() const { return description.c_str(); };
     void ChangeStateCallback();
+    u16 GetObjectID_script() const { return object_id; };
 };
 
 DEFINE_VECTOR(SGameTaskObjective, OBJECTIVE_VECTOR, OBJECTIVE_VECTOR_IT);
