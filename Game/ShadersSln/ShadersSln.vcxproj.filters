@@ -18,9 +18,6 @@
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\common\models_detector_cfg.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\common\ogsr_shaders_cfg.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\common\smaa.h">
       <Filter>common</Filter>
     </ClInclude>
@@ -70,7 +67,6 @@
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\check_screenspace_NEWGLOSS.h" />
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\check_screenspace_NVG.h" />
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\check_screenspace_SHADOWS.h" />
-    <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\check_screenspace_SSR.h" />
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\check_screenspace_sss.h" />
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\check_screenspace_WIND.h" />
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\common.h" />
@@ -79,7 +75,6 @@
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\common_defines.h" />
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\common_functions.h" />
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\common_iostructs.h" />
-    <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\common_policies.h" />
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\common_samplers.h" />
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\effects_flare.h" />
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\fluid_common.h" />
@@ -137,15 +132,14 @@
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\check_screenspace_BLOOM.h" />
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\nv_utils.h" />
     <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\thermal_utils.h" />
+    <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\check_screenspace_PUDDLES.h" />
+    <ClInclude Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\settings_screenspace_TERRAIN.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\dx11\tess.ds">
       <Filter>dx11</Filter>
     </None>
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\dx11\tess.hs">
-      <Filter>dx11</Filter>
-    </None>
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\dx11\tess_shadow.ds">
       <Filter>dx11</Filter>
     </None>
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\accum_base.ps" />
@@ -171,8 +165,6 @@
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\base_lplanes.ps" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\base_lplanes.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\bloom_build.ps" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\bloom_filter.ps" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\bloom_filter_f.ps" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\bloom_luminance_1.ps" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\bloom_luminance_2.ps" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\bloom_luminance_3.ps" />
@@ -181,7 +173,6 @@
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\clouds.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\combine.s" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\combine_1.ps" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\combine_1.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\combine_2_naa.ps" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\combine_distort.ps" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\combine_tonemap.ps" />
@@ -255,12 +246,6 @@
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_base_steep-hq.ps" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_grass.ps" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_grass.vs" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_impl_flat.ps" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_impl_flat_d.ps" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_impl_flat_d.vs" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_impl_lmh_flat.ps" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_impl_lmh_flat_d.ps" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_impl_lmh_flat_d.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_model_bump.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_model_bump_d.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_model_bump_d-hq.vs" />
@@ -532,7 +517,6 @@
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\stub_notransform_t_ma.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\stub_screen_space.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\temporal_antialiasing.s" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\test.gs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\vert.ps" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\vert.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\water.ps" />
@@ -547,10 +531,6 @@
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\water_studen.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\water_underground.ps" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\water_underground.vs" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\waterd.ps" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\waterd.vs" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\waterd_soft.ps" />
-    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\waterd_soft.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\wmark.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\yuv2rgb.ps" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\accum_lamp.ps" />
@@ -596,5 +576,27 @@
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\effects_flare.ps" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\effects_flare.vs" />
     <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\effects_sun.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_terrain_flat.vs" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_terrain_high_flat.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_terrain_low_flat.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_terrain_mid_flat.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_terrain_flat_d.vs" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_terrain_high_flat_d.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\ogsr_ssr.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\ogsr_ssr.s" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\ogsr_ssr_combine.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\shadow_direct_terrain.vs" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_impl_flat.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_impl_flat_d.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_impl_flat_d.vs" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_impl_lmh_flat.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_impl_lmh_flat_d.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\deffer_impl_lmh_flat_d.vs" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\combine_peak.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\combine_peak.vs" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\ogsr_blur.vs" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\ogsr_volumetric_blur.ps" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\ogsr_volumetric_blur.s" />
+    <None Include="..\Resources_SoC_1.0006\gamedata\shaders\r3\shadow_direct_base_branch_aref.ps" />
   </ItemGroup>
 </Project>

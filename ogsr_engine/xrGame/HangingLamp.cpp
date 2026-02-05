@@ -113,9 +113,12 @@ BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
 
     //Simp: для поинта не вижу смысла по дефолту включать волюметрик, ибо один поинт - это шесть отдельных источников света направленных в разные стороны. Слишком накладно по 6 волюметриков на светильник.
     //Да и вообще лучше придумать настройки чтоб каждую лампу индивидуально настроить можно было. Пока только настройку через скрипты добавил.
-    light_render->set_volumetric(lamp->flags.is(CSE_ALifeObjectHangingLamp::flVolumetricLight) /*|| light_render->get_type() == IRender_Light::SPOT*/);
-    light_render->set_volumetric_quality(1.f);
-    light_render->set_volumetric_intensity(0.1f);
+    if (lamp->flags.is(CSE_ALifeObjectHangingLamp::flTypeSpot))
+        light_render->set_volumetric(true);
+    else
+        light_render->set_volumetric(!!lamp->flags.is(CSE_ALifeObjectHangingLamp::flVolumetricLight));
+
+    light_render->set_volumetric_intensity(0.2f);
     light_render->set_volumetric_distance(1.f);
 
     if (lamp->flags.is(CSE_ALifeObjectHangingLamp::flPointAmbient))
@@ -403,7 +406,6 @@ void CHangingLamp::script_register(lua_State* L)
                            .def("turn_off", &CHangingLamp::TurnOff)
                            .def("set_lsf_params", &CHangingLamp::SetLSFParams)
                            .def("set_volumetric", [](CHangingLamp* self, const bool val) { self->light_render->set_volumetric(val); })
-                           .def("set_volumetric_quality", [](CHangingLamp* self, const float val) { self->light_render->set_volumetric_quality(val); })
                            .def("set_volumetric_intensity", [](CHangingLamp* self, const float val) { self->light_render->set_volumetric_intensity(val); })
                            .def("set_volumetric_distance", [](CHangingLamp* self, const float val) { self->light_render->set_volumetric_distance(val); })
     ];

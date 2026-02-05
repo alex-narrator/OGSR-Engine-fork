@@ -25,7 +25,6 @@ void DestroyPSs(PSVec& lst)
 void CreateSounds(SoundVec& lst, xr_vector<std::string>& buf)
 {
     int cnt = buf.size();
-    R_ASSERT(cnt <= GAMEMTL_SUBITEM_COUNT + 2);
     lst.resize(cnt);
     for (int k = 0; k < cnt; ++k)
         lst[k].create(buf[k].c_str(), st_Effect, sg_SourceType);
@@ -35,7 +34,6 @@ void CreateSoundNames(xr_vector<std::string>& lst, LPCSTR buf)
 {
     string128 tmp;
     int cnt = _GetItemCount(buf);
-    R_ASSERT(cnt <= GAMEMTL_SUBITEM_COUNT + 2);
     lst.reserve(cnt);
     for (int k = 0; k < cnt; ++k)
     {
@@ -44,25 +42,10 @@ void CreateSoundNames(xr_vector<std::string>& lst, LPCSTR buf)
     }
 }
 
-/*
-void CreateMarks(ShaderVec& lst, LPCSTR buf)
-{
-    string256	tmp;
-    int cnt		=_GetItemCount(buf);	R_ASSERT(cnt<=GAMEMTL_SUBITEM_COUNT);
-    ref_shader	s;
-    for (int k=0; k<cnt; ++k)
-    {
-        s.create		("effects\\wallmark",_GetItem(buf,k,tmp));
-        lst.push_back	(s);
-    }
-}
-*/
-
 void CreateMarks(IWallMarkArray* pMarks, LPCSTR buf)
 {
     string256 tmp;
     int cnt = _GetItemCount(buf);
-    R_ASSERT(cnt <= GAMEMTL_SUBITEM_COUNT);
     for (int k = 0; k < cnt; ++k)
         pMarks->AppendMark(_GetItem(buf, k, tmp));
 }
@@ -71,7 +54,6 @@ void CreatePSs(PSVec& lst, LPCSTR buf)
 {
     string256 tmp;
     int cnt = _GetItemCount(buf);
-    R_ASSERT(cnt <= GAMEMTL_SUBITEM_COUNT);
     for (int k = 0; k < cnt; ++k)
     {
         lst.emplace_back(_GetItem(buf, k, tmp));

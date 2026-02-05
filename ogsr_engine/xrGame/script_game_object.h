@@ -311,6 +311,7 @@ public:
     void SetTaskSelected(const shared_str& id, u16 idx, const bool safe);
     CGameTask* GetActiveTask();
     SGameTaskObjective* GetActiveObjective();
+    LPCSTR GetArticleText(LPCSTR article_id);
 
     bool IsTalking();
     void StopTalk();

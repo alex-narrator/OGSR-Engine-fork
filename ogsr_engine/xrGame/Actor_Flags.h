@@ -23,6 +23,7 @@ enum
     AF_FIRST_PERSON_DEATH       = 1 << 18,
     AF_CAM_COLLISION_COP        = 1 << 19,
     AF_ACTOR_SHADOW             = 1 << 20,
+    AF_THROW_DEBUG              = 1 << 21,
 };
 
 //enum

@@ -127,7 +127,10 @@ void CUIWindow::script_register(lua_State* L)
                   .def("GetAbsoluteRect", (void(CUIWindow::*)(Frect&)) & CUIWindow::GetAbsoluteRect)
                   .def("BringToTop", &CUIWindow::BringToTop)
                   .def("BringToBottom", &CUIWindow::BringToBottom)
-                  .def("BringAllToTop", &CUIWindow::BringAllToTop),
+                  .def("BringAllToTop", &CUIWindow::BringAllToTop)
+                  .def("SetPriority", &CUIWindow::SetPriority)
+                  .def("GetPriority", &CUIWindow::GetPriority)
+                  .def("SortByPriority", &CUIWindow::SortByPriority),
 
               //		.def("",						&CUIWindow::)
 

@@ -102,7 +102,8 @@ void CScriptGameObject::script_register(lua_State* L)
 
                     value("on_actor_footstep", int(GameObject::eOnActorFootStep)),
                     value("on_actor_land", int(GameObject::eOnActorLand)),
-                    value("on_actor_jump", int(GameObject::eOnActorJump))]
+                    value("on_actor_jump", int(GameObject::eOnActorJump)),
+                    value("on_actor_boltthrow", int(GameObject::eOnActorBoltThrow))]
         ];
 
     script_register_game_object4(L);

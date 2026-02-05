@@ -19,6 +19,7 @@
 
 #include "CalculateTriangle.h"
 #include "tri-colliderknoopc/dcTriangle.h"
+#include "../COMMON_AI/ai_sounds.h"
 
 float g_fForceGrowSpeed{25.f};
 
@@ -45,16 +46,17 @@ void CMissile::Load(LPCSTR section)
     m_dwDestroyTimeMax = pSettings->r_u32(section, "destroy_time");
 
     m_vThrowPoint = pSettings->r_fvector3(section, "throw_point");
-    m_vThrowDir = pSettings->r_fvector3(section, "throw_dir");
-    m_vHudThrowPoint = pSettings->r_fvector3(*hud_sect, "throw_point");
-    m_vHudThrowDir = pSettings->r_fvector3(*hud_sect, "throw_dir");
 
     m_sounds.LoadSound(section, "snd_draw", "sndShow", SOUND_TYPE_ITEM_TAKING);
     m_sounds.LoadSound(section, "snd_holster", "sndHide", SOUND_TYPE_ITEM_HIDING);
-    m_sounds.LoadSound(section, "snd_playing", "sndPlaying", SOUND_TYPE_ITEM_USING);
-    m_sounds.LoadSound(section, "snd_throw", "sndThrow", SOUND_TYPE_ITEM_USING);
+    m_sounds.LoadSound(section, "snd_playing", "sndPlaying", SOUND_TYPE_ITEM_TAKING);
+    m_sounds.LoadSound(section, "snd_throw", "sndThrow", SOUND_TYPE_WEAPON_SHOOTING);
+    m_sounds.LoadSound(section, "snd_throw_start", "sndThrowStart", SOUND_TYPE_WEAPON_EMPTY_CLICKING);
+    m_sounds.LoadSound(section, "snd_throw_end", "sndThrowEnd", SOUND_TYPE_WEAPON_EMPTY_CLICKING);
 
     m_ef_weapon_type = READ_IF_EXISTS(pSettings, r_u32, section, "ef_weapon_type", u32(-1));
+
+    m_sThrowPointBoneName = READ_IF_EXISTS(pSettings, r_string, section, "throw_point_bone", "");
 }
 
 BOOL CMissile::net_Spawn(CSE_Abstract* DC)
@@ -160,6 +162,8 @@ void CMissile::UpdateCL()
             }
         }
     }
+
+    UpdateHUDSounds();
 }
 
 void CMissile::shedule_Update(u32 dt)
@@ -179,6 +183,9 @@ void CMissile::shedule_Update(u32 dt)
 
 void CMissile::State(u32 state, u32 oldState)
 {
+    if (state == eHiding || state == eShowing || state == eIdle)  
+        m_bThrowPointUpdated = false;
+
     switch (state)
     {
     case eShowing: {
@@ -218,11 +225,7 @@ void CMissile::State(u32 state, u32 oldState)
     case eThrowStart: {
         SetPending(TRUE);
         m_fThrowForce = m_fMinForce;
-        if (!m_constpower && AnimationExist({"anim_throw_begin_alt", "anm_throw_begin_alt"}))
-            PlayHUDMotion({"anim_throw_begin_alt", "anm_throw_begin_alt"}, true, GetState());
-        else
-            PlayHUDMotion({"anim_throw_begin", "anm_throw_begin"}, true, GetState());
-        PlaySound("sndThrow", Position());
+        PlayAnimThrowStart();
     }
     break;
     case eReady: {
@@ -235,15 +238,12 @@ void CMissile::State(u32 state, u32 oldState)
     case eThrow: {
         SetPending(TRUE);
         m_throw = false;
-        if (!m_constpower && AnimationExist({"anim_throw_act_alt", "anm_throw_alt"}))
-            PlayHUDMotion({"anim_throw_act_alt", "anm_throw_alt"}, true, GetState());
-        else
-            PlayHUDMotion({"anim_throw_act", "anm_throw"}, true, GetState());
+        PlayAnimThrow();
         m_throwMotionMarksAvailable = m_current_motion_def && !m_current_motion_def->marks.empty();
     }
     break;
     case eThrowEnd: {
-        PlayHUDMotion({"anim_throw_end", "anm_throw_end"}, true, GetState());
+        PlayAnimThrowEnd();
         if (m_throwMotionMarksAvailable)
             SwitchState(eShowing);
         else
@@ -261,6 +261,21 @@ void CMissile::PlayAnimIdle()
     PlayHUDMotion({"anim_idle", "anm_idle"}, true, GetState());
 }
 
+void CMissile::PlayAnimThrowStart() { 
+    PlaySound("sndThrowStart", Position());
+    PlayHUDMotion({"anim_throw_begin", "anm_throw_begin"}, true, GetState()); 
+}
+
+void CMissile::PlayAnimThrow() { 
+    PlaySound("sndThrow", Position());
+    PlayHUDMotion({"anim_throw_act", "anm_throw"}, true, GetState()); 
+}
+
+void CMissile::PlayAnimThrowEnd() {
+    PlaySound("sndThrowEnd", Position());
+    PlayHUDMotion({"anim_throw_end", "anm_throw_end"}, true, GetState());
+}
+
 void CMissile::OnStateSwitch(u32 S, u32 oldState)
 {
     inherited::OnStateSwitch(S, oldState);
@@ -269,6 +284,9 @@ void CMissile::OnStateSwitch(u32 S, u32 oldState)
 
 void CMissile::OnAnimationEnd(u32 state)
 {
+    if (state == eThrowEnd)
+        m_bThrowPointUpdated = false;
+
     switch (state)
     {
     case eHiding: {
@@ -413,8 +431,8 @@ void CMissile::setup_throw_params()
             Log("H_Parent", H_Parent()->cNameSect().c_str());
         }
 #endif
-
-        entity->g_fireParams(this, FirePos, FireDir);
+        if (!g_ThrowPointParams(FirePos, FireDir))
+            entity->g_fireParams(this, FirePos, FireDir); 
     }
     else
     {
@@ -426,10 +444,16 @@ void CMissile::setup_throw_params()
     trans.c.set(FirePos);
     m_throw_matrix.set(trans);
     m_throw_direction.set(trans.k);
+
+    m_bThrowPointUpdated = true;
 }
 
 void CMissile::Throw()
 {
+    //-- having > 1 motion mark it will be called for each mark
+    if (m_bThrowPointUpdated)
+        return;
+
     VERIFY(smart_cast<CEntity*>(H_Parent()));
     setup_throw_params();
 
@@ -653,4 +677,178 @@ void CMissile::ExitContactCallback(bool& do_colide, bool bo1, dContact& c, SGame
             l_this->Contact(gd2 ? smart_cast<CPhysicsShellHolder*>(gd2->ph_ref_object) : nullptr);
         }
     }
+}
+
+
+//-------------------------------------------------------------------------------------
+//-- VlaGan: throwing (sexual) from HUD bone for actor with obstacle detection
+//-------------------------------------------------------------------------------------
+bool CMissile::g_ThrowPointParams(Fvector& FirePos, Fvector& FireDir)
+{
+    //-- no throw bone = user old method
+    if (!m_sThrowPointBoneName.size())
+        return false;
+
+    auto pActor = smart_cast<CActor*>(H_Parent());
+    if (!pActor)
+        return false;
+
+    if (pActor->active_cam() != eacFirstEye)
+        return false;
+
+    //-- hand format (cop/soc)
+    const bool isCopHands = g_player_hud->Model();
+
+    //-- Setup debug renderer
+    auto* dbg = &Level().debug_renderer();
+    dbg->SetStaticDrawFlag(AF_THROW_DEBUG);
+
+    const Fvector& cam_pos = pActor->Cameras().Position();
+    const Fvector& cam_dir = pActor->Cameras().Direction();
+
+    FireDir = cam_dir;
+
+    //----------------------------------------------------------------------------------
+    //-- calculate throw position
+    //----------------------------------------------------------------------------------
+
+    //-- hud model/transform
+    IKinematics* hi_model;
+    Fmatrix hi_trans;
+    if (isCopHands)
+    {
+        hi_model = smart_cast<IKinematics*>(g_player_hud->Model());
+        hi_trans = g_player_hud->XFORM();
+    }
+    else
+    {
+        hi_model = smart_cast<IKinematics*>(g_player_hud->attached_item(0)->m_model);
+        hi_trans = g_player_hud->attached_item(0)->m_item_transform;
+    }
+
+    Fmatrix m_offset, m_trans;
+    m_offset.identity();
+    //-- attach offset from bone
+    m_offset.translate_over(m_vThrowPoint);
+
+    u16 bid = hi_model->LL_BoneID(m_sThrowPointBoneName.c_str());
+    if (bid == BI_NONE)
+    {
+        bid = hi_model->LL_GetBoneRoot();
+        Msg("!![%s] Throw bone[%s] not found in [%s], choosen root[%s]", __FUNCTION__,
+            m_sThrowPointBoneName.c_str(), cNameSect().c_str(), hi_model->LL_BoneName(bid));
+        //return false;
+    }
+
+    Fmatrix temp;
+    temp.mul(hi_trans, hi_model->LL_GetTransform(bid));
+    m_trans.mul(temp, m_offset);
+
+    FirePos = m_trans.c;
+    FirePos.add(cam_pos);
+    //----------------------------------------------------------------------------------
+
+    //----------------------------------------------------------------------------------
+    //-- check for obstacles
+    //----------------------------------------------------------------------------------
+    Fvector rq_pos = cam_pos, rq_dir;
+    /*
+    //-- moving throw_pos.z to cam_pos.z by cam_dir
+    Fvector CP;
+    CP.sub(FirePos, cam_pos);
+    float depth = CP.dotproduct(cam_dir);
+    rq_pos.mad(cam_dir, -depth);
+    */
+    rq_dir.sub(FirePos, rq_pos);
+    float rq_dist = rq_dir.magnitude();
+    rq_dir.normalize();
+
+    //-- debug camera and calculated FirePos
+    if (psActorFlags.test(AF_THROW_DEBUG))
+    {
+        dbg->add_static_line(rq_pos, FirePos, D3DCOLOR_XRGB(0, 255, 0));
+        temp.identity();
+        temp.c.set(rq_pos);
+        dbg->add_static_box(temp, Fvector{0.05f, 0.05f, 0.05f}, D3DCOLOR_XRGB(0, 255, 255), "CAM_POS");
+        temp.c.set(FirePos);
+        dbg->add_static_box(temp, Fvector{0.05f, 0.05f, 0.05f}, D3DCOLOR_XRGB(0, 0, 255), "THROW_POS_ORIG");
+    }
+
+    collide::rq_result RQ{};
+    const collide::ray_defs RD{rq_pos, rq_dir, rq_dist, CDB::OPT_CULL, collide::rqtBoth};
+    collide::rq_results RQR;
+    Level().ObjectSpace.RayQuery(
+        RQR, RD,
+        [](collide::rq_result& result, LPVOID params) {
+            auto RQ = reinterpret_cast<collide::rq_result*>(params);
+            if (result.O)
+            {
+                if (auto* e = smart_cast<CEntityAlive*>(result.O); e && e->g_Alive())
+                    return TRUE;
+            }
+            *RQ = result;
+            return FALSE;
+        },
+        &RQ, nullptr, Level().CurrentEntity());
+
+    bool obstacle{};
+    for (auto& result : RQR.r_results())
+    {
+        if (!result.O)
+        {
+            CDB::TRI* T = Level().ObjectSpace.GetStaticTris() + result.element;
+            SGameMtl* mtl = GMLib.GetMaterialByIdx(T->material);
+
+            //-- ignore useless materials for this
+            if (mtl->Flags.is(SGameMtl::flPassable) || mtl->Flags.is(SGameMtl::flClimable))
+                continue;
+
+            //-- Debug static geom obstacle triangle
+            if (psActorFlags.test(AF_THROW_DEBUG))
+            {
+                Fvector* verts = Level().ObjectSpace.GetStaticVerts();
+                const Fvector& vpos0 = verts[T->verts[0]];
+                const Fvector& vpos1 = verts[T->verts[1]];
+                const Fvector& vpos2 = verts[T->verts[2]];
+
+                dbg->add_static_line(vpos0, vpos1, D3DCOLOR_XRGB(255, 0, 0));
+                dbg->add_static_line(vpos0, vpos2, D3DCOLOR_XRGB(255, 0, 0));
+                dbg->add_static_line(vpos1, vpos2, D3DCOLOR_XRGB(255, 0, 0));
+            }
+        }
+        obstacle = true;
+        RQ = result;
+        break;
+    }
+
+    //-- move throw point in front of the obstacle
+    if (obstacle)
+    {
+        float delta = 0.1f; // 0.1f enought
+        if (auto* e = smart_cast<CEntityAlive*>(RQ.O)) //-- little fix for npc
+            delta = 0.15f;
+
+        FirePos.set(Fvector{}.mad(cam_pos, rq_dir, RQ.range - delta));
+        //-- Moving point back by z coord
+        // Fvector det_pos{};
+        // det_pos.z = -(rq_dist - RQ.range) - 0.1f;
+        // hi_trans.transform_dir(det_pos);
+        // FirePos.add(det_pos);
+    }
+    //----------------------------------------------------------------------------------
+
+    //-- debug adjusted throw pos if obstacle detected
+    if (psActorFlags.test(AF_THROW_DEBUG) && obstacle)
+    {
+        dbg->add_static_line(cam_pos, FirePos, D3DCOLOR_XRGB(255, 0, 0));
+        temp.c.set(FirePos);
+        shared_str dbg_text = "THROW_POS_ADJUSTED";
+        if (RQ.O)
+            dbg_text.sprintf("%s (hit entity id=%s)", dbg_text.c_str(), RQ.O->cName().c_str());
+
+        dbg->add_static_box(temp, Fvector{0.05f, 0.05f, 0.05f}, D3DCOLOR_XRGB(255, 0, 0), dbg_text.c_str());
+    }
+
+    dbg->SetStaticDrawFlagDefault();
+    return true;
 }

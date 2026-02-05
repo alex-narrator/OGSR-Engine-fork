@@ -46,6 +46,9 @@ public:
     virtual void State(u32 state, u32 oldState);
     virtual void OnStateSwitch(u32 S, u32 oldState);
     virtual void PlayAnimIdle();
+    virtual void PlayAnimThrowStart();
+    virtual void PlayAnimThrow();
+    virtual void PlayAnimThrowEnd();
 
 protected:
     virtual void UpdateXForm();
@@ -90,25 +93,21 @@ protected:
     bool m_contacted{};
     bool b_impact_fuze{};
 
-protected:
     //относительная точка и направление вылета гранаты
     Fvector m_vThrowPoint;
-    Fvector m_vThrowDir;
-    //для HUD
-    Fvector m_vHudThrowPoint;
-    Fvector m_vHudThrowDir;
-
-    //звук анимации "играния"
-    HUD_SOUND sndPlaying;
-    HUD_SOUND sndItemOn;
 
     bool m_throwMotionMarksAvailable{};
 
-protected:
+
+private:
     void setup_throw_params();
+   
+public:
+    bool m_bThrowPointUpdated{};
+    shared_str m_sThrowPointBoneName{};
+    virtual bool g_ThrowPointParams(Fvector& FirePos, Fvector& FireDir);
 
 public:
-    Fvector const& throw_point_offset() const { return m_vThrowPoint; }
     virtual void activate_physic_shell();
     virtual void setup_physic_shell();
     virtual void create_physic_shell();

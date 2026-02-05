@@ -15,9 +15,7 @@ Texture2D s_ssfx_lensdirt;
 
 uniform float4 ssfx_bloom_1; // Threshold, Exposure, Emmisive, Sky
 uniform float4 ssfx_bloom_2; // Blur Radius, Vibrance, Lens, Dirt
-uniform float4 mask_control_flag;
-
-// uniform float4 shader_param_6;
+uniform float4 mask_control;
 
 float3 UnchartedToneMapping(float3 col, float exposure)
 {
@@ -70,7 +68,6 @@ float4 main(p_screen I) : SV_Target
     float radial = acos(cUV.x / cUV_len) * 2.0f;
     float starburst = s_starburst.Sample(smp_linear, radial.xx + sOffset).r;
     starburst *= s_starburst.Sample(smp_linear, radial.xx - sOffset).r;
-    // starburst = saturate(starburst + (1.0f - smoothstep(0.0, 0.5, d)));
 
 /* Simp: отключил, эффект как то всрато выглядит.
     // Lens flares
@@ -83,7 +80,7 @@ float4 main(p_screen I) : SV_Target
     Flares = saturate(Flares * starburst * ssfx_bloom_2.z);
 
     // Adjust brightness
-    Flares *= 0.5f / (0.5f + Flares) * mask_control_flag.x;
+    Flares *= 0.5f / (0.5f + Flares) * mask_control.x;
 
     // COMBINE /////////////////////////////////////////////////////////////////////////////////
 
@@ -92,7 +89,7 @@ float4 main(p_screen I) : SV_Target
 
     // Dirt Layer
     float3 MaskDirt = s_ssfx_lensdirt.Sample(smp_rtlinear, I.tc0.xy) * saturate(bloom.rgb + bloom.aaa);
-    MaskDirt *= 2.5f * ssfx_bloom_2.w * saturate(mask_control_flag.x);
+    MaskDirt *= 2.5f * ssfx_bloom_2.w * saturate(mask_control.x);
 
     bloom.rgb = blend_soft(bloom.rgb, MaskDirt.rgb);
 

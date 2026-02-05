@@ -41,8 +41,10 @@ void CRenderTarget::u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l
     // Calculate ordinaty TCs from blur and SS
     const float tw = static_cast<float>(get_width(RCache));
     const float th = static_cast<float>(get_height(RCache));
+
     if (th != Device.dwHeight)
         param_blur = 1.f;
+
     Fvector2 shift, p0, p1;
     shift.set(.5f / tw, .5f / th);
     shift.mul(param_blur);
@@ -83,8 +85,6 @@ void CRenderTarget::phase_pp(CBackend& cmd_list)
     // combination/postprocess
     u_setrt(cmd_list, Device.dwWidth, Device.dwHeight, get_base_rt(), nullptr, nullptr, nullptr);
 
-    //	Element 0 for normal post-process
-    //	Element 4 for color map post-process
     const bool bCMap = u_need_CM();
     cmd_list.set_Element(s_postprocess->E[bCMap ? 4 : 0]);
 
@@ -93,10 +93,6 @@ void CRenderTarget::phase_pp(CBackend& cmd_list)
     const u32 p_color = subst_alpha(param_color_base, nblend);
     const u32 p_gray = subst_alpha(param_color_gray, gblend);
     const Fvector p_brightness = param_color_add;
-    // Msg				("param_gray:%f(%d),param_noise:%f(%d)",param_gray,gblend,param_noise,nblend);
-    // Msg				("base: %d,%d,%d",	color_get_R(p_color),		color_get_G(p_color),		color_get_B(p_color));
-    // Msg				("gray: %d,%d,%d",	color_get_R(p_gray),		color_get_G(p_gray),		color_get_B(p_gray));
-    // Msg				("add:  %d,%d,%d",	color_get_R(p_brightness),	color_get_G(p_brightness),	color_get_B(p_brightness));
 
     // Draw full-screen quad textured with our scene image
     u32 Offset;
@@ -121,10 +117,8 @@ void CRenderTarget::phase_pp(CBackend& cmd_list)
     RImplementation.Vertex.Unlock(4, g_postprocess.stride());
 
     // Actual rendering
-    constexpr const char* s_brightness = "c_brightness";
-    constexpr const char* s_colormap = "c_colormap";
-    cmd_list.set_c(s_brightness, p_brightness.x, p_brightness.y, p_brightness.z, 0);
-    cmd_list.set_c(s_colormap, param_color_map_influence, param_color_map_interpolate, 0, 0);
+    cmd_list.set_c("c_brightness", p_brightness.x, p_brightness.y, p_brightness.z, 0);
+    cmd_list.set_c("c_colormap", param_color_map_influence, param_color_map_interpolate, 0, 0);
     cmd_list.set_Geometry(g_postprocess);
     cmd_list.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }

@@ -115,7 +115,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         {
             /*RImplementation.addShaderOption("USE_HAT", "1");
             Render->HAT = true;*/
-            C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 200);
+            C.r_Pass(tvs_s, oNotAnTree.value ? "shadow_direct_base_aref" : "shadow_direct_base_branch_aref", FALSE, TRUE, TRUE, TRUE, D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 200);
         }
         else
         {

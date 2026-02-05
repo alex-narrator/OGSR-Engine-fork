@@ -6,8 +6,7 @@ Texture2D s_water;
 
 float4 main(float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4 pos2d : SV_Position) : SV_Target
 {
-    gbuffer_data gbd = gbuffer_load_data(tc, pos2d);
-    float4 _P = float4(gbd.P, 1.0);
+    float4 _P = float4(gbuffer_load_position(tc, pos2d), 1.0);
 
     float4 PS = mul(m_shadow, _P);
 

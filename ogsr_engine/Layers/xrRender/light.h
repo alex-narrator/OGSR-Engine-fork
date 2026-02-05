@@ -7,8 +7,6 @@
 
 #define MIN_VIRTUAL_SIZE 0.01f
 
-extern Fvector3 ps_ssfx_volumetric;
-
 class light : public IRender_Light, public ISpatial
 {
 private:
@@ -44,7 +42,6 @@ public:
 
     u32 frame_render;
 
-    float m_volumetric_quality;
     float m_volumetric_intensity;
     float m_volumetric_distance;
 
@@ -61,7 +58,6 @@ public:
 
     ref_shader s_spot;
     ref_shader s_point;
-    ref_shader s_volumetric;
 
     Fmatrix m_xform;
 
@@ -117,7 +113,6 @@ public:
     }
     virtual bool get_volumetric() override { return b_originVolumetric; }
 
-    virtual void set_volumetric_quality(float fValue) { m_volumetric_quality = fValue; }
     virtual void set_volumetric_intensity(float fValue) { m_volumetric_intensity = fValue; }
     virtual void set_volumetric_distance(float fValue) { m_volumetric_distance = fValue; }
 

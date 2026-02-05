@@ -64,13 +64,9 @@ float3 GetWaterFall(Texture2D s_texture, float2 tc)
     return water.xyz;
 }
 
-#ifndef ISAMPLE
-#define ISAMPLE 0
-#endif
-
 float4 main(float2 tc : TEXCOORD0, float2 tcJ : TEXCOORD1, float4 Color : COLOR, float4 pos2d : SV_Position) : SV_Target
 {
-    gbuffer_data gbd = gbuffer_load_data(tc, pos2d, ISAMPLE);
+    gbuffer_data gbd = gbuffer_load_data(tc, pos2d);
 
     // Buffers
     float4 _P = float4(gbd.P, 1.0);

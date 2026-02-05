@@ -767,3 +767,8 @@ void CUIWindow::DetachFromParent()
 
     m_pParentWnd->DetachChild(this);
 }
+
+void CUIWindow::SortByPriority()
+{
+    m_ChildWndList.sort([](const auto& a, const auto& b) { return a->priority_index < b->priority_index; });
+}

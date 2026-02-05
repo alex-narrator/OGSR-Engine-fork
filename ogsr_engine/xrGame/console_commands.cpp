@@ -1724,7 +1724,8 @@ void CCC_RegisterCommands()
 
     CMD4(CCC_Float, "missile_force_grow_speed", &g_fForceGrowSpeed, 1.0f, 50.0f); // скорость замаха гранатой/болтом
     CMD3(CCC_Mask, "g_bloodmarks_on_dynamics", &psActorFlags, AF_BLOODMARKS_ON_DYNAMIC);
-
+    
+    CMD3(CCC_Mask, "g_throw_dbg", &psActorFlags, AF_THROW_DEBUG);
 #ifdef USE_MEMORY_VALIDATOR
     CMD4(CCC_Integer, "g_enable_memory_debug", &g_enable_memory_debug, 0, 1);
     CMD1(CCC_DbgMemoryDump, "dbg_memory_dump");

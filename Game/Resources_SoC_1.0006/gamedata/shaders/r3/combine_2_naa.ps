@@ -42,20 +42,21 @@ Texture2D s_ssfx_bloom;
 
 float4 main(p_screen I) : SV_Target
 {
-    int iSample = 0;
     float2 center = I.tc0;
 
-    gbuffer_data gbd = gbuffer_load_data(center, I.hpos, iSample);
+    float3 _P = gbuffer_load_position(center, I.hpos);
 
-    float depth = gbd.P.z;
+    float depth = _P.z;
 
     float3 img = s_image.Load(int3(center.xy * screen_res.xy, 0), 0);
 
-    img = mblur(center, gbd.P, img.rgb);
+#ifdef USE_MBLUR
+    img = mblur(center, _P, img.rgb);
+#endif
 
     // Indirect light - SCREEN SPACE SHADERS - UPDATE 14
 #ifdef SSFX_INDIRECT_LIGHT
-    ssfx_il(center, I.hpos, gbd.P, gbd.N, img, iSample);
+    ssfx_il(center, I.hpos, _P, gbuffer_load_normal(center), img, 0);
 #endif
 
 // Sky Debanding Implementation  - SCREEN SPACE SHADERS - UPDATE 12.5

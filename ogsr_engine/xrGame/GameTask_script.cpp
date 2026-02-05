@@ -1,8 +1,14 @@
 #include "stdafx.h"
 #include "GameTask.h"
+#include "gametaskmanager.h"
+#include "Actor.h"
+
 
 using namespace luabind;
 
+
+CGameTask* ActiveTask_script() { return Actor()->GameTaskManager().ActiveTask(); };
+SGameTaskObjective* ActiveObjective_script() { return Actor()->GameTaskManager().ActiveObjective(); };
 
 void CGameTask::script_register(lua_State* L)
 {
@@ -54,5 +60,9 @@ void CGameTask::script_register(lua_State* L)
                   .def("get_objective", &CGameTask::GetObjective_script)
                   .def("get_objectives_cnt", &CGameTask::GetObjectiveSize_script)
 
+    ];
+
+    module(L, "gametask")[
+        def("active_task", &ActiveTask_script), def("active_objection", &ActiveObjective_script)
     ];
 }

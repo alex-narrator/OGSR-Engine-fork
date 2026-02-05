@@ -204,7 +204,7 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
             lmap = false;
     }
 
-    string256 vs, dt;
+    string256 dt;
     xr_strcpy(dt, sizeof(dt), C.detail_texture ? C.detail_texture : "");
 
     // detect detail bump
@@ -233,9 +233,10 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
         xr_strcpy(fnameA, _t.bump_get().c_str());
         strconcat(sizeof(fnameB), fnameB, fnameA, "#");
     }
-
+    /* В этом нет смысла
     if (bump && RImplementation.o.dx11_enable_tessellation && C.TessMethod != 0)
     {
+        string256 vs;
         char hs[256], ds[256]; // = "DX11\\tess", ds[256] = "DX11\\tess";
         char params[256] = "(";
 
@@ -294,6 +295,6 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
         if (ps_r2_ls_flags_ext.test(R2FLAGEXT_WIREFRAME))
             C.R().SetRS(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
     }
-    else
+    else*/
         C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);
 }

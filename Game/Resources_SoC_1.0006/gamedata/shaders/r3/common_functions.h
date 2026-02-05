@@ -127,62 +127,6 @@ float3 gbuf_unpack_normal(float2 f)
     return normalize(n);
 }
 
-#ifdef REFLECTIONS_ONLY_ON_TERRAIN
-
-static const uint USABLE_BIT_1 = 1 << 13;
-static const uint USABLE_BIT_2 = 1 << 14;
-static const uint USABLE_BIT_3 = 1 << 15;
-static const uint USABLE_BIT_4 = 1 << 16;
-static const uint USABLE_BIT_5 = 1 << 17;
-static const uint USABLE_BIT_6 = 1 << 18;
-static const uint USABLE_BIT_7 = 1 << 19;
-static const uint USABLE_BIT_8 = 1 << 20;
-static const uint USABLE_BIT_9 = 1 << 21;
-static const uint USABLE_BIT_10 = 1 << 22;
-static const uint USABLE_BIT_11 = 1 << 23; // At least two of those four bit flags must be mutually exclusive (i.e. all 4 bits must not be set together)
-static const uint USABLE_BIT_12 = 1 << 24; // This is because setting 0x47800000 sets all 5 FP16 exponent bits to 1 which means infinity
-static const uint USABLE_BIT_13 = 1 << 25; // This will be translated to a +/-MAX_FLOAT in the FP16 render target (0xFBFF/0x7BFF), overwriting the
-static const uint USABLE_BIT_14 = 1 << 26; // mantissa bits where other bit flags are stored.
-static const uint MUST_BE_SET = 1 << 30; // This flag *must* be stored in the floating-point representation of the bit flag to store
-static const uint USABLE_BIT_15 = 1 << 31;
-
-float gbuf_pack_hemi_mtl(float hemi, float mtl, const bool use_reflections)
-{
-    uint packed_mtl = uint((mtl / 1.333333333) * 31.0);
-    // Clamp hemi max value
-    uint packed = (MUST_BE_SET + (uint(saturate(hemi) * 255.9) << 12) + ((packed_mtl & uint(31)) << 21));
-
-    if ((packed & USABLE_BIT_12) == 0)
-        packed |= USABLE_BIT_13;
-
-    if (packed_mtl & uint(16))
-        packed |= USABLE_BIT_14;
-
-    if (use_reflections)
-        packed |= USABLE_BIT_15;
-    else
-        packed &= ~USABLE_BIT_15;
-
-    return asfloat(packed);
-}
-
-float gbuf_unpack_hemi(float mtl_hemi) { return float((asuint(mtl_hemi) >> 12) & uint(255)) * (1.0 / 254.8); }
-
-float gbuf_unpack_mtl(float mtl_hemi)
-{
-    uint packed = asuint(mtl_hemi);
-    uint packed_hemi = ((packed >> 21) & uint(15)) + ((packed & USABLE_BIT_14) == 0 ? 0 : 16);
-    return float(packed_hemi) * (1.0 / 31.0) * 1.333333333;
-}
-
-bool gbuf_unpack_refl_flag(float mtl_hemi)
-{
-    uint packed = asuint(mtl_hemi);
-    return (packed & USABLE_BIT_15) != 0;
-}
-
-#else
-
 #define USABLE_BIT_1 uint(0x00002000)
 #define USABLE_BIT_2 uint(0x00004000)
 #define USABLE_BIT_3 uint(0x00008000)
@@ -224,23 +168,11 @@ float gbuf_unpack_mtl(float mtl_hemi)
     return float(packed_hemi) * (1.0 / 31.0) * 1.333333333;
 }
 
-#endif
-
-#ifndef EXTEND_F_DEFFER
-f_deffer pack_gbuffer(float4 norm, float4 pos, float4 col, const bool use_reflections = false)
-#else
-f_deffer pack_gbuffer(float4 norm, float4 pos, float4 col, uint imask, const bool use_reflections = false)
-#endif
+f_deffer pack_gbuffer(float4 norm, float4 pos, float4 col)
 {
     f_deffer res;
 
-    res.position = float4(gbuf_pack_normal(norm), pos.z,
-                          gbuf_pack_hemi_mtl(norm.w, pos.w
-#ifdef REFLECTIONS_ONLY_ON_TERRAIN
-                                             ,
-                                             use_reflections
-#endif
-                                             ));
+    res.position = float4(gbuf_pack_normal(norm), pos.z, gbuf_pack_hemi_mtl(norm.w, pos.w));
     res.C = col;
 
     if (L_hotness.x > 0.0)
@@ -248,35 +180,18 @@ f_deffer pack_gbuffer(float4 norm, float4 pos, float4 col, uint imask, const boo
     else
         res.H = float4(0.0, 0.0, 0.0, 0.0);
 
-#ifdef EXTEND_F_DEFFER
-    res.mask = imask;
-#endif
-
     return res;
 }
 
-gbuffer_data gbuffer_load_data(float2 tc : TEXCOORD, float2 pos2d, int iSample)
+inline gbuffer_data gbuffer_load_data(float2 tc, float2 pos2d)
 {
     gbuffer_data gbd;
-
-    gbd.P = float3(0, 0, 0);
-    gbd.hemi = 0;
-    gbd.mtl = 0;
-    gbd.C = 0;
-    gbd.N = float3(0, 0, 0);
 
     float4 P = s_position.Sample(smp_nofilter, tc);
 
     pos2d = pos2d - m_taa_jitter.xy * float2(0.5f, -0.5f) * pos_decompression_params2.xy;
 
     // 3d view space pos reconstruction math
-    // center of the plane (0,0) or (0.5,0.5) at distance 1 is eyepoint(0,0,0) + lookat (assuming |lookat| ==1
-    // left/right = (0,0,1) -/+ tan(fHorzFOV/2) * (1,0,0 )
-    // top/bottom = (0,0,1) +/- tan(fVertFOV/2) * (0,1,0 )
-    // lefttop = ( -tan(fHorzFOV/2),  tan(fVertFOV/2), 1 )
-    // righttop = (  tan(fHorzFOV/2),  tan(fVertFOV/2), 1 )
-    // leftbottom = ( -tan(fHorzFOV/2), -tan(fVertFOV/2), 1 )
-    // rightbottom = (  tan(fHorzFOV/2), -tan(fVertFOV/2), 1 )
     gbd.P = float3(P.z * (pos2d * pos_decompression_params.zw - pos_decompression_params.xy), P.z);
 
     // reconstruct N
@@ -288,10 +203,6 @@ gbuffer_data gbuffer_load_data(float2 tc : TEXCOORD, float2 pos2d, int iSample)
     // reconstruct hemi
     gbd.hemi = gbuf_unpack_hemi(P.w);
 
-#ifdef REFLECTIONS_ONLY_ON_TERRAIN
-    gbd.refl_flag = gbuf_unpack_refl_flag(P.w);
-#endif
-
     float4 C = s_diffuse.Sample(smp_nofilter, tc);
 
     gbd.C = C.xyz;
@@ -300,20 +211,25 @@ gbuffer_data gbuffer_load_data(float2 tc : TEXCOORD, float2 pos2d, int iSample)
     return gbd;
 }
 
-gbuffer_data gbuffer_load_data(float2 tc : TEXCOORD, float2 pos2d) { return gbuffer_load_data(tc, pos2d, 0); }
-
-gbuffer_data gbuffer_load_data_offset(float2 tc : TEXCOORD, float2 OffsetTC : TEXCOORD, float2 pos2d)
+inline float3 gbuffer_load_position(float2 tc, float2 pos2d)
 {
-    float2 delta = ((OffsetTC - tc) * pos_decompression_params2.xy);
+    float4 P = s_position.Sample(smp_nofilter, tc);
 
-    return gbuffer_load_data(OffsetTC, pos2d + delta, 0);
+    pos2d = pos2d - m_taa_jitter.xy * float2(0.5f, -0.5f) * pos_decompression_params2.xy;
+
+    return float3(P.z * (pos2d * pos_decompression_params.zw - pos_decompression_params.xy), P.z);
 }
 
-gbuffer_data gbuffer_load_data_offset(float2 tc : TEXCOORD, float2 OffsetTC : TEXCOORD, float2 pos2d, uint iSample)
+inline float gbuffer_load_depth(float2 tc)
 {
-    float2 delta = ((OffsetTC - tc) * pos_decompression_params2.xy);
+    return s_position.Sample(smp_nofilter, tc).z;
+}
 
-    return gbuffer_load_data(OffsetTC, pos2d + delta, iSample);
+inline float3 gbuffer_load_normal(float2 tc)
+{
+    float4 P = s_position.Sample(smp_nofilter, tc);
+
+    return gbuf_unpack_normal(P.xy);
 }
 
 //#define SKY_WITH_DEPTH // sky renders with

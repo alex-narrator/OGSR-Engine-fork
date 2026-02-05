@@ -46,7 +46,6 @@ public:
     virtual void set_volumetric(bool) = 0;
     virtual bool get_volumetric() = 0;
 
-    virtual void set_volumetric_quality(float) = 0;
     virtual void set_volumetric_intensity(float) = 0;
     virtual void set_volumetric_distance(float) = 0;
 
