@@ -350,7 +350,7 @@ void CTorch::LoadLightDefinitions(shared_str light_sect)
         light_render->set_volumetric(useVolumetric);
         if (useVolumetric)
         {
-            float volIntensity = READ_IF_EXISTS(pUserData, r_float, "torch_definition", "volumetric_intensity", 0.2f);
+            float volIntensity = READ_IF_EXISTS(pSettings, r_float, light_sect, "volumetric_intensity", 0.2f);
             volIntensity = std::clamp(volIntensity, 0.f, 1.f);
             light_render->set_volumetric_intensity(volIntensity);
 

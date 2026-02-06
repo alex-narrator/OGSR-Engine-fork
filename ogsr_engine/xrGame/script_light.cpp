@@ -66,8 +66,6 @@ void CScriptLight::SetVolumetricDistance(float dist) { light_render->set_volumet
 
 void CScriptLight::SetVolumetricIntensity(float intensity) { light_render->set_volumetric_intensity(intensity); }
 
-void CScriptLight::SetVolumetricQuality(float quality) { light_render->set_volumetric_quality(quality); }
-
 void CScriptLight::Update()
 {
     if (lanim)

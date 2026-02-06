@@ -309,8 +309,6 @@ public:
     void SetGameTaskState(ETaskState state, LPCSTR task_id, int objective_num);
     void GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExisting);
     void SetTaskSelected(const shared_str& id, u16 idx, const bool safe);
-    CGameTask* GetActiveTask();
-    SGameTaskObjective* GetActiveObjective();
     LPCSTR GetArticleText(LPCSTR article_id);
 
     bool IsTalking();

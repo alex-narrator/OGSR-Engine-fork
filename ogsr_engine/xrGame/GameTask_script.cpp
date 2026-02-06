@@ -63,6 +63,6 @@ void CGameTask::script_register(lua_State* L)
     ];
 
     module(L, "gametask")[
-        def("active_task", &ActiveTask_script), def("active_objection", &ActiveObjective_script)
+        def("active_task", &ActiveTask_script), def("active_objective", &ActiveObjective_script)
     ];
 }

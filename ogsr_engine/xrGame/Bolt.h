@@ -28,8 +28,6 @@ public:
     virtual BOOL UsedAI_Locations() { return FALSE; }
     virtual IDamageSource* cast_IDamageSource() { return this; }
 
-    virtual void State(u32 state, u32 oldState);
-
     virtual void Load(LPCSTR section) override;
     virtual void State(u32 state, u32 oldState) override;
     virtual void OnAnimationEnd(u32 state) override;
@@ -43,13 +41,6 @@ public:
     shared_str m_sQuickThrowPointBoneName{};
 
 protected:
-    HUD_SOUND sndQuickThrowStart;
-    HUD_SOUND sndQuickThrow;
-    HUD_SOUND sndQuickThrowEnd;
-
-    virtual void StopHUDSounds() override;
-    virtual bool UpdateHUDSounds() override;
-
     virtual size_t GetWeaponTypeForCollision() const override { return Bolt; }
 
     virtual bool g_ThrowPointParams(Fvector& FirePos, Fvector& FireDir) override;

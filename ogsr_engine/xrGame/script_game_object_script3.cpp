@@ -142,8 +142,6 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("set_task_state", &CScriptGameObject::SetGameTaskState)
         .def("give_task", &CScriptGameObject::GiveTaskToActor, adopt<2>())
         .def("set_task_selected", &CScriptGameObject::SetTaskSelected)
-        .def("get_active_task", &CScriptGameObject::GetActiveTask)
-        .def("get_active_objective", &CScriptGameObject::GetActiveObjective)
         .def("get_article_text", &CScriptGameObject::GetArticleText)
 
         .def("is_talking", &CScriptGameObject::IsTalking)

@@ -1354,6 +1354,20 @@ void CWeaponMagazined::LoadFlashlightParams(LPCSTR section)
     flashlight_render->set_cone(deg2rad(READ_IF_EXISTS(pSettings, r_float, m_light_section, "spot_angle", 60.f)));
     flashlight_render->set_texture(READ_IF_EXISTS(pSettings, r_string, m_light_section, "spot_texture", nullptr));
 
+    bool useVolumetric = READ_IF_EXISTS(pSettings, r_bool, m_light_section, "volumetric_enabled", false);
+    if (useVolumetric)
+    {
+        flashlight_render->set_volumetric(useVolumetric);
+
+        float volIntensity = READ_IF_EXISTS(pSettings, r_float, m_light_section, "volumetric_intensity", 0.2f);
+        volIntensity = std::clamp(volIntensity, 0.f, 1.f);
+        flashlight_render->set_volumetric_intensity(volIntensity);
+
+        float volDistance = READ_IF_EXISTS(pSettings, r_float, m_light_section, "volumetric_distance", 1.f);
+        volDistance = std::clamp(volDistance, 0.f, 1.f);
+        flashlight_render->set_volumetric_distance(volDistance);
+    }
+
     flashlight_omni = ::Render->light_create();
     flashlight_omni->set_type((IRender_Light::LT)(READ_IF_EXISTS(pSettings, r_u8, m_light_section, "omni_type",IRender_Light::SPOT))); // KRodin: вообще omni это обычно поинт, но поинт светит во все стороны от себя, поэтому тут спот используется по умолчанию.
     flashlight_omni->set_shadow(false);

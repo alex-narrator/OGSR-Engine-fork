@@ -153,7 +153,7 @@ void CBolt::PlayAnimThrowStart()
 {
     if (m_bQuickThrowProsess)
     {
-        PlaySound(sndQuickThrowStart, Position());
+        PlaySound("sndQuickThrowStart", Position());
         PlayHUDMotion({ "anim_throw_quick_begin", "anm_throw_quick_begin" }, true, GetState());
     }
     else
@@ -166,7 +166,7 @@ void CBolt::PlayAnimThrow()
 {
     if (m_bQuickThrowProsess)
     {
-        PlaySound(sndQuickThrow, Position());
+        PlaySound("sndQuickThrow", Position());
         PlayHUDMotion({ "anim_throw_quick_act", "anm_throw_quick" }, true, GetState());
     }
     else
@@ -179,7 +179,7 @@ void CBolt::PlayAnimThrowEnd()
 {
     if (m_bQuickThrowProsess)
     {
-        PlaySound(sndQuickThrowEnd, Position());
+        PlaySound("sndQuickThrowEnd", Position());
         PlayHUDMotion({ "anim_throw_quick_end", "anm_throw_quick_end" }, true, GetState());
     }
     else

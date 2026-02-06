@@ -26,7 +26,6 @@ void CScriptLight::script_register(lua_State* L)
                   .def("set_brightness", &CScriptLight::SetBrightness)
                   .def("set_virtual_size", &CScriptLight::SetVirtualSize)
                   .def("set_volumetric", &CScriptLight::SetVolumetric)
-                  .def("set_volumetric_quality", &CScriptLight::SetVolumetricQuality)
                   .def("set_volumetric_distance", &CScriptLight::SetVolumetricDistance)
                   .def("set_volumetric_intensity",&CScriptLight::SetVolumetricIntensity)
                   .def("set_hud_mode", &CScriptLight::SetHudMode)];

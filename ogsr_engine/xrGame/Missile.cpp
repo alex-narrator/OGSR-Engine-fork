@@ -19,7 +19,11 @@
 
 #include "CalculateTriangle.h"
 #include "tri-colliderknoopc/dcTriangle.h"
-#include "../COMMON_AI/ai_sounds.h"
+
+#include "player_hud.h"
+#include "../xr_3da/gamemtllib.h"
+#include "debug_renderer.h"
+#include "ActorEffector.h"
 
 float g_fForceGrowSpeed{25.f};
 
@@ -162,8 +166,6 @@ void CMissile::UpdateCL()
             }
         }
     }
-
-    UpdateHUDSounds();
 }
 
 void CMissile::shedule_Update(u32 dt)
