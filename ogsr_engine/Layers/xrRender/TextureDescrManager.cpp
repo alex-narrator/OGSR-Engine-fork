@@ -72,7 +72,7 @@ void CTextureDescrMngr::LoadLTX()
 
                 string_path bmode{}, bparallax{};
                 const int res = sscanf(value.c_str(), "bump_mode[%[^]]], material[%f], parallax[%[^]]", bmode, &desc.m_spec->m_material, bparallax);
-                R_ASSERT(res >= 2);
+                ASSERT_FMT(res >= 2, "Something strange in textures.ltx. key:[%s], val:[%s]", key.c_str(), value.c_str());
 
                 if ((bmode[0] == 'u') && (bmode[1] == 's') && (bmode[2] == 'e') && (bmode[3] == ':')) // bump-map specified
                     desc.m_spec->m_bump_name = bmode + 4;
