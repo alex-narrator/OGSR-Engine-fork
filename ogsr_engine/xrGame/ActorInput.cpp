@@ -104,21 +104,13 @@ void CActor::IR_OnKeyboardPress(int cmd)
     case kCAM_3: cam_Set(eacFreeLook); break;
     case kNIGHT_VISION:
     case kTORCH: {
-        if (!Core.Features.test(xrCore::Feature::busy_actor_restrictions))
-        {
-            if (auto pTorch = smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT)))
-                cmd == kNIGHT_VISION ? pTorch->SwitchNightVision() : pTorch->Switch();
-        }
-        else
-        {
-            auto act_it = inventory().ActiveItem();
-            auto active_hud = smart_cast<CHudItem*>(act_it);
-            if (active_hud && active_hud->GetState() != CHudItem::eIdle)
-                return;
-            auto pTorch = smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch && !smart_cast<CWeaponMagazined*>(act_it) && !smart_cast<CWeaponKnife*>(act_it) && !smart_cast<CMissile*>(act_it))
-                cmd == kNIGHT_VISION ? pTorch->SwitchNightVision() : pTorch->Switch();
-        }
+        auto act_it = inventory().ActiveItem();
+        auto active_hud = smart_cast<CHudItem*>(act_it);
+        if (active_hud && active_hud->GetState() != CHudItem::eIdle && Core.Features.test(xrCore::Feature::busy_actor_restrictions))
+            return;
+        auto pTorch = smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT));
+        if (pTorch && !smart_cast<CWeaponMagazined*>(act_it) && !smart_cast<CWeaponKnife*>(act_it) && !smart_cast<CMissile*>(act_it))
+            cmd == kNIGHT_VISION ? pTorch->SwitchNightVision() : pTorch->Switch();
     }
     break;
     case kWPN_8: {
