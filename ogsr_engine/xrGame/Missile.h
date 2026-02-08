@@ -94,7 +94,7 @@ protected:
     bool b_impact_fuze{};
 
     //относительная точка и направление вылета гранаты
-    Fvector m_vThrowPoint;
+    Fvector m_vThrowPoint, m_vQuickThrowPoint{};
 
     bool m_throwMotionMarksAvailable{};
 
@@ -104,7 +104,7 @@ private:
    
 public:
     bool m_bThrowPointUpdated{};
-    shared_str m_sThrowPointBoneName{};
+    shared_str m_sThrowPointBoneName{}, m_sQuickThrowPointBoneName{};
     virtual bool g_ThrowPointParams(Fvector& FirePos, Fvector& FireDir);
 
 public:

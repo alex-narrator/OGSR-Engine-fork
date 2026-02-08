@@ -50,6 +50,7 @@ void CMissile::Load(LPCSTR section)
     m_dwDestroyTimeMax = pSettings->r_u32(section, "destroy_time");
 
     m_vThrowPoint = pSettings->r_fvector3(section, "throw_point");
+    m_vQuickThrowPoint = READ_IF_EXISTS(pSettings, r_fvector3, section, "quick_throw_point", m_vThrowPoint);
 
     m_sounds.LoadSound(section, "snd_draw", "sndShow", SOUND_TYPE_ITEM_TAKING);
     m_sounds.LoadSound(section, "snd_holster", "sndHide", SOUND_TYPE_ITEM_HIDING);
@@ -58,9 +59,18 @@ void CMissile::Load(LPCSTR section)
     m_sounds.LoadSound(section, "snd_throw_start", "sndThrowStart", SOUND_TYPE_WEAPON_EMPTY_CLICKING);
     m_sounds.LoadSound(section, "snd_throw_end", "sndThrowEnd", SOUND_TYPE_WEAPON_EMPTY_CLICKING);
 
+    //- Quick throw sounds
+    auto sound_name = pSettings->line_exist(section, "snd_quick_throw_start") ? "snd_quick_throw_start" : "snd_throw_start";
+    m_sounds.LoadSound(section, sound_name, "sndQuickThrowStart", SOUND_TYPE_WEAPON_EMPTY_CLICKING);
+    sound_name = pSettings->line_exist(section, "snd_quick_throw") ? "snd_quick_throw" : "snd_throw";
+    m_sounds.LoadSound(section, sound_name, "sndQuickThrow", SOUND_TYPE_WEAPON_SHOOTING);
+    sound_name = pSettings->line_exist(section, "snd_quick_throw_end") ? "snd_quick_throw_end" : "snd_throw_end";
+    m_sounds.LoadSound(section, sound_name, "sndQuickThrowEnd", SOUND_TYPE_WEAPON_SHOOTING);
+
     m_ef_weapon_type = READ_IF_EXISTS(pSettings, r_u32, section, "ef_weapon_type", u32(-1));
 
     m_sThrowPointBoneName = READ_IF_EXISTS(pSettings, r_string, section, "throw_point_bone", "");
+    m_sQuickThrowPointBoneName = READ_IF_EXISTS(pSettings, r_string, section, "quick_throw_point_bone", m_sThrowPointBoneName);
 }
 
 BOOL CMissile::net_Spawn(CSE_Abstract* DC)
@@ -231,10 +241,7 @@ void CMissile::State(u32 state, u32 oldState)
     }
     break;
     case eReady: {
-        if (!m_constpower && AnimationExist({"anim_throw_idle_alt", "anm_throw_idle_alt"}))
-            PlayHUDMotion({"anim_throw_idle_alt", "anm_throw_idle_alt"}, true, GetState());
-        else
-            PlayHUDMotion({"anim_throw_idle", "anm_throw_idle"}, true, GetState());
+        PlayHUDMotion({"anim_throw_idle", "anm_throw_idle"}, true, GetState());
     }
     break;
     case eThrow: {
@@ -264,18 +271,42 @@ void CMissile::PlayAnimIdle()
 }
 
 void CMissile::PlayAnimThrowStart() { 
-    PlaySound("sndThrowStart", Position());
-    PlayHUDMotion({"anim_throw_begin", "anm_throw_begin"}, true, GetState()); 
+    if (m_constpower && AnimationExist({"anim_throw_quick_begin", "anm_throw_quick_begin"}))
+    {
+        PlaySound("sndQuickThrowStart", Position());
+        PlayHUDMotion({"anim_throw_quick_begin", "anm_throw_quick_begin"}, true, GetState());
+    }
+    else
+    {
+        PlaySound("sndThrowStart", Position());
+        PlayHUDMotion({"anim_throw_begin", "anm_throw_begin"}, true, GetState());
+    }
 }
 
 void CMissile::PlayAnimThrow() { 
-    PlaySound("sndThrow", Position());
-    PlayHUDMotion({"anim_throw_act", "anm_throw"}, true, GetState()); 
+    if (m_constpower && AnimationExist({"anim_throw_quick_act", "anm_throw_quick"}))
+    {
+        PlaySound("sndQuickThrow", Position());
+        PlayHUDMotion({"anim_throw_quick_act", "anm_throw_quick"}, true, GetState());
+    }
+    else
+    {
+        PlaySound("sndThrow", Position());
+        PlayHUDMotion({"anim_throw_act", "anm_throw"}, true, GetState());
+    }
 }
 
 void CMissile::PlayAnimThrowEnd() {
-    PlaySound("sndThrowEnd", Position());
-    PlayHUDMotion({"anim_throw_end", "anm_throw_end"}, true, GetState());
+    if (m_constpower && AnimationExist({"anim_throw_quick_end", "anm_throw_quick_end"}))
+    {
+        PlaySound("sndQuickThrowEnd", Position());
+        PlayHUDMotion({"anim_throw_quick_end", "anm_throw_quick_end"}, true, GetState());
+    }
+    else
+    {
+        PlaySound("sndThrowEnd", Position());
+        PlayHUDMotion({"anim_throw_end", "anm_throw_end"}, true, GetState());
+    }
 }
 
 void CMissile::OnStateSwitch(u32 S, u32 oldState)
@@ -688,7 +719,8 @@ void CMissile::ExitContactCallback(bool& do_colide, bool bo1, dContact& c, SGame
 bool CMissile::g_ThrowPointParams(Fvector& FirePos, Fvector& FireDir)
 {
     //-- no throw bone = user old method
-    if (!m_sThrowPointBoneName.size())
+    const auto& throw_bone = m_constpower ? m_sQuickThrowPointBoneName : m_sThrowPointBoneName;
+    if (!throw_bone.size())
         return false;
 
     auto pActor = smart_cast<CActor*>(H_Parent());
@@ -731,14 +763,14 @@ bool CMissile::g_ThrowPointParams(Fvector& FirePos, Fvector& FireDir)
     Fmatrix m_offset, m_trans;
     m_offset.identity();
     //-- attach offset from bone
-    m_offset.translate_over(m_vThrowPoint);
+    const auto& throw_point = m_constpower ? m_vQuickThrowPoint : m_vThrowPoint;
+    m_offset.translate_over(throw_point);
 
-    u16 bid = hi_model->LL_BoneID(m_sThrowPointBoneName.c_str());
+    u16 bid = hi_model->LL_BoneID(throw_bone.c_str());
     if (bid == BI_NONE)
     {
         bid = hi_model->LL_GetBoneRoot();
-        Msg("!![%s] Throw bone[%s] not found in [%s], choosen root[%s]", __FUNCTION__,
-            m_sThrowPointBoneName.c_str(), cNameSect().c_str(), hi_model->LL_BoneName(bid));
+        Msg("!![%s] Throw bone[%s] not found in [%s], choosen root[%s]", __FUNCTION__, throw_bone.c_str(), cNameSect().c_str(), hi_model->LL_BoneName(bid));
         //return false;
     }
 
@@ -768,6 +800,7 @@ bool CMissile::g_ThrowPointParams(Fvector& FirePos, Fvector& FireDir)
     //-- debug camera and calculated FirePos
     if (psActorFlags.test(AF_THROW_DEBUG))
     {
+        Msg("~AF_THROW_DEBUG - using [%s] params", m_constpower ? "QUICK" : "NORMAL");
         dbg->add_static_line(rq_pos, FirePos, D3DCOLOR_XRGB(0, 255, 0));
         temp.identity();
         temp.c.set(rq_pos);
