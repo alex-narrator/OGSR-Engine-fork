@@ -561,36 +561,6 @@ void CActor::Die(CObject* who)
 {
     inherited::Die(who);
 
-    {
-        xr_vector<CInventorySlot>::iterator I = inventory().m_slots.begin();
-        xr_vector<CInventorySlot>::iterator E = inventory().m_slots.end();
-
-        for (u32 slot_idx = 0; I != E; ++I, ++slot_idx)
-        {
-            if (slot_idx == inventory().GetActiveSlot())
-            {
-                if ((*I).m_pIItem)
-                {
-                    (*I).m_pIItem->SetDropManual(TRUE);
-                }
-                continue;
-            }
-            else
-            {
-                CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>((*I).m_pIItem);
-                if (pOutfit)
-                    continue;
-            };
-            if ((*I).m_pIItem)
-                inventory().Ruck((*I).m_pIItem);
-        };
-
-        ///!!! чистка пояса
-        TIItemContainer& l_blist = inventory().m_belt;
-        while (!l_blist.empty())
-            inventory().Ruck(l_blist.front());
-    }
-
     if (!psActorFlags.test(AF_FIRST_PERSON_DEATH))
     {
         cam_Set(eacFreeLook);
