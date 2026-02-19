@@ -85,8 +85,8 @@ class ref_sound_data : public xr_resource
 {
 public:
     //	shared_str						nm;
-    CSound_source* handle; //!< Pointer to wave-source interface
-    CSound_emitter* feedback; //!< Pointer to emitter, automaticaly clears on emitter-stop
+    CSound_source* handle{}; //!< Pointer to wave-source interface
+    CSound_emitter* feedback{}; //!< Pointer to emitter, automaticaly clears on emitter-stop
     esound_type s_type;
     int g_type; //!< Sound type, usually for AI
     CObject* g_object; //!< Game object that emitts ref_sound
@@ -118,8 +118,8 @@ public:
     ref_sound() {}
     ~ref_sound() {}
 
-    IC CSound_source* _handle() const { return _p ? _p->handle : NULL; }
-    IC CSound_emitter* _feedback() { return _p ? _p->feedback : 0; }
+    IC CSound_source* _handle() const { return _p ? _p->handle : nullptr; }
+    IC CSound_emitter* _feedback() { return _p ? _p->feedback : nullptr; }
     IC CObject* _g_object()
     {
         VERIFY(_p);

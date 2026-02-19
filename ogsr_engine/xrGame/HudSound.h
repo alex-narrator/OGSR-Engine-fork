@@ -26,23 +26,41 @@ struct HUD_SOUND
 
     static void StopSound(HUD_SOUND& snd);
 
-    ICF BOOL playing()
+    ICF bool active_snd_valid()
     {
-        if (m_activeSnd)
-            return m_activeSnd->snd._feedback() ? TRUE : FALSE;
+        if (!m_activeSnd)
+            return false;
+        if (sounds.empty())
+        {
+            m_activeSnd = nullptr;
+            return false;
+        }
+        SSnd* base = &sounds[0];
+        ptrdiff_t idx = m_activeSnd - base;
+        if (idx < 0 || static_cast<size_t>(idx) >= sounds.size())
+        {
+            m_activeSnd = nullptr;
+            return false;
+        }
+        return true;
+    }
+
+    ICF bool playing()
+    {
+        if (active_snd_valid())
+            return m_activeSnd->snd._feedback() ? true : false;
         else
-            return FALSE;
+            return false;
     }
 
     ICF void set_position(const Fvector& pos)
     {
-        if (m_activeSnd)
-        {
-            if (m_activeSnd->snd._feedback() && !m_activeSnd->snd._feedback()->is_2D())
-                m_activeSnd->snd.set_position(pos);
-            else
-                m_activeSnd = nullptr;
-        }
+        if (!active_snd_valid())
+            return;
+        if (m_activeSnd->snd._feedback() && !m_activeSnd->snd._feedback()->is_2D())
+            m_activeSnd->snd.set_position(pos);
+        else
+            m_activeSnd = nullptr;
     }
 
     struct SSnd
