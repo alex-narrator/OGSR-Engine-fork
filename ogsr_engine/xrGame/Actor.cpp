@@ -356,13 +356,7 @@ void CActor::Load(LPCSTR section)
     SetDefaultVisualOutfit(default_outfit);
 
     //-----------------------------------------
-    if (pSettings->line_exist(section, "lookout_angle"))
-    {
-        m_fLookoutAngle = pSettings->r_float(section, "lookout_angle");
-        m_fLookoutAngle = deg2rad(m_fLookoutAngle);
-    }
-    else
-        m_fLookoutAngle = ACTOR_LOOKOUT_ANGLE;
+    m_fLookoutAngle = deg2rad(READ_IF_EXISTS(pSettings, r_float, section, "lookout_angle", ACTOR_LOOKOUT_ANGLE));
 
     // Alex ADD: for smooth crouch fix
     CurrentHeight = CameraHeight();
@@ -1517,3 +1511,6 @@ void CActor::block_action(EGameActions cmd) { m_blocked_actor_actions.insert(cmd
 void CActor::unblock_action(EGameActions cmd) { m_blocked_actor_actions.erase(cmd); }
 
 bool CActor::is_action_blocked(EGameActions cmd) const { return m_blocked_actor_actions.find(cmd) != m_blocked_actor_actions.end(); }
+
+int CActor::GetPhBoxID() const { return character_physics_support()->movement()->BoxID(); }
+void CActor::SetPhBoxID(int box_id) { character_physics_support()->movement()->ActivateBoxDynamic(box_id); }

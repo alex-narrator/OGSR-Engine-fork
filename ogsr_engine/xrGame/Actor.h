@@ -761,6 +761,12 @@ public:
     virtual void UpdateItemsEffect();
 
     virtual float GetArtefactsProtection(int);
+
+    float GetLookoutAngle() const { return rad2deg(m_fLookoutAngle); }
+    void SetLookoutAngle(float lookout_angle) { m_fLookoutAngle = deg2rad(lookout_angle); }
+
+    int GetPhBoxID() const;
+    void SetPhBoxID(int box_id);
 };
 
 extern bool isActorAccelerated(u32 mstate, bool ZoomMode);

@@ -217,6 +217,9 @@ void CScriptActor::script_register(lua_State* L)
                .def("get_artefacts_protection", &CActor::GetArtefactsProtection)
                .def("get_items_effect", &CActor::GetItemBoostedParams)
                .def("update_items_effect", &CActor::UpdateItemsEffect)
+
+               .property("lookout_angle", &CActor::GetLookoutAngle, &CActor::SetLookoutAngle)
+               .property("ph_box_id", &CActor::GetPhBoxID, &CActor::SetPhBoxID)
                 ,
 
                 //move commands
