@@ -194,6 +194,9 @@ bool CWeaponMagazinedWGrenade::SwitchMode()
 
     m_dwAmmoCurrentCalcFrame = 0;
 
+    if (auto pActor = smart_cast<CActor*>(H_Parent()))
+        pActor->callback(GameObject::eOnActorWeaponGrenadeModeChange)(lua_game_object(), IsGrenadeMode());
+
     return true;
 }
 

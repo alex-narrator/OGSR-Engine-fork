@@ -855,7 +855,7 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
     case kWPN_FIREMODE_PREV: {
         if (flags & CMD_START)
         {
-            OnPrevFireMode(flags & CMD_OPT);
+            OnPrevFireMode();
             return true;
         }
     }
@@ -863,7 +863,7 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
     case kWPN_FIREMODE_NEXT: {
         if (flags & CMD_START)
         {
-            OnNextFireMode(flags & CMD_OPT);
+            OnNextFireMode();
             return true;
         }
     }
@@ -1760,26 +1760,30 @@ bool CWeaponMagazined::SwitchMode()
     return true;
 }
 
-void CWeaponMagazined::OnNextFireMode(bool opt)
+void CWeaponMagazined::OnNextFireMode()
 {
     if (!m_bHasDifferentFireModes)
         return;
-    if (opt && m_iCurFireMode + 1 == m_aFireModes.size())
+    if (m_iCurFireMode + 1 == m_aFireModes.size())
         return;
     m_iCurFireMode = (m_iCurFireMode + 1 + m_aFireModes.size()) % m_aFireModes.size();
     SetQueueSize(GetCurrentFireMode());
     PlaySound("sndFireModes", get_LastFP());
+    if (auto pActor = smart_cast<CActor*>(H_Parent()))
+        pActor->callback(GameObject::eOnActorWeaponFireModeChange)(lua_game_object(), GetCurrentFireMode());
 }
 
-void CWeaponMagazined::OnPrevFireMode(bool opt)
+void CWeaponMagazined::OnPrevFireMode()
 {
     if (!m_bHasDifferentFireModes)
         return;
-    if (opt && m_iCurFireMode == 0)
+    if (m_iCurFireMode == 0)
         return;
     m_iCurFireMode = (m_iCurFireMode - 1 + m_aFireModes.size()) % m_aFireModes.size();
     SetQueueSize(GetCurrentFireMode());
     PlaySound("sndFireModes", get_LastFP());
+    if (auto pActor = smart_cast<CActor*>(H_Parent()))
+        pActor->callback(GameObject::eOnActorWeaponFireModeChange)(lua_game_object(), GetCurrentFireMode());
 }
 
 void CWeaponMagazined::OnH_A_Chield()

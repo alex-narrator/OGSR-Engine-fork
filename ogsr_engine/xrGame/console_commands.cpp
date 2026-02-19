@@ -1609,8 +1609,6 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_camera_collision", &psActorFlags, AF_CAM_COLLISION);
     CMD3(CCC_Mask, "g_camera_collision_cop_mode", &psActorFlags, AF_CAM_COLLISION_COP);
 
-    CMD3(CCC_Mask, "g_mouse_wheel_switch_slot", &psActorFlags, AF_MOUSE_WHEEL_SWITCH_SLOTS);
-
     CMD3(CCC_Mask, "g_3d_pda", &psActorFlags, AF_3D_PDA);
 
     CMD3(CCC_Mask, "g_first_person_death", &psActorFlags, AF_FIRST_PERSON_DEATH);

@@ -227,8 +227,8 @@ public:
     virtual void OnZoomIn();
     virtual void OnZoomOut(bool rezoom = false);
     virtual void OnZoomChanged();
-    virtual void OnNextFireMode(bool = false);
-    virtual void OnPrevFireMode(bool = false);
+    virtual void OnNextFireMode();
+    virtual void OnPrevFireMode();
     virtual bool HasFireModes() { return m_bHasDifferentFireModes; };
     virtual int GetCurrentFireMode() { return m_bHasDifferentFireModes ? m_aFireModes[m_iCurFireMode] : 1; };
     virtual LPCSTR GetCurrentFireModeStr() { return m_sCurFireMode; };

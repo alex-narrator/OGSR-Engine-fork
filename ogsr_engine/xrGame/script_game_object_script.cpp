@@ -88,6 +88,8 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("on_actor_weapon_zoom_in", int(GameObject::eOnActorWeaponZoomIn)), value("on_actor_weapon_zoom_out", int(GameObject::eOnActorWeaponZoomOut)),
                     value("on_actor_weapon_zoom_change", int(GameObject::eOnActorWeaponZoomChange)),
                     value("on_actor_weapon_scope_mode_change", int(GameObject::eOnActorWeaponScopeModeChange)),
+                    value("on_actor_weapon_fire_mode_change", int(GameObject::eOnActorWeaponFireModeChange)),
+                    value("on_actor_weapon_grenade_mode_change", int(GameObject::eOnActorWeaponGrenadeModeChange)),
 
                     value("on_throw_grenade", int(GameObject::eOnThrowGrenade)), value("on_goodwill_change", int(GameObject::eOnGoodwillChange)),
                     value("level_changer_action", int(GameObject::eLevelChangerAction)), value("update_items_effect", int(GameObject::eUpdateItemsEffect)),

@@ -71,6 +71,8 @@ enum ECallbackType
     eOnActorWeaponZoomOut,
     eOnActorWeaponZoomChange,
     eOnActorWeaponScopeModeChange,
+    eOnActorWeaponFireModeChange,
+    eOnActorWeaponGrenadeModeChange,
 
     eBeforeSave,
     ePostSave,

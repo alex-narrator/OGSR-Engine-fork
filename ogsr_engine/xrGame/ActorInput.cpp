@@ -159,21 +159,6 @@ void CActor::IR_OnMouseWheel(int direction)
 
     if (inventory().Action((direction > 0) ? kWPN_ZOOM_DEC : kWPN_ZOOM_INC, CMD_START))
         return;
-
-    if (psActorFlags.test(AF_MOUSE_WHEEL_SWITCH_SLOTS))
-    {
-        if (direction > 0)
-            OnNextWeaponSlot();
-        else
-            OnPrevWeaponSlot();
-    }
-    else
-    {
-        if (direction > 0)
-            inventory().Action(kWPN_FIREMODE_NEXT, CMD_START | CMD_OPT);
-        else
-            inventory().Action(kWPN_FIREMODE_PREV, CMD_START | CMD_OPT);
-    }
 }
 void CActor::IR_OnKeyboardRelease(int cmd)
 {
