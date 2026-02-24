@@ -10,6 +10,7 @@
 #include "inventory.h"
 #include "torch.h"
 #include "weapon.h"
+#include "flashlight.h"
 #include "ui/UIMessagesWindow.h"
 
 CFontManager::CFontManager()
@@ -282,18 +283,18 @@ void CHUDManager::Render_Actor_Shadow(u32 context_id) // added by KD
     // in other modes actor model already in scene graph and renders well
     if (A->active_cam() != eacFirstEye)
         return;
-/*
-    const auto flashlight = smart_cast<CFlashlight*>(A->inventory().ItemFromSlot(DETECTOR_SLOT));
-    if (flashlight && flashlight->torch_active())
-        return;
-*/
-    //const auto torch = smart_cast<CTorch*>(A->inventory().ItemFromSlot(TORCH_SLOT));
-    //if (torch && torch->IsPowerOn())
-    //    return;
 
-    //const auto wpn = smart_cast<CWeapon*>(A->inventory().ActiveItem());
-    //if (wpn && (wpn->IsFlashlightOn()))
-    //    return;
+    const auto flashlight = smart_cast<CFlashlight*>(A->inventory().ItemFromSlot(DETECTOR_SLOT));
+    if (flashlight && flashlight->IsPowerOn())
+        return;
+
+    const auto torch = smart_cast<CTorch*>(A->inventory().ItemFromSlot(TORCH_SLOT));
+    if (torch && torch->IsPowerOn())
+        return;
+
+    const auto wpn = smart_cast<CWeapon*>(A->inventory().ActiveItem());
+    if (wpn && (wpn->IsFlashlightOn()))
+        return;
 
     std::scoped_lock slock(render_lock);
     O->renderable_Render(context_id, O->H_Root());
