@@ -719,6 +719,7 @@ public:
     u32 GetCurrAmmo();
 
     CScriptGameObject* GetActorHolder();
+    bool ActorUseHolder(const CScriptGameObject* obj);
     CCameraBase* GetCarCamera();
     Fmatrix* GetXForm();
     bool ZoomMode();

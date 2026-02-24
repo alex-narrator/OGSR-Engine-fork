@@ -20,8 +20,6 @@ using namespace luabind;
 
 CPHMovementControl* get_movement(CActor* pActor) { return pActor->character_physics_support()->movement(); }
 
-
-
 typedef CScriptActor::SConditionChangeV SConditionChangeV;
 typedef float SConditionChangeV::*SConditionChangeVField;
 

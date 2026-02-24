@@ -555,6 +555,9 @@ void CActor::Die(CObject* who)
 {
     inherited::Die(who);
 
+    if (m_holder && !smart_cast<CCar*>(m_holder))
+        use_Holder(m_holder);
+
     if (!psActorFlags.test(AF_FIRST_PERSON_DEATH))
     {
         cam_Set(eacFreeLook);

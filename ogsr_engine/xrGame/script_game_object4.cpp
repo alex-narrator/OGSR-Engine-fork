@@ -595,6 +595,28 @@ CScriptGameObject* CScriptGameObject::GetActorHolder()
     else
         return nullptr;
 }
+
+ bool CScriptGameObject::ActorUseHolder(const CScriptGameObject* obj)
+{
+    CActor* actor = smart_cast<CActor*>(&object());
+    if (actor)
+    {
+        CHolderCustom* holder = obj ? smart_cast<CHolderCustom*>(&obj->object()) : nullptr;
+        if (holder)
+            return actor->use_Holder(holder);
+        else
+        {
+            ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "ScriptGameObject : attempt to call ActorUseHolder method with non-CHolderCustom object");
+            return false;
+        }
+    }
+    else
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "ScriptGameObject : attempt to call ActorUseHolder method for non-actor object");
+        return false;
+    }
+}
+
 class CCameraBase;
 CCameraBase* CScriptGameObject::GetCarCamera()
 {

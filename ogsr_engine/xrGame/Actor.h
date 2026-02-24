@@ -264,10 +264,12 @@ public:
 
     virtual bool can_attach(const CInventoryItem* inventory_item) const;
 
+    bool use_Holder(CHolderCustom* holder);
+
 protected:
     CHolderCustom* m_holder{};
     u16 m_holderID{u16(-1)};
-    bool use_Holder(CHolderCustom* holder);
+    /*bool use_Holder(CHolderCustom* holder);*/
 
     bool use_Vehicle(CHolderCustom* object);
     bool use_MountedWeapon(CHolderCustom* object);

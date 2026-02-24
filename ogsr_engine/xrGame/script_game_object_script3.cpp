@@ -396,6 +396,8 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("get_holder", &CScriptGameObject::GetActorHolder)
         .def("get_camera", &CScriptGameObject::GetCarCamera)
 
+        .def("use_holder", &CScriptGameObject::ActorUseHolder)
+
         .def("zoom_mode", &CScriptGameObject::ZoomMode)
         .def("reset_state", &CScriptGameObject::ResetState)
 
