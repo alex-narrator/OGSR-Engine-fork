@@ -236,6 +236,8 @@ public:
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
 
+    float GetFlashlightRange(int target = 0) const;
+
 protected:
     virtual bool AllowFireWhileWorking() { return false; }
 

@@ -32,6 +32,8 @@
 #include "holder_custom.h"
 #include "inventory.h"
 #include "torch.h"
+#include "flashlight.h"
+#include "weaponmagazined.h"
 
 #ifndef MASTER_GOLD
 #include "clsid_game.h"
@@ -287,6 +289,22 @@ float CVisualMemoryManager::object_luminocity(const CGameObject* game_object) co
     {
         float dist = m_object->Position().distance_to(game_object->Position());
         if (dist < pTorch->get_range())
+            return 1.f;
+    }
+
+    const auto* pFlashlight = smart_cast<const CFlashlight*>(pActor->inventory().ItemFromSlot(DETECTOR_SLOT));
+    if (pFlashlight && pFlashlight->IsPowerOn())
+    {
+        float dist = m_object->Position().distance_to(game_object->Position());
+        if (dist < pFlashlight->get_range())
+            return 1.f;
+    }
+
+    const auto* pWpn = smart_cast<CWeaponMagazined*>(pActor->inventory().ActiveItem());
+    if (pWpn && (pWpn->IsFlashlightOn()))
+    {
+        float dist = m_object->Position().distance_to(game_object->Position());
+        if (dist < pWpn->GetFlashlightRange())
             return 1.f;
     }
 

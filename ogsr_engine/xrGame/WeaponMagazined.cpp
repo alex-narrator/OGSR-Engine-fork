@@ -2263,6 +2263,22 @@ void CWeaponMagazined::SetFlashlightType(int type, int target)
     }
 }
 
+float CWeaponMagazined::GetFlashlightRange(int target) const
+{
+    if (!flashlight_render)
+        return 0.f;
+    switch (target)
+    {
+    case 0: {
+        return flashlight_render->get_range();
+    }
+    case 1:
+        if (flashlight_omni)
+            return flashlight_omni->get_range();
+    }
+    return 0.f;
+}
+
 bool CWeaponMagazined::ShouldPlayFlameParticles()
 {
     if (m_bFlameParticlesHideInZoom && IsZoomed() && !IsRotatingToZoom() && Is3dssEnabled())

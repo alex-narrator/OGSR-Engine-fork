@@ -47,6 +47,8 @@ public:
     void SetVirtualSize(float size, int target = 0);
     void SetType(int type, int target = 0);
 
+    float get_range() const { return light_render->get_range(); }
+
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 
