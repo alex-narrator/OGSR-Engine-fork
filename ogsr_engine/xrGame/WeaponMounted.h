@@ -58,6 +58,8 @@ protected:
     float camRelaxSpeed;
     float camMaxAngle;
 
+    float m_fControlInertionFactor{};
+
     /////////////////////////////////////////////////
     // Generic
     /////////////////////////////////////////////////

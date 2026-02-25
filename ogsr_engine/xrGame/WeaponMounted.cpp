@@ -66,6 +66,8 @@ void CWeaponMounted::Load(LPCSTR section)
     camMaxAngle = deg2rad(camMaxAngle);
     camRelaxSpeed = pSettings->r_float(section, "cam_relax_speed");
     camRelaxSpeed = deg2rad(camRelaxSpeed);
+
+    m_fControlInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "control_inertion_factor", 1.f);
 }
 
 BOOL CWeaponMounted::net_Spawn(CSE_Abstract* DC)
@@ -166,7 +168,7 @@ void CWeaponMounted::OnMouseMove(int dx, int dy)
         return;
 
     CCameraBase* C = camera;
-    float scale = (C->f_fov / g_fov) * psMouseSens / 50.f;
+    float scale = (C->f_fov / g_fov) * psMouseSens / 50.f / m_fControlInertionFactor;
     if (dx)
     {
         float d = float(dx) * scale;
@@ -226,6 +228,7 @@ void CWeaponMounted::cam_Update(float dt, float fov)
         /*		OwnerActor()->Orientation().yaw			= -Camera()->yaw;
                 OwnerActor()->Orientation().pitch		= -Camera()->pitch;*/
         CCameraBase* cam = Camera();
+        cam->f_fov = fov;
         A->Orientation().yaw = -cam->yaw;
         A->Orientation().pitch = cam->pitch; // alpet: ??????? ????????? ???????????? ????????, ???????? ??? ???? ?? 3-?? ????
         CCameraBase* fe = A->cam_FirstEye();
