@@ -128,6 +128,7 @@ void CWeaponMounted::net_Export(CSE_Abstract* E) { inherited::net_Export(E); }
 void CWeaponMounted::UpdateCL()
 {
     inherited::UpdateCL();
+    UpdateFire();
     if (Owner())
     {
         IKinematics* K = smart_cast<IKinematics*>(Visual());
@@ -139,8 +140,6 @@ void CWeaponMounted::UpdateCL()
         fire_bone_xform.transform_tiny(fire_pos);
         fire_dir.set(0, 0, 1);
         fire_bone_xform.transform_dir(fire_dir);
-
-        UpdateFire();
 
         if (OwnerActor() && OwnerActor()->IsMyCamera())
         {
