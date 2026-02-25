@@ -67,7 +67,6 @@ void CWeaponStatMgun::Load(LPCSTR section)
     inheritedPH::Load(section);
     inheritedShooting::Load(section);
 
-    /*HUD_SOUND::LoadSound(section, "snd_shoot", sndShot, SOUND_TYPE_WEAPON_SHOOTING);*/
     m_sounds.LoadSound(section, "snd_shoot", "sndShot", SOUND_TYPE_WEAPON_SHOOTING);
     m_Ammo->Load(pSettings->r_string(section, "ammo_class"), 0);
     camMaxAngle = pSettings->r_float(section, "cam_max_angle");

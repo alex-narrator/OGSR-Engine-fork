@@ -65,7 +65,6 @@ void CWeaponStatMgun::OnShot()
     OnShellDrop(m_fire_pos, {});
 
     bool b_hud_mode = (Level().CurrentEntity() == smart_cast<CObject*>(Owner()));
-    /*HUD_SOUND::PlaySound(sndShot, m_fire_pos, Owner(), b_hud_mode);*/
     m_sounds.PlaySound("sndShot", m_fire_pos, Owner(), b_hud_mode);
 
     AddShotEffector();

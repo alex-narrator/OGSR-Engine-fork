@@ -52,7 +52,6 @@ protected:
     CCartridge m_CurrentAmmo;
 
     //звук стрельбы
-    /*HUD_SOUND sndShot;*/
     HUD_SOUND_COLLECTION_LAYERED m_sounds{};
 
     //для отдачи
