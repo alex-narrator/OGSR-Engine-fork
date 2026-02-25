@@ -26,7 +26,7 @@ void CCar::OnMouseMove(int dx, int dy)
         return;
 
     CCameraBase* C = active_camera;
-    float scale = (C->f_fov / g_fov) * psMouseSens * psMouseSensScale / 50.f;
+    float scale = (C->f_fov / g_fov) * psMouseSens / 50.f;
     if (dx)
     {
         float d = float(dx) * scale;
