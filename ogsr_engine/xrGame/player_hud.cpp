@@ -548,13 +548,10 @@ void attachable_hud_item::load(const shared_str& sect_name)
 u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, const CMotionDef*& md, bool randomAnim, float speed)
 {
     R_ASSERT(strstr(anm_name_b.c_str(), "anm_") == anm_name_b.c_str() || strstr(anm_name_b.c_str(), "anim_") == anm_name_b.c_str());
-    string256 anim_name_r;
-    bool is_16x9 = UI()->is_widescreen();
-    xr_sprintf(anim_name_r, "%s%s", anm_name_b.c_str(), ((m_attach_place_idx == 1) && is_16x9) ? "_16x9" : "");
 
-    player_hud_motion* anm = m_hand_motions.find_motion(anim_name_r);
-    ASSERT_FMT(anm, "model [%s] has no motion alias defined [%s]", m_visual_name.c_str(), anim_name_r);
-    ASSERT_FMT(anm->m_animations.size(), "model [%s] has no motion defined in motion_alias [%s]", m_visual_name.c_str(), anim_name_r);
+    player_hud_motion* anm = m_hand_motions.find_motion(anm_name_b);
+    ASSERT_FMT(anm, "model [%s] has no motion alias defined [%s]", m_visual_name.c_str(), anm_name_b);
+    ASSERT_FMT(anm->m_animations.size(), "model [%s] has no motion defined in motion_alias [%s]", m_visual_name.c_str(), anm_name_b);
 
     u8 rnd_idx = 0;
 
