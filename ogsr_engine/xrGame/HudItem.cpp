@@ -1439,21 +1439,20 @@ void CHudItem::GetBoneOffsetPosDir(const shared_str& bone_name, Fvector& dest_po
 
  Fmatrix CHudItem::GetBoneTransformPosDir(const shared_str bone_name, const Fvector pos, const Fvector rot, const float scale) const
  {
-     Fmatrix res{};
-     const auto visual = GetHUDmode() ? HudItemData()->m_model : object().Visual()->dcast_PKinematics();
+     Fmatrix m_res{};
      const auto transform = GetHUDmode() ? HudItemData()->m_item_transform : object().XFORM();
-
+     const auto visual = GetHUDmode() ? HudItemData()->m_model : object().Visual()->dcast_PKinematics();
      u16 bone_id = visual->LL_BoneID(bone_name);
      Fmatrix bone_trans = visual->LL_GetTransform(bone_id);
-
-     Fmatrix offset{};
-     if (!fis_zero(scale))
-         bone_trans.scale(scale, scale, scale);
-     offset.setHPB(rot.x, rot.y, rot.z);
-     offset.translate_over(pos);
-     res.mul(bone_trans, offset);
-     res.mulA_43(transform);
-     return res;
+     Fmatrix m_offset{};
+     m_offset.setHPB(rot.x, rot.y, rot.z);
+     m_offset.translate_over(pos);
+     Fmatrix m_scale{};
+     m_scale.scale(scale, scale, scale);
+     m_offset.mulA_43(m_scale);
+     m_res.mul(bone_trans, m_offset);
+     m_res.mulA_43(transform);
+     return m_res;
  }
 
 extern ENGINE_API float psHUD_FOV;

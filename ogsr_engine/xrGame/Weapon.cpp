@@ -2388,7 +2388,7 @@ void CWeapon::InitAddonsVisual()
                 world_attach_visual_offset[i][1] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
 
                 sprintf(res_sect, "%s_%s", addon_name, "attach_scale");
-                world_attach_visual_scale[i] = READ_IF_EXISTS(pSettings, r_float, sect, res_sect, 0.f);
+                world_attach_visual_scale[i] = READ_IF_EXISTS(pSettings, r_float, sect, res_sect, 1.f);
             }
         }
     }
@@ -2427,7 +2427,7 @@ void CWeapon::InitAddonsVisualHud()
                 hud_attach_visual_offset[i][1] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
 
                 sprintf(res_sect, "%s_%s", addon_name, "attach_scale");
-                hud_attach_visual_scale[i] = READ_IF_EXISTS(pSettings, r_float, sect, res_sect, 0.f);
+                hud_attach_visual_scale[i] = READ_IF_EXISTS(pSettings, r_float, sect, res_sect, 1.f);
             }
         }
     }
