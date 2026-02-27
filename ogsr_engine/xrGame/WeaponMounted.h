@@ -44,8 +44,8 @@ protected:
     virtual void FireEnd();
     virtual void UpdateFire();
     virtual void OnShot();
-    void AddShotEffector();
-    void RemoveShotEffector();
+    //void AddShotEffector();
+    //void RemoveShotEffector();
 
 protected:
     shared_str m_sAmmoType;

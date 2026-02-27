@@ -301,7 +301,7 @@ void CWeaponMounted::FireEnd()
     m_dAngle.set(0.0f, 0.0f);
     CShootingObject::FireEnd();
     StopFlameParticles();
-    RemoveShotEffector();
+    //RemoveShotEffector();
 }
 
 void CWeaponMounted::OnShot()
@@ -318,11 +318,10 @@ void CWeaponMounted::OnShot()
     OnShellDrop(fire_pos, {});
 
     bool b_hud_mode = (Level().CurrentEntity() == smart_cast<CObject*>(Owner()));
-    /*HUD_SOUND::PlaySound(sndShot, fire_pos, Owner(), b_hud_mode);*/
     m_sounds.PlaySound("sndShot", fire_pos, Owner(), b_hud_mode);
 
     //добавить эффектор стрельбы
-    AddShotEffector();
+    //AddShotEffector();
     m_dAngle.set(::Random.randF(-fireDispersionBase, fireDispersionBase), ::Random.randF(-fireDispersionBase, fireDispersionBase));
 }
 
@@ -354,20 +353,20 @@ void CWeaponMounted::UpdateFire()
 
 const Fmatrix& CWeaponMounted::get_ParticlesXFORM() { return fire_bone_xform; }
 
-void CWeaponMounted::AddShotEffector()
-{
-    if (OwnerActor())
-    {
-        CCameraShotEffector* S = smart_cast<CCameraShotEffector*>(OwnerActor()->Cameras().GetCamEffector(eCEShot));
-        if (!S)
-            S = (CCameraShotEffector*)OwnerActor()->Cameras().AddCamEffector(xr_new<CCameraShotEffector>(camMaxAngle, camRelaxSpeed, 0.25f, 0.01f, 0.7f));
-        R_ASSERT(S);
-        S->Shot(0.01f);
-    }
-}
-
-void CWeaponMounted::RemoveShotEffector()
-{
-    if (OwnerActor())
-        OwnerActor()->Cameras().RemoveCamEffector(eCEShot);
-}
+//void CWeaponMounted::AddShotEffector()
+//{
+//    if (OwnerActor())
+//    {
+//        CCameraShotEffector* S = smart_cast<CCameraShotEffector*>(OwnerActor()->Cameras().GetCamEffector(eCEShot));
+//        if (!S)
+//            S = (CCameraShotEffector*)OwnerActor()->Cameras().AddCamEffector(xr_new<CCameraShotEffector>(camMaxAngle, camRelaxSpeed, 0.25f, 0.01f, 0.7f));
+//        R_ASSERT(S);
+//        S->Shot(0.01f);
+//    }
+//}
+//
+//void CWeaponMounted::RemoveShotEffector()
+//{
+//    if (OwnerActor())
+//        OwnerActor()->Cameras().RemoveCamEffector(eCEShot);
+//}
