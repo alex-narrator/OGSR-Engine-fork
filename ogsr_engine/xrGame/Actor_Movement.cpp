@@ -165,7 +165,7 @@ void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
 
         if (bOnClimbNow != bOnClimbOld)
         {
-            SetWeaponHideState(INV_STATE_LADDER, bOnClimbNow);
+            SetWeaponHideState(INV_STATE_LADDER, bOnClimbNow, true);
         };
     };
 };
