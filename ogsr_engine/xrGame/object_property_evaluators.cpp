@@ -46,7 +46,7 @@ CObjectPropertyEvaluatorAmmo::CObjectPropertyEvaluatorAmmo(CWeapon* item, CAI_St
 CObjectPropertyEvaluatorAmmo::_value_type CObjectPropertyEvaluatorAmmo::evaluate()
 {
     if (!m_ammo_type)
-        return (_value_type(!!(m_item->GetAmmoCurrent()))); //- m_item->GetAmmoElapsed())));
+        return (_value_type((m_item->unlimited_ammo() || !!m_item->GetAmmoCurrent()))); //- m_item->GetAmmoElapsed())));
     else
         return (_value_type(false));
 }
