@@ -316,6 +316,8 @@ bool CAI_Stalker::non_conflicted(const CInventoryItem* item, const CWeapon* new_
 
 bool CAI_Stalker::enough_ammo(const CWeapon* new_weapon) const
 {
+    if (unlimited_ammo())
+        return true;
     // int						ammo_box_count = 0;
 
     TIItemContainer::const_iterator I = inventory().m_all.begin();
