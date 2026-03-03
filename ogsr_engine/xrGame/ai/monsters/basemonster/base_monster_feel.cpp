@@ -119,19 +119,19 @@ void CBaseMonster::HitEntity(const CEntity* pEntity, float fDamage, float impuls
 
         if (pEntityNC == Actor() && draw_hit_marks)
         {
-            START_PROFILE("BaseMonster/Animation/HitEntity");
-            SDrawStaticStruct* s = HUD().GetUI()->UIGame()->AddCustomStatic("monster_claws", false);
-            s->m_endTime = Device.fTimeGlobal + 3.0f; // 3sec
+            //START_PROFILE("BaseMonster/Animation/HitEntity");
+            //SDrawStaticStruct* s = HUD().GetUI()->UIGame()->AddCustomStatic("monster_claws", false);
+            //s->m_endTime = Device.fTimeGlobal + 3.0f; // 3sec
 
-            float h1, p1;
-            Device.vCameraDirection.getHP(h1, p1);
+            //float h1, p1;
+            //Device.vCameraDirection.getHP(h1, p1);
 
-            Fvector hd = hit_dir;
-            hd.mul(-1);
-            float d = -h1 + hd.getH();
-            s->wnd()->SetHeading(d);
-            s->wnd()->SetHeadingPivot(Fvector2().set(256, 512), Fvector2().set(0, 0), false);
-            STOP_PROFILE;
+            //Fvector hd = hit_dir;
+            //hd.mul(-1);
+            //float d = -h1 + hd.getH();
+            //s->wnd()->SetHeading(d);
+            //s->wnd()->SetHeadingPivot(Fvector2().set(256, 512), Fvector2().set(0, 0), false);
+            //STOP_PROFILE;
 
             // SetAttackEffector			();
 

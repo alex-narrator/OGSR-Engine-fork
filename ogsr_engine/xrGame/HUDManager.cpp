@@ -329,7 +329,7 @@ void CHUDManager::RenderUI()
 
     if (HUD().GetUI()->GameIndicatorsShown() /*&& psHUD_Flags.is(HUD_DRAW | HUD_DRAW_RT)*/)
     {
-        HitMarker.Render();
+        /*HitMarker.Render();*/
 
         m_pHUDTarget->Render();
     }
@@ -359,9 +359,9 @@ void CHUDManager::OnEvent(EVENT E, u64 P1, u64 P2) {}
 
 collide::rq_result& CHUDManager::GetCurrentRayQuery() { return m_pHUDTarget->RQ; }
 
-void CHUDManager::Hit(int idx, float power, const Fvector& dir) { HitMarker.Hit(idx, dir); }
-
-void CHUDManager::SetHitmarkType(LPCSTR tex_name) { HitMarker.InitShader(tex_name); }
+//void CHUDManager::Hit(int idx, float power, const Fvector& dir) { HitMarker.Hit(idx, dir); }
+//
+//void CHUDManager::SetHitmarkType(LPCSTR tex_name) { HitMarker.InitShader(tex_name); }
 #include "ui\UIMainInGameWnd.h"
 void CHUDManager::OnScreenRatioChanged()
 {

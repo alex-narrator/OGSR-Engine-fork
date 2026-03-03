@@ -458,7 +458,7 @@ void CActor::HitMark(SHit* pHDS)
     // hit marker
     if ((pHDS->type() == ALife::eHitTypeFireWound || pHDS->type() == ALife::eHitTypeWound_2) && g_Alive() && Local() && (Level().CurrentEntity() == this))
     {
-        HUD().Hit(0, pHDS->damage(), pHDS->direction());
+        /*HUD().Hit(0, pHDS->damage(), pHDS->direction());*/
 
         {
             CEffectorCam* ce = Cameras().GetCamEffector((ECamEffectorType)effFireHit);

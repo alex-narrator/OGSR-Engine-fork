@@ -1,7 +1,7 @@
 #pragma once
 
 #include "..\xr_3da\CustomHUD.h"
-#include "HitMarker.h"
+//#include "HitMarker.h"
 #include "UI.h"
 
 class CHUDTarget;
@@ -46,7 +46,7 @@ class CHUDManager : public CCustomHUD
 
 private:
     CUI* pUI;
-    CHitMarker HitMarker;
+    /*CHitMarker HitMarker;*/
     CHUDTarget* m_pHUDTarget;
     bool b_online;
 
@@ -68,13 +68,13 @@ public:
 
     virtual IC CUI* GetUI() { return pUI; }
 
-    void Hit(int idx, float power, const Fvector& dir);
+    /*void Hit(int idx, float power, const Fvector& dir);*/
     CFontManager& Font() { return *(UI()->Font()); }
 
     //текущий предмет на который смотрит HUD
     collide::rq_result& GetCurrentRayQuery();
 
-    void SetHitmarkType(LPCSTR tex_name);
+    /*void SetHitmarkType(LPCSTR tex_name);*/
     virtual void OnScreenRatioChanged();
     virtual void OnDisconnected();
     virtual void OnConnected();
