@@ -185,9 +185,6 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
         mstate_real &= ~mcAnyMove;
         IKinematicsAnimated* K = smart_cast<IKinematicsAnimated*>(Visual());
         K->PlayCycle("death_init");
-
-        //остановить звук тяжелого дыхания
-        m_HeavyBreathSnd.stop();
     }
 
     auto callback = fastdelegate::MakeDelegate(this, &CActor::on_requested_spawn);

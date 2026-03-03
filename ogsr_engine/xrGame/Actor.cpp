@@ -148,8 +148,6 @@ CActor::~CActor()
     for (int i = 0; i < eacMaxCam; ++i)
         xr_delete(cameras[i]);
 
-    m_HeavyBreathSnd.destroy();
-    m_BloodSnd.destroy();
     m_HitSnd.destroy();
 
     xr_delete(m_pActorEffector);
@@ -326,9 +324,6 @@ void CActor::Load(LPCSTR section)
         ::Sound->create(sndDie[1], strconcat(sizeof(buf), buf, *cName(), "\\die1"), st_Effect, SOUND_TYPE_MONSTER_DYING);
         ::Sound->create(sndDie[2], strconcat(sizeof(buf), buf, *cName(), "\\die2"), st_Effect, SOUND_TYPE_MONSTER_DYING);
         ::Sound->create(sndDie[3], strconcat(sizeof(buf), buf, *cName(), "\\die3"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-
-        m_HeavyBreathSnd.create(pSettings->r_string(section, "heavy_breath_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
-        m_BloodSnd.create(pSettings->r_string(section, "heavy_blood_snd"), st_Effect, SOUND_TYPE_MONSTER_INJURING);
     }
 
     // KRodin: это, мне кажется, лишнее.
@@ -567,8 +562,6 @@ void CActor::Die(CObject* who)
 
     ::Sound->play_at_pos(sndDie[Random.randI(SND_DIE_COUNT)], this, Position());
 
-    m_HeavyBreathSnd.stop();
-    m_BloodSnd.stop();
     m_HitSnd.stop();
 
     start_tutorial("game_over");
@@ -940,39 +933,6 @@ void CActor::shedule_Update(u32 DT)
             Cameras().AddCamEffector(pCamBobbing);
         }
         pCamBobbing->SetState(mstate_real, conditions().IsLimping(), IsZoomAimingMode());
-    }
-
-    //звук тяжелого дыхания при уталости и хромании
-    if (this == Level().CurrentControlEntity())
-    {
-        if (conditions().IsLimping() && g_Alive())
-        {
-            if (!m_HeavyBreathSnd._feedback())
-                m_HeavyBreathSnd.play(this, sm_Looped | sm_2D);
-        }
-        else if (m_HeavyBreathSnd._feedback())
-        {
-            m_HeavyBreathSnd.stop();
-        }
-
-        float bs = conditions().BleedingSpeed();
-        if (bs > 0.6f)
-        {
-            if (!m_BloodSnd._feedback())
-                m_BloodSnd.play(this, sm_Looped | sm_2D);
-
-            float v = bs + 0.25f;
-
-            m_BloodSnd.set_volume(v);
-        }
-        else
-        {
-            if (m_BloodSnd._feedback())
-                m_BloodSnd.stop();
-        }
-
-        if (!g_Alive() && m_BloodSnd._feedback())
-            m_BloodSnd.stop();
     }
 
     //если в режиме HUD, то сама модель актера не рисуется
