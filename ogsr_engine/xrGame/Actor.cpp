@@ -148,8 +148,6 @@ CActor::~CActor()
     for (int i = 0; i < eacMaxCam; ++i)
         xr_delete(cameras[i]);
 
-    m_HitSnd.destroy();
-
     xr_delete(m_pActorEffector);
 
     xr_delete(m_pSleepEffector);
@@ -306,26 +304,6 @@ void CActor::Load(LPCSTR section)
 
     // Weapons				= xr_new<CWeaponList> (this);
 
-    LPCSTR hit_snd_sect = pSettings->r_string(section, "hit_sounds");
-    for (int hit_type = 0; hit_type < (int)ALife::eHitTypeMax; ++hit_type)
-    {
-        LPCSTR hit_name = ALife::g_cafHitType2String((ALife::EHitType)hit_type);
-        LPCSTR hit_snds = READ_IF_EXISTS(pSettings, r_string, hit_snd_sect, hit_name, "");
-        int cnt = _GetItemCount(hit_snds);
-        string128 tmp;
-        VERIFY(cnt != 0);
-        for (int i = 0; i < cnt; ++i)
-        {
-            sndHit[hit_type].emplace_back().create(_GetItem(hit_snds, i, tmp), st_Effect, sg_SourceType);
-        }
-        char buf[256];
-
-        ::Sound->create(sndDie[0], strconcat(sizeof(buf), buf, *cName(), "\\die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-        ::Sound->create(sndDie[1], strconcat(sizeof(buf), buf, *cName(), "\\die1"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-        ::Sound->create(sndDie[2], strconcat(sizeof(buf), buf, *cName(), "\\die2"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-        ::Sound->create(sndDie[3], strconcat(sizeof(buf), buf, *cName(), "\\die3"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-    }
-
     // KRodin: это, мне кажется, лишнее.
     // if( psActorFlags.test(AF_PSP) )
     //	cam_Set(eacLookAt);
@@ -391,35 +369,6 @@ void CActor::Hit(SHit* pHDS)
     callback(GameObject::entity_alive_before_hit)(&HDS);
     if (HDS.ignore_flag)
         return;
-
-    bool bPlaySound = true;
-    if (!g_Alive())
-        bPlaySound = false;
-
-    if (!sndHit[HDS.hit_type].empty() && (ALife::eHitTypeTelepatic != HDS.hit_type))
-    {
-        m_HitSnd = sndHit[HDS.hit_type][Random.randI(sndHit[HDS.hit_type].size())];
-        bool b_snd_hit_playing = sndHit[HDS.hit_type].end() != std::find_if(sndHit[HDS.hit_type].begin(), sndHit[HDS.hit_type].end(), playing_pred());
-
-        if (ALife::eHitTypeExplosion == HDS.hit_type)
-        {
-            if (this == Level().CurrentControlEntity())
-            {
-                m_HitSnd.set_volume(10.0f);
-                if (!m_sndShockEffector)
-                {
-                    m_sndShockEffector = xr_new<SndShockEffector>();
-                    m_sndShockEffector->Start(this, float(m_HitSnd.get_length_sec() * 1000.0f), HDS.damage());
-                }
-            }
-            else
-                bPlaySound = false;
-        }
-        if (bPlaySound && !b_snd_hit_playing)
-        {
-            m_HitSnd.play(this, sm_2D);
-        };
-    }
 
     // slow actor, only when he gets hit
     hit_slowmo = conditions().HitSlowmo(pHDS);
@@ -560,12 +509,7 @@ void CActor::Die(CObject* who)
     mstate_wishful &= ~mcAnyMove;
     mstate_real &= ~mcAnyMove;
 
-    ::Sound->play_at_pos(sndDie[Random.randI(SND_DIE_COUNT)], this, Position());
-
-    m_HitSnd.stop();
-
     start_tutorial("game_over");
-    xr_delete(m_sndShockEffector);
 }
 
 void CActor::SwitchOutBorder(bool new_border_state)
@@ -726,19 +670,6 @@ void CActor::UpdateCL()
         CStepManager::update();
 
     spatial.type |= STYPE_REACTTOSOUND;
-
-    if (m_sndShockEffector)
-    {
-        if (this == Level().CurrentViewEntity())
-        {
-            m_sndShockEffector->Update();
-
-            if (!m_sndShockEffector->InWork() || !g_Alive())
-                xr_delete(m_sndShockEffector);
-        }
-        else
-            xr_delete(m_sndShockEffector);
-    }
 
     Fmatrix trans;
     if (cam_Active() == cam_FirstEye())

@@ -213,13 +213,6 @@ public:
 
     virtual bool unlimited_ammo() const;
 
-public:
-
-
-protected:
-    //звук тяжелого дыхания
-    ref_sound m_HitSnd{};
-
     /////////////////////////////////////////////////////////////////
     // misc properties
 protected:
@@ -227,11 +220,6 @@ protected:
     float hit_slowmo{};
     float hit_probability{1.f};
     bool m_hit_slowmo_jump;
-
-    // media
-    SndShockEffector* m_sndShockEffector;
-    xr_vector<ref_sound> sndHit[ALife::eHitTypeMax];
-    ref_sound sndDie[SND_DIE_COUNT];
 
     float m_fLandingTime;
     float m_fJumpTime;
