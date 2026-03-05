@@ -316,6 +316,7 @@ void CCar::SaveNetState(NET_Packet& P)
 bool CCar::IsLightsOn() { return m_lights.IsOn(); }
 bool CCar::IsEngineOn() { return b_engine_on; }
 void CCar::SwitchLights() { m_lights.SwitchHeadLights(); }
+void CCar::SwitchLights(bool on) { on ? m_lights.TurnOnHeadLights() : m_lights.TurnOffHeadLights(); }
 
 void CCar::RestoreNetState(CSE_PHSkeleton* /*po*/)
 {
@@ -1051,13 +1052,9 @@ void CCar::ReleasePedals()
     UpdatePower(); // set engine friction;
 }
 
-void CCar::SwitchEngine()
-{
-    if (b_engine_on)
-        StopEngine();
-    else
-        StartEngine();
-}
+void CCar::SwitchEngine() { b_engine_on ? StopEngine() : StartEngine(); }
+void CCar::SwitchEngine(bool on) { on ? StartEngine() : StopEngine(); }
+
 void CCar::Clutch() { b_clutch = true; }
 
 void CCar::Unclutch() { b_clutch = false; }

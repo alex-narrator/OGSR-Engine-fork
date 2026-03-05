@@ -26,13 +26,9 @@ xr_vector<_action> actions = {
     DEF_ACTION("llookout", kL_LOOKOUT) 
     DEF_ACTION("rlookout", kR_LOOKOUT)
 
-    DEF_ACTION("turn_engine", kENGINE)
-
     DEF_ACTION("cam_1", kCAM_1) 
     DEF_ACTION("cam_2", kCAM_2) 
     DEF_ACTION("cam_3", kCAM_3)
-
-    DEF_ACTION("torch", kTORCH)
 
     DEF_ACTION("wpn_1", kWPN_1) 
     DEF_ACTION("wpn_2", kWPN_2)

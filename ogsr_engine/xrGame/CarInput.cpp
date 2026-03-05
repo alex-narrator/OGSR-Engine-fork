@@ -166,8 +166,8 @@ void CCar::OnKeyboardPress(int cmd)
             OwnerActor()->steer_Vehicle(-1);
         break;
     case kJUMP: PressBreaks(); break;
-    case kENGINE: SwitchEngine(); break;
-    case kTORCH: m_lights.SwitchHeadLights(); break;
+    //case kENGINE: SwitchEngine(); break;
+    //case kTORCH: m_lights.SwitchHeadLights(); break;
     case kUSE: break;
     };
 }

@@ -446,6 +446,7 @@ private:
     void Clutch();
     void Unclutch();
     void SwitchEngine();
+    void SwitchEngine(bool);
     void NeutralDrive();
     void UpdatePower();
     void ReleasePedals();
@@ -611,6 +612,7 @@ public:
     bool IsEngineOn();
     bool IsLightsOn();
     void SwitchLights();
+    void SwitchLights(bool);
     virtual float GetHotness() override { return 0.f; }
 
 private:
