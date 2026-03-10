@@ -24,8 +24,6 @@ void CFlashlight::Load(LPCSTR section)
 {
     inherited::Load(section);
     LoadLightDefinitions(READ_IF_EXISTS(pSettings, r_string, section, "light_definition", nullptr));
-
-    light_direction = READ_IF_EXISTS(pSettings, r_fvector3, section, "light_direction", Fvector().set(0.f, 0.f, 1.0f));
 }
 
 void CFlashlight::LoadLightDefinitions(shared_str light_sect)
@@ -74,42 +72,21 @@ void CFlashlight::LoadLightDefinitions(shared_str light_sect)
 
 void CFlashlight::UpdateWork()
 {
-    if (auto actor = smart_cast<CActor*>(H_Parent()))
+    if (const auto actor = smart_cast<CActor*>(H_Parent()))
     {
-        if (HudItemData())
+        if (const auto hid = HudItemData())
         {
             firedeps dep;
-            HudItemData()->setup_firedeps(dep);
+            hid->setup_firedeps(dep);
 
             light_render->set_position(dep.vLastFP);
             light_omni->set_position(dep.vLastFP);
 
-            Fvector dir = dep.m_FireParticlesXForm.k;
+            Fvector dir{dep.m_FireParticlesXForm.k};
 
             light_render->set_rotation(dir, dep.m_FireParticlesXForm.i);
             light_omni->set_rotation(dir, dep.m_FireParticlesXForm.i);
         }
-        else
-        {
-            Fvector pos{actor->Position()};
-            pos.y += actor->CameraHeight();
-            light_render->set_position(pos);
-            light_omni->set_position(pos);
-
-            Fvector dir{Device.vCameraDirection};
-            light_render->set_rotation(dir, Fvector{});
-            light_omni->set_rotation(dir, Fvector{});
-        }
-    }
-    else if (!H_Parent())
-    {
-        Fvector last_pos = Position();
-
-        light_render->set_position(last_pos);
-        light_omni->set_position(last_pos);
-
-        light_render->set_rotation(light_direction, Fvector{});
-        light_omni->set_rotation(light_direction, Fvector{});
     }
 
     if (useVolumetric)
@@ -139,6 +116,7 @@ void CFlashlight::Switch(bool turn_on)
 {
     inherited::Switch(turn_on);
 
-    light_render->set_active(turn_on);
-    light_omni->set_active(turn_on);
+    const bool is_on = IsPowerOn();
+    light_render->set_active(is_on);
+    light_omni->set_active(is_on);
 }

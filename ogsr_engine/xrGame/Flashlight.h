@@ -22,7 +22,6 @@ protected:
 
 private:
     bool useVolumetric{}, useVolumetricForActor{};
-    Fvector light_direction{};
 
 public:
     CFlashlight();

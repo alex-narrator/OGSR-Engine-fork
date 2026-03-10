@@ -12,7 +12,6 @@ protected:
     bool m_bFastAnimMode{};
     bool m_bNeedActivation{};
     bool m_bWorking{};
-    bool m_bWorkIndependent{};
     bool CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate);
     void UpdateVisibility();
 
