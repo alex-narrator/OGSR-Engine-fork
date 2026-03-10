@@ -79,6 +79,8 @@ static bool r_bool_script(CInifile* self, LPCSTR S, LPCSTR L) { return (!!self->
 
 static LPCSTR r_string_wb_script(CInifile* self, LPCSTR S, LPCSTR L) { return (self->r_string_wb(S, L).c_str()); }
 
+static Fcolor r_fcolor_script(CInifile* self, LPCSTR S, LPCSTR L) { return (self->r_fcolor(S, L)); }
+
 static void append_section_script(CInifile* self, LPCSTR S) 
 { 
     if (!self->section_exist(S))
@@ -171,6 +173,8 @@ void CScriptIniFile::script_register(lua_State* L)
                   .def("r_clsid", &r_clsid_script)
                   .def("r_string_wq", &r_string_wb_script)
 
+                  .def("r_fcolor", &r_fcolor_script)
+
                   //.def("annotation", &CInifile::annotation)
 
                   .def("w_bool", &CInifile::w_bool)
@@ -190,6 +194,9 @@ void CScriptIniFile::script_register(lua_State* L)
                   .def("w_vector2", &CInifile::w_fvector2)
                   .def("w_vector", &CInifile::w_fvector3)
                   .def("w_vector4", &CInifile::w_fvector4)
+
+                  .def("w_fcolor", &CInifile::w_fcolor)
+
                   .def("save_ini", &CInifile::save_as),
 
               def("system_ini", [] { return pSettings; }), def("game_ini", [] { return pGameIni; }),
