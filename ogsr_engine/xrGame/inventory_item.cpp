@@ -72,7 +72,6 @@ CInventoryItem::~CInventoryItem()
         Msg("! ERROR item_id[%d] H_Parent=[%s][%d] [%d]", object().ID(), p ? p->cName().c_str() : "none", p ? p->ID() : -1, Device.dwFrame);
     }
 
-    sndBreaking.destroy();
     xr_delete(m_boneProtection);
 }
 
@@ -123,14 +122,6 @@ void CInventoryItem::Load(LPCSTR section)
     m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", FALSE));
 
     m_fControlInertionFactor = READ_IF_EXISTS(pSettings, r_float, section, "control_inertion_factor", 1.0f);
-
-    b_breakable = READ_IF_EXISTS(pSettings, r_bool, section, "breakable", false);
-
-    if (pSettings->line_exist(section, "break_particles"))
-        m_sBreakParticles = pSettings->r_string(section, "break_particles");
-
-    if (pSettings->line_exist(section, "break_sound"))
-        sndBreaking.create(pSettings->r_string(section, "break_sound"), st_Effect, sg_SourceType);
 
     //*_restore_speed
     m_ItemEffect[eHealthRestoreSpeed] = READ_IF_EXISTS(pSettings, r_float, section, "health_restore_speed", 0.f);
@@ -275,9 +266,6 @@ void CInventoryItem::Hit(SHit* pHDS)
         return;
 
     ChangeCondition(-hit_power);
-
-    if (fis_zero(GetCondition()) && b_breakable && !IsQuestItem())
-        BreakItem();
 }
 
 const char* CInventoryItem::Name() { return m_name.c_str(); }
@@ -648,32 +636,6 @@ void CInventoryItem::OnMoveToSlot(EItemPlace prevPlace)
 //};
 
 void CInventoryItem::OnMoveOut(EItemPlace prevPlace) { OnMoveToRuck(prevPlace); };
-
-void CInventoryItem::BreakItem()
-{
-    if (object().H_Parent())
-    {
-        object().setEnabled(false);
-        object().setVisible(false);
-        // играем звук
-        sndBreaking.play_no_feedback(object().H_Parent(), u32{}, float{}, &object().H_Parent()->Position());
-        SetDropManual(TRUE);
-    }
-    else
-    {
-        // играем звук
-        sndBreaking.play_no_feedback(cast_game_object(), u32{}, float{}, &object().Position());
-        // отыграть партиклы разбивания
-        if (!!m_sBreakParticles)
-        {
-            // показываем эффекты
-            CParticlesObject* pStaticPG;
-            pStaticPG = CParticlesObject::Create(m_sBreakParticles.c_str(), TRUE);
-            pStaticPG->PlayAtPos(object().Position());
-        }
-    }
-    object().DestroyObject();
-}
 
 float CInventoryItem::GetHitTypeProtection(int hit_type) const { return m_HitTypeProtection[hit_type] * GetCondition(); }
 

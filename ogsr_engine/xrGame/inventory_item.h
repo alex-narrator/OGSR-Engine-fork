@@ -136,11 +136,8 @@ public:
 
     shared_str m_name{};
     shared_str m_nameShort{};
-    shared_str m_nameComplex;
 
     EItemPlace m_eItemPlace{};
-
-    bool b_breakable{};
 
     virtual void OnMoveToSlot(EItemPlace prevPlace);
     virtual void OnMoveToBelt(EItemPlace prevPlace) {};
@@ -257,15 +254,6 @@ public:
     virtual CWeaponAmmo* cast_weapon_ammo() { return 0; }
     virtual CGameObject* cast_game_object() { return 0; };
 
-    virtual void BreakItem();
-
-protected:
-    // партікли знищення
-    shared_str m_sBreakParticles;
-    // звук знищення
-    ref_sound sndBreaking;
-
-public:
     enum ItemEffects
     {
         // restore
