@@ -224,6 +224,7 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
 
         .def("setEnabled", &CScriptGameObject::setEnabled)
         .def("setVisible", &CScriptGameObject::setVisible)
+        .def("getDestroy", &CScriptGameObject::getDestroy)
 
         .def("actor_can_take", &actor_can_take)
 

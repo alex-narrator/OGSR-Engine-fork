@@ -829,6 +829,8 @@ public:
 
     void setVisible(bool value);
 
+    bool getDestroy() const;
+
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };
 add_to_type_list(CScriptGameObject)

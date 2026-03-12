@@ -897,3 +897,9 @@ void CScriptGameObject::setVisible(bool value)
 {
     object().setVisible(value);
 }
+
+bool CScriptGameObject::getDestroy() const 
+{ 
+    CGameObject* GO = smart_cast<CGameObject*>(&object());
+    return GO->getDestroy();
+}
