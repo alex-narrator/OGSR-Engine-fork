@@ -397,12 +397,12 @@ void player_hud::DumpParamsToLog()
             Msg("aim_alt_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
-        else if (idx == hud_item_measures::m_hands_offset_type_aim_alt_scope)
+        else if (idx == hud_item_measures::m_hands_offset_type_aim_alt_sight)
         {
             Log("####################################");
             Msg("[%s]", hud_sect);
-            Msg("aim_alt_scope_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
-            Msg("aim_alt_scope_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
+            Msg("aim_alt_sight_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos_.x, pos_.y, pos_.z);
+            Msg("aim_alt_sight_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", rot_.x, rot_.y, rot_.z);
             Log("####################################");
         }
         else if (idx == hud_item_measures::m_hands_offset_type_aim_scope)

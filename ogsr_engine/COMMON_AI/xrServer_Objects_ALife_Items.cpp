@@ -293,9 +293,8 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
     m_grenade_launcher_status = (EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, caSection, "grenade_launcher_status", 0);
     m_laser_status = (EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, caSection, "laser_status", 0);
     m_flashlight_status = (EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, caSection, "flashlight_status", 0);
-    m_stock_status = (EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, caSection, "stock_status", 0);
+    m_sight_status = (EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, caSection, "sight_status", 0);
     m_extender_status = (EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, caSection, "extender_status", 0);
-    m_forend_status = (EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, caSection, "forend_status", 0);
     // preloaded ammo_type
     if (pSettings->line_exist(caSection, "ammo_type_loaded"))
     {
@@ -342,12 +341,12 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
             m_cur_flashlight = pSettings->r_u8(s_name, "flashlight_installed");
         }
     }
-    if (m_stock_status == EWeaponAddonStatus::eAddonAttachable)
+    if (m_sight_status == EWeaponAddonStatus::eAddonAttachable)
     {
-        if (pSettings->line_exist(caSection, "stock_installed"))
+        if (pSettings->line_exist(caSection, "sight_installed"))
         {
-            m_addon_flags.set(eWeaponAddonStock, true);
-            m_cur_stock = pSettings->r_u8(s_name, "stock_installed");
+            m_addon_flags.set(eWeaponAddonSight, true);
+            m_cur_sight = pSettings->r_u8(s_name, "sight_installed");
         }
     }
     if (m_extender_status == EWeaponAddonStatus::eAddonAttachable)
@@ -356,14 +355,6 @@ CSE_ALifeItemWeapon::CSE_ALifeItemWeapon(LPCSTR caSection) : CSE_ALifeItem(caSec
         {
             m_addon_flags.set(eWeaponAddonExtender, true);
             m_cur_extender = pSettings->r_u8(s_name, "extender_installed");
-        }
-    }
-    if (m_forend_status == EWeaponAddonStatus::eAddonAttachable)
-    {
-        if (pSettings->line_exist(caSection, "forend_installed"))
-        {
-            m_addon_flags.set(eWeaponAddonForend, true);
-            m_cur_forend = pSettings->r_u8(s_name, "forend_installed");
         }
     }
     if (pSettings->line_exist(caSection, "magazine_class"))
@@ -410,9 +401,8 @@ void CSE_ALifeItemWeapon::UPDATE_Read(NET_Packet& tNetPacket)
         tNetPacket.r_u8(m_cur_glauncher);
         tNetPacket.r_u8(m_cur_laser);
         tNetPacket.r_u8(m_cur_flashlight);
-        tNetPacket.r_u8(m_cur_stock);
+        tNetPacket.r_u8(m_cur_sight);
         tNetPacket.r_u8(m_cur_extender);
-        tNetPacket.r_u8(m_cur_forend);
         tNetPacket.r_u8(m_cur_magazine);
     }
 }
@@ -434,9 +424,8 @@ void CSE_ALifeItemWeapon::UPDATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8(m_cur_glauncher);
     tNetPacket.w_u8(m_cur_laser);
     tNetPacket.w_u8(m_cur_flashlight);
-    tNetPacket.w_u8(m_cur_stock);
+    tNetPacket.w_u8(m_cur_sight);
     tNetPacket.w_u8(m_cur_extender);
-    tNetPacket.w_u8(m_cur_forend);
     tNetPacket.w_u8(m_cur_magazine);
 }
 
@@ -461,9 +450,8 @@ void CSE_ALifeItemWeapon::STATE_Read(NET_Packet& tNetPacket, u16 size)
         tNetPacket.r_u8(m_cur_glauncher);
         tNetPacket.r_u8(m_cur_laser);
         tNetPacket.r_u8(m_cur_flashlight);
-        tNetPacket.r_u8(m_cur_stock);
+        tNetPacket.r_u8(m_cur_sight);
         tNetPacket.r_u8(m_cur_extender);
-        tNetPacket.r_u8(m_cur_forend);
         tNetPacket.r_u8(m_cur_magazine);
     }
 }
@@ -483,9 +471,8 @@ void CSE_ALifeItemWeapon::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8(m_cur_glauncher);
     tNetPacket.w_u8(m_cur_laser);
     tNetPacket.w_u8(m_cur_flashlight);
-    tNetPacket.w_u8(m_cur_stock);
+    tNetPacket.w_u8(m_cur_sight);
     tNetPacket.w_u8(m_cur_extender);
-    tNetPacket.w_u8(m_cur_forend);
     tNetPacket.w_u8(m_cur_magazine);
 }
 

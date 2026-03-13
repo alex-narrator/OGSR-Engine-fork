@@ -26,7 +26,7 @@ class CUIStaticItem;
 constexpr float def_min_zoom_k = 0.3f;
 constexpr float def_zoom_step_count = 4.0f;
 
-extern enum eWeaponAddonType { eSilencer, eScope, eLauncher, eLaser, eFlashlight, eStock, eExtender, eForend, eMagazine, eMaxAddon };
+extern enum eWeaponAddonType { eSilencer, eScope, eLauncher, eLaser, eFlashlight, eSight, eExtender, eMagazine, eMaxAddon };
 
 class CWeapon : public CHudItemObject, public CShootingObject
 {
@@ -189,14 +189,14 @@ public:
     shared_str m_sWpn_laser_bone;
     shared_str m_sWpn_flashlight_bone;
     shared_str m_sWpn_magazine_bone;
-    shared_str m_sWpn_stock_bone;
+    shared_str m_sWpn_sight_bone;
     xr_vector<shared_str> m_sHud_wpn_scope_bones;
     shared_str m_sHud_wpn_silencer_bone;
     shared_str m_sHud_wpn_launcher_bone;
     shared_str m_sHud_wpn_laser_bone;
     shared_str m_sHud_wpn_flashlight_bone;
     shared_str m_sHud_wpn_magazine_bone;
-    shared_str m_sHud_wpn_stock_bone;
+    shared_str m_sHud_wpn_sight_bone;
 
     xr_vector<u8> m_scope_meshes{};
     xr_vector<u8> m_silencer_meshes{};
@@ -204,7 +204,7 @@ public:
     xr_vector<u8> m_laser_meshes{};
     xr_vector<u8> m_flashlight_meshes{};
     xr_vector<u8> m_magazine_meshes{};
-    xr_vector<u8> m_stock_meshes{};
+    xr_vector<u8> m_sight_meshes{};
 
     xr_vector<u8> m_scope_meshes_hud{};
     xr_vector<u8> m_silencer_meshes_hud{};
@@ -212,7 +212,7 @@ public:
     xr_vector<u8> m_laser_meshes_hud{};
     xr_vector<u8> m_flashlight_meshes_hud{};
     xr_vector<u8> m_magazine_meshes_hud{};
-    xr_vector<u8> m_stock_meshes_hud{};
+    xr_vector<u8> m_sight_meshes_hud{};
 
 private:
     xr_vector<shared_str> hidden_bones;
@@ -229,9 +229,8 @@ protected:
     ALife::EWeaponAddonStatus m_eGrenadeLauncherStatus;
     ALife::EWeaponAddonStatus m_eLaserStatus;
     ALife::EWeaponAddonStatus m_eFlashlightStatus;
-    ALife::EWeaponAddonStatus m_eStockStatus;
+    ALife::EWeaponAddonStatus m_eSightStatus;
     ALife::EWeaponAddonStatus m_eExtenderStatus;
-    ALife::EWeaponAddonStatus m_eForendStatus;
 
     ///////////////////////////////////////////////////
     //	для режима приближения и снайперского прицела
@@ -606,14 +605,11 @@ public:
     xr_vector<shared_str> m_flashlights{};
     u8 m_cur_flashlight{};
 
-    xr_vector<shared_str> m_stocks{};
-    u8 m_cur_stock{};
+    xr_vector<shared_str> m_sights{};
+    u8 m_cur_sight{};
 
     xr_vector<shared_str> m_extenders{};
     u8 m_cur_extender{};
-
-    xr_vector<shared_str> m_forends{};
-    u8 m_cur_forend{};
 
     xr_vector<shared_str> m_magazines{};
     u8 m_cur_magazine{};

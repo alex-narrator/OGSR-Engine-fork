@@ -307,8 +307,8 @@ void CWeaponScript::script_register(lua_State* L)
 
               class_<enum_exporter<eWeaponAddonType>>("addon").enum_("addon")[
                   value("silencer", int(eSilencer)), value("scope", int(eScope)), value("launcher", int(eLauncher)), 
-                  value("laser", int(eLaser)), value("flashlight", int(eFlashlight)), value("stock", int(eStock)), 
-                  value("extender", int(eExtender)), value("forend", int(eForend)), value("magazine", int(eMagazine)), 
+                  value("laser", int(eLaser)), value("flashlight", int(eFlashlight)), value("sight", int(eSight)), 
+                  value("extender", int(eExtender)), value("magazine", int(eMagazine)), 
                   value("max", int(eMaxAddon))]];
 }
 

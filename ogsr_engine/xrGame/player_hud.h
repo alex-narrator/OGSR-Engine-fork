@@ -76,7 +76,7 @@ struct hud_item_measures
         m_hands_offset_type_normal, // Не прицеливаемся
         m_hands_offset_type_aim, // Смотрим в механический прицел
         m_hands_offset_type_aim_alt, // Дивимося у альтернативний приціл
-        m_hands_offset_type_aim_alt_scope, // Дивимося у альтернативний приціл коли приєднано оптичний приціл
+        m_hands_offset_type_aim_alt_sight, // Дивимося у альтернативний приціл коли приєднано додатковий приціл
         m_hands_offset_type_aim_scope, // Смотрим в присоединяемый прицел
         m_hands_offset_type_gl, // Смотрим в механический прицел в режиме ПГ
         m_hands_offset_type_gl_scope, // Дивимось у приціл ПГ із приєднаним оптичним прицілом (сам приціл може заважати прицілюванню з ПГ)

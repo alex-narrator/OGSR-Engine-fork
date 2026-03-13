@@ -132,9 +132,8 @@ enum EWeaponAddonState : u8
     eWeaponAddonSilencer = 1 << 2,
     eWeaponAddonLaser = 1 << 3,
     eWeaponAddonFlashlight = 1 << 4,
-    eWeaponAddonStock = 1 << 5,
+    eWeaponAddonSight = 1 << 5,
     eWeaponAddonExtender = 1 << 6,
-    eWeaponAddonForend = 1 << 7,
 };
 
 enum EWeaponState : u8
@@ -151,9 +150,8 @@ EWeaponAddonStatus m_silencer_status{};
 EWeaponAddonStatus m_grenade_launcher_status{};
 EWeaponAddonStatus m_laser_status{};
 EWeaponAddonStatus m_flashlight_status{};
-EWeaponAddonStatus m_stock_status{};
+EWeaponAddonStatus m_sight_status{};
 EWeaponAddonStatus m_extender_status{};
-EWeaponAddonStatus m_forend_status{};
 
 u32 timestamp{};
 u8 wpn_flags{};
@@ -174,9 +172,8 @@ u8 m_cur_silencer{};
 u8 m_cur_glauncher{};
 u8 m_cur_laser{};
 u8 m_cur_flashlight{};
-u8 m_cur_stock{};
+u8 m_cur_sight{};
 u8 m_cur_extender{};
-u8 m_cur_forend{};
 u8 m_cur_magazine{};
 
 CSE_ALifeItemWeapon(LPCSTR caSection);

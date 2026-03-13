@@ -59,9 +59,8 @@ CWeapon::~CWeapon()
     delete_data(m_glaunchers);
     delete_data(m_lasers);
     delete_data(m_flashlights);
-    delete_data(m_stocks);
+    delete_data(m_sights);
     delete_data(m_extenders);
-    delete_data(m_forends);
     delete_data(m_magazines);
 }
 
@@ -313,9 +312,8 @@ void CWeapon::Load(LPCSTR section)
     m_eGrenadeLauncherStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "grenade_launcher_status", 0);
     m_eLaserStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "laser_status", 0);
     m_eFlashlightStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "flashlight_status", 0);
-    m_eStockStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "stock_status", 0);
+    m_eSightStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "sight_status", 0);
     m_eExtenderStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "extender_status", 0);
-    m_eForendStatus = (ALife::EWeaponAddonStatus)READ_IF_EXISTS(pSettings, r_u8, section, "forend_status", 0);
 
     m_bZoomEnabled = !!pSettings->r_bool(section, "zoom_enabled");
     m_bScopeShowIndicators = !!READ_IF_EXISTS(pSettings, r_bool, section, "scope_show_indicators", true);
@@ -394,16 +392,16 @@ void CWeapon::Load(LPCSTR section)
             }
         }
     }
-    if (m_eStockStatus == ALife::eAddonAttachable)
+    if (m_eSightStatus == ALife::eAddonAttachable)
     {
-        if (pSettings->line_exist(section, "stock_name"))
+        if (pSettings->line_exist(section, "sight_name"))
         {
-            str = pSettings->r_string(section, "stock_name");
+            str = pSettings->r_string(section, "sight_name");
             for (int i = 0, count = _GetItemCount(str); i < count; ++i)
             {
-                string128 stock_section;
-                _GetItem(str, i, stock_section);
-                m_stocks.push_back(stock_section);
+                string128 sight_section;
+                _GetItem(str, i, sight_section);
+                m_sights.push_back(sight_section);
             }
         }
     }
@@ -417,19 +415,6 @@ void CWeapon::Load(LPCSTR section)
                 string128 extender_section;
                 _GetItem(str, i, extender_section);
                 m_extenders.push_back(extender_section);
-            }
-        }
-    }
-    if (m_eForendStatus == ALife::eAddonAttachable)
-    {
-        if (pSettings->line_exist(section, "forend_name"))
-        {
-            str = pSettings->r_string(section, "forend_name");
-            for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-            {
-                string128 forend_section;
-                _GetItem(str, i, forend_section);
-                m_forends.push_back(forend_section);
             }
         }
     }
@@ -469,7 +454,7 @@ void CWeapon::Load(LPCSTR section)
     m_sWpn_laser_bone = READ_IF_EXISTS(pSettings, r_string, section, "laser_ray_bones", "");
     m_sWpn_flashlight_bone = READ_IF_EXISTS(pSettings, r_string, section, "torch_cone_bones", "");
     m_sWpn_magazine_bone = READ_IF_EXISTS(pSettings, r_string, section, "magazine_bone", "");
-    m_sWpn_stock_bone = READ_IF_EXISTS(pSettings, r_string, section, "stock_bone", "");
+    m_sWpn_sight_bone = READ_IF_EXISTS(pSettings, r_string, section, "sight_bone", "");
 
     if (pSettings->line_exist(section, "hidden_bones"))
     {
@@ -510,7 +495,7 @@ void CWeapon::Load(LPCSTR section)
     m_sHud_wpn_laser_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "laser_ray_bones", m_sWpn_laser_bone);
     m_sHud_wpn_flashlight_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "torch_cone_bones", m_sWpn_flashlight_bone);
     m_sHud_wpn_magazine_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "magazine_bone", m_sWpn_magazine_bone);
-    m_sHud_wpn_stock_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "stock_bone", m_sWpn_stock_bone);
+    m_sHud_wpn_sight_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "sight_bone", m_sWpn_sight_bone);
 
     if (pSettings->line_exist(hud_sect, "hidden_bones"))
     {
@@ -665,12 +650,12 @@ BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
     }
     m_cur_flashlight = E->m_cur_flashlight;
 
-    if (AddonAttachable(eStock) && IsAddonAttached(eStock) && E->m_cur_stock >= m_stocks.size())
+    if (AddonAttachable(eSight) && IsAddonAttached(eSight) && E->m_cur_sight >= m_sights.size())
     {
-        Msg("! [%s]: %s: wrong stock current [%u/%u]", __FUNCTION__, cName().c_str(), E->m_cur_stock, m_stocks.size() - 1);
-        E->m_cur_stock = 0;
+        Msg("! [%s]: %s: wrong sight current [%u/%u]", __FUNCTION__, cName().c_str(), E->m_cur_sight, m_sights.size() - 1);
+        E->m_cur_sight = 0;
     }
-    m_cur_stock = E->m_cur_stock;
+    m_cur_sight = E->m_cur_sight;
 
     if (AddonAttachable(eExtender) && IsAddonAttached(eExtender) && E->m_cur_extender >= m_extenders.size())
     {
@@ -678,13 +663,6 @@ BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
         E->m_cur_extender = 0;
     }
     m_cur_extender = E->m_cur_extender;
-
-    if (AddonAttachable(eForend) && IsAddonAttached(eForend) && E->m_cur_forend >= m_forends.size())
-    {
-        Msg("! [%s]: %s: wrong forend current [%u/%u]", __FUNCTION__, cName().c_str(), E->m_cur_forend, m_forends.size() - 1);
-        E->m_cur_forend = 0;
-    }
-    m_cur_forend = E->m_cur_forend;
 
     if (AddonAttachable(eMagazine))
     {
@@ -790,9 +768,8 @@ void CWeapon::net_Export(CSE_Abstract* E)
     wpn->m_cur_glauncher = m_cur_glauncher;
     wpn->m_cur_laser = m_cur_laser;
     wpn->m_cur_flashlight = m_cur_flashlight;
-    wpn->m_cur_stock = m_cur_stock;
+    wpn->m_cur_sight = m_cur_sight;
     wpn->m_cur_extender = m_cur_extender;
-    wpn->m_cur_forend = m_cur_forend;
     wpn->m_cur_magazine = m_cur_magazine;
 }
 
@@ -1308,8 +1285,8 @@ void CWeapon::UpdateHUDAddonsVisibility()
     if (m_sHud_wpn_flashlight_bone.size() && IsAddonAttached(eFlashlight))
         HudItemData()->set_bone_visible(m_sHud_wpn_flashlight_bone, IsFlashlightOn(), TRUE);
 
-    if (m_sHud_wpn_stock_bone.size() && AddonAttachable(eStock))
-        HudItemData()->set_bone_visible(m_sHud_wpn_stock_bone, IsAddonAttached(eStock));
+    if (m_sHud_wpn_sight_bone.size() && AddonAttachable(eSight))
+        HudItemData()->set_bone_visible(m_sHud_wpn_sight_bone, IsAddonAttached(eSight));
 
     for (const shared_str& bone_name : hud_hidden_bones)
         HudItemData()->set_bone_visible(bone_name, FALSE, TRUE);
@@ -1326,8 +1303,8 @@ void CWeapon::UpdateHUDAddonsVisibility()
     //    weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eLaser));
     //for (const auto& mesh_idx : m_flashlight_meshes_hud)
     //    weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eFlashlight));
-    //for (const auto& mesh_idx : m_stock_meshes_hud)
-    //    weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eStock));
+    //for (const auto& mesh_idx : m_sight_meshes_hud)
+    //    weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eSight));
     //
     //InitAddonsVisualHud();
 
@@ -1431,10 +1408,10 @@ void CWeapon::UpdateAddonsVisibility()
         }
     }
 
-    if (m_sWpn_stock_bone.size() && AddonAttachable(eStock))
+    if (m_sWpn_sight_bone.size() && AddonAttachable(eSight))
     {
-        bone_id = pWeaponVisual->LL_BoneID(m_sWpn_stock_bone);
-        pWeaponVisual->LL_SetBoneVisible(bone_id, IsAddonAttached(eStock), false);
+        bone_id = pWeaponVisual->LL_BoneID(m_sWpn_sight_bone);
+        pWeaponVisual->LL_SetBoneVisible(bone_id, IsAddonAttached(eSight), false);
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -1459,8 +1436,8 @@ void CWeapon::UpdateAddonsVisibility()
     //    pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eLaser));
     //for (const auto& mesh_idx : m_flashlight_meshes)
     //    pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eFlashlight));
-    //for (const auto& mesh_idx : m_stock_meshes)
-    //    pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eStock));
+    //for (const auto& mesh_idx : m_sight_meshes)
+    //    pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eSight));
     //
     //InitAddonsVisual();
 
@@ -1707,8 +1684,8 @@ u8 CWeapon::GetCurrentHudOffsetIdx() const
 
         if (IsAimAltMode())
         {
-            if (has_scope)
-                return hud_item_measures::m_hands_offset_type_aim_alt_scope;
+            if (AddonAttachable(eSight) && IsAddonAttached(eSight))
+                return hud_item_measures::m_hands_offset_type_aim_alt_sight;
             else
                 return hud_item_measures::m_hands_offset_type_aim_alt;
         }
@@ -2147,15 +2124,12 @@ bool CWeapon::IsAddonAttached(u32 addon) const
     case eFlashlight:
         return (CSE_ALifeItemWeapon::eAddonAttachable == m_eFlashlightStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight)) ||
             CSE_ALifeItemWeapon::eAddonPermanent == m_eFlashlightStatus;
-    case eStock:
-        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eStockStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock)) ||
-            CSE_ALifeItemWeapon::eAddonPermanent == m_eStockStatus;
+    case eSight:
+        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eSightStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSight)) ||
+            CSE_ALifeItemWeapon::eAddonPermanent == m_eSightStatus;
     case eExtender:
         return (CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender)) ||
             CSE_ALifeItemWeapon::eAddonPermanent == m_eExtenderStatus;
-    case eForend:
-        return (CSE_ALifeItemWeapon::eAddonAttachable == m_eForendStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend)) ||
-            CSE_ALifeItemWeapon::eAddonPermanent == m_eForendStatus;
     case eMagazine: return m_flagsWeaponState & CSE_ALifeItemWeapon::eWeaponMagazineAttached;
     default: return false;
     }
@@ -2170,9 +2144,8 @@ bool CWeapon::AddonAttachable(u32 addon) const
     case eLauncher: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eGrenadeLauncherStatus);
     case eLaser: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eLaserStatus);
     case eFlashlight: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eFlashlightStatus);
-    case eStock: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eStockStatus);
+    case eSight: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eSightStatus);
     case eExtender: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus);
-    case eForend: return (CSE_ALifeItemWeapon::eAddonAttachable == m_eForendStatus);
     case eMagazine: return !m_magazines.empty();
     default: return false;
     }
@@ -2187,9 +2160,8 @@ shared_str CWeapon::GetAddonName(u32 addon) const
     case eLauncher: return m_glaunchers[m_cur_glauncher];
     case eLaser: return m_lasers[m_cur_laser];
     case eFlashlight: return m_flashlights[m_cur_flashlight];
-    case eStock: return m_stocks[m_cur_stock];
+    case eSight: return m_sights[m_cur_sight];
     case eExtender: return m_extenders[m_cur_extender];
-    case eForend: return m_forends[m_cur_forend];
     case eMagazine: return m_magazines[m_cur_magazine];
     default: return nullptr;
     }
@@ -2285,7 +2257,7 @@ Fvector CWeapon::GetDirectionForCollision() { return psHUD_Flags.test(HUD_CROSSH
 //        {
 //            string128 mesh_num;
 //            _GetItem(str, i, mesh_num);
-//            m_stock_meshes.push_back(u8(atoi(mesh_num)));
+//            m_sight_meshes.push_back(u8(atoi(mesh_num)));
 //        }
 //}
 //
@@ -2345,7 +2317,7 @@ Fvector CWeapon::GetDirectionForCollision() { return psHUD_Flags.test(HUD_CROSSH
 //        {
 //            string128 mesh_num;
 //            _GetItem(str, i, mesh_num);
-//            m_stock_meshes_hud.push_back(u8(atoi(mesh_num)));
+//            m_sight_meshes_hud.push_back(u8(atoi(mesh_num)));
 //        }
 //}
 

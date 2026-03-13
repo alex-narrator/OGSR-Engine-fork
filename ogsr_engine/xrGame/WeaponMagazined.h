@@ -84,8 +84,6 @@ protected:
     virtual void ReloadMagazine();
     void ApplySilencerParams();
     void ApplySilencerKoeffs();
-    void ApplyStockParams();
-    void ApplyForendParams();
 
     virtual void state_Fire(float dt);
 
@@ -146,6 +144,7 @@ public:
     virtual void LoadScopeParams(LPCSTR);
     virtual void LoadLaserParams(LPCSTR);
     virtual void LoadFlashlightParams(LPCSTR);
+    virtual void LoadSightParams(LPCSTR);
     //
     LPCSTR binoc_vision_sect{};
 

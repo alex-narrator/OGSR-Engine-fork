@@ -878,8 +878,7 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
     auto pSilencer = std::find(m_silencers.begin(), m_silencers.end(), pIItem->object().cNameSect()) != m_silencers.end();
     auto pLaser = std::find(m_lasers.begin(), m_lasers.end(), pIItem->object().cNameSect()) != m_lasers.end();
     auto pFlashlight = std::find(m_flashlights.begin(), m_flashlights.end(), pIItem->object().cNameSect()) != m_flashlights.end();
-    auto pStock = std::find(m_stocks.begin(), m_stocks.end(), pIItem->object().cNameSect()) != m_stocks.end();
-    auto pForend = std::find(m_forends.begin(), m_forends.end(), pIItem->object().cNameSect()) != m_forends.end();
+    auto pSight = std::find(m_sights.begin(), m_sights.end(), pIItem->object().cNameSect()) != m_sights.end();
 
     if (pScope && m_eScopeStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) == 0)
         return true;
@@ -889,9 +888,7 @@ bool CWeaponMagazined::CanAttach(PIItem pIItem)
         return true;
     else if (pFlashlight && m_eFlashlightStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) == 0)
         return true;
-    else if (pStock && m_eStockStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock) == 0)
-        return true;
-    else if (pForend && m_eForendStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend) == 0)
+    else if (pSight && m_eSightStatus == ALife::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSight) == 0)
         return true;
     else
         return inherited::CanAttach(pIItem);
@@ -911,11 +908,8 @@ bool CWeaponMagazined::CanDetach(const char* item_section_name)
     else if (m_eFlashlightStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) &&
              std::find(m_flashlights.begin(), m_flashlights.end(), item_section_name) != m_flashlights.end())
         return true;
-    else if (m_eStockStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock) &&
-             std::find(m_stocks.begin(), m_stocks.end(), item_section_name) != m_stocks.end())
-        return true;
-    else if (m_eForendStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend) &&
-             std::find(m_forends.begin(), m_forends.end(), item_section_name) != m_forends.end())
+    else if (m_eSightStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSight) &&
+             std::find(m_sights.begin(), m_sights.end(), item_section_name) != m_sights.end())
         return true;
     else
         return inherited::CanDetach(item_section_name);
@@ -929,8 +923,7 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
     auto pSilencer = std::find(m_silencers.begin(), m_silencers.end(), pIItem->object().cNameSect()) != m_silencers.end();
     auto pLaser = std::find(m_lasers.begin(), m_lasers.end(), pIItem->object().cNameSect()) != m_lasers.end();
     auto pFlashlight = std::find(m_flashlights.begin(), m_flashlights.end(), pIItem->object().cNameSect()) != m_flashlights.end();
-    auto pStock = std::find(m_stocks.begin(), m_stocks.end(), pIItem->object().cNameSect()) != m_stocks.end();
-    auto pForend = std::find(m_forends.begin(), m_forends.end(), pIItem->object().cNameSect()) != m_forends.end();
+    auto pSight = std::find(m_sights.begin(), m_sights.end(), pIItem->object().cNameSect()) != m_sights.end();
 
     if (pScope && m_eScopeStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonScope) == 0)
     {
@@ -956,16 +949,10 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonFlashlight;
         result = true;
     }
-    else if (pStock && m_eStockStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock) == 0)
+    else if (pSight && m_eSightStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSight) == 0)
     {
-        m_cur_stock = (u8)std::distance(m_stocks.begin(), std::find(m_stocks.begin(), m_stocks.end(), pIItem->object().cNameSect()));
-        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonStock;
-        result = true;
-    }
-    else if (pForend && m_eForendStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend) == 0)
-    {
-        m_cur_forend = (u8)std::distance(m_forends.begin(), std::find(m_forends.begin(), m_forends.end(), pIItem->object().cNameSect()));
-        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonForend;
+        m_cur_sight = (u8)std::distance(m_sights.begin(), std::find(m_sights.begin(), m_sights.end(), pIItem->object().cNameSect()));
+        m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonSight;
         result = true;
     }
 
@@ -1038,23 +1025,12 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
         InitAddons();
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
-    else if (m_eStockStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonStock) &&
-             std::find(m_stocks.begin(), m_stocks.end(), item_section_name) != m_stocks.end())
+    else if (m_eSightStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSight) &&
+             std::find(m_sights.begin(), m_sights.end(), item_section_name) != m_sights.end())
     {
-        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonStock;
+        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonSight;
         //
-        m_cur_stock = 0;
-        //
-        UpdateAddonsVisibility();
-        InitAddons();
-        return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
-    }
-    else if (m_eForendStatus == CSE_ALifeItemWeapon::eAddonAttachable && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonForend) &&
-             std::find(m_forends.begin(), m_forends.end(), item_section_name) != m_forends.end())
-    {
-        m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonForend;
-        //
-        m_cur_forend = 0;
+        m_cur_sight = 0;
         //
         UpdateAddonsVisibility();
         InitAddons();
@@ -1090,10 +1066,12 @@ void CWeaponMagazined::InitAddons()
     // до цих параметрів можуть додаватися коефіцієнти у функціях нижче
     m_fAimControlInertionK = 0.f;
     m_fAimInertionK = 0.f;
-    // приклад
-    ApplyStockParams();
-    // цівка
-    ApplyForendParams();
+    // кутовий приціл
+    if (IsAddonAttached(eSight))
+    {
+        sect = IsAddonAttached(eSight) && AddonAttachable(eSight) ? GetAddonName(eSight).c_str() : cNameSect().c_str();
+        LoadSightParams(sect);
+    }
 
     inherited::InitAddons();
 }
@@ -1246,17 +1224,15 @@ void CWeaponMagazined::ApplySilencerKoeffs()
     }
 }
 
-void CWeaponMagazined::ApplyStockParams()
+void CWeaponMagazined::LoadSightParams(LPCSTR section)
 {
-    if (!IsAddonAttached(eStock) || !AddonAttachable(eStock))
-        return;
+    m_bHasAimAlt = true;
+    m_bAimAltMode = false;
 
-    auto stock_sect = GetAddonName(eStock);
-
-    float CD_k = READ_IF_EXISTS(pSettings, r_float, stock_sect, "cam_dispersion_k", 0.f);
-    float ZR_k = READ_IF_EXISTS(pSettings, r_float, stock_sect, "zoom_rotate_time_k", 0.f);
-    float AI_k = READ_IF_EXISTS(pSettings, r_float, stock_sect, "aim_inertion_k", 0.f);
-    float CI_k = READ_IF_EXISTS(pSettings, r_float, stock_sect, "aim_control_inertion_k", 0.f);
+    float CD_k = READ_IF_EXISTS(pSettings, r_float, section, "cam_dispersion_k", 0.f);
+    float ZR_k = READ_IF_EXISTS(pSettings, r_float, section, "zoom_rotate_time_k", 0.f);
+    float AI_k = READ_IF_EXISTS(pSettings, r_float, section, "aim_inertion_k", 0.f);
+    float CI_k = READ_IF_EXISTS(pSettings, r_float, section, "aim_control_inertion_k", 0.f);
     if (!fis_zero(CD_k))
     {
         camDispersion += camDispersion * CD_k;
@@ -1268,25 +1244,8 @@ void CWeaponMagazined::ApplyStockParams()
     }
     m_fAimInertionK += AI_k;
     m_fAimControlInertionK += CI_k;
-}
 
-void CWeaponMagazined::ApplyForendParams()
-{
-    if (!IsAddonAttached(eForend) || !AddonAttachable(eForend))
-        return;
-
-    auto forend_sect = GetAddonName(eForend);
-
-    float CD_k = READ_IF_EXISTS(pSettings, r_float, forend_sect, "cam_dispersion_k", 0.f);
-    float AI_k = READ_IF_EXISTS(pSettings, r_float, forend_sect, "aim_inertion_k", 0.f);
-    float CI_k = READ_IF_EXISTS(pSettings, r_float, forend_sect, "aim_control_inertion_k", 0.f);
-    if (!fis_zero(CD_k))
-    {
-        camDispersion += camDispersion * CD_k;
-        camDispersionInc += camDispersionInc * CD_k;
-    }
-    m_fAimInertionK += AI_k;
-    m_fAimControlInertionK += CI_k;
+    m_fScopeZoomFactorAlt = READ_IF_EXISTS(pSettings, r_float, section, "scope_zoom_factor_alt", 1.0f);
 }
 
 void CWeaponMagazined::LoadLaserParams(LPCSTR section)

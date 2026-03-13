@@ -260,16 +260,6 @@ void CObjectFactory::register_classes()
     ADD(CWeaponAmmo, CSE_ALifeItemAmmo, CLSID_OBJECT_A_M209, "wpn_ammo_m209");
     //-----------------------------------------------------------------------------------------------------
 
-    // Weapons Add-on
-    ADD(CScope, CSE_ALifeItem, CLSID_OBJECT_W_SCOPE, "wpn_scope");
-    ADD(CSilencer, CSE_ALifeItem, CLSID_OBJECT_W_SILENCER, "wpn_silencer");
-    ADD(CGrenadeLauncher, CSE_ALifeItem, CLSID_OBJECT_W_GLAUNCHER, "wpn_grenade_launcher");
-    ADD(CLaser, CSE_ALifeItem, CLSID_OBJECT_W_LASER, "wpn_laser");
-    ADD(CAddonFlashlight, CSE_ALifeItem, CLSID_OBJECT_W_FLASHLIGHT, "wpn_flashlight");
-    ADD(CStock, CSE_ALifeItem, CLSID_OBJECT_W_STOCK, "wpn_stock");
-    ADD(CExtender, CSE_ALifeItem, CLSID_OBJECT_W_EXTENDER, "wpn_extender");
-    ADD(CForend, CSE_ALifeItem, CLSID_OBJECT_W_FOREND, "wpn_forend");
-
     // Inventory
     ADD(CBolt, CSE_ALifeItemBolt, CLSID_IITEM_BOLT, "obj_bolt");
     ADD(CMedkit, CSE_ALifeItem, CLSID_IITEM_MEDKIT, "obj_medkit");

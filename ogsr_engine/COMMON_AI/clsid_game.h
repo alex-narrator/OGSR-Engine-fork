@@ -100,15 +100,6 @@ constexpr auto CLSID_OBJECT_A_VOG25 = MK_CLSID('A', '_', 'V', 'O', 'G', '2', '5'
 constexpr auto CLSID_OBJECT_A_OG7B = MK_CLSID('A', '_', 'O', 'G', '7', 'B', ' ', ' ');
 constexpr auto CLSID_OBJECT_A_M209 = MK_CLSID('A', '_', 'M', '2', '0', '9', ' ', ' ');
 //-----------------------------------------------------------------------------
-// Weapons Add-ons
-constexpr auto CLSID_OBJECT_W_SCOPE = MK_CLSID('W', '_', 'S', 'C', 'O', 'P', 'E', ' ');
-constexpr auto CLSID_OBJECT_W_SILENCER = MK_CLSID('W', '_', 'S', 'I', 'L', 'E', 'N', 'C');
-constexpr auto CLSID_OBJECT_W_GLAUNCHER = MK_CLSID('W', '_', 'G', 'L', 'A', 'U', 'N', 'C');
-constexpr auto CLSID_OBJECT_W_LASER = MK_CLSID('W', '_', 'L', 'A', 'S', 'E', 'R', ' ');
-constexpr auto CLSID_OBJECT_W_FLASHLIGHT = MK_CLSID('W', '_', 'F', 'L', 'A', 'S', 'H', 'L');
-constexpr auto CLSID_OBJECT_W_STOCK = MK_CLSID('W', '_', 'S', 'T', 'O', 'C', 'K', ' ');
-constexpr auto CLSID_OBJECT_W_EXTENDER = MK_CLSID('W', '_', 'E', 'X', 'T', 'N', 'D', 'R');
-constexpr auto CLSID_OBJECT_W_FOREND = MK_CLSID('W', '_', 'F', 'O', 'R', 'E', 'N', 'D');
 
 // Modifiers
 constexpr auto CLSID_OBJECT_M_QDAMAGE = MK_CLSID('O', '_', 'Q', 'D', 'M', 'G', ' ', ' ');

@@ -459,15 +459,15 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
     m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim_alt] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_rot[m_hands_offset_type_aim]);
     //
     // scope second ofset with scope
-    xr_strconcat(val_name, "aim_alt_scope_hud_offset_pos", _prefix);
+    xr_strconcat(val_name, "aim_alt_sight_hud_offset_pos", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
-        xr_strcpy(val_name, "aim_alt_scope_hud_offset_pos");
-    m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim_alt_scope] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_pos[m_hands_offset_type_aim_alt]);
+        xr_strcpy(val_name, "aim_alt_sight_hud_offset_pos");
+    m_hands_offset[m_hands_offset_pos][m_hands_offset_type_aim_alt_sight] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_pos[m_hands_offset_type_aim_alt]);
 
-    xr_strconcat(val_name, "aim_alt_scope_hud_offset_rot", _prefix);
+    xr_strconcat(val_name, "aim_alt_sight_hud_offset_rot", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
-        xr_strcpy(val_name, "aim_alt_scope_hud_offset_rot");
-    m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim_alt_scope] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_rot[m_hands_offset_type_aim_alt]);
+        xr_strcpy(val_name, "aim_alt_sight_hud_offset_rot");
+    m_hands_offset[m_hands_offset_rot][m_hands_offset_type_aim_alt_sight] = READ_IF_EXISTS(pSettings, r_fvector3, sect_name, val_name, aim_rot[m_hands_offset_type_aim_alt]);
     //
     xr_strconcat(val_name, "aim_scope_hud_offset_pos", _prefix);
     if (is_16x9 && !pSettings->line_exist(sect_name, val_name))
