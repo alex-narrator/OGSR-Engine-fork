@@ -38,6 +38,7 @@ void ShowHudEditor(bool& show)
         ImGui::Separator();
 
     const auto aim_idx = hud_item_measures::m_hands_offset_type_aim;
+    const auto aim_scope_idx = hud_item_measures::m_hands_offset_type_aim_scope;
     const auto aim_alt_idx = hud_item_measures::m_hands_offset_type_aim_alt;
     const auto aim_sight_idx = hud_item_measures::m_hands_offset_type_aim_alt_sight;
     const auto aim_gl_idx = hud_item_measures::m_hands_offset_type_gl;
@@ -57,6 +58,8 @@ void ShowHudEditor(bool& show)
 		ImGui::DragFloat3("item_orientation",               (float*)&item->m_measures.m_item_attach[1],                     drag_rot_intensity, NULL, NULL, "%.6f");
         ImGui::DragFloat3("aim_hud_offset_pos",             (float*)&item->m_measures.m_hands_offset[0][aim_idx],           drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("aim_hud_offset_rot",             (float*)&item->m_measures.m_hands_offset[1][aim_idx],           drag_rot_intensity, NULL, NULL, "%.6f");
+        ImGui::DragFloat3("aim_scope_hud_offset_pos",       (float*)&item->m_measures.m_hands_offset[0][aim_scope_idx],     drag_pos_intensity, NULL, NULL, "%.6f");
+		ImGui::DragFloat3("aim_scope_hud_offset_rot",       (float*)&item->m_measures.m_hands_offset[1][aim_scope_idx],     drag_rot_intensity, NULL, NULL, "%.6f");
         ImGui::DragFloat3("aim_alt_hud_offset_pos",         (float*)&item->m_measures.m_hands_offset[0][aim_alt_idx],       drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("aim_alt_hud_offset_rot",         (float*)&item->m_measures.m_hands_offset[1][aim_alt_idx],       drag_rot_intensity, NULL, NULL, "%.6f");
         ImGui::DragFloat3("aim_alt_sight_hud_offset_pos",   (float*)&item->m_measures.m_hands_offset[0][aim_sight_idx],     drag_pos_intensity, NULL, NULL, "%.6f");
@@ -167,6 +170,11 @@ void ShowHudEditor(bool& show)
             Msg("aim_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
             pos = item->m_measures.m_hands_offset[1][aim_idx];
             Msg("aim_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+
+            pos = item->m_measures.m_hands_offset[0][aim_scope_idx];
+            Msg("aim_scope_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+            pos = item->m_measures.m_hands_offset[1][aim_scope_idx];
+            Msg("aim_scope_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
 
             pos = item->m_measures.m_hands_offset[0][aim_alt_idx];
             Msg("aim_alt_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
