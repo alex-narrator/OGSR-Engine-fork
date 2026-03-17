@@ -59,16 +59,12 @@ public:
 
     virtual void renderable_Render(u32 context_id, IRenderable* root) override;
     virtual void render_hud_mode(u32 context_id, IRenderable* root) override;
-    /*virtual void OnDrawUI();*/
-    /*virtual bool need_renderable();*/
 
     virtual void OnH_B_Chield();
     virtual void OnH_A_Chield();
     virtual void OnH_B_Independent(bool just_before_destroy);
     virtual void OnH_A_Independent();
     virtual void OnEvent(NET_Packet& P, u16 type); // {inherited::OnEvent(P,type);}
-
-    /*virtual void Hit(SHit* pHDS);*/
 
     virtual void reinit();
     virtual void reload(LPCSTR section);
@@ -197,22 +193,6 @@ public:
     shared_str m_sHud_wpn_flashlight_bone;
     shared_str m_sHud_wpn_magazine_bone;
     shared_str m_sHud_wpn_sight_bone;
-
-    xr_vector<u8> m_scope_meshes{};
-    xr_vector<u8> m_silencer_meshes{};
-    xr_vector<u8> m_launcher_meshes{};
-    xr_vector<u8> m_laser_meshes{};
-    xr_vector<u8> m_flashlight_meshes{};
-    xr_vector<u8> m_magazine_meshes{};
-    xr_vector<u8> m_sight_meshes{};
-
-    xr_vector<u8> m_scope_meshes_hud{};
-    xr_vector<u8> m_silencer_meshes_hud{};
-    xr_vector<u8> m_launcher_meshes_hud{};
-    xr_vector<u8> m_laser_meshes_hud{};
-    xr_vector<u8> m_flashlight_meshes_hud{};
-    xr_vector<u8> m_magazine_meshes_hud{};
-    xr_vector<u8> m_sight_meshes_hud{};
 
 private:
     xr_vector<shared_str> hidden_bones;
@@ -424,12 +404,6 @@ public:
     float camMaxAngleHorz;
     float camStepAngleHorz;
 
-    //float dof_transition_time{};
-    //static float dof_zoom_effect, dof_reload_effect;
-    //Fvector4 dof_params_zoom{};
-    //Fvector4 dof_params_reload{};
-    //void UpdateDof(float& type, const Fvector4& params_type, const bool desire);
-
 protected:
     //фактор увеличения дисперсии при максимальной изношености
     //(на сколько процентов увеличится дисперсия)
@@ -538,7 +512,6 @@ public:
 
     bool m_bDirectReload{};
     virtual bool IsDirectReload(CWeaponAmmo*);
-    /*virtual bool IsOpened() const { return !GetAmmoElapsed(); };*/
 
 protected:
     u32 m_ef_main_weapon_type{u32(-1)};
@@ -618,13 +591,6 @@ public:
 
     bool m_bCamRecoilCompensation;
 
-    //virtual void processing_deactivate() override
-    //{
-    //    UpdateLaser();
-    //    UpdateFlashlight();
-    //    inherited::processing_deactivate();
-    //}
-
     virtual void on_a_hud_attach() override;
     virtual void on_b_hud_detach() override;
 
@@ -678,9 +644,6 @@ private:
 
 public:
     void update_visual_bullet_textures(const bool forced = false);
-
-    //void LoadAddonMeshes(LPCSTR);
-    //void LoadAddonMeshesHud();
 
     virtual void InitAddonsVisual();
     virtual void InitAddonsVisualHud();

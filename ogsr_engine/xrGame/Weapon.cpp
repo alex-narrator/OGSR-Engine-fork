@@ -64,8 +64,6 @@ CWeapon::~CWeapon()
     delete_data(m_magazines);
 }
 
-//void CWeapon::Hit(SHit* pHDS) { inherited::Hit(pHDS); }
-
 void CWeapon::UpdateXForm()
 {
     if (Device.dwFrame != dwXF_Frame)
@@ -318,8 +316,6 @@ void CWeapon::Load(LPCSTR section)
     m_bZoomEnabled = !!pSettings->r_bool(section, "zoom_enabled");
     m_bScopeShowIndicators = !!READ_IF_EXISTS(pSettings, r_bool, section, "scope_show_indicators", true);
 
-    /*m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME);*/
-
     m_bScopeDynamicZoom = false;
     m_fScopeZoomFactor = 0;
     m_fRTZoomFactor = 0;
@@ -514,10 +510,6 @@ void CWeapon::Load(LPCSTR section)
     else
         hud_hidden_bones = hidden_bones;
 
-    // addon meshes
-    //LoadAddonMeshes(section);
-    //LoadAddonMeshesHud();
-
     //Можно и из конфига прицела читать и наоборот! Пока так.
     m_fZoomHudFov = 0.0f;
     m_f3dssHudFov = 0.0f;
@@ -566,23 +558,6 @@ void CWeapon::Load(LPCSTR section)
             bullet_textures_for_ammos.emplace(std::move(ammo_section), std::move(bullet_tex));
         }
     }
-
-    str = READ_IF_EXISTS(pSettings, r_string, section, "magazine_meshes", nullptr);
-    if (str)
-        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-        {
-            string128 mesh_num;
-            _GetItem(str, i, mesh_num);
-            m_magazine_meshes.push_back(u8(atoi(mesh_num)));
-        }
-    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "magazine_meshes", nullptr);
-    if (str)
-        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-        {
-            string128 mesh_num;
-            _GetItem(str, i, mesh_num);
-            m_magazine_meshes_hud.push_back(u8(atoi(mesh_num)));
-        }
 }
 
 void CWeapon::LoadFireParams(LPCSTR section, LPCSTR prefix)
@@ -957,8 +932,6 @@ void CWeapon::render_hud_mode(u32 context_id, IRenderable* root)
     inherited::render_hud_mode(context_id, root);
 }
 
-//bool CWeapon::need_renderable() { return !(IsZoomed() && ZoomTexture() && !IsRotatingToZoom()); }
-
 void CWeapon::signal_HideComplete()
 {
     if (H_Parent())
@@ -1055,20 +1028,12 @@ void CWeapon::ZoomChange(bool inc)
         return total_zoom_delta / step_count;
     };
 
-//    if (Is3dssEnabled())
-//    {
-//// Simp: переменную кратность в новых прицелах сделал на скриптах, мб в будущем верну в двиг, но пока так.
-//        return;
-//    }
-//    else
-    {
-        const float currentZoomFactor = m_fZoomFactor;
-        m_fZoomFactor += GetZoomStepDelta(m_fScopeZoomFactor, m_fMaxScopeZoomFactor, m_uZoomStepCount) * (inc ? 1 : -1); // delta;
-        clamp(m_fZoomFactor, m_fScopeZoomFactor, m_fMaxScopeZoomFactor);
-        wasChanged = !fsimilar(currentZoomFactor, m_fZoomFactor);
-        if (H_Parent() && !IsRotatingToZoom())
-            m_fRTZoomFactor = m_fZoomFactor; // store current
-    }
+    const float currentZoomFactor = m_fZoomFactor;
+    m_fZoomFactor += GetZoomStepDelta(m_fScopeZoomFactor, m_fMaxScopeZoomFactor, m_uZoomStepCount) * (inc ? 1 : -1); // delta;
+    clamp(m_fZoomFactor, m_fScopeZoomFactor, m_fMaxScopeZoomFactor);
+    wasChanged = !fsimilar(currentZoomFactor, m_fZoomFactor);
+    if (H_Parent() && !IsRotatingToZoom())
+        m_fRTZoomFactor = m_fZoomFactor; // store current
 
     if (wasChanged)
     {
@@ -1243,7 +1208,6 @@ void CWeapon::UpdateHUDAddonsVisibility()
             SetHudSection(scope_hud_sect);
             InitAddonsVisualHud();
             InitAddons();
-            /*LoadAddonMeshesHud();*/
         }
 
         HudItemData()->set_bone_visible(m_sHud_wpn_scope_bones, IsAddonAttached(eScope), TRUE);
@@ -1290,23 +1254,6 @@ void CWeapon::UpdateHUDAddonsVisibility()
 
     for (const shared_str& bone_name : hud_hidden_bones)
         HudItemData()->set_bone_visible(bone_name, FALSE, TRUE);
-
-    // addon meshes
-    //const auto weapon_visual = HudItemData()->m_model;
-    //for (const auto& mesh_idx : m_scope_meshes_hud)
-    //    weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eScope));
-    //for (const auto& mesh_idx : m_silencer_meshes_hud)
-    //    weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eSilencer));
-    //for (const auto& mesh_idx : m_launcher_meshes_hud)
-    //    weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eLauncher));
-    //for (const auto& mesh_idx : m_laser_meshes_hud)
-    //    weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eLaser));
-    //for (const auto& mesh_idx : m_flashlight_meshes_hud)
-    //    weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eFlashlight));
-    //for (const auto& mesh_idx : m_sight_meshes_hud)
-    //    weapon_visual->SetRFlag(mesh_idx, IsAddonAttached(eSight));
-    //
-    //InitAddonsVisualHud();
 
     callback(GameObject::eOnUpdateHUDAddonsVisibiility)();
 }
@@ -1425,22 +1372,6 @@ void CWeapon::UpdateAddonsVisibility()
 
     ///////////////////////////////////////////////////////////////////
 
-    // addon meshes
-    //for (const auto& mesh_idx : m_scope_meshes)
-    //    pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eScope));
-    //for (const auto& mesh_idx : m_silencer_meshes)
-    //    pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eSilencer));
-    //for (const auto& mesh_idx : m_launcher_meshes)
-    //    pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eLauncher));
-    //for (const auto& mesh_idx : m_laser_meshes)
-    //    pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eLaser));
-    //for (const auto& mesh_idx : m_flashlight_meshes)
-    //    pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eFlashlight));
-    //for (const auto& mesh_idx : m_sight_meshes)
-    //    pWeaponVisual->SetRFlag(mesh_idx, IsAddonAttached(eSight));
-    //
-    //InitAddonsVisual();
-
     callback(GameObject::eOnUpdateAddonsVisibiility)();
 
     pWeaponVisual->CalculateBones_Invalidate();
@@ -1486,9 +1417,9 @@ float CWeapon::CurrentZoomFactor()
     return res;
 }
 
-bool CWeapon::HasAimAlt() const { return /*IsAddonAttached(eScope) &&*/ !IsGrenadeMode() && m_bHasAimAlt; }
+bool CWeapon::HasAimAlt() const { return !IsGrenadeMode() && m_bHasAimAlt; }
 
-bool CWeapon::IsAimAltMode() const { return /*IsAddonAttached(eScope) &&*/ !IsGrenadeMode() && m_bAimAltMode; }
+bool CWeapon::IsAimAltMode() const { return !IsGrenadeMode() && m_bAimAltMode; }
 
 void CWeapon::OnZoomIn()
 {
@@ -1760,21 +1691,6 @@ void CWeapon::modify_holder_params(float& range, float& fov) const
     fov *= m_addon_holder_fov_modifier;
 }
 
-//void CWeapon::OnDrawUI()
-//{
-//    if (IsZoomed() && ZoomHideCrosshair())
-//    {
-//        if (ZoomTexture() && !IsRotatingToZoom())
-//        {
-//            ZoomTexture()->SetPos(0, 0);
-//            ZoomTexture()->SetRect(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
-//            ZoomTexture()->Render();
-//
-//            //			m_UILens.Draw();
-//        }
-//    }
-//}
-
 bool CWeapon::IsHudModeNow() { return !!HudItemData(); }
 
 bool CWeapon::unlimited_ammo() const
@@ -1895,29 +1811,8 @@ float CWeapon::GetControlInertionFactor() const
 {
     const float fInertionFactor = inherited::GetControlInertionFactor();
 
-    if (IsZoomed() /*&& Is3dssEnabled()*/ && !IsRotatingToZoom())
+    if (IsZoomed() && !IsRotatingToZoom())
     {
-        //if (m_bScopeDynamicZoom)
-        //{
-        //    const auto& zoom_params = shader_exports.get_custom_params("s3ds_param_2");
-        //    const float& max_zoom = zoom_params.y;
-        //    const float& current_zoom = zoom_params.w;
-        //    const float res = fInertionFactor + ((m_fScopeInertionFactor - fInertionFactor) * (current_zoom / max_zoom));
-        //    // Msg("--[%s] current inertion: [%g], fInertionFactor: [%g], m_fScopeInertionFactor: [%g], current zoom: [%g], max_zoom: [%g]", __FUNCTION__, res, fInertionFactor,
-        //    // m_fScopeInertionFactor, current_zoom, max_zoom);
-        //    return res;
-        //}
-        //else
-        //    return m_fScopeInertionFactor;
-
-        //float k{1.f};
-        //if (Is3dssEnabled())
-        //{
-        //    const auto& zoom_params = shader_exports.get_custom_params("s3ds_param_2");
-        //    const float& current_zoom = zoom_params.w;
-        //    k = current_zoom;
-        //}
-        /*float k = Is3dssEnabled() ? m_fZoomFactor : 1.f;*/
         return (fInertionFactor + fInertionFactor * m_fAimControlInertionK) * m_fScopeInertionFactor;
     }
 
@@ -2167,8 +2062,6 @@ shared_str CWeapon::GetAddonName(u32 addon) const
     }
 }
 
-//float CWeapon::GetHitPowerForActor() const { return fvHitPower[g_SingleGameDifficulty]; }
-
 bool CWeapon::IsDirectReload(CWeaponAmmo* ammo)
 {
     auto _it = std::find(m_ammoTypes.begin(), m_ammoTypes.end(), ammo->m_ammoSect);
@@ -2200,126 +2093,6 @@ bool CWeapon::CanBeUnloaded() { return GetAmmoElapsed() || GetAmmoElapsed2() || 
 
 Fvector CWeapon::GetPositionForCollision() { return psHUD_Flags.test(HUD_CROSSHAIR_HARD) ? get_LastShootPoint() : inherited::GetPositionForCollision(); }
 Fvector CWeapon::GetDirectionForCollision() { return psHUD_Flags.test(HUD_CROSSHAIR_HARD) ? get_LastFD() : inherited::GetDirectionForCollision(); }
-
-//void CWeapon::LoadAddonMeshes(LPCSTR section)
-//{
-//    LPCSTR str = READ_IF_EXISTS(pSettings, r_string, section, "scope_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_scope_meshes.push_back(u8(atoi(mesh_num)));
-//        }
-//    str = READ_IF_EXISTS(pSettings, r_string, section, "silencer_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_silencer_meshes.push_back(u8(atoi(mesh_num)));
-//        }
-//    str = READ_IF_EXISTS(pSettings, r_string, section, "launcher_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_launcher_meshes.push_back(u8(atoi(mesh_num)));
-//        }
-//    str = READ_IF_EXISTS(pSettings, r_string, section, "laser_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_laser_meshes.push_back(atoi(_GetItem(str, i, mesh_num)));
-//        }
-//    str = READ_IF_EXISTS(pSettings, r_string, section, "flashlight_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_flashlight_meshes.push_back(u8(atoi(mesh_num)));
-//        }
-//    str = READ_IF_EXISTS(pSettings, r_string, section, "magazine_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_magazine_meshes.push_back(u8(atoi(mesh_num)));
-//        }
-//    str = READ_IF_EXISTS(pSettings, r_string, section, "stock_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_sight_meshes.push_back(u8(atoi(mesh_num)));
-//        }
-//}
-//
-//void CWeapon::LoadAddonMeshesHud()
-//{
-//    LPCSTR str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "scope_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_scope_meshes_hud.push_back(u8(atoi(mesh_num)));
-//        }
-//    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "silencer_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_silencer_meshes_hud.push_back(u8(atoi(mesh_num)));
-//        }
-//    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "launcher_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_launcher_meshes_hud.push_back(u8(atoi(mesh_num)));
-//        }
-//    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "laser_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_laser_meshes_hud.push_back(u8(atoi(mesh_num)));
-//        }
-//    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "flashlight_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_flashlight_meshes_hud.push_back(u8(atoi(mesh_num)));
-//        }
-//    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "magazine_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_magazine_meshes_hud.push_back(u8(atoi(mesh_num)));
-//        }
-//    str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "stock_meshes", nullptr);
-//    if (str)
-//        for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-//        {
-//            string128 mesh_num;
-//            _GetItem(str, i, mesh_num);
-//            m_sight_meshes_hud.push_back(u8(atoi(mesh_num)));
-//        }
-//}
 
 /////////////////////////////////////////////////////visual addon attach/////////////////////////////////////////////////////////////
 
