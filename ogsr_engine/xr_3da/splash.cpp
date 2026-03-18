@@ -58,6 +58,7 @@ static IStream* CreateStreamOnResource(LPCTSTR lpName, LPCTSTR lpType)
 const char* c_szSplashClass = "SplashWindow";
 
 static HWND logoWindow = nullptr;
+static HWND logoOwnerWindow = nullptr;
 
 void ShowSplash(HINSTANCE hInstance)
 {
@@ -79,12 +80,16 @@ void ShowSplash(HINSTANCE hInstance)
     splash_path = splash_path.erase(splash_path.find_last_of('\\'), splash_path.size() - 1);
     splash_path += "\\splash.png";
 
-    img.Load(splash_path.c_str()); // загрузка сплеша
+    HRESULT hr = img.Load(splash_path.c_str()); // загрузка сплеша
 
-    if (img.IsNull()) // если картинки нет на диске, то грузим из ресурсов
+    if (FAILED(hr) || img.IsNull()) // если картинки нет на диске, то грузим из ресурсов
     {
         img.Destroy();
-        img.Load(CreateStreamOnResource(MAKEINTRESOURCE(IDB_PNG1), "PNG")); // загружаем сплеш
+        if (IStream* pStream = CreateStreamOnResource(MAKEINTRESOURCE(IDB_PNG1), TEXT("PNG")))
+        {
+            img.Load(pStream);
+            pStream->Release();
+        }
     }
 
     // фиксируем ширину картинки
@@ -100,8 +105,8 @@ void ShowSplash(HINSTANCE hInstance)
 
     const HDC hdcScreen = GetDC(nullptr);
     const HDC hDC = CreateCompatibleDC(hdcScreen);
-    const HBITMAP hBmp = CreateCompatibleBitmap(hdcScreen, splashWidth, splashHeight);
 
+    HBITMAP hBmp = CreateCompatibleBitmap(hdcScreen, splashWidth, splashHeight);
     const HBITMAP hbmpOld = (HBITMAP)SelectObject(hDC, hBmp);
 
     // рисуем картиночку
@@ -117,6 +122,8 @@ void ShowSplash(HINSTANCE hInstance)
     }
 
     img.AlphaBlend(hDC, 0, 0, splashWidth, splashHeight, 0, 0, splashWidth, splashHeight);
+
+    img.Destroy();
 
     // alpha
     BLENDFUNCTION blend = {0};
@@ -145,16 +152,27 @@ void ShowSplash(HINSTANCE hInstance)
     SetWindowPos(hWnd, logoInsertPos, 0, 0, splashWidth, splashHeight, SWP_NOMOVE | SWP_SHOWWINDOW);
 
     // delete temporary objects
-    SelectObject(hDC, hbmpOld);
+    hBmp = (HBITMAP)SelectObject(hDC, hbmpOld);
+    DeleteObject(hBmp);
+
     DeleteDC(hDC);
     ReleaseDC(nullptr, hdcScreen);
 
+    logoOwnerWindow = hwndOwner;
     logoWindow = hWnd;
 }
 
 void HideSplash()
 {
     // Destroy LOGO
-    DestroyWindow(logoWindow);
-    logoWindow = nullptr;
+    if (logoWindow)
+    {
+        DestroyWindow(logoWindow);
+        logoWindow = nullptr;
+    }
+    if (logoOwnerWindow)
+    {
+        DestroyWindow(logoOwnerWindow);
+        logoOwnerWindow = nullptr;
+    }
 }
