@@ -278,4 +278,7 @@ protected:
     virtual void UpdateMagazineVisibility();
     bool ScopeRespawn();
     void RespawnWeapon(LPCSTR);
+
+public:
+    virtual void SaveCfg();
 };

@@ -389,6 +389,8 @@ public:
     IKinematicsAnimated* Model() { return m_model; }
     const Fmatrix& XFORM() const { return m_transform; }
 
+    void SaveCfg(u16 item_idx) const;
+
 private:
     static void Thumb0Callback(CBoneInstance* B);
     static void Thumb01Callback(CBoneInstance* B);

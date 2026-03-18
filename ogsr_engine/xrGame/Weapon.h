@@ -647,4 +647,6 @@ public:
 
     virtual void InitAddonsVisual();
     virtual void InitAddonsVisualHud();
+
+    virtual void SaveCfg() {};
 };

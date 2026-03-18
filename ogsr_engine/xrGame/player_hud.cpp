@@ -1912,3 +1912,112 @@ player_hud_motion_container* player_hud::get_hand_motions(LPCSTR section, IKinem
     return &res->pm;
 }
 
+
+#include "WeaponMagazined.h"
+void player_hud::SaveCfg(u16 item_idx) const
+{
+    const auto& item = m_attached_items[item_idx];
+    if (!item)
+        return;
+
+    const char* sect_name = item->m_parent_hud_item->HudSection().c_str();
+    string_path buff;
+    FS.update_path(buff, "$logs$", make_string("_hud\\%s.ltx", sect_name).c_str());
+
+    CInifile pCfg(buff, FALSE, FALSE, TRUE);
+
+    const auto aim_idx = hud_item_measures::m_hands_offset_type_aim;
+    const auto aim_alt_idx = hud_item_measures::m_hands_offset_type_aim_alt;
+    const auto aim_sight_idx = hud_item_measures::m_hands_offset_type_aim_alt_sight;
+    const auto aim_scope_idx = hud_item_measures::m_hands_offset_type_aim_scope;
+    const auto aim_gl_idx = hud_item_measures::m_hands_offset_type_gl;
+    const auto aim_gl_scope_idx = hud_item_measures::m_hands_offset_type_gl_scope;
+
+    const bool is_16x9 = UI()->is_widescreen();
+    string64 _prefix;
+    xr_sprintf(_prefix, "%s", is_16x9 ? "_16x9" : "");
+    string128 val_name;
+
+    strconcat(sizeof(val_name), val_name, "item_position", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_item_attach[0]);
+    strconcat(sizeof(val_name), val_name, "item_orientation", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_item_attach[1]);
+
+    strconcat(sizeof(val_name), val_name, "hands_position", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_attach[0]);
+    strconcat(sizeof(val_name), val_name, "hands_orientation", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_attach[1]);
+
+    strconcat(sizeof(val_name), val_name, "fire_point", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_fire_point_offset);
+    strconcat(sizeof(val_name), val_name, "fire_point2", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_fire_point2_offset);
+    strconcat(sizeof(val_name), val_name, "shell_point", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_shell_point_offset);
+
+    strconcat(sizeof(val_name), val_name, "aim_hud_offset_pos", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_offset[0][aim_idx]);
+    strconcat(sizeof(val_name), val_name, "aim_hud_offset_rot", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_offset[1][aim_idx]);
+
+    strconcat(sizeof(val_name), val_name, "aim_alt_hud_offset_pos", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_offset[0][aim_alt_idx]);
+    strconcat(sizeof(val_name), val_name, "aim_alt_hud_offset_rot", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_offset[1][aim_alt_idx]);
+
+    strconcat(sizeof(val_name), val_name, "aim_alt_sight_hud_offset_pos", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_offset[0][aim_sight_idx]);
+    strconcat(sizeof(val_name), val_name, "aim_alt_sight_hud_offset_rot", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_offset[1][aim_sight_idx]);
+
+    strconcat(sizeof(val_name), val_name, "aim_scope_hud_offset_pos", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_offset[0][aim_scope_idx]);
+    strconcat(sizeof(val_name), val_name, "aim_scope_hud_offset_rot", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_offset[1][aim_scope_idx]);
+
+    strconcat(sizeof(val_name), val_name, "gl_hud_offset_pos", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_offset[0][aim_gl_idx]);
+    strconcat(sizeof(val_name), val_name, "gl_hud_offset_rot", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_offset[1][aim_gl_idx]);
+
+    strconcat(sizeof(val_name), val_name, "gl_scope_hud_offset_pos", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_offset[0][aim_gl_scope_idx]);
+    strconcat(sizeof(val_name), val_name, "gl_scope_hud_offset_rot", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_offset[1][aim_gl_scope_idx]);
+
+    pCfg.w_fvector3(sect_name, "custom_ui_pos", item->m_parent_hud_item->script_ui_offset[0]);
+    pCfg.w_fvector3(sect_name, "custom_ui_rot", item->m_parent_hud_item->script_ui_offset[1]);
+
+    const auto& Wpn = smart_cast<CWeaponMagazined*>(item->m_parent_hud_item);
+
+    if (Wpn)
+    {
+        if (Wpn->IsAddonAttached(eLaser))
+        {
+            pCfg.w_fvector3(sect_name, "laserdot_attach_offset", Wpn->laserdot_hud_attach_offset);
+            pCfg.w_fvector3(sect_name, "laserdot_aim_attach_offset", Wpn->laserdot_aim_hud_attach_offset);
+        }
+        if (Wpn->IsAddonAttached(eFlashlight) || Wpn->laser_flashlight)
+        {
+            pCfg.w_fvector3(sect_name, "flashlight_attach_offset", Wpn->flashlight_hud_attach_offset);
+            pCfg.w_fvector3(sect_name, "flashlight_aim_attach_offset", Wpn->flashlight_aim_hud_attach_offset);
+            pCfg.w_fvector3(sect_name, "flashlight_omni_attach_offset", Wpn->flashlight_omni_hud_attach_offset);
+            pCfg.w_fvector3(sect_name, "flashlight_aim_omni_attach_offset", Wpn->flashlight_aim_omni_hud_attach_offset);
+        }
+        for (int i = 0; i < eMaxAddon; ++i)
+        {
+            if (Wpn->hud_attach_visual[i])
+            {
+                const auto addon_name = Wpn->hud_attach_addon_name[i];
+                strconcat(sizeof(val_name), val_name, addon_name, "_attach_pos");
+                pCfg.w_fvector3(sect_name, val_name, Wpn->hud_attach_visual_offset[i][0]);
+                strconcat(sizeof(val_name), val_name, addon_name, "_attach_rot");
+                pCfg.w_fvector3(sect_name, val_name, Wpn->hud_attach_visual_offset[i][1]);
+                strconcat(sizeof(val_name), val_name, addon_name, "_attach_scale");
+                pCfg.w_float(sect_name, val_name, Wpn->hud_attach_visual_scale[i]);
+            }
+        }
+    }
+
+    Msg("--[%s] data saved to [%s]", __FUNCTION__, pCfg.fname());
+}

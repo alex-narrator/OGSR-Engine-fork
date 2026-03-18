@@ -2241,3 +2241,40 @@ bool CWeaponMagazined::ShouldPlayFlameParticles()
 
     return true;
 }
+
+void CWeaponMagazined::SaveCfg()
+{
+    inherited::SaveCfg();
+
+    const char* sect_name = cNameSect().c_str();
+    string_path buff;
+    FS.update_path(buff, "$logs$", make_string("_world\\%s.ltx", sect_name).c_str());
+
+    CInifile pCfg(buff, FALSE, FALSE, TRUE);
+
+    if (IsAddonAttached(eLaser))
+    {
+        pCfg.w_fvector3(sect_name, "laserdot_attach_offset", laserdot_world_attach_offset);
+    }
+    if (IsAddonAttached(eFlashlight) || laser_flashlight)
+    {
+        pCfg.w_fvector3(sect_name, "flashlight_attach_offset", flashlight_world_attach_offset);
+        pCfg.w_fvector3(sect_name, "flashlight_omni_attach_offset", flashlight_omni_world_attach_offset);
+    }
+    for (int i = 0; i < eMaxAddon; ++i)
+    {
+        if (world_attach_visual[i])
+        {
+            string128 val_name;
+            const auto addon_name = world_attach_addon_name[i];
+            strconcat(sizeof(val_name), val_name, addon_name, "_attach_pos");
+            pCfg.w_fvector3(sect_name, val_name, world_attach_visual_offset[i][0]);
+            strconcat(sizeof(val_name), val_name, addon_name, "_attach_rot");
+            pCfg.w_fvector3(sect_name, val_name, world_attach_visual_offset[i][1]);
+            strconcat(sizeof(val_name), val_name, addon_name, "_attach_scale");
+            pCfg.w_float(sect_name, val_name, world_attach_visual_scale[i]);
+        }
+    }
+
+    Msg("--[%s] data saved to [%s]", __FUNCTION__, pCfg.fname());
+}

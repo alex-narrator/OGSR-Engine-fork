@@ -37,43 +37,85 @@ void ShowHudEditor(bool& show)
     if (showSeparator)
         ImGui::Separator();
 
+    const auto normal_idx = hud_item_measures::m_hands_offset_type_normal;
     const auto aim_idx = hud_item_measures::m_hands_offset_type_aim;
-    const auto aim_scope_idx = hud_item_measures::m_hands_offset_type_aim_scope;
     const auto aim_alt_idx = hud_item_measures::m_hands_offset_type_aim_alt;
     const auto aim_sight_idx = hud_item_measures::m_hands_offset_type_aim_alt_sight;
+    const auto aim_scope_idx = hud_item_measures::m_hands_offset_type_aim_scope;
     const auto aim_gl_idx = hud_item_measures::m_hands_offset_type_gl;
+    const auto aim_gl_scope_idx = hud_item_measures::m_hands_offset_type_gl_scope;
 
     if (item)
     {
-        if (showSeparator)
-            ImGui::Separator();
         ImGui::Text("Item 0: %s", item->m_parent_hud_item->object().cNameSect().c_str());
         ImGui::Text("hud section: %s", item->m_parent_hud_item->HudSection().c_str());
-
         if (showSeparator)
             ImGui::Separator();
-        ImGui::DragFloat3("hands_position",                 (float*)&item->m_measures.m_hands_attach[0],                    drag_pos_intensity, NULL, NULL, "%.6f");
-        ImGui::DragFloat3("hands_orientation",              (float*)&item->m_measures.m_hands_attach[1],                    drag_rot_intensity, NULL, NULL, "%.6f");
+
 		ImGui::DragFloat3("item_position",                  (float*)&item->m_measures.m_item_attach[0],                     drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("item_orientation",               (float*)&item->m_measures.m_item_attach[1],                     drag_rot_intensity, NULL, NULL, "%.6f");
-        ImGui::DragFloat3("aim_hud_offset_pos",             (float*)&item->m_measures.m_hands_offset[0][aim_idx],           drag_pos_intensity, NULL, NULL, "%.6f");
-		ImGui::DragFloat3("aim_hud_offset_rot",             (float*)&item->m_measures.m_hands_offset[1][aim_idx],           drag_rot_intensity, NULL, NULL, "%.6f");
-        ImGui::DragFloat3("aim_scope_hud_offset_pos",       (float*)&item->m_measures.m_hands_offset[0][aim_scope_idx],     drag_pos_intensity, NULL, NULL, "%.6f");
-		ImGui::DragFloat3("aim_scope_hud_offset_rot",       (float*)&item->m_measures.m_hands_offset[1][aim_scope_idx],     drag_rot_intensity, NULL, NULL, "%.6f");
-        ImGui::DragFloat3("aim_alt_hud_offset_pos",         (float*)&item->m_measures.m_hands_offset[0][aim_alt_idx],       drag_pos_intensity, NULL, NULL, "%.6f");
-		ImGui::DragFloat3("aim_alt_hud_offset_rot",         (float*)&item->m_measures.m_hands_offset[1][aim_alt_idx],       drag_rot_intensity, NULL, NULL, "%.6f");
-        ImGui::DragFloat3("aim_alt_sight_hud_offset_pos",   (float*)&item->m_measures.m_hands_offset[0][aim_sight_idx],     drag_pos_intensity, NULL, NULL, "%.6f");
-		ImGui::DragFloat3("aim_alt_sight_hud_offset_rot",   (float*)&item->m_measures.m_hands_offset[1][aim_sight_idx],     drag_rot_intensity, NULL, NULL, "%.6f");
-		ImGui::DragFloat3("gl_hud_offset_pos",              (float*)&item->m_measures.m_hands_offset[0][aim_gl_idx],        drag_pos_intensity, NULL, NULL, "%.6f");
-		ImGui::DragFloat3("gl_hud_offset_rot",              (float*)&item->m_measures.m_hands_offset[1][aim_gl_idx],        drag_rot_intensity, NULL, NULL, "%.6f");
+        if (showSeparator)
+            ImGui::Separator();
 		ImGui::DragFloat3("fire_point",                     (float*)&item->m_measures.m_fire_point_offset[0],               drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("fire_point2",                    (float*)&item->m_measures.m_fire_point2_offset[0],              drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("shell_point",                    (float*)&item->m_measures.m_shell_point_offset[0],              drag_pos_intensity, NULL, NULL, "%.6f");
-
         if (showSeparator)
             ImGui::Separator();
+
+        const auto idx = item->m_parent_hud_item->GetCurrentHudOffsetIdx();
+        switch (idx)
+        {
+        case normal_idx:
+            ImGui::DragFloat3("hands_position", (float*)&item->m_measures.m_hands_attach[0], drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::DragFloat3("hands_orientation", (float*)&item->m_measures.m_hands_attach[1], drag_rot_intensity, NULL, NULL, "%.6f");
+            break;
+        case aim_idx:
+            ImGui::DragFloat3("aim_hud_offset_pos", (float*)&item->m_measures.m_hands_offset[0][aim_idx], drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::DragFloat3("aim_hud_offset_rot", (float*)&item->m_measures.m_hands_offset[1][aim_idx], drag_rot_intensity, NULL, NULL, "%.6f");
+            break;
+        case aim_alt_idx:
+            ImGui::DragFloat3("aim_alt_hud_offset_pos", (float*)&item->m_measures.m_hands_offset[0][aim_alt_idx], drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::DragFloat3("aim_alt_hud_offset_rot", (float*)&item->m_measures.m_hands_offset[1][aim_alt_idx], drag_rot_intensity, NULL, NULL, "%.6f");
+            break;
+        case aim_sight_idx:
+            ImGui::DragFloat3("aim_alt_sight_hud_offset_pos", (float*)&item->m_measures.m_hands_offset[0][aim_sight_idx], drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::DragFloat3("aim_alt_sight_hud_offset_rot", (float*)&item->m_measures.m_hands_offset[1][aim_sight_idx], drag_rot_intensity, NULL, NULL, "%.6f");
+            break;
+        case aim_scope_idx:
+            ImGui::DragFloat3("aim_scope_hud_offset_pos", (float*)&item->m_measures.m_hands_offset[0][aim_scope_idx], drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::DragFloat3("aim_scope_hud_offset_rot", (float*)&item->m_measures.m_hands_offset[1][aim_scope_idx], drag_rot_intensity, NULL, NULL, "%.6f");
+            break;
+        case aim_gl_idx:
+            ImGui::DragFloat3("gl_hud_offset_pos", (float*)&item->m_measures.m_hands_offset[0][aim_gl_idx], drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::DragFloat3("gl_hud_offset_rot", (float*)&item->m_measures.m_hands_offset[1][aim_gl_idx], drag_rot_intensity, NULL, NULL, "%.6f");
+            break;
+        case aim_gl_scope_idx:
+            ImGui::DragFloat3("gl_scope_hud_offset_pos", (float*)&item->m_measures.m_hands_offset[0][aim_gl_scope_idx], drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::DragFloat3("gl_scope_hud_offset_rot", (float*)&item->m_measures.m_hands_offset[1][aim_gl_scope_idx], drag_rot_intensity, NULL, NULL, "%.6f");
+            break;
+        }
+        if (showSeparator)
+            ImGui::Separator();
+
+        //ImGui::DragFloat3("hands_position",                 (float*)&item->m_measures.m_hands_attach[0],                    drag_pos_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("hands_orientation",              (float*)&item->m_measures.m_hands_attach[1],                    drag_rot_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("aim_hud_offset_pos",             (float*)&item->m_measures.m_hands_offset[0][aim_idx],           drag_pos_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("aim_hud_offset_rot",             (float*)&item->m_measures.m_hands_offset[1][aim_idx],           drag_rot_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("aim_alt_hud_offset_pos",         (float*)&item->m_measures.m_hands_offset[0][aim_alt_idx],       drag_pos_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("aim_alt_hud_offset_rot",         (float*)&item->m_measures.m_hands_offset[1][aim_alt_idx],       drag_rot_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("aim_alt_sight_hud_offset_pos",   (float*)&item->m_measures.m_hands_offset[0][aim_sight_idx],     drag_pos_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("aim_alt_sight_hud_offset_rot",   (float*)&item->m_measures.m_hands_offset[1][aim_sight_idx],     drag_rot_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("aim_scope_hud_offset_pos",       (float*)&item->m_measures.m_hands_offset[0][aim_scope_idx],     drag_pos_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("aim_scope_hud_offset_rot",       (float*)&item->m_measures.m_hands_offset[1][aim_scope_idx],     drag_rot_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("gl_hud_offset_pos",              (float*)&item->m_measures.m_hands_offset[0][aim_gl_idx],        drag_pos_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("gl_hud_offset_rot",              (float*)&item->m_measures.m_hands_offset[1][aim_gl_idx],        drag_rot_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("gl_scope_hud_offset_pos",        (float*)&item->m_measures.m_hands_offset[0][aim_gl_scope_idx],  drag_pos_intensity, NULL, NULL, "%.6f");
+        //ImGui::DragFloat3("gl_scope_hud_offset_rot",        (float*)&item->m_measures.m_hands_offset[1][aim_gl_scope_idx],  drag_rot_intensity, NULL, NULL, "%.6f");
+
         ImGui::DragFloat3("custom_ui_pos",              (float*)&item->m_parent_hud_item->script_ui_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
         ImGui::DragFloat3("custom_ui_rot",              (float*)&item->m_parent_hud_item->script_ui_offset[1], drag_rot_intensity, NULL, NULL, "%.6f");
+        if (showSeparator)
+            ImGui::Separator();
 
         if (Wpn)
         {
@@ -81,10 +123,12 @@ void ShowHudEditor(bool& show)
             // Laser light offsets
             if (Wpn->IsAddonAttached(eLaser) && Wpn->IsLaserOn())
             {
+                if (Wpn->IsAiming())
+                    ImGui::DragFloat3("laserdot_aim_attach_offset", (float*)&Wpn->laserdot_aim_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                else
+                    ImGui::DragFloat3("laserdot_attach_offset", (float*)&Wpn->laserdot_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
                 if (showSeparator)
-                    ImGui::Separator();                
-                ImGui::DragFloat3("laserdot_attach_offset",             (float*)&Wpn->laserdot_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
-                ImGui::DragFloat3("laserdot_aim_attach_offset",         (float*)&Wpn->laserdot_aim_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                    ImGui::Separator();
                 
                 render.draw_aabb(Wpn->laser_pos, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(125, 0, 0));
             }
@@ -92,12 +136,18 @@ void ShowHudEditor(bool& show)
             // Flashlight offsets
             if ((Wpn->IsAddonAttached(eFlashlight) || Wpn->laser_flashlight) && Wpn->IsFlashlightOn())
             {
+                if (Wpn->IsAiming())
+                {
+                    ImGui::DragFloat3("flashlight_aim_attach_offset", (float*)&Wpn->flashlight_aim_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                    ImGui::DragFloat3("flashlight_aim_omni_attach_offset", (float*)&Wpn->flashlight_aim_omni_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                }
+                else
+                {
+                    ImGui::DragFloat3("flashlight_attach_offset", (float*)&Wpn->flashlight_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                    ImGui::DragFloat3("flashlight_omni_attach_offset", (float*)&Wpn->flashlight_omni_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                }
                 if (showSeparator)
-                    ImGui::Separator();                
-                ImGui::DragFloat3("flashlight_attach_offset",           (float*)&Wpn->flashlight_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
-                ImGui::DragFloat3("flashlight_aim_attach_offset",       (float*)&Wpn->flashlight_aim_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
-                ImGui::DragFloat3("flashlight_omni_attach_offset",      (float*)&Wpn->flashlight_omni_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
-                ImGui::DragFloat3("flashlight_aim_omni_attach_offset",  (float*)&Wpn->flashlight_aim_omni_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                    ImGui::Separator();
 
                 render.draw_aabb(Wpn->flashlight_pos, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(0, 56, 125));
             }
@@ -106,12 +156,12 @@ void ShowHudEditor(bool& show)
             {
                 if (Wpn->hud_attach_visual[i])
                 {
-                    if (showSeparator)
-                        ImGui::Separator();
                     const auto addon_name = std::string(Wpn->hud_attach_addon_name[i]);
                     ImGui::DragFloat3((addon_name + "_attach_pos").c_str(), (float*)&Wpn->hud_attach_visual_offset[i][0], drag_pos_intensity, NULL, NULL, "%.6f");
                     ImGui::DragFloat3((addon_name + "_attach_rot").c_str(), (float*)&Wpn->hud_attach_visual_offset[i][1], drag_rot_intensity, NULL, NULL, "%.6f");
                     ImGui::DragFloat((addon_name + "_attach_scale").c_str(), (float*)&Wpn->hud_attach_visual_scale[i], drag_pos_intensity, NULL, NULL, "%.6f");
+                    if (showSeparator)
+                        ImGui::Separator();
                 }
             }
         }
@@ -121,153 +171,160 @@ void ShowHudEditor(bool& show)
 
     if (item_1)
     {
-        if (showSeparator)
-            ImGui::Separator();
         ImGui::Text("Item 1: %s", item_1->m_parent_hud_item->object().cNameSect().c_str());
         ImGui::Text("hud section: %s", item_1->m_parent_hud_item->HudSection().c_str());
+        if (showSeparator)
+            ImGui::Separator();
 
+		ImGui::DragFloat3("item_position",		(float*)&item_1->m_measures.m_item_attach[0],			drag_pos_intensity, NULL, NULL, "%.6f");
+		ImGui::DragFloat3("item_orientation",   (float*)&item_1->m_measures.m_item_attach[1],			drag_rot_intensity, NULL, NULL, "%.6f");
         if (showSeparator)
             ImGui::Separator();
         ImGui::DragFloat3("hands_position",		(float*)&item_1->m_measures.m_hands_attach[0][0],		drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("hands_orientation",	(float*)&item_1->m_measures.m_hands_attach[1][0],		drag_rot_intensity, NULL, NULL, "%.6f");
-		ImGui::DragFloat3("item_position",		(float*)&item_1->m_measures.m_item_attach[0],			drag_pos_intensity, NULL, NULL, "%.6f");
-		ImGui::DragFloat3("item_orientation",   (float*)&item_1->m_measures.m_item_attach[1],			drag_rot_intensity, NULL, NULL, "%.6f");
+        if (showSeparator)
+            ImGui::Separator();
 		ImGui::DragFloat3("fire_point",			(float*)&item_1->m_measures.m_fire_point_offset[0],	    drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("fire_point2",        (float*)&item_1->m_measures.m_fire_point2_offset[0],	drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("shell_point",        (float*)&item_1->m_measures.m_shell_point_offset[0],	drag_pos_intensity, NULL, NULL, "%.6f");
-
         if (showSeparator)
             ImGui::Separator();
         ImGui::DragFloat3("custom_ui_pos",      (float*)&item_1->m_parent_hud_item->script_ui_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
         ImGui::DragFloat3("custom_ui_rot",      (float*)&item_1->m_parent_hud_item->script_ui_offset[1], drag_rot_intensity, NULL, NULL, "%.6f");
+        if (showSeparator)
+            ImGui::Separator();
     }
 
-    //if (ImGui::Button("Save"))
-    //{
-    //    // TODO ImGui fix
-
-    //    // g_player_hud->SaveCfg(0);
-    //    // g_player_hud->SaveCfg(1);
-    //}
-    if (ImGui::Button("Print to log"))
+    if (ImGui::Button("Save to file"))
     {
-        const bool is_16x9 = UI()->is_widescreen();
-        if (item)
-        {
-            Log("####################################");
-            Msg("[%s]", item->m_parent_hud_item->HudSection().c_str());
-            auto pos = item->m_measures.m_hands_attach[0];
-            Msg("hands_position%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-            pos = item->m_measures.m_hands_attach[1];
-            Msg("hands_orientation%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-
-            pos = item->m_measures.m_item_attach[0];
-            Msg("item_position%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-            pos = item->m_measures.m_item_attach[1];
-            Msg("item_orientation%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-
-            pos = item->m_measures.m_hands_offset[0][aim_idx];
-            Msg("aim_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-            pos = item->m_measures.m_hands_offset[1][aim_idx];
-            Msg("aim_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-
-            pos = item->m_measures.m_hands_offset[0][aim_scope_idx];
-            Msg("aim_scope_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-            pos = item->m_measures.m_hands_offset[1][aim_scope_idx];
-            Msg("aim_scope_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-
-            pos = item->m_measures.m_hands_offset[0][aim_alt_idx];
-            Msg("aim_alt_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-            pos = item->m_measures.m_hands_offset[1][aim_alt_idx];
-            Msg("aim_alt_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-
-            pos = item->m_measures.m_hands_offset[0][aim_sight_idx];
-            Msg("aim_alt_sight_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-            pos = item->m_measures.m_hands_offset[1][aim_sight_idx];
-            Msg("aim_alt_sight_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-
-            pos = item->m_measures.m_hands_offset[0][aim_gl_idx];
-            Msg("gl_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-            pos = item->m_measures.m_hands_offset[1][aim_gl_idx];
-            Msg("gl_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-
-            pos = item->m_measures.m_fire_point_offset;
-            Msg("fire_point = %g,%g,%g", pos.x, pos.y, pos.z);
-            pos = item->m_measures.m_fire_point2_offset;
-            Msg("fire_point2 = %g,%g,%g", pos.x, pos.y, pos.z);
-            pos = item->m_measures.m_shell_point_offset;
-            Msg("shell_point = %g,%g,%g", pos.x, pos.y, pos.z);
-
-            pos = item->m_parent_hud_item->script_ui_offset[0];
-            Msg("custom_ui_pos = %g,%g,%g", pos.x, pos.y, pos.z);
-            pos = item->m_parent_hud_item->script_ui_offset[1];
-            Msg("custom_ui_rot = %g,%g,%g", pos.x, pos.y, pos.z);
-
-            if (Wpn)
-            {
-                if (Wpn->IsAddonAttached(eLaser))
-                {
-                    pos = Wpn->laserdot_hud_attach_offset;
-                    Msg("laserdot_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
-                    pos = Wpn->laserdot_aim_hud_attach_offset;
-                    Msg("laserdot_aim_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
-                }
-
-                if (Wpn->IsAddonAttached(eFlashlight) || Wpn->laser_flashlight)
-                {
-                    pos = Wpn->flashlight_hud_attach_offset;
-                    Msg("flashlight_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
-                    pos = Wpn->flashlight_aim_hud_attach_offset;
-                    Msg("flashlight_aim_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
-                    pos = Wpn->flashlight_omni_hud_attach_offset;
-                    Msg("flashlight_omni_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
-                    pos = Wpn->flashlight_aim_omni_hud_attach_offset;
-                    Msg("flashlight_aim_omni_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
-                }
-
-                for (int i = 0; i < eMaxAddon; ++i)
-                {
-                    if (Wpn->hud_attach_visual[i])
-                    {
-                        pos = Wpn->hud_attach_visual_offset[i][0];
-                        const auto addon_name = Wpn->hud_attach_addon_name[i];
-                        Msg("%s_attach_pos = %g,%g,%g", addon_name, pos.x, pos.y, pos.z);
-                        pos = Wpn->hud_attach_visual_offset[i][1];
-                        Msg("%s_attach_rot = %g,%g,%g", addon_name, pos.x, pos.y, pos.z);
-                        Msg("%s_attach_scale = %g", addon_name, Wpn->hud_attach_visual_scale[i]);
-                    }
-                }
-            }
-            Log("####################################");
-        }
-
-        if (item_1)
-        {
-            Log("####################################");
-            Msg("[%s]", item_1->m_parent_hud_item->HudSection().c_str());
-            auto pos = item_1->m_measures.m_hands_attach[0];
-            Msg("hands_position%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-            pos = item_1->m_measures.m_hands_attach[1];
-            Msg("hands_orientation%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-
-            pos = item_1->m_measures.m_item_attach[0];
-            Msg("item_position%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-            pos = item_1->m_measures.m_item_attach[1];
-            Msg("item_orientation%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
-
-            pos = item_1->m_measures.m_fire_point_offset;
-            Msg("fire_point = %g,%g,%g", pos.x, pos.y, pos.z);
-            pos = item_1->m_measures.m_fire_point2_offset;
-            Msg("fire_point2 = %g,%g,%g", pos.x, pos.y, pos.z);
-            pos = item_1->m_measures.m_shell_point_offset;
-            Msg("shell_point = %g,%g,%g", pos.x, pos.y, pos.z);
-
-            pos = item_1->m_parent_hud_item->script_ui_offset[0];
-            Msg("custom_ui_pos = %g,%g,%g", pos.x, pos.y, pos.z);
-            pos = item_1->m_parent_hud_item->script_ui_offset[1];
-            Msg("custom_ui_rot = %g,%g,%g", pos.x, pos.y, pos.z);
-
-            Log("####################################");
-        }
+        // TODO ImGui fix
+        g_player_hud->SaveCfg(0);
+        g_player_hud->SaveCfg(1);
     }
+    //if (ImGui::Button("Print to log"))
+    //{
+    //    const bool is_16x9 = UI()->is_widescreen();
+    //    if (item)
+    //    {
+    //        Log("####################################");
+    //        auto pos = item->m_measures.m_item_attach[0];
+    //        Msg("item_position%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+    //        pos = item->m_measures.m_item_attach[1];
+    //        Msg("item_orientation%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+
+    //        Msg("[%s]", item->m_parent_hud_item->HudSection().c_str());
+    //        pos = item->m_measures.m_hands_attach[0];
+    //        Msg("hands_position%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+    //        pos = item->m_measures.m_hands_attach[1];
+    //        Msg("hands_orientation%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+
+    //        pos = item->m_measures.m_fire_point_offset;
+    //        Msg("fire_point = %g,%g,%g", pos.x, pos.y, pos.z);
+    //        pos = item->m_measures.m_fire_point2_offset;
+    //        Msg("fire_point2 = %g,%g,%g", pos.x, pos.y, pos.z);
+    //        pos = item->m_measures.m_shell_point_offset;
+    //        Msg("shell_point = %g,%g,%g", pos.x, pos.y, pos.z);
+
+    //        pos = item->m_measures.m_hands_offset[0][aim_idx];
+    //        Msg("aim_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+    //        pos = item->m_measures.m_hands_offset[1][aim_idx];
+    //        Msg("aim_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+
+    //        pos = item->m_measures.m_hands_offset[0][aim_alt_idx];
+    //        Msg("aim_alt_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+    //        pos = item->m_measures.m_hands_offset[1][aim_alt_idx];
+    //        Msg("aim_alt_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+
+    //        pos = item->m_measures.m_hands_offset[0][aim_sight_idx];
+    //        Msg("aim_alt_sight_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+    //        pos = item->m_measures.m_hands_offset[1][aim_sight_idx];
+    //        Msg("aim_alt_sight_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+
+    //        pos = item->m_measures.m_hands_offset[0][aim_scope_idx];
+    //        Msg("aim_scope_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+    //        pos = item->m_measures.m_hands_offset[1][aim_scope_idx];
+    //        Msg("aim_scope_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+
+    //        pos = item->m_measures.m_hands_offset[0][aim_gl_idx];
+    //        Msg("gl_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+    //        pos = item->m_measures.m_hands_offset[1][aim_gl_idx];
+    //        Msg("gl_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+
+    //        pos = item->m_measures.m_hands_offset[0][aim_gl_scope_idx];
+    //        Msg("gl_scope_hud_offset_pos%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+    //        pos = item->m_measures.m_hands_offset[1][aim_gl_scope_idx];
+    //        Msg("gl_scope_hud_offset_rot%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+
+    //        pos = item->m_parent_hud_item->script_ui_offset[0];
+    //        Msg("custom_ui_pos = %g,%g,%g", pos.x, pos.y, pos.z);
+    //        pos = item->m_parent_hud_item->script_ui_offset[1];
+    //        Msg("custom_ui_rot = %g,%g,%g", pos.x, pos.y, pos.z);
+
+    //        if (Wpn)
+    //        {
+    //            if (Wpn->IsAddonAttached(eLaser))
+    //            {
+    //                pos = Wpn->laserdot_hud_attach_offset;
+    //                Msg("laserdot_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
+    //                pos = Wpn->laserdot_aim_hud_attach_offset;
+    //                Msg("laserdot_aim_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
+    //            }
+
+    //            if (Wpn->IsAddonAttached(eFlashlight) || Wpn->laser_flashlight)
+    //            {
+    //                pos = Wpn->flashlight_hud_attach_offset;
+    //                Msg("flashlight_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
+    //                pos = Wpn->flashlight_aim_hud_attach_offset;
+    //                Msg("flashlight_aim_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
+    //                pos = Wpn->flashlight_omni_hud_attach_offset;
+    //                Msg("flashlight_omni_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
+    //                pos = Wpn->flashlight_aim_omni_hud_attach_offset;
+    //                Msg("flashlight_aim_omni_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
+    //            }
+
+    //            for (int i = 0; i < eMaxAddon; ++i)
+    //            {
+    //                if (Wpn->hud_attach_visual[i])
+    //                {
+    //                    pos = Wpn->hud_attach_visual_offset[i][0];
+    //                    const auto addon_name = Wpn->hud_attach_addon_name[i];
+    //                    Msg("%s_attach_pos = %g,%g,%g", addon_name, pos.x, pos.y, pos.z);
+    //                    pos = Wpn->hud_attach_visual_offset[i][1];
+    //                    Msg("%s_attach_rot = %g,%g,%g", addon_name, pos.x, pos.y, pos.z);
+    //                    Msg("%s_attach_scale = %g", addon_name, Wpn->hud_attach_visual_scale[i]);
+    //                }
+    //            }
+    //        }
+    //        Log("####################################");
+    //    }
+
+    //    if (item_1)
+    //    {
+    //        Log("####################################");
+    //        Msg("[%s]", item_1->m_parent_hud_item->HudSection().c_str());
+    //        auto pos = item_1->m_measures.m_hands_attach[0];
+    //        Msg("hands_position%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+    //        pos = item_1->m_measures.m_hands_attach[1];
+    //        Msg("hands_orientation%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+
+    //        pos = item_1->m_measures.m_item_attach[0];
+    //        Msg("item_position%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+    //        pos = item_1->m_measures.m_item_attach[1];
+    //        Msg("item_orientation%s = %g,%g,%g", is_16x9 ? "_16x9" : "", pos.x, pos.y, pos.z);
+
+    //        pos = item_1->m_measures.m_fire_point_offset;
+    //        Msg("fire_point = %g,%g,%g", pos.x, pos.y, pos.z);
+    //        pos = item_1->m_measures.m_fire_point2_offset;
+    //        Msg("fire_point2 = %g,%g,%g", pos.x, pos.y, pos.z);
+    //        pos = item_1->m_measures.m_shell_point_offset;
+    //        Msg("shell_point = %g,%g,%g", pos.x, pos.y, pos.z);
+
+    //        pos = item_1->m_parent_hud_item->script_ui_offset[0];
+    //        Msg("custom_ui_pos = %g,%g,%g", pos.x, pos.y, pos.z);
+    //        pos = item_1->m_parent_hud_item->script_ui_offset[1];
+    //        Msg("custom_ui_rot = %g,%g,%g", pos.x, pos.y, pos.z);
+
+    //        Log("####################################");
+    //    }
+    //}
 }
