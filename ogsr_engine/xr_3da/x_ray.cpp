@@ -386,6 +386,13 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance, HINSTANCE hPrevInstance, char* lp
     Core._initialize("xray", NULL, TRUE, fsgame[0] ? fsgame : NULL);
     InitSettings();
 
+    // Adjust player & computer name for Asian
+    if (pSettings->line_exist("string_table", "no_native_input"))
+    {
+        strcpy_s(Core.UserName, "Player");
+        strcpy_s(Core.CompName, "Computer");
+    }
+
     {
         damn_keys_filter filter;
         (void)filter;
@@ -624,6 +631,12 @@ void CApplication::Level_Append(LPCSTR folder)
 
 void CApplication::Level_Scan()
 {
+    for (auto& lvl : Levels)
+    {
+        xr_free(lvl.folder);
+    }
+    Levels.clear();
+
     xr_vector<char*>* folder = FS.file_list_open("$game_levels$", FS_ListFolders | FS_RootOnly);
     R_ASSERT(folder && folder->size());
 
@@ -652,6 +665,10 @@ void CApplication::Level_Scan()
 void generate_logo_path(string_path& path, pcstr level_name, int num = -1)
 {
     strconcat(sizeof(path), path, "intro\\intro_", level_name);
+
+   // const auto len = xr_strlen(path);
+  //  if (path[len - 1] == '\\')
+  //      path[len - 1] = 0;
 
     if (num < 0)
         return;
@@ -712,16 +729,49 @@ void CApplication::Level_Set(u32 L)
     loadingScreen->SetLevelText(level_name);
 }
 
-int CApplication::Level_ID(LPCSTR name)
+int CApplication::Level_ID(const char* name, const char* ver, const bool bSet)
 {
-    char buffer[256];
+    int result = -1;
+    bool arch_res = false;
+/* //Вроде б нам это не нужно. что-то от мп
+    auto it = FS.m_archives.begin();
+    auto it_e = FS.m_archives.end();
+    for (; it != it_e; ++it)
+    {
+        CLocatorAPI::archive& A = *it;
+        if (A.hSrcFile == NULL)
+        {
+            LPCSTR ln = A.header->r_string("header", "level_name");
+            LPCSTR lv = A.header->r_string("header", "level_ver");
+            if (0 == _stricmp(ln, name) && 0 == _stricmp(lv, ver))
+            {
+                FS.LoadArchive(A);
+                arch_res = true;
+            }
+        }
+    }
+
+    if (arch_res)
+        Level_Scan();
+*/
+    string256 buffer;
     strconcat(sizeof(buffer), buffer, name, "\\");
-    for (u32 I = 0; I < Levels.size(); I++)
+    for (u32 I = 0; I < Levels.size(); ++I)
     {
         if (0 == _stricmp(buffer, Levels[I].folder))
-            return int(I);
+        {
+            result = int(I);
+            break;
+        }
     }
-    return -1;
+
+    if (bSet && result != -1)
+        Level_Set(result);
+
+    if (arch_res)
+        g_pGamePersistent->OnAssetsChanged();
+
+    return result;
 }
 
 extern void render_reshade_effects();
@@ -732,6 +782,27 @@ void CApplication::load_draw_internal() const
         render_reshade_effects();
 
     loadingScreen->Update(load_stage, max_load_stage);
+}
+
+bool CApplication::CheckCsCopMode()
+{
+#pragma todo("Simp: на будущее, активировать эту функцию когда будет надо!")
+    if constexpr (true)
+        return false;
+
+    // Определять, что мы запускаем ЧН/ЗП будем по названию папки конфигов. Решение так себе, но ничего лучше пока не придумал.
+    static const char* cfg_path{FS.get_path("$game_config$")->m_Path};
+    static const char* cfg_dir_name{cfg_path + (strlen(cfg_path) - (strlen("configs") + 1))};
+    static const bool res{!!strstr(cfg_dir_name, "configs")};
+
+    static bool first_call{true};
+    if (first_call)
+    {
+        Msg("~~[%s] Configs dir name: [%s]", __FUNCTION__, cfg_dir_name);
+        first_call = false;
+    }
+
+    return res;
 }
 
 #pragma todo("Simp: нужно ли это? сомневаюсь.")

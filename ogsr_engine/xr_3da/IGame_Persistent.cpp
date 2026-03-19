@@ -95,7 +95,7 @@ void IGame_Persistent::Disconnect()
     if (g_hud)
         g_hud->OnDisconnected();
 
-    if (!g_prefetch) // очистка при выходе из игры в главное меню
+    if (CApplication::CheckCsCopMode() || !g_prefetch) // очистка при выходе из игры в главное меню
     {
         ObjectPool.clear();
     }
@@ -146,12 +146,10 @@ void IGame_Persistent::OnFrame()
     Device.Statistic->Particles_destroy = ps_destroy.size();
 
     // Play req particle systems
-    while (!ps_needtoplay.empty())
-    {
-        auto& psi = ps_needtoplay.back();
-        ps_needtoplay.pop_back();
-        psi->Play();
-    }
+    std::erase_if(ps_needtoplay, [](auto* psi) {
+        psi->Play(false);
+        return true;
+    });
 
     // Destroy inactive particle systems
     while (!ps_destroy.empty())
@@ -166,7 +164,8 @@ void IGame_Persistent::OnFrame()
         psi->PSI_internal_delete();
     }
 
-    Device.add_to_seq_parallel(fastdelegate::MakeDelegate(this, &IGame_Persistent::ProcessParticlesCreate));
+#pragma todo("SIMP: пока убрано")
+//    Device.add_to_seq_parallel(fastdelegate::MakeDelegate(this, &IGame_Persistent::ProcessParticlesCreate));
 }
 
 void IGame_Persistent::destroy_particles(const bool& all_particles) // this for level unload or disconnect
@@ -174,7 +173,8 @@ void IGame_Persistent::destroy_particles(const bool& all_particles) // this for 
     ps_needtoplay.clear();
 
     {
-        Device.remove_from_seq_parallel(fastdelegate::MakeDelegate(this, &IGame_Persistent::ProcessParticlesCreate));
+#pragma todo("SIMP: пока убрано")
+//        Device.remove_from_seq_parallel(fastdelegate::MakeDelegate(this, &IGame_Persistent::ProcessParticlesCreate));
 
         ps_needtocreate.clear();
     }
@@ -225,20 +225,13 @@ void IGame_Persistent::ProcessParticlesCreate()
 {
     if (!ps_needtocreate.empty())
     {
+        //Msg("ProcessParticlesCreate fire");
         ZoneScoped;
-
-        /*if (ps_needtocreate.size() > 8)
+#pragma todo("SIMP: пока убрано")
+        /*for (const auto& ps : ps_needtocreate)
         {
-#pragma todo("Simp: Rework it!!!")
-            std::for_each(std::execution::par_unseq, ps_needtocreate.begin(), ps_needtocreate.end(), [](auto* ps) { ps->PerformCreate(); });
-        }
-        else*/
-        {
-            for (auto* ps : ps_needtocreate)
-            {
-                ps->PerformCreate();
-            }
-        }
+            ps->PerformCreate();
+        }*/
 
         ps_needtocreate.clear();
     }
@@ -625,7 +618,7 @@ void IGame_Persistent::UpdateHudRaindrops() const
         drops_anim = 0.f;
 
     // Update shader data
-    ps_ssfx_hud_drops_1.set(drops_anim, drops_int, ssfx_hud_raindrops_refle, ssfx_hud_raindrops_refra);
+    ps_ssfx_hud_drops_1.set(drops_anim, psDeviceFlags.test(rs_SSFX_HUD_RAINDROPS) ? drops_int : 0.f, ssfx_hud_raindrops_refle, ssfx_hud_raindrops_refra);
     // Msg("~~ps_ssfx_hud_drops_1: [%f, %f, %f, %f]", drops_anim, drops_int, ssfx_hud_raindrops_refle, ssfx_hud_raindrops_refra);
 }
 
@@ -666,3 +659,5 @@ void IGame_Persistent::UpdateRainGloss() const
         std::max(2.0f - ssfx_default_settings.waterfall_size, 0.01f); // Change how the value works to be more intuitive(<1.0 smaller |> 1.0 bigger)
     ps_ssfx_wetsurfaces_2.set(waterfall_size, ssfx_default_settings.waterfall_speed, ssfx_default_settings.waterfall_min_speed, ssfx_default_settings.waterfall_intensity);
 }
+
+void IGame_Persistent::OnAssetsChanged() { Device.m_pRender->OnAssetsChanged(); }
