@@ -390,7 +390,7 @@ static class cl_pda_params final : public R_constant_setup
     void setup(CBackend& cmd_list, R_constant* C) override
     {
         const auto& P = shader_exports.get_pda_params();
-        cmd_list.set_c(C, P.x, P.y, 0.f, P.z);
+        cmd_list.set_c(C, P.x, P.y, shader_exports.get_pda_screen_vision(), P.z);
     }
 } binder_pda_params;
 
@@ -645,8 +645,8 @@ static class cl_taa_jitter final : public R_constant_setup
         cmd_list.set_c(C, 
             ps_r_taa_jitter.x, 
             ps_r_taa_jitter.y,
-            ps_r2_ls_flags.test(R2FLAG_HAT) ? 1.f : 0.f, 
-            0.f);
+            0.f, 
+            ps_r_alphatest_threshold);
     }
 } binder_taa_jitter;
 

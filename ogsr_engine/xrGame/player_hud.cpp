@@ -730,6 +730,12 @@ player_hud::~player_hud()
         ::Render->model_Delete(v);
         m_model = nullptr;
     }
+    if (m_model_2)
+    {
+        IRenderVisual* v2 = m_model_2->dcast_RenderVisual();
+        ::Render->model_Delete(v2);
+        m_model_2 = nullptr;
+    }
 
     auto it = m_pool.begin();
     auto it_e = m_pool.end();
@@ -1059,7 +1065,7 @@ void player_hud::update(const Fmatrix& cam_trans)
 
             if (anm->blend_amount > 0.f)
             {
-                if (anm->anm->bLoop || anm->anm->m_MParam.t < anm->anm->m_MParam.max_t)
+                if (anm->anm->bLoop || anm->anm->m_MParam.t_current < anm->anm->m_MParam.max_t)
                     anm->anm->Update(Device.fTimeDelta);
                 else
                     anm->Stop(false);
@@ -1874,13 +1880,13 @@ float player_hud::PlayBlendAnm(LPCSTR name, u8 part, float speed, float power, b
             anm->anm->Speed() = speed;
             anm->m_power = power;
             anm->active = true;
-            return (anm->anm->m_MParam.max_t - anm->anm->m_MParam.t) / anm->anm->Speed();
+            return (anm->anm->m_MParam.max_t - anm->anm->m_MParam.t_current) / anm->anm->Speed();
         }
     }
 
     script_layer* anm = xr_new<script_layer>(name, part, speed, power, bLooped);
     m_script_layers.push_back(anm);
-    return (anm->anm->m_MParam.max_t - anm->anm->m_MParam.t) / anm->anm->Speed();
+    return (anm->anm->m_MParam.max_t - anm->anm->m_MParam.t_current) / anm->anm->Speed();
 }
 
 void player_hud::StopBlendAnm(LPCSTR name, bool bForce)
@@ -1912,7 +1918,7 @@ float player_hud::SetBlendAnmTime(LPCSTR name, float time)
             if (!anm->anm->IsPlaying())
                 return 0;
 
-            float speed = (anm->anm->m_MParam.max_t - anm->anm->m_MParam.t) / time;
+            float speed = (anm->anm->m_MParam.max_t - anm->anm->m_MParam.t_current) / time;
             anm->anm->Speed() = speed;
             return speed;
         }
@@ -1924,17 +1930,15 @@ float player_hud::SetBlendAnmTime(LPCSTR name, float time)
 
 player_hud_motion_container* player_hud::get_hand_motions(LPCSTR section, IKinematicsAnimated* animatedHudItem)
 {
-    for (hand_motions* phm : m_hand_motions)
+    for (hand_motions& phm : _m_hand_motions)
     {
-        if (phm->section == section)
-            return &phm->pm;
+        if (phm.section == section)
+            return &phm.pm;
     }
 
-    hand_motions* res = xr_new<hand_motions>();
-    res->section = section;
-    res->pm.load(true, m_model, animatedHudItem, section);
-    m_hand_motions.push_back(res);
+    hand_motions& res = _m_hand_motions.emplace_back();
+    res.section = section;
+    res.pm.load(true, m_model, animatedHudItem, section);
 
-    return &res->pm;
+    return &res.pm;
 }
-

@@ -40,8 +40,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <LinkIncremental Condition="$(Configuration.Contains('Release'))">false</LinkIncremental>
+    <LinkIncremental Condition="$(Configuration.Contains('Debug')) And '$(EnableASAN)'=='true'">false</LinkIncremental>
+    <LinkIncremental Condition="$(Configuration.Contains('Debug')) And '$(EnableASAN)'!='true'">true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>xrEngine</TargetName>
@@ -158,7 +159,8 @@
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>4456;4457;4458;4995;4577;4315;4267;4267;</DisableSpecificWarnings>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BasicRuntimeChecks Condition="$(Configuration.Contains('Debug')) And '$(EnableASAN)'=='true'"></BasicRuntimeChecks>
+      <BasicRuntimeChecks Condition="$(Configuration.Contains('Debug')) And '$(EnableASAN)'!='true'">EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -199,6 +201,8 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\build_config_defines.h" />
+    <ClInclude Include="cf_dynamic_mesh.h" />
     <ClInclude Include="IPhysicsDefinitions.h" />
     <ClInclude Include="bone.h" />
     <ClInclude Include="..\xrParticles\psystem.h" />
@@ -283,6 +287,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bone.cpp" />
+    <ClCompile Include="cf_dynamic_mesh.cpp" />
     <ClCompile Include="defines.cpp" />
     <ClCompile Include="DiscordRPC.cpp" />
     <ClCompile Include="edit_actions.cpp" />

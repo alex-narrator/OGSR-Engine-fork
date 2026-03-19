@@ -13,11 +13,15 @@ typedef TiXmlAttribute XML_ATTRIBUTE;
 
 class XRCORE_API CXml
 {
+    bool Load(LPCSTR path_alias, LPCSTR xml_filename, bool fatal = true);
+
 public:
     string_path m_xml_file_name{};
     CXml();
     virtual ~CXml();
     void ClearInternal();
+
+    bool Load(LPCSTR path_alias, LPCSTR path, LPCSTR xml_filename, bool fatal = true);
 
     bool Init(LPCSTR path_alias, LPCSTR path, LPCSTR xml_filename);
     bool Init(LPCSTR path_alias, LPCSTR xml_filename);
@@ -87,8 +91,8 @@ public:
     virtual shared_str correct_file_name(LPCSTR path, LPCSTR fn) { return fn; }
 
 private:
-    CXml(const CXml& copy);
-    void operator=(const CXml& copy);
+    CXml(const CXml& copy) = delete;
+    void operator=(const CXml& copy) = delete;
 
     typedef TiXmlElement XML_ELEM;
     TiXmlDocument m_Doc;
