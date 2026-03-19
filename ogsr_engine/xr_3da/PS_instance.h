@@ -36,5 +36,6 @@ public:
     virtual IRenderable* dcast_Renderable() { return this; }
 
     virtual void PerformFrame() = 0;
-    virtual void PerformCreate() = 0;
+
+    //virtual void PerformCreate() = 0;
 };

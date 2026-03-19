@@ -256,9 +256,6 @@ protected:
 
     //объект партиклов обычного состояния зоны
     CParticlesObject* m_pIdleParticles;
-    CParticlesObject* m_pBlowoutParticles;
-    CParticlesObject* m_pAccumParticles;
-    CParticlesObject* m_pAwakingParticles;
 
     //////////////////////////////
     //подсветка аномалии
@@ -312,11 +309,8 @@ protected:
     void PlayIdleParticles();
     void StopIdleParticles();
     void PlayAccumParticles();
-    void StopAccumParticles();
     void PlayAwakingParticles();
-    void StopAwakingParticles();
     void PlayBlowoutParticles();
-    void StopBlowoutParticles();
     void PlayEntranceParticles(CGameObject* pObject);
     void PlayBulletParticles(Fvector& pos);
 

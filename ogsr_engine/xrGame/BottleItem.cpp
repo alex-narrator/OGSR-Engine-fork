@@ -50,7 +50,7 @@ void CBottleItem::BreakToPieces()
         //показываем эффекты
         CParticlesObject* pStaticPG;
         pStaticPG = CParticlesObject::Create(*m_sBreakParticles, TRUE);
-        pStaticPG->PlayAtPos(Position());
+        pStaticPG->play_at_pos(Position());
     }
 
     //ликвидировать сам объект
