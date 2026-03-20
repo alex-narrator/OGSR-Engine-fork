@@ -655,8 +655,7 @@ void IGame_Persistent::UpdateRainGloss() const
     const float ripples_size = std::max(2.0f - ssfx_default_settings.ripples_size, 0.01f); // Change how the value works to be more intuitive(<1.0 smaller |> 1.0 bigger)
     ps_ssfx_wetsurfaces_1.set(ripples_size, ssfx_default_settings.ripples_speed, ssfx_default_settings.ripples_min_speed, ssfx_default_settings.ripples_intensity);
 
-    const float waterfall_size =
-        std::max(2.0f - ssfx_default_settings.waterfall_size, 0.01f); // Change how the value works to be more intuitive(<1.0 smaller |> 1.0 bigger)
+    const float waterfall_size = std::max(2.0f - ssfx_default_settings.waterfall_size, 0.01f); // Change how the value works to be more intuitive(<1.0 smaller |> 1.0 bigger)
     ps_ssfx_wetsurfaces_2.set(waterfall_size, ssfx_default_settings.waterfall_speed, ssfx_default_settings.waterfall_min_speed, ssfx_default_settings.waterfall_intensity);
 }
 

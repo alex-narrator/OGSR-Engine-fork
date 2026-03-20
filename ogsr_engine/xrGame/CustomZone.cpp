@@ -32,28 +32,6 @@ CCustomZone::CCustomZone(void)
     m_StateTime.resize(eZoneStateMax);
     for (int i = 0; i < eZoneStateMax; i++)
         m_StateTime[i] = 0;
-
-    m_dwAffectFrameNum = 0;
-    m_fArtefactSpawnProbability = 0.f;
-    m_fThrowOutPower = 0.f;
-    m_fArtefactSpawnHeight = 0.f;
-    m_fBlowoutWindPowerMax = m_fStoreWindPower = 0.f;
-    m_fDistanceToCurEntity = flt_max;
-    m_ef_weapon_type = u32(-1);
-    m_owner_id = u32(-1);
-
-    m_effector = NULL;
-    m_bIdleObjectParticlesDontStop = FALSE;
-    m_b_always_fastmode = false;
-
-    m_bBornOnBlowoutFlag = false;
-    m_keep_update = false;
-    m_pBlowoutParticles = nullptr;
-    m_pAccumParticles = nullptr;
-    m_pAwakingParticles = nullptr;
-    m_pBlowoutParticles = nullptr;
-    m_pAccumParticles = nullptr;
-    m_pAwakingParticles = nullptr;
 }
 
 CCustomZone::~CCustomZone(void)

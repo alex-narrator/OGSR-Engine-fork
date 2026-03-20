@@ -259,7 +259,7 @@ protected:
     void GrassZoneUpdate();
 
     //объект партиклов обычного состояния зоны
-    CParticlesObject* m_pIdleParticles;
+    CParticlesObject* m_pIdleParticles{};
 
     //////////////////////////////
     // подсветка аномалии
