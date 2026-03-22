@@ -73,28 +73,4 @@ void ShowWorldEditor(bool& show)
     {
         Wpn->SaveCfg();
     }
-    //if (ImGui::Button("Print to log"))
-    //{
-    //    Log("####################################");
-    //    Msg("[%s]", Wpn->cNameSect().c_str());
-    //    auto pos = Wpn->laserdot_world_attach_offset;
-    //    Msg("laserdot_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
-    //    pos = Wpn->flashlight_world_attach_offset;
-    //    Msg("flashlight_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
-    //    pos = Wpn->flashlight_omni_world_attach_offset;
-    //    Msg("flashlight_omni_attach_offset = %g,%g,%g", pos.x, pos.y, pos.z);
-    //    for (int i = 0; i < eMaxAddon; ++i)
-    //    {
-    //        if (Wpn->world_attach_visual[i])
-    //        {
-    //            pos = Wpn->world_attach_visual_offset[i][0];
-    //            const auto addon_name = Wpn->world_attach_addon_name[i];
-    //            Msg("%s_attach_pos = %g,%g,%g", addon_name, pos.x, pos.y, pos.z);
-    //            pos = Wpn->world_attach_visual_offset[i][1];
-    //            Msg("%s_attach_rot = %g,%g,%g", addon_name, pos.x, pos.y, pos.z);
-    //            Msg("%s_attach_scale = %g", addon_name, Wpn->world_attach_visual_scale[i]);
-    //        }
-    //    }
-    //    Log("####################################");
-    //}
 }
