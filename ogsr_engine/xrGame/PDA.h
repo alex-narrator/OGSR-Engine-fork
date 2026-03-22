@@ -89,5 +89,5 @@ public:
     float m_thumb_rot[2]{};
     xr_string thumb_anim_name;
 
-    u8 GetCurrentHudOffsetIdx() const override { return IsZoomed() ? 1 : 0; }
+    u8 GetCurrentHudOffsetIdx() const override { return IsZoomed(); }
 };

@@ -190,6 +190,7 @@ public:
     virtual void on_a_hud_attach();
     virtual void on_b_hud_detach();
     const shared_str& HudSection() const { return hud_sect; }
+    virtual void LoadHudSection(shared_str section);
     void SetHudSection(shared_str sect);
 
     BOOL GetHUDmode() const;
@@ -320,8 +321,6 @@ protected:
     virtual Fvector GetDirectionForCollision() { return Device.vCameraDirection; }
     float m_fZoomRotationFactor{}; //от 0 до 1, показывает насколько процентов мы перемещаем HUD
     float m_fZoomRotateTime{}; //время приближения
-    //bool is_second_zoom_offset_enabled{};
-    //bool AimAlt{};
     u32 skip_updated_frame{};
     bool HudInertionAllowed() const { return m_huditem_flags.test(fl_inertion_allow); }
     void AllowHudInertion(BOOL B) { m_huditem_flags.set(fl_inertion_allow, B); }

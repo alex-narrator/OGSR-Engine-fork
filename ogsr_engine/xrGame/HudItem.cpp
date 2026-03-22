@@ -55,25 +55,28 @@ void CHudItem::Load(LPCSTR section)
 {
     world_sect = section;
 
+    m_animation_slot = pSettings->r_u32(section, "animation_slot");
+
     //загрузить hud, если он нужен
     if (pSettings->line_exist(section, "hud"))
     {
-        hud_sect = pSettings->r_string(section, "hud");
-
-        if (pSettings->line_exist(hud_sect, "allow_inertion"))
-            EnableHudInertion(pSettings->r_bool(hud_sect, "allow_inertion"));
-
-        if (pSettings->line_exist(hud_sect, "allow_bobbing"))
-            allow_bobbing = pSettings->r_bool(hud_sect, "allow_bobbing");
-
-        hud_recalc_koef = READ_IF_EXISTS(pSettings, r_float, hud_sect, "hud_recalc_koef",
-                                         1.35f); //На калаше при 1.35 вроде норм смотрится, другим стволам возможно придется подбирать другие значения.
+        LoadHudSection(pSettings->r_string(section, "hud"));
     }
+}
 
-    m_animation_slot = pSettings->r_u32(section, "animation_slot");
+void CHudItem::LoadHudSection(shared_str section)
+{
+    hud_sect = section;
 
-    m_nearwall_on = READ_IF_EXISTS(pSettings, r_bool, section, "nearwall_on", IS_OGSR_GA ? true : READ_IF_EXISTS(pSettings, r_bool, "features", "default_nearwall_on", true));
-    //AimAlt = READ_IF_EXISTS(pSettings, r_bool, section, "use_alt_aim_hud", false);
+    if (pSettings->line_exist(hud_sect, "allow_inertion"))
+        EnableHudInertion(pSettings->r_bool(hud_sect, "allow_inertion"));
+
+    if (pSettings->line_exist(hud_sect, "allow_bobbing"))
+        allow_bobbing = pSettings->r_bool(hud_sect, "allow_bobbing");
+
+    hud_recalc_koef = READ_IF_EXISTS(pSettings, r_float, hud_sect, "hud_recalc_koef", 1.35f); // На калаше при 1.35 вроде норм смотрится, другим стволам возможно придется подбирать другие значения.
+
+    m_nearwall_on = READ_IF_EXISTS(pSettings, r_bool, hud_sect, "nearwall_on", IS_OGSR_GA ? true : READ_IF_EXISTS(pSettings, r_bool, "features", "default_nearwall_on", true));
 
     if (m_nearwall_on)
     {
@@ -82,14 +85,15 @@ void CHudItem::Load(LPCSTR section)
             // Min, Max dist, offset, rotate, HudFov, HudFov Aim
             {0.25f, 0.95f, {-0.0615f, -0.4380f, 0.1235f}, {-0.9219f, -0.0972f, 0.2525f}, IS_OGSR_GA ? 0.5f : 0.25f, IS_OGSR_GA ? 0.25f : 0.15f}, // Общие для всех оружий
             {0.25f, 0.70f, {-0.1000f, -0.5537f, 0.0350f}, {-1.0630f, 0.1751f, -0.0600f}, IS_OGSR_GA ? 0.5f : 0.25f, IS_OGSR_GA ? 0.20f : 0.10f}, // Пистолеты
-            {0.30f, 1.30f, {-0.0615f, -0.4380f, 0.1235f}, {-0.9219f, -0.0972f, 0.2525f}, IS_OGSR_GA ? 0.5f : 0.25f, IS_OGSR_GA ? 0.25f : 0.15f}, // СВД и прочие длинные снайперки
+            {0.30f, 1.30f, {-0.0615f, -0.4380f, 0.1235f}, {-0.9219f, -0.0972f, 0.2525f}, IS_OGSR_GA ? 0.5f : 0.25f, IS_OGSR_GA ? 0.25f : 0.15f}, // СВД и прочие длинные
+                                                                                                                                                 // снайперки
             {0.35f, 1.85f, {-0.0399f, 0.0929f, -0.0589f}, {0.3908f, 0.0488f, -0.0193f}, IS_OGSR_GA ? 0.5f : 0.25f, IS_OGSR_GA ? 0.25f : 0.15f}, // РПГ
             {0.25f, 0.80f, {0.0015f, -0.5655f, 0.1240f}, {-1.0319f, 0.0678f, 0.0700f}, IS_OGSR_GA ? 0.5f : 0.25f, IS_OGSR_GA ? 0.25f : 0.15f}, // РГ-6
             {0.25f, 0.80f, {-0.0406f, -0.4191f, 0.1718f}, {-0.8981f, -0.1101f, 0.4420f}, IS_OGSR_GA ? 0.5f : 0.25f, IS_OGSR_GA ? 0.25f : 0.15f}, // Гроза
             {0.25f, 0.80f, {-0.0335f, -0.4618f, 0.1098f}, {-0.9119f, -0.0973f, 0.4143f}, IS_OGSR_GA ? 0.5f : 0.25f, IS_OGSR_GA ? 0.25f : 0.15f}, // ФН2000
             {0.25f, 0.60f, {-0.0650f, -0.5170f, 0.0465f}, {-1.0405f, 0.1051f, -0.0350f}, IS_OGSR_GA ? 0.5f : 0.25f, IS_OGSR_GA ? 0.25f : 0.15f}, // БМ-16
             {0.30f, 0.50f, {-0.0025f, -0.4045f, -0.1415f}, {-0.7900f, 0.0100f, 0.f}, IS_OGSR_GA ? 0.5f : 0.25f, IS_OGSR_GA ? 0.25f : 0.15f}, // Болт
-            {0.25f, 0.65f, {0.0120f, -0.4780f, -0.1150f}, {-0.6250f, -0.0725f, -0.1950f}, 0.5f, 1.f}, //Детектор
+            {0.25f, 0.65f, {0.0120f, -0.4780f, -0.1150f}, {-0.6250f, -0.0725f, -0.1950f}, 0.5f, 1.f}, // Детектор
             {0.30f, 0.50f, {-0.0025f, -0.4045f, -0.1415f}, {-0.7900f, 0.0100f, 0.f}, IS_OGSR_GA ? 0.5f : 0.25f, IS_OGSR_GA ? 0.25f : 0.15f}, // Нож, гранаты и прочее
             {0.25f, 0.70f, {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, IS_OGSR_GA ? 0.5f : 0.25f, IS_OGSR_GA ? 0.40f : 0.30f}, // Бинокль
         }};
@@ -97,79 +101,81 @@ void CHudItem::Load(LPCSTR section)
         const auto& CollisionParams = CollisionParamsBase.at(type);
 
         // Параметры изменения коллизии когда игрок стоит вплотную к стене
-        m_nearwall_hud_offset_speed = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_hud_offset_speed", 0.1f); // Скорость поднятия\опускания ствола
-        m_nearwall_dist_min = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_dist_min", std::get<0>(CollisionParams)); //Максимальное расстояние, на которое камера ГГ может упереться к стене
-        m_nearwall_dist_max = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_dist_max", std::get<1>(CollisionParams)); //Расстояние, ближе которого начинаем поднимать ствол
-        m_nearwall_target_hud_offset = READ_IF_EXISTS(pSettings, r_fvector3, section, "nearwall_target_hud_offset", std::get<2>(CollisionParams)); //Максимальный оффсет худа
-        m_nearwall_target_hud_rotate = READ_IF_EXISTS(pSettings, r_fvector3, section, "nearwall_target_hud_rotate", std::get<3>(CollisionParams)); //Максимальный поворот худа
-        m_nearwall_target_hud_fov = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_target_hud_fov", std::get<4>(CollisionParams));
-        m_nearwall_target_aim_hud_fov = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_target_aim_hud_fov", std::get<5>(CollisionParams));
-        m_nearwall_speed_mod = READ_IF_EXISTS(pSettings, r_float, section, "nearwall_speed_mod", 10.f);
+        m_nearwall_hud_offset_speed = READ_IF_EXISTS(pSettings, r_float, hud_sect, "nearwall_hud_offset_speed", 0.1f); // Скорость поднятия\опускания ствола
+        m_nearwall_dist_min = READ_IF_EXISTS(pSettings, r_float, hud_sect, "nearwall_dist_min", std::get<0>(CollisionParams)); // Максимальное расстояние, на которое камера ГГ может упереться к стене
+        m_nearwall_dist_max = READ_IF_EXISTS(pSettings, r_float, hud_sect, "nearwall_dist_max", std::get<1>(CollisionParams)); // Расстояние, ближе которого начинаем поднимать ствол
+        m_nearwall_target_hud_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "nearwall_target_hud_offset", std::get<2>(CollisionParams)); // Максимальный оффсет худа
+        m_nearwall_target_hud_rotate = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "nearwall_target_hud_rotate", std::get<3>(CollisionParams)); // Максимальный поворот худа
+        m_nearwall_target_hud_fov = READ_IF_EXISTS(pSettings, r_float, hud_sect, "nearwall_target_hud_fov", std::get<4>(CollisionParams));
+        m_nearwall_target_aim_hud_fov = READ_IF_EXISTS(pSettings, r_float, hud_sect, "nearwall_target_aim_hud_fov", std::get<5>(CollisionParams));
+        m_nearwall_speed_mod = READ_IF_EXISTS(pSettings, r_float, hud_sect, "nearwall_speed_mod", 10.f);
     }
 
-    //if (pSettings->line_exist(hud_sect, "hud_fov"))
-    //    m_base_fov = READ_IF_EXISTS(pSettings, r_float, hud_sect, "hud_fov", 0.0f);
-    //else
-        m_base_fov = READ_IF_EXISTS(pSettings, r_float, section, "hud_fov", 0.0f);
+    m_base_fov = READ_IF_EXISTS(pSettings, r_float, hud_sect, "hud_fov", 0.0f);
 
     m_nearwall_last_hud_fov = m_base_fov > 0.0f ? m_base_fov : psHUD_FOV_def;
 
     ////////////////////////////////////////////
-    m_strafe_offset[0][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "strafe_hud_offset_pos", (Fvector{0.025f, 0.f, 0.f}));
-    m_strafe_offset[1][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "strafe_hud_offset_rot", (Fvector{0.f, 0.f, 5.5f}));
+    m_strafe_offset[0][0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "strafe_hud_offset_pos", (Fvector{0.025f, 0.f, 0.f}));
+    m_strafe_offset[1][0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "strafe_hud_offset_rot", (Fvector{0.f, 0.f, 5.5f}));
 
-    m_strafe_offset[0][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "strafe_aim_hud_offset_pos", (Fvector{0.f, 0.f, 0.f}));
-    m_strafe_offset[1][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "strafe_aim_hud_offset_rot", (Fvector{0.f, 0.f, 3.5f}));
+    m_strafe_offset[0][1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "strafe_aim_hud_offset_pos", (Fvector{0.f, 0.f, 0.f}));
+    m_strafe_offset[1][1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "strafe_aim_hud_offset_rot", (Fvector{0.f, 0.f, 3.5f}));
 
-    m_strafe_offset[2][0].set(READ_IF_EXISTS(pSettings, r_bool, section, "strafe_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "strafe_transition_time", 0.25f), 0.f);
-    m_strafe_offset[2][1].set(READ_IF_EXISTS(pSettings, r_bool, section, "strafe_aim_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "strafe_aim_transition_time", 0.15f), 0.f);
+    m_strafe_offset[2][0].set(READ_IF_EXISTS(pSettings, r_bool, hud_sect, "strafe_enabled", true), READ_IF_EXISTS(pSettings, r_float, hud_sect, "strafe_transition_time", 0.25f),
+                              0.f);
+    m_strafe_offset[2][1].set(READ_IF_EXISTS(pSettings, r_bool, hud_sect, "strafe_aim_enabled", true),
+                              READ_IF_EXISTS(pSettings, r_float, hud_sect, "strafe_aim_transition_time", 0.15f), 0.f);
 
     ////////////////////////////////////////////
     ////////////////////////////////////////////
-    m_lookout_offset[0][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "lookout_hud_offset_pos", (Fvector{0.045f, 0.f, 0.f}));
-    m_lookout_offset[1][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "lookout_hud_offset_rot", (Fvector{0.f, 0.f, 10.f}));
+    m_lookout_offset[0][0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "lookout_hud_offset_pos", (Fvector{0.045f, 0.f, 0.f}));
+    m_lookout_offset[1][0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "lookout_hud_offset_rot", (Fvector{0.f, 0.f, 10.f}));
 
-    m_lookout_offset[0][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "lookout_aim_hud_offset_pos", (Fvector{0.f, 0.f, 0.f}));
-    m_lookout_offset[1][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "lookout_aim_hud_offset_rot", (Fvector{0.f, 0.f, 15.f}));
+    m_lookout_offset[0][1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "lookout_aim_hud_offset_pos", (Fvector{0.f, 0.f, 0.f}));
+    m_lookout_offset[1][1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "lookout_aim_hud_offset_rot", (Fvector{0.f, 0.f, 15.f}));
 
-    m_lookout_offset[2][0].set(READ_IF_EXISTS(pSettings, r_bool, section, "lookout_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "lookout_transition_time", 0.25f), 0.f);
-    m_lookout_offset[2][1].set(READ_IF_EXISTS(pSettings, r_bool, section, "lookout_aim_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "lookout_aim_transition_time", 0.15f), 0.f);
+    m_lookout_offset[2][0].set(READ_IF_EXISTS(pSettings, r_bool, hud_sect, "lookout_enabled", true), READ_IF_EXISTS(pSettings, r_float, hud_sect, "lookout_transition_time", 0.25f),
+                               0.f);
+    m_lookout_offset[2][1].set(READ_IF_EXISTS(pSettings, r_bool, hud_sect, "lookout_aim_enabled", true),
+                               READ_IF_EXISTS(pSettings, r_float, hud_sect, "lookout_aim_transition_time", 0.15f), 0.f);
     ////////////////////////////////////////////
     ////////////////////////////////////////////
-    m_jump_offset[0][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "jump_hud_offset_pos", (Fvector{0.f, 0.05f, 0.03f}));
-    m_jump_offset[1][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "jump_hud_offset_rot", (Fvector{0.f, -10.f, -10.f}));
+    m_jump_offset[0][0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "jump_hud_offset_pos", (Fvector{0.f, 0.05f, 0.03f}));
+    m_jump_offset[1][0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "jump_hud_offset_rot", (Fvector{0.f, -10.f, -10.f}));
 
-    m_jump_offset[0][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "jump_aim_hud_offset_pos", (Fvector{0.f, 0.03f, 0.01f}));
-    m_jump_offset[1][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "jump_aim_hud_offset_rot", (Fvector{0.f, 2.5f, -3.f}));
+    m_jump_offset[0][1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "jump_aim_hud_offset_pos", (Fvector{0.f, 0.03f, 0.01f}));
+    m_jump_offset[1][1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "jump_aim_hud_offset_rot", (Fvector{0.f, 2.5f, -3.f}));
 
-    m_jump_offset[2][0].set(READ_IF_EXISTS(pSettings, r_bool, section, "jump_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "jump_transition_time", 0.35f), 0.f);
-    m_jump_offset[2][1].set(READ_IF_EXISTS(pSettings, r_bool, section, "jump_aim_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "jump_aim_transition_time", 0.4f), 0.f);
+    m_jump_offset[2][0].set(READ_IF_EXISTS(pSettings, r_bool, hud_sect, "jump_enabled", true), READ_IF_EXISTS(pSettings, r_float, hud_sect, "jump_transition_time", 0.35f), 0.f);
+    m_jump_offset[2][1].set(READ_IF_EXISTS(pSettings, r_bool, hud_sect, "jump_aim_enabled", true), READ_IF_EXISTS(pSettings, r_float, hud_sect, "jump_aim_transition_time", 0.4f),
+                            0.f);
     ////////////////////////////////////////////
     ////////////////////////////////////////////
-    m_fall_offset[0][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "fall_hud_offset_pos", (Fvector{0.f, -0.05f, 0.06f}));
-    m_fall_offset[1][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "fall_hud_offset_rot", (Fvector{0.f, 5.f, 0.f}));
+    m_fall_offset[0][0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "fall_hud_offset_pos", (Fvector{0.f, -0.05f, 0.06f}));
+    m_fall_offset[1][0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "fall_hud_offset_rot", (Fvector{0.f, 5.f, 0.f}));
 
-    m_fall_offset[0][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "fall_aim_hud_offset_pos", (Fvector{0.f, 0.03f, -0.01f}));
-    m_fall_offset[1][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "fall_aim_hud_offset_rot", (Fvector{0.f, -2.5f, 3.f}));
+    m_fall_offset[0][1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "fall_aim_hud_offset_pos", (Fvector{0.f, 0.03f, -0.01f}));
+    m_fall_offset[1][1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "fall_aim_hud_offset_rot", (Fvector{0.f, -2.5f, 3.f}));
     ////////////////////////////////////////////
     ////////////////////////////////////////////
-    m_landing_offset[0][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "landing_hud_offset_pos", (Fvector{0.f, -0.2f, 0.03f}));
-    m_landing_offset[1][0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "landing_hud_offset_rot", (Fvector{0.f, -5.f, 10.f}));
+    m_landing_offset[0][0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "landing_hud_offset_pos", (Fvector{0.f, -0.2f, 0.03f}));
+    m_landing_offset[1][0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "landing_hud_offset_rot", (Fvector{0.f, -5.f, 10.f}));
 
-    m_landing_offset[0][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "landing_aim_hud_offset_pos", (Fvector{0.f, -0.1f, 0.02f}));
-    m_landing_offset[1][1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "landing_aim_hud_offset_rot", (Fvector{0.f, -2.5f, 5.f}));
+    m_landing_offset[0][1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "landing_aim_hud_offset_pos", (Fvector{0.f, -0.1f, 0.02f}));
+    m_landing_offset[1][1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "landing_aim_hud_offset_rot", (Fvector{0.f, -2.5f, 5.f}));
     ////////////////////////////////////////////
     ////////////////////////////////////////////
-    m_move_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "stay_hud_offset_pos", (Fvector{0.f, -0.03f, 0.f}));
-    m_move_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "stay_hud_offset_rot", (Fvector{0.f, 0.5f, -3.f}));
-    m_move_offset[2].set(READ_IF_EXISTS(pSettings, r_bool, section, "move_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "move_transition_time", 0.25f), 0.f);
+    m_move_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "stay_hud_offset_pos", (Fvector{0.f, -0.03f, 0.f}));
+    m_move_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "stay_hud_offset_rot", (Fvector{0.f, 0.5f, -3.f}));
+    m_move_offset[2].set(READ_IF_EXISTS(pSettings, r_bool, hud_sect, "move_enabled", true), READ_IF_EXISTS(pSettings, r_float, hud_sect, "move_transition_time", 0.25f), 0.f);
     ////////////////////////////////////////////
     ////////////////////////////////////////////
-    m_walk_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "walk_hud_offset_pos", (Fvector{-0.02f, -0.02f, -0.03f}));
-    m_walk_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "walk_hud_offset_rot", (Fvector{0.f, 0.05f, -1.f}));
-    m_walk_offset[2].set(READ_IF_EXISTS(pSettings, r_bool, section, "walk_enabled", true), READ_IF_EXISTS(pSettings, r_float, section, "walk_transition_time", 0.25f), 0.f);
+    m_walk_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "walk_hud_offset_pos", (Fvector{-0.02f, -0.02f, -0.03f}));
+    m_walk_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "walk_hud_offset_rot", (Fvector{0.f, 0.05f, -1.f}));
+    m_walk_offset[2].set(READ_IF_EXISTS(pSettings, r_bool, hud_sect, "walk_enabled", true), READ_IF_EXISTS(pSettings, r_float, hud_sect, "walk_transition_time", 0.25f), 0.f);
 
-    //Загрузка параметров инерции --#SM+# Begin--
+    // Загрузка параметров инерции --#SM+# Begin--
     inertion_data.m_pitch_offset_r = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_right", PITCH_OFFSET_R);
     inertion_data.m_pitch_offset_n = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_up", PITCH_OFFSET_N);
     inertion_data.m_pitch_offset_d = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_forward", PITCH_OFFSET_D);
@@ -183,7 +189,7 @@ void CHudItem::Load(LPCSTR section)
 
     m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME);
 
-	// Rezy - Custom Script 3D UI
+    // Rezy - Custom Script 3D UI
     if (script_ui_funct = READ_IF_EXISTS(pSettings, r_string, hud_sect, "custom_ui_func", nullptr))
     {
         script_ui_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "custom_ui_bone", "wpn_body");
@@ -202,15 +208,7 @@ void CHudItem::PlaySound(HUD_SOUND& hud_snd, const Fvector& position, bool overl
 
 void CHudItem::PlaySound(LPCSTR alias, const Fvector& position, bool overlap) { m_sounds.PlaySound(alias, position, object().H_Root(), !!GetHUDmode(), false, overlap); }
 
-//void CHudItem::UpdateSoundPosition(LPCSTR alias, const Fvector& pos)
-//{
-//    auto snd = m_sounds.FindSoundItem(alias, false);
-//    if (snd && snd->playing())
-//        snd->set_position(pos);
-//}
-
 bool CHudItem::SoundExist(LPCSTR alias) { return !!m_sounds.FindSoundItem(alias, false); }
-
 
 void CHudItem::net_Destroy() { m_dwStateTime = 0; }
 
@@ -1487,46 +1485,8 @@ void CHudItem::SetHudSection(shared_str sect)
 {
     if (!xr_strcmp(hud_sect, sect))
         return;
-    hud_sect = sect;
 
-    if (pSettings->line_exist(hud_sect, "allow_inertion"))
-        EnableHudInertion(pSettings->r_bool(hud_sect, "allow_inertion"));
-
-    if (pSettings->line_exist(hud_sect, "allow_bobbing"))
-        allow_bobbing = pSettings->r_bool(hud_sect, "allow_bobbing");
-
-    hud_recalc_koef = READ_IF_EXISTS(pSettings, r_float, hud_sect, "hud_recalc_koef",
-                                     1.35f); // На калаше при 1.35 вроде норм смотрится, другим стволам возможно придется подбирать другие значения.
-
-    inertion_data.m_pitch_offset_r = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_right", PITCH_OFFSET_R);
-    inertion_data.m_pitch_offset_n = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_up", PITCH_OFFSET_N);
-    inertion_data.m_pitch_offset_d = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_forward", PITCH_OFFSET_D);
-    inertion_data.m_pitch_low_limit = READ_IF_EXISTS(pSettings, r_float, hud_sect, "pitch_offset_up_low_limit", PITCH_LOW_LIMIT);
-
-    inertion_data.m_origin_offset = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_origin_offset", ORIGIN_OFFSET);
-    inertion_data.m_origin_offset_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_origin_offset", ORIGIN_OFFSET_AIM);
-    inertion_data.m_tendto_speed = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_tendto_speed", TENDTO_SPEED);
-    inertion_data.m_tendto_speed_aim = READ_IF_EXISTS(pSettings, r_float, hud_sect, "inertion_zoom_tendto_speed", TENDTO_SPEED_AIM);
-
-    m_fZoomRotateTime = READ_IF_EXISTS(pSettings, r_float, hud_sect, "zoom_rotate_time", ROTATION_TIME);
-
-    if (script_ui_funct = READ_IF_EXISTS(pSettings, r_string, hud_sect, "custom_ui_func", nullptr))
-    {
-        script_ui_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "custom_ui_bone", "wpn_body");
-
-        script_ui_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "custom_ui_pos", Fvector().set(0.f, 0.f, 0.f));
-        script_ui_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "custom_ui_rot", Fvector().set(0.f, 0.f, 0.f));
-    }
-
-    /*m_hidden_meshes_hud.clear();*/
-    //LPCSTR str = READ_IF_EXISTS(pSettings, r_string, hud_sect, "hidden_meshes", nullptr);
-    //if (str)
-    //    for (int i = 0, count = _GetItemCount(str); i < count; ++i)
-    //    {
-    //        string128 mesh_num;
-    //        _GetItem(str, i, mesh_num);
-    //        m_hidden_meshes_hud.push_back(u8(atoi(mesh_num)));
-    //    }
+    LoadHudSection(sect);
 
     auto hi = HudItemData();
     if (hi)
