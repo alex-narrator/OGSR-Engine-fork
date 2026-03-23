@@ -55,6 +55,8 @@ public:
     virtual void on_activate_physic_shell();
     virtual void modify_holder_params(float& range, float& fov) const;
 
+    virtual bool use_parent_ai_locations() const { return (!H_Parent()); }
+
 protected:
 #ifdef DEBUG
     virtual void OnRender();
