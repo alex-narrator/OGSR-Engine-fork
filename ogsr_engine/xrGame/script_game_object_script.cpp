@@ -45,18 +45,6 @@ void CScriptGameObject::script_register(lua_State* L)
 
            script_register_game_object3(script_register_game_object2(script_register_game_object1(script_register_game_object_trader(std::move(instance))))),
 
-           /*		class_<CCameraBase>("CCameraBase")
-                       .def_readwrite("lim_yaw",	&CCameraBase::GetLimYaw,	&CCameraBase::SetLimYaw)
-                       .def_readwrite("lim_pitch", &CCameraBase::GetLimPitch,	&CCameraBase::SetLimPitch)
-                       .def_readwrite("rot_speed", &CCameraBase::GetRotSpeed,	&CCameraBase::SetRotSpeed)
-                       .def_readwrite("yaw",		&CCameraBase::GetYaw,		&CCameraBase::SetYaw),*/
-
-           /*		class_<CProjector>("CProjector")
-                       .def_readwrite("current_yaw",			&CProjector::GetCurrentYaw,		&CProjector::SetCurrentYaw)
-                       .def_readwrite("current_pitch",			&CProjector::GetCurrentPitch,	&CProjector::SetCurrentPitch)
-                       .def_readwrite("target_yaw",			&CProjector::GetTargetYaw,		&CProjector::SetTargetYaw)
-                       .def_readwrite("target_pitch",			&CProjector::GetTargetPitch,	&CProjector::SetTargetPitch),*/
-
            class_<enum_exporter<GameObject::ECallbackType>>("callback")
                .enum_("callback_types")
                    [value("trade_start", int(GameObject::eTradeStart)), value("trade_stop", int(GameObject::eTradeStop)),
