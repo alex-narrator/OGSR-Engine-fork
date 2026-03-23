@@ -324,9 +324,8 @@ void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
         g_pda_info_state &= ~pda_section::quests;
         break;
     default: // Msg("not registered button identifier [%d]", UITabControl->GetActiveIndex());
-        if (pSettings->line_exist("engine_callbacks", "on_pda_custom_tab"))
+        if (const char* callback = READ_IF_EXISTS(pSettings, r_string, "engine_callbacks", "on_pda_custom_tab", nullptr))
         {
-            const char* callback = pSettings->r_string("engine_callbacks", "on_pda_custom_tab");
             if (luabind::functor<CUIDialogWndEx*> lua_function; ai().script_engine().functor(callback, lua_function))
             {
                 CUIDialogWndEx* res = lua_function(section);

@@ -418,9 +418,8 @@ bool CWeaponAmmo::UsefulForReload() const
         return true;
 
     bool useful{true};
-    if (pSettings->line_exist("engine_callbacks", "is_ammo_for_reload"))
+    if (const char* callback = READ_IF_EXISTS(pSettings, r_string, "engine_callbacks", "is_ammo_for_reload", nullptr))
     {
-        const char* callback = pSettings->r_string("engine_callbacks", "is_ammo_for_reload");
         if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
             useful = lua_function(lua_game_object());
     }

@@ -164,15 +164,12 @@ void CActor::PickupModeUpdate_COD()
         {
             bool allow_pickup = true;
 
-            if (pSettings->line_exist("engine_callbacks", "actor_on_item_before_pickup"))
+            if (const char* callback = READ_IF_EXISTS(pSettings, r_string, "engine_callbacks", "actor_on_item_before_pickup", nullptr))
             {
-                std::string on_item_before_pickup = pSettings->r_string("engine_callbacks", "actor_on_item_before_pickup");
-
                 // Tronex: ability to prevent item picking up if the export returns false
-                luabind::functor<bool> func;
-                if (ai().script_engine().functor(on_item_before_pickup.c_str(), func))
+                if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
                 {
-                    allow_pickup = func(pNearestItem->cast_game_object()->lua_game_object());
+                    allow_pickup = lua_function(pNearestItem->cast_game_object()->lua_game_object());
                 }
             }
 
@@ -264,15 +261,12 @@ void CActor::PickupModeUpdate_COD()
         {
             bool allow_pickup = true;
 
-            if (pSettings->line_exist("engine_callbacks", "actor_on_item_before_pickup"))
+            if (const char* callback = READ_IF_EXISTS(pSettings, r_string, "engine_callbacks", "actor_on_item_before_pickup", nullptr))
             {
-                std::string on_item_before_pickup = pSettings->r_string("engine_callbacks", "actor_on_item_before_pickup");
-
                 // Tronex: ability to prevent item picking up if the export returns false
-                luabind::functor<bool> func;
-                if (ai().script_engine().functor(on_item_before_pickup.c_str(), func))
+                if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
                 {
-                    allow_pickup = func(pNearestItem->cast_game_object()->lua_game_object());
+                    allow_pickup = lua_function(pNearestItem->cast_game_object()->lua_game_object());
                 }
             }
 

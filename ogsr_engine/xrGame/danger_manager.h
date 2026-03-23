@@ -37,7 +37,7 @@ private:
 
 private:
     CCustomMonster* m_object;
-    xr_string on_before_add;
+    xr_string on_before_add{};
 
 public:
     IC CDangerManager(CCustomMonster* object);

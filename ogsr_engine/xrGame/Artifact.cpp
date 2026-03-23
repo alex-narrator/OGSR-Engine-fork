@@ -472,9 +472,8 @@ void CArtefact::SwitchAfParticles(bool bOn)
 bool CArtefact::CanAffect()
 {
     bool res{true};
-    if (pSettings->line_exist("engine_callbacks", "can_artefact_affect"))
+    if (const char* callback = READ_IF_EXISTS(pSettings, r_string, "engine_callbacks", "can_artefact_affect", nullptr))
     {
-        const char* callback = pSettings->r_string("engine_callbacks", "can_artefact_affect");
         if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
             res = lua_function(lua_game_object());
     }

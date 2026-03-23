@@ -83,13 +83,7 @@ struct CRemoveByTimePredicate
 
 CDangerManager::~CDangerManager() {}
 
-void CDangerManager::Load(LPCSTR section)
-{
-    if (pSettings->section_exist("engine_callbacks") && pSettings->line_exist("engine_callbacks", "danger_on_before_add"))
-    {
-        on_before_add = pSettings->r_string("engine_callbacks", "danger_on_before_add");
-    }
-}
+void CDangerManager::Load(LPCSTR section) { on_before_add = READ_IF_EXISTS(pSettings, r_string, "engine_callbacks", "danger_on_before_add", ""); }
 
 void CDangerManager::reinit()
 {

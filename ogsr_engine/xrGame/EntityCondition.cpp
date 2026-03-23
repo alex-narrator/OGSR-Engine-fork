@@ -313,9 +313,8 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
     float hit_power = hit_power_org;
     hit_power = HitOutfitEffect(pHDS);
 
-    if (pSettings->line_exist("engine_callbacks", "on_actor_condition_hit") && m_object->cast_actor())
+    if (const char* callback = READ_IF_EXISTS(pSettings, r_string, "engine_callbacks", "on_actor_condition_hit", nullptr); callback && m_object->cast_actor())
     {
-        const char* callback = pSettings->r_string("engine_callbacks", "on_actor_condition_hit");
         if (luabind::functor<float> lua_function; ai().script_engine().functor(callback, lua_function))
             hit_power = lua_function(hit_power, pHDS->hit_type);
     }

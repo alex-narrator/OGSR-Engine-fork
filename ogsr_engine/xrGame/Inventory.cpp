@@ -764,9 +764,8 @@ bool CInventory::CanPutInBelt(PIItem pIItem)
         return false;
 
     bool res{true};
-    if (pSettings->line_exist("engine_callbacks", "can_put_in_belt"))
+    if (const char* callback = READ_IF_EXISTS(pSettings, r_string, "engine_callbacks", "can_put_in_belt", nullptr))
     {
-        const char* callback = pSettings->r_string("engine_callbacks", "can_put_in_belt");
         if (luabind::functor<bool> lua_function; ai().script_engine().functor(callback, lua_function))
             res = lua_function(smart_cast<CGameObject*>(pIItem)->lua_game_object());
     }
