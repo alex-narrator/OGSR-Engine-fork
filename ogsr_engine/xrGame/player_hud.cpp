@@ -1943,10 +1943,8 @@ void player_hud::SaveCfg(u16 item_idx) const
     xr_sprintf(_prefix, "%s", is_16x9 ? "_16x9" : "");
     string128 val_name;
 
-    strconcat(sizeof(val_name), val_name, "item_position", _prefix);
-    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_item_attach[0]);
-    strconcat(sizeof(val_name), val_name, "item_orientation", _prefix);
-    pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_item_attach[1]);
+    pCfg.w_fvector3(sect_name, "item_position", item->m_measures.m_item_attach[0]);
+    pCfg.w_fvector3(sect_name, "item_orientation", item->m_measures.m_item_attach[1]);
 
     strconcat(sizeof(val_name), val_name, "hands_position", _prefix);
     pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_attach[0]);
