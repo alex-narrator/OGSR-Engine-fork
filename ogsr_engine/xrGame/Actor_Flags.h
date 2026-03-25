@@ -16,7 +16,7 @@ enum
     AF_ZONES_DBG                = 1 << 11,
     AF_VERTEX_DBG               = 1 << 12,
     AF_CAM_COLLISION            = 1 << 13,
-    // = 1 << 14,
+    AF_HOLD_TO_LOOKOUT          = 1 << 14,
     AF_3D_PDA                   = 1 << 15,
     AF_AI_VOLUMETRIC_LIGHTS     = 1 << 16,
     AF_EFFECTS_ON_DEMORECORD    = 1 << 17,

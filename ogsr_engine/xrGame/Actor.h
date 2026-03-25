@@ -227,6 +227,7 @@ protected:
     float m_fCamHeightFactor{0.87f};
     bool b_ClearCrouch{true};
     bool b_ClearAccel{true};
+    bool b_ClearLookout{true};
 
     // Dropping
     //BOOL b_DropActivated{};

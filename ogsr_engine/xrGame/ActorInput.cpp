@@ -117,6 +117,9 @@ void CActor::IR_OnKeyboardPress(int cmd)
         if (!psActorFlags.test(AF_HOLD_TO_ACCEL) && !b_ClearAccel)
             b_ClearAccel = true;
 
+        if (!psActorFlags.test(AF_HOLD_TO_LOOKOUT) && !b_ClearLookout)
+            b_ClearLookout = true;
+
         if (mstate_wishful & mcSprint)
             mstate_wishful &= ~mcSprint;
         else
@@ -129,6 +132,20 @@ void CActor::IR_OnKeyboardPress(int cmd)
     case kWPN_8: {
         if (auto dev = smart_cast<CCustomDevice*>(inventory().ItemFromSlot(DETECTOR_SLOT)))
             dev->ToggleDevice(/*g_player_hud->attached_item(0) != nullptr*/ false);
+    }
+    break;
+    case kL_LOOKOUT: {
+        if (!psActorFlags.test(AF_HOLD_TO_LOOKOUT))
+            b_ClearLookout = !b_ClearLookout;
+        if (!b_ClearLookout)
+            mstate_wishful ^= mcLLookout;
+    }
+    break;
+    case kR_LOOKOUT: {
+        if (!psActorFlags.test(AF_HOLD_TO_LOOKOUT))
+            b_ClearLookout = !b_ClearLookout;
+        if (!b_ClearLookout)
+            mstate_wishful ^= mcRLookout;
     }
     break;
     case kUSE: ActorUse(); break;
@@ -206,6 +223,11 @@ void CActor::IR_OnKeyboardRelease(int cmd)
             if (psActorFlags.test(AF_HOLD_TO_ACCEL))
                 b_ClearAccel = true;
             break;
+        case kL_LOOKOUT:
+        case kR_LOOKOUT:
+            if (psActorFlags.test(AF_HOLD_TO_LOOKOUT))
+                b_ClearLookout = true;
+            break;
         }
     }
 }
@@ -268,8 +290,14 @@ void CActor::IR_OnKeyboardHold(int cmd)
         break;
     case kL_STRAFE: mstate_wishful |= mcLStrafe; break;
     case kR_STRAFE: mstate_wishful |= mcRStrafe; break;
-    case kL_LOOKOUT: mstate_wishful |= mcLLookout; break;
-    case kR_LOOKOUT: mstate_wishful |= mcRLookout; break;
+    case kL_LOOKOUT:
+        if (psActorFlags.test(AF_HOLD_TO_LOOKOUT))
+            mstate_wishful |= mcLLookout;
+        break;
+    case kR_LOOKOUT:
+        if (psActorFlags.test(AF_HOLD_TO_LOOKOUT))
+            mstate_wishful |= mcRLookout;
+        break;
     case kFWD: mstate_wishful |= mcFwd; break;
     case kBACK: mstate_wishful |= mcBack; break;
     case kCROUCH:

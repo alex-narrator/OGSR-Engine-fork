@@ -1474,6 +1474,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_hold_to_aim", &psActorFlags, AF_HOLD_TO_AIM);
     CMD3(CCC_Mask, "g_hold_to_crouch", &psActorFlags, AF_HOLD_TO_CROUCH);
     CMD3(CCC_Mask, "g_hold_to_accel", &psActorFlags, AF_HOLD_TO_ACCEL);
+    CMD3(CCC_Mask, "g_hold_to_lookout", &psActorFlags, AF_HOLD_TO_LOOKOUT);
 
     // alife
 #ifdef DEBUG
