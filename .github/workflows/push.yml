@@ -14,11 +14,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        Configuration: [Debug, Release, ReleaseTracyProfiler]
+#        Configuration: [Debug, Release, ReleaseTracyProfiler]
+        Configuration: [Release, ReleaseTracyProfiler]
         Platform: [x64]
         include:
-          - Configuration: Debug
-            ConfigurationReal: Debug
+#          - Configuration: Debug
+#            ConfigurationReal: Debug
           - Configuration: Release
             ConfigurationReal: Release
           - Configuration: ReleaseTracyProfiler
@@ -33,7 +34,7 @@ jobs:
         ${{ github.workspace }}/Update_Components.cmd
 
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v2
+      uses: microsoft/setup-msbuild@v3
     - name: MSBuild
       shell: cmd
       run: |

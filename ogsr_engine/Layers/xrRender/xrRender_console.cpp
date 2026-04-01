@@ -109,7 +109,7 @@ Fvector3 ps_r_taa_jitter{};
 Fvector2 ps_r_taa_jitter_full{};
 float ps_r_cas{};
 
-int ps_r__LightSleepFrames = 10;
+int ps_r__LightSleepFrames = 100;
 
 float ps_r__WallmarkTTL = 60.f;
 float ps_r__WallmarkSHIFT = 0.0001f;
@@ -124,7 +124,7 @@ float ps_r__LOD_k = 1.f;
 float ps_r__ssaDISCARD = 3.5f; // RO
 
 int ps_r__tf_Anisotropic{16}, ps_r__tf_Anisotropic_SMAP{1};
-float ps_r__tf_Mipbias{-0.5f}, ps_r__tf_Mipbias_SMAP{3.f};
+float ps_r__tf_Mipbias{-0.5f}, ps_r__tf_Mipbias_SMAP{};
 
 // R2
 float ps_r2_ssaLOD_A = 64.f;
@@ -174,6 +174,7 @@ Flags64 ps_r2_ls_flags = {
 //    | R2FLAGEXT_SSFX_SHADOWS
 //    | R2FLAGEXT_SSFX_SSS
     | R2FLAGEXT_SMAP_LOW_LOD
+    | R2FLAGEXT_DISABLE_SMAPVIS
 };
 
 BOOL ps_no_scale_on_fade = 0; // Alundaio
@@ -641,9 +642,9 @@ void xrRender_initconsole()
 
     //CMD4(CCC_Float, "r__dtex_range", &r__dtex_range, 5, 175);
 
-#ifdef DEBUG
-    CMD4(CCC_Integer, "r__lsleep_frames", &ps_r__LightSleepFrames, 4, 30);
+    //CMD4(CCC_Integer, "r_smapvis_sleep_frames", &ps_r__LightSleepFrames, 15, 1000);
 
+#ifdef DEBUG
     CMD4(CCC_Float, "r__wallmark_shift_pp", &ps_r__WallmarkSHIFT, 0.0f, 1.f);
     CMD4(CCC_Float, "r__wallmark_shift_v", &ps_r__WallmarkSHIFT_V, 0.0f, 1.f);
 #endif // DEBUG
@@ -696,7 +697,7 @@ void xrRender_initconsole()
     CMD3(CCC_Mask64, "r2_disable_particles", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_PARTICLES);
     CMD3(CCC_Mask64, "r2_disable_dynamic", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_DYNAMIC);
     CMD3(CCC_Mask64, "r2_disable_light", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_LIGHT);
-    CMD3(CCC_Mask64, "r2_disable_smapvis", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_SMAPVIS);
+    //CMD3(CCC_Mask64, "r2_disable_smapvis", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_SMAPVIS);
     CMD3(CCC_Mask64, "r2_disable_sectors", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_SECTORS);
 
     CMD3(CCC_Mask64, "r2_disable_static_normal", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_STATIC_NORMAL);
