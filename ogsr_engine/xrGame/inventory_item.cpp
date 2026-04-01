@@ -153,7 +153,7 @@ void CInventoryItem::Load(LPCSTR section)
     //m_fRadiationAccumLimit = READ_IF_EXISTS(pSettings, r_float, section, "radiation_accum_limit", 0.f);
     // hands
     eHandDependence = EHandDependence(READ_IF_EXISTS(pSettings, r_u32, section, "hand_dependence", hdNone));
-    m_bIsSingleHanded = READ_IF_EXISTS(pSettings, r_bool, section, "single_handed", TRUE);
+    m_bIsSingleHanded = READ_IF_EXISTS(pSettings, r_bool, section, "single_handed", true);
 
     m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 0.f);
 
