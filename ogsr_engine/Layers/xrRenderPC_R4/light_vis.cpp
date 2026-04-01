@@ -8,7 +8,7 @@ constexpr u32 delay_small_max = 3;
 constexpr u32 delay_visible_min = 20;
 constexpr u32 delay_visible_max = 40;
 
-int delay_invisible_min{2}, delay_invisible_max{4};
+int delay_invisible_min{1}, delay_invisible_max{2};
 
 constexpr u32 cullfragments = 4;
 

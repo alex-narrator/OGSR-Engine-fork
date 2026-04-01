@@ -46,12 +46,10 @@ CStats::~CStats()
 
 static void _draw_cam_pos(CGameFont* pFont)
 {
-    float sz = pFont->GetHeight();
     pFont->SetHeightI(0.02f);
     pFont->SetColor(0xffffffff);
     pFont->Out(10, 600, "CAMERA POSITION:  [%3.2f,%3.2f,%3.2f]", VPUSH(Device.vCameraPosition));
-    pFont->SetHeight(sz);
-    pFont->OnRender();
+
 }
 
 void CStats::Show()
@@ -379,7 +377,7 @@ void CStats::Show_HW()
             CPU::ID.MTCPULoad();
         }
 
-        pFontHW->SetHeightI(0.018f);
+        pFontHW->SetHeightI(0.01f);
 
         if (AvailableMem < 512 || AvailablePageFileMem < 1596)
             pFontHW->SetColor(DebugTextColor::DTC_RED);

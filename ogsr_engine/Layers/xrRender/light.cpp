@@ -195,7 +195,7 @@ void light::spatial_move()
     // update spatial DB
     ISpatial::spatial_move();
 
-    if (!ps_r2_ls_flags_ext.test(R2FLAGEXT_DISABLE_SMAPVIS) && !get_moveable())
+    if (!ps_r2_ls_flags_ext.test(R2FLAGEXT_DISABLE_SMAPVIS))
     {
         for (auto& svi : svis)
             svi.invalidate();
