@@ -185,11 +185,14 @@ void CUIEventsWnd::Show(bool status)
 bool CUIEventsWnd::Filter(CGameTask* t)
 {
     ETaskState task_state = t->m_Objectives[0].TaskState();
-
-    return (false /*m_currFilter==eOwnTask && task_state==eTaskUserDefined*/) ||
-        ((true /*!bprimary_only || (bprimary_only && t->m_is_task_general)*/) &&
-         ((m_currFilter == eAccomplishedTask && task_state == eTaskStateCompleted) || (m_currFilter == eFailedTask && task_state == eTaskStateFail) ||
-          (m_currFilter == eActiveTask && task_state == eTaskStateInProgress)));
+    switch (m_currFilter)
+    {
+    case eActiveTask: return task_state == eTaskStateInProgress;
+    case eAccomplishedTask: return task_state == eTaskStateCompleted;
+    case eFailedTask: return task_state == eTaskStateFail;
+    case eSkipedTask: return task_state == eTaskStateSkiped;
+    }
+    return false;
 }
 
 void CUIEventsWnd::ShowDescription(CGameTask* t, int idx)
