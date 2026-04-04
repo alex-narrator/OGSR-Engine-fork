@@ -4,8 +4,8 @@
 #include "dxRenderDeviceRender.h"
 #include <..\NVIDIA_DLSS\DLSS\include\nvsdk_ngx.h>
 
-u32 r2_SmapCascade0Size{2048}, r2_SmapCascade1Size{1536}, r2_SmapCascade2Size{1024};
-constexpr xr_token CascadesSmapSizeToken[]{{"512x512", 512},
+u32 r2_SmapCascade0Size{2048}, /*r2_SmapCascade1Size{1536},*/ r2_SmapCascade2Size{1024};
+constexpr xr_token CascadesSmapSizeToken[]{// {"512x512", 512},
                                       {"1024x1024", 1024},
                                       {"1536x1536", 1536},
                                       {"2048x2048", 2048},
@@ -735,7 +735,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r2_sun_tsm_bias", &ps_r2_sun_tsm_bias, -0.5, +0.5);
 
     CMD3(CCC_Token, "r__smap_cascade0_size", &r2_SmapCascade0Size, CascadesSmapSizeToken);
-    CMD3(CCC_Token, "r__smap_cascade1_size", &r2_SmapCascade1Size, CascadesSmapSizeToken);
+    // CMD3(CCC_Token, "r__smap_cascade1_size", &r2_SmapCascade1Size, CascadesSmapSizeToken);
     CMD3(CCC_Token, "r__smap_cascade2_size", &r2_SmapCascade2Size, CascadesSmapSizeToken);
     CMD3(CCC_Token, "r__smap_lights_size", &r2_SmapLightsSize, LightsSmapSizeToken);
     CMD3(CCC_Token, "r__smap_rain_size", &r2_SmapRainSize, RainSmapSizeToken);

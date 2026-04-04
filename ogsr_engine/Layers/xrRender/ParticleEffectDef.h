@@ -16,7 +16,6 @@ namespace PS
 {
 class CParticleEffect;
 
-typedef BOOL (*CollisionCallback)(CParticleEffect* E, PAPI::Particle& P, const Fvector& pt, const Fvector& norm); // TRUE-continue collision exec
 typedef void (*DestroyCallback)(CParticleEffect* E, PAPI::Particle& P);
 
 class PFunction;
@@ -96,8 +95,8 @@ public:
     EPAVec m_EActionList;
 
     // execute
-    void ExecuteAnimate(PAPI::Particle* particles, u32 p_cnt, float dt);
-    void ExecuteCollision(PAPI::Particle* particles, u32 p_cnt, float dt, CParticleEffect* owner, CollisionCallback cb);
+    void ExecuteAnimate(PAPI::Particle* particles, u32 p_cnt, float dt) const;
+    void ExecuteCollision(PAPI::Particle* particles, u32 p_cnt, float dt, CParticleEffect* owner) const;
 
     CPEDef();
     ~CPEDef();

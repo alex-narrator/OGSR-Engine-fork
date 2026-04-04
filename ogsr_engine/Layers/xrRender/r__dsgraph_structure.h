@@ -136,4 +136,4 @@ public:
 extern float r_ssaDISCARD;
 extern float r_ssaGLOD_start, r_ssaGLOD_end;
 
-ICF float calcLOD(const float ssa /*fDistSq*/, float R) { return _sqrt(clampr((ssa - r_ssaGLOD_end) / (r_ssaGLOD_start - r_ssaGLOD_end), 0.01f, 1.f)); }
+ICF float calcLOD(const float ssa) { return _sqrt(clampr((ssa - r_ssaGLOD_end) / (r_ssaGLOD_start - r_ssaGLOD_end), 0.01f, 1.f)); }

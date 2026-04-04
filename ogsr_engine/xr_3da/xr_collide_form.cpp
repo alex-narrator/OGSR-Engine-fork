@@ -115,8 +115,8 @@ void CCF_Skeleton::BuildState()
     IRenderVisual* pVisual = owner->Visual();
     IKinematics* K = PKinematics(pVisual);
 
-    //K->CalculateBones_InvalidateSkeleton();
-    //K->CalculateBones(TRUE);
+    K->CalculateBones_Invalidate();
+    K->CalculateBones(TRUE);
 
     const Fmatrix& L2W = owner->XFORM();
 
@@ -234,7 +234,13 @@ BOOL CCF_Skeleton::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
 {
     ZoneScoped;
 
-    Calculate();
+    // не будет тут обновлять стейт костей если мы не на основном потоке.
+    // он тут или с прошлого кадра уже есть или даже если чуть кривой - не важно
+    // если обновлять - будут дергатся модели
+    if (Device.OnMainThread())
+    {
+        Calculate();
+    }
 
     Fsphere w_bv_sphere{};
     owner->XFORM().transform_tiny(w_bv_sphere.P, bv_sphere.P);

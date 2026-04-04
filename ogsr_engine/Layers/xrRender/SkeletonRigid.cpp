@@ -8,151 +8,132 @@ extern int psSkeletonUpdate;
 void check_kinematics(CKinematics* _k, LPCSTR s);
 #endif
 
-void CKinematics::CalculateSkeleton()
-{
-    // mark
-    UCalc_Skeleton = -(::Random.randI(psSkeletonUpdate - 1));
-
-    ZoneScopedN("Skeleton update");
-
-    u32 count_bones = 0;
-
-    // the update itself
-    Fbox Box;
-    Box.invalidate();
-    for (u32 b = 0; b < bones->size(); b++)
-    {
-        if (!LL_GetBoneVisible(static_cast<u16>(b)))
-            continue;
-
-        Fobb& obb = (*bones)[b]->obb;
-        Fmatrix& Mbone = bone_instances[b].mTransform;
-        Fmatrix Mbox;
-        obb.xform_get(Mbox);
-        Fmatrix X;
-        X.mul_43(Mbone, Mbox);
-        Fvector& S = obb.m_halfsize;
-
-        Fvector P, A;
-        A.set(-S.x, -S.y, -S.z);
-        X.transform_tiny(P, A);
-        Box.modify(P);
-        A.set(-S.x, -S.y, S.z);
-        X.transform_tiny(P, A);
-        Box.modify(P);
-        A.set(S.x, -S.y, S.z);
-        X.transform_tiny(P, A);
-        Box.modify(P);
-        A.set(S.x, -S.y, -S.z);
-        X.transform_tiny(P, A);
-        Box.modify(P);
-        A.set(-S.x, S.y, -S.z);
-        X.transform_tiny(P, A);
-        Box.modify(P);
-        A.set(-S.x, S.y, S.z);
-        X.transform_tiny(P, A);
-        Box.modify(P);
-        A.set(S.x, S.y, S.z);
-        X.transform_tiny(P, A);
-        Box.modify(P);
-        A.set(S.x, S.y, -S.z);
-        X.transform_tiny(P, A);
-        Box.modify(P);
-
-        count_bones++;
-    }
-
-    if (!bones->empty() && count_bones)
-    {
-        // previous frame we have updated box - update sphere
-        vis.box.min = (Box.min);
-        vis.box.max = (Box.max);
-        vis.box.getsphere(vis.sphere.P, vis.sphere.R);
-    }
-
-#ifdef DEBUG
-    // Validate
-    VERIFY(_valid(vis.box.min) && _valid(vis.box.max), "Invalid bones-xform in model", dbg_name.c_str());
-    if (vis.sphere.R > 1000.f)
-    {
-        for (u16 ii = 0; ii < LL_BoneCount(); ++ii)
-        {
-            Fmatrix tr;
-            tr = LL_GetTransform(ii);
-            Log("bone ", LL_BoneName(ii));
-            Log("bone_matrix", tr);
-        }
-        Log("end-------");
-    }
-    VERIFY(vis.sphere.R < 1000.f, "Invalid bones-xform in model", dbg_name.c_str());
-#endif
-}
-
 void CKinematics::CalculateBones(BOOL bForceExact)
 {
     std::scoped_lock UCalc_Lock(UCalc_Mutex);
 
+    // early out.
     // check if the info is still relevant
     // skip all the computations - assume nothing changes in a small period of time :)
-
-    bool need_update_bones = bForceExact || (Device.dwFrame >= (UCalc_Time + UCalc_Interval));
-    bool need_update_skeleton = UCalc_Skeleton >= psSkeletonUpdate;
-
-    // early out if we already updated bones on this frame
-    if (Device.dwFrame == UCalc_Time)
-    {
-        if (need_update_skeleton)
-        {
-            // Calculate BOXes/Spheres if needed
-            CalculateSkeleton();
-        }
-
+    if (Device.dwTimeGlobal == UCalc_Time)
         return; // early out for "fast" update
-    }
-
-    UCalc_Skeleton++;
 
     ZoneScoped;
 
-    if (need_update_bones)
-    {
-        OnCalculateBones();
+    if (!bForceExact && (Device.dwTimeGlobal < (UCalc_Time + UCalc_Interval)))
+        return; // early out for "slow" update
 
-        if (Update_Visibility)
-            Visibility_Update();
+    OnCalculateBones();
 
-        // here we have either:
-        //	1:	timeout elapsed
-        //	2:	exact computation required
-        UCalc_Time = Device.dwFrame;
+    if (Update_Visibility)
+        Visibility_Update();
 
-        // exact computation
-        // Calculate bones
+    // here we have either:
+    //	1:	timeout elapsed
+    //	2:	exact computation required
+    UCalc_Time = Device.dwTimeGlobal;
+
+    // exact computation
+    // Calculate bones
 #ifdef DEBUG
-        Device.Statistic->Animation.Begin();
+    Device.Statistic->Animation.Begin();
 #endif
 
-        Bone_Calculate(bones->at(iRoot), &Fidentity);
+    Bone_Calculate(bones->at(iRoot), &Fidentity);
 
 #ifdef DEBUG
-        check_kinematics(this, dbg_name.c_str());
-        Device.Statistic->Animation.End();
+    check_kinematics(this, dbg_name.c_str());
+    Device.Statistic->Animation.End();
 #endif
-    }
 
-    if (need_update_skeleton)
-    {
-        // Calculate BOXes/Spheres if needed
-        CalculateSkeleton();
-    }
+    VERIFY(LL_GetBonesVisible() != 0);
 
-    if (need_update_bones)
+    // Calculate BOXes/Spheres if needed
+    UCalc_Visibox++;
+    if (UCalc_Visibox >= psSkeletonUpdate)
     {
-        //if (Device.OnMainThread() || TTAPI->on_pool_thread())
+        ZoneScopedN("Skeleton update");
+
+        // mark
+        UCalc_Visibox = -(::Random.randI(psSkeletonUpdate - 1));
+
+        u32 count_bones = 0;
+
+        // the update itself
+        Fbox Box;
+        Box.invalidate();
+        for (u32 b = 0; b < bones->size(); b++)
         {
-            if (Update_Callback)
-                Update_Callback(this);
+            if (!LL_GetBoneVisible(u16(b)))
+                continue;
+
+            Fobb& obb = (*bones)[b]->obb;
+            Fmatrix& Mbone = bone_instances[b].mTransform;
+            Fmatrix Mbox;
+            obb.xform_get(Mbox);
+            Fmatrix X;
+            X.mul_43(Mbone, Mbox);
+            Fvector& S = obb.m_halfsize;
+
+            Fvector P, A;
+            A.set(-S.x, -S.y, -S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(-S.x, -S.y, S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(S.x, -S.y, S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(S.x, -S.y, -S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(-S.x, S.y, -S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(-S.x, S.y, S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(S.x, S.y, S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+            A.set(S.x, S.y, -S.z);
+            X.transform_tiny(P, A);
+            Box.modify(P);
+
+            count_bones++;
         }
+
+        if (!bones->empty() && count_bones)
+        {
+            // previous frame we have updated box - update sphere
+            vis.box.min = (Box.min);
+            vis.box.max = (Box.max);
+            vis.box.getsphere(vis.sphere.P, vis.sphere.R);
+        }
+
+#ifdef DEBUG
+        // Validate
+        VERIFY(_valid(vis.box.min) && _valid(vis.box.max), "Invalid bones-xform in model", dbg_name.c_str());
+        if (vis.sphere.R > 1000.f)
+        {
+            for (u16 ii = 0; ii < LL_BoneCount(); ++ii)
+            {
+                Fmatrix tr;
+                tr = LL_GetTransform(ii);
+                Log("bone ", LL_BoneName(ii));
+                Log("bone_matrix", tr);
+            }
+            Log("end-------");
+        }
+        VERIFY(vis.sphere.R < 1000.f, "Invalid bones-xform in model", dbg_name.c_str());
+#endif
+    }
+
+    if (Device.OnMainThread() || TTAPI->on_pool_thread())
+    {
+        if (Update_Callback)
+            Update_Callback(this);
     }
 }
 
@@ -192,16 +173,18 @@ void CKinematics::CLBone(const CBoneData* bd, CBoneInstance& bi, const Fmatrix* 
 
     if (LL_GetBoneVisible(SelfID))
     {
-        if (!bi.callback_overwrite())
+        if (bi.callback_overwrite())
+        {
+            if (bi.callback())
+                bi.callback()(&bi);
+        }
+        else
         {
             BuildBoneMatrix(bd, bi, parent, channel_mask);
-        }
-
-        if (bi.callback())
-        {
-            ZoneScopedN("CLBone/callback");
-
-            bi.callback()(&bi);
+            if (bi.callback())
+            {
+                bi.callback()(&bi);
+            }
         }
 
         bi.mRenderTransform.mul_43(bi.mTransform, bd->m2b_transform);
