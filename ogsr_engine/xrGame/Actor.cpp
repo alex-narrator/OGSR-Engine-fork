@@ -291,8 +291,6 @@ void CActor::Load(LPCSTR section)
     float AirControlParam = pSettings->r_float(section, "air_control_param");
     character_physics_support()->movement()->SetAirControlParam(AirControlParam);
 
-    m_fPickupInfoRadius = pSettings->r_float(section, "pickup_info_radius");
-
     character_physics_support()->in_Load(section);
 
     //загрузить параметры эффектора
@@ -620,11 +618,6 @@ void CActor::UpdateCL()
     VERIFY2(_valid(renderable.xform), *cName());
 
     Visual()->dcast_PKinematics()->CalculateBones(TRUE);
-
-    if (g_Alive())
-        PickupModeUpdate();
-
-    PickupModeUpdate_COD();
 
     if (Level().CurrentEntity() && this->ID() == Level().CurrentEntity()->ID())
     {
@@ -1400,15 +1393,6 @@ bool CActor::IsFreeHands() const
 
 float CActor::GetVisibility() { return m_npc_visibility.size() ? m_npc_visibility.back().value : 0.f; }
 void CActor::ResetVisibility() { m_npc_visibility.clear(); };
-
-void CActor::SetPickUpItem(CInventoryItem* pickup_item)
-{
-    if (const char* callback = READ_IF_EXISTS(pSettings, r_string, "engine_callbacks", "on_pickup_item_set", nullptr))
-    {
-        if (luabind::functor<void> lua_function; ai().script_engine().functor(callback, lua_function))
-            lua_function(pickup_item ? pickup_item->object().lua_game_object() : nullptr);
-    }
-}
 
 void CActor::block_action(EGameActions cmd) { m_blocked_actor_actions.insert(cmd); }
 

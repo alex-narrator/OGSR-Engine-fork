@@ -205,10 +205,9 @@ public:
             wpn_cost_include_addons = 1ull << 8,
             npc_simplified_shooting = 1ull << 9,
             show_objectives_ondemand = 1ull << 10,
-            pickup_check_overlaped = 1ull << 11,
-            disable_dialog_break = 1ull << 12,
-            no_progress_bar_animation = 1ull << 13,
-            limited_bolts = 1ull << 14;
+            disable_dialog_break = 1ull << 11,
+            no_progress_bar_animation = 1ull << 12,
+            limited_bolts = 1ull << 13;
     };
 
     void _initialize(LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0);

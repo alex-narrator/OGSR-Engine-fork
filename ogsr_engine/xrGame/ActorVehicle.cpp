@@ -31,7 +31,6 @@ void CActor::attach_Vehicle(CHolderCustom* vehicle)
 
     if (m_holder)
         return;
-    PickupModeOff();
     m_holder = vehicle;
 
     IKinematicsAnimated* V = smart_cast<IKinematicsAnimated*>(Visual());

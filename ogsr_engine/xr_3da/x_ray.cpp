@@ -123,7 +123,6 @@ void InitConsole()
     CORE_FEATURE_SET(wpn_cost_include_addons, "features");
     CORE_FEATURE_SET(npc_simplified_shooting, "features");
     CORE_FEATURE_SET(show_objectives_ondemand, "features");
-    CORE_FEATURE_SET(pickup_check_overlaped, "features");
     CORE_FEATURE_SET(no_progress_bar_animation, "features");
     CORE_FEATURE_SET(disable_dialog_break, "features");
     CORE_FEATURE_SET(limited_bolts, "features");

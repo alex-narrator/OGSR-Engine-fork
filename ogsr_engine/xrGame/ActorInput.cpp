@@ -194,9 +194,6 @@ void CActor::IR_OnKeyboardRelease(int cmd)
 
     if (g_Alive())
     {
-        if (cmd == kUSE)
-            PickupModeOff();
-
         if (m_holder)
         {
             m_holder->OnKeyboardRelease(cmd);
@@ -433,17 +430,7 @@ void CActor::ActorUse()
 
     bool is_add_act = pInput->iGetAsyncKeyState(get_action_dik(kADDITIONAL_ACTION));
 
-    if (m_pInvBoxWeLookingAt && m_pInvBoxWeLookingAt->object().nonscript_usable())
-    {
-        if (smart_cast<CInventoryContainer*>(m_pInvBoxWeLookingAt) && is_add_act)
-        {
-            PickupModeOn();
-            PickupModeUpdate_COD();
-            return;
-        }
-    }
-
-    else if (!m_pUsableObject || m_pUsableObject->nonscript_usable())
+    if (!m_pUsableObject || m_pUsableObject->nonscript_usable())
     {
         if (m_pPersonWeLookingAt)
         {
@@ -477,9 +464,6 @@ void CActor::ActorUse()
             }
         }
     }
-
-    PickupModeOn();
-    PickupModeUpdate_COD();
 }
 
 BOOL CActor::HUDview() const { return IsFocused() && (cam_active == eacFirstEye) && ((!m_holder) || (m_holder && m_holder->allowWeapon() && m_holder->HUDView())); }

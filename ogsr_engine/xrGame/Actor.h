@@ -392,25 +392,11 @@ protected:
 
     // Tip for action for object we're looking at
     const char* m_sDefaultObjAction{};
-
-    //режим подбирания предметов
-    bool m_bPickupMode{};
-    //расстояние подсветки предметов
-    float m_fPickupInfoRadius;
-
-    void PickupInfoDraw(CObject* object);
-
-    void PickupModeUpdate();
-    void PickupModeUpdate_COD();
-
 public:
-    void PickupModeOn();
-    void PickupModeOff();
-
     //////////////////////////////////////////////////////////////////////////
     // Motions (передвижения актрера)
     //////////////////////////////////////////////////////////////////////////
-public:
+
     void g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Jump, float dt);
     void g_cl_ValidateMState(float dt, u32 mstate_wf);
     void g_cl_Orientate(u32 mstate_rl, float dt);
@@ -689,7 +675,6 @@ public:
 
 private:
     collide::rq_results RQR;
-    BOOL CanPickItem(const CFrustum& frustum, const Fvector& from, CObject* item);
     xr_vector<ISpatial*> ISpatialResult;
 
 private:
@@ -744,8 +729,6 @@ public:
 
     float GetVisibility();
     void ResetVisibility();
-
-    void SetPickUpItem(CInventoryItem* pickup_item);
     
     virtual void UpdateItemsEffect();
 
