@@ -124,8 +124,8 @@ void CGameObject::net_Destroy()
     xr_delete(m_ini_file);
 
     m_script_clsid = -1;
-
-    SetKinematicsCallback(false);
+    if (Visual() && smart_cast<IKinematics*>(Visual()))
+        smart_cast<IKinematics*>(Visual())->Callback(0, 0);
 
     inherited::net_Destroy();
     setReady(FALSE);
@@ -822,7 +822,7 @@ void CGameObject::shedule_Update(u32 dt)
     {
         if (IKinematics* K = PKinematics(Visual()))
         {
-            K->CalculateBones_InvalidateSkeleton();
+            K->CalculateBones_Invalidate();
             K->CalculateBones(TRUE);
         }
 

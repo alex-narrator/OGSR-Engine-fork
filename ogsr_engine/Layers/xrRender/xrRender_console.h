@@ -1,7 +1,7 @@
 #pragma once
 
 // Common
-extern ECORE_API u32 r2_SmapCascade0Size, r2_SmapCascade1Size, r2_SmapCascade2Size, r2_SmapLightsSize, r2_SmapRainSize;
+extern ECORE_API u32 r2_SmapCascade0Size, /*r2_SmapCascade1Size,*/ r2_SmapCascade2Size, r2_SmapLightsSize, r2_SmapRainSize;
 
 extern ECORE_API u32 ps_r_pp_aa_mode;
 extern ECORE_API u32 ps_r_dlss_preset;

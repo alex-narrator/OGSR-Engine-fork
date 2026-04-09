@@ -154,6 +154,8 @@ void CParticleEffect::OnFrame(u32 frame_dt)
             // our actions
             if (m_Def->m_Flags.is(CPEDef::dfFramed | CPEDef::dfAnimated))
                 m_Def->ExecuteAnimate(particles, p_cnt, fDT_STEP);
+            if (m_Def->m_Flags.is(CPEDef::dfCollision))
+                m_Def->ExecuteCollision(particles, p_cnt, fDT_STEP, this);
 
             //-move action
             if (p_cnt)

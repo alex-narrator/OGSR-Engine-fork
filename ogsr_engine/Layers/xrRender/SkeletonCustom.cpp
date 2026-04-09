@@ -479,12 +479,7 @@ void CKinematics::Copy(dxRender_Visual* P)
 void CKinematics::CalculateBones_Invalidate()
 {
     UCalc_Time = 0x0;
-    UCalc_Skeleton = psSkeletonUpdate;
-}
-
-void CKinematics::CalculateBones_InvalidateSkeleton()
-{
-    UCalc_Skeleton = psSkeletonUpdate;
+    UCalc_Visibox = psSkeletonUpdate;
 }
 
 void CKinematics::Spawn()

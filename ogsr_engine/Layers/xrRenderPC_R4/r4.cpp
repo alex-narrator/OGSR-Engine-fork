@@ -75,7 +75,7 @@ void CRender::create()
 
     // options (smap-pool-size)
     o.sun_cascades_smapsize[0] = r2_SmapCascade0Size;
-    o.sun_cascades_smapsize[1] = r2_SmapCascade1Size;
+    o.sun_cascades_smapsize[1] = r2_SmapCascade0Size; // r2_SmapCascade1Size;
     o.sun_cascades_smapsize[2] = r2_SmapCascade2Size;
     o.rain_smapsize = r2_SmapRainSize;
     o.lights_smapsize = r2_SmapLightsSize;
