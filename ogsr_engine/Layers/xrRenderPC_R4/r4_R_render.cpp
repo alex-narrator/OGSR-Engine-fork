@@ -351,7 +351,7 @@ void CRender::Render()
         g_pGamePersistent->Environment().RenderSky(cmd_list);
     }
 
-    const Fcolor sun_color = ((light*)Lights.sun_adapted._get())->color;
+    const Fcolor& sun_color = smart_cast<light*>(Lights.sun_adapted._get())->color;
     const BOOL bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
 
     cmd_list.set_xform_world(Fidentity);

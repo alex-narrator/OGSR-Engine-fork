@@ -190,7 +190,7 @@ IC bool IsValuableToRender(dxRender_Visual* pVisual, const bool sm, const bool i
 
 ICF float CalcSSA(float& distSQ, const Fvector& C, dxRender_Visual* V)
 {
-    const float R = V->getVisData().sphere.R + 0;
+    const float& R = V->getVisData().sphere.R;
     distSQ = Device.vCameraPosition.distance_to_sqr(C) + EPS;
     return R / distSQ;
 }
@@ -402,7 +402,7 @@ void R_dsgraph_structure::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 
             if (pVisual->base_crc)
             {
-                const float lod = calcLOD(SSA, pVisual->getVisData().sphere.R);
+                const float lod = calcLOD(SSA);
                 pVisual->select_lod_id(clampr(1.f - (1.f - lod) * ps_r__LOD_k, 0.01f, 1.f), context_id, phase == CRender::PHASE_SMAP);
 
                 if (auto it = normalItems.trees->find(pVisual->crc[context_id]); it != normalItems.trees->end())

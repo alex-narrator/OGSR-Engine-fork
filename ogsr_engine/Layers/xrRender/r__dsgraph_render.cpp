@@ -58,7 +58,7 @@ void R_dsgraph_structure::r_dsgraph_render_graph_static(const u32 _priority, con
                 const mapNormalItems& items = it.second;
                 for (const auto& item : *items.items)
                 {
-                    const float lod = calcLOD(item.ssa, item.pVisual->getVisData().sphere.R);
+                    const float lod = calcLOD(item.ssa);
                     cmd_list.lod.set_lod(lod);
 
                     {
@@ -169,7 +169,7 @@ void R_dsgraph_structure::r_dsgraph_render_graph_dynamic(u32 _priority)
                     RImplementation.apply_object(cmd_list, item.pObject, phase == CRender::PHASE_NORMAL);
                     cmd_list.apply_lmaterial();
 
-                    const float lod = calcLOD(item.ssa, item.pVisual->getVisData().sphere.R);
+                    const float lod = calcLOD(item.ssa);
                     cmd_list.lod.set_lod(lod);
                     item.pVisual->Render(cmd_list, lod, phase == CRender::PHASE_SMAP);
                 }
@@ -212,7 +212,7 @@ void render_item(u32 context_id, const T& item)
     //     cmd_list.set_CullMode(cullMode == CULL_CW ? CULL_CCW : CULL_CW);
     // }
 
-    const float lod = calcLOD(item.first, V->getVisData().sphere.R);
+    const float lod = calcLOD(item.first);
     dsgraph.cmd_list.lod.set_lod(lod); // !!!
     V->Render(dsgraph.cmd_list, lod, dsgraph.phase == CRender::PHASE_SMAP);
 }
@@ -269,7 +269,7 @@ void render_large_map(const u32 context_id, mapSortedLarge_T& map)
             RImplementation.apply_object(dsgraph.cmd_list, item.pObject, dsgraph.phase == CRender::PHASE_NORMAL);
             dsgraph.cmd_list.apply_lmaterial();
 
-            const float lod = calcLOD(item.ssa, item.pVisual->getVisData().sphere.R);
+            const float lod = calcLOD(item.ssa);
             dsgraph.cmd_list.lod.set_lod(lod);
             item.pVisual->Render(dsgraph.cmd_list, lod, dsgraph.phase == CRender::PHASE_SMAP);
         }
