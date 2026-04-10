@@ -264,9 +264,6 @@ void CActor::cam_Lookout(const Fmatrix& xform, float camera_height)
     }
 }
 
-// Alex ADD: smooth crouch fix
-float cam_HeightInterpolationSpeed = 8.f;
-
 #include "physics.h"
 #include "PHActivationShape.h"
 #include "debug_renderer.h"
@@ -308,7 +305,7 @@ void CActor::cam_Update(float dt, float fFOV)
     // Alex ADD: smooth crouch fix
     if (CurrentHeight != CameraHeight())
     {
-        float smoothK = cam_HeightInterpolationSpeed * dt;
+        float smoothK = m_fCamHeightSpeed * dt;
         if (smoothK > 1.0f)
             smoothK = 1.0f;
 

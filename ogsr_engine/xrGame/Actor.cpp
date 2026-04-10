@@ -327,7 +327,9 @@ void CActor::Load(LPCSTR section)
     SetDefaultVisualOutfit(default_outfit);
 
     //-----------------------------------------
-    m_fLookoutAngle = deg2rad(READ_IF_EXISTS(pSettings, r_float, section, "lookout_angle", ACTOR_LOOKOUT_ANGLE));
+    m_fLookoutAngle = deg2rad(READ_IF_EXISTS(pSettings, r_float, section, "lookout_angle", 45.f));
+    m_fCamLookoutSpeed = READ_IF_EXISTS(pSettings, r_float, section, "lookout_speed", 2.f);
+    m_fCamHeightSpeed = READ_IF_EXISTS(pSettings, r_float, section, "cam_height_speed", 8.f);
 
     // Alex ADD: for smooth crouch fix
     CurrentHeight = CameraHeight();

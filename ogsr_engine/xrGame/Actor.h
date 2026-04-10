@@ -229,6 +229,9 @@ protected:
     bool b_ClearAccel{true};
     bool b_ClearLookout{true};
 
+    float m_fCamHeightSpeed;
+    float m_fCamLookoutSpeed;
+
     // Dropping
     //BOOL b_DropActivated{};
     //float f_DropPower{};
@@ -447,6 +450,7 @@ protected:
 
     float m_fExoFactor;
     float m_fLookoutAngle;
+
     //////////////////////////////////////////////////////////////////////////
     // User input/output
     //////////////////////////////////////////////////////////////////////////
@@ -752,5 +756,3 @@ IC CActorCondition& CActor::conditions() const
 extern CActor* g_actor;
 CActor* Actor();
 extern const float s_fFallTime;
-extern float cam_HeightInterpolationSpeed;
-extern float cam_LookoutSpeed;

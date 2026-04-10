@@ -495,8 +495,6 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
 }
 
 #define ACTOR_ANIM_SECT "actor_animation"
-// Alex ADD: smooth crouch fix
-float cam_LookoutSpeed = 2.f;
 
 void CActor::g_Orientate(u32 mstate_rl, float dt)
 {
@@ -559,7 +557,7 @@ void CActor::g_Orientate(u32 mstate_rl, float dt)
     }
     if (!fsimilar(tgt_roll, r_torso_tgt_roll, EPS))
     {
-        r_torso_tgt_roll = angle_inertion_var(r_torso_tgt_roll, tgt_roll, 0.f, CurrentHeight * PI_MUL_2 * cam_LookoutSpeed, PI_DIV_2, dt);
+        r_torso_tgt_roll = angle_inertion_var(r_torso_tgt_roll, tgt_roll, 0.f, CurrentHeight * PI_MUL_2 * m_fCamLookoutSpeed, PI_DIV_2, dt);
         r_torso_tgt_roll = angle_normalize_signed(r_torso_tgt_roll);
     }
 }

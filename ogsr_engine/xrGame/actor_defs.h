@@ -4,10 +4,6 @@
 
 #pragma once
 
-constexpr auto ACTOR_HEIGHT = 1.75f;
-constexpr auto ACTOR_LOOKOUT_ANGLE = 45.f; // PI_DIV_4;
-constexpr auto ACTOR_LOOKOUT_SPEED = 2.f;
-
 namespace ACTOR_DEFS
 {
 

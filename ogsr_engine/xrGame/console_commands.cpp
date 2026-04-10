@@ -1714,9 +1714,6 @@ void CCC_RegisterCommands()
 
     *g_last_saved_game = 0;
 
-    CMD4(CCC_Float, "g_cam_height_speed", &cam_HeightInterpolationSpeed, 4.0f, 16.0f);
-    CMD4(CCC_Float, "g_cam_lookout_speed", &cam_LookoutSpeed, 1.0f, 4.0f);
-
     CMD3(CCC_Mask, "g_actor_shadow", &psActorFlags, AF_ACTOR_SHADOW);
 
     CMD3(CCC_Mask, "g_bloodmarks_on_dynamics", &psActorFlags, AF_BLOODMARKS_ON_DYNAMIC);

@@ -219,6 +219,9 @@ void CScriptActor::script_register(lua_State* L)
 
                .property("lookout_angle", &CActor::GetLookoutAngle, &CActor::SetLookoutAngle)
                .property("ph_box_id", &CActor::GetPhBoxID, &CActor::SetPhBoxID)
+
+               .def_readwrite("cam_height_speed", &CActor::m_fCamHeightSpeed)
+               .def_readwrite("lookout_speed", &CActor::m_fCamLookoutSpeed)
                 ,
 
                 //move commands
