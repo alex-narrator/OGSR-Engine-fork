@@ -85,7 +85,7 @@ protected:
 
     //параметры броска
 
-    float m_fMinForce, m_fMaxForce, m_fConstForce;
+    float m_fMinForce, m_fMaxForce, m_fConstForce, m_fForceGrowSpeed;
     
     bool m_constpower;
     float m_fThrowForce;

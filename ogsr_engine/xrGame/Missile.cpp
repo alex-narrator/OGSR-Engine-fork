@@ -25,8 +25,6 @@
 #include "debug_renderer.h"
 #include "ActorEffector.h"
 
-float g_fForceGrowSpeed{25.f};
-
 void CMissile::reinit()
 {
     inherited::reinit();
@@ -46,6 +44,7 @@ void CMissile::Load(LPCSTR section)
     m_fMinForce = pSettings->r_float(section, "force_min");
     m_fMaxForce = pSettings->r_float(section, "force_max");
     m_fConstForce = READ_IF_EXISTS(pSettings, r_float, section, "force_const", (m_fMinForce + m_fMaxForce) * 0.5f);
+    m_fForceGrowSpeed = READ_IF_EXISTS(pSettings, r_float, section, "force_grow_speed", 25.f);
 
     m_dwDestroyTimeMax = pSettings->r_u32(section, "destroy_time");
 
@@ -171,7 +170,7 @@ void CMissile::UpdateCL()
             CActor* actor = smart_cast<CActor*>(H_Parent());
             if (actor)
             {
-                m_fThrowForce += (g_fForceGrowSpeed * Device.dwTimeDelta) * .001f;
+                m_fThrowForce += (m_fForceGrowSpeed * Device.dwTimeDelta) * .001f;
                 clamp(m_fThrowForce, m_fMinForce, m_fMaxForce);
             }
         }

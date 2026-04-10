@@ -96,8 +96,6 @@ extern BOOL b_death_anim_velocity;
 #endif
 int g_AI_inactive_time = 0;
 
-extern float g_fForceGrowSpeed;
-
 void get_files_list(xr_vector<shared_str>& files, LPCSTR dir, LPCSTR file_ext)
 {
     VERIFY(dir && file_ext);
@@ -1721,7 +1719,6 @@ void CCC_RegisterCommands()
 
     CMD3(CCC_Mask, "g_actor_shadow", &psActorFlags, AF_ACTOR_SHADOW);
 
-    CMD4(CCC_Float, "missile_force_grow_speed", &g_fForceGrowSpeed, 1.0f, 50.0f); // скорость замаха гранатой/болтом
     CMD3(CCC_Mask, "g_bloodmarks_on_dynamics", &psActorFlags, AF_BLOODMARKS_ON_DYNAMIC);
     
     CMD3(CCC_Mask, "g_throw_dbg", &psActorFlags, AF_THROW_DEBUG);
