@@ -131,7 +131,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
     case kCAM_3: cam_Set(eacFreeLook); break;
     case kWPN_8: {
         if (auto dev = smart_cast<CCustomDevice*>(inventory().ItemFromSlot(DETECTOR_SLOT)))
-            dev->ToggleDevice(/*g_player_hud->attached_item(0) != nullptr*/ false);
+            dev->ToggleDevice(g_player_hud->attached_item(0) != nullptr);
     }
     break;
     case kL_LOOKOUT: {
