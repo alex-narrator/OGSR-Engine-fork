@@ -91,17 +91,11 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
     break;
     case kCROUCH: {
-        if (!psActorFlags.test(AF_HOLD_TO_CROUCH))
-            b_ClearCrouch = !b_ClearCrouch;
-        if (!b_ClearCrouch)
-            mstate_wishful ^= mcCrouch;
+        mstate_wishful ^= mcCrouch;
     }
     break;
     case kACCEL: {
-        if (!psActorFlags.test(AF_HOLD_TO_ACCEL))
-            b_ClearAccel = !b_ClearAccel;
-        if (!b_ClearAccel)
-            mstate_wishful ^= mcAccel;
+        mstate_wishful ^= mcAccel;
     }
     break;
     case kSPRINT: {
@@ -111,19 +105,11 @@ void CActor::IR_OnKeyboardPress(int cmd)
                 pWeapon->OnZoomOut();
         }
 
-        if (!psActorFlags.test(AF_HOLD_TO_CROUCH) && !b_ClearCrouch)
-            b_ClearCrouch = true;
+        mstate_wishful &= ~mcCrouch;
+        mstate_wishful &= ~mcAccel;
+        mstate_wishful &= ~mcLookout;
 
-        if (!psActorFlags.test(AF_HOLD_TO_ACCEL) && !b_ClearAccel)
-            b_ClearAccel = true;
-
-        if (!psActorFlags.test(AF_HOLD_TO_LOOKOUT) && !b_ClearLookout)
-            b_ClearLookout = true;
-
-        if (mstate_wishful & mcSprint)
-            mstate_wishful &= ~mcSprint;
-        else
-            mstate_wishful |= mcSprint;
+        mstate_wishful ^= mcSprint;
     }
     break;
     case kCAM_1: cam_Set(eacFirstEye); break;
@@ -135,17 +121,11 @@ void CActor::IR_OnKeyboardPress(int cmd)
     }
     break;
     case kL_LOOKOUT: {
-        if (!psActorFlags.test(AF_HOLD_TO_LOOKOUT))
-            b_ClearLookout = !b_ClearLookout;
-        if (!b_ClearLookout)
-            mstate_wishful ^= mcLLookout;
+        mstate_wishful ^= mcLLookout;
     }
     break;
     case kR_LOOKOUT: {
-        if (!psActorFlags.test(AF_HOLD_TO_LOOKOUT))
-            b_ClearLookout = !b_ClearLookout;
-        if (!b_ClearLookout)
-            mstate_wishful ^= mcRLookout;
+        mstate_wishful ^= mcRLookout;
     }
     break;
     case kUSE: ActorUse(); break;
@@ -214,16 +194,20 @@ void CActor::IR_OnKeyboardRelease(int cmd)
         //    break;
         case kCROUCH:
             if (psActorFlags.test(AF_HOLD_TO_CROUCH))
-                b_ClearCrouch = true;
+                mstate_wishful &= ~mcCrouch;
             break;
         case kACCEL:
             if (psActorFlags.test(AF_HOLD_TO_ACCEL))
-                b_ClearAccel = true;
+                mstate_wishful &= ~mcAccel;
+            break;
+        case kSPRINT:
+            if (psActorFlags.test(AF_HOLD_TO_SPRINT))
+                mstate_wishful &= ~mcSprint;
             break;
         case kL_LOOKOUT:
         case kR_LOOKOUT:
             if (psActorFlags.test(AF_HOLD_TO_LOOKOUT))
-                b_ClearLookout = true;
+                mstate_wishful &= ~mcLookout;
             break;
         }
     }
@@ -281,26 +265,10 @@ void CActor::IR_OnKeyboardHold(int cmd)
         if (eacFreeLook != cam_active)
             cam_Active()->Move(cmd, 0, LookFactor);
         break;
-    case kACCEL:
-        if (psActorFlags.test(AF_HOLD_TO_ACCEL))
-            mstate_wishful |= mcAccel; 
-        break;
     case kL_STRAFE: mstate_wishful |= mcLStrafe; break;
     case kR_STRAFE: mstate_wishful |= mcRStrafe; break;
-    case kL_LOOKOUT:
-        if (psActorFlags.test(AF_HOLD_TO_LOOKOUT))
-            mstate_wishful |= mcLLookout;
-        break;
-    case kR_LOOKOUT:
-        if (psActorFlags.test(AF_HOLD_TO_LOOKOUT))
-            mstate_wishful |= mcRLookout;
-        break;
     case kFWD: mstate_wishful |= mcFwd; break;
     case kBACK: mstate_wishful |= mcBack; break;
-    case kCROUCH:
-        if (psActorFlags.test(AF_HOLD_TO_CROUCH))
-            mstate_wishful |= mcCrouch;
-        break;
     }
 }
 

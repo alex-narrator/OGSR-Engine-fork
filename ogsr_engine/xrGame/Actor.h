@@ -225,9 +225,6 @@ protected:
     float m_fJumpTime;
     float m_fFallTime;
     float m_fCamHeightFactor{0.87f};
-    bool b_ClearCrouch{true};
-    bool b_ClearAccel{true};
-    bool b_ClearLookout{true};
 
     float m_fCamHeightSpeed;
     float m_fCamLookoutSpeed;

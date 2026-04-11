@@ -51,6 +51,7 @@ void CActor::g_cl_ValidateMState(float dt, u32 mstate_wf)
     {
         // It's impossible to perform right and left lookouts in the same time
         mstate_real &= ~mcLookout;
+        mstate_wishful &= ~mcLookout;
     }
     else if (mstate_wf & mcLookout)
     {
