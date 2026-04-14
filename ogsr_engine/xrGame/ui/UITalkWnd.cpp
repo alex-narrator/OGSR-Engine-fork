@@ -165,37 +165,6 @@ void CUITalkWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 }
 
 
-#include "../Include/xrRender/Kinematics.h"
-
-//////////////////////////////////////////////////////////////////////////
-void UpdateCameraDirection(CGameObject* pTo)
-{
-    //Fvector des_pt;
-    //pTo->Center(des_pt);
-    //des_pt.y += pTo->Radius() * 0.5f;
-
-    const auto k = smart_cast<IKinematics*>(pTo->Visual());
-    const u16 bone_id = k->LL_BoneID("bip01_head");
-
-    Fmatrix matrix;
-    matrix.mul_43(pTo->XFORM(), k->LL_GetBoneInstance(bone_id).mTransform);
-    const Fvector des_pt = matrix.c;
-
-    CCameraBase* cam = Actor()->cam_Active();
-
-    Fvector des_dir;
-    des_dir.sub(des_pt, cam->vPosition);
-
-    float p, h;
-    des_dir.getHP(h, p);
-
-    if (angle_difference(cam->yaw, -h) > 0.2)
-        cam->yaw = angle_inertion_var(cam->yaw, -h, 0.15f, 0.2f, PI_DIV_6, Device.fTimeDelta);
-
-    if (angle_difference(cam->pitch, -p) > 0.2)
-        cam->pitch = angle_inertion_var(cam->pitch, -p, 0.15f, 0.2f, PI_DIV_6, Device.fTimeDelta);
-}
-
 void CUITalkWnd::Update()
 {
     //остановить разговор, если нужно
@@ -219,7 +188,6 @@ void CUITalkWnd::Update()
         UpdateQuestions();
     }
     inherited::Update();
-    UpdateCameraDirection(smart_cast<CGameObject*>(m_pOthersInvOwner));
 }
 
 //////////////////////////////////////////////////////////////////////////
