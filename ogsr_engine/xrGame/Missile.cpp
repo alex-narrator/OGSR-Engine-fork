@@ -820,9 +820,11 @@ void CMissile::ExitContactCallback(bool& do_colide, bool bo1, dContact& c, SGame
 
         SGameMtl* material;
         CMissile* l_this = l_pUD1 ? smart_cast<CMissile*>(l_pUD1->ph_ref_object) : NULL;
+        CPhysicsShellHolder* l_contact_obj = l_pUD2 ? l_pUD2->ph_ref_object : nullptr;
         if (!l_this)
         {
             l_this = l_pUD2 ? smart_cast<CMissile*>(l_pUD2->ph_ref_object) : NULL;
+            l_contact_obj = l_pUD1 ? l_pUD1->ph_ref_object : nullptr;
             material = material_1;
         }
         else
@@ -834,7 +836,7 @@ void CMissile::ExitContactCallback(bool& do_colide, bool bo1, dContact& c, SGame
         if (material->Flags.is(SGameMtl::flPassable))
             return;
 
-        if (!l_this || !l_this->m_kick_on_explode || l_this->has_already_contact)
+        if (!l_this || (!l_this->m_kick_on_explode || (smart_cast<CActor*>(l_this->m_pOwner) && smart_cast<CActor*>(l_contact_obj))) || l_this->has_already_contact)
             return;
 
         bool safe_to_explode = true;
