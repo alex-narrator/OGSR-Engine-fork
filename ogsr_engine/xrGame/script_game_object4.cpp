@@ -308,6 +308,7 @@ TEST_OBJECT_CLASS(CScriptGameObject::IsInventoryBox, IInventoryBox)
 TEST_OBJECT_CLASS(CScriptGameObject::IsWeaponBinoculars, CWeaponBinoculars)
 TEST_OBJECT_CLASS(CScriptGameObject::IsKnife, CWeaponKnife)
 TEST_OBJECT_CLASS(CScriptGameObject::IsPistol, CWeaponPistol)
+TEST_OBJECT_CLASS(CScriptGameObject::IsUsable, CUsableScriptObject)
 // KD
 
 void CScriptGameObject::SetActorCamDir(Fvector _dir)

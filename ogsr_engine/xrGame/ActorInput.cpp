@@ -128,7 +128,6 @@ void CActor::IR_OnKeyboardPress(int cmd)
         mstate_wishful ^= mcRLookout;
     }
     break;
-    case kUSE: ActorUse(); break;
     //case kDROP:
     //    b_DropActivated = TRUE;
     //    f_DropPower = 0;
@@ -364,73 +363,6 @@ bool CActor::use_Holder(CHolderCustom* holder)
         }
 
         return b;
-    }
-}
-
-extern bool g_bDisableAllInput;
-
-void CActor::ActorUse()
-{
-    if (g_bDisableAllInput || HUD().GetUI()->MainInputReceiver())
-        return;
-
-    if (!IsFreeHands())
-        return;
-
-    if (m_holder)
-    {
-        use_Holder(nullptr);
-        return;
-    }
-
-    if (character_physics_support()->movement()->PHCapture())
-    {
-        character_physics_support()->movement()->PHReleaseObject();
-        return;
-    }
-
-    if (m_pUsableObject)
-    {
-        m_pUsableObject->use(this);
-        if (g_bDisableAllInput || HUD().GetUI()->MainInputReceiver())
-            return;
-    }
-
-    bool is_add_act = pInput->iGetAsyncKeyState(get_action_dik(kADDITIONAL_ACTION));
-
-    if (!m_pUsableObject || m_pUsableObject->nonscript_usable())
-    {
-        if (m_pPersonWeLookingAt)
-        {
-            CEntityAlive* pEntityAliveWeLookingAt = smart_cast<CEntityAlive*>(m_pPersonWeLookingAt);
-            VERIFY(pEntityAliveWeLookingAt);
-            if (pEntityAliveWeLookingAt->g_Alive())
-            {
-                TryToTalk();
-                return;
-            }
-        }
-
-        collide::rq_result& RQ = HUD().GetCurrentRayQuery();
-        CPhysicsShellHolder* object = smart_cast<CPhysicsShellHolder*>(RQ.O);
-        if (object)
-        {
-            if (is_add_act)
-            {
-                if (object->ActorCanCapture())
-                {
-                    character_physics_support()->movement()->PHCaptureObject(object, (u16)RQ.element);
-                }
-                return;
-            }
-            else if (auto holder = smart_cast<CHolderCustom*>(object); holder && RQ.range < inventory().GetTakeDist())
-            {
-                VERIFY(m_holder == NULL);
-                if (!holder->Engaged())
-                    use_Holder(holder);
-                return;
-            }
-        }
     }
 }
 

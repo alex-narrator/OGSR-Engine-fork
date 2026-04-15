@@ -260,7 +260,6 @@ protected:
 
     bool use_Vehicle(CHolderCustom* object);
     bool use_MountedWeapon(CHolderCustom* object);
-    void ActorUse();
 
 private:
     CCar* m_pending_car{};

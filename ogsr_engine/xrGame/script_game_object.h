@@ -778,6 +778,7 @@ public:
     _DECLARE_FUNCTION10(IsWeaponBinoculars, bool);
     _DECLARE_FUNCTION10(IsKnife, bool);
     _DECLARE_FUNCTION10(IsPistol, bool);
+    _DECLARE_FUNCTION10(IsUsable, bool);
 
     float GetActorJumpSpeed() const;
     void SetActorJumpSpeed(float _factor);
