@@ -15,6 +15,8 @@ public:
     virtual bool render_item_3d_ui_query() override;
     virtual LPCSTR ui_xml_tag() const { return "elite"; }
 
+    CUIArtefactDetectorElite* GetUI() { return (CUIArtefactDetectorElite*)m_ui; }
+
 protected:
     virtual void UpdateAf() override;
     virtual void CreateUI() override;

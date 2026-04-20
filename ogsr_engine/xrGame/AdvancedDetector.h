@@ -12,6 +12,8 @@ public:
     virtual void on_a_hud_attach() override;
     virtual void on_b_hud_detach() override;
 
+    CUIArtefactDetectorAdv* GetUI() { return (CUIArtefactDetectorAdv*)m_ui; }
+
 protected:
     virtual void UpdateAf() override;
     virtual void CreateUI() override;

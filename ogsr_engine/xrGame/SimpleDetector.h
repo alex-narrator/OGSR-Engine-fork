@@ -11,6 +11,8 @@ public:
     CSimpleDetector() {};
     virtual ~CSimpleDetector() = default;
 
+    CUIArtefactDetectorSimple* GetUI() { return (CUIArtefactDetectorSimple*)m_ui; }
+
 protected:
     virtual void UpdateAf() override;
     virtual void CreateUI() override;

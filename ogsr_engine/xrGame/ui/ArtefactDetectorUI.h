@@ -55,12 +55,13 @@ class CUIArtefactDetectorElite : public CUIArtefactDetectorBase, public CUIWindo
     };
     xr_vector<SDrawOneItem> m_items_to_draw;
     CEliteDetector* m_parent{};
-    Fmatrix m_map_attach_offset{};
 
     void GetUILocatorMatrix(Fmatrix& _m);
 
 public:
     CUIWindow* m_wrk_area{};
+    Fvector m_map_attach_offset_pos{};
+    Fvector m_map_attach_offset_rot{};
 
     virtual void update() override;
     virtual void Draw() override;

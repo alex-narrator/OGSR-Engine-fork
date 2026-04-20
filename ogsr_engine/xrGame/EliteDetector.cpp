@@ -205,12 +205,8 @@ void CUIArtefactDetectorElite::construct(CEliteDetector* p)
         Msg("!![%s] xml file [ui_detector_artefact.xml] not found!", __FUNCTION__);
     }
 
-    Fvector _map_attach_p = pSettings->r_fvector3(m_parent->HudSection(), "ui_pos");
-    Fvector _map_attach_r = pSettings->r_fvector3(m_parent->HudSection(), "ui_rot");
-
-    _map_attach_r.mul(PI / 180.f);
-    m_map_attach_offset.setHPB(_map_attach_r.x, _map_attach_r.y, _map_attach_r.z);
-    m_map_attach_offset.translate_over(_map_attach_p);
+    m_map_attach_offset_pos = READ_IF_EXISTS(pSettings, r_fvector3, m_parent->HudSection(), "ui_pos", Fvector{});
+    m_map_attach_offset_rot = READ_IF_EXISTS(pSettings, r_fvector3, m_parent->HudSection(), "ui_rot", Fvector{});
 }
 
 void CUIArtefactDetectorElite::update()
@@ -281,7 +277,13 @@ void CUIArtefactDetectorElite::GetUILocatorMatrix(Fmatrix& _m)
     u16 bid = m_parent->HudItemData()->m_model->LL_BoneID("cover");
     Fmatrix cover_bone = m_parent->HudItemData()->m_model->LL_GetTransform(bid);
     _m.mul(trans, cover_bone);
-    _m.mulB_43(m_map_attach_offset);
+    
+    Fvector offset_rot{m_map_attach_offset_rot};
+    offset_rot.mul(PI / 180.f);
+    Fmatrix attach_offset{};
+    attach_offset.setHPB(offset_rot.x, offset_rot.y, offset_rot.z);
+    attach_offset.translate_over(m_map_attach_offset_pos);
+    _m.mulB_43(attach_offset);
 }
 
 void CUIArtefactDetectorElite::Clear() { m_items_to_draw.clear(); }

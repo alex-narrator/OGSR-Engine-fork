@@ -1919,6 +1919,8 @@ player_hud_motion_container* player_hud::get_hand_motions(LPCSTR section, IKinem
 
 
 #include "WeaponMagazined.h"
+#include "EliteDetector.h"
+#include "ui/ArtefactDetectorUI.h"
 void player_hud::SaveCfg(u16 item_idx) const
 {
     const auto& item = m_attached_items[item_idx];
@@ -1991,9 +1993,7 @@ void player_hud::SaveCfg(u16 item_idx) const
     pCfg.w_fvector3(sect_name, "custom_ui_pos", item->m_parent_hud_item->script_ui_offset[0]);
     pCfg.w_fvector3(sect_name, "custom_ui_rot", item->m_parent_hud_item->script_ui_offset[1]);
 
-    const auto& Wpn = smart_cast<CWeaponMagazined*>(item->m_parent_hud_item);
-
-    if (Wpn)
+    if (const auto Wpn = smart_cast<CWeaponMagazined*>(item->m_parent_hud_item))
     {
         if (Wpn->IsAddonAttached(eLaser))
         {
@@ -2020,6 +2020,12 @@ void player_hud::SaveCfg(u16 item_idx) const
                 pCfg.w_float(sect_name, val_name, Wpn->hud_attach_visual_scale[i]);
             }
         }
+    }
+
+    if (const auto Det = smart_cast<CEliteDetector*>(item->m_parent_hud_item))
+    {
+        pCfg.w_fvector3(sect_name, "ui_pos", Det->GetUI()->m_map_attach_offset_pos);
+        pCfg.w_fvector3(sect_name, "ui_rot", Det->GetUI()->m_map_attach_offset_rot);
     }
 
     Msg("--[%s] data saved to [%s]", __FUNCTION__, pCfg.fname());

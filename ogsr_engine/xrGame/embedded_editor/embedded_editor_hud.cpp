@@ -10,9 +10,11 @@
 #include "embedded_editor_hud.h"
 #include "embedded_editor_helper.h"
 #include "../../XR_3DA/device.h"
-#include "../player_hud.h"
-#include "../WeaponMagazined.h"
-#include "../Inventory.h"
+#include "player_hud.h"
+#include "WeaponMagazined.h"
+#include "Inventory.h"
+#include "EliteDetector.h"
+#include "ui/ArtefactDetectorUI.h"
 #include "debug_renderer.h"
 #include "HUDManager.h"
 
@@ -27,7 +29,6 @@ void ShowHudEditor(bool& show)
 
     bool showSeparator = true;
     auto item = g_player_hud->attached_item(0);
-    auto Wpn = smart_cast<CWeaponMagazined*>(Actor()->inventory().ActiveItem());
 
     static float drag_pos_intensity = 0.0001f;
     static float drag_rot_intensity = 0.0001f;
@@ -102,7 +103,7 @@ void ShowHudEditor(bool& show)
         if (showSeparator)
             ImGui::Separator();
 
-        if (Wpn)
+        if (const auto Wpn = smart_cast<CWeaponMagazined*>(item->m_parent_hud_item))
         {
             auto& render = Level().debug_renderer();
             // Laser light offsets
@@ -191,6 +192,14 @@ void ShowHudEditor(bool& show)
         ImGui::DragFloat3("custom_ui_rot 1", (float*)&item_1->m_parent_hud_item->script_ui_offset[1], drag_rot_intensity, NULL, NULL, "%.6f");
         if (showSeparator)
             ImGui::Separator();
+
+        if (const auto Det = smart_cast<CEliteDetector*>(item_1->m_parent_hud_item))
+        {
+            ImGui::DragFloat3("ui_pos", (float*)&Det->GetUI()->m_map_attach_offset_pos, drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::DragFloat3("ui_rot", (float*)&Det->GetUI()->m_map_attach_offset_rot, drag_rot_intensity, NULL, NULL, "%.6f");
+            if (showSeparator)
+                ImGui::Separator();
+        }
     }
 
     if (ImGui::Button("Save to file"))
