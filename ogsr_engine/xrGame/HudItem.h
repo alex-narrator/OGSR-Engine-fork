@@ -150,7 +150,7 @@ public:
     virtual void OnHiddenItem(){};
 
     virtual void OnAnimationEnd(u32 state);
-    virtual void OnMotionMark(u32 state, const motion_marks&){};
+    virtual void OnMotionMark(u32 state, const motion_marks&);
     virtual void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd);
 
     virtual void PlayAnimIdle();

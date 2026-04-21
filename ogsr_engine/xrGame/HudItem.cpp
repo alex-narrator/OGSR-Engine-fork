@@ -353,6 +353,12 @@ void CHudItem::UpdateCL()
         script_ui->Update();
 }
 
+void CHudItem::OnMotionMark(u32 state, const motion_marks& M)
+{
+    if (auto actor = smart_cast<CActor*>(object().H_Parent()))
+        actor->callback(GameObject::eOnMotionMark)(object().lua_game_object(), state, M.name.c_str());
+}
+
 void CHudItem::OnH_A_Chield() {}
 
 void CHudItem::OnH_B_Chield()

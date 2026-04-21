@@ -729,6 +729,7 @@ public:
     void SetIIFlags(Flags16);
     Flags16 GetIIFlags();
     u32 GetHudItemState();
+    void SwitchHudItemState(u32 state);
     bool IsPending() const;
     void SetAimInertion(float);
     float GetRadius();

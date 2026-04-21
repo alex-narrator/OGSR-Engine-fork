@@ -408,6 +408,7 @@ class_<CScriptGameObject> script_register_game_object2(class_<CScriptGameObject>
         .def("get_bone_name", &CScriptGameObject::GetBoneName)
 
         .def("get_hud_item_state", &CScriptGameObject::GetHudItemState)
+        .def("switch_hud_item_state", &CScriptGameObject::SwitchHudItemState)
         .def("is_pending", &CScriptGameObject::IsPending)
         .def("set_aim_inertion", &CScriptGameObject::SetAimInertion)
         .def("show_item_hud", &CScriptGameObject::ShowItemHud)

@@ -658,6 +658,13 @@ u32 CScriptGameObject::GetHudItemState()
     return k->GetState();
 }
 
+void CScriptGameObject::SwitchHudItemState(u32 state)
+{
+    CHudItem* k = smart_cast<CHudItem*>(&object());
+    ASSERT_FMT(k, "CHudItem : cannot access class member SwitchState!");
+    k->SwitchState(state);
+}
+
 bool CScriptGameObject::IsPending() const
 {
     CHudItem* k = smart_cast<CHudItem*>(&object());
