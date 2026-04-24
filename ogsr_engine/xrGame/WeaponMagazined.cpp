@@ -686,8 +686,11 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
     switch (state)
     {
     case eReload:
-        ReloadMagazine();
-        HandleCartridgeInChamber();
+        if (!m_reloadMotionMarksAvailable)
+        {
+            ReloadMagazine();
+            HandleCartridgeInChamber();
+        }
         m_sounds.StopSound("sndReload");
         m_sounds.StopSound("sndReloadPartly");
         m_sounds.StopSound("sndReloadJammed");
@@ -791,6 +794,7 @@ void CWeaponMagazined::switch2_Reload()
     PlayAnimReload();
     SetPending(TRUE);
     bullet_update = false;
+    m_reloadMotionMarksAvailable = m_current_motion_def && !m_current_motion_def->marks.empty();
 }
 
 void CWeaponMagazined::switch2_Hiding()
@@ -1618,6 +1622,7 @@ void CWeaponMagazined::OnMotionMark(u32 state, const motion_marks& M)
         else
         {
             ReloadMagazine();
+            HandleCartridgeInChamber();
         }
     }
 }

@@ -56,6 +56,8 @@ protected:
     void SetFlashlightRGB(float, float, float, int = 0);
     void SetFlashlightType(int type, int target = 0);
 
+    bool m_reloadMotionMarksAvailable{};
+
 protected:
     virtual void OnMagazineEmpty();
 
