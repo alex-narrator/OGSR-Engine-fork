@@ -78,8 +78,6 @@ public:
 
     virtual float GetWeaponDeterioration();
 
-    virtual void PlayAnimShutter() override;
-    virtual void PlayAnimShutterMisfire() override;
     virtual bool IsDirectReload(CWeaponAmmo*);
     virtual void SetQueueSize(int size);
     virtual void UnloadWeaponFull();

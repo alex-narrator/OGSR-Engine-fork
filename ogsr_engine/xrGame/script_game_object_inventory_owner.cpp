@@ -295,7 +295,7 @@ void CScriptGameObject::UnloadMagazine(bool spawn_ammo, bool unload_gl)
         return;
 
     weapon_magazined->UnloadMagazine(spawn_ammo);
-    weapon_magazined->ShutterAction();
+    weapon_magazined->UnloadChamber(spawn_ammo);
     if (unload_gl)
     {
         auto WpnMagazWgl = smart_cast<CWeaponMagazinedWGrenade*>(weapon_magazined);

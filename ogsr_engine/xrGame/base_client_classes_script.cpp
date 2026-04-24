@@ -135,7 +135,6 @@ void CObjectScript::script_register(lua_State* L)
                       value("eThrow", int(CHudItem::EHudStates::eThrow)),
                       value("eThrowEnd", int(CHudItem::EHudStates::eThrowEnd)),
                       value("eActivating", int(CHudItem::EHudStates::eActivating)),
-                      value("eShutter", int(CHudItem::EHudStates::eShutter)),
                       value("eIdleZoom", int(CHudItem::EHudStates::eIdleZoom)),
                       value("eIdleZoomIn", int(CHudItem::EHudStates::eIdleZoomIn)),
                       value("eIdleZoomOut", int(CHudItem::EHudStates::eIdleZoomOut))

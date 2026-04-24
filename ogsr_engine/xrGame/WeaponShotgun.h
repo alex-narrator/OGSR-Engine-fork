@@ -42,9 +42,6 @@ protected:
     virtual u8 AddCartridge(u8 cnt);
     virtual void ReloadMagazine();
 
-    virtual void PlayAnimShutter();
-    virtual void PlayAnimShutterMisfire();
-
     bool m_stop_triStateReload{};
     bool has_anm_reload_jammed{};
     bool SecondCartridge{};

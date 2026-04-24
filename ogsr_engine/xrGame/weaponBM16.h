@@ -25,8 +25,6 @@ protected:
     virtual void PlayAnimIdleMovingCrouchSlow() override;
     virtual void PlayAnimIdleSprint();
     virtual void PlayAnimIdle();
-    virtual void PlayAnimShutter() override;
-    virtual void PlayAnimShutterMisfire() override;
     virtual void PlayAnimCheckMisfire() override;
     virtual void PlayAnimSprintStart() override;
     virtual void PlayAnimSprintEnd() override;

@@ -110,9 +110,6 @@ void CWeaponMagazined::Load(LPCSTR section)
         m_sounds.LoadSound(section, "snd_aim_end", "sndAimEnd", SOUND_TYPE_ITEM_HIDING);
 
     //
-    m_sounds.LoadSound(section, pSettings->line_exist(section, "snd_shutter") ? "snd_shutter" : "snd_draw", "sndShutter", SOUND_TYPE_WEAPON_RECHARGING);
-    m_sounds.LoadSound(section, pSettings->line_exist(section, "snd_shutter_misfire") ? "snd_shutter_misfire" : "snd_draw", "sndShutterMisfire", SOUND_TYPE_WEAPON_RECHARGING);
-    //
     if (pSettings->line_exist(section, "snd_unload"))
         m_sounds.LoadSound(section, "snd_unload", "sndUnload", SOUND_TYPE_WEAPON_RECHARGING);
 
@@ -275,7 +272,7 @@ bool CWeaponMagazined::TryReload()
     }
     if (m_pCurrentInventory)
     {
-        if (TryToGetAmmo(m_ammoType) || unlimited_ammo())
+        if (TryToGetAmmo(m_ammoType) || unlimited_ammo() || IsMisfire())
         {
             SetPending(TRUE);
             SwitchState(eReload);
@@ -324,10 +321,11 @@ void CWeaponMagazined::UnloadMagazine(bool spawn_ammo)
 void CWeaponMagazined::ReloadMagazine()
 {
     m_dwAmmoCurrentCalcFrame = 0;
-    // устранить осечку при полной перезарядке
-    if (IsMisfire() && (!HasChamber() || m_magazine.empty()))
+    // устранить осечку при перезарядке
+    if (IsMisfire() && !IsGrenadeMode())
     {
         SetMisfire(false);
+        return;
     }
     // переменная блокирует использование
     // только разных типов патронов
@@ -457,7 +455,6 @@ void CWeaponMagazined::OnStateSwitch(u32 S, u32 oldState)
     case eShowing: switch2_Showing(); break;
     case eHiding: switch2_Hiding(); break;
     case eHidden: switch2_Hidden(); break;
-    case eShutter: switch2_Shutter(); break;
     }
 }
 
@@ -698,10 +695,6 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
         SwitchState(eIdle);
         break;
     }
-    case eShutter:
-        ShutterAction();
-        SwitchState(eIdle);
-        break; // End of Shutter animation
     case eMisfire:
     case eFire:
     case eFire2: SwitchState(eIdle); break;
@@ -839,12 +832,7 @@ bool CWeaponMagazined::Action(s32 cmd, u32 flags)
     case kWPN_RELOAD: {
         if (flags & CMD_START)
         {
-            if (pInput->iGetAsyncKeyState(get_action_dik(kADDITIONAL_ACTION)))
-            {
-                OnShutter();
-                return true;
-            }
-            else if (CanBeReloaded())
+            if (CanBeReloaded())
             {
                 Reload();
                 return true;
@@ -1481,24 +1469,12 @@ void CWeaponMagazined::PlayAnimHide()
 
 void CWeaponMagazined::PlayAnimReload()
 {
-    //if (IsMisfire())
-    //    PlayHUDMotion({iAmmoElapsed == 1 ? "anm_reload_jammed_last" : "anm_reload_jammed", "anm_reload_jammed", "anm_reload_empty", "anim_reload", "anm_reload"}, true, GetState());
-    //else if (IsPartlyReloading())
-    //    PlayHUDMotion({"anim_reload_partly", "anm_reload_partly", "anim_reload", "anm_reload"}, true, GetState());
-    //else
-    //    PlayHUDMotion({"anm_reload_empty", "anim_reload", "anm_reload"}, true, GetState());
-
-    if (IsPartlyReloading())
-        PlayHUDMotion({"anim_reload_partly", "anm_reload_partly", "anim_reload", "anm_reload"}, true, GetState());
-    else if (IsSingleReloading())
-    {
-        if (AnimationExist({"anm_reload_single"}))
-            PlayHUDMotion("anm_reload_single", true, GetState());
-        else
-            PlayHUDMotion({"anim_draw", "anm_show"}, false, GetState());
-    }
-    else if (IsMisfire())
+    if (IsMisfire())
         PlayHUDMotion({iAmmoElapsed == 1 ? "anm_reload_jammed_last" : "anm_reload_jammed", "anm_reload_jammed", "anm_reload_empty", "anim_reload", "anm_reload"}, true, GetState());
+    else if (IsPartlyReloading())
+        PlayHUDMotion({"anim_reload_partly", "anm_reload_partly", "anim_reload", "anm_reload"}, true, GetState());
+    else if (IsSingleReloading() && AnimationExist("anm_reload_single"))
+        PlayHUDMotion({"anm_reload_single", "anim_reload", "anm_reload"}, true, GetState());
     else
         PlayHUDMotion({"anm_reload_empty", "anim_reload", "anm_reload"}, true, GetState());
 }
@@ -1887,66 +1863,11 @@ void CWeaponMagazined::HandleCartridgeInChamber()
     }
 }
 
-// работа затвора
-void CWeaponMagazined::OnShutter() { SwitchState(eShutter); }
-//
-void CWeaponMagazined::switch2_Shutter()
+void CWeaponMagazined::UnloadChamber(bool spawn_ammo)
 {
-    //if (IsZoomed())
-    //    OnZoomOut();
-    IsMisfire() ? PlayAnimShutterMisfire() : PlayAnimShutter();
-    SetPending(TRUE);
-}
-//
-void CWeaponMagazined::PlayAnimShutter()
-{
-    VERIFY(GetState() == eShutter);
-    AnimationExist("anm_shutter") ? PlayHUDMotion("anm_shutter", true, GetState()) : PlayHUDMotion({"anim_draw", "anm_show"}, true, GetState(), false);
-    PlaySound("sndShutter", get_LastFP());
-}
-void CWeaponMagazined::PlayAnimShutterMisfire()
-{
-    VERIFY(GetState() == eShutter);
-    if (AnimationExist("anm_shutter_misfire"))
-    {
-        PlayHUDMotion("anm_shutter_misfire", true, GetState());
-        PlaySound("sndShutterMisfire", get_LastFP());
+    if (!HasChamber() || m_magazine.empty())
         return;
-    }
-    PlayAnimShutter();
-}
-
-//void CWeaponMagazined::PlayAnimCheckMisfire()
-//{
-//    string128 check_misfire;
-//    xr_strconcat(check_misfire, "anm_check_misfire", IsAddonAttached(eLauncher) ? (!IsGrenadeMode() ? "_w_gl" : "_g") : "");
-//    if (AnimationExist(check_misfire))
-//    {
-//        if (IsZoomed())
-//            OnZoomOut();
-//        PlayHUDMotion(check_misfire, true, GetState());
-//    }
-//    else
-//        SwitchState(eIdle);
-//}
-//
-void CWeaponMagazined::ShutterAction() // передёргивание затвора
-{
-    bool b_spawn_ammo{true};
-    if (IsMisfire())
-    {
-        b_spawn_ammo = false;
-        SetMisfire(false);
-    }
-
-    if (HasChamber() && !m_magazine.empty())
-    {
-        UnloadAmmo(1, b_spawn_ammo);
-        // Shell Drop
-        Fvector vel;
-        PHGetLinearVell(vel);
-        OnShellDrop(get_LastSP(), vel);
-    }
+    UnloadAmmo(1, spawn_ammo);
 }
 
 float CWeaponMagazined::GetConditionMisfireProbability() const
@@ -2020,7 +1941,7 @@ void CWeaponMagazined::UnloadWeaponFull()
 {
     PlaySound("sndUnload", get_LastFP());
     UnloadMagazine();
-    ShutterAction();
+    UnloadChamber();
 }
 
 void CWeaponMagazined::UnloadAndDetachAllAddons()

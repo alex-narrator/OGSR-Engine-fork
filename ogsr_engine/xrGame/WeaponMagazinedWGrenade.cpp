@@ -40,8 +40,6 @@ void CWeaponMagazinedWGrenade::Load(LPCSTR section)
     m_sounds.LoadSound(section, "snd_reload_grenade", "sndReloadG", SOUND_TYPE_WEAPON_RECHARGING);
     m_sounds.LoadSound(section, "snd_switch", "sndSwitch", SOUND_TYPE_WEAPON_RECHARGING);
 
-    m_sounds.LoadSound(section, pSettings->line_exist(section, "snd_shutter_g") ? "snd_shutter_g" : "snd_draw", "sndShutterG", SOUND_TYPE_WEAPON_RECHARGING);
-
     m_sFlameParticles2 = pSettings->r_string(section, "grenade_flame_particles");
 
     if (m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
@@ -630,6 +628,8 @@ void CWeaponMagazinedWGrenade::PlayAnimReload()
             PlayHUDMotion({"anm_reload_jammed_w_gl", "anm_reload_empty_w_gl", "anim_reload_gl", "anm_reload_w_gl"}, true, GetState());
         else if (IsPartlyReloading())
             PlayHUDMotion({"anim_reload_gl_partly", "anm_reload_w_gl_partly", "anim_reload_gl", "anm_reload_w_gl"}, true, GetState());
+        else if (IsSingleReloading() && AnimationExist("anm_reload_single_w_gl"))
+            PlayHUDMotion({"anm_reload_single_w_gl", "anim_reload_gl", "anm_reload_w_gl"}, true, GetState());
         else
             PlayHUDMotion({"anm_reload_empty_w_gl", "anim_reload_gl", "anm_reload_w_gl"}, true, GetState());
     }
@@ -876,41 +876,6 @@ bool CWeaponMagazinedWGrenade::IsNecessaryItem(const shared_str& item_sect)
 float CWeaponMagazinedWGrenade::Weight() const { return inherited::Weight() + GetAmmoInMagazineWeight(m_magazine2); }
 
 float CWeaponMagazinedWGrenade::GetWeaponDeterioration() { return IsGrenadeMode() ? conditionDecreasePerShotGL : inherited::GetWeaponDeterioration(); }
-
-void CWeaponMagazinedWGrenade::PlayAnimShutter()
-{
-    if (!IsAddonAttached(eLauncher))
-    {
-        inherited::PlayAnimShutter();
-        return;
-    }
-    else if (IsGrenadeMode())
-        AnimationExist("anm_shutter_g") ? PlayHUDMotion("anm_shutter_g", true, GetState()) : PlayHUDMotion({"anim_draw_g", "anm_show_g"}, true, GetState());
-    else
-        AnimationExist("anm_shutter_w_gl") ? PlayHUDMotion("anm_shutter_w_gl", true, GetState()) : PlayHUDMotion({"anim_draw_gl", "anm_show_w_gl"}, true, GetState());
-    PlaySound("sndShutter", get_LastFP());
-}
-void CWeaponMagazinedWGrenade::PlayAnimShutterMisfire()
-{
-    if (!IsAddonAttached(eLauncher))
-    {
-        inherited::PlayAnimShutterMisfire();
-        return;
-    }
-    else if (IsGrenadeMode() && AnimationExist("anm_shutter_misfire_g"))
-    {
-        PlayHUDMotion("anm_shutter_misfire_g", true, GetState());
-        PlaySound("sndShutterMisfire", get_LastFP());
-        return;
-    }
-    else if (!IsGrenadeMode() && AnimationExist("anm_shutter_misfire_w_gl"))
-    {
-        PlayHUDMotion("anm_shutter_misfire_w_gl", true, GetState());
-        PlaySound("sndShutterMisfire", get_LastFP());
-        return;
-    }
-    PlayAnimShutter();
-}
 
 void CWeaponMagazinedWGrenade::UnloadWeaponFull()
 {

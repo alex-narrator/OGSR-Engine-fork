@@ -192,15 +192,7 @@ void CWeaponPistol::PlayAnimShoot()
 
 void CWeaponPistol::OnAnimationEnd(u32 state)
 {
-    if ((state == eHiding || state == eShutter) && m_opened)
-    {
+    if (state == eHiding && m_opened)
         m_opened = false;
-    }
     inherited::OnAnimationEnd(state);
 }
-
-//void CWeaponPistol::UpdateSounds()
-//{
-//    inherited::UpdateSounds();
-//    UpdateSoundPosition("sndClose", get_LastFP());
-//}

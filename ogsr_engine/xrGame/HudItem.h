@@ -44,7 +44,6 @@ public:
         eThrow,
         eThrowEnd,
         eActivating,
-        eShutter,
         eIdleZoom,
         eIdleZoomIn,
         eIdleZoomOut,

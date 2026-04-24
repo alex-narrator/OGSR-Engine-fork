@@ -407,22 +407,6 @@ void CWeaponShotgun::OnStateSwitch(u32 S, u32 oldState)
     };
 }
 
-void CWeaponShotgun::PlayAnimShutter()
-{
-    AnimationExist("anm_shutter") ? PlayHUDMotion("anm_shutter", true, GetState()) : PlayHUDMotion({"anm_shots"}, true, GetState());
-    PlaySound("sndShutter", get_LastFP());
-}
-void CWeaponShotgun::PlayAnimShutterMisfire()
-{
-    if (AnimationExist("anm_shutter_misfire"))
-    {
-        PlayHUDMotion("anm_shutter_misfire", true, GetState());
-        PlaySound("sndShutterMisfire", get_LastFP());
-        return;
-    }
-    PlayAnimShutter();
-}
-
 bool CWeaponShotgun::HaveCartridgeInInventory(u8 cnt)
 {
     if (unlimited_ammo())
@@ -507,19 +491,24 @@ void CWeaponShotgun::ReloadMagazine()
 { //Используется только при отключенном tri_state_reload
     m_dwAmmoCurrentCalcFrame = 0;
 
-    if (!m_pCurrentInventory)
-        return;
-
-    u8 cnt = AddCartridge(1);
-    while (cnt == 0)
+    if (IsMisfire())
+        SetMisfire(false);
+    else
     {
-        if (m_magazine.size() >= (u32)iMagazineSize || !HaveCartridgeInInventory(1))
+        if (!m_pCurrentInventory)
+            return;
+
+        u8 cnt = AddCartridge(1);
+        while (cnt == 0)
         {
-            if (m_bDirectReload)
-                m_bDirectReload = false;            
-            break;
+            if (m_magazine.size() >= (u32)iMagazineSize || !HaveCartridgeInInventory(1))
+            {
+                if (m_bDirectReload)
+                    m_bDirectReload = false;
+                break;
+            }
+            cnt = AddCartridge(1);
         }
-        cnt = AddCartridge(1);
     }
 }
 
@@ -593,4 +582,4 @@ void CWeaponShotgun::InitAddons()
     inherited::InitAddons();
 }
 
-bool CWeaponShotgun::CanBeReloaded() { return iAmmoElapsed < iMagazineSize; }
+bool CWeaponShotgun::CanBeReloaded() { return iAmmoElapsed < iMagazineSize || IsMisfire(); }

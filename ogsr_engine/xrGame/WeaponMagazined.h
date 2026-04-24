@@ -134,8 +134,8 @@ public:
     //
     virtual bool IsSingleReloading();
 
-    // действие передёргивания затвора
-    virtual void ShutterAction();
+    // розрядити патронник
+    virtual void UnloadChamber(bool = true);
     // сохранение типа патрона в патроннике при смешанной зарядке
     virtual void HandleCartridgeInChamber();
 
@@ -270,10 +270,10 @@ protected:
     bool ShouldPlayFlameParticles();
 
     // передёргивание затвора
-    virtual void OnShutter();
-    virtual void switch2_Shutter();
-    virtual void PlayAnimShutter();
-    virtual void PlayAnimShutterMisfire();
+    //virtual void OnShutter();
+    //virtual void switch2_Shutter();
+    //virtual void PlayAnimShutter();
+    //virtual void PlayAnimShutterMisfire();
 
     virtual void UpdateMagazineVisibility();
     bool ScopeRespawn();
