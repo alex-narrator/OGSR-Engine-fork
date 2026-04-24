@@ -562,6 +562,13 @@ void CWeaponMagazined::state_Fire(float dt)
     //	Msg("%d && %d && (%d || %d) && (%d || %d)", !m_magazine.empty(), fTime<=0, IsWorking(), m_bFireSingleShot, m_iQueueSize < 0, m_iShotNum < m_iQueueSize);
     while (!m_magazine.empty() && fTime <= 0 && (IsWorking() || m_bFireSingleShot) && (m_iQueueSize < 0 || m_iShotNum < m_iQueueSize))
     {
+        if (CheckForMisfire() && !IsGrenadeMode())
+        {
+            OnEmptyClick();
+            StopShooting();
+            return;
+        }
+
         m_bFireSingleShot = false;
 
         VERIFY(fTimeToFire > 0.f);
@@ -584,8 +591,8 @@ void CWeaponMagazined::state_Fire(float dt)
 
         ++m_iShotNum;
 
-        if (!IsGrenadeMode())
-            CheckForMisfire();
+        //if (!IsGrenadeMode())
+        //    CheckForMisfire();
         OnShot();
 
         if (smart_cast<CWeaponBM16*>(this) && IsMisfire())
