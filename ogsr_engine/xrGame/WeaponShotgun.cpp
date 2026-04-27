@@ -18,7 +18,6 @@ void CWeaponShotgun::Load(LPCSTR section)
     m_sounds.LoadSound(section, "snd_shoot_duplet", "sndShotBoth", SOUND_TYPE_WEAPON_SHOOTING);
 
     m_bTriStateReload = READ_IF_EXISTS(pSettings, r_bool, section, "tri_state_reload", false);
-    m_bDrumMagazineReload = READ_IF_EXISTS(pSettings, r_bool, section, "drum_magazine_reload", false);
     m_bTriStateReloadPartly = READ_IF_EXISTS(pSettings, r_bool, section, "tri_state_reload_partly", false);
 
     if (m_bTriStateReload)
@@ -474,7 +473,7 @@ u8 CWeaponShotgun::AddCartridge(u8 cnt)
         //l_cartridge.m_LocalAmmoType = u8(m_ammoType);
         l_cartridge.Load(m_ammoTypes[m_ammoType].c_str(), u8(m_ammoType));
         /*m_magazine.push_back(l_cartridge);*/
-        if (!m_magazine.size() || m_bDrumMagazineReload)
+        if (!m_magazine.size() || !HasChamber())
             m_magazine.push_back(l_cartridge);
         else
             m_magazine.insert(m_magazine.end() - 1, l_cartridge);
