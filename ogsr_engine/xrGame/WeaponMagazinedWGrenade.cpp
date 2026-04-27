@@ -877,15 +877,6 @@ float CWeaponMagazinedWGrenade::Weight() const { return inherited::Weight() + Ge
 
 float CWeaponMagazinedWGrenade::GetWeaponDeterioration() { return IsGrenadeMode() ? conditionDecreasePerShotGL : inherited::GetWeaponDeterioration(); }
 
-void CWeaponMagazinedWGrenade::UnloadWeaponFull()
-{
-    if (!IsGrenadeMode())
-        PerformSwitchGL();
-    UnloadMagazine();
-    PerformSwitchGL();
-    inherited::UnloadWeaponFull();
-}
-
 bool CWeaponMagazinedWGrenade::IsPartlyReloading() const
 {
     if (IsGrenadeMode())

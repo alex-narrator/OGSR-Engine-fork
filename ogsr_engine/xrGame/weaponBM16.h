@@ -7,8 +7,6 @@ class CWeaponBM16 : public CWeaponShotgun
 {
     typedef CWeaponShotgun inherited;
 
-    HUD_SOUND m_sndReload1;
-
 public:
     virtual ~CWeaponBM16() {};
     virtual void Load(LPCSTR section);
@@ -30,7 +28,6 @@ protected:
     virtual void PlayAnimSprintEnd() override;
     virtual void PlayReloadSound();
     /*virtual void OnShot();*/
-    /*virtual void UpdateSounds() override;*/
 
     virtual size_t GetWeaponTypeForCollision() const override { return BM_16; }
 

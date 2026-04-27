@@ -80,5 +80,4 @@ public:
 
     virtual bool IsDirectReload(CWeaponAmmo*);
     virtual void SetQueueSize(int size);
-    virtual void UnloadWeaponFull();
 };

@@ -13,5 +13,7 @@ void CWeaponAmmo::script_register(lua_State* L)
                   .def_readonly("box_curr", &CWeaponAmmo::m_boxCurr)
                   .def_readonly("box_ammo_type", &CWeaponAmmo::m_cur_ammo_type)
                   .def("is_magazine", &CWeaponAmmo::IsBoxReloadable)
-                  .def("ammo_sect", &CWeaponAmmo::GetAmmoSect)];
+                  .def("ammo_sect", &CWeaponAmmo::GetAmmoSect)
+                  .def("unload_box", &CWeaponAmmo::UnloadBox)
+    ];
 }

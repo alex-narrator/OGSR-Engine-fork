@@ -283,10 +283,24 @@ bool CScriptGameObject::MarkedDropped(CScriptGameObject* item)
 
 void CScriptGameObject::UnloadMagazine(bool spawn_ammo, bool unload_gl)
 {
-    auto weapon_magazined = smart_cast<CWeaponMagazined*>(&object());
-    if (!weapon_magazined)
+    const auto weapon_magazined = smart_cast<CWeaponMagazined*>(&object());
+    const auto ammo_magazine = smart_cast<CWeaponAmmo*>(&object());
+
+    if (!weapon_magazined && !ammo_magazine)
     {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject::UnloadMagazine non-CWeaponMagazined object !!!");
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject::UnloadMagazine non-CWeaponMagazined and non-CWeaponAmmo object !!!");
+        return;
+    }
+
+    if (ammo_magazine)
+    {
+        if (ammo_magazine->IsBoxReloadable())
+        {
+            if (spawn_ammo)
+                ammo_magazine->UnloadBox();
+            else
+                ammo_magazine->m_boxCurr = 0;
+        }
         return;
     }
 
@@ -295,7 +309,10 @@ void CScriptGameObject::UnloadMagazine(bool spawn_ammo, bool unload_gl)
         return;
 
     weapon_magazined->UnloadMagazine(spawn_ammo);
-    weapon_magazined->UnloadChamber(spawn_ammo);
+    const auto ae = weapon_magazined->GetAmmoElapsed();
+    if (ae)
+        weapon_magazined->UnloadAmmo(ae, spawn_ammo);
+
     if (unload_gl)
     {
         auto WpnMagazWgl = smart_cast<CWeaponMagazinedWGrenade*>(weapon_magazined);
@@ -321,27 +338,6 @@ bool CScriptGameObject::IsDirectReload(CScriptGameObject* pItem)
         return false;
 
     return weapon ? weapon->IsDirectReload(ammo_to_load) : ammo->IsDirectReload(ammo_to_load);
-}
-
-void CScriptGameObject::UnloadMagazineFull()
-{
-    auto weapon_magazined = smart_cast<CWeaponMagazined*>(&object());
-    auto ammo_magazine = smart_cast<CWeaponAmmo*>(&object());
-
-    if (!weapon_magazined && !ammo_magazine)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CScriptGameObject::UnloadWeaponFull non-CWeaponMagazined and non-CWeaponAmmo object !!!");
-        return;
-    }
-
-    if (ammo_magazine)
-    {
-        if (ammo_magazine->IsBoxReloadable())
-            ammo_magazine->UnloadBox();
-        return;
-    }
-
-    weapon_magazined->UnloadWeaponFull();
 }
 
 void CScriptGameObject::DropItem(CScriptGameObject* pItem)

@@ -284,6 +284,8 @@ void CWeaponScript::script_register(lua_State* L)
         
                   .def("respawn_weapon", &CWeaponMagazined::RespawnWeapon)
                   .def("firemod_string", &CWeaponMagazined::GetCurrentFireModeStr)
+
+                  .def("unload_ammo", &CWeaponMagazined::UnloadAmmo)
                   // laser
                   .def("set_laser_range", &CWeaponMagazined::SetLaserRange)
                   .def("set_laser_angle", &CWeaponMagazined::SetLaserAngle)

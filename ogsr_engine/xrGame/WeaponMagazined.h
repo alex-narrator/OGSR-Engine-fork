@@ -56,7 +56,7 @@ protected:
     void SetFlashlightRGB(float, float, float, int = 0);
     void SetFlashlightType(int type, int target = 0);
 
-    bool m_reloadMotionMarksAvailable{};
+    bool m_bWasReloaded{};
 
 protected:
     virtual void OnMagazineEmpty();
@@ -136,8 +136,6 @@ public:
     //
     virtual bool IsSingleReloading();
 
-    // розрядити патронник
-    virtual void UnloadChamber(bool = true);
     // сохранение типа патрона в патроннике при смешанной зарядке
     virtual void HandleCartridgeInChamber();
 
@@ -154,11 +152,6 @@ public:
 
     virtual void SwitchLaser(bool on);
     virtual void SwitchFlashlight(bool on);
-
-    virtual void UnloadWeaponFull();
-
-    virtual void UnloadAndDetachAllAddons();
-    virtual void DetachAll();
 
     virtual void processing_deactivate() override
     {

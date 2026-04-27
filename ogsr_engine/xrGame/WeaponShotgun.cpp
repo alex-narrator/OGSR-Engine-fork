@@ -305,7 +305,7 @@ void CWeaponShotgun::Reload()
 
 void CWeaponShotgun::TriStateReload()
 {
-    if (HaveCartridgeInInventory(1)/* || IsMisfire()*/)
+    if (HaveCartridgeInInventory(1) || IsMisfire())
     {
         StartCartridge = true;
         m_sub_state = is_gunslinger_weapon && !IsMisfire() ? eSubstateReloadInProcess : eSubstateReloadBegin;
@@ -323,12 +323,14 @@ void CWeaponShotgun::OnStateSwitch(u32 S, u32 oldState)
 
     CWeapon::OnStateSwitch(S, oldState);
 
-    if (m_magazine.size() >= (u32)iMagazineSize || !HaveCartridgeInInventory(1))
-    {
-        m_sub_state = eSubstateReloadEnd;
-        if (m_bDirectReload)
-            m_bDirectReload = false;
-    };
+    //if (m_magazine.size() >= (u32)iMagazineSize || !HaveCartridgeInInventory(1))
+    //{
+    //    m_sub_state = eSubstateReloadEnd;
+    //    if (m_bDirectReload)
+    //        m_bDirectReload = false;
+    //};
+    if (m_bDirectReload)
+        m_bDirectReload = false;
 
     switch (m_sub_state)
     {
@@ -539,7 +541,9 @@ bool CWeaponShotgun::Attach(PIItem pIItem, bool b_send_event)
         m_cur_extender = (u8)std::distance(m_extenders.begin(), std::find(m_extenders.begin(), m_extenders.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonExtender;
 
-        UnloadWeaponFull();
+        UnloadMagazine();
+        if (iAmmoElapsed)
+            UnloadAmmo(iAmmoElapsed);
 
         if (b_send_event)
         {
@@ -558,7 +562,9 @@ bool CWeaponShotgun::Detach(const char* item_section_name, bool b_spawn_item, fl
     if (CSE_ALifeItemWeapon::eAddonAttachable == m_eExtenderStatus && 0 != (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonExtender) &&
         std::find(m_extenders.begin(), m_extenders.end(), item_section_name) != m_extenders.end())
     {
-        UnloadWeaponFull();
+        UnloadMagazine();
+        if (iAmmoElapsed)
+            UnloadAmmo(iAmmoElapsed);
 
         m_flagsAddOnState &= ~CSE_ALifeItemWeapon::eWeaponAddonExtender;
 

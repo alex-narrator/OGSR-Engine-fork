@@ -109,11 +109,6 @@ void CWeaponMagazined::Load(LPCSTR section)
     if (pSettings->line_exist(section, "snd_aim_end"))
         m_sounds.LoadSound(section, "snd_aim_end", "sndAimEnd", SOUND_TYPE_ITEM_HIDING);
 
-    //
-    if (pSettings->line_exist(section, "snd_unload"))
-        m_sounds.LoadSound(section, "snd_unload", "sndUnload", SOUND_TYPE_WEAPON_RECHARGING);
-
-    /*m_pSndShotCurrent = &sndShot;*/
     m_sSndShotCurrent = IsAddonAttached(eSilencer) ? "sndSilencerShot" : "sndShot";
 
     //звуки и партиклы глушителя, еслит такой есть
@@ -686,7 +681,7 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
     switch (state)
     {
     case eReload:
-        if (!m_reloadMotionMarksAvailable)
+        if (!m_bWasReloaded)
         {
             ReloadMagazine();
             HandleCartridgeInChamber();
@@ -794,7 +789,7 @@ void CWeaponMagazined::switch2_Reload()
     PlayAnimReload();
     SetPending(TRUE);
     bullet_update = false;
-    m_reloadMotionMarksAvailable = m_current_motion_def && !m_current_motion_def->marks.empty();
+    m_bWasReloaded = false;
 }
 
 void CWeaponMagazined::switch2_Hiding()
@@ -1623,6 +1618,7 @@ void CWeaponMagazined::OnMotionMark(u32 state, const motion_marks& M)
         {
             ReloadMagazine();
             HandleCartridgeInChamber();
+            m_bWasReloaded = true;
         }
     }
 }
@@ -1875,13 +1871,6 @@ void CWeaponMagazined::HandleCartridgeInChamber()
     }
 }
 
-void CWeaponMagazined::UnloadChamber(bool spawn_ammo)
-{
-    if (!HasChamber() || m_magazine.empty())
-        return;
-    UnloadAmmo(1, spawn_ammo);
-}
-
 float CWeaponMagazined::GetConditionMisfireProbability() const
 {
     float mis = inherited::GetConditionMisfireProbability();
@@ -1947,29 +1936,6 @@ void CWeaponMagazined::SwitchFlashlight(bool on)
         flashlight_render->set_active(false);
         flashlight_omni->set_active(false);
     }
-}
-
-void CWeaponMagazined::UnloadWeaponFull()
-{
-    PlaySound("sndUnload", get_LastFP());
-    UnloadMagazine();
-    UnloadChamber();
-}
-
-void CWeaponMagazined::UnloadAndDetachAllAddons()
-{
-    UnloadWeaponFull();
-    for (u32 i = 0; i < eMagazine; i++)
-    {
-        if (AddonAttachable(i) && IsAddonAttached(i))
-            Detach(GetAddonName(i).c_str(), true);
-    }
-}
-
-void CWeaponMagazined::DetachAll()
-{
-    UnloadAndDetachAllAddons();
-    inherited::DetachAll();
 }
 
 #include "player_hud.h"

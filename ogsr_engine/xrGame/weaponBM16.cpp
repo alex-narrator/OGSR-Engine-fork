@@ -2,32 +2,20 @@
 #include "weaponBM16.h"
 #include "../xr_3da/x_ray.h"
 
-//CWeaponBM16::~CWeaponBM16() 
-//{ 
-//    HUD_SOUND::DestroySound(m_sndReload1);
-//}
-
 void CWeaponBM16::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    /*HUD_SOUND::LoadSound(section, "snd_reload_1", m_sndReload1, m_eSoundReload);*/
-    m_sounds.LoadSound(section, "snd_reload_1", "m_sndReload1", SOUND_TYPE_WEAPON_RECHARGING);
+    m_sounds.LoadSound(section, "snd_reload_1", "sndReload1", SOUND_TYPE_WEAPON_RECHARGING);
 }
 
 void CWeaponBM16::PlayReloadSound()
 {
     if (m_magazine.size() == 1 || !HaveCartridgeInInventory(2))
-        PlaySound((IsMisfire() && SoundExist("sndReloadJammed")) ? "sndReloadJammed" : "m_sndReload1", get_LastFP());
+        PlaySound((IsMisfire() && SoundExist("sndReloadJammed")) ? "sndReloadJammed" : "sndReload1", get_LastFP());
     else
         PlaySound((IsMisfire() && SoundExist("sndReloadJammed")) ? "sndReloadJammed" : "sndReload", get_LastFP());
 }
-
-//void CWeaponBM16::UpdateSounds()
-//{
-//    inherited::UpdateSounds();
-//    UpdateSoundPosition("m_sndReload1", get_LastFP());
-//}
 
 //void CWeaponBM16::OnShot()
 //{
