@@ -702,6 +702,8 @@ public:
 
     IC void set_state_wishful(u32 state) { mstate_wishful = state; }
 
+    IC u32 get_state_old() const { return this->mstate_old; }
+
     // Real Wolf. Start. 14.10.2014
     void block_action(EGameActions cmd);
     void unblock_action(EGameActions cmd);

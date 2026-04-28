@@ -198,6 +198,8 @@ void CScriptActor::script_register(lua_State* L)
                 // wishful state
                .def("get_state_wishful", &CActor::get_state_wishful)
                .def("set_state_wishful", &CActor::set_state_wishful)
+                // old state
+               .def("get_state_old", &CActor::get_state_old)
 
                .def("IsDetectorActive", &CActor::IsDetectorActive)
                .def_readonly("sound_noise", &CActor::m_snd_noise)
