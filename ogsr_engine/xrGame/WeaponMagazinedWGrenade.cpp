@@ -639,6 +639,9 @@ void CWeaponMagazinedWGrenade::PlayAnimReload()
 
 void CWeaponMagazinedWGrenade::PlayAnimIdle()
 {
+    if (IsIdleAnimBlocked())
+        return;
+
     if (IsAddonAttached(eLauncher))
     {
         if (IsZoomed())

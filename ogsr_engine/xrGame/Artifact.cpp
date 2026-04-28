@@ -404,8 +404,6 @@ void CArtefact::OnStateSwitch(u32 S, u32 oldState)
     }
 }
 
-void CArtefact::PlayAnimIdle() { PlayHUDMotion({"anim_idle", "anm_idle"}, true, eIdle); }
-
 #include "HUDManager.h"
 void CArtefact::OnAnimationEnd(u32 state)
 {

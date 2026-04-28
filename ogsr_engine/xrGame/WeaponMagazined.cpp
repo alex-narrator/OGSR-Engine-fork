@@ -1535,6 +1535,9 @@ void CWeaponMagazined::PlayAnimIdle()
     if (GetState() != eIdle)
         return;
 
+    if (IsIdleAnimBlocked())
+        return;
+
     if (IsZoomed())
         PlayAnimAim();
     else
