@@ -783,7 +783,7 @@ void CWeaponMagazined::PlayReloadSound()
 
 void CWeaponMagazined::switch2_Reload()
 {
-    CWeapon::FireEnd();
+    inherited::FireEnd();
 
     PlayReloadSound();
     PlayAnimReload();
@@ -794,7 +794,7 @@ void CWeaponMagazined::switch2_Reload()
 
 void CWeaponMagazined::switch2_Hiding()
 {
-    CWeapon::FireEnd();
+    inherited::FireEnd();
 
     StopHUDSounds();
     PlaySound("sndHide", get_LastFP());
@@ -805,7 +805,7 @@ void CWeaponMagazined::switch2_Hiding()
 
 void CWeaponMagazined::switch2_Hidden()
 {
-    CWeapon::FireEnd();
+    inherited::FireEnd();
 
     m_sounds.StopSound("sndReload");
     m_sounds.StopSound("sndReloadPartly");

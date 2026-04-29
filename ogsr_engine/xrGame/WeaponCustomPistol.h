@@ -9,9 +9,8 @@ private:
 
 public:
     CWeaponCustomPistol(LPCSTR name);
-    virtual ~CWeaponCustomPistol();
+    virtual ~CWeaponCustomPistol() {};
 
 protected:
-    virtual void FireEnd();
     virtual void switch2_Fire();
 };
