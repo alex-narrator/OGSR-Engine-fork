@@ -45,6 +45,7 @@ public:
 
     virtual void State(u32 state, u32 oldState);
     virtual void OnStateSwitch(u32 S, u32 oldState);
+    virtual void PlayAnimIdle();
     virtual void PlayAnimThrowStart();
     virtual void PlayAnimThrow();
     virtual void PlayAnimThrowEnd();

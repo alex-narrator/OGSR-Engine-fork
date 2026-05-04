@@ -391,9 +391,6 @@ void CPda::OnAnimationEnd(u32 state)
 
 void CPda::PlayAnimIdle()
 {
-    if (IsIdleAnimBlocked())
-        return;    
-    
     if (auto pActor = smart_cast<CActor*>(H_Parent()); pActor && ThumbAnimsAllowed() && IsZoomed())
     {
         const char* moving_postfix{""};

@@ -533,9 +533,6 @@ void CHudItem::PlayBlendAnm(LPCSTR name, float speed, float power, bool stop_old
 
 void CHudItem::PlayAnimIdle()
 {
-    if (IsIdleAnimBlocked())
-        return;
-
     if (TryPlayAnimIdle())
         return;
 

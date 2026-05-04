@@ -108,8 +108,6 @@ protected: //чтоб нельзя было вызвать на прямую
     LPCSTR script_ui_funct{};
     LPCSTR script_ui_bone{};
 
-    bool m_bBlockIdleAnim{};
-
 public:
     virtual void Load(LPCSTR section);
     virtual CHudItem* cast_hud_item() { return this; }
@@ -211,9 +209,6 @@ public:
     Fvector script_ui_offset[2]{}; // pos, rot
 
     void ShowHud(bool show) { b_show_hud = show; };
-
-    bool IsIdleAnimBlocked() const { return m_bBlockIdleAnim; }
-    void BlockIdleAnim(bool blocked) { m_bBlockIdleAnim = blocked; }
 
 protected:
     BOOL hud_mode;

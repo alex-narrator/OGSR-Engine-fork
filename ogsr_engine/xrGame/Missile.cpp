@@ -261,6 +261,14 @@ void CMissile::State(u32 state, u32 oldState)
     }
 }
 
+void CMissile::PlayAnimIdle()
+{
+    if (TryPlayAnimIdle())
+        return;
+
+    PlayHUDMotion({"anim_idle", "anm_idle"}, true, GetState());
+}
+
 void CMissile::PlayAnimThrowStart() { 
     if (m_constpower && AnimationExist({"anim_throw_quick_begin", "anm_throw_quick_begin"}))
     {

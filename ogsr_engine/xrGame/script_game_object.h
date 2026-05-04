@@ -729,8 +729,6 @@ public:
     Flags16 GetIIFlags();
     u32 GetHudItemState();
     void SwitchHudItemState(u32 state);
-    bool GetIdleAnimBlocked();
-    void SetIdleAnimBlocked(bool);
     bool IsPending() const;
     void SetAimInertion(float);
     float GetRadius();

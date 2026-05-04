@@ -685,28 +685,6 @@ void CScriptGameObject::ShowItemHud(bool val)
         k->ShowHud(val);
 }
 
-bool CScriptGameObject::GetIdleAnimBlocked()
-{
-    CHudItem* k = smart_cast<CHudItem*>(&object());
-    if (!k)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CHudItem : cannot access class member GetIdleAnimBlocked!");
-        return false;
-    }
-    return k->IsIdleAnimBlocked();
-}
-
-void CScriptGameObject::SetIdleAnimBlocked(bool val)
-{
-    CHudItem* k = smart_cast<CHudItem*>(&object());
-    if (!k)
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "CHudItem : cannot access class member SetIdleAnimBlocked!");
-        return;
-    }
-    k->BlockIdleAnim(val);
-}
-
 float CScriptGameObject::GetRadius()
 {
     CGameObject* k = smart_cast<CGameObject*>(&object());

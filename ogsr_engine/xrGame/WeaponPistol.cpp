@@ -87,9 +87,6 @@ void CWeaponPistol::PlayAnimIdle()
 {
     VERIFY(GetState() == eIdle);
 
-    if (IsIdleAnimBlocked())
-        return;
-
     if (TryPlayAnimIdle())
         return;
 

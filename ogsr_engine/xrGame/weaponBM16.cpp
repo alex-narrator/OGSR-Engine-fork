@@ -249,9 +249,6 @@ const char* CWeaponBM16::GetAnimAimName()
 
 void CWeaponBM16::PlayAnimIdle()
 {
-    if (IsIdleAnimBlocked())
-        return;    
-
     if (TryPlayAnimIdle())
         return;
 
