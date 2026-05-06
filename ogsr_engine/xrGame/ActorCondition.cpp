@@ -61,9 +61,6 @@ void CActorCondition::UpdateCondition()
         return;
     if (!object().Local() && m_object != Level().CurrentViewEntity())
         return;
-    //
-    if (IsCantWalk() && object().character_physics_support()->movement()->PHCapture())
-        object().character_physics_support()->movement()->PHReleaseObject();
 
     float weight_k = object().GetCarryWeight() / object().MaxCarryWeight();
 
