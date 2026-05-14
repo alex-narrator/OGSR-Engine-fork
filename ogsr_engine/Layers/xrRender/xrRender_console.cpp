@@ -107,7 +107,7 @@ extern float r__dtex_range;
 
 Fvector3 ps_r_taa_jitter{};
 Fvector2 ps_r_taa_jitter_full{};
-float ps_r_cas{};
+float ps_r_cas{0.5};
 
 int ps_r__LightSleepFrames = 100;
 
@@ -167,15 +167,16 @@ Flags64 ps_r2_ls_flags = {
 //    R2FLAGEXT_RAIN_DROPS_CONTROL | 
 //    R2FLAGEXT_MASK | 
 //    R2FLAGEXT_MASK_CONTROL | 
-//    R2FLAGEXT_MT_TEXLOAD  |
+    R2FLAGEXT_MT_TEXLOAD  |
     R2FLAGEXT_SSLR |
     R2FLAGEXT_SSFX_INTER_GRASS |
     R2FLAGEXT_FONT_SHADOWS
 //    | R2FLAGEXT_SSFX_SHADOWS
 //    | R2FLAGEXT_SSFX_SSS
-    | R2FLAGEXT_SMAP_LOW_LOD
+//    | R2FLAGEXT_SMAP_LOW_LOD
     | R2FLAGEXT_DISABLE_SMAPVIS
     | R2FLAG_SMAP_2SIDE
+    | R2FLAGEXT_USE_ACES
 };
 
 BOOL ps_no_scale_on_fade = 0; // Alundaio
@@ -252,9 +253,9 @@ Fvector4 ps_ssfx_hud_drops_1{}, ps_ssfx_hud_drops_2{}; // Значениями �
 
 Fvector4 ps_ssfx_blood_decals{0.6f, 0.6f, 0.f, 0.f};
 
-Fvector4 ps_ssfx_rain_1{10.0f, 0.02f, 5.f, 2.f}; // Len, Width, Speed, Quality
-Fvector4 ps_ssfx_rain_2{0.4f, 0.5f, 5.0f, 1.0f}; // Alpha, Brigthness, Refraction, Reflection
-Fvector4 ps_ssfx_rain_3{0.95f, 0.5f, 0.0f, 0.0f}; // Alpha, Refraction ( Splashes )
+Fvector4 ps_ssfx_rain_1{6.0f, 0.025f, 0.6f, 2.f}; // Len, Width, Speed, Quality
+Fvector4 ps_ssfx_rain_2{0.7f, 0.1f, 1.0f, 0.5f}; // Alpha, Brigthness, Refraction, Reflection
+Fvector4 ps_ssfx_rain_3{0.15f, 1.f, 0.0f, 0.0f}; // Alpha, Refraction ( Splashes )
 
 Fvector3 ps_ssfx_shadow_cascades{25.f, 60.f, 160.f};
 Fvector4 ps_ssfx_grass_shadows = {0.0f, 0.0f, 0.0f, 0.0f}; // X - каскады на которых будут рендериться тени (0 - на первом, 1 - на первом и втором, 2 - на всех трёх), Y - устарело и более не используется, Z - дальность на которой будут рендериться тени от источников света (НЕ СОЛНЦА)
@@ -465,7 +466,7 @@ class CCC_SunshaftsIntensity : public CCC_Float
 public:
     CCC_SunshaftsIntensity(LPCSTR N, float* V, float _min, float _max) : CCC_Float(N, V, _min, _max)
     {
-        SetCanSave(FALSE);
+        SetCanSave(false);
     }
 };
 

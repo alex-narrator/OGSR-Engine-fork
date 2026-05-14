@@ -453,7 +453,7 @@ public:
 class CCC_TimeFactor : public IConsole_Command
 {
 public:
-    CCC_TimeFactor(LPCSTR N) : IConsole_Command(N) {}
+    CCC_TimeFactor(LPCSTR N) : IConsole_Command(N) { SetCanSave(false); }
     virtual void Execute(LPCSTR args)
     {
         float time_factor = (float)atof(args);
