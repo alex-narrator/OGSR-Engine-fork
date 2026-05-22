@@ -8,6 +8,7 @@
 #include "Actor.h"
 #include "player_hud.h"
 #include "Weapon.h"
+#include "Missile.h"
 #include "Grenade.h"
 #include "string_table.h"
 #include "UIGameSP.h"
@@ -81,13 +82,13 @@ bool CCustomDevice::CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate)
             bres = true;
     }
 
-    if (itm->GetState() != CHUDState::eShowing)
+    if (itm->GetState() != eShowing)
         bres = bres && !itm->IsPending();
 
     if (bres)
     {
         if (CWeapon* W = smart_cast<CWeapon*>(itm))
-            bres = bres && (W->GetState() != CWeapon::eReload) && (W->GetState() != CWeapon::eSwitch);
+            bres = bres && (W->GetState() != eReload && W->GetState() != eSwitch);
     }
 
     return bres;
@@ -273,10 +274,18 @@ void CCustomDevice::UpdateVisibility()
         }
         else if (i0 && HudItemData())
         {
-            if (i0->m_parent_hud_item)
+            if (const auto itm = i0->m_parent_hud_item)
             {
-                u32 state = i0->m_parent_hud_item->GetState();
-                if (smart_cast<CMissile*>(i0->m_parent_hud_item) && AnimationExist("anm_throw"))
+                u32 state = itm->GetState();
+                if (smart_cast<CGrenade*>(itm))
+                {
+                    if (state == eThrowStart || state == eReady || state == eThrow || state == eThrowEnd)
+                    {
+                        HideDevice(true);
+                        m_bNeedActivation = true;
+                    }
+                }
+                else if (smart_cast<CMissile*>(itm) && AnimationExist("anm_throw"))
                 {
                     if ((state == eThrowStart || state == eReady) && GetState() == eIdle)
                         SwitchState(eThrowStart);
@@ -285,7 +294,7 @@ void CCustomDevice::UpdateVisibility()
                     else if (state == eHiding && (GetState() == eThrowStart || GetState() == eThrow))
                         SwitchState(eIdle);
                 }
-                if (auto wpn = smart_cast<CWeapon*>(i0->m_parent_hud_item) && AnimationExist("anm_idle_zoom"))
+                if (smart_cast<CWeapon*>(itm) && AnimationExist("anm_idle_zoom"))
                 {
                     if (IsZoomed() && GetState() != eIdleZoom)
                         SwitchState(eIdleZoomIn);
