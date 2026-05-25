@@ -85,7 +85,7 @@ enum ECallbackType
     eOnGoodwillChange,
     eLevelChangerAction,
 
-    eUpdateItemsEffect,
+    eOnUpdateItemsEffect,
 
     eAttachVehicle,
     eDetachVehicle,

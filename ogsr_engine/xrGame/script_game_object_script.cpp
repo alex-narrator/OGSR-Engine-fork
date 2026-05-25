@@ -80,7 +80,7 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("on_actor_weapon_grenade_mode_change", int(GameObject::eOnActorWeaponGrenadeModeChange)),
 
                     value("on_throw_grenade", int(GameObject::eOnThrowGrenade)), value("on_goodwill_change", int(GameObject::eOnGoodwillChange)),
-                    value("level_changer_action", int(GameObject::eLevelChangerAction)), value("update_items_effect", int(GameObject::eUpdateItemsEffect)),
+                    value("level_changer_action", int(GameObject::eLevelChangerAction)), value("on_update_items_effect", int(GameObject::eOnUpdateItemsEffect)),
 
                     value("on_attach_vehicle", int(GameObject::eAttachVehicle)), value("on_detach_vehicle", int(GameObject::eDetachVehicle)),
                     value("on_use_vehicle", int(GameObject::eUseVehicle)),

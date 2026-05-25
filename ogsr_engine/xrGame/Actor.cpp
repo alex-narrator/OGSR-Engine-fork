@@ -1161,7 +1161,7 @@ void CActor::UpdateItemsEffect()
         cond->ApplyInfluence(i, m_ActorItemBoostedParam[i] * f_update_time);
     }
 
-    callback(GameObject::eUpdateItemsEffect)(f_update_time);
+    callback(GameObject::eOnUpdateItemsEffect)(f_update_time);
 }
 
 float CActor::GetArtefactsProtection(int hit_type)
