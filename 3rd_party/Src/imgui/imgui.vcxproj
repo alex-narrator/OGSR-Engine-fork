@@ -51,7 +51,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <StringPooling>false</StringPooling>
-      <BasicRuntimeChecks Condition="$(Configuration.Contains('Debug')) And '$(EnableASAN)'=='true'"></BasicRuntimeChecks>
+      <BasicRuntimeChecks Condition="$(Configuration.Contains('Debug')) And '$(EnableASAN)'=='true'">
+      </BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="$(Configuration.Contains('Debug')) And '$(EnableASAN)'!='true'">EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
@@ -74,6 +75,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -83,8 +85,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="addons\ImGuiColorTextEdit\TextEditor.cpp" />
-    <ClCompile Include="addons\ImGuizmo\ImGuizmo.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="imgui_demo.cpp" />
     <ClCompile Include="imgui_draw.cpp" />
@@ -92,8 +92,6 @@
     <ClCompile Include="imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="addons\ImGuiColorTextEdit\TextEditor.h" />
-    <ClInclude Include="addons\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="imgui_internal.h" />

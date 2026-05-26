@@ -38,7 +38,7 @@ void CAnomalyZoneScript::set_zone_state(CCustomZone* obj, u32 new_state) { obj->
 
 void CAnomalyZoneScript::script_register(lua_State* L)
 {
-    module(L)[class_<CSpaceRestrictor, CGameObject>("CSpaceRestrictor")
+    module(L)[(class_<CSpaceRestrictor, CGameObject>("CSpaceRestrictor")
                   .def(constructor<>())
                   .property("restrictor_center", &get_restrictor_center)
                   .property("restrictor_type", &CSpaceRestrictor::restrictor_type)
@@ -61,23 +61,22 @@ void CAnomalyZoneScript::script_register(lua_State* L)
                   .def_readwrite("time_to_live", &CCustomZone::m_ttl)
                   .def_readwrite("zone_active", &CCustomZone::m_bZoneActive)
                   .property("zone_state", &get_zone_state, &CAnomalyZoneScript::set_zone_state)
-
-    ];
+    )];
 }
 
 IC void alive_entity_set_radiation(CEntityAlive* E, float value) { E->SetfRadiation(value); }
 
 void CEntityScript::script_register(lua_State* L)
 {
-    module(L)[class_<CEntity, CGameObject>("CEntity"),
+    module(L)[(class_<CEntity, CGameObject>("CEntity"),
               class_<CEntityAlive, CEntity>("CEntityAlive")
                   .property("radiation", &CEntityAlive::g_Radiation, &alive_entity_set_radiation) // доза в %
-                  .property("condition", &CEntityAlive::conditions)];
+                  .property("condition", &CEntityAlive::conditions))];
 }
 
 void CEatableItemScript::script_register(lua_State* L)
 {
-    module(L)[class_<CEatableItem, CInventoryItem>("CEatableItem")
+    module(L)[(class_<CEatableItem, CInventoryItem>("CEatableItem")
                   .def_readwrite("eat_health", &CEatableItem::m_fHealthInfluence)
                   .def_readwrite("eat_power", &CEatableItem::m_fPowerInfluence)
                   .def_readwrite("eat_satiety", &CEatableItem::m_fSatietyInfluence)
@@ -88,7 +87,7 @@ void CEatableItemScript::script_register(lua_State* L)
                   .def_readwrite("wounds_heal_perc", &CEatableItem::m_fWoundsHealPerc)
                   .def_readwrite("eat_portions_num", &CEatableItem::m_iPortionsNum)
                   .def_readwrite("eat_start_portions_num", &CEatableItem::m_iStartPortionsNum),
-              class_<CEatableItemObject, bases<CEatableItem, CGameObject>>("CEatableItemObject")];
+              class_<CEatableItemObject, bases<CEatableItem, CGameObject>>("CEatableItemObject"))];
 }
 
 void set_io_money(CInventoryOwner* IO, u32 money) { IO->set_money(money, true); }
@@ -163,7 +162,7 @@ luabind::object get_slots(CInventoryItem* itm)
 
 void CInventoryScript::script_register(lua_State* L)
 {
-    module(L)[
+    module(L)[(
 
         class_<CInventoryItem>("CInventoryItem")
             .def_readonly("item_place", &CInventoryItem::m_eItemPlace)
@@ -222,8 +221,7 @@ void CInventoryScript::script_register(lua_State* L)
             //.property	  ("class_name"					,			&get_lua_class_name)
             .def("Name", &CInventoryOwner::Name)
             .def("SetName", &CInventoryOwner::SetName)
-
-    ];
+    )];
 }
 
 CParticlesObject* monster_play_particles(CBaseMonster* monster, LPCSTR name, const Fvector& position, const Fvector& dir, BOOL auto_remove, BOOL xformed)
@@ -251,6 +249,15 @@ void COutfitScript::script_register(lua_State* L)
     module(L)[class_<CCustomOutfit, CInventoryItemObject>("CCustomOutfit")
                   .def_readwrite("additional_inventory_weight", &CCustomOutfit::m_additional_weight)
                   .def_readwrite("additional_inventory_weight2", &CCustomOutfit::m_additional_weight2)
+
+                  .def_readwrite("health_restore_speed", &CCustomOutfit::m_fHealthRestoreSpeed)
+                  .def_readwrite("psy_health_restore_speed", &CCustomOutfit::m_fPsyHealthRestoreSpeed)
+                  .def_readwrite("radiation_restore_speed", &CCustomOutfit::m_fRadiationRestoreSpeed)
+                  .def_readwrite("satiety_restore_speed", &CCustomOutfit::m_fSatietyRestoreSpeed)
+                  .def_readwrite("power_restore_speed", &CCustomOutfit::m_fPowerRestoreSpeed)
+                  .def_readwrite("bleeding_restore_speed", &CCustomOutfit::m_fBleedingRestoreSpeed)
+                  .def_readwrite("thirst_restore_speed", &CCustomOutfit::m_fThirstRestoreSpeed)
+
                   .def_readwrite("power_loss", &CCustomOutfit::m_fPowerLoss)
                   .property("burn_protection", &get_protection<ALife::eHitTypeBurn>, &set_protection<ALife::eHitTypeBurn>)
                   .property("strike_protection", &get_protection<ALife::eHitTypeStrike>, &set_protection<ALife::eHitTypeStrike>)
@@ -344,7 +351,7 @@ void CWeaponScript::script_register(lua_State* L)
 #ifdef NLC_EXTENSIONS
     attach_upgrades(L);
 #endif
-    module(L)[class_<CWeapon, CInventoryItemObject>("CWeapon")
+    module(L)[(class_<CWeapon, CInventoryItemObject>("CWeapon")
                   // из неэкспортируемого класса CHudItemObject:
                   .property("state", &CHudItemObject::GetState)
                   .property("next_state", &CHudItemObject::GetNextState)
@@ -443,7 +450,7 @@ void CWeaponScript::script_register(lua_State* L)
                   .def("switch_gl", &CWeaponMagazinedWGrenade::SwitchMode),
               class_<CMissile, CInventoryItemObject>("CMissile")
                   .def_readwrite("destroy_time", &CMissile::m_dwDestroyTime)
-                  .def_readwrite("destroy_time_max", &CMissile::m_dwDestroyTimeMax)];
+                  .def_readwrite("destroy_time_max", &CMissile::m_dwDestroyTimeMax))];
 }
 
 void CCustomMonsterScript::script_register(lua_State* L)
