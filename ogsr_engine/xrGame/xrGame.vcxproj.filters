@@ -5909,9 +5909,6 @@
     <ClInclude Include="ui\UIActorInfo.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Statistics</Filter>
     </ClInclude>
-    <ClInclude Include="embedded_editor\embedded_editor_world.h">
-      <Filter>EmbeddedEditor</Filter>
-    </ClInclude>
     <ClInclude Include="script_light.h">
       <Filter>AI\AScript\ScriptClasses\ScriptLight</Filter>
     </ClInclude>
@@ -5937,6 +5934,9 @@
       <Filter>EmbeddedEditor\EditorWindows</Filter>
     </ClInclude>
     <ClInclude Include="embedded_editor\embedded_editor_settings.h">
+      <Filter>EmbeddedEditor\EditorWindows</Filter>
+    </ClInclude>
+    <ClInclude Include="embedded_editor\embedded_editor_world.h">
       <Filter>EmbeddedEditor\EditorWindows</Filter>
     </ClInclude>
   </ItemGroup>
@@ -8708,14 +8708,14 @@
     <ClCompile Include="inventory_item_object_script.cpp">
       <Filter>Core\Client\Objects\inventory\InventoryItemObject</Filter>
     </ClCompile>
-    <ClCompile Include="embedded_editor\embedded_editor_world.cpp">
-      <Filter>EmbeddedEditor</Filter>
-    </ClCompile>
     <ClCompile Include="script_light_script.cpp">
       <Filter>AI\AScript\ScriptClasses\ScriptLight</Filter>
     </ClCompile>
     <ClCompile Include="script_light.cpp">
       <Filter>AI\AScript\ScriptClasses\ScriptLight</Filter>
+    </ClCompile>
+    <ClCompile Include="embedded_editor\embedded_editor_world.cpp">
+      <Filter>EmbeddedEditor\EditorWindows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

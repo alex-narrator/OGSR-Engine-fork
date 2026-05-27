@@ -14,6 +14,7 @@
 #include "embedded_editor_helper.h"
 #include "embedded_editor_weather.h"
 #include "embedded_editor_hud.h"
+#include "embedded_editor_world.h"
 #include "embedded_editor_pos_informer.h"
 #include "embedded_editor_sound_env.h"
 #include "embedded_editor_debug_rt.h"
@@ -50,6 +51,10 @@ CImGuiEditor::CImGuiEditor() {
     CImGuiHudEditorWnd* hud_editor_wnd = xr_new<CImGuiHudEditorWnd>();
     hud_editor_wnd->m_Name = "HUD Editor";
     m_Windows.push_back(hud_editor_wnd);
+
+    CImGuiWorldEditorWnd* world_editor_wnd = xr_new<CImGuiWorldEditorWnd>();
+    world_editor_wnd->m_Name = "World Editor";
+    m_Windows.push_back(world_editor_wnd);
 
     CImGuiSoundEnvWnd* sound_env_wnd = xr_new<CImGuiSoundEnvWnd>();
     sound_env_wnd->m_Name = "SoundEnv###SoundEnv";

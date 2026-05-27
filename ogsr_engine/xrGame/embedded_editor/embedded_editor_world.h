@@ -1,3 +1,10 @@
 #pragma once
+#include "embedded_editor_window.h"
 
-void ShowWorldEditor(bool& show);
+class CImGuiWorldEditorWnd : public CImGuiEditorWnd
+{
+public:
+    CImGuiWorldEditorWnd() : CImGuiEditorWnd("World Editor") {}
+    CImGuiWorldEditorWnd(LPSTR name) : CImGuiEditorWnd(name) {}
+    void Render() override;
+};

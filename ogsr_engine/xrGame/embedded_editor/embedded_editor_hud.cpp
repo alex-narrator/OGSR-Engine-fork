@@ -30,7 +30,6 @@ void CImGuiHudEditorWnd::Render()
         return;
     }
 
-    bool showSeparator = true;
     auto item = g_player_hud->attached_item(0);
 
     static float drag_pos_intensity = 0.0001f;
@@ -38,8 +37,7 @@ void CImGuiHudEditorWnd::Render()
 
     ImGui::DragFloat("Drag Pos Intensity", &drag_pos_intensity, 0.000001f, 0.000001f, 1.0f, "%.6f");
     ImGui::DragFloat("Drag Rot Intensity", &drag_rot_intensity, 0.000001f, 0.000001f, 1.0f, "%.6f");
-    if (showSeparator)
-        ImGui::Separator();
+    ImGui::Separator();
 
     const auto normal_idx = hud_item_measures::m_hands_offset_type_normal;
     const auto aim_idx = hud_item_measures::m_hands_offset_type_aim;
@@ -53,18 +51,16 @@ void CImGuiHudEditorWnd::Render()
     {
         ImGui::Text("Item 0: %s", item->m_parent_hud_item->object().cNameSect().c_str());
         ImGui::Text("hud section: %s", item->m_parent_hud_item->HudSection().c_str());
-        if (showSeparator)
-            ImGui::Separator();
+        ImGui::Separator();
 
 		ImGui::DragFloat3("item_position", (float*)&item->m_measures.m_item_attach[0], drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("item_orientation", (float*)&item->m_measures.m_item_attach[1], drag_rot_intensity, NULL, NULL, "%.6f");
-        if (showSeparator)
-            ImGui::Separator();
+        ImGui::Separator();
+
 		ImGui::DragFloat3("fire_point", (float*)&item->m_measures.m_fire_point_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("fire_point2", (float*)&item->m_measures.m_fire_point2_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("shell_point", (float*)&item->m_measures.m_shell_point_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
-        if (showSeparator)
-            ImGui::Separator();
+        ImGui::Separator();
 
         const auto idx = item->m_parent_hud_item->GetCurrentHudOffsetIdx();
         switch (idx)
@@ -98,13 +94,11 @@ void CImGuiHudEditorWnd::Render()
             ImGui::DragFloat3("gl_scope_hud_offset_rot", (float*)&item->m_measures.m_hands_offset[1][aim_gl_scope_idx], drag_rot_intensity, NULL, NULL, "%.6f");
             break;
         }
-        if (showSeparator)
-            ImGui::Separator();
+        ImGui::Separator();
 
         ImGui::DragFloat3("custom_ui_pos", (float*)&item->m_parent_hud_item->script_ui_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
         ImGui::DragFloat3("custom_ui_rot", (float*)&item->m_parent_hud_item->script_ui_offset[1], drag_rot_intensity, NULL, NULL, "%.6f");
-        if (showSeparator)
-            ImGui::Separator();
+        ImGui::Separator();
 
         if (const auto Wpn = smart_cast<CWeaponMagazined*>(item->m_parent_hud_item))
         {
@@ -116,8 +110,7 @@ void CImGuiHudEditorWnd::Render()
                     ImGui::DragFloat3("laserdot_aim_attach_offset", (float*)&Wpn->laserdot_aim_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
                 else
                     ImGui::DragFloat3("laserdot_attach_offset", (float*)&Wpn->laserdot_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
-                if (showSeparator)
-                    ImGui::Separator();
+                ImGui::Separator();
                 
                 render.draw_aabb(Wpn->laser_pos, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(125, 0, 0));
             }
@@ -135,8 +128,7 @@ void CImGuiHudEditorWnd::Render()
                     ImGui::DragFloat3("flashlight_attach_offset", (float*)&Wpn->flashlight_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
                     ImGui::DragFloat3("flashlight_omni_attach_offset", (float*)&Wpn->flashlight_omni_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
                 }
-                if (showSeparator)
-                    ImGui::Separator();
+                ImGui::Separator();
 
                 render.draw_aabb(Wpn->flashlight_pos, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(0, 56, 125));
             }
@@ -149,8 +141,7 @@ void CImGuiHudEditorWnd::Render()
                     ImGui::DragFloat3((addon_name + "_attach_pos").c_str(), (float*)&Wpn->hud_attach_visual_offset[i][0], drag_pos_intensity, NULL, NULL, "%.6f");
                     ImGui::DragFloat3((addon_name + "_attach_rot").c_str(), (float*)&Wpn->hud_attach_visual_offset[i][1], drag_rot_intensity, NULL, NULL, "%.6f");
                     ImGui::DragFloat((addon_name + "_attach_scale").c_str(), (float*)&Wpn->hud_attach_visual_scale[i], drag_pos_intensity, NULL, NULL, "%.6f");
-                    if (showSeparator)
-                        ImGui::Separator();
+                    ImGui::Separator();
                 }
             }
         }
@@ -162,19 +153,16 @@ void CImGuiHudEditorWnd::Render()
     {
         ImGui::Text("Item 1: %s", item_1->m_parent_hud_item->object().cNameSect().c_str());
         ImGui::Text("hud section: %s", item_1->m_parent_hud_item->HudSection().c_str());
-        if (showSeparator)
-            ImGui::Separator();
+        ImGui::Separator();
 
 		ImGui::DragFloat3("item_position 1", (float*)&item_1->m_measures.m_item_attach[0], drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("item_orientation 1", (float*)&item_1->m_measures.m_item_attach[1], drag_rot_intensity, NULL, NULL, "%.6f");
-        if (showSeparator)
-            ImGui::Separator();
+        ImGui::Separator();
 
         ImGui::DragFloat3("fire_point 1", (float*)&item_1->m_measures.m_fire_point_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
         ImGui::DragFloat3("fire_point2 1", (float*)&item_1->m_measures.m_fire_point2_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
         ImGui::DragFloat3("shell_point 1", (float*)&item_1->m_measures.m_shell_point_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
-        if (showSeparator)
-            ImGui::Separator();
+        ImGui::Separator();
 
         const auto idx_1 = item_1->m_parent_hud_item->GetCurrentHudOffsetIdx();
         switch (idx_1)
@@ -188,20 +176,17 @@ void CImGuiHudEditorWnd::Render()
             ImGui::DragFloat3("aim_hud_offset_rot 1", (float*)&item_1->m_measures.m_hands_offset[1][aim_idx], drag_rot_intensity, NULL, NULL, "%.6f");
             break;
         }
-        if (showSeparator)
-            ImGui::Separator();
+        ImGui::Separator();
 
         ImGui::DragFloat3("custom_ui_pos 1", (float*)&item_1->m_parent_hud_item->script_ui_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
         ImGui::DragFloat3("custom_ui_rot 1", (float*)&item_1->m_parent_hud_item->script_ui_offset[1], drag_rot_intensity, NULL, NULL, "%.6f");
-        if (showSeparator)
-            ImGui::Separator();
+        ImGui::Separator();
 
         if (const auto Det = smart_cast<CEliteDetector*>(item_1->m_parent_hud_item))
         {
             ImGui::DragFloat3("ui_pos", (float*)&Det->GetUI()->m_map_attach_offset_pos, drag_pos_intensity, NULL, NULL, "%.6f");
             ImGui::DragFloat3("ui_rot", (float*)&Det->GetUI()->m_map_attach_offset_rot, drag_rot_intensity, NULL, NULL, "%.6f");
-            if (showSeparator)
-                ImGui::Separator();
+            ImGui::Separator();
         }
     }
 

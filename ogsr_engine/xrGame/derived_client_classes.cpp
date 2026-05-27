@@ -310,7 +310,7 @@ void CWeaponScript::script_register(lua_State* L)
                   value("silencer", int(eSilencer)), value("scope", int(eScope)), value("launcher", int(eLauncher)), 
                   value("laser", int(eLaser)), value("flashlight", int(eFlashlight)), value("sight", int(eSight)), 
                   value("extender", int(eExtender)), value("magazine", int(eMagazine)), 
-                  value("max", int(eMaxAddon)))]];
+                  value("max", int(eMaxAddon)))])];
 }
 
 void CCustomMonsterScript::script_register(lua_State* L)

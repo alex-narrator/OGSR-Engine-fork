@@ -1138,7 +1138,7 @@ void CLevel::script_register(lua_State* L)
                                    def("clear_personal_goodwill", &g_clear_personal_goodwill), def("clear_personal_relations", &g_clear_personal_relations))];
     //установка параметров для шейдеров из скриптов
     module(L)[(def("set_artefact_slot", &g_set_artefact_position), def("set_anomaly_slot", &g_set_anomaly_position), def("set_detector_mode", &g_set_detector_params),
-              def("set_pda_params", [](const Fvector& p) { shader_exports.set_pda_params(p); }), def("update_inventory_window", &update_inventory_window),
+               def("set_pda_params", [](const Fvector& p) { shader_exports.set_pda_params(p); }), def("get_pda_params", &g_get_pda_params),
 
            def("set_dof_params", [](const float& p1, const float& p2, const float& p3, const float& p4) { shader_exports.set_dof_params(p1, p2, p3, p4); }),
 

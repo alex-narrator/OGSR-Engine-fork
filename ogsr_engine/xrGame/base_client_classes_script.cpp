@@ -116,7 +116,7 @@ void CObjectScript::script_register(lua_State* L)
                                             value("flOfflineNoMove", int(CSE_ALifeObject::flOfflineNoMove)), value("flUsedAI_Locations", int(CSE_ALifeObject::flUsedAI_Locations)),
                                             value("flGroupBehaviour", int(CSE_ALifeObject::flGroupBehaviour)), value("flCanSave", int(CSE_ALifeObject::flCanSave)),
                                             value("flVisibleForMap", int(CSE_ALifeObject::flVisibleForMap)), value("flUseSmartTerrains", int(CSE_ALifeObject::flUseSmartTerrains)),
-                                            value("flCheckForSeparator", int(CSE_ALifeObject::flCheckForSeparator))]
+                                            value("flCheckForSeparator", int(CSE_ALifeObject::flCheckForSeparator)))]
                   .enum_("weapon_states")[(
                       value("eIdle", int(CHudItem::EHudStates::eIdle)), 
                       value("eFire", int(CHudItem::EHudStates::eFire)),
