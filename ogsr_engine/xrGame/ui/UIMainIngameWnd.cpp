@@ -161,10 +161,10 @@ using namespace luabind;
 
 void CUIMainIngameWnd::script_register(lua_State* L)
 {
-    module(L)[
+    module(L)[(
         class_<CUIMainIngameWnd, CUIWindow>("CUIMainIngameWnd")
-            .def("GetStatic", &GetStaticRaw, raw<2>())
+            .def("GetStatic", &GetStaticRaw, raw<2>()),
             .def_readwrite("show_zone_map", &CUIMainIngameWnd::m_bShowZoneMap),
         def("get_main_window", &GetMainIngameWindow) // get_mainingame_window better??
-    ];
+    )];
 }

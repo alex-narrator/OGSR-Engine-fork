@@ -18,14 +18,17 @@
 #include "debug_renderer.h"
 #include "HUDManager.h"
 
-void ShowHudEditor(bool& show)
-{
-    ImguiWnd wnd("HUD Editor", &show);
-    if (wnd.Collapsed)
-        return;
 
+void CImGuiHudEditorWnd::Render()
+{
     if (!g_player_hud)
         return;
+
+    if (!RenderBegin())
+    {
+        RenderEnd();
+        return;
+    }
 
     bool showSeparator = true;
     auto item = g_player_hud->attached_item(0);
@@ -208,4 +211,6 @@ void ShowHudEditor(bool& show)
         g_player_hud->SaveCfg(0);
         g_player_hud->SaveCfg(1);
     }
+
+    RenderEnd();
 }

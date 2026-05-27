@@ -26,10 +26,10 @@ IC void alive_entity_set_radiation(CEntityAlive* E, float value) { E->SetfRadiat
 
 void CEntityScript::script_register(lua_State* L)
 {
-    module(L)[class_<CEntity, CGameObject>("CEntity"),
+    module(L)[(class_<CEntity, CGameObject>("CEntity"),
               class_<CEntityAlive, CEntity>("CEntityAlive")
                   .property("radiation", &CEntityAlive::g_Radiation, &alive_entity_set_radiation) // доза в %
-                  .property("condition", &CEntityAlive::conditions)];
+                  .property("condition", &CEntityAlive::conditions))];
 }
 
 void set_io_money(CInventoryOwner* IO, u32 money) { IO->set_money(money, true); }
@@ -66,7 +66,7 @@ luabind::object get_slots(CInventoryItem* itm)
 
 void CInventoryScript::script_register(lua_State* L)
 {
-    module(L)[
+    module(L)[(
 
         class_<CInventory>("CInventory")
             .def_readonly("max_belt", &CInventory::m_iMaxBelt)
@@ -95,8 +95,7 @@ void CInventoryScript::script_register(lua_State* L)
             .property("money", &CInventoryOwner::get_money, &set_io_money)
             .def("Name", &CInventoryOwner::Name)
             .def("SetName", &CInventoryOwner::SetName)
-
-    ];
+    )];
 }
 
 CParticlesObject* monster_play_particles(CBaseMonster* monster, LPCSTR name, const Fvector& position, const Fvector& dir, BOOL auto_remove, BOOL xformed)
@@ -185,7 +184,7 @@ void CWeaponScript::script_register(lua_State* L)
 #ifdef NLC_EXTENSIONS
     attach_upgrades(L);
 #endif
-    module(L)[class_<CWeapon, CInventoryItemObject>("CWeapon")
+    module(L)[(class_<CWeapon, CInventoryItemObject>("CWeapon")
                   // из неэкспортируемого класса CHudItemObject:
                   .property("state", &CHudItemObject::GetState)
                   .property("next_state", &CHudItemObject::GetNextState)
@@ -307,11 +306,11 @@ void CWeaponScript::script_register(lua_State* L)
                   .def_readwrite("gren_mag_size", &CWeaponMagazinedWGrenade::iMagazineSize2)
                   .def("switch_gl", &CWeaponMagazinedWGrenade::SwitchMode),
 
-              class_<enum_exporter<eWeaponAddonType>>("addon").enum_("addon")[
+              class_<enum_exporter<eWeaponAddonType>>("addon").enum_("addon")[(
                   value("silencer", int(eSilencer)), value("scope", int(eScope)), value("launcher", int(eLauncher)), 
                   value("laser", int(eLaser)), value("flashlight", int(eFlashlight)), value("sight", int(eSight)), 
                   value("extender", int(eExtender)), value("magazine", int(eMagazine)), 
-                  value("max", int(eMaxAddon))]];
+                  value("max", int(eMaxAddon)))]];
 }
 
 void CCustomMonsterScript::script_register(lua_State* L)

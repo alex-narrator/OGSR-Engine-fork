@@ -10,6 +10,7 @@
 #include "UITextureMaster.h"
 #include "UIScrollView.h"
 #include "UIProgressBar.h"
+#include "MMSound.h"
 
 CFontManager& mngr() { return *(UI()->Font()); }
 
@@ -66,7 +67,7 @@ void CUIWindow::create_ui_snd(ref_sound& S, LPCSTR fName)
 
 void CUIWindow::script_register(lua_State* L)
 {
-    module(L)[def("GetARGB", &GetARGB),
+    module(L)[(def("GetARGB", &GetARGB),
 
               def("GetFontSmall", &GetFontSmall), def("GetFontMedium", &GetFontMedium), def("GetFontDI", &GetFontDI), def("GetFontGraffiti19Russian", &GetFontGraffiti19Russian),
               def("GetFontGraffiti22Russian", &GetFontGraffiti22Russian), def("GetFontLetterica16Russian", &GetFontLetterica16Russian),
@@ -161,7 +162,9 @@ void CUIWindow::script_register(lua_State* L)
 
               class_<CUILabel, CUIFrameLineWnd>("CUILabel").def(constructor<>()).def("SetText", &CUILabel::SetText).def("GetText", &CUILabel::GetText),
 
-              class_<CUIMMShniaga, CUIWindow>("CUIMMShniaga").def("SetVisibleMagnifier", &CUIMMShniaga::SetVisibleMagnifier),
+              class_<CUIMMShniaga, CUIWindow>("CUIMMShniaga")
+                  .def("SetVisibleMagnifier", &CUIMMShniaga::SetVisibleMagnifier)
+                  .def("SetMusic", [](CUIMMShniaga* self, const char* filename) { self->m_sound->SetMusic(filename); }),
 
               class_<CUIScrollView, CUIWindow>("CUIScrollView")
                   .def(constructor<>())
@@ -185,7 +188,7 @@ void CUIWindow::script_register(lua_State* L)
               //		.def("",						&CUIFrameLineWnd::)
 
               class_<enum_exporter<EUIMessages>>("ui_events")
-                  .enum_("events")[
+                  .enum_("events")[(
                       // CUIWindow
                       value("WINDOW_LBUTTON_DOWN", int(WINDOW_LBUTTON_DOWN)), value("WINDOW_RBUTTON_DOWN", int(WINDOW_RBUTTON_DOWN)),
                       value("WINDOW_LBUTTON_UP", int(WINDOW_LBUTTON_UP)), value("WINDOW_RBUTTON_UP", int(WINDOW_RBUTTON_UP)), value("WINDOW_MOUSE_MOVE", int(WINDOW_MOUSE_MOVE)),
@@ -238,5 +241,5 @@ void CUIWindow::script_register(lua_State* L)
     // CUIPdaContactsWnd
 #pragma todo( \
     "KRodin: ивент PDA_CONTACTS_WND_CONTACT_SELECTED нигде не вызывается. Надо доделать по необходимости. Хотя я не очень представляю, для чего он может понадобиться в скриптах.")
-                      value("PDA_CONTACTS_WND_CONTACT_SELECTED", int(PDA_CONTACTS_WND_CONTACT_SELECTED))]];
+                      value("PDA_CONTACTS_WND_CONTACT_SELECTED", int(PDA_CONTACTS_WND_CONTACT_SELECTED)))])];
 }

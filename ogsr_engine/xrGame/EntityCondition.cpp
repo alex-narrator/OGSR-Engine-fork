@@ -539,7 +539,7 @@ bool get_entity_sprint(CEntity::SEntityState* S) { return S->bSprint; }
 
 void CEntityCondition::script_register(lua_State* L)
 {
-    module(L)[class_<CEntity::SEntityState>("SEntityState")
+    module(L)[(class_<CEntity::SEntityState>("SEntityState")
                   .property("crouch", &get_entity_crouch)
                   .property("fall", &get_entity_fall)
                   .property("jump", &get_entity_jump)
@@ -565,7 +565,8 @@ void CEntityCondition::script_register(lua_State* L)
                   .def_readwrite("min_wound_size", &CEntityCondition::m_fMinWoundSize)
                   .def_readonly("is_bleeding", &CEntityCondition::m_bIsBleeding)
                   //.def_readwrite("health_hit_part", &CEntityCondition::m_fHealthHitPart)
-                  .def_readwrite("power_hit_part", &CEntityCondition::m_fPowerHitPart)];
+                  .def_readwrite("power_hit_part", &CEntityCondition::m_fPowerHitPart)
+        )];
 }
 
 void CEntityCondition::ApplyInfluence(int type, float value)

@@ -66,7 +66,11 @@ protected:
     int m_selected_btn{-1};
     int m_page{-1};
     CUIWindow* m_selected{};
+
+public:
     CMMSound* m_sound;
+
+protected:
     Fvector2 m_wheel_size[2]{};
     enum
     {

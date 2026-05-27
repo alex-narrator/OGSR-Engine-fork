@@ -239,4 +239,4 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
         ;
 }
 
-void script_register_game_object4(lua_State* L) { module(L)[def("get_actor_obj", &Actor), def("get_level_id", &get_level_id)]; }
+void script_register_game_object4(lua_State* L) { module(L)[(def("get_actor_obj", &Actor), def("get_level_id", &get_level_id))]; }

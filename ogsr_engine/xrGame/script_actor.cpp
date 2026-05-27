@@ -89,8 +89,7 @@ bool IsCantSprint(CActorCondition* C) { return C->IsCantSprint(); }
 
 void CScriptActor::script_register(lua_State* L)
 {
-    module(
-        L)[class_<CActorCondition>("CActorConditionBase")
+    module(L)[(class_<CActorCondition>("CActorConditionBase")
                .property("health", &CActorCondition::GetHealth, &set_health)
                .property("health_max", &CActorCondition::GetMaxHealth, &set_max_health)
                .def_readwrite("alcohol", &CActorCondition::m_fAlcohol)
@@ -248,6 +247,5 @@ void CScriptActor::script_register(lua_State* L)
                    value("mcCrouchAccel", int(mcCrouchAccel))
                ],
            class_<CActorObject, bases<CActor, CEntityAlive>>("CActor") // хак с наследованием нужен для переопределения свойств. Luabind не поддерживает property getters override
-
-    ];
+    )];
 }

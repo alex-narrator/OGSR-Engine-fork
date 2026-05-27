@@ -107,6 +107,7 @@ public:
     virtual bool unlimited_ammo() const { return false; };
     virtual bool natural_weapon() const { return false; }
     virtual bool natural_detector() const { return false; }
+    bool CanPutInSlot(PIItem item, u32 slot) override { return slot == PDA_SLOT; }
 
     void dialog_sound_start(LPCSTR phrase);
     void dialog_sound_stop();

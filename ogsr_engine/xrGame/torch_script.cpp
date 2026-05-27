@@ -114,7 +114,7 @@ using namespace luabind;
 
 void CTorch::script_register(lua_State* L)
 {
-    module(L)[class_<CTorch, CGameObject /*CInventoryItemObject*/>("CTorch")
+    module(L)[(class_<CTorch, CGameObject /*CInventoryItemObject*/>("CTorch")
                   .def(constructor<>())
                   // alpet: управление параметрами света
                   .def_readonly("on", &CTorch::m_switched_on)
@@ -130,5 +130,5 @@ void CTorch::script_register(lua_State* L)
                   .def("set_texture", &CTorch::SetTexture)
                   .def("set_virtual_size", &CTorch::SetVirtualSize)
                   .def("set_type", &CTorch::SetType)
-              ];
+              )];
 }
