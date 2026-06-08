@@ -208,6 +208,15 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
         .def("throw_target", (bool(CScriptGameObject::*)(const Fvector&, CScriptGameObject*))(&CScriptGameObject::throw_target))
         .def("throw_target", (bool(CScriptGameObject::*)(const Fvector&, u32 const, CScriptGameObject*))(&CScriptGameObject::throw_target))
 
+        .def("can_throw_grenades", (bool(CScriptGameObject::*)())(&CScriptGameObject::can_throw_grenades))
+        .def("can_throw_grenades", (void(CScriptGameObject::*)(bool))(&CScriptGameObject::can_throw_grenades))
+
+        .def("throw_randomness_enabled", (bool(CScriptGameObject::*)())(&CScriptGameObject::throw_randomness_enabled))
+        .def("throw_randomness_enabled", (void(CScriptGameObject::*)(bool))(&CScriptGameObject::throw_randomness_enabled))
+
+        .def("throw_max_distance", (float(CScriptGameObject::*)())(&CScriptGameObject::throw_max_distance))
+        .def("throw_max_distance", (void(CScriptGameObject::*)(float))(&CScriptGameObject::throw_max_distance))
+
         .def("g_fireParams", &CScriptGameObject::g_fireParams)
         .def("can_kill_enemy", &CScriptGameObject::can_kill_enemy)
         .def("can_fire_to_enemy", &CScriptGameObject::can_fire_to_enemy)

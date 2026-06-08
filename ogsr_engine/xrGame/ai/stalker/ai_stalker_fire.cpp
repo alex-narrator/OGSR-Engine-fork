@@ -904,6 +904,14 @@ void CAI_Stalker::throw_target(const Fvector& position, u32 const vertex_id, COb
     compute_throw_miss(vertex_id);
 }
 
+void CAI_Stalker::throw_target_setup(const Fvector& position, CGameObject* target)
+{
+    if (throw_randomness_enabled())
+        throw_target(position, target->ai_location().level_vertex_id(), target);
+    else
+        throw_target(position, target);
+}
+
 static void throw_position(Fvector& result, const Fvector& start_position, const Fvector& velocity, const Fvector& gravity, const float& time)
 {
     // result = start_position + velocity*t + gravity*t^2/2
@@ -1077,26 +1085,24 @@ void CAI_Stalker::update_throw_params()
     m_throw_position.y += 2.f;
 #endif
 
-    /*
-        static float const distances[] = {
-            30.f, 40.f, 50.f, 60.f
-        };
-        VERIFY					(g_SingleGameDifficulty < sizeof(distances)/sizeof(distances[0]));
-        float const max_distance= distances[g_SingleGameDifficulty];
-    */
+    
+    //static float const distances[] = {30.f, 40.f, 50.f, 60.f};
+    //VERIFY(g_SingleGameDifficulty < sizeof(distances) / sizeof(distances[0]));
+    //float const max_distance = distances[g_SingleGameDifficulty];
 
     // computing velocity with minimum magnitude
     m_throw_velocity.sub(m_throw_target_position, m_throw_position);
-    /*
-        if (m_throw_velocity.magnitude() > max_distance) {
-            m_throw_enabled		= false;
+    
+    if (m_throw_velocity.magnitude() > /*max_distance*/ m_throw_max_distance)
+    {
+        m_throw_enabled = false;
 
-    #ifdef DEBUG
-            m_throw_picks.clear	();
-    #endif // DEBUG
-            return;
-        }
-    */
+#ifdef DEBUG
+        m_throw_picks.clear();
+#endif // DEBUG
+        return;
+    }
+    
 
     float time = ThrowMinVelTime(m_throw_velocity, ph_world->Gravity());
     TransferenceToThrowVel(m_throw_velocity, time, ph_world->Gravity());
@@ -1192,7 +1198,8 @@ bool CAI_Stalker::can_cry_enemy_is_wounded() const
     case StalkerDecisionSpace::eWorldOperatorDetourEnemy:
     case StalkerDecisionSpace::eWorldOperatorSearchEnemy:
     case StalkerDecisionSpace::eWorldOperatorKillEnemyIfNotVisible:
-    case StalkerDecisionSpace::eWorldOperatorKillEnemyIfCriticallyWounded: return (true);
+    case StalkerDecisionSpace::eWorldOperatorKillEnemyIfCriticallyWounded: 
+    case StalkerDecisionSpace::eWorldOperatorThrowGrenade: return (true);
     case StalkerDecisionSpace::eWorldOperatorGetItemToKill:
     case StalkerDecisionSpace::eWorldOperatorRetreatFromEnemy:
     case StalkerDecisionSpace::eWorldOperatorPostCombatWait:

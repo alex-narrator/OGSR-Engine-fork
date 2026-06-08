@@ -183,8 +183,8 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
 {
     VERIFY(m_missile);
 
-    if (body_state == eBodyStateCrouch)
-        slot = 0;
+    //if (body_state == eBodyStateCrouch)
+    //    slot = 0;
 
     const xr_vector<CAniVector>& animation = m_data_storage->m_part_animations.A[body_state].m_torso.A[slot].A;
 
@@ -195,10 +195,20 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
     case CMissile::eThrowStart: return (animation[1].A[0]);
     case CMissile::eReady: return (animation[1].A[1]);
     case CMissile::eThrow: return (animation[1].A[2]);
-    case CMissile::eThrowEnd: return (animation[1].A[2]);
+    case CMissile::eThrowEnd: return (animation[6].A[0]);
+    case CMissile::eHidden: return (animation[6].A[0]);
     case CMissile::eIdle:
-    case CMissile::eHidden:
-    default: return (torso().select(animation[6].A));
+    default: {
+        CAI_Stalker& stalker = object();
+        CStalkerMovementManager& movement = stalker.movement();
+        if (standing())
+            return (animation[6].A[0]);
+
+        if (eMovementTypeWalk == movement.movement_type())
+            return (animation[6].A[2]);
+
+        return (animation[6].A[3]);
+        }
     }
 }
 

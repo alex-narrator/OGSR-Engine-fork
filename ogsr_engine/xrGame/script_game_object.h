@@ -812,6 +812,15 @@ public:
     bool throw_target(const Fvector&, CScriptGameObject* = nullptr);
     bool throw_target(const Fvector&, u32 const, CScriptGameObject* = nullptr);
 
+    bool can_throw_grenades();
+    void can_throw_grenades(bool enabled);
+
+    bool throw_randomness_enabled();
+    void throw_randomness_enabled(bool enabled);
+
+    float throw_max_distance();
+    void throw_max_distance(float distance);
+
     void g_fireParams(const CScriptGameObject*, Fvector&, Fvector&);
     bool can_fire_to_enemy(const CScriptGameObject*);
 

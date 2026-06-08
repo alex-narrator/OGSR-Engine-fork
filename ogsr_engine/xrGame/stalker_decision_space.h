@@ -50,6 +50,8 @@ enum EWorldProperties
     eWorldPropertyPausedAfterKill,
     eWorldPropertyKilledWounded,
 
+    eWorldPropertyStartedToThrowGrenade,
+
     eWorldPropertyDangerUnknown,
     eWorldPropertyDangerInDirection,
     eWorldPropertyDangerGrenade,
@@ -62,6 +64,8 @@ enum EWorldProperties
 
     eWorldPropertyAnomaly,
     eWorldPropertyInsideAnomaly,
+
+    eWorldPropertyShouldThrowGrenade,
 
     eWorldPropertyScript,
     eWorldPropertyDummy = u32(-1),
@@ -118,6 +122,7 @@ enum EWorldOperators
     eWorldOperatorCriticallyWounded,
     eWorldOperatorKillEnemyIfCriticallyWounded,
     eWorldOperatorPauseAfterKill,
+    eWorldOperatorThrowGrenade,
 
     // danger
     eWorldOperatorDangerUnknownPlanner,

@@ -797,6 +797,48 @@ bool CScriptGameObject::throw_target(const Fvector& position, u32 const vertex_i
     return stalker->throw_enabled();
 }
 
+bool CScriptGameObject::can_throw_grenades()
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    ASSERT_FMT(stalker, "[%s]: %s not a CAI_Stalker", __FUNCTION__, object().cName().c_str());
+    return stalker->can_throw_grenades();
+}
+
+void CScriptGameObject::can_throw_grenades(bool value)
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    ASSERT_FMT(stalker, "[%s]: %s not a CAI_Stalker", __FUNCTION__, object().cName().c_str());
+    stalker->can_throw_grenades(value);
+}
+
+bool CScriptGameObject::throw_randomness_enabled()
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    ASSERT_FMT(stalker, "[%s]: %s not a CAI_Stalker", __FUNCTION__, object().cName().c_str());
+    return stalker->throw_randomness_enabled();
+}
+
+void CScriptGameObject::throw_randomness_enabled(bool value)
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    ASSERT_FMT(stalker, "[%s]: %s not a CAI_Stalker", __FUNCTION__, object().cName().c_str());
+    stalker->throw_randomness_enabled(value);
+}
+
+float CScriptGameObject::throw_max_distance()
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    ASSERT_FMT(stalker, "[%s]: %s not a CAI_Stalker", __FUNCTION__, object().cName().c_str());
+    return stalker->throw_max_distance();
+}
+
+void CScriptGameObject::throw_max_distance(float distance)
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    ASSERT_FMT(stalker, "[%s]: %s not a CAI_Stalker", __FUNCTION__, object().cName().c_str());
+    stalker->throw_max_distance(distance);
+}
+
 void CScriptGameObject::g_fireParams(const CScriptGameObject* pHudItem, Fvector& P, Fvector& D)
 {
     auto E = smart_cast<CEntity*>(&object());

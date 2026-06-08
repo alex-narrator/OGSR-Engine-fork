@@ -166,6 +166,7 @@ void CAI_Stalker::reinit()
 
     m_can_throw_grenades = true;
     m_throw_time_interval = 20000;
+    m_throw_randomness_enabled = true;
 
     brain().CStalkerPlanner::m_storage.set_property(StalkerDecisionSpace::eWorldPropertyCriticallyWounded, false);
 
@@ -212,6 +213,7 @@ void CAI_Stalker::LoadSounds(LPCSTR section)
     sound().add_deferred(pSettings->r_string(section, "sound_kill_wounded"), 100, SOUND_TYPE_MONSTER_TALKING, 5, u32(eStalkerSoundMaskKillWounded), eStalkerSoundKillWounded, head_bone_name, xr_new<CStalkerSoundData>(this));
     sound().add_deferred(pSettings->r_string(section, "sound_enemy_critically_wounded"), 100, SOUND_TYPE_MONSTER_TALKING, 4, u32(eStalkerSoundMaskEnemyCriticallyWounded), eStalkerSoundEnemyCriticallyWounded, head_bone_name, xr_new<CStalkerSoundData>(this));
     sound().add_deferred(pSettings->r_string(section, "sound_enemy_killed_or_wounded"), 100, SOUND_TYPE_MONSTER_TALKING, 4, u32(eStalkerSoundMaskEnemyKilledOrWounded), eStalkerSoundEnemyKilledOrWounded, head_bone_name, xr_new<CStalkerSoundData>(this));
+    sound().add_deferred(pSettings->r_string(section, "sound_throw_grenade"), 100, SOUND_TYPE_MONSTER_TALKING, 4, u32(eStalkerSoundMaskThrowGrenade), eStalkerSoundThrowGrenade, head_bone_name, xr_new<CStalkerSoundData>(this));
 }
 
 void CAI_Stalker::reload(LPCSTR section)
@@ -325,6 +327,11 @@ void CAI_Stalker::Load(LPCSTR section)
     m_pPhysics_support->in_Load(section);
 
     m_can_select_items = !!pSettings->r_bool(section, "can_select_items");
+
+    m_can_throw_grenades = READ_IF_EXISTS(pSettings, r_bool, section, "can_throw_grenades", true);
+    m_throw_time_interval = READ_IF_EXISTS(pSettings, r_u32, section, "throw_time_interval", 20000);
+    m_throw_randomness_enabled = READ_IF_EXISTS(pSettings, r_bool, section, "throw_randomness_enabled", true);
+    m_throw_max_distance = READ_IF_EXISTS(pSettings, r_float, section, "throw_max_distance", 50.0f );
 }
 
 BOOL CAI_Stalker::net_Spawn(CSE_Abstract* DC)

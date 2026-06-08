@@ -493,11 +493,17 @@ public:
     IC const bool& throw_enabled();
 
 private:
-    bool m_can_throw_grenades;
+    bool m_can_throw_grenades{};
+    bool m_throw_randomness_enabled{};
+    float m_throw_max_distance{};
 
 public:
     IC const bool& can_throw_grenades() const;
     IC void can_throw_grenades(const bool& value);
+    IC const bool& throw_randomness_enabled() const;
+    IC void throw_randomness_enabled(const bool& value);
+    IC const float& throw_max_distance() const;
+    IC void throw_max_distance(const float& value);
 
 private:
     bool throw_check_error(float low, float high, const Fvector& start, const Fvector& velocity, const Fvector& gravity);
@@ -511,6 +517,7 @@ public:
     virtual bool use_throw_randomness();
     void throw_target(const Fvector& position, CObject* throw_ignore_object = nullptr);
     void throw_target(const Fvector& position, u32 const vertex_id, CObject* throw_ignore_object = nullptr);
+    void throw_target_setup(const Fvector& position, CGameObject* target);
     IC const Fvector& throw_target() const;
     void update_throw_params();
     void on_throw_completed();

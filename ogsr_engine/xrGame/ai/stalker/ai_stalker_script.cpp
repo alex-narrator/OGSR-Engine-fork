@@ -57,7 +57,10 @@ void CAI_Stalker::script_register(lua_State* L)
                     luabind::value("property_inside_anomaly", StalkerDecisionSpace::eWorldPropertyInsideAnomaly),
                     luabind::value("property_pure_enemy", StalkerDecisionSpace::eWorldPropertyPureEnemy),
                     luabind::value("property_script", StalkerDecisionSpace::eWorldPropertyScript),
-                    luabind::value("property_enemy_wounded", StalkerDecisionSpace::eWorldPropertyEnemyWounded))]
+                    luabind::value("property_enemy_wounded", StalkerDecisionSpace::eWorldPropertyEnemyWounded),
+                    luabind::value("property_started_to_throw_grenade", StalkerDecisionSpace::eWorldPropertyStartedToThrowGrenade),
+                    luabind::value("property_should_throw_grenade", StalkerDecisionSpace::eWorldPropertyShouldThrowGrenade)
+                       )]
 
                .enum_("action")[(luabind::value("action_dead", StalkerDecisionSpace::eWorldOperatorDead), luabind::value("action_dying", StalkerDecisionSpace::eWorldOperatorDying),
                                 luabind::value("action_gather_items", StalkerDecisionSpace::eWorldOperatorGatherItems),
@@ -121,7 +124,9 @@ void CAI_Stalker::script_register(lua_State* L)
                                 luabind::value("action_danger_planner", StalkerDecisionSpace::eWorldOperatorDangerPlanner),
                                 luabind::value("action_post_combat_wait", StalkerDecisionSpace::eWorldOperatorPostCombatWait),
                                 luabind::value("action_script", StalkerDecisionSpace::eWorldOperatorScript),
-                                luabind::value("action_hide_from_grenade", StalkerDecisionSpace::eWorldOperatorHideFromGrenade))]
+                                luabind::value("action_hide_from_grenade", StalkerDecisionSpace::eWorldOperatorHideFromGrenade),
+                                luabind::value("action_throw_grenade", StalkerDecisionSpace::eWorldOperatorThrowGrenade)
+                   )]
 
                .enum_(
                    "sounds")[(luabind::value("sound_die", StalkerSpace::eStalkerSoundDie), luabind::value("sound_die_in_anomaly", StalkerSpace::eStalkerSoundDieInAnomaly),
@@ -144,6 +149,7 @@ void CAI_Stalker::script_register(lua_State* L)
                              luabind::value("sound_kill_wounded", StalkerSpace::eStalkerSoundKillWounded),
                              luabind::value("sound_enemy_critically_wounded", StalkerSpace::eStalkerSoundEnemyCriticallyWounded),
                              luabind::value("sound_enemy_killed_or_wounded", StalkerSpace::eStalkerSoundEnemyKilledOrWounded),
+                             luabind::value("sound_throw_grenade", StalkerSpace::eStalkerSoundThrowGrenade),
 
                              luabind::value("sound_script", StalkerSpace::eStalkerSoundScript))],
 

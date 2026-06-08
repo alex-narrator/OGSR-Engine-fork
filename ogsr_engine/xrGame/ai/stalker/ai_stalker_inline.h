@@ -102,3 +102,11 @@ IC const u32& CAI_Stalker::throw_time_interval() const { return (m_throw_time_in
 IC void CAI_Stalker::throw_time_interval(const u32& value) { m_throw_time_interval = value; }
 
 IC const Fvector& CAI_Stalker::throw_target() const { return (m_throw_target_position); }
+
+IC const bool& CAI_Stalker::throw_randomness_enabled() const { return (m_throw_randomness_enabled); }
+
+IC void CAI_Stalker::throw_randomness_enabled(const bool& value) { m_throw_randomness_enabled = value; }
+
+IC const float& CAI_Stalker::throw_max_distance() const { return (m_throw_max_distance); }
+
+IC void CAI_Stalker::throw_max_distance(const float& value) { m_throw_max_distance = value; }
