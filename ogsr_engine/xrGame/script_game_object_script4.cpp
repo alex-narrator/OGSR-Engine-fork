@@ -198,6 +198,8 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
         .def("get_weapon_ammo", &script_game_object_cast<CWeaponAmmo>)
         .def("get_flashlight", &script_game_object_cast<CFlashlight>)
 
+        .def("get_explosive", &script_game_object_cast<CExplosive>)
+
         .def("ph_capture_object", (void(CScriptGameObject::*)(CScriptGameObject*))(&CScriptGameObject::PHCaptureObject))
         .def("ph_capture_object", (void(CScriptGameObject::*)(CScriptGameObject*, LPCSTR))(&CScriptGameObject::PHCaptureObject))
         .def("ph_capture_object", (void(CScriptGameObject::*)(CScriptGameObject*, u16))(&CScriptGameObject::PHCaptureObject))

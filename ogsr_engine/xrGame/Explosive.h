@@ -69,6 +69,7 @@ public:
     virtual bool Useful() const;
     bool IsExploded() { return !!m_explosion_flags.test(flExploded); }
     bool IsReadyToExplode() { return !!m_explosion_flags.test(flReadyToExplode); };
+    bool IsExploding() { return !!m_explosion_flags.test(flExploding); }
 
 protected:
     bool IsSoundPlaying();
