@@ -158,7 +158,7 @@ bool CUIPropertiesBox::OnKeyboard(int dik, EUIMessages keyboard_action)
     return true;
 }
 
-void CUIPropertiesBox::CheckCustomActionsMapSpot(u16 id, LPCSTR spot_type, LPCSTR location_name, Fvector pos)
+void CUIPropertiesBox::CheckCustomActionsMapSpot(u16 id, LPCSTR spot_type, LPCSTR location_name, Fvector pos, bool user_def)
 {
     for (const auto& action : m_custom_actions_map_spot)
     {
@@ -168,7 +168,7 @@ void CUIPropertiesBox::CheckCustomActionsMapSpot(u16 id, LPCSTR spot_type, LPCST
             {
                 LPCSTR tip_text{};
                 if (luabind::functor<LPCSTR> tip_func; ai().script_engine().functor(action.first.c_str(), tip_func))
-                    tip_text = tip_func(id, spot_type, location_name, pos);
+                    tip_text = tip_func(id, spot_type, location_name, pos, user_def);
                 else
                     tip_text = CStringTable().translate(action.first).c_str();
 
@@ -180,11 +180,11 @@ void CUIPropertiesBox::CheckCustomActionsMapSpot(u16 id, LPCSTR spot_type, LPCST
     }
 }
 
-void CUIPropertiesBox::ProcessCustomActionsMapSpot(u16 id, LPCSTR spot_type, LPCSTR location_name, Fvector pos)
+void CUIPropertiesBox::ProcessCustomActionsMapSpot(u16 id, LPCSTR spot_type, LPCSTR location_name, Fvector pos, bool user_def)
 {
     auto it = m_custom_actions_map_spot.find((LPCSTR)GetClickedItem()->GetData());
     if (luabind::functor<void> m_functorDoAction; ai().script_engine().functor(it->second[1].c_str(), m_functorDoAction))
-        m_functorDoAction(id, spot_type, location_name, pos);
+        m_functorDoAction(id, spot_type, location_name, pos, user_def);
     else
         Msg("!Item-action function [%s] not exist.", it->second[1].c_str());
 }

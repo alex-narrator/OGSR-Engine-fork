@@ -522,7 +522,7 @@ void CUIMapWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         // Click on the custom actions
         case MAP_SPOT_CUSTOM_ACTION: {
             m_UIPropertiesBox->ProcessCustomActionsMapSpot(m_cur_location->ObjectID(), m_cur_location->GetType(), m_cur_location->LevelName().c_str(),
-                                                           m_cur_location->GetLastPosition());
+                                                           m_cur_location->GetLastPosition(), m_cur_location->IsUserDefined());
             break;
         }
         }
@@ -798,29 +798,8 @@ void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
         m_UIPropertiesBox->AddItem("st_pda_change_spot_hint", w, MAP_CHANGE_SPOT_HINT_ACT);
         m_UIPropertiesBox->AddItem("st_pda_delete_spot", w, MAP_REMOVE_SPOT_ACT);
     }
-    else
-    {
-        auto& tm = Actor()->GameTaskManager();
-        for (const auto& task : tm.GameTasks())
-        {
-            const auto gametask = task.game_task;
-            if (gametask->HasInProgressObjective() && gametask->HasLinkedMapLocations())
-            {
-                for (int i = 1; i < gametask->GetObjectiveSize_script(); ++i)
-                {
-                    auto& objective = gametask->Objective(i);
-                    auto map_location = objective.LinkedMapLocation();
-                    if (map_location && map_location->SpotEnabled() && map_location->ObjectID() == m_cur_location->ObjectID())
-                    {
-                        tm.SetActiveTask(task.task_id, objective.idx);
-                        break;
-                    }
-                }
-            }
-        }
-    }
 
-    m_UIPropertiesBox->CheckCustomActionsMapSpot(m_cur_location->ObjectID(), m_cur_location->GetType(), m_cur_location->LevelName().c_str(), m_cur_location->GetLastPosition());
+    m_UIPropertiesBox->CheckCustomActionsMapSpot(m_cur_location->ObjectID(), m_cur_location->GetType(), m_cur_location->LevelName().c_str(), m_cur_location->GetLastPosition(), m_cur_location->IsUserDefined());
 
     if (m_UIPropertiesBox->GetItemsCount() > 0)
     {

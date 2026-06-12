@@ -89,6 +89,7 @@ public:
     int GetIDX_script() { return idx; };
     void SetMapHint_script(LPCSTR _str);
     void SetMapLocation_script(LPCSTR _str);
+    LPCSTR GetMapLocation_script() { return map_location.c_str(); };
     void SetObjectID_script(u16 id);
     u16 GetObjectID_script() const { return object_id; };
 

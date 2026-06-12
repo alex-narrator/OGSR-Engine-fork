@@ -560,6 +560,10 @@ void CUILevelMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         const auto* ui_game_sp = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
         if (ui_game_sp->PdaMenu->m_pActiveSection == EPdaTabs::eptMap) // Правильнее было бы проверять там, откуда вызвали, но надо кучу инклудов... Да ну нахер возиться.
             MapWnd()->ActivatePropertiesBox(pWnd);
+
+        if (const auto ms = smart_cast<CMapSpot*>(pWnd))
+            if (const auto ml = ms->MapLocation())
+                g_actor->callback(GameObject::eMapLocationClicked)(ml->ObjectID(), ml->GetType(), ml->LevelName().c_str(), ml->GetLastPosition(), ml->IsUserDefined());
     }
     break;
     case MAP_SHOW_HINT: {

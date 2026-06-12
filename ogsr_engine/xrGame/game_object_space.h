@@ -18,6 +18,7 @@ enum ECallbackType
     eTaskStateChange,
     eMapLocationAdded,
     eMapRelationLocationAdded,
+    eMapLocationClicked,
 
     eUseObject,
 
