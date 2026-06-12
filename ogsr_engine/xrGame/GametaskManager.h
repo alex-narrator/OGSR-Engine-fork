@@ -24,6 +24,8 @@ public:
     void SetTaskState(const TASK_ID& id, u16 objective_num, ETaskState state);
     void SetTaskState(CGameTask* t, u16 objective_num, ETaskState state);
 
+    void RemoveGameTask(CGameTask* t);
+
     void UpdateTasks();
     //.	void					RemoveUserTask					(CMapLocation* ml);
 

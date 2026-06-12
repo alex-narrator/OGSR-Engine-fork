@@ -304,12 +304,9 @@ public:
     bool HasInfo(LPCSTR info_id);
     bool DontHasInfo(LPCSTR info_id);
     xrTime GetInfoTime(LPCSTR info_id);
-    //работа с заданиями
-    ETaskState GetGameTaskState(LPCSTR task_id, int objective_num);
-    void SetGameTaskState(ETaskState state, LPCSTR task_id, int objective_num);
-    void GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExisting);
-    void SetTaskSelected(const shared_str& id, u16 idx, const bool safe);
+
     LPCSTR GetArticleText(LPCSTR article_id);
+    CUIStatic* GetArticleImage(LPCSTR article_id);
 
     bool IsTalking();
     void StopTalk();

@@ -85,6 +85,7 @@ public:
     // for scripting access
     void SetDescription_script(LPCSTR _descr);
     void SetArticleID_script(LPCSTR _id);
+    LPCSTR GetArticleID_script() { return article_id.c_str(); };
     int GetIDX_script() { return idx; };
     void SetMapHint_script(LPCSTR _str);
     void SetMapLocation_script(LPCSTR _str);

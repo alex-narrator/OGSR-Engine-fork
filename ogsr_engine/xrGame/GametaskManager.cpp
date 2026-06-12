@@ -315,6 +315,34 @@ SGameTaskObjective* CGameTaskManager::ActiveObjective()
     return (t) ? &t->Objective(g_active_task_objective_id) : NULL;
 }
 
+void CGameTaskManager::RemoveGameTask(CGameTask* t)
+{
+    if (!t)
+        return;
+    auto it = std::find_if(GameTasks().begin(), GameTasks().end(), [&](const SGameTaskKey& key) { return t == key.game_task; });
+    if (it != GameTasks().end())
+    {
+        xr_vector<shared_str> articles;
+        for (const auto& obj : it->game_task->m_Objectives)
+            if (obj.article_id.size())
+                articles.push_back(obj.article_id);
+
+        if (!articles.empty())
+        {
+            auto& article_vector = Actor()->encyclopedia_registry->registry().objects();
+            for (const auto& article_id : articles)
+            {
+                FindArticleByIDPred pred(article_id);
+                article_vector.erase(std::remove_if(article_vector.begin(), article_vector.end(), pred), article_vector.end());
+            }
+        }
+
+        GameTasks().erase(it);
+        if (ActiveTask() == t)
+            SetActiveTask("", 1);
+    }
+}
+
 void CGameTaskManager::cleanup()
 {
     xr_vector<shared_str> articles;

@@ -153,10 +153,18 @@ LPCSTR CScriptGameObject::GetArticleText(LPCSTR article_id)
 {
     CEncyclopediaArticle A;
     A.Load(article_id);
-
     return A.data()->text.c_str();
 }
 
+CUIStatic* CScriptGameObject::GetArticleImage(LPCSTR article_id)
+{
+    CEncyclopediaArticle A;
+    A.Load(article_id);
+    if (A.data()->image.TextureAvailable())
+        return &A.data()->image;
+    else
+        return nullptr;
+}
 
 bool CScriptGameObject::IsTalking()
 {
@@ -645,34 +653,6 @@ LPCSTR CScriptGameObject::sound_voice_prefix() const
     return pInventoryOwner->SpecificCharacter().sound_voice_prefix();
 }
 
-#include "GameTaskManager.h"
-ETaskState CScriptGameObject::GetGameTaskState(LPCSTR task_id, int objective_num)
-{
-    /*	CActor* pActor = smart_cast<CActor*>(&object());
-        if (!pActor) {
-            ai().script_engine().script_log		(ScriptStorage::eLuaMessageTypeError,"GetGameTaskState available only for actor");
-            return eTaskStateDummy;
-        }
-    */
-    shared_str shared_name = task_id;
-    CGameTask* t = Actor()->GameTaskManager().HasGameTask(shared_name);
-    if (NULL == t)
-        return eTaskStateDummy;
-
-    if ((std::size_t)objective_num >= t->m_Objectives.size())
-    {
-        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "wrong objective num", task_id);
-        return eTaskStateDummy;
-    }
-    return t->m_Objectives[objective_num].TaskState();
-}
-
-void CScriptGameObject::SetGameTaskState(ETaskState state, LPCSTR task_id, int objective_num)
-{
-    shared_str shared_name = task_id;
-    Actor()->GameTaskManager().SetTaskState(shared_name, (u16)objective_num, state);
-}
-
 //////////////////////////////////////////////////////////////////////////
 
 void CScriptGameObject::RunTalkDialog(CScriptGameObject* pToWho) const
@@ -934,9 +914,6 @@ CScriptGameObject* CScriptGameObject::active_device() const
     }
     return nullptr;
 }
-
-void CScriptGameObject::GiveTaskToActor(CGameTask* t, u32 dt, bool bCheckExisting) { Actor()->GameTaskManager().GiveGameTaskToActor(t, dt, bCheckExisting); }
-void CScriptGameObject::SetTaskSelected(const shared_str& id, u16 idx, const bool safe) { Actor()->GameTaskManager().SetActiveTask(id, idx, safe); };
 
 u32 CScriptGameObject::active_slot()
 {
