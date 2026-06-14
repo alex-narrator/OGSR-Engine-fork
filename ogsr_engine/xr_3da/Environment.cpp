@@ -217,7 +217,7 @@ float CEnvironment::NormalizeTime(float tm)
         return tm;
 }
 
-void CEnvironment::SetWeather(shared_str name, bool forced)
+void CEnvironment::SetWeather(const shared_str& name, const bool forced)
 {
     //.	static BOOL bAlready = FALSE;
     //.	if(bAlready)	return;
@@ -257,7 +257,7 @@ void CEnvironment::SetWeather(shared_str name, bool forced)
     }
 }
 
-bool CEnvironment::SetWeatherFX(shared_str name)
+bool CEnvironment::SetWeatherFX(const shared_str& name)
 {
     if (b_wfx)
         return false;
@@ -288,7 +288,7 @@ bool CEnvironment::SetWeatherFX(shared_str name)
         CEnvDescriptor* CE = CurrentWeather->at(CurrentWeather->size() - 2);
         CEnvDescriptor* CT = CurrentWeather->at(CurrentWeather->size() - 1);
         C0->copy(*Current[0]);
-        C0->exec_time = NormalizeTime(fGameTime - ((rewind_tm / (Current[1]->exec_time - fGameTime)) * current_length - rewind_tm));
+        C0->exec_time = NormalizeTime(fGameTime - ((rewind_tm / TimeDiff(fGameTime, Current[1]->exec_time)) * current_length - rewind_tm));
         C1->copy(*Current[1]);
         C1->exec_time = NormalizeTime(start_tm);
         for (EnvIt t_it = CurrentWeather->begin() + 2; t_it != CurrentWeather->end() - 1; ++t_it)
@@ -319,7 +319,7 @@ bool CEnvironment::SetWeatherFX(shared_str name)
     return true;
 }
 
-bool CEnvironment::SetWeatherFXFromTime(shared_str name, float time)
+bool CEnvironment::SetWeatherFXFromTime(const shared_str& name, const float time)
 {
     float _fGameTime = fGameTime;
     fGameTime = NormalizeTime(fGameTime - time);
@@ -468,9 +468,9 @@ void CEnvironment::lerp(float& current_weight)
     for (auto& Modifier : Modifiers)
         mpower += EM.sum(Modifier, view);
 
-    extern bool s_ScriptNoMixer;
+    extern bool editor_weather_no_mixer;
 
-    if (s_ScriptNoMixer)
+    if (editor_weather_no_mixer)
         current_weight = 0;
 
     // final lerp
@@ -518,15 +518,20 @@ void CEnvironment::OnFrame()
     m_pRender->OnFrame(*this);
 }
 
+extern bool editor_override_sun_position;
+
 void CEnvironment::calculate_config_sun_dir() const
 {
-    float current_time = fGameTime / (DAY_LENGTH / 24);
-    int weather_time = iFloor(current_time);
-    float s_weight = current_time - weather_time;
+    if (editor_override_sun_position)
+        return;
 
+    const float current_time = fGameTime / (DAY_LENGTH / 24);
+    const int weather_time = iFloor(current_time);
+    const float s_weight = current_time - weather_time;
+
+    const float s_alt = sun_hp[weather_time].x;
+    const float s_long = sun_hp[weather_time].y;
     float real_sun_alt, real_sun_long;
-    float s_alt = sun_hp[weather_time].x;
-    float s_long = sun_hp[weather_time].y;
 
     if (s_weight > 0)
     {
@@ -685,7 +690,7 @@ CLensFlareDescriptor* CEnvironment::add_flare(xr_vector<CLensFlareDescriptor*>& 
     return result;
 }
 
-void CEnvironment::SetWeatherNext(shared_str name)
+void CEnvironment::SetWeatherNext(const shared_str& name)
 {
     ASSERT_FMT(name.size(), "empty weather name");
     EnvsMapIt it = WeatherCycles.find(name);
