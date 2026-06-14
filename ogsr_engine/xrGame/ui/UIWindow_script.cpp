@@ -11,6 +11,7 @@
 #include "UIScrollView.h"
 #include "UIProgressBar.h"
 #include "MMSound.h"
+#include "UIOptionsItem.h"
 
 CFontManager& mngr() { return *(UI()->Font()); }
 
@@ -52,10 +53,17 @@ T* wnd_object_cast(CUIWindow* wnd)
     return smart_cast<T*>(wnd);
 }
 
+LPCSTR OptionItemEntry_script(CUIWindow* self)
+{
+    if (auto* optionItem = smart_cast<CUIOptionsItem*>(self))
+    {
+        return optionItem->GetEntry();
+    }
+    return nullptr;
+}
+
 #include "UIButton.h"
 using namespace luabind;
-
-
 
 void CUIWindow::create_ui_snd(ref_sound& S, LPCSTR fName)
 {
@@ -131,9 +139,8 @@ void CUIWindow::script_register(lua_State* L)
                   .def("BringAllToTop", &CUIWindow::BringAllToTop)
                   .def("SetPriority", &CUIWindow::SetPriority)
                   .def("GetPriority", &CUIWindow::GetPriority)
-                  .def("SortByPriority", &CUIWindow::SortByPriority),
-
-              //		.def("",						&CUIWindow::)
+                  .def("SortByPriority", &CUIWindow::SortByPriority)
+                  .def("GetOptionItemEntry", &OptionItemEntry_script),
 
               class_<CDialogHolder>("CDialogHolder")
                   .def("MainInputReceiver", &CDialogHolder::MainInputReceiver)

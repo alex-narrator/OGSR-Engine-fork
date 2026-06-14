@@ -87,6 +87,7 @@ extern "C" __declspec(noreturn) void __fastfail(unsigned int);
 #include <mutex>
 #include <shared_mutex>
 #include <typeinfo>
+#include <ranges>
 #pragma warning(pop)
 
 // Our headers
@@ -215,7 +216,8 @@ public:
             show_objectives_ondemand = 1ull << 10,
             disable_dialog_break = 1ull << 11,
             no_progress_bar_animation = 1ull << 12,
-            limited_bolts = 1ull << 13;
+            limited_bolts = 1ull << 13,
+            dont_switch_active_task_by_prio = 1ull << 14;
     };
 
     void _initialize(LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0);

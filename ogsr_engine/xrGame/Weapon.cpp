@@ -1322,7 +1322,7 @@ void CWeapon::UpdateAddonsVisibility()
 
     bone_id = pWeaponVisual->LL_BoneID(m_sWpn_launcher_bone);
 
-    if (AddonAttachable(eLauncher))
+    if (AddonAttachable(eLauncher) && (bone_id != BI_NONE))
     {
         pWeaponVisual->LL_SetBoneVisible(bone_id, IsAddonAttached(eLauncher), TRUE);
     }
