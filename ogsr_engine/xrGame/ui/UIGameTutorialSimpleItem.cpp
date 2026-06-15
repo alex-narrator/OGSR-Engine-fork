@@ -237,14 +237,14 @@ void CUISequenceSimpleItem::Start()
                 ui_game_sp->PdaMenu->SetActiveSubdialog(eptRanking);
                 bShowPda = true;
             }
-            else if (!_stricmp(m_pda_section, "pda_statistics"))
-            {
-                ui_game_sp->PdaMenu->SetActiveSubdialog(eptActorStatistic);
-                bShowPda = true;
-            }
             else if (!_stricmp(m_pda_section, "pda_encyclopedia"))
             {
                 ui_game_sp->PdaMenu->SetActiveSubdialog(eptEncyclopedia); //-V595
+                bShowPda = true;
+            }
+            else if (auto tab_num = EPdaTabs(atoi(m_pda_section)))
+            {
+                ui_game_sp->PdaMenu->SetActiveSubdialog(tab_num);
                 bShowPda = true;
             }
         }

@@ -26,7 +26,6 @@
 #include "GameTaskManager.h"
 #include "holder_custom.h"
 #include "actor_memory.h"
-#include "actor_statistic_mgr.h"
 #include "alife_simulator_header.h"
 #include "actorcondition.h"
 #include "Car.h"
@@ -201,8 +200,6 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     m_game_task_manager = xr_new<CGameTaskManager>();
     GameTaskManager().initialize(ID());
 
-    m_statistic_manager = xr_new<CActorStatisticMgr>();
-
     spatial.type |= STYPE_REACTTOSOUND;
 
     g_player_hud->load_default();
@@ -220,7 +217,6 @@ void CActor::net_Destroy()
         Level().client_spawn_manager().remove(m_holder_id, ID());
 
     delete_data(m_game_task_manager);
-    delete_data(m_statistic_manager);
 
     Level().MapManager().RemoveMapLocationByObjectID(ID());
 

@@ -57,7 +57,6 @@ class CCameraShotEffector;
 class CActorInputHandler;
 
 class CActorMemory;
-class CActorStatisticMgr;
 
 class CLocationManager;
 
@@ -172,13 +171,11 @@ public:
 
 protected:
     CGameTaskManager* m_game_task_manager{};
-    CActorStatisticMgr* m_statistic_manager{};
 
 public:
     void StartTalk(CInventoryOwner* talk_partner, bool = true) override;
     virtual void RunTalkDialog(CInventoryOwner* talk_partner);
     CGameTaskManager& GameTaskManager() const { return *m_game_task_manager; }
-    CActorStatisticMgr& StatisticMgr() { return *m_statistic_manager; }
     CEncyclopediaRegistryWrapper* encyclopedia_registry;
     CGameNewsRegistryWrapper* game_news_registry;
     CCharacterPhysicsSupport* m_pPhysics_support;

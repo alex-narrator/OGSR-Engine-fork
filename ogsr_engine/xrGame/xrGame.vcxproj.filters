@@ -4326,12 +4326,6 @@
     <ClInclude Include="game_news.h">
       <Filter>Core\Client\Objects\tasks_info_dialogs\news</Filter>
     </ClInclude>
-    <ClInclude Include="actor_statistic_defs.h">
-      <Filter>Core\Client\Objects\tasks_info_dialogs\statistics</Filter>
-    </ClInclude>
-    <ClInclude Include="actor_statistic_mgr.h">
-      <Filter>Core\Client\Objects\tasks_info_dialogs\statistics</Filter>
-    </ClInclude>
     <ClInclude Include="Inventory.h">
       <Filter>Core\Client\Objects\inventory</Filter>
     </ClInclude>
@@ -5906,9 +5900,6 @@
     <ClInclude Include="Helmet.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIActorInfo.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\Statistics</Filter>
-    </ClInclude>
     <ClInclude Include="script_light.h">
       <Filter>AI\AScript\ScriptClasses\ScriptLight</Filter>
     </ClInclude>
@@ -7372,9 +7363,6 @@
     <ClCompile Include="game_news.cpp">
       <Filter>Core\Client\Objects\tasks_info_dialogs\news</Filter>
     </ClCompile>
-    <ClCompile Include="actor_statistic_mgr.cpp">
-      <Filter>Core\Client\Objects\tasks_info_dialogs\statistics</Filter>
-    </ClCompile>
     <ClCompile Include="Inventory.cpp">
       <Filter>Core\Client\Objects\inventory</Filter>
     </ClCompile>
@@ -8701,9 +8689,6 @@
     </ClCompile>
     <ClCompile Include="WeaponAmmo_script.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\Custom Weapon\Ammo</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIActorInfo.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\Statistics</Filter>
     </ClCompile>
     <ClCompile Include="inventory_item_object_script.cpp">
       <Filter>Core\Client\Objects\inventory\InventoryItemObject</Filter>

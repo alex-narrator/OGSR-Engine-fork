@@ -20,7 +20,6 @@
 #include "UIFrameLineWnd.h"
 #include "UIEncyclopediaWnd.h"
 #include "UIStalkersRankingWnd.h"
-#include "UIActorInfo.h"
 #include "UIEventsWnd.h"
 #include "../object_broker.h"
 #include "UIMessagesWindow.h"
@@ -49,7 +48,6 @@ CUIPdaWnd::~CUIPdaWnd()
     delete_data(UIPdaContactsWnd);
     delete_data(UIEncyclopediaWnd);
     delete_data(UIDiaryWnd);
-    delete_data(UIActorInfo);
     delete_data(UIStalkersRanking);
     delete_data(UIEventsWnd);
 }
@@ -97,10 +95,6 @@ void CUIPdaWnd::Init()
     // Окно энциклопедии
     UIEncyclopediaWnd = xr_new<CUIEncyclopediaWnd>();
     UIEncyclopediaWnd->Init();
-
-    // Окно статистики о актере
-    UIActorInfo = xr_new<CUIActorInfoWnd>();
-    UIActorInfo->Init();
 
     // Окно рейтинга сталкеров
     UIStalkersRanking = xr_new<CUIStalkersRankingWnd>();
@@ -309,11 +303,6 @@ void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
         InventoryUtilities::SendInfoToActor("ui_pda_encyclopedia");
         g_pda_info_state &= ~pda_section::encyclopedia;
         break;
-    case eptActorStatistic:
-        m_pActiveDialog = smart_cast<CUIWindow*>(UIActorInfo);
-        InventoryUtilities::SendInfoToActor("ui_pda_actor_info");
-        g_pda_info_state &= ~pda_section::statistics;
-        break;
     case eptRanking:
         m_pActiveDialog = smart_cast<CUIWindow*>(UIStalkersRanking);
         g_pda_info_state &= ~pda_section::ranking;
@@ -419,9 +408,6 @@ void CUIPdaWnd::DrawUpdatedSections()
     if (g_pda_info_state & pda_section::ranking)
         UITabControl->GetButtonByIndex(eptRanking)->DrawHighlightedText();
 
-    if (g_pda_info_state & pda_section::statistics)
-        UITabControl->GetButtonByIndex(eptActorStatistic)->DrawHighlightedText();
-
     if (g_pda_info_state & pda_section::encyclopedia)
         UITabControl->GetButtonByIndex(eptEncyclopedia)->DrawHighlightedText();
 }
@@ -437,8 +423,6 @@ void CUIPdaWnd::Reset()
         UIEncyclopediaWnd->Reset();
     if (UIDiaryWnd)
         UIDiaryWnd->Reset();
-    if (UIActorInfo)
-        UIActorInfo->Reset();
     if (UIStalkersRanking)
         UIStalkersRanking->Reset();
     if (UIEventsWnd)

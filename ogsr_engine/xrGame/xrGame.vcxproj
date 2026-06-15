@@ -319,7 +319,6 @@
     <ClInclude Include="steering_behaviour_separation.h" />
     <ClInclude Include="trajectories.h" />
     <ClInclude Include="ui\ArtefactDetectorUI.h" />
-    <ClInclude Include="ui\UIActorInfo.h" />
     <ClInclude Include="ui\UIHelper.h" />
     <ClInclude Include="ui\UILoadingScreen.h" />
     <ClInclude Include="ui\UIPdaSpot.h" />
@@ -1075,8 +1074,6 @@
     <ClInclude Include="PhraseDialogManager.h" />
     <ClInclude Include="PhraseScript.h" />
     <ClInclude Include="game_news.h" />
-    <ClInclude Include="actor_statistic_defs.h" />
-    <ClInclude Include="actor_statistic_mgr.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="..\COMMON_AI\inventory_space.h" />
     <ClInclude Include="attachable_item.h" />
@@ -1535,7 +1532,6 @@
     <ClCompile Include="space_restrictor_script.cpp" />
     <ClCompile Include="steering_behaviour.cpp" />
     <ClCompile Include="trajectories.cpp" />
-    <ClCompile Include="ui\UIActorInfo.cpp" />
     <ClCompile Include="ui\UIHelper.cpp" />
     <ClCompile Include="ui\UILoadingScreen.cpp" />
     <ClCompile Include="ui\UIPdaSpot.cpp" />
@@ -2007,7 +2003,6 @@
     <ClCompile Include="PhraseDialogManager.cpp" />
     <ClCompile Include="PhraseScript.cpp" />
     <ClCompile Include="game_news.cpp" />
-    <ClCompile Include="actor_statistic_mgr.cpp" />
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="attachable_item.cpp" />
     <ClCompile Include="attachment_owner.cpp" />
