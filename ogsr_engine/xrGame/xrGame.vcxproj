@@ -1465,6 +1465,7 @@
     <ClCompile Include="..\COMMON_AI\script_writer_script.cpp" />
     <ClCompile Include="Addons.cpp" />
     <ClCompile Include="AdvancedDetector.cpp" />
+    <ClCompile Include="character_info_script.cpp" />
     <ClCompile Include="CustomDevice.cpp" />
     <ClCompile Include="CustomZone_script.cpp" />
     <ClCompile Include="eatable_item_script.cpp" />

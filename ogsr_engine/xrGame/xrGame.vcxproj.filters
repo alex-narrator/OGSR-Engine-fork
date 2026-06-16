@@ -8702,6 +8702,9 @@
     <ClCompile Include="embedded_editor\embedded_editor_world.cpp">
       <Filter>EmbeddedEditor\EditorWindows</Filter>
     </ClCompile>
+    <ClCompile Include="character_info_script.cpp">
+      <Filter>Core\Client\Objects\inventory\InventoryOwner\character_info</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="Explosive.h">

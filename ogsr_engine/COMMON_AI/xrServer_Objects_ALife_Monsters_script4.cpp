@@ -49,6 +49,7 @@ ALife::_OBJECT_ID smart_terrain_id(CSE_ALifeMonsterAbstract* monster)
     return (monster->m_smart_terrain_id);
 }
 
+LPCSTR name_translated_script(CSE_ALifeTraderAbstract* trader) {return trader->name_translated().c_str();}
 
 void CSE_ALifeMonsterAbstract::script_register(lua_State* L)
 {
@@ -69,6 +70,7 @@ void CSE_ALifeHumanAbstract::script_register(lua_State* L)
 #ifdef XRGAME_EXPORTS
                   .def("rank", &CSE_ALifeTraderAbstract::Rank)
                   .def("set_rank", &CSE_ALifeTraderAbstract::SetRank)
+                  .def("name_translated", &name_translated_script)
 
 #endif
     ];

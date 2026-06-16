@@ -18,6 +18,7 @@ class NET_Packet;
 #include "character_community.h"
 #include "character_rank.h"
 #include "character_reputation.h"
+#include "script_export_space.h"
 class CSE_ALifeTraderAbstract;
 #endif
 
@@ -125,6 +126,7 @@ public:
 
     shared_str StartDialog() const;
     const DIALOG_ID_VECTOR& ActorDialogs() const;
+    DECLARE_SCRIPT_REGISTER_FUNCTION
 #endif
 
 protected:
@@ -134,3 +136,7 @@ protected:
     CHARACTER_COMMUNITY m_CurrentCommunity;
 #endif
 };
+
+add_to_type_list(CCharacterInfo)
+#undef script_type_list
+#define script_type_list save_type_list(CCharacterInfo)

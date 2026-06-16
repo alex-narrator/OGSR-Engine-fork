@@ -958,7 +958,6 @@ static void shader_get_custom_param(const char* key, float& x, float& y, float& 
     w = v.w;
 }
 
-
 void CLevel::script_register(lua_State* L)
 {
     module(L)[(class_<CEnvDescriptor>("CEnvDescriptor")
