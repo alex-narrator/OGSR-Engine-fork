@@ -17,7 +17,6 @@ enum ECallbackType
     eArticleInfo,
     eTaskStateChange,
     eMapLocationAdded,
-    eMapRelationLocationAdded,
     eMapLocationClicked,
 
     eUseObject,
@@ -102,6 +101,9 @@ enum ECallbackType
     eOnActorLand,
     eOnActorJump,
     eOnActorBoltThrow,
+
+    eOnPDAContactAdd,
+    eOnPDAContactRemove,
 
     eDummy = u32(-1),
 };

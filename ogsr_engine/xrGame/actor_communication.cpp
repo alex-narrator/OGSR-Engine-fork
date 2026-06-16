@@ -295,6 +295,7 @@ void CActor::NewPdaContact(CInventoryOwner* pInvOwner)
         if (pGameSP)
             pGameSP->PdaMenu->PdaContentsChanged(pda_section::contacts);
     }
+    callback(GameObject::eOnPDAContactAdd)(pInvOwner->object_id());
 }
 
 void CActor::LostPdaContact(CInventoryOwner* pInvOwner)
@@ -318,6 +319,7 @@ void CActor::LostPdaContact(CInventoryOwner* pInvOwner)
             pGameSP->PdaMenu->PdaContentsChanged(pda_section::contacts);
         }
     }
+    callback(GameObject::eOnPDAContactRemove)(pInvOwner->object_id());
 }
 
 void CActor::AddGameNews_deffered(GAME_NEWS_DATA& news_data, u32 delay)

@@ -61,8 +61,7 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("on_item_take", int(GameObject::eOnItemTake)), value("on_item_drop", int(GameObject::eOnItemDrop)),
                     value("script_animation", int(GameObject::eScriptAnimation)), value("task_state", int(GameObject::eTaskStateChange)),
                     value("take_item_from_box", int(GameObject::eInvBoxItemTake)), value("place_item_to_box", int(GameObject::eInvBoxItemPlace)),
-                    value("map_location_added", int(GameObject::eMapLocationAdded)), value("map_relation_location_added", int(GameObject::eMapRelationLocationAdded)),
-                    value("map_location_clicked", int(GameObject::eMapLocationClicked)),
+                    value("map_location_added", int(GameObject::eMapLocationAdded)), value("map_location_clicked", int(GameObject::eMapLocationClicked)),
                     value("on_key_press", int(GameObject::eOnKeyPress)),
                     value("on_key_release", int(GameObject::eOnKeyRelease)), value("on_key_hold", int(GameObject::eOnKeyHold)),
                     value("on_mouse_wheel", int(GameObject::eOnMouseWheel)), value("on_mouse_move", int(GameObject::eOnMouseMove)),
@@ -95,7 +94,9 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("on_actor_footstep", int(GameObject::eOnActorFootStep)),
                     value("on_actor_land", int(GameObject::eOnActorLand)),
                     value("on_actor_jump", int(GameObject::eOnActorJump)),
-                    value("on_actor_boltthrow", int(GameObject::eOnActorBoltThrow)))]
+                    value("on_actor_boltthrow", int(GameObject::eOnActorBoltThrow)),
+                    value("on_pda_contact_add", int(GameObject::eOnPDAContactAdd))),
+                    value("on_pda_contact_remove", int(GameObject::eOnPDAContactRemove))]
         )];
 
     script_register_game_object4(L);
