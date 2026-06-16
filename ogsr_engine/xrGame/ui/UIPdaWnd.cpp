@@ -19,7 +19,6 @@
 #include "UIDiaryWnd.h"
 #include "UIFrameLineWnd.h"
 #include "UIEncyclopediaWnd.h"
-#include "UIStalkersRankingWnd.h"
 #include "UIEventsWnd.h"
 #include "../object_broker.h"
 #include "UIMessagesWindow.h"
@@ -48,7 +47,6 @@ CUIPdaWnd::~CUIPdaWnd()
     delete_data(UIPdaContactsWnd);
     delete_data(UIEncyclopediaWnd);
     delete_data(UIDiaryWnd);
-    delete_data(UIStalkersRanking);
     delete_data(UIEventsWnd);
 }
 
@@ -95,10 +93,6 @@ void CUIPdaWnd::Init()
     // Окно энциклопедии
     UIEncyclopediaWnd = xr_new<CUIEncyclopediaWnd>();
     UIEncyclopediaWnd->Init();
-
-    // Окно рейтинга сталкеров
-    UIStalkersRanking = xr_new<CUIStalkersRankingWnd>();
-    UIStalkersRanking->Init();
 
     UIEventsWnd = xr_new<CUIEventsWnd>();
     UIEventsWnd->Init();
@@ -303,11 +297,6 @@ void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
         InventoryUtilities::SendInfoToActor("ui_pda_encyclopedia");
         g_pda_info_state &= ~pda_section::encyclopedia;
         break;
-    case eptRanking:
-        m_pActiveDialog = smart_cast<CUIWindow*>(UIStalkersRanking);
-        g_pda_info_state &= ~pda_section::ranking;
-        InventoryUtilities::SendInfoToActor("ui_pda_ranking");
-        break;
     case eptQuests:
         m_pActiveDialog = smart_cast<CUIWindow*>(UIEventsWnd);
         g_pda_info_state &= ~pda_section::quests;
@@ -405,9 +394,6 @@ void CUIPdaWnd::DrawUpdatedSections()
     if (g_pda_info_state & pda_section::contacts)
         UITabControl->GetButtonByIndex(eptContacts)->DrawHighlightedText();
 
-    if (g_pda_info_state & pda_section::ranking)
-        UITabControl->GetButtonByIndex(eptRanking)->DrawHighlightedText();
-
     if (g_pda_info_state & pda_section::encyclopedia)
         UITabControl->GetButtonByIndex(eptEncyclopedia)->DrawHighlightedText();
 }
@@ -423,8 +409,6 @@ void CUIPdaWnd::Reset()
         UIEncyclopediaWnd->Reset();
     if (UIDiaryWnd)
         UIDiaryWnd->Reset();
-    if (UIStalkersRanking)
-        UIStalkersRanking->Reset();
     if (UIEventsWnd)
         UIEventsWnd->Reset();
 }

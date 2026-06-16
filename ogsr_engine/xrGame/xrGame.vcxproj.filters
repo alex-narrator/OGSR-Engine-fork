@@ -5217,9 +5217,6 @@
     <ClInclude Include="ui\UIColorAnimatorWrapper.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Animations</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIStalkersRankingWnd.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\Statistics</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIDebugFonts.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\_Debug Fonts</Filter>
     </ClInclude>
@@ -8247,9 +8244,6 @@
     </ClCompile>
     <ClCompile Include="ui\UIColorAnimatorWrapper.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Animations</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIStalkersRankingWnd.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\Statistics</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIDebugFonts.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\_Debug Fonts</Filter>

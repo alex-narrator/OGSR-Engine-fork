@@ -14,7 +14,6 @@ enum EPdaTabs
     eptMap,
     eptDiary,
     eptContacts,
-    eptRanking,
     eptEncyclopedia,
     eptNoActiveTab = u16(-1)
 };

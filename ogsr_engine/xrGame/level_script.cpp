@@ -580,10 +580,6 @@ void set_snd_volume(float v)
     clamp(psSoundVFactor, 0.0f, 1.0f);
 }
 
-extern int get_actor_ranking();
-extern void add_human_to_top_list(u16 id);
-extern void remove_human_from_top_list(u16 id);
-
 void add_complex_effector(LPCSTR section, int id) { AddEffector(Actor(), id, section); }
 void add_complex_effector2(LPCSTR section, int id, float factor) { AddEffector(Actor(), id, section, factor); }
 
@@ -1117,8 +1113,6 @@ void CLevel::script_register(lua_State* L)
             def("block_action", [](EGameActions action) { Level().block_action(action); }),
             def("unblock_action", [](EGameActions action) { Level().unblock_action(action); })
     )],
-
-        module(L, "actor_stats")[(def("add_to_ranking", &add_human_to_top_list), def("remove_from_ranking", &remove_human_from_top_list), def("get_actor_ranking", &get_actor_ranking))];
 
     module(L)[def("command_line", &command_line)];
 

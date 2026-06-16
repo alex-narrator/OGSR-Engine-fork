@@ -1376,7 +1376,6 @@
     <ClInclude Include="ui\UIPdaMsgListItem.h" />
     <ClInclude Include="UIZoneMap.h" />
     <ClInclude Include="ui\UIColorAnimatorWrapper.h" />
-    <ClInclude Include="ui\UIStalkersRankingWnd.h" />
     <ClInclude Include="ui\UIDebugFonts.h" />
     <ClInclude Include="ui\UIOptionsItem.h" />
     <ClInclude Include="ui\UIOptionsManager.h" />
@@ -2302,7 +2301,6 @@
     <ClCompile Include="ui\UIPdaMsgListItem.cpp" />
     <ClCompile Include="UIZoneMap.cpp" />
     <ClCompile Include="ui\UIColorAnimatorWrapper.cpp" />
-    <ClCompile Include="ui\UIStalkersRankingWnd.cpp" />
     <ClCompile Include="ui\UIDebugFonts.cpp" />
     <ClCompile Include="ui\UIOptionsItem.cpp" />
     <ClCompile Include="ui\UIOptionsManager.cpp" />

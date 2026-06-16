@@ -232,11 +232,6 @@ void CUISequenceSimpleItem::Start()
                 ui_game_sp->PdaMenu->SetActiveSubdialog(eptDiary);
                 bShowPda = true;
             }
-            else if (!_stricmp(m_pda_section, "pda_ranking"))
-            {
-                ui_game_sp->PdaMenu->SetActiveSubdialog(eptRanking);
-                bShowPda = true;
-            }
             else if (!_stricmp(m_pda_section, "pda_encyclopedia"))
             {
                 ui_game_sp->PdaMenu->SetActiveSubdialog(eptEncyclopedia); //-V595
