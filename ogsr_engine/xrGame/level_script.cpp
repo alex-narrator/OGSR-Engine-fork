@@ -274,6 +274,14 @@ void map_change_spot_hint(u16 id, LPCSTR spot_type, LPCSTR text)
     ml->SetHint(text);
 }
 
+LPCSTR map_get_spot_hint(u16 id, LPCSTR spot_type)
+{
+    CMapLocation* ml = Level().MapManager().GetMapLocation(spot_type, id);
+    if (!ml)
+        return nullptr;
+    return ml->GetHint();
+}
+
 void map_change_spot_ser(u16 id, LPCSTR spot_type, BOOL v)
 {
     CMapLocation* ml = Level().MapManager().GetMapLocation(spot_type, id);
@@ -289,7 +297,7 @@ void prefetch_many_sounds( LPCSTR prefix ) {
 
 void map_remove_object_spot(u16 id, LPCSTR spot_type) { Level().MapManager().RemoveMapLocation(spot_type, id); }
 
-u16 map_has_object_spot(u16 id, LPCSTR spot_type) { return Level().MapManager().HasMapLocation(spot_type, id); }
+bool map_has_object_spot(u16 id, LPCSTR spot_type) { return !!Level().MapManager().HasMapLocation(spot_type, id); }
 
 bool patrol_path_exists(LPCSTR patrol_path) { return (!!ai().patrol_paths().path(patrol_path, true)); }
 
@@ -316,8 +324,6 @@ Fvector2 get_crosshair_pos() { return ((CHUDManager*)g_hud)->GetTarget()->GetCro
 #include "UIGameCustom.h"
 #include "ui/UITalkWnd.h"
 #include "UIGameSP.h"
-#include "HUDTarget.h"
-#include "InventoryBox.h"
 
 CUIWindow* GetTalkWindow()
 {
@@ -1040,7 +1046,7 @@ void CLevel::script_register(lua_State* L)
 
             def("map_add_object_spot_ser", &map_add_object_spot_ser), def("map_add_object_spot", &map_add_object_spot), def("map_remove_object_spot", &map_remove_object_spot),
             def("map_has_object_spot", &map_has_object_spot), def("map_change_spot_hint", &map_change_spot_hint), def("map_change_spot_ser", &map_change_spot_ser),
-            def("map_add_user_spot", &map_add_user_spot),
+            def("map_add_user_spot", &map_add_user_spot), def("map_get_spot_hint", &map_get_spot_hint),
 
             def("start_stop_menu", &start_stop_menu), def("add_dialog_to_render", &add_dialog_to_render), def("remove_dialog_to_render", &remove_dialog_to_render),
             def("main_input_receiver", &main_input_receiver), def("hide_indicators", &hide_indicators), def("show_indicators", &show_indicators),
