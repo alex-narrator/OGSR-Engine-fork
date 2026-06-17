@@ -210,19 +210,14 @@ void CUISequenceSimpleItem::Start()
     {
         bool bShowPda = false;
         CUIGameSP* ui_game_sp = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-        if (!_stricmp(m_pda_section, "pda_contacts"))
+        if (!_stricmp(m_pda_section, "pda_map"))
         {
-            ui_game_sp->PdaMenu->SetActiveSubdialog(eptContacts);
+            ui_game_sp->PdaMenu->SetActiveSubdialog(eptMap);
             bShowPda = true;
         }
         else
         {
-            if (!_stricmp(m_pda_section, "pda_map"))
-            {
-                ui_game_sp->PdaMenu->SetActiveSubdialog(eptMap);
-                bShowPda = true;
-            }
-            else if (!_stricmp(m_pda_section, "pda_quests"))
+            if (!_stricmp(m_pda_section, "pda_quests"))
             {
                 ui_game_sp->PdaMenu->SetActiveSubdialog(eptQuests);
                 bShowPda = true;

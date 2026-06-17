@@ -13,7 +13,6 @@ class CUIMapWnd;
 class CUIEncyclopediaWnd;
 class CUIDiaryWnd;
 class CUIEventsWnd;
-class CUIPdaContactsWnd;
 
 class CUIPdaWnd : public CUIDialogWnd
 {
@@ -40,7 +39,6 @@ public:
     EPdaTabs m_pActiveSection;
     // Поддиалоги PDA
     CUIMapWnd* UIMapWnd{};
-    CUIPdaContactsWnd* UIPdaContactsWnd{};
     CUIEncyclopediaWnd* UIEncyclopediaWnd{};
     CUIDiaryWnd* UIDiaryWnd{};
     CUIEventsWnd* UIEventsWnd{};

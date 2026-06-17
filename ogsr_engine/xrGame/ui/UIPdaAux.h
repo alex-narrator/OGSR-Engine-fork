@@ -13,7 +13,6 @@ enum EPdaTabs
     eptQuests = 0,
     eptMap,
     eptDiary,
-    eptContacts,
     eptEncyclopedia,
     eptNoActiveTab = u16(-1)
 };

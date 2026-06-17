@@ -47,7 +47,6 @@ enum EGameActions
     kCONSOLE,
     kACTIVE_JOBS,
     kMAP,
-    kCONTACTS,
     kJOURNAL,
     kEXT_1,
 

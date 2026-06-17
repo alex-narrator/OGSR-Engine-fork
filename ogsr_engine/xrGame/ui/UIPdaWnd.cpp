@@ -14,7 +14,6 @@
 #include "UIFrameWindow.h"
 #include "UITabControl.h"
 //#include "UIPdaCommunication.h"
-#include "UIPdaContactsWnd.h"
 #include "UIMapWnd.h"
 #include "UIDiaryWnd.h"
 #include "UIFrameLineWnd.h"
@@ -44,7 +43,6 @@ CUIPdaWnd::CUIPdaWnd()
 CUIPdaWnd::~CUIPdaWnd()
 {
     delete_data(UIMapWnd);
-    delete_data(UIPdaContactsWnd);
     delete_data(UIEncyclopediaWnd);
     delete_data(UIDiaryWnd);
     delete_data(UIEventsWnd);
@@ -81,10 +79,6 @@ void CUIPdaWnd::Init()
     // Oкно карты
     UIMapWnd = xr_new<CUIMapWnd>();
     UIMapWnd->Init("pda_map.xml", "map_wnd");
-
-    // Oкно коммуникaции
-    UIPdaContactsWnd = xr_new<CUIPdaContactsWnd>();
-    UIPdaContactsWnd->Init();
 
     // Oкно новостей
     UIDiaryWnd = xr_new<CUIDiaryWnd>();
@@ -283,11 +277,6 @@ void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
         InventoryUtilities::SendInfoToActor("ui_pda_diary");
         g_pda_info_state &= ~pda_section::diary;
         break;
-    case eptContacts:
-        m_pActiveDialog = smart_cast<CUIWindow*>(UIPdaContactsWnd);
-        InventoryUtilities::SendInfoToActor("ui_pda_contacts");
-        g_pda_info_state &= ~pda_section::contacts;
-        break;
     case eptMap:
         m_pActiveDialog = smart_cast<CUIWindow*>(UIMapWnd);
         g_pda_info_state &= ~pda_section::map;
@@ -355,11 +344,6 @@ void CUIPdaWnd::PdaContentsChanged(pda_section::part type, bool flash, bool forc
     {
         UIEventsWnd->Reload();
     }
-    else if (type == pda_section::contacts)
-    {
-        UIPdaContactsWnd->Reload();
-        flash = false;
-    }
 
     else if (type == pda_section::journal || type == pda_section::info)
     {
@@ -391,9 +375,6 @@ void CUIPdaWnd::DrawUpdatedSections()
     if (g_pda_info_state & pda_section::diary)
         UITabControl->GetButtonByIndex(eptDiary)->DrawHighlightedText();
 
-    if (g_pda_info_state & pda_section::contacts)
-        UITabControl->GetButtonByIndex(eptContacts)->DrawHighlightedText();
-
     if (g_pda_info_state & pda_section::encyclopedia)
         UITabControl->GetButtonByIndex(eptEncyclopedia)->DrawHighlightedText();
 }
@@ -403,8 +384,6 @@ void CUIPdaWnd::Reset()
     inherited::Reset();
     if (UIMapWnd)
         UIMapWnd->Reset();
-    if (UIPdaContactsWnd)
-        UIPdaContactsWnd->Reset();
     if (UIEncyclopediaWnd)
         UIEncyclopediaWnd->Reset();
     if (UIDiaryWnd)

@@ -56,7 +56,6 @@ xr_vector<_action> actions = {
 
     DEF_ACTION("active_jobs", kACTIVE_JOBS)
     DEF_ACTION("map", kMAP) 
-    DEF_ACTION("contacts", kCONTACTS)
     DEF_ACTION("journal", kJOURNAL)
 
     DEF_ACTION("ext_1", kEXT_1)

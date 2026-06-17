@@ -243,10 +243,6 @@ void CUIWindow::script_register(lua_State* L)
                       value("MESSAGE_BOX_QUIT_GAME_CLICKED", int(MESSAGE_BOX_QUIT_GAME_CLICKED)), value("MESSAGE_BOX_QUIT_WIN_CLICKED", int(MESSAGE_BOX_QUIT_WIN_CLICKED)),
 
                       // CUITalkDialogWnd
-                      value("TALK_DIALOG_QUESTION_CLICKED", int(TALK_DIALOG_QUESTION_CLICKED)),
-
-    // CUIPdaContactsWnd
-#pragma todo( \
-    "KRodin: ивент PDA_CONTACTS_WND_CONTACT_SELECTED нигде не вызывается. Надо доделать по необходимости. Хотя я не очень представляю, для чего он может понадобиться в скриптах.")
-                      value("PDA_CONTACTS_WND_CONTACT_SELECTED", int(PDA_CONTACTS_WND_CONTACT_SELECTED)))])];
+                      value("TALK_DIALOG_QUESTION_CLICKED", int(TALK_DIALOG_QUESTION_CLICKED))
+                      )])];
 }

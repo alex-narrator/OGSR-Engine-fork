@@ -288,13 +288,6 @@ void CActor::NewPdaContact(CInventoryOwner* pInvOwner)
 {
     Level().MapManager().AddRelationLocation(pInvOwner);
 
-    if (HUD().GetUI())
-    {
-        CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-
-        if (pGameSP)
-            pGameSP->PdaMenu->PdaContentsChanged(pda_section::contacts);
-    }
     callback(GameObject::eOnPDAContactAdd)(pInvOwner->object_id());
 }
 
@@ -311,14 +304,6 @@ void CActor::LostPdaContact(CInventoryOwner* pInvOwner)
         Level().MapManager().RemoveMapLocation("deadbody_location", GO->ID());
     };
 
-    if (HUD().GetUI())
-    {
-        CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-        if (pGameSP)
-        {
-            pGameSP->PdaMenu->PdaContentsChanged(pda_section::contacts);
-        }
-    }
     callback(GameObject::eOnPDAContactRemove)(pInvOwner->object_id());
 }
 
