@@ -67,6 +67,7 @@ void CUIStatic::script_register(lua_State* L)
                   .def("SetNoShaderCache", &CUIStatic::SetNoShaderCache)
                   .def("SetStretchTexture", &CUIStatic::SetStretchTexture)
                   .def("GetStretchTexture", &CUIStatic::GetStretchTexture)
+                  .def("GetTextureName", &CUIStatic::GetTextureName)
 
                   .def("SetTextAlign", &CUIStatic::SetTextAlign_script)
                   .def("GetTextAlign", &CUIStatic::GetTextAlign_script)
