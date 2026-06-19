@@ -403,7 +403,7 @@ void CActor::OnNextWeaponSlot()
         if (inventory().ItemFromSlot(SlotsToCheck[i]))
         {
             if (SlotsToCheck[i] == PDA_SLOT)
-                IR_OnKeyboardPress(kACTIVE_JOBS);
+                IR_OnKeyboardPress(kMAP);
             else
                 IR_OnKeyboardPress(kWPN_1 + i);
             return;
@@ -435,7 +435,7 @@ void CActor::OnPrevWeaponSlot()
         if (inventory().ItemFromSlot(SlotsToCheck[i]))
         {
             if (SlotsToCheck[i] == PDA_SLOT)
-                IR_OnKeyboardPress(kACTIVE_JOBS);
+                IR_OnKeyboardPress(kMAP);
             else
                 IR_OnKeyboardPress(kWPN_1 + i);
             return;

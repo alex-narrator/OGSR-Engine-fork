@@ -11,7 +11,6 @@
 #include "UIGameSP.h"
 #include "ui/UIPDAWnd.h"
 #include "encyclopedia_article.h"
-#include "ui/UIEventsWnd.h"
 #include "..\xr_3da\DiscordRPC.hpp"
 #include "string_table.h"
 

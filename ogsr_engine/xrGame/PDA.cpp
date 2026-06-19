@@ -556,7 +556,7 @@ void CPda::OnActiveItem()
     pGameSP->ShowHidePda(true);
 
     if (pGameSP->PdaMenu->m_pActiveSection == eptNoActiveTab)
-        pGameSP->PdaMenu->SetActiveSubdialog((EPdaTabs)eptQuests);
+        pGameSP->PdaMenu->SetActiveSubdialog((EPdaTabs)eptMap);
 
     m_fZoomRotationFactor = 0.f;
 }

@@ -12,7 +12,6 @@ class CUIStatic;
 class CUIMapWnd;
 class CUIEncyclopediaWnd;
 class CUIDiaryWnd;
-class CUIEventsWnd;
 
 class CUIPdaWnd : public CUIDialogWnd
 {
@@ -41,7 +40,6 @@ public:
     CUIMapWnd* UIMapWnd{};
     CUIEncyclopediaWnd* UIEncyclopediaWnd{};
     CUIDiaryWnd* UIDiaryWnd{};
-    CUIEventsWnd* UIEventsWnd{};
     virtual void Reset();
 
 public:

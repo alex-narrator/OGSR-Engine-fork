@@ -18,7 +18,6 @@
 #include "UIDiaryWnd.h"
 #include "UIFrameLineWnd.h"
 #include "UIEncyclopediaWnd.h"
-#include "UIEventsWnd.h"
 #include "../object_broker.h"
 #include "UIMessagesWindow.h"
 #include "UIMainIngameWnd.h"
@@ -45,7 +44,6 @@ CUIPdaWnd::~CUIPdaWnd()
     delete_data(UIMapWnd);
     delete_data(UIEncyclopediaWnd);
     delete_data(UIDiaryWnd);
-    delete_data(UIEventsWnd);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -88,8 +86,6 @@ void CUIPdaWnd::Init()
     UIEncyclopediaWnd = xr_new<CUIEncyclopediaWnd>();
     UIEncyclopediaWnd->Init();
 
-    UIEventsWnd = xr_new<CUIEventsWnd>();
-    UIEventsWnd->Init();
     // Tab control
     UITabControl = xr_new<CUITabControl>();
     UITabControl->SetAutoDelete(true);
@@ -253,7 +249,7 @@ void CUIPdaWnd::Hide()
     if (m_pActiveDialog)
     {
         m_pActiveDialog->Show(false);
-        m_pActiveDialog = smart_cast<CUIWindow*>(UIEventsWnd); // hack for script window
+        m_pActiveDialog = smart_cast<CUIWindow*>(UIMapWnd); // hack for script window
         m_pActiveSection = eptNoActiveTab;
     }
 }
@@ -285,10 +281,6 @@ void CUIPdaWnd::SetActiveSubdialog(EPdaTabs section)
         m_pActiveDialog = smart_cast<CUIWindow*>(UIEncyclopediaWnd);
         InventoryUtilities::SendInfoToActor("ui_pda_encyclopedia");
         g_pda_info_state &= ~pda_section::encyclopedia;
-        break;
-    case eptQuests:
-        m_pActiveDialog = smart_cast<CUIWindow*>(UIEventsWnd);
-        g_pda_info_state &= ~pda_section::quests;
         break;
     default: // Msg("not registered button identifier [%d]", UITabControl->GetActiveIndex());
         if (const char* callback = READ_IF_EXISTS(pSettings, r_string, "engine_callbacks", "on_pda_custom_tab", nullptr))
@@ -340,10 +332,6 @@ void CUIPdaWnd::PdaContentsChanged(pda_section::part type, bool flash, bool forc
         UIDiaryWnd->AddNews();
         UIDiaryWnd->MarkNewsAsRead(UIDiaryWnd->IsShown());
     }
-    else if (type == pda_section::quests)
-    {
-        UIEventsWnd->Reload();
-    }
 
     else if (type == pda_section::journal || type == pda_section::info)
     {
@@ -366,9 +354,6 @@ void draw_sign(CUIStatic* s, Fvector2& pos)
 
 void CUIPdaWnd::DrawUpdatedSections()
 {
-    if (g_pda_info_state & pda_section::quests)
-        UITabControl->GetButtonByIndex(eptQuests)->DrawHighlightedText();
-
     if (g_pda_info_state & pda_section::map)
         UITabControl->GetButtonByIndex(eptMap)->DrawHighlightedText();
 
@@ -388,8 +373,6 @@ void CUIPdaWnd::Reset()
         UIEncyclopediaWnd->Reset();
     if (UIDiaryWnd)
         UIDiaryWnd->Reset();
-    if (UIEventsWnd)
-        UIEventsWnd->Reset();
 }
 
 bool CUIPdaWnd::OnKeyboard(int dik, EUIMessages keyboard_action)

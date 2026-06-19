@@ -98,7 +98,6 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
 
     switch (bind)
     {
-    case kACTIVE_JOBS:
     case kMAP:
     case kJOURNAL: {
         auto Pda = pActor->GetPDA();
@@ -106,7 +105,7 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
         {
             if (g_actor_allow_pda)
             {
-                PdaMenu->SetActiveSubdialog(bind == kACTIVE_JOBS ? eptQuests : (bind == kMAP ? eptMap : eptDiary));
+                PdaMenu->SetActiveSubdialog(bind == kMAP ? eptMap : eptDiary);
                 m_game->StartStopMenu(PdaMenu, true);
                 return true;
             }

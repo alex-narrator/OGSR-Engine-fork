@@ -551,7 +551,6 @@ bool CInventory::Action(s32 cmd, u32 flags)
         }
     }
     break;
-    case kACTIVE_JOBS:
     case kMAP:
     case kJOURNAL: {
         if (flags & CMD_START)
@@ -567,7 +566,7 @@ bool CInventory::Action(s32 cmd, u32 flags)
             else if (g_actor_allow_pda)
             {
                 auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-                pGameSP->PdaMenu->SetActiveSubdialog(cmd == kACTIVE_JOBS ? eptQuests : (cmd == kMAP ? eptMap : eptDiary));
+                pGameSP->PdaMenu->SetActiveSubdialog(cmd == kMAP ? eptMap : eptDiary);
                 Activate(PDA_SLOT, eKeyAction);
             }
         }

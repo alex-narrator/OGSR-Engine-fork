@@ -5226,13 +5226,7 @@
     <ClInclude Include="ui\UIOptionsManagerScript.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\OptionsItem</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIEventsWnd.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\EventsWnd</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UITaskDescrWnd.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\EventsWnd</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UITaskItem.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\EventsWnd</Filter>
     </ClInclude>
     <ClInclude Include="ui\MMSound.h">
@@ -8251,13 +8245,7 @@
     <ClCompile Include="ui\UIOptionsManagerScript.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\OptionsItem</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UIEventsWnd.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\EventsWnd</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UITaskDescrWnd.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\EventsWnd</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UITaskItem.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\EventsWnd</Filter>
     </ClCompile>
     <ClCompile Include="ui\MMSound.cpp">

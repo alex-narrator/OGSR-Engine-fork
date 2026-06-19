@@ -1379,9 +1379,7 @@
     <ClInclude Include="ui\UIOptionsItem.h" />
     <ClInclude Include="ui\UIOptionsManager.h" />
     <ClInclude Include="ui\UIOptionsManagerScript.h" />
-    <ClInclude Include="ui\UIEventsWnd.h" />
     <ClInclude Include="ui\UITaskDescrWnd.h" />
-    <ClInclude Include="ui\UITaskItem.h" />
     <ClInclude Include="ui\MMSound.h" />
     <ClInclude Include="ui\UIMMShniaga.h" />
     <ClInclude Include="ui\UIEditKeyBind.h" />
@@ -2303,9 +2301,7 @@
     <ClCompile Include="ui\UIOptionsItem.cpp" />
     <ClCompile Include="ui\UIOptionsManager.cpp" />
     <ClCompile Include="ui\UIOptionsManagerScript.cpp" />
-    <ClCompile Include="ui\UIEventsWnd.cpp" />
     <ClCompile Include="ui\UITaskDescrWnd.cpp" />
-    <ClCompile Include="ui\UITaskItem.cpp" />
     <ClCompile Include="ui\MMSound.cpp" />
     <ClCompile Include="ui\UIMMShniaga.cpp" />
     <ClCompile Include="ui\UIEditKeyBind.cpp" />

@@ -217,12 +217,7 @@ void CUISequenceSimpleItem::Start()
         }
         else
         {
-            if (!_stricmp(m_pda_section, "pda_quests"))
-            {
-                ui_game_sp->PdaMenu->SetActiveSubdialog(eptQuests);
-                bShowPda = true;
-            }
-            else if (!_stricmp(m_pda_section, "pda_diary"))
+            if (!_stricmp(m_pda_section, "pda_diary"))
             {
                 ui_game_sp->PdaMenu->SetActiveSubdialog(eptDiary);
                 bShowPda = true;
