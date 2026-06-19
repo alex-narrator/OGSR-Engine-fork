@@ -268,6 +268,9 @@ void CUIWindow::DoDetachChild(CUIWindow* pChild, bool from_destructor)
     if (GetMouseCapturer() == pChild)
         SetMouseCapture(pChild, false);
 
+    if (GetKeyboardCapturer() == pChild)
+        SetKeyboardCapture(pChild, false);
+
     pChild->SetParent(NULL);
 
     if (from_destructor && pChild->IsAutoDelete())

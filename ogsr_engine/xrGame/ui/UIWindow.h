@@ -77,6 +77,7 @@ public:
     virtual bool OnKeyboard(int dik, EUIMessages keyboard_action);
     virtual bool OnKeyboardHold(int dik);
     virtual void SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status);
+    CUIWindow* GetKeyboardCapturer() { return m_pKeyboardCapturer; }
 
     //обработка сообщений не предусмотреных стандартными обработчиками
     //ф-ция должна переопределяться
