@@ -104,12 +104,6 @@ void CPda::shedule_Update(u32 dt)
 
         if (m_changed)
         {
-            if (HUD().GetUI())
-            {
-                CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-                if (pGameSP)
-                    pGameSP->PdaMenu->PdaContentsChanged(pda_section::contacts);
-            }
             m_changed = false;
         }
     }
