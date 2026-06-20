@@ -1355,7 +1355,6 @@
     <ClInclude Include="ui_base.h" />
     <ClInclude Include="UIDialogHolder.h" />
     <ClInclude Include="ui\UIPdaAux.h" />
-    <ClInclude Include="ui\UIPdaListItem.h" />
     <ClInclude Include="ui\UIPdaWnd.h" />
     <ClInclude Include="ui\map_hint.h" />
     <ClInclude Include="map_spot.h" />
@@ -2278,7 +2277,6 @@
     <ClCompile Include="ui_base.cpp" />
     <ClCompile Include="UIDialogHolder.cpp" />
     <ClCompile Include="ui\UIPdaAux.cpp" />
-    <ClCompile Include="ui\UIPdaListItem.cpp" />
     <ClCompile Include="ui\UIPdaWnd.cpp" />
     <ClCompile Include="ui\map_hint.cpp" />
     <ClCompile Include="map_spot.cpp" />

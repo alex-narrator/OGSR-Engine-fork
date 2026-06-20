@@ -5154,9 +5154,6 @@
     <ClInclude Include="ui\UIPdaAux.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIPdaListItem.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIPdaWnd.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
     </ClInclude>
@@ -8174,9 +8171,6 @@
       <Filter>AI\AScript\ScriptClasses\UI</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIPdaAux.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIPdaListItem.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIPdaWnd.cpp">
