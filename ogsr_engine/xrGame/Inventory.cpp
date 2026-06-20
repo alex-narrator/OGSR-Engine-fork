@@ -551,27 +551,6 @@ bool CInventory::Action(s32 cmd, u32 flags)
         }
     }
     break;
-    case kMAP:
-    case kJOURNAL: {
-        if (flags & CMD_START)
-        {
-            auto Pda = m_pOwner->GetPDA();
-            if (!Pda || !Pda->Is3DPDA() || !psActorFlags.test(AF_3D_PDA))
-                break;
-
-            extern bool g_actor_allow_pda;
-
-            if (GetActiveSlot() == PDA_SLOT && ActiveItem())
-                Activate(NO_ACTIVE_SLOT);
-            else if (g_actor_allow_pda)
-            {
-                auto pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-                pGameSP->PdaMenu->SetActiveSubdialog(cmd == kMAP ? eptMap : eptDiary);
-                Activate(PDA_SLOT, eKeyAction);
-            }
-        }
-    }
-    break;
     }
 
     return false;

@@ -45,8 +45,6 @@ enum EGameActions
     kSCREENSHOT,
     kQUIT,
     kCONSOLE,
-    kMAP,
-    kJOURNAL,
     kEXT_1,
 
     kNEXT_SLOT,

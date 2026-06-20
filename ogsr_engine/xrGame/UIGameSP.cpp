@@ -68,8 +68,6 @@ extern void attach_draw_adjust_mode();
 extern void hud_adjust_mode_keyb(int dik);
 extern void hud_draw_adjust_mode();
 
-extern bool g_actor_allow_pda;
-
 bool CUIGameSP::IR_OnKeyboardPress(int dik)
 {
     if (inherited::IR_OnKeyboardPress(dik))
@@ -98,21 +96,6 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
 
     switch (bind)
     {
-    case kMAP:
-    case kJOURNAL: {
-        auto Pda = pActor->GetPDA();
-        if ((!Pda || !Pda->Is3DPDA() || !psActorFlags.test(AF_3D_PDA)) && (!MainInputReceiver() || MainInputReceiver() == PdaMenu))
-        {
-            if (g_actor_allow_pda)
-            {
-                PdaMenu->SetActiveSubdialog(bind == kMAP ? eptMap : eptDiary);
-                m_game->StartStopMenu(PdaMenu, true);
-                return true;
-            }
-        }
-    }
-    break;
-
     case kWPN_FIRE:
     case kWPN_ZOOM: {
         auto Pda = pActor->GetPDA();

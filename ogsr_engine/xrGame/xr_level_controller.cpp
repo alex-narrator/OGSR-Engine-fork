@@ -54,9 +54,6 @@ xr_vector<_action> actions = {
     DEF_ACTION("quit", kQUIT) 
     DEF_ACTION("console", kCONSOLE)
 
-    DEF_ACTION("map", kMAP) 
-    DEF_ACTION("journal", kJOURNAL)
-
     DEF_ACTION("ext_1", kEXT_1)
 
     DEF_ACTION("next_slot", kNEXT_SLOT)
