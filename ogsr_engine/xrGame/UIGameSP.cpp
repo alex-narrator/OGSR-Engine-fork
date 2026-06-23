@@ -99,7 +99,7 @@ bool CUIGameSP::IR_OnKeyboardPress(int dik)
     case kWPN_FIRE:
     case kWPN_ZOOM: {
         auto Pda = pActor->GetPDA();
-        if (Pda && Pda->Is3DPDA() && psActorFlags.test(AF_3D_PDA) && PdaMenu->IsShown() && (!MainInputReceiver() || MainInputReceiver() != PdaMenu))
+        if (Pda && Pda->Is3DPDA() && psActorFlags.test(AF_3D_PDA) && PdaMenu->IsShown() && (!MainInputReceiver()/* || MainInputReceiver() != PdaMenu*/))
         {
             Flags8 IRFlags{};
             IRFlags.set(recvItem::eIndicators, HUD().GetUI()->GameIndicatorsShown());
