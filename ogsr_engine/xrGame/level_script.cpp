@@ -264,6 +264,8 @@ u16 map_add_user_spot_level_id(u8 level_id, Fvector position, LPCSTR spot_type, 
     if (xr_strlen(text))
         ml->SetHint(text);
 
+    ml->SetSerializable(true);
+
     return ml->ObjectID();
 }
 
@@ -272,6 +274,8 @@ u16 map_add_user_spot_level_name(LPCSTR level_name, Fvector position, LPCSTR spo
     CMapLocation* ml = Level().MapManager().AddUserLocation(spot_type, level_name, position);
     if (xr_strlen(text))
         ml->SetHint(text);
+
+    ml->SetSerializable(true);
 
     return ml->ObjectID();
 }
