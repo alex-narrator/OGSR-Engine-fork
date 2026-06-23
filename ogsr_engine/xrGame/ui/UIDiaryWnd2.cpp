@@ -145,9 +145,6 @@ void CUIDiaryWnd::Reload(EDiaryFilter new_filter)
         LoadNewsTab();
         InventoryUtilities::SendInfoToActor("ui_pda_news");
         break;
-    case eNotes: 
-        InventoryUtilities::SendInfoToActor("ui_pda_notes"); 
-        break;
     default: Msg("%s - not registered button identifier [%d]", __FUNCTION__, m_currFilter);
     };
 }
@@ -231,9 +228,6 @@ void CUIDiaryWnd::Draw()
 
     if (g_pda_info_state & pda_section::journal)
         m_FilterTab->GetButtonByIndex(eJournal)->DrawHighlightedText();
-
-    if (g_pda_info_state & pda_section::notes)
-        m_FilterTab->GetButtonByIndex(eNotes)->DrawHighlightedText();
 }
 
 void CUIDiaryWnd::Reset()
