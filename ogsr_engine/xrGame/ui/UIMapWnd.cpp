@@ -18,9 +18,6 @@
 
 #include "../HUDManager.h"
 
-#include "UIPropertiesBox.h"
-#include "UIListBoxItem.h"
-#include "UIPdaSpot.h"
 #include "map_spot.h"
 
 #include "Actor.h"
@@ -222,17 +219,6 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
     m_ActionPlanner = xr_new<CMapActionPlanner>();
     m_ActionPlanner->setup(this);
     m_flags.set(lmFirst, TRUE);
-
-    m_UIPropertiesBox = xr_new<CUIPropertiesBox>();
-    m_UIPropertiesBox->SetAutoDelete(true);
-    m_UIPropertiesBox->Init(0, 0, 300, 300);
-    AttachChild(m_UIPropertiesBox);
-    m_UIPropertiesBox->Hide();
-    m_UIPropertiesBox->SetWindowName("property_box");
-
-    m_UserSpotWnd = xr_new<CUIPdaSpot>();
-    m_UserSpotWnd->SetAutoDelete(true);
-    AttachChild(m_UserSpotWnd);
 }
 
 void CUIMapWnd::Show(bool status)
@@ -271,8 +257,6 @@ void CUIMapWnd::Show(bool status)
     }
 
     m_hint->SetOwner(NULL);
-
-    m_UserSpotWnd->Exit();
 }
 
 void CUIMapWnd::AddMapToRender(CUICustomMap* m)
@@ -497,37 +481,7 @@ bool CUIMapWnd::OnMouse(float x, float y, EUIMessages mouse_action)
     return false;
 }
 
-void CUIMapWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
-{
-    CUIWndCallback::OnEvent(pWnd, msg, pData);
-
-    if (pWnd == m_UIPropertiesBox && msg == PROPERTY_CLICKED)
-    {
-        CUIListBoxItem* item = (CUIListBoxItem*)pData;
-        switch (item->GetTAG())
-        {
-        // Click on the button 'change spot name'
-        case MAP_CHANGE_SPOT_HINT_ACT: {
-            ShowSettingsWindow(m_cur_location->ObjectID(), m_cur_location->GetLastPosition(), m_cur_location->LevelName());
-            m_cur_location = nullptr;
-            break;
-        }
-        // Click on the button 'remove spot'
-        case MAP_REMOVE_SPOT_ACT: {
-            HideHint((CUIWindow*)item->GetData());
-            Level().MapManager().RemoveMapLocation(m_cur_location);
-            m_cur_location = nullptr;
-            break;
-        }
-        // Click on the custom actions
-        case MAP_SPOT_CUSTOM_ACTION: {
-            m_UIPropertiesBox->ProcessCustomActionsMapSpot(m_cur_location->ObjectID(), m_cur_location->GetType(), m_cur_location->LevelName().c_str(),
-                                                           m_cur_location->GetLastPosition(), m_cur_location->IsUserDefined());
-            break;
-        }
-        }
-    }
-}
+void CUIMapWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 
 CUICustomMap* CUIMapWnd::GetMapByIdx(u16 idx)
 {
@@ -742,12 +696,6 @@ bool CUIMapWnd::ConvertCursorPosToMap(Fvector* return_position, CUICustomMap* cu
     return true;
 }
 
-void CUIMapWnd::ShowSettingsWindow(u16 id, Fvector pos, shared_str levelName)
-{
-    m_UserSpotWnd->Init(id, levelName.c_str(), pos, false);
-    m_UserSpotWnd->Show();
-}
-
 CMapLocation* CUIMapWnd::UnderSpot(Fvector RealPosition, CUICustomMap* curr_map)
 {
     Fvector2 RealPositionXZ;
@@ -773,44 +721,4 @@ CMapLocation* CUIMapWnd::UnderSpot(Fvector RealPosition, CUICustomMap* curr_map)
         }
     }
     return ml;
-}
-
-void CUIMapWnd::CreateSpotWindow(Fvector RealPosition, shared_str map_name)
-{
-    m_UserSpotWnd->Init(u16(-1), map_name.c_str(), RealPosition, true);
-    m_UserSpotWnd->Show();
-}
-
-void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
-{
-    m_UIPropertiesBox->RemoveAll();
-
-    CMapSpot* sp = smart_cast<CMapSpot*>(w);
-    if (!sp)
-        return;
-
-    m_cur_location = sp->MapLocation();
-    if (!m_cur_location)
-        return;
-
-    if (m_cur_location->IsUserDefined())
-    {
-        m_UIPropertiesBox->AddItem("st_pda_change_spot_hint", w, MAP_CHANGE_SPOT_HINT_ACT);
-        m_UIPropertiesBox->AddItem("st_pda_delete_spot", w, MAP_REMOVE_SPOT_ACT);
-    }
-
-    m_UIPropertiesBox->CheckCustomActionsMapSpot(m_cur_location->ObjectID(), m_cur_location->GetType(), m_cur_location->LevelName().c_str(), m_cur_location->GetLastPosition(), m_cur_location->IsUserDefined());
-
-    if (m_UIPropertiesBox->GetItemsCount() > 0)
-    {
-        m_UIPropertiesBox->AutoUpdateSize();
-
-        Fvector2 cursor_pos;
-        Frect vis_rect;
-
-        GetAbsoluteRect(vis_rect);
-        cursor_pos = GetUICursor()->GetCursorPosition();
-        cursor_pos.sub(vis_rect.lt);
-        m_UIPropertiesBox->Show(vis_rect, cursor_pos);
-    }
 }

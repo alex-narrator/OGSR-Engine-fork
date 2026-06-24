@@ -500,43 +500,32 @@ bool CUILevelMap::OnMouse(float x, float y, EUIMessages mouse_action)
     if (MapWnd()->GlobalMap()->Locked())
         return true;
 
-    if (mouse_action == WINDOW_LBUTTON_DB_CLICK)
+    if (mouse_action == WINDOW_LBUTTON_DOWN || mouse_action == WINDOW_LBUTTON_DB_CLICK)
     {
-        const auto* ui_game_sp = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-        if (ui_game_sp->PdaMenu->m_pActiveSection == EPdaTabs::eptMap)
+        Fvector real_position;
+        if (MapWnd()->ConvertCursorPosToMap(&real_position, this))
         {
-            Fvector real_position;
-            if (MapWnd()->ConvertCursorPosToMap(&real_position, this))
+            const CMapLocation* map_loc = MapWnd()->UnderSpot(real_position, this);
+            if (!map_loc)
             {
-                const CMapLocation* map_loc = MapWnd()->UnderSpot(real_position, this);
-                if (!map_loc)
-                {
-                    MapWnd()->CreateSpotWindow(real_position, MapName());
-                    return true;
-                }
+                /*MapWnd()->CreateSpotWindow(real_position, MapName());*/
+                Fvector2 _p;
+                GetAbsolutePos(_p);
+
+                Fvector2 cursor_pos = GetUICursor()->GetCursorPosition();
+                cursor_pos.sub(_p);
+                const Fvector2 p = ConvertLocalToReal(cursor_pos);
+
+                Fvector pos;
+                pos.set(p.x, 0.0f, p.y);
+
+                if (mouse_action == WINDOW_LBUTTON_DOWN)
+                    g_actor->callback(GameObject::eUIMapClick)(pos, MapName().c_str(), real_position);
+                else
+                    g_actor->callback(GameObject::eUIMapDbClick)(pos, MapName().c_str(), real_position);
+                return true;
             }
         }
-    }
-    else if (mouse_action == WINDOW_LBUTTON_DOWN)
-    {
-        // Real Wolf: Колбек с позицией и названием карты при клике по самой карте. 03.08.2014.
-        Fvector2 _p;
-        GetAbsolutePos(_p);
-
-        Fvector2 cursor_pos = GetUICursor()->GetCursorPosition();
-        cursor_pos.sub(_p);
-        const Fvector2 p = ConvertLocalToReal(cursor_pos);
-
-        Fvector pos;
-        pos.set(p.x, 0.0f, p.y);
-
-        Fvector real_position{};
-        if (!MapWnd()->ConvertCursorPosToMap(&real_position, this))
-        {
-            Msg("! Cannot get real location from map point");
-        }
-
-        g_actor->callback(GameObject::eUIMapClick)(pos, MapName().c_str(), real_position);
     }
     else if (mouse_action == WINDOW_MOUSE_MOVE)
     {
@@ -557,10 +546,6 @@ void CUILevelMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     switch (msg)
     {
     case MAP_SELECT_SPOT2: {
-        const auto* ui_game_sp = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-        if (ui_game_sp->PdaMenu->m_pActiveSection == EPdaTabs::eptMap) // Правильнее было бы проверять там, откуда вызвали, но надо кучу инклудов... Да ну нахер возиться.
-            MapWnd()->ActivatePropertiesBox(pWnd);
-
         if (const auto ms = smart_cast<CMapSpot*>(pWnd))
             if (const auto ml = ms->MapLocation())
                 g_actor->callback(GameObject::eMapLocationClicked)(ml->ObjectID(), ml->GetType(), ml->LevelName().c_str(), ml->GetLastPosition(), ml->IsUserDefined());

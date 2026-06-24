@@ -79,6 +79,7 @@ enum ECallbackType
     ePostSave,
 
     eUIMapClick,
+    eUIMapDbClick,
 
     eOnWpnShellDrop,
     eOnThrowGrenade,

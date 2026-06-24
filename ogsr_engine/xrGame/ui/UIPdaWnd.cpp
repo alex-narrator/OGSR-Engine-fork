@@ -23,7 +23,6 @@
 #include "UIMainIngameWnd.h"
 #include "UITabButton.h"
 #include "../actor.h"
-#include "UIPdaSpot.h"
 #include "player_hud.h"
 #include "../../xr_3da/XR_IOConsole.h"
 #include "inventory.h"

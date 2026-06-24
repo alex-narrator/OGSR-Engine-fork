@@ -5673,9 +5673,6 @@
     <ClInclude Include="InventoryContainer.h">
       <Filter>Core\Client\Objects\inventory\InventoryContainer</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIPdaSpot.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
-    </ClInclude>
     <ClInclude Include="ai\monsters\states\monster_state_attack_on_run.h">
       <Filter>AI\AMonsters\common\monster states\Attack</Filter>
     </ClInclude>
@@ -8523,9 +8520,6 @@
     </ClCompile>
     <ClCompile Include="InventoryContainer.cpp">
       <Filter>Core\Client\Objects\inventory\InventoryContainer</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIPdaSpot.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\PdaWnd</Filter>
     </ClCompile>
     <ClCompile Include="ai\monsters\anti_aim_ability.cpp">
       <Filter>AI\AMonsters\common\components</Filter>
