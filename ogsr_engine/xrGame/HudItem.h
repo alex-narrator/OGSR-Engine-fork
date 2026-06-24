@@ -155,8 +155,8 @@ public:
     virtual void PlayAnimIdle();
     bool TryPlayAnimIdle();
     virtual bool IsZoomed() const { return false; }
-    virtual void OnZoomOut(bool = false) {};
-    virtual void OnZoomIn() {};
+    virtual void OnZoomOut();
+    virtual void OnZoomIn();
     // virtual void	PlayAnimBore		();
     virtual void PlayAnimIdleMoving();
     virtual void PlayAnimIdleMovingSlow();

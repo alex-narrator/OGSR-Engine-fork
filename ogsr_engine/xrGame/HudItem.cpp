@@ -1499,3 +1499,15 @@ void CHudItem::SetHudSection(shared_str sect)
         hi->load(sect);
     on_a_hud_attach();
 }
+
+void CHudItem::OnZoomIn()
+{
+    if (auto actor = smart_cast<CActor*>(object().H_Parent()))
+        actor->callback(GameObject::eOnHudItemZoomIn)(object().lua_game_object());
+}
+
+void CHudItem::OnZoomOut()
+{
+    if (auto actor = smart_cast<CActor*>(object().H_Parent()))
+        actor->callback(GameObject::eOnHudItemZoomOut)(object().lua_game_object());
+}

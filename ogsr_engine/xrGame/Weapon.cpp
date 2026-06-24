@@ -1010,7 +1010,10 @@ bool CWeapon::Action(s32 cmd, u32 flags)
                 if (auto pActor = smart_cast<CActor*>(H_Parent()))
                     pActor->callback(GameObject::eOnActorWeaponScopeModeChange)(lua_game_object());
                 if (IsZoomed())
-                    OnZoomOut(true);
+                {
+                    OnZoomOut();
+                    OnZoomIn();
+                }
                 return true;
             }
         }
@@ -1422,6 +1425,7 @@ bool CWeapon::IsAimAltMode() const { return !IsGrenadeMode() && m_bAimAltMode; }
 
 void CWeapon::OnZoomIn()
 {
+    inherited::OnZoomIn();
     m_bZoomMode = true;
     m_fZoomFactor = CurrentZoomFactor();
     if (IsAddonAttached(eScope) && !IsGrenadeMode())
@@ -1431,21 +1435,18 @@ void CWeapon::OnZoomIn()
     }
     else if (!m_bZoomInertionAllow)
         AllowHudInertion(FALSE);
-    if (auto pActor = smart_cast<CActor*>(H_Parent()))
-        pActor->callback(GameObject::eOnActorWeaponZoomIn)(lua_game_object());
 
     g_player_hud->updateMovementLayerState();
 }
 
-void CWeapon::OnZoomOut(bool rezoom)
+void CWeapon::OnZoomOut()
 {
+    inherited::OnZoomOut();
     m_fZoomFactor = 1.f;
     if (m_bZoomMode)
     {
         SprintType = false;
         m_bZoomMode = false;
-        if (auto pActor = smart_cast<CActor*>(H_Parent()))
-            pActor->callback(GameObject::eOnActorWeaponZoomOut)(lua_game_object());
     }
     AllowHudInertion(TRUE);
     ResetSubStateTime();

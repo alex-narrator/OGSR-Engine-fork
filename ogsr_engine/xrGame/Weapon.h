@@ -264,7 +264,7 @@ public:
     IC bool IsZoomEnabled() const { return m_bZoomEnabled; }
     virtual void ZoomChange(bool inc);
     virtual void OnZoomIn();
-    virtual void OnZoomOut(bool rezoom = false);
+    virtual void OnZoomOut();
     bool IsZoomed() const override { return m_bZoomMode; }
     bool IsAiming() const;
 

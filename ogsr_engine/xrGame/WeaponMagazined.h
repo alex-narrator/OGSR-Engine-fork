@@ -219,7 +219,7 @@ protected:
     //////////////////////////////////////////////
 public:
     virtual void OnZoomIn();
-    virtual void OnZoomOut(bool rezoom = false);
+    virtual void OnZoomOut();
     virtual void OnZoomChanged();
     virtual void OnNextFireMode();
     virtual void OnPrevFireMode();

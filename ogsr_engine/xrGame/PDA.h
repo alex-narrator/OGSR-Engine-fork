@@ -75,7 +75,7 @@ public:
     virtual void OnActiveItem() override;
     virtual void OnHiddenItem() override;
 
-    virtual void OnZoomOut(bool = false) override;
+    virtual void OnZoomOut() override;
     virtual void OnZoomIn() override;
     bool IsZoomed() const override { return m_bZoomed; }
 

@@ -1654,11 +1654,11 @@ void CWeaponMagazined::OnZoomIn()
         }
     }
 }
-void CWeaponMagazined::OnZoomOut(bool rezoom)
+void CWeaponMagazined::OnZoomOut()
 {
     if (!m_bZoomMode)
         return;
-    inherited::OnZoomOut(rezoom);
+    inherited::OnZoomOut();
     if (GetState() == eIdle)
         PlayAnimIdle();
     if (IsAddonAttached(eScope) && !IsGrenadeMode() && H_Parent())
@@ -1675,8 +1675,6 @@ void CWeaponMagazined::OnZoomOut(bool rezoom)
             xr_delete(m_binoc_vision);
         }
     }
-    if (rezoom)
-        OnZoomIn();
 }
 
 void CWeaponMagazined::OnZoomChanged()

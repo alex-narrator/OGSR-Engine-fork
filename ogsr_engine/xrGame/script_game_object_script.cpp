@@ -73,7 +73,7 @@ void CScriptGameObject::script_register(lua_State* L)
                     value("on_before_save", int(GameObject::eBeforeSave)), value("on_after_save", int(GameObject::ePostSave)),
                     value("on_level_map_click", int(GameObject::eUIMapClick)),value("on_level_map_db_click", int(GameObject::eUIMapDbClick)), 
                     value("on_weapon_shell_drop", int(GameObject::eOnWpnShellDrop)),
-                    value("on_actor_weapon_zoom_in", int(GameObject::eOnActorWeaponZoomIn)), value("on_actor_weapon_zoom_out", int(GameObject::eOnActorWeaponZoomOut)),
+                    value("on_hud_item_zoom_in", int(GameObject::eOnHudItemZoomIn)), value("on_hud_item_zoom_out", int(GameObject::eOnHudItemZoomOut)),
                     value("on_actor_weapon_zoom_change", int(GameObject::eOnActorWeaponZoomChange)),
                     value("on_actor_weapon_scope_mode_change", int(GameObject::eOnActorWeaponScopeModeChange)),
                     value("on_actor_weapon_fire_mode_change", int(GameObject::eOnActorWeaponFireModeChange)),
