@@ -508,7 +508,6 @@ bool CUILevelMap::OnMouse(float x, float y, EUIMessages mouse_action)
             const CMapLocation* map_loc = MapWnd()->UnderSpot(real_position, this);
             if (!map_loc)
             {
-                /*MapWnd()->CreateSpotWindow(real_position, MapName());*/
                 Fvector2 _p;
                 GetAbsolutePos(_p);
 
@@ -523,7 +522,7 @@ bool CUILevelMap::OnMouse(float x, float y, EUIMessages mouse_action)
                     g_actor->callback(GameObject::eUIMapClick)(pos, MapName().c_str(), real_position);
                 else
                     g_actor->callback(GameObject::eUIMapDbClick)(pos, MapName().c_str(), real_position);
-                return true;
+                return (mouse_action == WINDOW_LBUTTON_DB_CLICK);
             }
         }
     }
