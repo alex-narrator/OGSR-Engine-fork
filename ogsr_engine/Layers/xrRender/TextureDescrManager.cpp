@@ -34,7 +34,10 @@ void CTextureDescrMngr::LoadLTX()
 
             for (const auto& [key, value] : Sect.Ordered_Data)
             {
-                texture_desc& desc = m_texture_details[key];
+                auto low_key = key;
+                xr_strlwr(low_key);
+
+                texture_desc& desc = m_texture_details[low_key];
                 if (desc.m_assoc)
                     xr_delete(desc.m_assoc);
                 desc.m_assoc = xr_new<texture_assoc>();
@@ -65,7 +68,10 @@ void CTextureDescrMngr::LoadLTX()
 
             for (const auto& [key, value] : Sect.Ordered_Data)
             {
-                texture_desc& desc = m_texture_details[key];
+                auto low_key = key;
+                xr_strlwr(low_key);
+
+                texture_desc& desc = m_texture_details[low_key];
                 if (desc.m_spec)
                     xr_delete(desc.m_spec);
                 desc.m_spec = xr_new<texture_spec>();
