@@ -38,6 +38,7 @@ void CUIZoneMap::Init()
 
     m_rounded = uiXml.ReadAttribInt("minimap", 0, "rounded", 0) == 1;
     m_alpha = uiXml.ReadAttribInt("minimap", 0, "alpha", 127);
+    m_segments_count = uiXml.ReadAttribInt("minimap", 0, "segments_count", 20);
 
     m_clipFrame->AttachChild(m_activeMap);
 
@@ -45,6 +46,7 @@ void CUIZoneMap::Init()
     m_activeMap->EnableHeading(true);
     m_activeMap->SetWindowName("minimap");
     m_activeMap->SetRounded(m_rounded);
+    m_activeMap->SetSegmentsCount(m_segments_count);
 
     m_activeMap->SetTextureColor(color_argb(m_alpha, 255, 255, 255));
 
@@ -110,6 +112,7 @@ void CUIZoneMap::SetupCurrentMap()
     m_activeMap->SetAutoDelete(true);
     m_activeMap->EnableHeading(true);
     m_activeMap->SetRounded(m_rounded);
+    m_activeMap->SetSegmentsCount(m_segments_count);
 
     m_activeMap->Init(Level().name(), *pLtx, "hud\\default");
     m_activeMap->SetWindowName("minimap"); // имя нужно задавать позже чем Init

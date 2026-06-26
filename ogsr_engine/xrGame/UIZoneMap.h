@@ -16,6 +16,7 @@ class CUIZoneMap
 
     bool m_rounded{};
     u32 m_alpha{};
+    u32 m_segments_count{};
 
 public:
     CUIZoneMap();

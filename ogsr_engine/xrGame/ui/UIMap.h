@@ -22,6 +22,8 @@ protected:
 
     Frect m_workingArea{};
 
+    u32 m_segments_count{};
+
 public:
     Frect& WorkingArea() { return m_workingArea; }
 
@@ -62,6 +64,9 @@ public:
 
     void SetPointerDistance(float d) { m_pointer_dist = d; };
     float GetPointerDistance() const { return m_pointer_dist; };
+
+    u32 GetSegmentsCount() { return m_segments_count; };
+    void SetSegmentsCount(u32 count) { m_segments_count = count; };
 
 protected:
     virtual void UpdateSpots(){};

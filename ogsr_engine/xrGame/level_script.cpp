@@ -359,26 +359,6 @@ CUIWindow* GetPdaWindow()
     return (CUIWindow*)pGameSP->PdaMenu;
 }
 
-int get_active_pda_tab_idx()
-{
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return 0;
-    if (!pGameSP->PdaMenu)
-        return 0;
-    return pGameSP->PdaMenu->m_pActiveSection;
-}
-
-void set_active_pda_tab_idx(EPdaTabs idx)
-{
-    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-    if (!pGameSP)
-        return;
-    if (!pGameSP->PdaMenu)
-        return;
-    pGameSP->PdaMenu->SetActiveSubdialog(idx);
-}
-
 void set_pda_map_target_spot(u16 id, LPCSTR spot_type, bool bZoomIn)
 {
     CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
@@ -1113,7 +1093,6 @@ void CLevel::script_register(lua_State* L)
             def("get_second_talker", &GetSecondTalker),
             def("get_change_level_wnd", &GetUIChangeLevelWnd),
 
-            def("get_active_pda_tab_idx", &get_active_pda_tab_idx), def("set_active_pda_tab_idx", &set_active_pda_tab_idx),
             def("set_pda_map_target_spot", &set_pda_map_target_spot),
 
             def("ray_query", &PerformRayQuery),

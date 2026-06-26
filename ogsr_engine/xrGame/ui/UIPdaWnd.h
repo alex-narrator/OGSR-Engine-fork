@@ -58,6 +58,7 @@ public:
     virtual bool OnKeyboard(int dik, EUIMessages keyboard_action) override;
 
     void SetActiveSubdialog(EPdaTabs section);
+    int GetActiveSubdialog() { return m_pActiveSection; };
     virtual bool StopAnyMove() { return false; }
 
     void PdaContentsChanged(pda_section::part type, bool = true, bool = false);

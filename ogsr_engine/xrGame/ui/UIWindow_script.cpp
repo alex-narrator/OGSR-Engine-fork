@@ -12,6 +12,7 @@
 #include "UIProgressBar.h"
 #include "MMSound.h"
 #include "UIOptionsItem.h"
+#include "UIPdaWnd.h"
 
 CFontManager& mngr() { return *(UI()->Font()); }
 
@@ -133,6 +134,7 @@ void CUIWindow::script_register(lua_State* L)
                   .def("GetButton", &wnd_object_cast<CUIButton>)
                   .def("GetCUIStatic", &wnd_object_cast<CUIStatic>)
                   .def("GetProgressBar", &wnd_object_cast<CUIProgressBar>)
+                  .def("GetPdaWnd", &wnd_object_cast<CUIPdaWnd>)
                   .def("GetAbsoluteRect", (void(CUIWindow::*)(Frect&)) & CUIWindow::GetAbsoluteRect)
                   .def("BringToTop", &CUIWindow::BringToTop)
                   .def("BringToBottom", &CUIWindow::BringToBottom)
@@ -188,6 +190,11 @@ void CUIWindow::script_register(lua_State* L)
                   .def("ForceScrollPos", &CUIScrollView::ForceScrollPosition)
                   .def("GetDesiredChildWidth", &CUIScrollView::GetDesiredChildWidth)
                   .def("GetPadSize", &CUIScrollView::GetPadSize),
+
+              class_<CUIPdaWnd, CUIWindow>("CUIPdaWnd")
+                   .def(constructor<>())
+                   .def("GetActiveTabIdx", &CUIPdaWnd::GetActiveSubdialog)
+                   .def("SetActiveTabIdx", &CUIPdaWnd::SetActiveSubdialog),
 
 
               //		.def("",						&CUIFrameLineWnd::)

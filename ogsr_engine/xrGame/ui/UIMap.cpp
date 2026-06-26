@@ -602,7 +602,7 @@ void CUIMiniMap::Draw()
         return;
     }
 
-    const u32 segments_count = 20;
+    const u32 segments_count = GetSegmentsCount();
 
     UIRender->SetShader(*m_UIStaticItem.GetShader());
     UIRender->StartPrimitive(segments_count * 3, IUIRender::ptTriList, UI()->m_currentPointType);
