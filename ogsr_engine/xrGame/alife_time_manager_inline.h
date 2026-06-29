@@ -21,6 +21,8 @@ IC void CALifeTimeManager::advance_game_time(u32 dt_ms)
     m_start_time = Device.dwTimeGlobal;
 };
 
+IC void CALifeTimeManager::change_game_time(u32 value) { m_game_time += value; }
+
 IC ALife::_TIME_ID CALifeTimeManager::game_time() const { return (m_game_time + iFloor(m_time_factor * float(Device.dwTimeGlobal - m_start_time))); };
 
 IC float CALifeTimeManager::time_factor() const { return (m_time_factor); }
