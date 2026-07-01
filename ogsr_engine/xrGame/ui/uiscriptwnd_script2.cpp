@@ -5,7 +5,6 @@
 #include "UIScriptWnd.h"
 #include "UIButton.h"
 #include "UIMessageBox.h"
-#include "UIPropertiesBox.h"
 #include "UICheckButton.h"
 #include "UIRadioButton.h"
 #include "UIStatic.h"

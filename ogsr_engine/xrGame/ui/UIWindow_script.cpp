@@ -241,9 +241,6 @@ void CUIWindow::script_register(lua_State* L)
                       // CUIListWnd
                       value("LIST_ITEM_CLICKED", int(LIST_ITEM_CLICKED)), value("LIST_ITEM_SELECT", int(LIST_ITEM_SELECT)),
 
-                      // UIPropertiesBox
-                      value("PROPERTY_CLICKED", int(PROPERTY_CLICKED)),
-
                       // CUIMessageBox
                       value("MESSAGE_BOX_OK_CLICKED", int(MESSAGE_BOX_OK_CLICKED)), value("MESSAGE_BOX_YES_CLICKED", int(MESSAGE_BOX_YES_CLICKED)),
                       value("MESSAGE_BOX_NO_CLICKED", int(MESSAGE_BOX_NO_CLICKED)), value("MESSAGE_BOX_CANCEL_CLICKED", int(MESSAGE_BOX_CANCEL_CLICKED)),

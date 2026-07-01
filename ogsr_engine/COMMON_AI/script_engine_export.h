@@ -70,7 +70,6 @@
 #include "UI/UIProgressBar.h"
 #include "UI/UIEditBox.h"
 #include "UI/UIMessageBox.h"
-#include "UI/UIPropertiesBox.h"
 #include "UI/UITabControl.h"
 #include "UI/UIListWnd.h"
 #include "UI/UIComboBox.h"

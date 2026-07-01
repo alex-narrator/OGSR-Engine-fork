@@ -5274,9 +5274,6 @@
     <ClInclude Include="ui\UIMessageBoxEx.h">
       <Filter>AI\AScript\ScriptClasses\UI\UIWindows\MessageBox</Filter>
     </ClInclude>
-    <ClInclude Include="ui\UIPropertiesBox.h">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\PropertiesBox</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIAnimatedStatic.h">
       <Filter>AI\AScript\ScriptClasses\UI\UIWindows\Static</Filter>
     </ClInclude>
@@ -8280,12 +8277,6 @@
     </ClCompile>
     <ClCompile Include="ui\UIMessageBoxEx.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\UIWindows\MessageBox</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIPropertiesBox.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\PropertiesBox</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIPropertiesBox_script.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\UIWindows\PropertiesBox</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIAnimatedStatic.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\UIWindows\Static</Filter>

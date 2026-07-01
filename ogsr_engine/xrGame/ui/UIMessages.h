@@ -59,9 +59,6 @@ enum EUIMessages : s16
     LIST_ITEM_UNSELECT,
     LIST_ITEM_FOCUS_RECEIVED,
 
-    // UIPropertiesBox
-    PROPERTY_CLICKED,
-
     // CUIMessageBox
     MESSAGE_BOX_OK_CLICKED,
     MESSAGE_BOX_YES_CLICKED,

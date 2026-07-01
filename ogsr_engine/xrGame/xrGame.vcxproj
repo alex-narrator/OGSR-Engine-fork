@@ -1394,7 +1394,6 @@
     <ClInclude Include="ui\xrUIXmlParser.h" />
     <ClInclude Include="ui\UIMessageBox.h" />
     <ClInclude Include="ui\UIMessageBoxEx.h" />
-    <ClInclude Include="ui\UIPropertiesBox.h" />
     <ClInclude Include="ui\UIAnimatedStatic.h" />
     <ClInclude Include="UICustomItem.h" />
     <ClInclude Include="ui\UIMultiTextStatic.h" />
@@ -2312,8 +2311,6 @@
     <ClCompile Include="ui\UIMessageBox.cpp" />
     <ClCompile Include="ui\UIMessageBox_script.cpp" />
     <ClCompile Include="ui\UIMessageBoxEx.cpp" />
-    <ClCompile Include="ui\UIPropertiesBox.cpp" />
-    <ClCompile Include="ui\UIPropertiesBox_script.cpp" />
     <ClCompile Include="ui\UIAnimatedStatic.cpp" />
     <ClCompile Include="UICustomItem.cpp" />
     <ClCompile Include="ui\UIMultiTextStatic.cpp" />
