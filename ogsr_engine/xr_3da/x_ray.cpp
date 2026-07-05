@@ -764,27 +764,7 @@ int CApplication::Level_ID(const char* name, const char* ver, const bool bSet)
 {
     int result = -1;
     bool arch_res = false;
-/* //Вроде б нам это не нужно. что-то от мп
-    auto it = FS.m_archives.begin();
-    auto it_e = FS.m_archives.end();
-    for (; it != it_e; ++it)
-    {
-        CLocatorAPI::archive& A = *it;
-        if (A.hSrcFile == NULL)
-        {
-            LPCSTR ln = A.header->r_string("header", "level_name");
-            LPCSTR lv = A.header->r_string("header", "level_ver");
-            if (0 == _stricmp(ln, name) && 0 == _stricmp(lv, ver))
-            {
-                FS.LoadArchive(A);
-                arch_res = true;
-            }
-        }
-    }
 
-    if (arch_res)
-        Level_Scan();
-*/
     string256 buffer;
     strconcat(sizeof(buffer), buffer, name, "\\");
     for (u32 I = 0; I < Levels.size(); ++I)

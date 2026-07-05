@@ -157,13 +157,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         LPCSTR c_target = "vs_5_0";
         LPCSTR c_entry = "main";
 
-        // xrSimpodin: Для воды снизил версию до 4.1 потому что с ней фиксится баг с неподвижной водой. Не понятно почему так происходит и проблема решается таким странным
-        // способом. Можно было бы сменить c_entry на main_vs_4_1 но там куча шейдеров для воды сделано через инклуды и они не позволяют так сделать.
-        if (!strncmp(shName, "water", strlen("water")))
-        {
-            c_target = "vs_4_1";
-        }
-        else if (strbuf.find("main_vs_4_1") != decltype(strbuf)::npos)
+        if (strbuf.find("main_vs_4_1") != decltype(strbuf)::npos)
         {
             c_target = "vs_4_1";
             c_entry = "main_vs_4_1";
@@ -252,14 +246,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
         LPCSTR c_target = "ps_5_0";
         LPCSTR c_entry = "main";
 
-        // xrSimpodin: Для воды снизил версию до 4.1 потому что с ней фиксится баг с неподвижной водой. Не понятно почему так происходит и проблема решается таким странным
-        // способом.
-        // Можно было бы сменить c_entry на main_ps_4_1 но там куча шейдеров для воды сделано через инклуды и они не позволяют так сделать.
-        if (!strncmp(shName, "water", strlen("water")))
-        {
-            c_target = "ps_4_1";
-        }
-        else if (strbuf.find("main_ps_4_1") != decltype(strbuf)::npos)
+        if (strbuf.find("main_ps_4_1") != decltype(strbuf)::npos)
         {
             c_target = "ps_4_1";
             c_entry = "main_ps_4_1";

@@ -628,7 +628,10 @@ void CCC_Register()
     CMD4(CCC_Integer, "lua_gctimeout", &psLUA_GCTIMEOUT_MIN, 1000, 16000);
 
     extern BOOL bLevelEnvModExport;
-    CMD4(CCC_Integer, "level_env_mod_export", &bLevelEnvModExport, FALSE, TRUE);
+    CMD2(CCC_Bool, "level_env_mod_export", &bLevelEnvModExport);
 
     CMD3(CCC_Mask, "ssfx_hud_raindrops", &psDeviceFlags, rs_SSFX_HUD_RAINDROPS);
+
+    extern BOOL g_console_show_always;
+    CMD2(CCC_Bool, "g_console_show_always", &g_console_show_always);
 };

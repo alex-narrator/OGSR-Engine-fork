@@ -90,16 +90,7 @@ extern "C" __declspec(noreturn) void __fastfail(unsigned int);
 #include <ranges>
 #pragma warning(pop)
 
-// Our headers
-#ifdef XRCORE_STATIC
 #define XRCORE_API
-#else
-#ifdef XRCORE_EXPORTS
-#define XRCORE_API __declspec(dllexport)
-#else
-#define XRCORE_API __declspec(dllimport)
-#endif
-#endif
 
 #include <tracy/Tracy.hpp>
 
