@@ -183,6 +183,9 @@ public:
 	void SetConstHeading(bool b) { m_bConstHeading = b; };
     bool GetConstHeading() { return m_bConstHeading; }
 
+    void SetOriginalHeading(float f) { m_fOriginalHeading = f; };
+    float GetOriginalHeading() { return m_fOriginalHeading; }
+
     // will be need by CUI3tButton
     // Don't change order!!!!!
     typedef enum
@@ -218,6 +221,7 @@ protected:
     bool m_bHeading;
     float m_fHeading;
     bool m_bConstHeading{};
+    float m_fOriginalHeading{};
 
     // Для вывода текстуры с обрезанием по маске используем CUIFrameWindow
     CUIFrameWindow* m_pMask;

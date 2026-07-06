@@ -207,6 +207,7 @@ bool CUIXmlInit::InitStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* 
         pWnd->EnableHeading(true);
         pWnd->SetConstHeading(true);
         pWnd->SetHeading(deg2rad(heading_angle));
+        pWnd->SetOriginalHeading(deg2rad(heading_angle));
     }
 
     LPCSTR str_flag = xml_doc.ReadAttrib(path, index, "light_anim", "");
@@ -402,6 +403,7 @@ bool CUIXmlInit::Init3tButton(CUIXml& xml_doc, const char* path, int index, CUI3
         pWnd->EnableHeading(true);
         pWnd->SetConstHeading(true);
         pWnd->SetHeading(deg2rad(heading_angle));
+        pWnd->SetOriginalHeading(deg2rad(heading_angle));
     }
     pWnd->SetStretchTexture(!!xml_doc.ReadAttribInt(path, index, "stretch"));
 
