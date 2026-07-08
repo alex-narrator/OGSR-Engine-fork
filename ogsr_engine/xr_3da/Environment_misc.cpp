@@ -699,10 +699,10 @@ void CEnvironment::mods_load()
     {
         CInifile ltXfile = CInifile(path);
 
-        for (const auto& it : ltXfile.sections())
+        for (const auto& key : ltXfile.sections_ordered() | std::views::keys)
         {
             CEnvModifier E;
-            if (E.loadIni(ltXfile, it.first.c_str()))
+            if (E.loadIni(ltXfile, key.c_str()))
                 Modifiers.push_back(E);
         }
     }
@@ -849,11 +849,11 @@ void CEnvironment::load_weathers()
             CInifile config(file_name);
 
             EnvVec& env = WeatherCycles[identifier];
-            auto& sections = config.sections();
+            auto& sections = config.sections_ordered();
             env.reserve(sections.size());
 
-            for (const auto& pair : sections)
-                env.push_back(create_descriptor(pair.second->Name, &config));
+            for (const auto* ini : sections | std::views::values)
+                env.push_back(create_descriptor(ini->Name, &config));
         }
 
         FS.file_list_close(file_list);
@@ -911,14 +911,15 @@ void CEnvironment::load_weather_effects()
             string_path file_name;
             FS.update_path(file_name, fsgame::game_weather_effects, file);
             CInifile config(file_name);
-            auto& sections = config.sections();
 
             EnvVec& env = WeatherFXs[identifier];
+            auto& sections = config.sections_ordered();
             env.reserve(sections.size() + 2);
+
             env.push_back(create_descriptor("00:00:00", nullptr));
 
-            for (const auto& pair : sections)
-                env.push_back(create_descriptor(pair.second->Name, &config));
+            for (const auto* ini : sections | std::views::values)
+                env.push_back(create_descriptor(ini->Name, &config));
 
             env.emplace_back(create_descriptor("24:00:00", nullptr))->exec_time_loaded = DAY_LENGTH;
         }

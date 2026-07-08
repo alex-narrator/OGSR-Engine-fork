@@ -113,11 +113,13 @@ void CRender::level_Load(IReader* fs)
     {
         CInifile ini(puddles_file);
 
-        current_level_puddles.reserve(ini.sections().size());
+        const auto& sects = ini.sections_ordered();
 
-        for (const auto& pair : ini.sections())
+        current_level_puddles.reserve(sects.size());
+
+        for (const auto& _sect : sects | std::views::values)
         {
-            const auto& sect = pair.second->Name;
+            const auto& sect = _sect->Name;
 
             auto& puddle = current_level_puddles.emplace_back();
 
@@ -128,7 +130,7 @@ void CRender::level_Load(IReader* fs)
             if (fis_zero(size_xz.y))
                 size_xz.y = size_xz.x;
 
-            if (pair.second->line_exist("rotation"))
+            if (_sect->line_exist("rotation"))
                 puddle.xform.rotateY(ini.r_float(sect, "rotation"));
 
             puddle.xform.mulB_43(Fmatrix{}.scale(size_xz.x, 1.0f, size_xz.y));

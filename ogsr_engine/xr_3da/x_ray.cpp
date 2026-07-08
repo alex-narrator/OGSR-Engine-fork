@@ -42,11 +42,11 @@ void InitSettings()
     string_path fname;
     FS.update_path(fname, "$game_config$", "system.ltx");
     pSettings = xr_new<CInifile>(fname, TRUE);
-    CHECK_OR_EXIT(!pSettings->sections().empty(), make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
+    CHECK_OR_EXIT(!pSettings->sections_ordered().empty(), make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
 
     FS.update_path(fname, "$game_config$", "game.ltx");
     pGameIni = xr_new<CInifile>(fname, TRUE);
-    CHECK_OR_EXIT(!pGameIni->sections().empty(), make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
+    CHECK_OR_EXIT(!pGameIni->sections_ordered().empty(), make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
 
     IS_OGSR_GA = strstr(READ_IF_EXISTS(pSettings, r_string, "mod_ver", "mod_ver", "nullptr"), "OGSR");
 
@@ -83,8 +83,8 @@ void InitSettings()
     {
         Msg("[shader_params_export] section found!!!");
 
-        int tb_count = pSettings->line_count("shader_params_export");
-        for (int tb_idx = 0; tb_idx < tb_count; tb_idx++)
+        const u32 tb_count = pSettings->line_count("shader_params_export");
+        for (u32 tb_idx = 0; tb_idx < tb_count; tb_idx++)
         {
             LPCSTR N, V;
             if (pSettings->r_line("shader_params_export", tb_idx, &N, &V))

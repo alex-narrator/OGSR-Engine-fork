@@ -688,11 +688,9 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
 
     if (pUserData && pUserData->section_exist("omf_override"))
     {
-        for (const auto& it : pUserData->r_section("omf_override").Ordered_Data)
+        for (const auto& nm : pUserData->r_section("omf_override").Ordered_Data | std::views::keys)
         {
-            LPCSTR nm = it.first.c_str();
-
-            add_omf(nm);
+            add_omf(nm.c_str());
         }
     }
     else if (data->find_chunk(OGF_S_MOTION_REFS))
@@ -725,18 +723,16 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
 
     if (const auto omf_override_ini = RImplementation.Models->omf_override_ini)
     {
-        for (const auto& pair : omf_override_ini->sections())
+        for (const auto* sect : omf_override_ini->sections_ordered() | std::views::values)
         {
             // pair.second->Name
-            if (!strncmp(N, pair.second->Name.c_str(), strlen(pair.second->Name.c_str())))
+            if (!strncmp(N, sect->Name.c_str(), strlen(sect->Name.c_str())))
             {
                 MsgDbg("Loading additional omf files for %s...", N);
 
-                for (const auto& it : pair.second->Ordered_Data)
+                for (const auto& nm : sect->Ordered_Data | std::views::keys)
                 {
-                    LPCSTR nm = it.first.c_str();
-
-                    add_omf(nm);
+                    add_omf(nm.c_str());
                 }
             }
         }

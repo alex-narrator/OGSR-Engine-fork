@@ -29,10 +29,10 @@ void CTextureDescrMngr::LoadLTX()
         {
             auto& Sect = ini.r_section("association");
 
-            m_texture_details.reserve(m_texture_details.size() + Sect.Data.size());
-            m_detail_scalers.reserve(m_detail_scalers.size() + Sect.Data.size());
+            m_texture_details.reserve(m_texture_details.size() + Sect.Ordered_Data.size());
+            m_detail_scalers.reserve(m_detail_scalers.size() + Sect.Ordered_Data.size());
 
-            for (const auto& [key, value] : Sect.Data)
+            for (const auto& [key, value] : Sect.Ordered_Data)
             {
                 texture_desc& desc = m_texture_details[key];
                 if (desc.m_assoc)
@@ -61,9 +61,9 @@ void CTextureDescrMngr::LoadLTX()
         {
             auto& Sect = ini.r_section("specification");
 
-            m_texture_details.reserve(m_texture_details.size() + Sect.Data.size());
+            m_texture_details.reserve(m_texture_details.size() + Sect.Ordered_Data.size());
 
-            for (const auto& [key, value] : Sect.Data)
+            for (const auto& [key, value] : Sect.Ordered_Data)
             {
                 texture_desc& desc = m_texture_details[key];
                 if (desc.m_spec)
