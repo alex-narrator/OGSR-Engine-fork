@@ -424,6 +424,14 @@ CBlend* CKinematicsAnimated::PlayFX(LPCSTR N, float power_scale)
     return PlayFX(motion_ID, power_scale);
 }
 
+CBlend* CKinematicsAnimated::PlayFX_Safe(LPCSTR N, float power_scale)
+{
+    MotionID motion_ID = ID_FX_Safe(N);
+    if (motion_ID.valid())
+        return PlayFX(motion_ID, power_scale);
+    return nullptr;
+}
+
 CBlend* CKinematicsAnimated::LL_PlayFX(u16 bone, MotionID motion_ID, float blendAccrue, float blendFalloff, float Speed, float Power)
 {
     if (!motion_ID.valid())

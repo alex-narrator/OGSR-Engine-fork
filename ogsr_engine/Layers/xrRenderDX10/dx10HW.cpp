@@ -15,6 +15,7 @@
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
 #include "imgui/Stratum2_Bold.hpp"
+#include "imgui/imgui_styles.hpp"
 
 #include <dxgi1_6.h>
 
@@ -267,7 +268,6 @@ void CHW::CreateDevice(HWND m_hWnd)
     FS.update_path(fname, fsgame::app_data_root, "imgui.ltx");
     CInifile imgui_custom_ltx{fname};
     const u32 style_idx = READ_IF_EXISTS(reinterpret_cast<CInifile*>(&imgui_custom_ltx), r_u32, "im_style", "theme_selected", 0);
-    void SetupStyle(const u32);
     SetupStyle(style_idx);
 
     ImGui_ImplWin32_Init(m_hWnd);

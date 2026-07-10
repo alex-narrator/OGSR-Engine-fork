@@ -10,6 +10,7 @@
 #include "SkeletonMotions.h"
 #include "IGame_Persistent.h"
 #include "LightAnimLibrary.h"
+#include "IInputReceiver.h"
 
 int psLUA_GCSTEP{128}; // 10;
 int psLUA_GCTIMEOUT{2000}, psLUA_GCTIMEOUT_MIN{2000}; // in micro seconds

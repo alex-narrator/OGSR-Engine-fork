@@ -259,7 +259,7 @@ void CObjectList::net_Unregister(CObject* O)
 constexpr bool g_Dump_Export_Obj{};
 
 // Simp: net_exported_objects добавлено в OGSR, при адаптации ЗП учесть это!
-u32 CObjectList::net_Export(NET_Packet* _Packet, u32 start, u32 max_object_size, std::vector<CObject*>& net_exported_objects)
+u32 CObjectList::net_Export(NET_Packet* _Packet, u32 start, u32 max_object_size, std::vector<CObject*>* net_exported_objects)
 {
     if (g_Dump_Export_Obj)
         Msg("---- net_export --- ");
@@ -276,7 +276,8 @@ u32 CObjectList::net_Export(NET_Packet* _Packet, u32 start, u32 max_object_size,
             // Msg						("cl_export: %d '%s'",P->ID(),*P->cName());
             P->net_Export(Packet);
 
-            net_exported_objects.push_back(P);
+            if (net_exported_objects)
+                net_exported_objects->push_back(P);
 
 #ifdef DEBUG
             u32 size = u32(Packet.w_tell() - position) - sizeof(u8);
