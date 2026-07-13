@@ -526,7 +526,7 @@ void CCC_Register()
     CMD3(CCC_Token, "r_fps_lock", &g_dwFPSlimit, FpsLockToken);
 
     CMD3(CCC_Mask, "rs_v_sync", &psDeviceFlags, rsVSync);
-    //CMD3(CCC_Mask, "rs_fullscreen", &psDeviceFlags, rsFullscreen);
+    CMD3(CCC_Mask, "rs_fullscreen", &psDeviceFlags, rsFullscreen);
     //CMD3(CCC_Mask, "rs_refresh_60hz", &psDeviceFlags, rsRefresh60hz);
     CMD3(CCC_Mask, "rs_stats", &psDeviceFlags, rsStatistic);
     CMD4(CCC_Float, "rs_vis_distance", &psVisDistance, 0.4f, 1.1f);
