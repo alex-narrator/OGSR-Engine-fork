@@ -632,6 +632,9 @@
 	<string id="ui_mm_font_scale_y">
 		<text>Высота шрифтов</text>
 	</string>
+	<string id="ui_mm_exclusive_input">
+		<text>Exclusive Input (блокирует горячие клавиши Windows)</text>
+	</string>
 
 	<!-- Окно "Управление" -->
 	<string id="ui_mm_controls">
