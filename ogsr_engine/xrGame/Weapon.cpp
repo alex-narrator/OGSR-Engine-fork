@@ -969,9 +969,11 @@ bool CWeapon::Action(s32 cmd, u32 flags)
         return true;
 
     case kWPN_ZOOM: {
+        const u32 state = GetState();
+        const bool bPending = IsPending();
         if (IsZoomEnabled())
         {
-            if (flags & CMD_START/* && !IsPending()*/)
+            if (flags & CMD_START && (state == eFire || state == eFire2 || state == eMagEmpty || state == eIdle || !bPending))
             {
                 if (!psActorFlags.is(AF_HOLD_TO_AIM) && IsZoomed())
                     OnZoomOut();
