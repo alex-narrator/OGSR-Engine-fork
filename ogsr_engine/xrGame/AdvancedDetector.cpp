@@ -15,6 +15,7 @@ CUIArtefactDetectorAdv& CAdvancedDetector::ui() { return *((CUIArtefactDetectorA
 
 void CAdvancedDetector::UpdateAf()
 {
+    ui().SetValue(0.0f, Fvector{});
     if (m_artefacts.m_ItemInfos.empty())
         return;
 
