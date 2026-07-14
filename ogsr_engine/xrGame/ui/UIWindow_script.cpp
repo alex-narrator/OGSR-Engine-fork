@@ -189,7 +189,9 @@ void CUIWindow::script_register(lua_State* L)
                   .def("ForceUpdate", &CUIScrollView::ForceUpdate)
                   .def("ForceScrollPos", &CUIScrollView::ForceScrollPosition)
                   .def("GetDesiredChildWidth", &CUIScrollView::GetDesiredChildWidth)
-                  .def("GetPadSize", &CUIScrollView::GetPadSize),
+                  .def("GetPadSize", &CUIScrollView::GetPadSize)
+                  .def("GetHorizIndent", &CUIScrollView::GetHorizIndent)
+                  .def("GetVertIndent", &CUIScrollView::GetVertIndent),
 
               class_<CUIPdaWnd, CUIWindow>("CUIPdaWnd")
                    .def(constructor<>())
