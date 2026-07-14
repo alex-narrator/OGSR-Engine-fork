@@ -331,7 +331,7 @@ float ps_r__opt_dist = 750.f;
 #include "../../xr_3da/xr_ioconsole.h"
 #include "../../xr_3da/xr_ioc_cmd.h"
 
-float ps_particle_update_coeff = 0.3f;
+float ps_particle_update_coeff{0.3f}, ps_particle_collision_min_dist{EPS_L};
 
 // Geometry optimization from Anomaly
 int opt_static_geom = 0;
@@ -702,6 +702,7 @@ void xrRender_initconsole()
 
     CMD3(CCC_Mask64, "r2_disable_hom", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_HOM);
     CMD3(CCC_Mask64, "r2_disable_particles", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_PARTICLES);
+    CMD3(CCC_Mask64, "r2_disable_particles_collision", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_PARTICLES_COLLISION);
     CMD3(CCC_Mask64, "r2_disable_dynamic", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_DYNAMIC);
     CMD3(CCC_Mask64, "r2_disable_light", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_LIGHT);
     //CMD3(CCC_Mask64, "r2_disable_smapvis", &ps_r2_ls_flags_ext, R2FLAGEXT_DISABLE_SMAPVIS);
@@ -960,6 +961,7 @@ void xrRender_initconsole()
     CMD1(CCC_PART_DumpTextures, "particles_dump_textures");
 
     CMD4(CCC_Float, "particle_update_mod", &ps_particle_update_coeff, 0.04f, 10.f);
+    CMD4(CCC_Float, "particle_collision_min_dist", &ps_particle_collision_min_dist, EPS, 1.0f);
 
     CMD3(CCC_Mask64, "r_lens_flare", &ps_r2_ls_flags_ext, R2FLAGEXT_LENS_FLARE);
     CMD3(CCC_Token, "r_lens_flare_mode", &r_lens_flare_mode, r_lens_flare_mode_token);
