@@ -124,7 +124,6 @@ const u32 LUMINANCE_size = 16;
 #define SE_R2_SHADOW 2 // shadow generation
 
 // spot
-#define SE_L_FILL 0
 #define SE_L_UNSHADOWED 1
 #define SE_L_NORMAL 2 // typical, scaled
 #define SE_L_FULLSIZE 3 // full texture coverage
