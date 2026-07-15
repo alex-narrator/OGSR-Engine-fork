@@ -435,8 +435,21 @@ void CEnvDescriptor::load(CEnvironment& environment, CInifile& config)
     }
     else
     {
-        sun_dir.setHP(deg2rad(config.r_float(m_identifier.c_str(), "sun_altitude")), deg2rad(config.r_float(m_identifier.c_str(), "sun_longitude")));
-        R_ASSERT(_valid(sun_dir));
+        if (config.line_exist(m_identifier.c_str(), "sun_altitude") && config.line_exist(m_identifier.c_str(), "sun_longitude"))
+        {
+            sun_dir.setHP(deg2rad(config.r_float(m_identifier.c_str(), "sun_altitude")), deg2rad(config.r_float(m_identifier.c_str(), "sun_longitude")));
+            R_ASSERT(_valid(sun_dir));
+        }
+        else if (config.line_exist(m_identifier.c_str(), "sun_dir")) // для OpenXRay-стайл погодных секций
+        {
+            Fvector2 sund = config.r_fvector2(m_identifier.c_str(), "sun_dir");
+            sun_dir.setHP(deg2rad(sund.y), deg2rad(sund.x));
+            VERIFY(sun_dir.y < 0, "Invalid sun direction settings while loading");
+        }
+        else
+        {
+            FATAL("Invalid sun sun_altitude or sun_longitude settings in weather config:[%s] section:[%s]", config.fname(), m_identifier.c_str());
+        }
     }
 
     VERIFY(sun_dir.y < 0, "Invalid sun direction settings while loading");
