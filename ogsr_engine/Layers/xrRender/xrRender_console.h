@@ -151,6 +151,13 @@ extern ECORE_API int opt_shadow_geom;
 
 extern int r_back_buffer_count;
 
+enum
+{
+    old_style_flare,
+    new_shader_flare
+};
+extern u32 r_lens_flare_mode;
+
 enum : u64
 {
     R2FLAG_SUN = 1ull << 0,

@@ -337,7 +337,7 @@ public:
 
     void RenderSky(CBackend& cmd_list);
     void RenderClouds(CBackend& cmd_list);
-    void RenderFlares(CBackend& cmd_list);
+    void RenderFlares(CBackend& cmd_list, BOOL bSun, BOOL bFlares, BOOL bGradient);
     void RenderLast(CBackend& cmd_list);
 
     bool SetWeatherFX(const shared_str& name);

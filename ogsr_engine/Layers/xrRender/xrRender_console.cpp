@@ -178,6 +178,7 @@ Flags64 ps_r2_ls_flags = {
     | R2FLAGEXT_DISABLE_SMAPVIS
     | R2FLAG_SMAP_2SIDE
     | R2FLAGEXT_USE_ACES
+    | R2FLAGEXT_LENS_FLARE
 };
 
 BOOL ps_no_scale_on_fade = 0; // Alundaio
@@ -339,6 +340,9 @@ int opt_shadow_geom = 0;
 int r_back_buffer_count{2};
 
 extern int delay_invisible_min, delay_invisible_max;
+
+constexpr xr_token r_lens_flare_mode_token[]{{"old_style_flare", old_style_flare}, {"new_shader_flare", new_shader_flare}, {}};
+u32 r_lens_flare_mode{new_shader_flare};
 
 //-----------------------------------------------------------------------
 class CCC_detail_radius : public CCC_Integer
@@ -958,6 +962,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "particle_update_mod", &ps_particle_update_coeff, 0.04f, 10.f);
 
     CMD3(CCC_Mask64, "r_lens_flare", &ps_r2_ls_flags_ext, R2FLAGEXT_LENS_FLARE);
+    CMD3(CCC_Token, "r_lens_flare_mode", &r_lens_flare_mode, r_lens_flare_mode_token);
 
     CMD1(CCC_Dbg_DumpStaticVisual, "dbg_dump_static_at_look");
 
