@@ -209,19 +209,22 @@ void CObjectList::ProcessDestroyQueue()
                 (*oit)->net_Relcase(destroy_queue[it]);
 
         for (int it = destroy_queue.size() - 1; it >= 0; it--)
-            Sound->object_relcase(destroy_queue[it]);
+        {
+            auto* obj = destroy_queue.at(it);
+            Sound->object_relcase(obj);
+            g_hud->net_Relcase(obj);
+        }
 
         auto It = m_relcase_callbacks.begin();
         auto Ite = m_relcase_callbacks.end();
         for (; It != Ite; ++It)
         {
-            VERIFY(*(*It).m_ID == (It - m_relcase_callbacks.begin()));
+            VERIFY((*It->m_ID) == (It - m_relcase_callbacks.begin()));
             auto dIt = destroy_queue.begin();
             auto dIte = destroy_queue.end();
             for (; dIt != dIte; ++dIt)
             {
-                (*It).m_Callback(*dIt);
-                g_hud->net_Relcase(*dIt);
+                It->m_Callback(*dIt);
             }
         }
 
