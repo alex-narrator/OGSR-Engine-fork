@@ -247,8 +247,7 @@ void CObjectList::ProcessDestroyQueue()
 
 void CObjectList::net_Register(CObject* O)
 {
-    R_ASSERT(O);
-    R_ASSERT(O->ID() < 0xffff);
+    R_ASSERT(O && O->ID() < 0xffff);
 
     map_NETID[O->ID()] = O;
 }

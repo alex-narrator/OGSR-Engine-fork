@@ -43,6 +43,7 @@
 
 #include "hudmanager.h"
 #include "../xr_3da/x_ray.h"
+#include <filesystem>
 
 string_path g_last_saved_game;
 
@@ -240,17 +241,41 @@ public:
             tok.id = i;
             string64 temp{};
             _GetItem(str, i++, temp);
-            if (curr_lang_len > 0 && !_stricmp(temp, &curr_lang_name[0]))
-                LanguageID = tok.id;
             tok.name = xr_strdup(temp);
+
+            if (curr_lang_len > 0 && !_stricmp(temp, &curr_lang_name[0]))
+            {
+                LanguageID = tok.id;
+                //инит при первом запуске движка, когда user.ltx нет, т.к. в этом случае Execute не будет вызван
+                if (!FS.exist(fsgame::app_data_root, Console->ConfigFile))
+                    InitLocalization(tok.name);
+            }
         }
         LanguagesToken.emplace_back();
         tokens = LanguagesToken.data();
     };
 
-    void Execute(LPCSTR args) override
+    void Execute(LPCSTR lang) override
     {
-        CCC_Token::Execute(args);
+        for (const auto& tok : LanguagesToken)
+        {
+            if (tok.name)
+            {
+                if (_stricmp(tok.name, lang) == 0)
+                {
+                    InitLocalization(tok.name);
+                    *value = tok.id;
+                    break;
+                }
+            }
+            else
+            {
+                InvalidSyntax();
+                return;
+            }
+        }
+
+        /*
         CStringTable().ReloadLanguage();
 
         if (IsMainMenuActive())
@@ -265,15 +290,25 @@ public:
             MainMenu()->Activate(TRUE);
         }
 
-        for (u16 id = 0; id < 0xffff; id++)
-        {
-            auto gameObj = Level().Objects.net_Find(id);
+        for (auto* gameObj : Level().Objects.get_objects_map())
             if (gameObj)
-            {
-                if (auto invItem = smart_cast<CInventoryItem*>(gameObj))
+                if (auto* invItem = smart_cast<CInventoryItem*>(gameObj))
                     invItem->ReloadNames();
-            }
-        }
+        */
+    }
+
+    void InitLocalization(const char* lang) const
+    {
+        string64 buff2;
+        sprintf_s(buff2, "languages\\%s\\", lang);
+        string_path buff;
+        FS.update_path(buff, fsgame::fs_root, buff2);
+        namespace stdfs = std::filesystem;
+        //ASSERT_FMT(stdfs::exists(buff), "!![%s] Path [%s] dont exists!", __FUNCTION__, buff);
+        //ASSERT_FMT(stdfs::is_directory(buff), "!![%s] Path [%s] is not directory!", __FUNCTION__, buff);
+        //ASSERT_FMT(!stdfs::is_empty(buff), "!![%s] Path [%s] is empty!", __FUNCTION__, buff);
+        if (stdfs::exists(buff) && stdfs::is_directory(buff) && !stdfs::is_empty(buff))
+            FS.append_path(fsgame::localization_dir, buff, nullptr, FALSE);
     }
 };
 
