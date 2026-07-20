@@ -243,7 +243,7 @@ void CCC_LoadCFG::Execute(LPCSTR args)
     {
         while (!F->eof())
         {
-            if (F->tell() == 0 && strstr(cfg_full_name, "user.ltx"))
+            if (F->tell() == 0 && strstr(cfg_full_name, fsgame::user_ltx))
             {
                 // Костыль от ситуации когда в редких случаях почему-то у игроков бьётся user.ltx - оказывается набит нулями, в результате чего игра не
                 // запускается. Не понятно почему так происходит, поэтому сделал тут обработку такой ситуации.

@@ -104,7 +104,7 @@ void InitConsole()
     Console = xr_new<CConsole>();
     Console->Initialize();
 
-    strcpy_s(Console->ConfigFile, "user.ltx");
+    strcpy_s(Console->ConfigFile, fsgame::user_ltx);
     if (strstr(Core.Params, "-ltx "))
     {
         string64 c_name;
