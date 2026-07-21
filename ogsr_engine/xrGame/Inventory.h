@@ -129,7 +129,7 @@ public:
     // максимальный вес инвентаря
     float m_fMaxWeight;
 
-     bool m_bBlockDevice{};
+    bool m_bDeviceWasBlocked{};
 
     u32 BeltSize() const { return m_iMaxBelt; }
     bool IsAllItemsLoaded() const;

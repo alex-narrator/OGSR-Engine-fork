@@ -267,7 +267,7 @@ void CCustomDevice::UpdateVisibility()
     attachable_hud_item* i0 = g_player_hud->attached_item(0);
     if (GetState() == eIdle || GetState() == eIdleZoom || GetState() == eShowing || GetState() == eThrow || GetState() == eThrowStart)
     {
-        if (bClimb || IsBlocked())
+        if (bClimb/* || IsBlocked()*/)
         {
             HideDevice(true);
             m_bNeedActivation = true;
@@ -407,7 +407,7 @@ bool CCustomDevice::IsBlocked()
     auto actor = smart_cast<CActor*>(H_Parent());
     if (!actor)
         return false;
-    if (actor->inventory().m_bBlockDevice || !m_pCurrentInventory->InSlot(this))
+    if (actor->inventory().m_bDeviceWasBlocked || !m_pCurrentInventory->InSlot(this))
         return true;
     return false;
 }

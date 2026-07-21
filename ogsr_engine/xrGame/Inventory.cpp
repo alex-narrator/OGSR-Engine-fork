@@ -14,6 +14,7 @@
 #include "game_base_space.h"
 #include "clsid_game.h"
 #include "CustomOutfit.h"
+#include "CustomDevice.h"
 #include "HudItem.h"
 #include "PDA.h"
 
@@ -464,7 +465,7 @@ bool CInventory::Activate(u32 slot, EActivationReason reason, bool bForce, bool 
 
     if (m_iActiveSlot == slot && m_iActiveSlot != NO_ACTIVE_SLOT && m_slots[m_iActiveSlot].m_pIItem)
     {
-        m_slots[m_iActiveSlot].m_pIItem->Activate();
+        m_slots[m_iActiveSlot].m_pIItem->Activate(now);
     }
 
     if (m_iActiveSlot == slot ||
@@ -862,7 +863,7 @@ void CInventory::Items_SetCurrentEntityHud(bool current_entity)
 void CInventory::SetSlotsBlocked(u16 mask, bool bBlock, bool now)
 {
     bool bChanged = false;
-    m_bBlockDevice = bBlock;
+
     for (int i = 0; i < SLOTS_TOTAL; ++i)
     {
         if (mask & (1 << i))
@@ -916,6 +917,13 @@ void CInventory::SetSlotsBlocked(u16 mask, bool bBlock, bool now)
                 if (Activate(NO_ACTIVE_SLOT, eGeneral, false, now))
                     SetPrevActiveSlot(ActiveSlot);
         }
+    }
+    if (m_bDeviceWasBlocked != m_slots[DETECTOR_SLOT].IsBlocked())
+    {
+        m_bDeviceWasBlocked = m_slots[DETECTOR_SLOT].IsBlocked();
+        const auto device = smart_cast<CCustomDevice*>(m_slots[DETECTOR_SLOT].m_pIItem);
+        if (device)
+            device->ToggleDevice(now);
     }
 }
 
