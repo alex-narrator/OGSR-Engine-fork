@@ -130,6 +130,7 @@ public:
     float m_fMaxWeight;
 
     bool m_bDeviceWasBlocked{};
+    bool m_bDeviceWasShown{};
 
     u32 BeltSize() const { return m_iMaxBelt; }
     bool IsAllItemsLoaded() const;

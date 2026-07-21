@@ -918,11 +918,17 @@ void CInventory::SetSlotsBlocked(u16 mask, bool bBlock, bool now)
                     SetPrevActiveSlot(ActiveSlot);
         }
     }
-    if (m_bDeviceWasBlocked != m_slots[DETECTOR_SLOT].IsBlocked())
+    const auto device_slot_blocked = m_slots[DETECTOR_SLOT].IsBlocked();
+    if (m_bDeviceWasBlocked != device_slot_blocked)
     {
-        m_bDeviceWasBlocked = m_slots[DETECTOR_SLOT].IsBlocked();
-        const auto device = smart_cast<CCustomDevice*>(m_slots[DETECTOR_SLOT].m_pIItem);
-        if (device)
+        m_bDeviceWasBlocked = device_slot_blocked;
+        const auto slot_item = m_slots[DETECTOR_SLOT].m_pIItem;
+        const auto device = smart_cast<CCustomDevice*>(slot_item);
+
+        if (device_slot_blocked)
+            m_bDeviceWasShown = slot_item && slot_item->cast_hud_item() && slot_item->cast_hud_item()->GetHUDmode();
+
+        if (device && m_bDeviceWasShown)
             device->ToggleDevice(now);
     }
 }
