@@ -47,9 +47,14 @@ dx10ConstantBuffer::dx10ConstantBuffer(ID3DShaderReflectionConstantBuffer* pTabl
 
         pVar = pTable->GetVariableByIndex(i);
         VERIFY(pVar);
+
         pType = pVar->GetType();
         VERIFY(pType);
         pType->GetDesc(&m_MembersList[i]);
+
+        // Exclude pointers from hashing
+        m_MembersList[i].Name = nullptr;
+
         //	Buffers with the same layout can contain totally different members
         R_CHK(pVar->GetDesc(&var_desc));
         m_MembersNames[i] = var_desc.Name;
@@ -75,22 +80,7 @@ bool dx10ConstantBuffer::Similar(const dx10ConstantBuffer& _in) const
     if (m_uiMembersCRC != _in.m_uiMembersCRC)
         return false;
 
-    if (m_MembersList.size() != _in.m_MembersList.size())
-        return false;
-
-    if (memcmp(&m_MembersList[0], &_in.m_MembersList[0], m_MembersList.size() * sizeof(m_MembersList[0])))
-        return false;
-
-    VERIFY(m_MembersNames.size() == _in.m_MembersNames.size());
-
-    const int iMemberNum = m_MembersNames.size();
-    for (int i = 0; i < iMemberNum; ++i)
-    {
-        if (m_MembersNames[i].c_str() != _in.m_MembersNames[i].c_str())
-            return false;
-    }
-
-    return true;
+    return std::ranges::equal(m_MembersNames, _in.m_MembersNames);
 }
 
 void dx10ConstantBuffer::Flush(const u32 context_id)
