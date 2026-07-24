@@ -43,17 +43,17 @@ void _make_rot(Fvector2& pt, const Fvector2& src, float sin_a, float cos_a, floa
     pt.y = src.y * cos_a - src.x * sin_a;
 }
 
-float calc_color(u32 idx, u32 total, float stage, float max_stage, bool blend)
+float calc_color_alpha(u32 idx, u32 total, float stage, float max_stage, bool blend, float max_alpha)
 {
     float kk = (stage / max_stage) * (float(total + 1));
     if (blend)
     {
-        return (1 / (exp((float(idx) - kk) * 0.9f) + 1.0f));
+        return (1 / (exp((float(idx) - kk) * 0.9f) + 1.0f)) * max_alpha;
     }
 
     if ((float)idx < kk)
     {
-        return 1.0f;
+        return max_alpha;
     }
     return 0.0f;
 }
@@ -122,8 +122,15 @@ void CUIProgressShape::Draw()
 
     for (u32 i = 0; i < m_sectorCount; ++i)
     {
-        float ffff = calc_color(i + 1, m_sectorCount, m_stage, 1.0f, m_blend);
+        float ffff = calc_color_alpha(i + 1, m_sectorCount, m_stage, 1.0f, m_blend, 1.0f);
         u32 color = color_argb_f(ffff, 1.0f, 1.0f, 1.0f);
+        if (m_bUseColor)
+        {
+            Fcolor curr{};
+            curr.lerp(m_minColor, m_middleColor, m_maxColor, m_stage);
+            curr.a = calc_color_alpha(i + 1, m_sectorCount, m_stage, 1.0f, m_blend, curr.a);
+            color = curr.get();
+        }
 
         UIRender->PushPoint(center_pos.x, center_pos.y, 0, color, center_tex.x, center_tex.y);
 

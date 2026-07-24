@@ -28,4 +28,9 @@ protected:
 
     float m_angle_begin;
     float m_angle_end;
+
+    bool m_bUseColor{};
+    Fcolor m_minColor{};
+    Fcolor m_middleColor{};
+    Fcolor m_maxColor{};
 };

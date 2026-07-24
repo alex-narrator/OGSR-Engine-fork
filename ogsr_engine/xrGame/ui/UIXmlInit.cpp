@@ -660,6 +660,28 @@ bool CUIXmlInit::InitProgressShape(CUIXml& xml_doc, const char* path, int index,
 
     pWnd->m_sectorCount = xml_doc.ReadAttribInt(path, index, "sector_count", 8);
     pWnd->m_bClockwise = xml_doc.ReadAttribInt(path, index, "clockwise") ? true : false;
+    pWnd->m_blend = xml_doc.ReadAttribInt(path, index, "blend", 1) ? true : false;
+
+    string256 buf;
+    strconcat(sizeof(buf), buf, path, ":min_color");
+
+    if (xml_doc.NavigateToNode(buf, index))
+    {
+        pWnd->m_bUseColor = true;
+
+        u32 color = GetColor(xml_doc, buf, index, 0xff);
+        pWnd->m_minColor.set(color);
+
+        strconcat(sizeof(buf), buf, path, ":middle_color");
+
+        color = GetColor(xml_doc, buf, index, 0xff);
+        pWnd->m_middleColor.set(color);
+
+        strconcat(sizeof(buf), buf, path, ":max_color");
+
+        color = GetColor(xml_doc, buf, index, 0xff);
+        pWnd->m_maxColor.set(color);
+    }
 
     return true;
 }
