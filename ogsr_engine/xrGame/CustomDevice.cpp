@@ -206,7 +206,10 @@ void CCustomDevice::OnStateSwitch(u32 S, u32 oldState)
     break;
     case eIdleZoom: {
         if (AnimationExist("anm_idle_zoom"))
+        {
             PlayHUDMotion("anm_idle_zoom", true, GetState());
+            SetPending(FALSE);
+        }
         else
             SwitchState(eIdle);
     }
