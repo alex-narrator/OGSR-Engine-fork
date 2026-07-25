@@ -185,29 +185,28 @@ int CObjectSpace::GetNearest(xr_vector<CObject*>& q_nearest, ICollisionForm* obj
 }
 
 //----------------------------------------------------------------------
-static void __stdcall build_callback(Fvector* V, const size_t Vcnt, CDB::TRI* T, const size_t Tcnt, void* params) { g_pGameLevel->Load_GameSpecific_CFORM(T, Tcnt); }
+static void build_callback(Fvector* V, const size_t Vcnt, CDB::TRI* T, const size_t Tcnt, void* params) { g_pGameLevel->Load_GameSpecific_CFORM(T, Tcnt); }
 
 void CObjectSpace::Load()
 {
-    IReader* F = FS.r_open(fsgame::level, fsgame::level_files::level_cform);
+    static IReader* F{};
+
+    F = FS.r_open(fsgame::level, fsgame::level_files::level_cform);
     R_ASSERT(F);
 
     hdrCFORM H;
     F->r(&H, sizeof(hdrCFORM));
 
-    Fvector* verts = (Fvector*)F->pointer();
-    CDB::TRI* tris = (CDB::TRI*)(verts + H.vertcount);
-
     R_ASSERT(CFORM_CURRENT_VERSION == H.version);
 
-    CTimer t_total;
+    std::thread{[H, this] {
+        auto* verts = reinterpret_cast<const Fvector*>(F->pointer());
+        auto* tris = reinterpret_cast<const CDB::TRI*>(verts + H.vertcount);
 
-    t_total.Start();
-    Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
-    if (t_total.GetElapsed_ms() > 5)
-    {
-        MsgDbg("Long CObjectSpace::Load() !!! duration [%d]ms!", t_total.GetElapsed_ms());
-    }
+        Static.build(verts, H.vertcount, tris, H.facecount, build_callback);
+
+        FS.r_close(F);
+    }}.detach();
 
     m_BoundingVolume.set(H.aabb);
     g_SpatialSpace->initialize(H.aabb);
@@ -215,8 +214,6 @@ void CObjectSpace::Load()
 
     Sound->set_geometry_occ(&Static);
     Sound->set_handler(_sound_event);
-
-    FS.r_close(F);
 }
 //----------------------------------------------------------------------
 
