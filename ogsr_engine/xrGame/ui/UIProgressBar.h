@@ -28,19 +28,18 @@ protected:
 
     float m_CurrentLength{};
 
-    bool m_bBackgroundPresent;
-    Fvector2 m_BackgroundOffset;
-    u32 m_last_render_frame;
+    bool m_bBackgroundPresent{};
+    Fvector2 m_BackgroundOffset{};
+    u32 m_last_render_frame{u32(-1)};
     void UpdateProgressBar();
 
 public:
-    bool m_bUseColor;
-    bool m_bUseGradient; // Alundaio: if false then use only solid color with m_maxColor
-    Fcolor m_minColor;
-    Fcolor m_middleColor;
-    Fcolor m_maxColor;
-    float m_inertion; //
-    float m_animated;
+    bool m_bUseColor{};
+    Fcolor m_minColor{};
+    Fcolor m_middleColor{};
+    Fcolor m_maxColor{};
+    float m_inertion{}; //
+    float m_animated{};
 
 public:
     CUIStatic m_UIProgressItem;

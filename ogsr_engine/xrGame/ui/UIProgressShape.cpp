@@ -122,15 +122,10 @@ void CUIProgressShape::Draw()
 
     for (u32 i = 0; i < m_sectorCount; ++i)
     {
-        float ffff = calc_color_alpha(i + 1, m_sectorCount, m_stage, 1.0f, m_blend, 1.0f);
-        u32 color = color_argb_f(ffff, 1.0f, 1.0f, 1.0f);
-        if (m_bUseColor)
-        {
-            Fcolor curr{};
-            curr.lerp(m_minColor, m_middleColor, m_maxColor, m_stage);
-            curr.a = calc_color_alpha(i + 1, m_sectorCount, m_stage, 1.0f, m_blend, curr.a);
-            color = curr.get();
-        }
+        Fcolor curr{};
+        m_bUseColor ? curr.lerp(m_minColor, m_middleColor, m_maxColor, m_stage) : curr.set(m_pTexture->GetTextureColor());
+        curr.a = calc_color_alpha(i + 1, m_sectorCount, m_stage, 1.0f, m_blend, curr.a);
+        u32 color = curr.get();
 
         UIRender->PushPoint(center_pos.x, center_pos.y, 0, color, center_tex.x, center_tex.y);
 
