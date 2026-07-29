@@ -227,6 +227,7 @@ enum : u64
     R2FLAGEXT_SSFX_SHADOWS = 1ull << 57,
     R2FLAGEXT_SSFX_SSS = 1ull << 58,
     R2FLAGEXT_SMAP_LOW_LOD = 1ull << 59,
+    R2FLAGEXT_SHADER_CACHE = 1ull << 60,
 };
 
 extern void xrRender_initconsole();

@@ -169,6 +169,7 @@ Flags64 ps_r2_ls_flags = {
 //    R2FLAGEXT_MASK_CONTROL | 
     R2FLAGEXT_MT_TEXLOAD  |
     R2FLAGEXT_SSLR |
+    R2FLAGEXT_SHADER_CACHE |
     R2FLAGEXT_SSFX_INTER_GRASS |
     R2FLAGEXT_FONT_SHADOWS
 //    | R2FLAGEXT_SSFX_SHADOWS
@@ -721,6 +722,7 @@ void xrRender_initconsole()
     CMD3(CCC_Mask64, "r2_mask_control", &ps_r2_ls_flags_ext, R2FLAGEXT_MASK_CONTROL);
 
     CMD3(CCC_Mask64, "r_sslr_enable", &ps_r2_ls_flags_ext, R2FLAGEXT_SSLR);
+    CMD3(CCC_Mask64, "r_shader_cache", &ps_r2_ls_flags_ext, R2FLAGEXT_SHADER_CACHE)
 
     CMD3(CCC_Mask64, "r_terrain_parallax_enable", &ps_r2_ls_flags_ext, R2FLAGEXT_TERRAIN_PARALLAX);
 
