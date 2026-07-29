@@ -17,9 +17,7 @@ public:
     virtual void Load(CUIXml* xml, LPCSTR path);
     CMapLocation* MapLocation() { return m_map_location; }
     virtual LPCSTR GetHint();
-    virtual void Update();
     virtual bool OnMouseDown(int mouse_btn);
-    virtual void OnFocusLost();
 };
 
 class CMapSpotPointer : public CMapSpot

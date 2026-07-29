@@ -19,6 +19,9 @@ enum ECallbackType
     eMapLocationAdded,
     eMapLocationClicked,
 
+    eMapLocationFocus,
+    eMapLocationFocusLost,
+
     eUseObject,
 
     eHit,

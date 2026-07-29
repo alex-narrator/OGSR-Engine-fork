@@ -547,7 +547,7 @@ void CUILevelMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     case MAP_SELECT_SPOT2: {
         if (const auto ms = smart_cast<CMapSpot*>(pWnd))
             if (const auto ml = ms->MapLocation())
-                g_actor->callback(GameObject::eMapLocationClicked)(ml->ObjectID(), ml->GetType(), ml->LevelName().c_str(), ml->GetLastPosition(), ml->IsUserDefined());
+                g_actor->callback(GameObject::eMapLocationClicked)(ml->ObjectID(), ml->GetType(), ml->LevelName().c_str(), ml->GetLastPosition(), ml->IsUserDefined(), ml->GetHint());
     }
     break;
     case MAP_SHOW_HINT: {
@@ -557,6 +557,18 @@ void CUILevelMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     break;
     case MAP_HIDE_HINT: MapWnd()->HideHint(pWnd); break;
+    case STATIC_FOCUS_RECEIVED: {
+        if (const auto ms = smart_cast<CMapSpot*>(pWnd))
+            if (const auto ml = ms->MapLocation())
+                g_actor->callback(GameObject::eMapLocationFocus)(ml->ObjectID(), ml->GetType(), ml->LevelName().c_str(), ml->GetLastPosition(), ml->IsUserDefined(), ml->GetHint());
+    }
+    break;
+    case STATIC_FOCUS_LOST: {
+        if (const auto ms = smart_cast<CMapSpot*>(pWnd))
+            if (const auto ml = ms->MapLocation())
+                g_actor->callback(GameObject::eMapLocationFocusLost)(ml->ObjectID(), ml->GetType(), ml->LevelName().c_str(), ml->GetLastPosition(), ml->IsUserDefined(), ml->GetHint());
+    }
+    break;
     default: break;
     }
 }

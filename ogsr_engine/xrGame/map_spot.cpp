@@ -31,20 +31,6 @@ void CMapSpot::Load(CUIXml* xml, LPCSTR path)
 
 LPCSTR CMapSpot::GetHint() { return MapLocation()->GetHint(); }
 
-void CMapSpot::Update()
-{
-    inherited::Update();
-    LPCSTR h = GetHint();
-    if (m_bCursorOverWindow && h && xr_strlen(h))
-    {
-        VERIFY(m_dwFocusReceiveTime >= 0);
-        if (Device.dwTimeGlobal > (m_dwFocusReceiveTime + 500))
-        {
-            GetMessageTarget()->SendMessage(this, MAP_SHOW_HINT, NULL);
-        }
-    }
-}
-
 bool CMapSpot::OnMouseDown(int mouse_btn)
 {
     if (mouse_btn == MOUSE_1)
@@ -54,14 +40,6 @@ bool CMapSpot::OnMouseDown(int mouse_btn)
     }
 
     return false;
-}
-
-void CMapSpot::OnFocusLost()
-{
-    inherited::OnFocusLost();
-    LPCSTR h = GetHint();
-    if (h && xr_strlen(h))
-        GetMessageTarget()->SendMessage(this, MAP_HIDE_HINT, NULL);
 }
 
 CMapSpotPointer::CMapSpotPointer(CMapLocation* ml) : inherited(ml) { ClipperOn(); }
