@@ -6,20 +6,11 @@
 
 dx10ConstantBuffer::~dx10ConstantBuffer()
 {
-    if ((dwFlags & xr_resource_flagged::RF_REGISTERED))
+    if (dwFlags & xr_resource_flagged::RF_REGISTERED)
     {
-        CResourceManager* inst = DEV;
-
-        bool removed = false;
-        for (u32 id = 0; id < R__NUM_CONTEXTS; ++id)
-        {
-            removed = removed || inst->_DeleteConstantBuffer(id, this);
-        }
-        if (!removed)
-            Msg("! ERROR: Failed to find compiled dx10ConstantBuffer.");
+        VERIFY(m_context_id < R__NUM_CONTEXTS);
+        DEV->_DeleteConstantBuffer(m_context_id, this);
     }
-
-    //	Flush();
 
     _RELEASE(m_pBuffer);
     xr_free(m_pBufferData);

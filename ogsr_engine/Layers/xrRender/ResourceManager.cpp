@@ -9,19 +9,22 @@
 #include "blenders/blender.h"
 #include "blenders/blender_recorder.h"
 
-template <class T>
-BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
+namespace
 {
-    auto it = vec.begin();
-    auto end = vec.end();
-    for (; it != end; ++it)
-        if (*it == ptr)
-        {
-            vec.erase(it);
-            return TRUE;
-        }
-    return FALSE;
-}
+    template <class T>
+    bool reclaim(xr_vector<T*>& vec, const T* ptr)
+    {
+        auto it = vec.begin();
+        auto end = vec.end();
+        for (; it != end; ++it)
+            if (*it == ptr)
+            {
+                vec.erase(it);
+                return true;
+            }
+        return false;
+    }
+} // namespace
 
 IBlender* CResourceManager::_GetBlender(LPCSTR Name)
 {

@@ -30,18 +30,21 @@ SGS* CResourceManager::_CreateGS(LPCSTR Name) { return CreateShader<SGS>(Name); 
 
 void CResourceManager::_DeleteGS(const SGS* GS) { DestroyShader(GS); }
 
-template <class T>
-BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
+namespace
 {
-    auto it = vec.begin();
-    auto end = vec.end();
-    for (; it != end; ++it)
-        if (*it == ptr)
-        {
-            vec.erase(it);
-            return TRUE;
-        }
-    return FALSE;
+    template <class T>
+    bool reclaim(xr_vector<T*>& vec, const T* ptr)
+    {
+        auto it = vec.begin();
+        auto end = vec.end();
+        for (; it != end; ++it)
+            if (*it == ptr)
+            {
+                vec.erase(it);
+                return true;
+            }
+        return false;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -598,17 +601,19 @@ dx10ConstantBuffer* CResourceManager::_CreateConstantBuffer(u32 context_id, ID3D
         }
     }
 
+    pTempBuffer->m_context_id = context_id;
     pTempBuffer->dwFlags |= xr_resource_flagged::RF_REGISTERED;
     v_constant_buffer[context_id].push_back(pTempBuffer);
     return pTempBuffer;
 }
-bool CResourceManager::_DeleteConstantBuffer(u32 context_id, const dx10ConstantBuffer* pBuffer)
+
+void CResourceManager::_DeleteConstantBuffer(u32 context_id, const dx10ConstantBuffer* pBuffer)
 {
     if (0 == (pBuffer->dwFlags & xr_resource_flagged::RF_REGISTERED))
-        return true;
+        return;
     if (reclaim(v_constant_buffer[context_id], pBuffer))
-        return true;
-    return false;
+        return;
+    Msg("! ERROR: Failed to find compiled constant buffer '%s' in context [%u]", pBuffer->cName.c_str(), context_id);
 }
 
 SInputSignature* CResourceManager::_CreateInputSignature(ID3DBlob* pBlob)
