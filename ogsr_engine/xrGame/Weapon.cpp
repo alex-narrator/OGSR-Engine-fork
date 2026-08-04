@@ -316,10 +316,6 @@ void CWeapon::Load(LPCSTR section)
     m_bZoomEnabled = !!pSettings->r_bool(section, "zoom_enabled");
     m_bScopeShowIndicators = !!READ_IF_EXISTS(pSettings, r_bool, section, "scope_show_indicators", true);
 
-    m_bScopeDynamicZoom = false;
-    m_fScopeZoomFactor = 0;
-    m_fRTZoomFactor = 0;
-
     m_fZoomFactor = CurrentZoomFactor();
 
     LPCSTR str{};
