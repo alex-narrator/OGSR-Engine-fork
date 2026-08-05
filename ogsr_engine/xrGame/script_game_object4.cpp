@@ -685,6 +685,12 @@ void CScriptGameObject::ShowItemHud(bool val)
         k->ShowHud(val);
 }
 
+bool CScriptGameObject::IsItemHudShown() const
+{
+    CHudItem* k = smart_cast<CHudItem*>(&object());
+    return k && k->need_renderable();
+}
+
 float CScriptGameObject::GetRadius()
 {
     CGameObject* k = smart_cast<CGameObject*>(&object());

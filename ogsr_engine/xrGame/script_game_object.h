@@ -730,6 +730,7 @@ public:
     void SetAimInertion(float);
     float GetRadius();
     void ShowItemHud(bool);
+    bool IsItemHudShown() const;
 
     // functions for object testing
     _DECLARE_FUNCTION10(IsGameObject, bool);
