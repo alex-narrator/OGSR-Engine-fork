@@ -654,6 +654,9 @@
 	<string id="ui_mm_exclusive_input">
 		<text>Exclusive Input (blocks Windows hotkeys)</text>
 	</string>
+	<string id="ui_st_weapon_bobbing">
+		<text>Weapon bobbing</text>
+	</string>
 
 	<!-- Окно "Управление" -->
 	<string id="ui_mm_controls">

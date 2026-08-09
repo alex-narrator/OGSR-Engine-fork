@@ -122,7 +122,6 @@ void InitConsole()
     CORE_FEATURE_SET(forcibly_equivalent_slots, "features");
     CORE_FEATURE_SET(slots_extend_menu, "features");
     CORE_FEATURE_SET(dynamic_sun_movement, "features");
-    CORE_FEATURE_SET(wpn_bobbing, "features");
     CORE_FEATURE_SET(show_inv_item_condition, "features");
     CORE_FEATURE_SET(remove_alt_keybinding, "features");
     CORE_FEATURE_SET(binoc_firing, "features");

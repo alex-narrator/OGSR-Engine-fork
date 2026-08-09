@@ -1671,6 +1671,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "keypress_on_start", &psActorFlags, AF_KEYPRESS_ON_START);
     CMD3(CCC_Mask, "g_effects_on_demorecord", &psActorFlags, AF_EFFECTS_ON_DEMORECORD);
     CMD3(CCC_Mask, "g_lock_reload", &psActorFlags, AF_LOCK_RELOAD);
+    CMD3(CCC_Mask, "g_weapon_bobbing", &psActorFlags, AF_WEAPON_BOBBING);
 
     CMD4(CCC_Integer, "g_cop_death_anim", &g_bCopDeathAnim, 0, 1);
 
