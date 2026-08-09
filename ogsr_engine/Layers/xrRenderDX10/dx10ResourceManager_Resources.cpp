@@ -179,25 +179,27 @@ void CResourceManager::_DeleteVS(const SVS* vs)
 {
     if (0 == (vs->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
-    const LPSTR N = LPSTR(*vs->cName);
-    const map_VS::iterator I = m_vs.find(N);
+
+    // R_ASSERT(Device.OnMainThread());
+
+    auto I = m_vs.find(vs->cName.c_str());
     if (I != m_vs.end())
     {
         m_vs.erase(I);
 
         for (const auto& iDecl : v_declarations)
         {
-            xr_map<ID3DBlob*, ID3DInputLayout*>::iterator iLayout = iDecl->vs_to_layout.find(vs->signature->signature);
+            auto iLayout = iDecl->vs_to_layout.find(vs->signature->signature);
             if (iLayout != iDecl->vs_to_layout.end())
             {
                 //	Release vertex layout
                 _RELEASE(iLayout->second);
-                iDecl->vs_to_layout.erase(iLayout);
+                iDecl->vs_to_layout.unsafe_erase(iLayout);
             }
         }
-        return;
     }
-    Msg("! ERROR: Failed to find compiled vertex-shader '%s'", *vs->cName);
+    else
+        Msg("! ERROR: Failed to find compiled vertex-shader [%s]", vs->cName.c_str());
 }
 
 //--------------------------------------------------------------------------------------------------------------
