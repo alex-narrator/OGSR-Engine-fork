@@ -22,12 +22,16 @@ float r_dtex_paralax_range = 50.f;
 //////////////////////////////////////////////////////////////////////////
 ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq, bool hud, u32 phase)
 {
-    int id = SE_R2_SHADOW;
+    u32 id;
     if (CRender::PHASE_NORMAL == phase)
     {
         // if (hud)
         //     Msg("--[%s] Detected hud model: [%s]", __FUNCTION__, pVisual->dbg_name.c_str());
         id = (hud || ((_sqrt(cdist_sq) - pVisual->getVisData().sphere.R) < r_dtex_paralax_range)) ? SE_R2_NORMAL_HQ : SE_R2_NORMAL_LQ;
+    }
+    else
+    {
+        id = CRender::PHASE_SMAP_LIGHTS == phase ? SE_R2_SHADOW_LIGHTS : SE_R2_SHADOW;
     }
     return pVisual->shader->E[id]._get();
 }
@@ -37,10 +41,14 @@ ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cd
 {
     if (!pVisual->shader)
         return nullptr;
-    int id = SE_R2_SHADOW;
+    u32 id;
     if (CRender::PHASE_NORMAL == phase)
     {
         id = ((_sqrt(cdist_sq) - pVisual->getVisData().sphere.R) < r_dtex_paralax_range) ? SE_R2_NORMAL_HQ : SE_R2_NORMAL_LQ;
+    }
+    else
+    {
+        id = CRender::PHASE_SMAP_LIGHTS == phase ? SE_R2_SHADOW_LIGHTS : SE_R2_SHADOW;
     }
     return pVisual->shader->E[id]._get();
 }

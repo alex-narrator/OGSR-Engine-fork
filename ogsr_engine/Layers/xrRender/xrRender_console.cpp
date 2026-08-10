@@ -742,6 +742,7 @@ void xrRender_initconsole()
     CMD3(CCC_Token, "r__smap_rain_size", &r2_SmapRainSize, RainSmapSizeToken);
 
     CMD3(CCC_Mask64, "r_smap_2side", &ps_r2_ls_flags, R2FLAG_SMAP_2SIDE);
+    CMD3(CCC_Mask64, "r_smap_lights_2side", &ps_r2_ls_flags, R2FLAG_SMAP_LIGHTS_2SIDE);
 
     CMD4(CCC_Float, "r2_sun_depth_far_scale", &ps_r2_sun_depth_far_scale, 0.5, 1.5);
     CMD4(CCC_Float, "r2_sun_depth_near_scale", &ps_r2_sun_depth_near_scale, 0.5, 1.5);
