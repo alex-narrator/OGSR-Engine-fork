@@ -37,7 +37,7 @@ u32 ps_r_pp_aa_mode = DLSS;
 constexpr xr_token pp_aa_mode_token[] = {
     {"st_opt_off", NO_AA},
     {"st_opt_dlss", DLSS},
-    {"st_opt_fsr2", FSR2},
+    {"st_opt_fsr3", FSR3},
     {"st_opt_taa", TAA},
     {"st_opt_smaa", SMAA},
 

@@ -247,7 +247,7 @@ void R_dsgraph_structure::r_dsgraph_insert_dynamic(IRenderable* root, dxRender_V
                 mapHUD.insert_anyway(EPS, _MatrixItemS({SSA, root, pVisual, xform, &*pVisual->shader->E[0]}));
                 mapScopeHUD.insert_anyway(dist_sqr, _MatrixItemS({SSA, root, pVisual, xform, &*pVisual->shader->E[1]}));
                 // Simp: этот костыль пусть работает только в OGSR GA, там прицелы с ним приемлемо выглядят.
-                if (IS_OGSR_GA && ps_r_pp_aa_mode == DLSS || ps_r_pp_aa_mode == FSR2 || ps_r_pp_aa_mode == TAA || ps_r2_ls_flags.test(R2FLAG_DBG_TAA_JITTER_ENABLE))
+                if (IS_OGSR_GA && ps_r_pp_aa_mode == DLSS || ps_r_pp_aa_mode == FSR3 || ps_r_pp_aa_mode == TAA || ps_r2_ls_flags.test(R2FLAG_DBG_TAA_JITTER_ENABLE))
                 {
                     mapScopeHUDSorted.insert_anyway(dist_sqr, _MatrixItemS({SSA, root, pVisual, xform, &*pVisual->shader->E[0]}));
                     mapScopeHUDSorted.insert_anyway(dist_sqr, _MatrixItemS({SSA, root, pVisual, xform, &*pVisual->shader->E[1]}));

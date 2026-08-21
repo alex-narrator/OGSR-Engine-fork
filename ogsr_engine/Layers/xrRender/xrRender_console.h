@@ -236,7 +236,7 @@ enum
 {
     NO_AA,
     DLSS,
-    FSR2,
+    FSR3,
     TAA,
     SMAA,
 };
