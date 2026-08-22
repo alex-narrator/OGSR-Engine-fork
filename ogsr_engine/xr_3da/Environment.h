@@ -266,7 +266,7 @@ private:
 
     bool b_wfx;
 
-    CEnvDescriptor* wfx_end_desc[2];
+    CEnvDescriptor* wfx_end_desc[2]{};
 
     shared_str CurrentName;
 
