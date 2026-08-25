@@ -555,8 +555,8 @@ public:
 
         const float dist = 10;
 
-        const Fvector pos = Device.vCameraPosition;
-        const Fvector dir = Device.vCameraDirection;
+        const Fvector& pos = Device.vCameraPosition;
+        const Fvector& dir = Device.vCameraDirection;
 
         xr_vector<std::pair<dxRender_Visual*, float>> list;
 

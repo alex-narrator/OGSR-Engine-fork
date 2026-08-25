@@ -107,7 +107,7 @@ bool CEnvModifier::saveIni(CInifile& ini, LPCSTR section)
     return true;
 }
 
-float CEnvModifier::sum(CEnvModifier& M, Fvector3& view)
+float CEnvModifier::sum(CEnvModifier& M, const Fvector3& view)
 {
     float _dist_sq{};
     switch (M.shape_type)

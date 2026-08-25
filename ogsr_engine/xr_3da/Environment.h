@@ -45,7 +45,7 @@ public:
     bool loadIni(CInifile& ini, LPCSTR section);
     bool saveIni(CInifile& ini, LPCSTR section);
 
-    float sum(CEnvModifier& _another, Fvector3& view);
+    float sum(CEnvModifier& _another, const Fvector3& view);
 };
 
 class ENGINE_API CEnvAmbient
