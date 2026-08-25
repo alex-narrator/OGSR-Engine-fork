@@ -15,7 +15,8 @@ IC bool pred_sp_sort(ISpatial* _1, ISpatial* _2)
     return d1 < d2;
 }
 
-#define BASE_FOV 67.f
+constexpr float PUDDLES_RENDER_RANGE_SQR{_sqr(150.f)};
+constexpr float BASE_FOV{67.f};
 
 // Aproximate, adjusted by fov, distance from camera to position (For right work when looking though binoculars and scopes)
 
@@ -536,9 +537,10 @@ void CRender::render_forward()
 
         if (ps_r2_ls_flags_ext.test(R2FLAGEXT_SSLR) && !fis_zero(Env.wetness_factor))
         {
+            const Fvector& cam_pos = Device.vCameraPositionSaved;
             for (const auto& puddle : current_level_puddles)
             {
-                if (!ViewBase.testSphere_dirty(puddle.xform.c, puddle.radius))
+                if (cam_pos.distance_to_sqr(puddle.xform.c) > PUDDLES_RENDER_RANGE_SQR || !ViewBase.testSphere_dirty(puddle.xform.c, puddle.radius))
                     continue;
 
                 cmd_list.set_Shader(Target->s_puddles);
