@@ -62,7 +62,7 @@
       <BasicRuntimeChecks Condition="$(Configuration.Contains('Debug')) And '$(EnableASAN)'=='true'"></BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="$(Configuration.Contains('Debug')) And '$(EnableASAN)'!='true'">EnableFastChecks</BasicRuntimeChecks>
       <AdditionalIncludeDirectories>mimalloc/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>MI_DEBUG=3;MI_GUARDED=0;MI_OPT_SIMD=ON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MI_DEBUG=3;MI_OPT_SIMD=ON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -117,7 +117,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="mimalloc\src\arena-meta.c" />
     <ClCompile Include="mimalloc\src\arena.c" />
     <ClCompile Include="mimalloc\src\bitmap.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -127,6 +126,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="mimalloc\src\heap.c" />
+    <ClCompile Include="mimalloc\src\prim\prim-tls.c" />
+    <ClCompile Include="mimalloc\src\subproc.c" />
     <ClCompile Include="mimalloc\src\init.c" />
     <ClCompile Include="mimalloc\src\libc.c" />
     <ClCompile Include="mimalloc\src\page-map.c" />
@@ -154,6 +155,7 @@
     <ClInclude Include="mimalloc\include\mimalloc-stats.h" />
     <ClInclude Include="mimalloc\include\mimalloc\atomic.h" />
     <ClInclude Include="mimalloc\include\mimalloc\internal.h" />
+	<ClInclude Include="mimalloc\include\mimalloc\prim-tls.h" />
     <ClInclude Include="mimalloc\include\mimalloc\prim.h" />
     <ClInclude Include="mimalloc\include\mimalloc\track.h" />
     <ClInclude Include="mimalloc\include\mimalloc\types.h" />
