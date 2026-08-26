@@ -46,7 +46,6 @@ enum EMoveCommand
     mcAnyAction = (mcAnyMove | mcJump | mcFall | mcLanding | mcLanding2), // mcTurn|
     mcAnyState = (mcCrouch | mcAccel | mcClimb | mcSprint),
     mcLookout = (mcLLookout | mcRLookout),
-    mcCrouchAccel = (mcCrouch | mcAccel), // глибокий присід
 };
 
 }; // namespace ACTOR_DEFS

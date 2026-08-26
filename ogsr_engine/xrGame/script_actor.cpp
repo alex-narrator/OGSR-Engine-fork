@@ -242,8 +242,7 @@ void CScriptActor::script_register(lua_State* L)
                    value("mcAnyMove", int(mcAnyMove)), 
                    value("mcAnyAction", int(mcAnyAction)),
                    value("mcAnyState", int(mcAnyState)),
-                   value("mcLookout", int(mcLookout)),
-                   value("mcCrouchAccel", int(mcCrouchAccel))
+                   value("mcLookout", int(mcLookout))
                ],
            class_<CActorObject, bases<CActor, CEntityAlive>>("CActor") // хак с наследованием нужен для переопределения свойств. Luabind не поддерживает property getters override
     )];
