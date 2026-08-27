@@ -34,6 +34,7 @@
 #include "level_graph.h"
 #include "cameralook.h"
 #include "ai_object_location.h"
+#include "InfoPortion.h"
 
 #ifdef DEBUG
 #include "PHDebug.h"
@@ -977,6 +978,38 @@ struct CCC_JumpToLevel : public IConsole_Command
     }
 };
 
+class CCC_Giveinfo : public IConsole_Command
+{
+public:
+    CCC_Giveinfo(LPCSTR N) : IConsole_Command(N) {};
+    void Execute(LPCSTR info_id) override
+    {
+        if (!g_pGameLevel)
+            return;
+
+        if (auto* actor = smart_cast<CActor*>(Level().CurrentEntity()))
+            actor->OnReceiveInfo(info_id);
+        else
+            Msg("! [g_info] : Actor not found!");
+    }
+};
+
+class CCC_Disinfo : public IConsole_Command
+{
+public:
+    CCC_Disinfo(LPCSTR N) : IConsole_Command(N) {};
+    void Execute(LPCSTR info_id) override
+    {
+        if (!g_pGameLevel)
+            return;
+
+        if (auto* actor = smart_cast<CActor*>(Level().CurrentEntity()))
+            actor->OnDisableInfo(info_id);
+        else
+            Msg("! [g_dis_info] : Actor not found!");
+    }
+};
+
 class CCC_Spawn : public IConsole_Command
 {
 public:
@@ -1640,6 +1673,8 @@ void CCC_RegisterCommands()
 
     //#ifndef MASTER_GOLD
     CMD1(CCC_JumpToLevel, "jump_to_level");
+    CMD1(CCC_Giveinfo, "give_info_portion");
+    CMD1(CCC_Disinfo, "disable_info_portion");
     CMD1(CCC_Spawn, "g_spawn");
     CMD1(CCC_SpawnToInventory, "g_spawn_to_inventory");
     CMD3(CCC_Mask, "g_god", &psActorFlags, AF_GODMODE);
