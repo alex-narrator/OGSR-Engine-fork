@@ -60,6 +60,7 @@ void CImGuiHudEditorWnd::Render()
 		ImGui::DragFloat3("fire_point", (float*)&item->m_measures.m_fire_point_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("fire_point2", (float*)&item->m_measures.m_fire_point2_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("shell_point", (float*)&item->m_measures.m_shell_point_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
+        ImGui::DragFloat3("shoot_point", (float*)&item->m_measures.m_shoot_point_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
         ImGui::Separator();
 
         const auto idx = item->m_parent_hud_item->GetCurrentHudOffsetIdx();

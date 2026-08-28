@@ -862,6 +862,9 @@ u8 CWeapon::idle_state()
 
 void CWeapon::UpdateCL()
 {
+    if (H_Parent() && !ParentIsActor() && (strapped_mode() || IsHidden()))
+        return;
+
     inherited::UpdateCL();
 
     UpdateHUDAddonsVisibility();

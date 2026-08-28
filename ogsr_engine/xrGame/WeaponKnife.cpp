@@ -263,6 +263,13 @@ bool CWeaponKnife::Action(s32 cmd, u32 flags)
     return false;
 }
 
+void CWeaponKnife::UpdateCL()
+{
+    if (H_Parent() && !ParentIsActor() && (strapped_mode() || IsHidden()))
+        return;
+
+    inherited::UpdateCL();
+}
 void CWeaponKnife::LoadFireParams(LPCSTR section, LPCSTR prefix)
 {
     inherited::LoadFireParams(section, prefix);

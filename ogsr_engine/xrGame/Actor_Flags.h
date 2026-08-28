@@ -25,6 +25,7 @@ enum
     AF_CAM_COLLISION_COP        = 1 << 20,
     AF_ACTOR_SHADOW             = 1 << 21,
     AF_THROW_DEBUG              = 1 << 22,
+    AF_WEAPON_BOBBING           = 1 << 23,
 };
 
 //enum

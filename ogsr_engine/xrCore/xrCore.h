@@ -7,14 +7,6 @@
 #include "..\build_config_defines.h"
 #endif
 
-#if _MSC_VER < 1950 //Костыли для старой студии, а то там юзается _invoke_watson , который не попадает в перехватчики и просто закрывает двиг без записи ошибки в лог
-#include <yvals_core.h>
-extern "C" __declspec(noreturn) void __fastfail(unsigned int);
-#define _MSVC_STL_DOOM_FUNCTION(mesg) \
-    __fastfail(5); \
-    _STL_UNREACHABLE
-#endif
-
 #if defined(__MSVC_RUNTIME_CHECKS) && defined(__SANITIZE_ADDRESS__)
 #error DISABLE RTC!
 #endif
@@ -90,16 +82,7 @@ extern "C" __declspec(noreturn) void __fastfail(unsigned int);
 #include <ranges>
 #pragma warning(pop)
 
-// Our headers
-#ifdef XRCORE_STATIC
 #define XRCORE_API
-#else
-#ifdef XRCORE_EXPORTS
-#define XRCORE_API __declspec(dllexport)
-#else
-#define XRCORE_API __declspec(dllimport)
-#endif
-#endif
 
 #include <tracy/Tracy.hpp>
 
@@ -205,7 +188,7 @@ public:
         static constexpr u64 
             remove_articles_on_disable_info = 1ull << 0, 
             dynamic_sun_movement = 1ull << 1,
-            wpn_bobbing = 1ull << 2,
+            // = 1ull << 2,
             remove_alt_keybinding = 1ull << 3,
             corpses_collision = 1ull << 4,
             keep_inprogress_tasks_only = 1ull << 5,
