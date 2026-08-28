@@ -25,6 +25,8 @@ protected:
     virtual void OnAnimationEnd(u32 state);
     virtual void OnStateSwitch(u32 S, u32 oldState);
 
+    virtual void UpdateCL() override;
+
     void state_Attacking(float dt);
 
     virtual void KnifeStrike(u32 state, const Fvector& pos, const Fvector& dir);

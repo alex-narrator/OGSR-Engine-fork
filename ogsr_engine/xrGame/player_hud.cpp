@@ -1615,7 +1615,7 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
     if (pSettings->line_exist(hud_section, "item_visual"))
     {
         ::Render->shader_option_hud_loading(true);
-        script_anim_item_model = ::Render->model_Create(pSettings->r_string(hud_section, "item_visual"))->dcast_PKinematicsAnimated();
+        script_item_model = ::Render->model_Create(pSettings->r_string(hud_section, "item_visual"))->dcast_PKinematics();
         ::Render->shader_option_hud_loading(false);
 
         item_pos[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_section, "item_position", def);
