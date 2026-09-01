@@ -159,6 +159,11 @@ u32 obj_level_id(CScriptGameObject* O) { return get_level_id(O->object().ai_loca
 
 LPCSTR obj_level_name(CScriptGameObject* O) { return get_level_name_by_id(obj_level_id(O)); }
 
+const float get_luminocity(CScriptGameObject* O)
+{
+    const auto ros = O->object().ROS();
+    return ros ? ros->get_luminocity() : 0.0f;
+}
 
 using namespace luabind;
 
@@ -245,6 +250,8 @@ class_<CScriptGameObject> script_register_game_object3(class_<CScriptGameObject>
         .property("conditions", &get_obj_conditions)
         .property("level_id", &obj_level_id)
         .property("level_name", &obj_level_name)
+
+        .def("get_luminocity", &get_luminocity)
 
         //#pragma message("+ game_object.extensions export end")
         ;
