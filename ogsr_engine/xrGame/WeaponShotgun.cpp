@@ -546,6 +546,8 @@ bool CWeaponShotgun::Attach(PIItem pIItem, bool b_send_event)
         }
         UpdateAddonsVisibility();
         InitAddons();
+        InitAddonVisual(eExtender);
+        InitAddonVisualHud(eExtender);
         return true;
     }
     else
@@ -567,6 +569,8 @@ bool CWeaponShotgun::Detach(const char* item_section_name, bool b_spawn_item, fl
 
         UpdateAddonsVisibility();
         InitAddons();
+        InitAddonVisual(eExtender);
+        InitAddonVisualHud(eExtender);
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
     else

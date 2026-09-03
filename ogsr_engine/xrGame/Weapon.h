@@ -171,7 +171,7 @@ public:
     void UpdateAddonsVisibility();
     void UpdateHUDAddonsVisibility();
     //инициализация свойств присоединенных аддонов
-    virtual void InitAddons();
+    virtual void InitAddons(){};
 
     virtual shared_str GetAddonName(u32) const;
 
@@ -255,7 +255,12 @@ protected:
     bool m_bHasAimAlt{};
     bool m_bAimAltMode{};
 
-    void SetMagazineAttached(bool attached) { attached ? m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponMagazineAttached : m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponMagazineAttached; }
+    void SetMagazineAttached(bool attached) 
+    { 
+        attached ? m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponMagazineAttached : m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponMagazineAttached;
+        InitAddonVisual(eMagazine);
+        InitAddonVisualHud(eMagazine);
+    }
     void SetLaserOn(bool on) { on ? m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponLaserOn : m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponLaserOn; }
     void SetFlashlightOn(bool on) { on ? m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponFlashlightOn : m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponFlashlightOn; }
     void SetGrenadeMode(bool on) { on ? m_flagsWeaponState |= CSE_ALifeItemWeapon::eWeaponGrenadeMode : m_flagsWeaponState &= ~CSE_ALifeItemWeapon::eWeaponGrenadeMode; }
@@ -643,6 +648,9 @@ private:
 
 public:
     void update_visual_bullet_textures(const bool forced = false);
+
+    virtual void InitAddonVisual(u32);
+    virtual void InitAddonVisualHud(u32);
 
     virtual void InitAddonsVisual();
     virtual void InitAddonsVisualHud();

@@ -264,13 +264,6 @@ protected:
 
     bool ShouldPlayFlameParticles();
 
-    // передёргивание затвора
-    //virtual void OnShutter();
-    //virtual void switch2_Shutter();
-    //virtual void PlayAnimShutter();
-    //virtual void PlayAnimShutterMisfire();
-
-    virtual void UpdateMagazineVisibility();
     bool ScopeRespawn();
     void RespawnWeapon(LPCSTR);
 

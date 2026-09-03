@@ -540,6 +540,8 @@ bool CWeaponMagazinedWGrenade::Attach(PIItem pIItem, bool b_send_event)
         }
         InitAddons();
         UpdateAddonsVisibility();
+        InitAddonVisual(eLauncher);
+        InitAddonVisualHud(eLauncher);
         return true;
     }
     else
@@ -565,6 +567,8 @@ bool CWeaponMagazinedWGrenade::Detach(const char* item_section_name, bool b_spaw
         m_cur_glauncher = 0;
 
         UpdateAddonsVisibility();
+        InitAddonVisual(eLauncher);
+        InitAddonVisualHud(eLauncher);
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
     else
@@ -626,6 +630,8 @@ void CWeaponMagazinedWGrenade::PlayAnimReload()
     {
         if (IsMisfire())
             PlayHUDMotion({"anm_reload_jammed_w_gl", "anm_reload_empty_w_gl", "anim_reload_gl", "anm_reload_w_gl"}, true, GetState());
+        else if (AddonAttachable(eMagazine) && !IsAddonAttached(eMagazine) && m_pAmmo->IsBoxReloadable() && AnimationExist("anm_reload_no_magazine_w_gl"))
+            PlayHUDMotion({"anm_reload_no_magazine_w_gl", "anim_reload", "anm_reload"}, true, GetState());
         else if (IsPartlyReloading())
             PlayHUDMotion({"anim_reload_gl_partly", "anm_reload_w_gl_partly", "anim_reload_gl", "anm_reload_w_gl"}, true, GetState());
         else if (IsSingleReloading() && AnimationExist("anm_reload_single_w_gl"))

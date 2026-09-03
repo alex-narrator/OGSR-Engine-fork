@@ -99,6 +99,12 @@ void CWeaponMagazined::Load(LPCSTR section)
     else if (pSettings->line_exist(section, "snd_reload_partly")) // OGSR-style неполная перезарядка
         m_sounds.LoadSound(section, "snd_reload_partly", "sndReloadPartly", SOUND_TYPE_WEAPON_RECHARGING);
 
+    if (pSettings->line_exist(section, "snd_reload_single"))
+        m_sounds.LoadSound(section, "snd_reload_single", "sndReloadSingle", SOUND_TYPE_WEAPON_RECHARGING);
+
+    if (pSettings->line_exist(section, "snd_reload_no_magazine"))
+        m_sounds.LoadSound(section, "snd_reload_no_magazine", "sndReloadNoMagazine", SOUND_TYPE_WEAPON_RECHARGING);
+
     if (pSettings->line_exist(section, "snd_fire_modes"))
         m_sounds.LoadSound(section, "snd_fire_modes", "sndFireModes", SOUND_TYPE_WEAPON_EMPTY_CLICKING);
     if (pSettings->line_exist(section, "snd_zoom_change"))
@@ -508,7 +514,6 @@ void CWeaponMagazined::UpdateCL()
     UpdateSounds();
     UpdateLaser();
     UpdateFlashlight();
-    UpdateMagazineVisibility();
 }
 
 void CWeaponMagazined::UpdateSounds()
@@ -693,6 +698,8 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
         m_sounds.StopSound("sndReloadPartly");
         m_sounds.StopSound("sndReloadJammed");
         m_sounds.StopSound("sndReloadJammedLast");
+        m_sounds.StopSound("sndReloadSingle");
+        m_sounds.StopSound("sndReloadNoMagazine");
         bullet_update = true;
         SwitchState(eIdle);
         break; // End of reload animation
@@ -778,8 +785,12 @@ void CWeaponMagazined::PlayReloadSound()
         PlaySound("sndReloadJammedLast", get_LastFP());
     else if (IsMisfire() && m_sounds.FindSoundItem("sndReloadJammed", false))
         PlaySound("sndReloadJammed", get_LastFP());
+    else if (AddonAttachable(eMagazine) && !IsAddonAttached(eMagazine) && m_pAmmo->IsBoxReloadable() && m_sounds.FindSoundItem("sndReloadNoMagazine", false))
+        PlaySound("sndReloadNoMagazine", get_LastFP());
     else if (IsPartlyReloading() && m_sounds.FindSoundItem("sndReloadPartly",false))
         PlaySound("sndReloadPartly", get_LastFP());
+    else if (IsSingleReloading() && m_sounds.FindSoundItem("sndReloadSingle", false))
+        PlaySound("sndReloadSingle", get_LastFP());
     else
         PlaySound("sndReload", get_LastFP());
 }
@@ -814,6 +825,8 @@ void CWeaponMagazined::switch2_Hidden()
     m_sounds.StopSound("sndReloadPartly");
     m_sounds.StopSound("sndReloadJammed");
     m_sounds.StopSound("sndReloadJammedLast");
+    m_sounds.StopSound("sndReloadSingle");
+    m_sounds.StopSound("sndReloadNoMagazine");
     StopCurrentAnimWithoutCallback();
 
     signal_HideComplete();
@@ -915,6 +928,7 @@ bool CWeaponMagazined::CanDetach(const char* item_section_name)
 bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
 {
     bool result = false;
+    u32 addon_type{u32(-1)};
 
     auto pScope = std::find(m_scopes.begin(), m_scopes.end(), pIItem->object().cNameSect()) != m_scopes.end();
     auto pSilencer = std::find(m_silencers.begin(), m_silencers.end(), pIItem->object().cNameSect()) != m_silencers.end();
@@ -927,30 +941,35 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
         m_cur_scope = (u8)std::distance(m_scopes.begin(), std::find(m_scopes.begin(), m_scopes.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonScope;
         result = true;
+        addon_type = eScope;
     }
     else if (pSilencer && m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSilencer) == 0)
     {
         m_cur_silencer = (u8)std::distance(m_silencers.begin(), std::find(m_silencers.begin(), m_silencers.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonSilencer;
         result = true;
+        addon_type = eSilencer;
     }
     else if (pLaser && m_eLaserStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonLaser) == 0)
     {
         m_cur_laser = (u8)std::distance(m_lasers.begin(), std::find(m_lasers.begin(), m_lasers.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonLaser;
         result = true;
+        addon_type = eLaser;
     }
     else if (pFlashlight && m_eFlashlightStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonFlashlight) == 0)
     {
         m_cur_flashlight = (u8)std::distance(m_flashlights.begin(), std::find(m_flashlights.begin(), m_flashlights.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonFlashlight;
         result = true;
+        addon_type = eFlashlight;
     }
     else if (pSight && m_eSightStatus == CSE_ALifeItemWeapon::eAddonAttachable && (m_flagsAddOnState & CSE_ALifeItemWeapon::eWeaponAddonSight) == 0)
     {
         m_cur_sight = (u8)std::distance(m_sights.begin(), std::find(m_sights.begin(), m_sights.end(), pIItem->object().cNameSect()));
         m_flagsAddOnState |= CSE_ALifeItemWeapon::eWeaponAddonSight;
         result = true;
+        addon_type = eSight;
     }
 
     if (result)
@@ -961,6 +980,8 @@ bool CWeaponMagazined::Attach(PIItem pIItem, bool b_send_event)
         if (!ScopeRespawn())
         {
             UpdateAddonsVisibility();
+            InitAddonVisual(addon_type);
+            InitAddonVisualHud(addon_type);
             InitAddons();
         }
 
@@ -981,6 +1002,8 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
         if (!ScopeRespawn())
         {
             UpdateAddonsVisibility();
+            InitAddonVisual(eScope);
+            InitAddonVisualHud(eScope);
             InitAddons();
         }
 
@@ -993,6 +1016,8 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
         //
         m_cur_silencer = 0;
         UpdateAddonsVisibility();
+        InitAddonVisual(eSilencer);
+        InitAddonVisualHud(eSilencer);
         InitAddons();
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
@@ -1007,6 +1032,8 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
         m_cur_laser = 0;
         //
         UpdateAddonsVisibility();
+        InitAddonVisual(eLaser);
+        InitAddonVisualHud(eLaser);
         InitAddons();
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
@@ -1019,6 +1046,8 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
         m_cur_flashlight = 0;
         //
         UpdateAddonsVisibility();
+        InitAddonVisual(eFlashlight);
+        InitAddonVisualHud(eFlashlight);
         InitAddons();
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
@@ -1030,6 +1059,8 @@ bool CWeaponMagazined::Detach(const char* item_section_name, bool b_spawn_item, 
         m_cur_sight = 0;
         //
         UpdateAddonsVisibility();
+        InitAddonVisual(eSight);
+        InitAddonVisualHud(eSight);
         InitAddons();
         return CInventoryItemObject::Detach(item_section_name, b_spawn_item, item_condition);
     }
@@ -1480,6 +1511,8 @@ void CWeaponMagazined::PlayAnimReload()
 {
     if (IsMisfire())
         PlayHUDMotion({iAmmoElapsed == 1 ? "anm_reload_jammed_last" : "anm_reload_jammed", "anm_reload_jammed", "anm_reload_empty", "anim_reload", "anm_reload"}, true, GetState());
+    else if (AddonAttachable(eMagazine) && !IsAddonAttached(eMagazine) && m_pAmmo->IsBoxReloadable() && AnimationExist("anm_reload_no_magazine"))
+        PlayHUDMotion({"anm_reload_no_magazine", "anim_reload", "anm_reload"}, true, GetState());
     else if (IsPartlyReloading())
         PlayHUDMotion({"anim_reload_partly", "anm_reload_partly", "anim_reload", "anm_reload"}, true, GetState());
     else if (IsSingleReloading() && AnimationExist("anm_reload_single"))
@@ -1936,27 +1969,6 @@ void CWeaponMagazined::SwitchFlashlight(bool on)
     {
         flashlight_render->set_active(false);
         flashlight_omni->set_active(false);
-    }
-}
-
-#include "player_hud.h"
-void CWeaponMagazined::UpdateMagazineVisibility()
-{
-    if (!AddonAttachable(eMagazine))
-        return;
-    bool show = IsAddonAttached(eMagazine) || GetState() == eReload && !IsSingleReloading();
-    if (auto pWeaponVisual = smart_cast<IKinematics*>(Visual()))
-    {
-        if (m_sWpn_magazine_bone.size())
-        {
-            u16 bone_id = pWeaponVisual->LL_BoneID(m_sWpn_magazine_bone);
-            pWeaponVisual->LL_SetBoneVisible(bone_id, show, TRUE);
-        }
-    }
-    if (GetHUDmode())
-    {
-        if (m_sHud_wpn_magazine_bone.size())
-            HudItemData()->set_bone_visible(m_sHud_wpn_magazine_bone, show);
     }
 }
 

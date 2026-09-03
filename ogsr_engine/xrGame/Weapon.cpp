@@ -694,6 +694,8 @@ BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
 
     UpdateAddonsVisibility();
     InitAddons();
+    InitAddonsVisual();
+    InitAddonsVisualHud();
 
     if (m_bLightShotEnabled)
         Light_Create();
@@ -1225,8 +1227,7 @@ void CWeapon::UpdateHUDAddonsVisibility()
     {
         if (AddonAttachable(eSilencer))
         {
-            bool b_show_on_model = READ_IF_EXISTS(pSettings, r_bool, GetAddonName(eSilencer), "show_on_model", true);
-            HudItemData()->set_bone_visible(m_sHud_wpn_silencer_bone, IsAddonAttached(eSilencer) && b_show_on_model);
+            HudItemData()->set_bone_visible(m_sHud_wpn_silencer_bone, IsAddonAttached(eSilencer));
         }
 
         if (m_eSilencerStatus == ALife::eAddonDisabled)
@@ -1253,7 +1254,10 @@ void CWeapon::UpdateHUDAddonsVisibility()
         HudItemData()->set_bone_visible(m_sHud_wpn_flashlight_bone, IsFlashlightOn(), TRUE);
 
     if (m_sHud_wpn_sight_bone.size() && AddonAttachable(eSight))
-        HudItemData()->set_bone_visible(m_sHud_wpn_sight_bone, IsAddonAttached(eSight));
+        HudItemData()->set_bone_visible(m_sHud_wpn_sight_bone, IsAddonAttached(eSight), TRUE);
+
+    if (m_sHud_wpn_magazine_bone.size() && AddonAttachable(eSight))
+        HudItemData()->set_bone_visible(m_sHud_wpn_magazine_bone, IsAddonAttached(eMagazine), TRUE);
 
     for (const shared_str& bone_name : hud_hidden_bones)
         HudItemData()->set_bone_visible(bone_name, FALSE, TRUE);
@@ -1313,8 +1317,7 @@ void CWeapon::UpdateAddonsVisibility()
 
     if (AddonAttachable(eSilencer) && (bone_id != BI_NONE))
     {
-        bool b_show_on_model = READ_IF_EXISTS(pSettings, r_bool, GetAddonName(eSilencer), "show_on_model", true);
-        pWeaponVisual->LL_SetBoneVisible(bone_id, IsAddonAttached(eSilencer) && b_show_on_model, TRUE);
+        pWeaponVisual->LL_SetBoneVisible(bone_id, IsAddonAttached(eSilencer), TRUE);
     }
 
     if (m_eSilencerStatus == CSE_ALifeItemWeapon::eAddonDisabled && bone_id != BI_NONE && pWeaponVisual->LL_GetBoneVisible(bone_id))
@@ -1362,6 +1365,17 @@ void CWeapon::UpdateAddonsVisibility()
     {
         bone_id = pWeaponVisual->LL_BoneID(m_sWpn_sight_bone);
         pWeaponVisual->LL_SetBoneVisible(bone_id, IsAddonAttached(eSight), false);
+    }
+
+    ///////////////////////////////////////////////////////////////////
+
+    if (m_sWpn_magazine_bone.size() && AddonAttachable(eMagazine))
+    {
+        bone_id = pWeaponVisual->LL_BoneID(m_sWpn_magazine_bone);
+        if (bone_id != BI_NONE)
+        {
+            pWeaponVisual->LL_SetBoneVisible(bone_id, IsAddonAttached(eMagazine), TRUE);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -2098,89 +2112,85 @@ Fvector CWeapon::GetDirectionForCollision() { return psHUD_Flags.test(HUD_CROSSH
 /////////////////////////////////////////////////////visual addon attach/////////////////////////////////////////////////////////////
 
 LPCSTR prefix_name[] = {
-    "silencer", "scope", "grenade_launcher", "laser", "flashlight", "stock", "extender", "forend", "magazine",
+    "silencer", "scope", "grenade_launcher", "laser", "flashlight", "sight", "extender", "magazine",
 };
+
+void CWeapon::InitAddonVisual(u32 i)
+{
+    world_attach_addon_name[i] = nullptr;
+    world_attach_visual[i] = nullptr;
+    world_attach_bone_name[i] = nullptr;
+
+    if (IsAddonAttached(i))
+    {
+        auto sect = cNameSect();
+        LPCSTR addon_name = AddonAttachable(i) ? GetAddonName(i).c_str() : prefix_name[i];
+        string1024 res_sect{};
+        sprintf(res_sect, "%s_%s", addon_name, "attach_visual");
+        LPCSTR visual_name = READ_IF_EXISTS(pSettings, r_string, sect, res_sect, nullptr);
+        if (visual_name)
+        {
+            world_attach_addon_name[i] = addon_name;
+
+            world_attach_visual[i] = ::Render->model_Create(visual_name);
+
+            sprintf(res_sect, "%s_%s", addon_name, "attach_bone");
+            world_attach_bone_name[i] = READ_IF_EXISTS(pSettings, r_string, sect, res_sect, "wpn_body");
+
+            sprintf(res_sect, "%s_%s", addon_name, "attach_pos");
+            world_attach_visual_offset[i][0] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
+
+            sprintf(res_sect, "%s_%s", addon_name, "attach_rot");
+            world_attach_visual_offset[i][1] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
+
+            sprintf(res_sect, "%s_%s", addon_name, "attach_scale");
+            world_attach_visual_scale[i] = READ_IF_EXISTS(pSettings, r_float, sect, res_sect, 1.f);
+        }
+    }
+}
+
 void CWeapon::InitAddonsVisual()
 {
     for (u32 i = 0; i < eMaxAddon; i++)
+        InitAddonVisual(i);
+}
+
+void CWeapon::InitAddonVisualHud(u32 i)
+{
+    hud_attach_addon_name[i] = nullptr;
+    hud_attach_visual[i] = nullptr;
+    hud_attach_bone_name[i] = nullptr;
+
+    if (IsAddonAttached(i))
     {
-        world_attach_addon_name[i] = nullptr;
-        world_attach_visual[i] = nullptr;
-        world_attach_bone_name[i] = nullptr;
-
-        if (IsAddonAttached(i))
+        auto& sect = hud_sect;
+        LPCSTR addon_name = AddonAttachable(i) ? GetAddonName(i).c_str() : prefix_name[i];
+        string1024 res_sect{};
+        sprintf(res_sect, "%s_%s", addon_name, "attach_visual");
+        LPCSTR visual_name = READ_IF_EXISTS(pSettings, r_string, sect, res_sect, nullptr);
+        if (visual_name)
         {
-            auto sect = cNameSect();
-            LPCSTR addon_name = AddonAttachable(i) ? GetAddonName(i).c_str() : prefix_name[i];
-            string1024 res_sect{};
-            sprintf(res_sect, "%s_%s", addon_name, "attach_visual");
-            LPCSTR visual_name = READ_IF_EXISTS(pSettings, r_string, sect, res_sect, nullptr);
-            if (visual_name)
-            {
-                world_attach_addon_name[i] = addon_name;
+            hud_attach_addon_name[i] = addon_name;
 
-                world_attach_visual[i] = ::Render->model_Create(visual_name);
+            hud_attach_visual[i] = ::Render->model_Create(visual_name);
 
-                sprintf(res_sect, "%s_%s", addon_name, "attach_bone");
-                world_attach_bone_name[i] = READ_IF_EXISTS(pSettings, r_string, sect, res_sect, "wpn_body");
+            sprintf(res_sect, "%s_%s", addon_name, "attach_bone");
+            hud_attach_bone_name[i] = READ_IF_EXISTS(pSettings, r_string, sect, res_sect, "wpn_body");
 
-                //if (g_bHudAdjustMode)
-                //    continue;
+            sprintf(res_sect, "%s_%s", addon_name, "attach_pos");
+            hud_attach_visual_offset[i][0] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
 
-                sprintf(res_sect, "%s_%s", addon_name, "attach_pos");
-                world_attach_visual_offset[i][0] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
+            sprintf(res_sect, "%s_%s", addon_name, "attach_rot");
+            hud_attach_visual_offset[i][1] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
 
-                sprintf(res_sect, "%s_%s", addon_name, "attach_rot");
-                world_attach_visual_offset[i][1] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
-
-                sprintf(res_sect, "%s_%s", addon_name, "attach_scale");
-                world_attach_visual_scale[i] = READ_IF_EXISTS(pSettings, r_float, sect, res_sect, 1.f);
-            }
+            sprintf(res_sect, "%s_%s", addon_name, "attach_scale");
+            hud_attach_visual_scale[i] = READ_IF_EXISTS(pSettings, r_float, sect, res_sect, 1.f);
         }
     }
 }
+
 void CWeapon::InitAddonsVisualHud()
 {
     for (u32 i = 0; i < eMaxAddon; i++)
-    {
-        hud_attach_addon_name[i] = nullptr;
-        hud_attach_visual[i] = nullptr;
-        hud_attach_bone_name[i] = nullptr;
-
-        if (IsAddonAttached(i))
-        {
-            auto& sect = hud_sect;
-            LPCSTR addon_name = AddonAttachable(i) ? GetAddonName(i).c_str() : prefix_name[i];
-            string1024 res_sect{};
-            sprintf(res_sect, "%s_%s", addon_name, "attach_visual");
-            LPCSTR visual_name = READ_IF_EXISTS(pSettings, r_string, sect, res_sect, nullptr);
-            if (visual_name)
-            {
-                hud_attach_addon_name[i] = addon_name;
-
-                hud_attach_visual[i] = ::Render->model_Create(visual_name);
-
-                sprintf(res_sect, "%s_%s", addon_name, "attach_bone");
-                hud_attach_bone_name[i] = READ_IF_EXISTS(pSettings, r_string, sect, res_sect, "wpn_body");
-
-                //if (g_bHudAdjustMode)
-                //    continue;
-
-                sprintf(res_sect, "%s_%s", addon_name, "attach_pos");
-                hud_attach_visual_offset[i][0] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
-
-                sprintf(res_sect, "%s_%s", addon_name, "attach_rot");
-                hud_attach_visual_offset[i][1] = READ_IF_EXISTS(pSettings, r_fvector3, sect, res_sect, Fvector{});
-
-                sprintf(res_sect, "%s_%s", addon_name, "attach_scale");
-                hud_attach_visual_scale[i] = READ_IF_EXISTS(pSettings, r_float, sect, res_sect, 1.f);
-            }
-        }
-    }
-}
-
-void CWeapon::InitAddons()
-{
-    InitAddonsVisual();
-    InitAddonsVisualHud();
+        InitAddonVisualHud(i);
 }
