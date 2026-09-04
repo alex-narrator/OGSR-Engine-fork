@@ -64,6 +64,7 @@ struct hud_item_measures
     Flags8 m_prop_flags;
 
     Fvector m_item_attach[2]{}; // pos,rot
+    float m_item_scale{1.f};
 
     enum m_hands_offset_coords : u8
     {
@@ -424,6 +425,7 @@ public:
 
     Fvector item_pos[2];
     Fmatrix m_item_pos;
+    float item_scale{1.f};
     u8 m_attach_idx;
 
     xr_vector<hand_motions> _m_hand_motions;

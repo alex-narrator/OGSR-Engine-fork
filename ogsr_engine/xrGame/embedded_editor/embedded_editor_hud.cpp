@@ -55,6 +55,7 @@ void CImGuiHudEditorWnd::Render()
 
 		ImGui::DragFloat3("item_position", (float*)&item->m_measures.m_item_attach[0], drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("item_orientation", (float*)&item->m_measures.m_item_attach[1], drag_rot_intensity, NULL, NULL, "%.6f");
+        ImGui::DragFloat("item_scale", &item->m_measures.m_item_scale, drag_pos_intensity, NULL, NULL, "%.6f");
         ImGui::Separator();
 
 		ImGui::DragFloat3("fire_point", (float*)&item->m_measures.m_fire_point_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
@@ -158,6 +159,7 @@ void CImGuiHudEditorWnd::Render()
 
 		ImGui::DragFloat3("item_position 1", (float*)&item_1->m_measures.m_item_attach[0], drag_pos_intensity, NULL, NULL, "%.6f");
 		ImGui::DragFloat3("item_orientation 1", (float*)&item_1->m_measures.m_item_attach[1], drag_rot_intensity, NULL, NULL, "%.6f");
+        ImGui::DragFloat("item_scale 1", &item_1->m_measures.m_item_scale, drag_pos_intensity, NULL, NULL, "%.6f");
         ImGui::Separator();
 
         ImGui::DragFloat3("fire_point 1", (float*)&item_1->m_measures.m_fire_point_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");

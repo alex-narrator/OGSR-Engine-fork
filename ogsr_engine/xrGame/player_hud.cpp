@@ -235,6 +235,12 @@ void attachable_hud_item::update(bool bForce)
     m_attach_offset.setHPB(ypr.x, ypr.y, ypr.z);
     m_attach_offset.translate_over(m_measures.m_item_attach[0]);
 
+    auto scale = m_measures.m_item_scale;
+    Fmatrix m_scale{};
+    m_scale.scale(scale, scale, scale);
+
+    m_attach_offset.mulA_43(m_scale);
+
     m_parent->calc_transform(m_attach_place_idx, m_attach_offset, m_item_transform);
     m_upd_firedeps_frame = Device.dwFrame;
 
@@ -347,6 +353,8 @@ void hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
         m_item_attach[1] = pSettings->r_fvector3(sect_name, "orientation");
     else
         m_item_attach[1] = pSettings->r_fvector3(sect_name, "item_orientation");
+
+    m_item_scale = READ_IF_EXISTS(pSettings, r_float, sect_name, "item_scale", 1.f);
 
     shared_str bone_name;
     if (pSettings->line_exist(sect_name, "use_cop_fire_point"))
@@ -1620,12 +1628,13 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
 
         item_pos[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_section, "item_position", def);
         item_pos[1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_section, "item_orientation", def);
+        item_scale = READ_IF_EXISTS(pSettings, r_float, hud_section, "item_scale", 1.f);
         script_anim_item_attached = READ_IF_EXISTS(pSettings, r_bool, hud_section, "item_attached", true);
         m_attach_idx = READ_IF_EXISTS(pSettings, r_u8, hud_section, "attach_place_idx", 0);
 
         if (!script_anim_item_attached)
         {
-            Fmatrix attach_offs;
+            Fmatrix attach_offs{};
             Fvector ypr = item_pos[1];
             ypr.mul(PI / 180.f);
             attach_offs.setHPB(ypr.x, ypr.y, ypr.z);
@@ -1813,6 +1822,10 @@ void player_hud::update_script_item()
     m_attach_offset.setHPB(ypr.x, ypr.y, ypr.z);
     m_attach_offset.translate_over(item_pos[0]);
 
+    Fmatrix m_scale{};
+    m_scale.scale(item_scale, item_scale, item_scale);
+    m_attach_offset.mulA_43(m_scale);
+
     calc_transform(m_attach_idx, m_attach_offset, m_item_pos);
 
     auto ka = script_item_model->dcast_PKinematicsAnimated();
@@ -1982,6 +1995,7 @@ void player_hud::SaveCfg(u16 item_idx) const
 
     pCfg.w_fvector3(sect_name, "item_position", item->m_measures.m_item_attach[0]);
     pCfg.w_fvector3(sect_name, "item_orientation", item->m_measures.m_item_attach[1]);
+    pCfg.w_float(sect_name, "item_scale", item->m_measures.m_item_scale);
 
     strconcat(sizeof(val_name), val_name, "hands_position", _prefix);
     pCfg.w_fvector3(sect_name, val_name, item->m_measures.m_hands_attach[0]);
