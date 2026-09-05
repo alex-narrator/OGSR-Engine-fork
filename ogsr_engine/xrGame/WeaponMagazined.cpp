@@ -1285,6 +1285,7 @@ void CWeaponMagazined::LoadLaserParams(LPCSTR section)
     laserdot_hud_attach_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "laserdot_attach_bone", "wpn_body");
     laserdot_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "laserdot_attach_offset", Fvector{});
     laserdot_aim_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "laserdot_aim_attach_offset", laserdot_hud_attach_offset);
+    laserdot_aim_alt_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "laserdot_aim_alt_attach_offset", laserdot_aim_hud_attach_offset);
 
     laserdot_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "laserdot_attach_offset", Fvector{});
 
@@ -1317,8 +1318,11 @@ void CWeaponMagazined::LoadFlashlightParams(LPCSTR section)
     flashlight_hud_attach_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "flashlight_light_bone", "wpn_body");
     flashlight_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "flashlight_attach_offset", Fvector{});
     flashlight_aim_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "flashlight_aim_attach_offset", flashlight_hud_attach_offset);
+    flashlight_aim_alt_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "flashlight_aim_alt_attach_offset", flashlight_aim_hud_attach_offset);
+
     flashlight_omni_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "flashlight_omni_attach_offset", Fvector{});
     flashlight_aim_omni_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "flashlight_aim_omni_attach_offset", flashlight_omni_hud_attach_offset);
+    flashlight_aim_alt_omni_hud_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "flashlight_aim_alt_omni_attach_offset", flashlight_aim_omni_hud_attach_offset);
 
     flashlight_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "flashlight_attach_offset", Fvector{});
     flashlight_omni_world_attach_offset = READ_IF_EXISTS(pSettings, r_fvector3, wpn_sect, "flashlight_omni_world_attach_offset", Fvector{});
@@ -1392,7 +1396,7 @@ void CWeaponMagazined::UpdateLaser()
 
             if (GetHUDmode())
             {
-                auto& attach_offset = IsAiming() ? laserdot_aim_hud_attach_offset : laserdot_hud_attach_offset;
+                auto& attach_offset = IsAiming() ? (IsAimAltMode() ? laserdot_aim_alt_hud_attach_offset : laserdot_aim_hud_attach_offset) : laserdot_hud_attach_offset;
                 GetBoneOffsetPosDir(laserdot_hud_attach_bone, laser_pos, laser_dir, attach_offset);
                 CorrectDirFromWorldToHud(laser_dir);
             }
@@ -1444,27 +1448,27 @@ void CWeaponMagazined::UpdateFlashlight()
         if (flashlight_render->get_active())
         {
             flashlight_pos = get_LastFP();
-            Fvector flashlight_dir{get_LastFD()}, 
-                flashlight_pos_omni{get_LastFP()}, 
+            flashlight_omni_pos = get_LastFP();
+            Fvector flashlight_dir{get_LastFD()},
                 flashlight_dir_omni{get_LastFD()};
 
             if (GetHUDmode())
             {
                 const auto b_aiming = IsAiming();
 
-                auto& attach_offset = b_aiming ? flashlight_aim_hud_attach_offset : flashlight_hud_attach_offset;
+                auto& attach_offset = b_aiming ? (IsAimAltMode() ? flashlight_aim_alt_hud_attach_offset : flashlight_aim_hud_attach_offset) : flashlight_hud_attach_offset;
                 GetBoneOffsetPosDir(flashlight_hud_attach_bone, flashlight_pos, flashlight_dir, attach_offset);
                 CorrectDirFromWorldToHud(flashlight_dir);
 
-                auto& omni_attach_offset = b_aiming ? flashlight_aim_omni_hud_attach_offset : flashlight_omni_hud_attach_offset;
-                GetBoneOffsetPosDir(flashlight_hud_attach_bone, flashlight_pos_omni, flashlight_dir_omni, omni_attach_offset);
+                auto& omni_attach_offset = b_aiming ? (IsAimAltMode() ? flashlight_aim_alt_omni_hud_attach_offset : flashlight_aim_omni_hud_attach_offset) : flashlight_omni_hud_attach_offset;
+                GetBoneOffsetPosDir(flashlight_hud_attach_bone, flashlight_omni_pos, flashlight_dir_omni, omni_attach_offset);
                 CorrectDirFromWorldToHud(flashlight_dir_omni);
             }
             else
             {
                 XFORM().transform_tiny(flashlight_pos, flashlight_world_attach_offset);
 
-                XFORM().transform_tiny(flashlight_pos_omni, flashlight_omni_world_attach_offset);
+                XFORM().transform_tiny(flashlight_omni_pos, flashlight_omni_world_attach_offset);
             }
 
             Fmatrix flashlightXForm{};
@@ -1478,7 +1482,7 @@ void CWeaponMagazined::UpdateFlashlight()
             flashlightomniXForm.identity();
             flashlightomniXForm.k.set(flashlight_dir_omni);
             Fvector::generate_orthonormal_basis_normalized(flashlightomniXForm.k, flashlightomniXForm.j, flashlightomniXForm.i);
-            flashlight_omni->set_position(flashlight_pos_omni);
+            flashlight_omni->set_position(flashlight_omni_pos);
             flashlight_omni->set_rotation(flashlightomniXForm.k, flashlightomniXForm.i);
 
             // calc color animator

@@ -1620,10 +1620,12 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
     Fvector offs = READ_IF_EXISTS(pSettings, r_fvector3, hud_section, pos.c_str(), def);
     Fvector rrot = READ_IF_EXISTS(pSettings, r_fvector3, hud_section, rot.c_str(), def);
 
-    if (pSettings->line_exist(hud_section, "item_visual"))
+    const auto visual_name = READ_IF_EXISTS(pSettings, r_string, hud_section, "item_visual", nullptr);
+
+    if (visual_name)
     {
         ::Render->shader_option_hud_loading(true);
-        script_item_model = ::Render->model_Create(pSettings->r_string(hud_section, "item_visual"))->dcast_PKinematics();
+        script_item_model = ::Render->model_Create(visual_name)->dcast_PKinematics();
         ::Render->shader_option_hud_loading(false);
 
         item_pos[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_section, "item_position", def);
@@ -1695,7 +1697,7 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
         if (!M2.valid())
             M2 = ka->ID_Cycle_Safe("idle");
 
-        R_ASSERT(M2.valid(), "model %s has no motion [idle] ", pSettings->r_string(hud_section, "item_visual"));
+        R_ASSERT(M2.valid(), "model %s has no motion [idle] ", visual_name);
 
         u16 root_id = script_item_model->LL_GetBoneRoot();
         CBoneInstance& root_binst = script_item_model->LL_GetBoneInstance(root_id);
@@ -1791,14 +1793,18 @@ u32 player_hud::motion_length_script(LPCSTR hud_section, LPCSTR anm_name, float 
         return 0;
     }
 
-    IKinematicsAnimated* animatedHudItem = NULL;
+    IKinematics* HudItem = nullptr;
 
-    if (pSettings->line_exist(hud_section, "item_visual"))
+    const auto visual_name = READ_IF_EXISTS(pSettings, r_string, hud_section, "item_visual", nullptr);
+
+    if (visual_name)
     {
         ::Render->shader_option_hud_loading(true);
-        animatedHudItem = ::Render->model_Create(pSettings->r_string(hud_section, "item_visual"))->dcast_PKinematicsAnimated();
+        HudItem = ::Render->model_Create(visual_name)->dcast_PKinematics();
         ::Render->shader_option_hud_loading(false);
     }
+
+    IKinematicsAnimated* animatedHudItem = HudItem ? HudItem->dcast_PKinematicsAnimated() : nullptr;
 
     player_hud_motion_container* pm = get_hand_motions(hud_section, animatedHudItem);
     if (!pm)
@@ -2050,13 +2056,17 @@ void player_hud::SaveCfg(u16 item_idx) const
         {
             pCfg.w_fvector3(sect_name, "laserdot_attach_offset", Wpn->laserdot_hud_attach_offset);
             pCfg.w_fvector3(sect_name, "laserdot_aim_attach_offset", Wpn->laserdot_aim_hud_attach_offset);
+            pCfg.w_fvector3(sect_name, "laserdot_aim_alt_attach_offset", Wpn->laserdot_aim_alt_hud_attach_offset);
         }
         if (Wpn->IsAddonAttached(eFlashlight) || Wpn->laser_flashlight)
         {
             pCfg.w_fvector3(sect_name, "flashlight_attach_offset", Wpn->flashlight_hud_attach_offset);
             pCfg.w_fvector3(sect_name, "flashlight_aim_attach_offset", Wpn->flashlight_aim_hud_attach_offset);
+            pCfg.w_fvector3(sect_name, "flashlight_aim_alt_attach_offset", Wpn->flashlight_aim_alt_hud_attach_offset);
+
             pCfg.w_fvector3(sect_name, "flashlight_omni_attach_offset", Wpn->flashlight_omni_hud_attach_offset);
             pCfg.w_fvector3(sect_name, "flashlight_aim_omni_attach_offset", Wpn->flashlight_aim_omni_hud_attach_offset);
+            pCfg.w_fvector3(sect_name, "flashlight_aim_alt_omni_attach_offset", Wpn->flashlight_aim_alt_omni_hud_attach_offset);
         }
         for (int i = 0; i < eMaxAddon; ++i)
         {

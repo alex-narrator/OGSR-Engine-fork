@@ -160,9 +160,10 @@ public:
         inherited::processing_deactivate();
     }
     bool laser_flashlight{};
-    Fvector laserdot_hud_attach_offset{}, laserdot_aim_hud_attach_offset{}, laserdot_world_attach_offset{}, laser_pos{};
-    Fvector flashlight_hud_attach_offset{}, flashlight_aim_hud_attach_offset{}, flashlight_world_attach_offset{}, flashlight_pos{};
-    Fvector flashlight_omni_hud_attach_offset{}, flashlight_aim_omni_hud_attach_offset{}, flashlight_omni_world_attach_offset{};
+    Fvector laserdot_hud_attach_offset{}, laserdot_aim_hud_attach_offset{}, laserdot_aim_alt_hud_attach_offset{}, laserdot_world_attach_offset{}, laser_pos{};
+    Fvector flashlight_hud_attach_offset{}, flashlight_aim_hud_attach_offset{}, flashlight_aim_alt_hud_attach_offset{}, flashlight_world_attach_offset{}, flashlight_pos{};
+    Fvector flashlight_omni_hud_attach_offset{}, flashlight_aim_omni_hud_attach_offset{}, flashlight_aim_alt_omni_hud_attach_offset{}, flashlight_omni_world_attach_offset{},
+        flashlight_omni_pos{};
 
     float m_fZoomRotateTime_K{}; // коефіцієнт часу повороту прицілу
 

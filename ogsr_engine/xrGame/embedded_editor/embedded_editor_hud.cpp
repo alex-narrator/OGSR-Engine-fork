@@ -113,7 +113,12 @@ void CImGuiHudEditorWnd::Render()
                 if (Wpn->IsAddonAttached(eLaser) && Wpn->IsLaserOn())
                 {
                     if (Wpn->IsAiming())
-                        ImGui::DragFloat3(label("laserdot_aim_attach_offset").c_str(), (float*)&Wpn->laserdot_aim_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                    {
+                        if (Wpn->IsAimAltMode())
+                            ImGui::DragFloat3(label("laserdot_aim_alt_attach_offset").c_str(), (float*)&Wpn->laserdot_aim_alt_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                        else
+                            ImGui::DragFloat3(label("laserdot_aim_attach_offset").c_str(), (float*)&Wpn->laserdot_aim_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                    }
                     else
                         ImGui::DragFloat3(label("laserdot_attach_offset").c_str(), (float*)&Wpn->laserdot_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
                     ImGui::Separator();
@@ -126,8 +131,16 @@ void CImGuiHudEditorWnd::Render()
                 {
                     if (Wpn->IsAiming())
                     {
-                        ImGui::DragFloat3(label("flashlight_aim_attach_offset").c_str(), (float*)&Wpn->flashlight_aim_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
-                        ImGui::DragFloat3(label("flashlight_aim_omni_attach_offset").c_str(), (float*)&Wpn->flashlight_aim_omni_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                        if (Wpn->IsAimAltMode())
+                        {
+                            ImGui::DragFloat3(label("flashlight_aim_alt_attach_offset").c_str(), (float*)&Wpn->flashlight_aim_alt_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                            ImGui::DragFloat3(label("flashlight_aim_alt_omni_attach_offset").c_str(), (float*)&Wpn->flashlight_aim_alt_omni_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                        }
+                        else
+                        {
+                            ImGui::DragFloat3(label("flashlight_aim_attach_offset").c_str(), (float*)&Wpn->flashlight_aim_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                            ImGui::DragFloat3(label("flashlight_aim_omni_attach_offset").c_str(), (float*)&Wpn->flashlight_aim_omni_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                        }
                     }
                     else
                     {
