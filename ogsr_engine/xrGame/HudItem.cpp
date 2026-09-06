@@ -1511,3 +1511,84 @@ void CHudItem::OnZoomOut()
     if (auto actor = smart_cast<CActor*>(object().H_Parent()))
         actor->callback(GameObject::eOnHudItemZoomOut)(object().lua_game_object());
 }
+
+CInifile CHudItem::SaveHudCfg()
+{
+    const char* sect_name = HudSection().c_str();
+    string_path buff;
+    FS.update_path(buff, "$logs$", make_string("_hud\\%s.ltx", sect_name).c_str());
+
+    CInifile pCfg(buff, FALSE, FALSE, TRUE);
+
+    const auto aim_idx = hud_item_measures::m_hands_offset_type_aim;
+    const auto aim_alt_idx = hud_item_measures::m_hands_offset_type_aim_alt;
+    const auto aim_sight_idx = hud_item_measures::m_hands_offset_type_aim_alt_sight;
+    const auto aim_scope_idx = hud_item_measures::m_hands_offset_type_aim_scope;
+    const auto aim_gl_idx = hud_item_measures::m_hands_offset_type_gl;
+    const auto aim_gl_scope_idx = hud_item_measures::m_hands_offset_type_gl_scope;
+
+    const bool is_16x9 = UI()->is_widescreen();
+    string64 _prefix;
+    xr_sprintf(_prefix, "%s", is_16x9 ? "_16x9" : "");
+    string128 val_name;
+
+    auto hd = HudItemData();
+
+    pCfg.w_fvector3(sect_name, "item_position", hd->m_measures.m_item_attach[0]);
+    pCfg.w_fvector3(sect_name, "item_orientation", hd->m_measures.m_item_attach[1]);
+    pCfg.w_float(sect_name, "item_scale", hd->m_measures.m_item_scale);
+
+    strconcat(sizeof(val_name), val_name, "hands_position", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_attach[0]);
+    strconcat(sizeof(val_name), val_name, "hands_orientation", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_attach[1]);
+
+    strconcat(sizeof(val_name), val_name, "fire_point", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_fire_point_offset);
+
+    strconcat(sizeof(val_name), val_name, "fire_point2", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_fire_point2_offset);
+
+    strconcat(sizeof(val_name), val_name, "shell_point", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_shell_point_offset);
+
+    strconcat(sizeof(val_name), val_name, "shoot_point", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_shoot_point_offset);
+
+    strconcat(sizeof(val_name), val_name, "aim_hud_offset_pos", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_offset[0][aim_idx]);
+    strconcat(sizeof(val_name), val_name, "aim_hud_offset_rot", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_offset[1][aim_idx]);
+
+    strconcat(sizeof(val_name), val_name, "aim_alt_hud_offset_pos", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_offset[0][aim_alt_idx]);
+    strconcat(sizeof(val_name), val_name, "aim_alt_hud_offset_rot", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_offset[1][aim_alt_idx]);
+
+    strconcat(sizeof(val_name), val_name, "aim_alt_sight_hud_offset_pos", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_offset[0][aim_sight_idx]);
+    strconcat(sizeof(val_name), val_name, "aim_alt_sight_hud_offset_rot", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_offset[1][aim_sight_idx]);
+
+    strconcat(sizeof(val_name), val_name, "aim_scope_hud_offset_pos", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_offset[0][aim_scope_idx]);
+    strconcat(sizeof(val_name), val_name, "aim_scope_hud_offset_rot", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_offset[1][aim_scope_idx]);
+
+    strconcat(sizeof(val_name), val_name, "gl_hud_offset_pos", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_offset[0][aim_gl_idx]);
+    strconcat(sizeof(val_name), val_name, "gl_hud_offset_rot", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_offset[1][aim_gl_idx]);
+
+    strconcat(sizeof(val_name), val_name, "gl_scope_hud_offset_pos", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_offset[0][aim_gl_scope_idx]);
+    strconcat(sizeof(val_name), val_name, "gl_scope_hud_offset_rot", _prefix);
+    pCfg.w_fvector3(sect_name, val_name, hd->m_measures.m_hands_offset[1][aim_gl_scope_idx]);
+
+    pCfg.w_fvector3(sect_name, "custom_ui_pos", hd->m_parent_hud_item->script_ui_offset[0]);
+    pCfg.w_fvector3(sect_name, "custom_ui_rot", hd->m_parent_hud_item->script_ui_offset[1]);
+
+    Msg("--[%s] data saved to [%s]", __FUNCTION__, pCfg.fname());
+
+    return pCfg;
+}

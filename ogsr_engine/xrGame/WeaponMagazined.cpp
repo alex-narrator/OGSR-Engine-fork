@@ -2194,3 +2194,39 @@ void CWeaponMagazined::SaveCfg()
 
     Msg("--[%s] data saved to [%s]", __FUNCTION__, pCfg.fname());
 }
+
+CInifile CWeaponMagazined::SaveHudCfg()
+{
+    auto pCfg = inherited::SaveHudCfg();
+    const char* sect_name = HudSection().c_str();
+    if (IsAddonAttached(eLaser))
+    {
+        pCfg.w_fvector3(sect_name, "laserdot_attach_offset", laserdot_hud_attach_offset);
+        pCfg.w_fvector3(sect_name, "laserdot_aim_attach_offset", laserdot_aim_hud_attach_offset);
+        pCfg.w_fvector3(sect_name, "laserdot_aim_alt_attach_offset", laserdot_aim_alt_hud_attach_offset);
+    }
+    if (IsAddonAttached(eFlashlight) || laser_flashlight)
+    {
+        pCfg.w_fvector3(sect_name, "flashlight_attach_offset", flashlight_hud_attach_offset);
+        pCfg.w_fvector3(sect_name, "flashlight_aim_attach_offset", flashlight_aim_hud_attach_offset);
+        pCfg.w_fvector3(sect_name, "flashlight_aim_alt_attach_offset", flashlight_aim_alt_hud_attach_offset);
+        pCfg.w_fvector3(sect_name, "flashlight_omni_attach_offset", flashlight_omni_hud_attach_offset);
+        pCfg.w_fvector3(sect_name, "flashlight_aim_omni_attach_offset", flashlight_aim_omni_hud_attach_offset);
+        pCfg.w_fvector3(sect_name, "flashlight_aim_alt_omni_attach_offset", flashlight_aim_alt_omni_hud_attach_offset);
+    }
+    string128 val_name;
+    for (int i = 0; i < eMaxAddon; ++i)
+    {
+        if (hud_attach_visual[i])
+        {
+            const auto addon_name = hud_attach_addon_name[i];
+            strconcat(sizeof(val_name), val_name, addon_name, "_attach_pos");
+            pCfg.w_fvector3(sect_name, val_name, hud_attach_visual_offset[i][0]);
+            strconcat(sizeof(val_name), val_name, addon_name, "_attach_rot");
+            pCfg.w_fvector3(sect_name, val_name, hud_attach_visual_offset[i][1]);
+            strconcat(sizeof(val_name), val_name, addon_name, "_attach_scale");
+            pCfg.w_float(sect_name, val_name, hud_attach_visual_scale[i]);
+        }
+    }
+    return pCfg;
+}

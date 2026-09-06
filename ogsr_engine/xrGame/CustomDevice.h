@@ -12,6 +12,7 @@ protected:
     bool m_bFastAnimMode{};
     bool m_bNeedActivation{};
     bool m_bWorking{};
+    shared_str hud_collision_bone{};
     bool CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate);
     void UpdateVisibility();
 
@@ -26,6 +27,7 @@ protected:
     virtual bool IsBlocked();
 
 public:
+    Fvector hud_collision_point{};
     virtual BOOL net_Spawn(CSE_Abstract* DC) override;
     virtual void Load(LPCSTR section) override;
 
@@ -55,4 +57,6 @@ public:
 
     bool IsZoomed() const override;
     bool IsAiming() const;
+
+    virtual CInifile SaveHudCfg() override;
 };

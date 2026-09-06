@@ -364,8 +364,8 @@ public:
     void detach_item(CHudItem* item);
     void detach_all_items()
     {
-        m_attached_items[0] = nullptr;
-        m_attached_items[1] = nullptr;
+        for (auto& item : m_attached_items)
+            item = nullptr;
     }
 
     void calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result);
@@ -440,8 +440,6 @@ public:
 
     IKinematicsAnimated* Model() { return m_model; }
     const Fmatrix& XFORM() const { return m_transform; }
-
-    void SaveCfg(u16 item_idx) const;
 
 private:
     static void Thumb0Callback(CBoneInstance* B);

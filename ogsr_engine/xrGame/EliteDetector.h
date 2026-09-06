@@ -17,6 +17,8 @@ public:
 
     CUIArtefactDetectorElite* GetUI() { return (CUIArtefactDetectorElite*)m_ui; }
 
+    virtual CInifile SaveHudCfg() override;
+
 protected:
     virtual void UpdateAf() override;
     virtual void CreateUI() override;

@@ -295,8 +295,10 @@ public:
 
     virtual float GetZoomRotationTime() const { return m_fZoomRotateTime; };
 
-    void UpdateSoundPosition(LPCSTR alias, const Fvector& pos);
     bool SoundExist(LPCSTR alias);
+
+    Fvector GetCollisionPoint() { return GetPositionForCollision(); };
+    virtual CInifile SaveHudCfg();
 
 protected:
     enum CollisionWeaponType : size_t

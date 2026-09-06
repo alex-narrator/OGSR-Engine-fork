@@ -45,6 +45,10 @@ void CImGuiHudEditorWnd::Render()
     const auto aim_gl_idx = hud_item_measures::m_hands_offset_type_gl;
     const auto aim_gl_scope_idx = hud_item_measures::m_hands_offset_type_gl_scope;
 
+    auto& render = Level().debug_renderer();
+
+    static bool checkbox[2][8]{};
+
     for (u16 i = 0; i < 2; i++)
     {
         if (auto item = g_player_hud->attached_item(i))
@@ -62,10 +66,29 @@ void CImGuiHudEditorWnd::Render()
             ImGui::DragFloat(label("item_scale").c_str(), &item->m_measures.m_item_scale, drag_pos_intensity, NULL, NULL, "%.6f");
             ImGui::Separator();
 
+            firedeps fd;
+            item->setup_firedeps(fd);
+
             ImGui::DragFloat3(label("fire_point").c_str(), (float*)&item->m_measures.m_fire_point_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::Checkbox(label("show_fire_point").c_str(), &checkbox[i][0]);
+            if (checkbox[i][0])
+                render.draw_aabb(fd.vLastFP, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(0, 56, 125));
+
             ImGui::DragFloat3(label("fire_point2").c_str(), (float*)&item->m_measures.m_fire_point2_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::Checkbox(label("show_fire_point2").c_str(), &checkbox[i][1]);
+            if (checkbox[i][1])
+                render.draw_aabb(fd.vLastFP2, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(0, 56, 125));
+
             ImGui::DragFloat3(label("shell_point").c_str(), (float*)&item->m_measures.m_shell_point_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::Checkbox(label("show_shell_point").c_str(), &checkbox[i][2]);
+            if (checkbox[i][2])
+                render.draw_aabb(fd.vLastSP, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(0, 56, 125));
+
             ImGui::DragFloat3(label("shoot_point").c_str(), (float*)&item->m_measures.m_shoot_point_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::Checkbox(label("show_shoot_point").c_str(), &checkbox[i][3]);
+            if (checkbox[i][3])
+                render.draw_aabb(fd.vLastShootPoint, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(0, 56, 125));
+
             ImGui::Separator();
 
             const auto idx = item->m_parent_hud_item->GetCurrentHudOffsetIdx();
@@ -108,7 +131,6 @@ void CImGuiHudEditorWnd::Render()
 
             if (const auto Wpn = smart_cast<CWeaponMagazined*>(item->m_parent_hud_item))
             {
-                auto& render = Level().debug_renderer();
                 // Laser light offsets
                 if (Wpn->IsAddonAttached(eLaser) && Wpn->IsLaserOn())
                 {
@@ -121,9 +143,10 @@ void CImGuiHudEditorWnd::Render()
                     }
                     else
                         ImGui::DragFloat3(label("laserdot_attach_offset").c_str(), (float*)&Wpn->laserdot_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
+                    ImGui::Checkbox(label("show_laser_pos").c_str(), &checkbox[i][4]);
+                    if (checkbox[i][4])
+                        render.draw_aabb(Wpn->laser_pos, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(125, 0, 0));
                     ImGui::Separator();
-
-                    render.draw_aabb(Wpn->laser_pos, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(125, 0, 0));
                 }
 
                 // Flashlight offsets
@@ -147,9 +170,13 @@ void CImGuiHudEditorWnd::Render()
                         ImGui::DragFloat3(label("flashlight_attach_offset").c_str(), (float*)&Wpn->flashlight_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
                         ImGui::DragFloat3(label("flashlight_omni_attach_offset").c_str(), (float*)&Wpn->flashlight_omni_hud_attach_offset, drag_pos_intensity, NULL, NULL, "%.6f");
                     }
+                    ImGui::Checkbox(label("show_flashlight_pos").c_str(), &checkbox[i][5]);
+                    if (checkbox[i][5])
+                        render.draw_aabb(Wpn->flashlight_pos, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(0, 56, 125));
+                    ImGui::Checkbox(label("show_flashlight_omni_pos").c_str(), &checkbox[i][6]);
+                    if (checkbox[i][6])
+                        render.draw_aabb(Wpn->flashlight_omni_pos, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(0, 56, 125));
                     ImGui::Separator();
-
-                    render.draw_aabb(Wpn->flashlight_pos, 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(0, 56, 125));
                 }
 
                 for (int i = 0; i < eMaxAddon; ++i)
@@ -164,6 +191,22 @@ void CImGuiHudEditorWnd::Render()
                     }
                 }
             }
+
+           if (const auto Dev = smart_cast<CCustomDevice*>(item->m_parent_hud_item))
+           {
+               ImGui::DragFloat3(label("hud_collision_point").c_str(), (float*)&Dev->hud_collision_point, drag_pos_intensity, NULL, NULL, "%.6f");
+               ImGui::Checkbox(label("show_hud_collision_point").c_str(), &checkbox[i][7]);
+               if (checkbox[i][7])
+                   render.draw_aabb(Dev->GetCollisionPoint(), 0.01f, 0.01f, 0.01f, D3DCOLOR_XRGB(0, 56, 125));
+               ImGui::Separator();
+           }
+
+           if (const auto Det = smart_cast<CEliteDetector*>(item->m_parent_hud_item))
+           {
+               ImGui::DragFloat3(label("ui_pos").c_str(), (float*)&Det->GetUI()->m_map_attach_offset_pos, drag_pos_intensity, NULL, NULL, "%.6f");
+               ImGui::DragFloat3(label("ui_rot").c_str(), (float*)&Det->GetUI()->m_map_attach_offset_rot, drag_rot_intensity, NULL, NULL, "%.6f");
+               ImGui::Separator();
+           }
         }
 
     }
@@ -171,7 +214,8 @@ void CImGuiHudEditorWnd::Render()
     if (ImGui::Button("Save to file"))
     {
         for (u16 i = 0; i < 2; i++)
-            g_player_hud->SaveCfg(i);
+            if (auto item = g_player_hud->attached_item(i))
+                item->m_parent_hud_item->SaveHudCfg();
     }
 
     RenderEnd();

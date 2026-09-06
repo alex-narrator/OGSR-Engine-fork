@@ -134,6 +134,15 @@ void CEliteDetector::render_item_3d_ui()
     UIRender->CacheSetCullMode(IUIRender::cmCCW);
 }
 
+CInifile CEliteDetector::SaveHudCfg()
+{
+    auto pCfg = inherited::SaveHudCfg();
+    const char* sect_name = HudSection().c_str();
+    pCfg.w_fvector3(sect_name, "ui_pos", GetUI()->m_map_attach_offset_pos);
+    pCfg.w_fvector3(sect_name, "ui_rot", GetUI()->m_map_attach_offset_rot);
+    return pCfg;
+}
+
 static void fix_ws_wnd_size(CUIWindow* w, float kx)
 {
     Fvector2 p = w->GetWndSize();

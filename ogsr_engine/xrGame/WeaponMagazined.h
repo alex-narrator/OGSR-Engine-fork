@@ -269,5 +269,6 @@ protected:
     void RespawnWeapon(LPCSTR);
 
 public:
-    virtual void SaveCfg();
+    virtual void SaveCfg() override;
+    virtual CInifile SaveHudCfg() override;
 };

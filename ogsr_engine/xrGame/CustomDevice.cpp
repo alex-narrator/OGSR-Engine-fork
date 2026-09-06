@@ -19,6 +19,10 @@ void CCustomDevice::Load(LPCSTR section)
     m_animation_slot = 7;
     inherited::Load(section);
 
+    hud_collision_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "hud_collision_bone", "wpn_body");
+    Fvector default_hud_collision_point{-0.247499f, -0.810510f, 0.178999f};
+    hud_collision_point = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "hud_collision_point", default_hud_collision_point);
+
     m_sounds.LoadSound(section, "snd_draw", "sndShow");
     m_sounds.LoadSound(section, "snd_holster", "sndHide");
 }
@@ -374,7 +378,7 @@ Fvector CCustomDevice::GetPositionForCollision()
 {
     Fvector det_pos{}, det_dir{};
     // Офсет подобрал через худ аждаст, это скорее всего временно, но такое решение подходит всем детекторам более-менее.
-    GetBoneOffsetPosDir("wpn_body", det_pos, det_dir, Fvector{-0.247499f, -0.810510f, 0.178999f});
+    GetBoneOffsetPosDir(hud_collision_bone, det_pos, det_dir, hud_collision_point);
     return det_pos;
 }
 
@@ -413,4 +417,12 @@ bool CCustomDevice::IsBlocked()
     if (actor->inventory().m_bDeviceWasBlocked || !m_pCurrentInventory->InSlot(this))
         return true;
     return false;
+}
+
+CInifile CCustomDevice::SaveHudCfg()
+{
+    auto pCfg = inherited::SaveHudCfg();
+    const char* sect_name = HudSection().c_str();
+    pCfg.w_fvector3(sect_name, "hud_collision_point", hud_collision_point);
+    return pCfg;
 }
