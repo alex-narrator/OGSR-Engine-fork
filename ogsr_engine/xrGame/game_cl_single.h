@@ -1,7 +1,7 @@
 #pragma once
 #include "game_cl_base.h"
 
-class game_cl_Single : public game_cl_GameState
+class game_cl_Single final : public game_cl_GameState
 {
 public:
     game_cl_Single();
@@ -15,14 +15,13 @@ public:
 };
 
 // game difficulty
-enum ESingleGameDifficulty
+enum ESingleGameDifficulty : u32
 {
     egdNovice = 0,
     egdStalker = 1,
     egdVeteran = 2,
     egdMaster = 3,
     egdCount,
-    egd_force_u32 = u32(-1)
 };
 
 extern ESingleGameDifficulty g_SingleGameDifficulty;
