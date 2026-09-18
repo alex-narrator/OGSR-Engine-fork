@@ -593,20 +593,15 @@ void CEnvDescriptorMixer::lerp(CEnvironment* env, CEnvDescriptor& A, CEnvDescrip
 
     sky_rotation = (fi * A.sky_rotation + f * B.sky_rotation);
 
-    //.	far_plane				=	(fi*A.far_plane + f*B.far_plane + Mdf.far_plane)*psVisDistance*modif_power;
     if (Mdf.use_flags.test(eViewDist))
         far_plane = (fi * A.far_plane + f * B.far_plane + Mdf.far_plane) * psVisDistance * modif_power;
     else
         far_plane = (fi * A.far_plane + f * B.far_plane) * psVisDistance;
 
-    far_plane = std::max(far_plane, 250.f); //костыль для шейдера волюметрик лучей
-
-    //.	fog_color.lerp			(A.fog_color,B.fog_color,f).add(Mdf.fog_color).mul(modif_power);
     fog_color.lerp(A.fog_color, B.fog_color, f);
     if (Mdf.use_flags.test(eFogColor))
         fog_color.add(Mdf.fog_color).mul(modif_power);
 
-    //.	fog_density				=	(fi*A.fog_density + f*B.fog_density + Mdf.fog_density)*modif_power;
     fog_density = (fi * A.fog_density + f * B.fog_density);
     if (Mdf.use_flags.test(eFogDensity))
     {

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <filesystem>
 
 #include "fs_internal.h"
 
@@ -231,9 +232,13 @@ void CInifile::Load(IReader* F, LPCSTR path, BOOL allow_dup_sections, const CIni
         }
     };
 
+    // Получаем расширение (вернет строку с точкой, например ".xml")
+    const std::string ext = std::filesystem::path(current_file).extension().string();
+
     // Должен стать true после прочтения первой секции в файле, только если файл является инклудом (root_level == false)
     // Нужно это чтобы детектить файлы с невалидными комментариями вверху. Была ситуация, когда коммент в верху файла без ; создал баг
-    bool sect_found{root_level};
+    // Сделано исключение для xml - в профилях нпс в </supplies> инклудятся файлы без секций.
+    bool sect_found{root_level || ext == ".xml"};
 
     while (!F->eof())
     {

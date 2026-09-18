@@ -9,16 +9,16 @@ on:
 
 jobs:
   build:
-    if: "contains(github.event.head_commit.message, '[ci build]') || github.event_name == 'release'"
     runs-on: windows-2022
     strategy:
       fail-fast: false
       matrix:
-        Configuration: [Debug, Release, ReleaseTracyProfiler]
+#        Configuration: [Debug, Release, ReleaseTracyProfiler]
+        Configuration: [Release, ReleaseTracyProfiler]
         Platform: [x64]
         include:
-          - Configuration: Debug
-            ConfigurationReal: Debug
+#          - Configuration: Debug
+#            ConfigurationReal: Debug
           - Configuration: Release
             ConfigurationReal: Release
           - Configuration: ReleaseTracyProfiler
