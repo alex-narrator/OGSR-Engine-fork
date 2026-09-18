@@ -203,6 +203,7 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     spatial.type |= STYPE_REACTTOSOUND;
 
     g_player_hud->load_default();
+    g_player_hud->clear_hud_hands_attachments();
 
     Level().debug_renderer().ClearDebugContainer();
 

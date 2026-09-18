@@ -57,9 +57,7 @@ void CImGuiHudEditorWnd::Render()
             ImGui::Text("[%d] hud section: %s", i, item->m_parent_hud_item->HudSection().c_str());
             ImGui::Separator();
 
-            auto label = [=](auto name) -> std::string {
-                return std::format("[{}] {}", i, name);
-            };
+            auto label = [=](auto name) -> std::string { return std::format("[{}] {}", i, name); };
 
             ImGui::DragFloat3(label("item_position").c_str(), (float*)&item->m_measures.m_item_attach[0], drag_pos_intensity, NULL, NULL, "%.6f");
             ImGui::DragFloat3(label("item_orientation").c_str(), (float*)&item->m_measures.m_item_attach[1], drag_rot_intensity, NULL, NULL, "%.6f");
@@ -211,11 +209,33 @@ void CImGuiHudEditorWnd::Render()
 
     }
 
+    for (auto attachment : g_player_hud->get_hud_hands_attacments())
+    {
+        ImGui::Text("attachment name: %s", attachment->name.c_str());
+        ImGui::Text("attachment section: %s", attachment->section.c_str());
+        ImGui::Text("attachment visual: %s", attachment->visual_name.c_str());
+
+        auto label = [=](auto name) -> std::string { return std::format("[{}] {}", attachment->name.c_str(), name); };
+
+        ImGui::DragFloat3(label("item_position").c_str(), (float*)&attachment->offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
+        ImGui::DragFloat3(label("item_orientation").c_str(), (float*)&attachment->offset[1], drag_rot_intensity, NULL, NULL, "%.6f");
+        ImGui::DragFloat(label("item_scale").c_str(), (float*)&attachment->scale, drag_pos_intensity, NULL, NULL, "%.6f");
+        if (attachment->script_ui_funct)
+        {
+            ImGui::DragFloat3(label("custom_ui_pos").c_str(), (float*)&attachment->script_ui_offset[0], drag_pos_intensity, NULL, NULL, "%.6f");
+            ImGui::DragFloat3(label("custom_ui_rot").c_str(), (float*)&attachment->script_ui_offset[1], drag_rot_intensity, NULL, NULL, "%.6f");
+        }
+        ImGui::Separator();
+    }
+
     if (ImGui::Button("Save to file"))
     {
         for (u16 i = 0; i < 2; i++)
             if (auto item = g_player_hud->attached_item(i))
                 item->m_parent_hud_item->SaveHudCfg();
+
+        for (auto attachment : g_player_hud->get_hud_hands_attacments())
+            attachment->save_cfg();
     }
 
     RenderEnd();

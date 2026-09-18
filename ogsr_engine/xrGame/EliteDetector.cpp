@@ -131,7 +131,7 @@ void CEliteDetector::render_item_3d_ui()
     inherited::render_item_3d_ui();
     ui().Draw();
     //	Restore cull mode
-    UIRender->CacheSetCullMode(IUIRender::cmCCW);
+    /*UIRender->CacheSetCullMode(IUIRender::cmCCW);*/
 }
 
 CInifile CEliteDetector::SaveHudCfg()
@@ -232,12 +232,11 @@ void CUIArtefactDetectorElite::Draw()
     Fmatrix LM;
     GetUILocatorMatrix(LM);
 
-    IUIRender::ePointType bk = UI()->m_currentPointType;
-
-    UI()->m_currentPointType = IUIRender::pttLIT;
+    //IUIRender::ePointType bk = UI()->m_currentPointType;
+    //UI()->m_currentPointType = IUIRender::pttLIT;
 
     UIRender->CacheSetXformWorld(LM);
-    UIRender->CacheSetCullMode(IUIRender::cmNONE);
+    /*UIRender->CacheSetCullMode(IUIRender::cmNONE);*/
 
     CUIWindow::Draw();
 
@@ -277,7 +276,7 @@ void CUIArtefactDetectorElite::Draw()
         }
     }
 
-    UI()->m_currentPointType = bk;
+    /*UI()->m_currentPointType = bk;*/
 }
 
 void CUIArtefactDetectorElite::GetUILocatorMatrix(Fmatrix& _m)

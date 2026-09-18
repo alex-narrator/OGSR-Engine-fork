@@ -80,6 +80,19 @@ LPCSTR generate_id()
     return r.c_str();
 }
 
+static hud_hands_attach* add_hud_hands_attachment(LPCSTR name, LPCSTR section) { return g_player_hud->add_hands_attach(name, section); }
+static void remove_hud_hands_attachment(LPCSTR name) { return g_player_hud->remove_hands_attach  (name); }
+static hud_hands_attach* get_hud_hands_attachment(LPCSTR name) { return g_player_hud->get_hands_attach(name); }
+static void iterate_hud_hands_attachments(const luabind::functor<bool>& functor)
+{
+    for (const auto& attachment : g_player_hud->get_hud_hands_attacments())
+        if (functor(attachment))
+            break;
+}
+static void clear_hud_hands_attachments() { g_player_hud->clear_hud_hands_attachments(); }
+static LPCSTR attachment_name(hud_hands_attach* attach) { return attach->name.c_str(); }
+static LPCSTR attachment_sect(hud_hands_attach* attach) { return attach->section.c_str(); }
+static LPCSTR attachment_visual_name(hud_hands_attach* attach) { return attach->visual_name.c_str(); }
 
 void game_sv_GameState::script_register(lua_State* L)
 {
@@ -140,9 +153,33 @@ void game_sv_GameState::script_register(lua_State* L)
        def("set_hud_anm_time", SetBlendAnmTime),
        //def("set_next_hud_motion_speed", SetNextHudMotionSpeed),
 
+       // hud hands attachments
+       def("add_hud_hands_attachment", add_hud_hands_attachment), 
+       def("remove_hud_hands_attachment", remove_hud_hands_attachment),
+       def("get_hud_hands_attachment", get_hud_hands_attachment),
+       def("iterate_hud_hands_attachments", iterate_hud_hands_attachments),
+       def("clear_hud_hands_attachments", clear_hud_hands_attachments),
+
        def("generate_id", &generate_id),
 
        def("StringHasUTF8", &StringHasUTF8), def("StringToUTF8", &StringToUTF8), def("StringFromUTF8", &StringFromUTF8)
+    )];
+
+     module(L)[(
+              class_<hud_hands_attach>("hud_hands_attach")
+                   .def(constructor<LPCSTR, LPCSTR>())
+                   .def("name", &attachment_name)
+                   .def("section", &attachment_sect)
+                   .def("visual_name", &attachment_visual_name)
+                   .def_readwrite("attach_place_idx", &hud_hands_attach::idx)
+                   .def_readwrite("attach_hand_idx", &hud_hands_attach::hand)
+                   .def_readwrite("scale", &hud_hands_attach::scale)
+                   .property("position", [](hud_hands_attach* attach) { return attach->offset[0]; }, [](hud_hands_attach* attach, Fvector pos) { attach->offset[0] = pos; })
+                   .property("orientation", [](hud_hands_attach* attach) { return attach->offset[1]; }, [](hud_hands_attach* attach, Fvector rot) { attach->offset[1] = rot; })
+                   .def_readwrite("ui_function", &hud_hands_attach::script_ui_funct)
+                   .def_readwrite("ui_bone", &hud_hands_attach::script_ui_bone)
+                   .property("ui_position", [](hud_hands_attach* attach) { return attach->script_ui_offset[0]; }, [](hud_hands_attach* attach, Fvector pos) { attach->script_ui_offset[0] = pos; })
+                   .property("ui_rotation", [](hud_hands_attach* attach) { return attach->script_ui_offset[1]; }, [](hud_hands_attach* attach, Fvector rot) { attach->script_ui_offset[1] = rot; })
     )];
 
     module(L)[(

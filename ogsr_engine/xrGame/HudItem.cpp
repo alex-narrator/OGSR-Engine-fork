@@ -193,9 +193,8 @@ void CHudItem::LoadHudSection(shared_str section)
     if (script_ui_funct = READ_IF_EXISTS(pSettings, r_string, hud_sect, "custom_ui_func", nullptr))
     {
         script_ui_bone = READ_IF_EXISTS(pSettings, r_string, hud_sect, "custom_ui_bone", "wpn_body");
-
-        script_ui_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "custom_ui_pos", Fvector().set(0.f, 0.f, 0.f));
-        script_ui_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "custom_ui_rot", Fvector().set(0.f, 0.f, 0.f));
+        script_ui_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "custom_ui_pos", Fvector{});
+        script_ui_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, hud_sect, "custom_ui_rot", Fvector{});
     }
 }
 
@@ -424,17 +423,16 @@ void CHudItem::render_item_3d_ui()
     {
         Fmatrix m_res = GetBoneTransformPosDir(script_ui_bone, script_ui_offset[0], script_ui_offset[1]);
 
-        IUIRender::ePointType bk = UI()->m_currentPointType;
-        UI()->m_currentPointType = IUIRender::pttLIT;
+        //IUIRender::ePointType bk = UI()->m_currentPointType;
+        //UI()->m_currentPointType = IUIRender::pttLIT;
         UIRender->CacheSetXformWorld(m_res);
-        UIRender->CacheSetCullMode(IUIRender::cmNONE);
+        /*UIRender->CacheSetCullMode(IUIRender::cmNONE);*/
         UI()->ScreenFrustumLIT().Clear();
         script_ui->Draw();
-        UI()->m_currentPointType = bk;
+        //UI()->m_currentPointType = bk;
     }
-
     //	Restore cull mode
-    UIRender->CacheSetCullMode(IUIRender::cmCCW);
+    /*UIRender->CacheSetCullMode(IUIRender::cmCCW);*/
 }
 
 u32 CHudItem::PlayHUDMotion(const char* M, const bool bMixIn, const u32 state, const bool randomAnim, float speed)

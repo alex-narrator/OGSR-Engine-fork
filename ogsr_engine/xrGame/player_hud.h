@@ -10,6 +10,7 @@
 class player_hud;
 class CHudItem;
 class CMotionDef;
+class CUIWindow;
 struct attachable_hud_item;
 
 struct motion_descr
@@ -340,6 +341,35 @@ public:
     void tune(const Ivector& values);
 };
 
+// custom non animated hud hands attachment
+struct hud_hands_attach
+{
+    shared_str name{};
+    shared_str section{};
+    shared_str visual_name{};
+    IRenderVisual* visual{};
+    u8 idx{};
+    u16 hand{};
+    Fvector offset[2]{}; // pos, rot
+    float scale{1.f}; // scale
+
+    Fmatrix m_transform{};
+    Fmatrix m_ui_transform{};
+
+	CUIWindow* script_ui{};
+    LPCSTR script_ui_funct{};
+    shared_str script_ui_bone{};
+    Fvector script_ui_offset[2]{}; // pos, rot
+
+    hud_hands_attach(const shared_str& name, const shared_str& section);
+    ~hud_hands_attach();
+
+    bool render_3d_ui_query();
+    void render_3d_ui();
+
+    void save_cfg();
+};
+
 class player_hud
 {
 public:
@@ -368,7 +398,7 @@ public:
             item = nullptr;
     }
 
-    void calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result);
+    void calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result, u16 hand_forced = u16(-1));
     void tune(const Ivector& values);
     void DumpParamsToLog();
 
@@ -453,6 +483,19 @@ private:
     xr_vector<u16> m_ancors;
     attachable_hud_item* m_attached_items[2]{};
     xr_vector<attachable_hud_item*> m_pool;
+
+    xr_vector<hud_hands_attach*>hands_attach{};
+
+public:
+    void clear_hud_hands_attachments();
+    hud_hands_attach* add_hands_attach(const shared_str&, const shared_str&);
+    void remove_hands_attach(const shared_str&);
+    hud_hands_attach* get_hands_attach(const shared_str&);
+    xr_vector<hud_hands_attach*> get_hud_hands_attacments() { return hands_attach; }
+    void render_hands_attach(u32 context_id, IRenderable* root);
+    void update_hands_attach();
+    bool render_hands_attach_ui_query();
+    void render_hands_attach_ui();
 };
 
 extern player_hud* g_player_hud;

@@ -106,7 +106,7 @@ protected: //чтоб нельзя было вызвать на прямую
 
 	CUIWindow* script_ui{};
     LPCSTR script_ui_funct{};
-    LPCSTR script_ui_bone{};
+    shared_str script_ui_bone{};
 
 public:
     virtual void Load(LPCSTR section);

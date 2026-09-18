@@ -700,17 +700,14 @@ player_hud::~player_hud()
         m_model_2 = nullptr;
     }
 
-    auto it = m_pool.begin();
-    auto it_e = m_pool.end();
-    for (; it != it_e; ++it)
-    {
-        attachable_hud_item* a = *it;
-        xr_delete(a);
-    }
+    for (auto ahi : m_pool)
+        xr_delete(ahi);
     m_pool.clear();
 
     delete_data(m_script_layers);
     delete_data(m_movement_layers);
+
+    clear_hud_hands_attachments();
 }
 
 void player_hud::load(const shared_str& player_hud_sect, bool force)
@@ -808,6 +805,8 @@ bool player_hud::render_item_ui_query()
     if (m_attached_items[1])
         res |= m_attached_items[1]->render_item_ui_query();
 
+    res |= render_hands_attach_ui_query();
+
     return res;
 }
 
@@ -822,6 +821,8 @@ void player_hud::render_item_ui()
 
     if (m_attached_items[1])
         m_attached_items[1]->render_item_ui();
+
+    render_hands_attach_ui();
 
     UIRender->CacheSetCullMode(IUIRender::cmCCW);
     UI()->m_currentPointType = bk;
@@ -846,6 +847,8 @@ void player_hud::render_hud(u32 context_id, IRenderable* root)
         ::Render->add_Visual(context_id, root, m_model->dcast_RenderVisual(), m_transform);
 
         ::Render->add_Visual(context_id, root, m_model_2->dcast_RenderVisual(), m_transform_2);
+
+        render_hands_attach(context_id, root);
     }
 
     if (!script_override_item) // можно скрывать предметы в руках во время скриптовой анимаии, но выглядит кривовато
@@ -1028,7 +1031,7 @@ void player_hud::update(const Fmatrix& cam_trans)
 
         m_model_2->UpdateTracks();
         m_model_2->dcast_PKinematics()->CalculateBones_Invalidate();
-        m_model_2->dcast_PKinematics()->CalculateBones(TRUE);       
+        m_model_2->dcast_PKinematics()->CalculateBones(TRUE);
     }
 
     for (script_layer* anm : m_script_layers)
@@ -1174,6 +1177,9 @@ void player_hud::update(const Fmatrix& cam_trans)
 
     if (script_anim_item_attached && script_item_model)
         update_script_item();
+
+    if (hasHands || script_anim_part != u8(-1))
+        update_hands_attach();
 
     {
         // single hand offset smoothing + syncing back to other hand animation on end
@@ -1384,15 +1390,16 @@ void player_hud::detach_item(CHudItem* item)
         detach_item_idx(item_idx);
 }
 
-void player_hud::calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result)
+void player_hud::calc_transform(u16 attach_slot_idx, const Fmatrix& offset, Fmatrix& result, u16 hand_forced)
 {
     bool hasHands = m_attached_items[attach_slot_idx] && m_attached_items[attach_slot_idx]->m_has_separated_hands;
 
-    if (hasHands || script_item_model)
+    if (hasHands || script_item_model || hand_forced != u16(-1))
     {
-        IKinematics* kin = (attach_slot_idx == 0) ? m_model->dcast_PKinematics() : m_model_2->dcast_PKinematics();
+        const bool right_hand = (hand_forced == 0 || attach_slot_idx == 0);
+        IKinematics* kin = right_hand ? m_model->dcast_PKinematics() : m_model_2->dcast_PKinematics();
         Fmatrix ancor_m = kin->LL_GetTransform(m_ancors.at(attach_slot_idx));
-        result.mul((attach_slot_idx == 0) ? m_transform : m_transform_2, ancor_m);
+        result.mul(right_hand ? m_transform : m_transform_2, ancor_m);
         result.mulB_43(offset);
     }
     else
@@ -1969,4 +1976,199 @@ player_hud_motion_container* player_hud::get_hand_motions(LPCSTR section, IKinem
     res.pm.load(true, m_model, animatedHudItem, section);
 
     return &res.pm;
+}
+
+// custom hands attach
+#include "ui\UIScriptWnd.h"
+hud_hands_attach::hud_hands_attach(const shared_str& attachment_name, const shared_str& attachment_section)
+{
+    if (!pSettings->section_exist(attachment_section))
+    {
+        Msg("! hud hands attachment [%s]: section [%s] does not exist", attachment_name.c_str(), attachment_section.c_str());
+        return;
+    }
+    name = attachment_name;
+    section = attachment_section;
+    visual_name = READ_IF_EXISTS(pSettings, r_string, section, "item_visual", nullptr);
+    visual = ::Render->model_Create(visual_name.c_str());
+    if (!visual)
+    {
+        Msg("! hud hands attachment [%s], section [%s]: Failed to load visual [%s]!", name.c_str(), section.c_str(), visual_name.c_str());
+        return;
+    }
+    offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "item_position", Fvector{});
+    offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "item_orientation", Fvector{});
+    scale = READ_IF_EXISTS(pSettings, r_float, section, "item_scale", 1.f);
+    idx = READ_IF_EXISTS(pSettings, r_u8, section, "attach_place_idx", 0);
+    hand = READ_IF_EXISTS(pSettings, r_u16, section, "attach_hand_idx", u16(-1));
+
+    if (script_ui_funct = READ_IF_EXISTS(pSettings, r_string, section, "custom_ui_func", nullptr))
+    {
+        script_ui_bone = READ_IF_EXISTS(pSettings, r_string, section, "custom_ui_bone", "link");
+        script_ui_offset[0] = READ_IF_EXISTS(pSettings, r_fvector3, section, "custom_ui_pos", Fvector{});
+        script_ui_offset[1] = READ_IF_EXISTS(pSettings, r_fvector3, section, "custom_ui_rot", Fvector{});
+
+        luabind::functor<CUIDialogWndEx*> funct;
+        if (ai().script_engine().functor(script_ui_funct, funct))
+        {
+            if (visual->dcast_PKinematics() && visual->dcast_PKinematics()->LL_BoneID(script_ui_bone) != BI_NONE)
+            {
+                CUIDialogWndEx* ret = funct(this);
+                CUIWindow* pScriptWnd = ret ? smart_cast<CUIWindow*>(ret) : nullptr;
+                if (pScriptWnd)
+                    script_ui = pScriptWnd;
+                else
+                    Msg("hud hands attachment [%s], section [%s]: Failed to load script UI [%s]!", name.c_str(), section.c_str(), script_ui_funct);
+            }
+            else
+                Msg("hud hands attachment [%s], section [%s]: Script UI bone [%s] does not exist in visual [%s]!", name.c_str(), section.c_str(), script_ui_bone.c_str(), visual_name.c_str());
+        }
+        else
+            Msg("hud hands attachment [%s], section [%s]: Script UI functor [%s] does not exist!", name.c_str(), section.c_str(), script_ui_funct);
+    }
+}
+
+hud_hands_attach::~hud_hands_attach() { ::Render->model_Delete(visual); }
+
+bool hud_hands_attach::render_3d_ui_query()
+{
+    if (!script_ui)
+        return false;
+    if (!visual || !visual->dcast_PKinematics())
+        return false;
+    u16 bone_id = visual->dcast_PKinematics()->LL_BoneID(script_ui_bone);
+    if (bone_id == BI_NONE)
+        return false;
+    return true;
+}
+
+void hud_hands_attach::render_3d_ui()
+{
+    if (render_3d_ui_query())
+    {
+        //IUIRender::ePointType bk = UI()->m_currentPointType;
+        //UI()->m_currentPointType = IUIRender::pttLIT;
+        UIRender->CacheSetXformWorld(m_ui_transform);
+        /*UIRender->CacheSetCullMode(IUIRender::cmNONE);*/
+        UI()->ScreenFrustumLIT().Clear();
+        script_ui->Draw();
+        /*UI()->m_currentPointType = bk;*/
+    }
+    //	Restore cull mode
+    /*UIRender->CacheSetCullMode(IUIRender::cmCCW);*/
+}
+
+void hud_hands_attach::save_cfg() 
+{
+    string_path buff;
+    FS.update_path(buff, "$logs$", make_string("_hud_hands_attach\\%s.ltx", section.c_str()).c_str());
+    CInifile pCfg(buff, FALSE, FALSE, TRUE);
+    pCfg.w_string(section.c_str(), "item_visual", visual_name.c_str());
+    pCfg.w_u16(section.c_str(), "attach_place_idx", idx);
+    pCfg.w_u16(section.c_str(), "attach_hand_idx", hand);
+    pCfg.w_fvector3(section.c_str(), "item_position", offset[0]);
+    pCfg.w_fvector3(section.c_str(), "item_orientation", offset[1]);
+    pCfg.w_float(section.c_str(), "item_scale", scale);
+    pCfg.w_fvector3(section.c_str(), "custom_ui_pos", script_ui_offset[0]);
+    pCfg.w_fvector3(section.c_str(), "custom_ui_rot", script_ui_offset[1]);
+}
+
+hud_hands_attach* player_hud::get_hands_attach(const shared_str& name) 
+{
+    for (auto attach : hands_attach)
+    {
+        if (attach->name == name)
+            return attach;
+    }
+    return nullptr;
+}
+
+void player_hud::clear_hud_hands_attachments()
+{
+    for (auto attach : hands_attach)
+        xr_delete(attach);
+    hands_attach.clear();
+}
+
+hud_hands_attach* player_hud::add_hands_attach(const shared_str& name, const shared_str& section)
+{
+    if (auto existed_attach = get_hands_attach(name))
+        remove_hands_attach(existed_attach->name);
+    hud_hands_attach* attach = xr_new<hud_hands_attach>(name, section);
+    hands_attach.emplace_back(attach);
+    return attach;
+}
+
+void player_hud::remove_hands_attach(const shared_str& name)
+{
+    hud_hands_attach* attach = get_hands_attach(name);
+    if (!attach)
+        return;
+    hands_attach.erase(std::remove(hands_attach.begin(), hands_attach.end(), attach), hands_attach.end());
+    xr_delete(attach);
+}
+
+void player_hud::update_hands_attach()
+{
+    for (auto attach : hands_attach)
+    {
+        Fmatrix m_offset{};
+        Fvector ypr = attach->offset[1];
+        ypr.mul(PI / 180.f);
+        m_offset.setHPB(ypr.x, ypr.y, ypr.z);
+        m_offset.translate_over(attach->offset[0]);
+
+        Fmatrix m_scale{};
+        m_scale.scale(attach->scale, attach->scale, attach->scale);
+        m_offset.mulA_43(m_scale);
+
+        calc_transform(attach->idx, m_offset, attach->m_transform, attach->hand);
+
+        if (attach->script_ui)
+        {
+            const auto pK = attach->visual->dcast_PKinematics();
+            u16 bone_id = pK->LL_BoneID(attach->script_ui_bone);
+            Fmatrix& bone_m = pK->LL_GetTransform(bone_id);
+            attach->m_ui_transform.mul(attach->m_transform, bone_m);
+            Fmatrix m_ui_offset{};
+            Fvector ypr = attach->script_ui_offset[1];
+            ypr.mul(PI / 180.f);
+            m_ui_offset.setHPB(ypr.x, ypr.y, ypr.z);
+            m_ui_offset.translate_over(attach->script_ui_offset[0]);
+            attach->m_ui_transform.mulB_43(m_ui_offset);
+
+            attach->script_ui->Update();
+        }
+    }
+}
+
+void player_hud::render_hands_attach(u32 context_id, IRenderable* root)
+{
+    for (auto attach : hands_attach)
+        ::Render->add_Visual(context_id, root, attach->visual, attach->m_transform);
+}
+
+bool player_hud::render_hands_attach_ui_query()
+{
+    bool b_has_hands =
+        (m_attached_items[0] && m_attached_items[0]->m_has_separated_hands) || (m_attached_items[1] && m_attached_items[1]->m_has_separated_hands) || script_item_model;
+    if (b_has_hands || script_anim_part != u8(-1))
+    {
+        for (auto attach : hands_attach)
+        {
+            if (attach->render_3d_ui_query())
+                return true;
+        }
+    }
+    return false;
+}
+
+void player_hud::render_hands_attach_ui()
+{
+    if (!render_hands_attach_ui_query())
+        return;
+    for (auto attach : hands_attach)
+    {
+        attach->render_3d_ui();
+    }
 }
