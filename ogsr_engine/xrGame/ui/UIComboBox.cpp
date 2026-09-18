@@ -123,12 +123,13 @@ void CUIComboBox::SetCurrentValue()
         m_list.Clear();
         const xr_token* tok = GetOptToken();
 
-    while (tok->name)
-    {
-        CUIListBoxItem* itm = AddItem_(tok->name, tok->id);
-        if (itm && !IsOptTokenEnabled(tok->id))
-            itm->Enable(false);
-        tok++;
+        while (tok->name)
+        {
+            CUIListBoxItem* itm = AddItem_(tok->name, tok->id);
+            if (itm && !IsOptTokenEnabled(tok->id))
+                itm->Enable(false);
+            tok++;
+        }
     }
 
     CUIListBoxItem* itm = m_list.GetSelectedItem();
