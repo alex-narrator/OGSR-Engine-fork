@@ -5205,9 +5205,6 @@
     <ClInclude Include="ui\UIPdaMsgListItem.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
     </ClInclude>
-    <ClInclude Include="UIZoneMap.h">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UIColorAnimatorWrapper.h">
       <Filter>AI\AScript\ScriptClasses\UI\Common\Animations</Filter>
     </ClInclude>
@@ -8213,9 +8210,6 @@
       <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIPdaMsgListItem.cpp">
-      <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
-    </ClCompile>
-    <ClCompile Include="UIZoneMap.cpp">
       <Filter>AI\AScript\ScriptClasses\UI\Common\MainIngame</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIColorAnimatorWrapper.cpp">

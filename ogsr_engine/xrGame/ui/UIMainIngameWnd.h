@@ -12,32 +12,20 @@
 
 struct GAME_NEWS_DATA;
 
-class CUIZoneMap;
-class CActor;
-
 class CUIMainIngameWnd : public CUIWindow
 {
 public:
-    CUIMainIngameWnd();
-    virtual ~CUIMainIngameWnd();
+    CUIMainIngameWnd() {};
+    virtual ~CUIMainIngameWnd() {};
 
     virtual void Init();
-    virtual void Draw();
-    virtual void Update();
 
     bool OnKeyboardPress(int dik);
 
-    CUIZoneMap* GetUIZoneMap() { return UIZoneMap; }
-    bool m_bShowZoneMap{};
-
     void ReceiveNews(GAME_NEWS_DATA* news);
 
-    void OnConnected();
-    void reset_ui();
-
-protected:
-    CUIZoneMap* UIZoneMap{};
-    CActor* m_pActor{};
+    void OnConnected() {};
+    void reset_ui() {};
 
     DECLARE_SCRIPT_REGISTER_FUNCTION
 };

@@ -1371,7 +1371,6 @@
     <ClInclude Include="ui\UIMainIngameWnd.h" />
     <ClInclude Include="ui\UIMessagesWindow.h" />
     <ClInclude Include="ui\UIPdaMsgListItem.h" />
-    <ClInclude Include="UIZoneMap.h" />
     <ClInclude Include="ui\UIColorAnimatorWrapper.h" />
     <ClInclude Include="ui\UIDebugFonts.h" />
     <ClInclude Include="ui\UIOptionsItem.h" />
@@ -2290,7 +2289,6 @@
     <ClCompile Include="ui\UIMainIngameWnd.cpp" />
     <ClCompile Include="ui\UIMessagesWindow.cpp" />
     <ClCompile Include="ui\UIPdaMsgListItem.cpp" />
-    <ClCompile Include="UIZoneMap.cpp" />
     <ClCompile Include="ui\UIColorAnimatorWrapper.cpp" />
     <ClCompile Include="ui\UIDebugFonts.cpp" />
     <ClCompile Include="ui\UIOptionsItem.cpp" />
