@@ -30,6 +30,24 @@ void UIMiniMapInit(CUIMiniMap* wnd)
     UIMiniMapZoom(wnd, 1.f);
 }
 
+void UIMiniMapInitEx(CUIMiniMap* wnd, LPCSTR sh_name)
+{
+    CUIWindow* parent = wnd->GetParent();
+
+    CInifile* pLtx = pGameIni;
+
+    R_ASSERT(pLtx->section_exist(Level().name()));
+
+    wnd->Init(Level().name(), *pLtx, sh_name);
+
+    Frect r;
+    parent->GetAbsoluteRect(r);
+    wnd->SetClipRect(r);
+    wnd->WorkingArea().set(r);
+
+    UIMiniMapZoom(wnd, 1.f);
+}
+
 using namespace luabind;
 
 
@@ -98,6 +116,7 @@ void CUIStatic::script_register(lua_State* L)
                   .def("SetRounded", &CUIMiniMap::SetRounded)
                   .def("SetLocked", &CUIMiniMap::SetLocked)
                   .def("Init", &UIMiniMapInit)
+                  .def("InitEx", &UIMiniMapInitEx)
                   .def("Zoom", &UIMiniMapZoom)
                   .def("SetActivePoint", &CUIMiniMap::SetActivePoint)
                   .def("GetActivePointDist", &CUIMiniMap::GetPointerDistance)
