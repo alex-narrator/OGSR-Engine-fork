@@ -27,6 +27,8 @@ protected:
 
     void DrawUpdatedSections();
 
+    bool m_mForceRenderUI{};
+
 protected:
     // Бэкграунд
     CUIStatic* UIMainPdaFrame{};
@@ -79,4 +81,7 @@ public:
         target_joystickrot.set(0.f, 0.f, 0.f);
         target_buttonpress = 0.f;
     }
+
+    void SetForceRenderUI(bool val) { m_mForceRenderUI = val; };
+    bool IsForceRenderUI() const { return m_mForceRenderUI; };
 };

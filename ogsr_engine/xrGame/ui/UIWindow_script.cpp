@@ -196,7 +196,9 @@ void CUIWindow::script_register(lua_State* L)
               class_<CUIPdaWnd, CUIWindow>("CUIPdaWnd")
                    .def(constructor<>())
                    .def("GetActiveTabIdx", &CUIPdaWnd::GetActiveSubdialog)
-                   .def("SetActiveTabIdx", &CUIPdaWnd::SetActiveSubdialog),
+                   .def("SetActiveTabIdx", &CUIPdaWnd::SetActiveSubdialog)
+                   .def("SetForceRenderUI", &CUIPdaWnd::SetForceRenderUI)
+                   .def("IsForceRenderUI", &CUIPdaWnd::IsForceRenderUI),
 
 
               //		.def("",						&CUIFrameLineWnd::)

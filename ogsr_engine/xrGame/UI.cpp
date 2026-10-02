@@ -62,6 +62,9 @@ void CUI::UIOnFrame()
         {
             UIMainIngameWnd->Update();
         }
+
+        if (auto gSP = smart_cast<CUIGameSP*>(pUIGame); gSP && gSP->PdaMenu->IsForceRenderUI())
+            gSP->PdaMenu->Update();
     }
 
     // out GAME-style depend information
@@ -101,7 +104,7 @@ bool CUI::Render()
         // а при скрытии с клавиатуры - нет. Способ кривоватый но посмотрим, мб и так пойдет.
         else if (!HUD().GetUI()->hud_disabled_by_user)
         {
-            if (auto gSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame()))
+            if (auto gSP = smart_cast<CUIGameSP*>(pUIGame))
             {
                 if (!gSP->PdaMenu->GetVisible())
                     m_pMessagesWnd->Draw();

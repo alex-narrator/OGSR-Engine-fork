@@ -28,13 +28,6 @@
 CMapLocation::CMapLocation(LPCSTR type, u16 object_id, bool is_user_loc)
 {
     m_flags.zero();
-    m_level_spot = NULL;
-    m_level_spot_pointer = NULL;
-    m_minimap_spot = NULL;
-    m_minimap_spot_pointer = NULL;
-
-    m_level_map_spot_border = NULL;
-    m_mini_map_spot_border = NULL;
 
     if (is_user_loc)
         m_flags.set(eUserDefined, TRUE);

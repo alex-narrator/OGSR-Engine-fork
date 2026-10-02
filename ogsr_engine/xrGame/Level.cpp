@@ -449,8 +449,9 @@ void CLevel::OnRender()
     auto pActor = smart_cast<CActor*>(Level().CurrentEntity());
     CPda* Pda = pActor ? pActor->GetPDA() : nullptr;
     const bool need_pda_render = Pda && Pda->Is3DPDA() && psActorFlags.test(AF_3D_PDA) && pGameSP->PdaMenu->IsShown();
+    const bool force_pda_ui_render = pGameSP->PdaMenu ? pGameSP->PdaMenu->IsForceRenderUI() : false;
 
-    if (need_pda_render)
+    if (need_pda_render || force_pda_ui_render)
     {
         Render->AfterWorldRender();
 

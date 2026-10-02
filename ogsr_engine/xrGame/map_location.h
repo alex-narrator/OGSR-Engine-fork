@@ -28,13 +28,12 @@ protected:
     LPCSTR m_type;
     Flags32 m_flags;
     shared_str m_hint;
-    CMapSpot* m_level_spot;
-    CMapSpotPointer* m_level_spot_pointer;
-    CMiniMapSpot* m_minimap_spot;
-    CMapSpotPointer* m_minimap_spot_pointer;
-
-    CMapSpot* m_level_map_spot_border;
-    CMapSpot* m_mini_map_spot_border;
+    CMapSpot* m_level_spot{};
+    CMapSpotPointer* m_level_spot_pointer{};
+    CMiniMapSpot* m_minimap_spot{};
+    CMapSpotPointer* m_minimap_spot_pointer{};
+    CMapSpot* m_level_map_spot_border{};
+    CMapSpot* m_mini_map_spot_border{};
 
     u16 m_objectID;
     CSE_ALifeDynamicObject* m_owner_se_object;
