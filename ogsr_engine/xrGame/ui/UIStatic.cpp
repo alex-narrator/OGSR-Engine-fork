@@ -619,8 +619,7 @@ void CUIStatic::AdjustHeightToText()
 
 void CUIStatic::AdjustWidthToText()
 {
-    // m_pLines->ParseText();  // надо ли тут парсить текст ?
-    float _len = m_pLines->GetFont()->SizeOf_(m_pLines->GetText());
+    float _len = m_pLines->GetVisibleWidth();
     UI()->ClientToScreenScaledWidth(_len);
     SetWidth(iCeil(_len));
 }

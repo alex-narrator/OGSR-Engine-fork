@@ -60,6 +60,7 @@ public:
     void Reset();
     void ParseText();
     float GetVisibleHeight();
+    float GetVisibleWidth();
 
     // cursor control
     int m_iCursorPos;

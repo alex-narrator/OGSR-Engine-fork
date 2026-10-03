@@ -414,6 +414,41 @@ float CUILines::GetVisibleHeight()
         return _curr_h;
 }
 
+float CUILines::GetVisibleWidth()
+{
+    float max_width{};
+
+    if (!uFlags.test(flComplexMode))
+    {
+        if (m_text.empty() || !m_pFont)
+            return max_width;
+        return m_pFont->SizeOf_(m_text.c_str());
+    }
+
+    float original_width = m_wndSize.x;
+    m_wndSize.x = 10000.0f;
+    uFlags.set(flNeedReparse, TRUE);
+
+    ParseText();
+
+    for (auto& line : m_lines)
+    {
+        float current_line_width{};
+        for (const auto& sub_line : line.m_subLines)
+        {
+            current_line_width += m_pFont->SizeOf_(sub_line.m_text.c_str());
+        }
+        if (current_line_width > max_width)
+            max_width = current_line_width;
+    }
+
+    m_wndSize.x = original_width;
+    uFlags.set(flNeedReparse, TRUE);
+    m_oldWidth = -1.0f;
+
+    return max_width;
+}
+
 void CUILines::SetTextColor(u32 color)
 {
     if (color == m_dwTextColor)
