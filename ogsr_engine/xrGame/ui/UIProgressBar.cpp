@@ -91,11 +91,23 @@ void CUIProgressBar::Draw()
     Frect rect;
     GetAbsoluteRect(rect);
 
+    const bool is_3d_ui = UI()->m_currentPointType == IUIRender::pttLIT;
+
     if (m_bBackgroundPresent)
     {
-        UI()->PushScissor(rect);
-        m_UIBackgroundItem.Draw();
-        UI()->PopScissor();
+        if (is_3d_ui)
+        {
+            const auto st_item = m_UIBackgroundItem.GetStaticItem();
+            st_item->SetPos(rect.left, rect.top);
+            st_item->SetRect(0.0f, 0.0f, rect.width(), rect.height());
+            st_item->Render();
+        }
+        else
+        {
+            UI()->PushScissor(rect);
+            m_UIBackgroundItem.Draw();
+            UI()->PopScissor();
+        }
     }
 
     Frect progress_rect;
@@ -124,9 +136,19 @@ void CUIProgressBar::Draw()
         Fvector2 pos = m_UIProgressItem.GetWndPos();
         progress_rect.add(rect.left + pos.x, rect.top + pos.y);
 
-        UI()->PushScissor(progress_rect);
-        m_UIProgressItem.Draw();
-        UI()->PopScissor();
+        if (is_3d_ui)
+        {
+            const auto st_item = m_UIProgressItem.GetStaticItem();
+            st_item->SetPos(progress_rect.left, progress_rect.top);
+            st_item->SetRect(0.0f, 0.0f, progress_rect.width(), progress_rect.height());
+            st_item->Render();
+        }
+        else
+        {
+            UI()->PushScissor(progress_rect);
+            m_UIProgressItem.Draw();
+            UI()->PopScissor();
+        }
     }
     m_last_render_frame = Device.dwFrame;
 }
