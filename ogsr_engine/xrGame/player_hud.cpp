@@ -816,11 +816,29 @@ void player_hud::render_item_ui()
     UI()->m_currentPointType = IUIRender::pttLIT;
     UIRender->CacheSetCullMode(IUIRender::cmNONE);
 
-    if (m_attached_items[0])
-        m_attached_items[0]->render_item_ui();
+    if (!script_override_item)
+    {
+        if (m_attached_items[0])
+            m_attached_items[0]->render_item_ui();
 
-    if (m_attached_items[1])
-        m_attached_items[1]->render_item_ui();
+        if (m_attached_items[1])
+            m_attached_items[1]->render_item_ui();
+    }
+    else
+    {
+        switch (script_override_item_hand)
+        {
+        case 0:
+            if (m_attached_items[1])
+                m_attached_items[1]->render_item_ui();
+            break;
+        case 1:
+            if (m_attached_items[0])
+                m_attached_items[0]->render_item_ui();
+            break;
+        default: break;
+        }
+    }
 
     render_hands_attach_ui();
 
