@@ -1780,14 +1780,17 @@ u32 player_hud::script_anim_play(u8 hand, LPCSTR hud_section, LPCSTR anm_name, b
 
     if (length > 0)
     {
-        script_override_item = bOverride_item;
-        script_override_item_hand = hand;
+        //script_override_item = bOverride_item;
+        //script_override_item_hand = hand;
 
         m_bStopAtEndAnimIsRunning = true;
         script_anim_end = Device.dwTimeGlobal + length;
     }
     else
         m_bStopAtEndAnimIsRunning = false;
+
+    script_override_item = bOverride_item;
+    script_override_item_hand = hand;
 
     updateMovementLayerState();
 
