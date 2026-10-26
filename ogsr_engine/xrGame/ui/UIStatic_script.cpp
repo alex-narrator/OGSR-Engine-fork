@@ -109,18 +109,21 @@ void CUIStatic::script_register(lua_State* L)
                   .def("AdjustWidthToText", &CUIStatic::AdjustWidthToText)
                   .def("AdjustHeightToText", &CUIStatic::AdjustHeightToText)
                   .def("SetVTextAlign", &CUIStatic::SetVTextAlignment)
-                  .def("SetTextPos", &CUIStatic::SetTextPos),
+                  .def("SetTextPos", &CUIStatic::SetTextPos)
+        
+                  .def("SetRounded", &CUIStatic::SetRounded)
+                  .def("IsRounded", &CUIStatic::IsRounded)
+                  .def("GetSegmentsCount", &CUIStatic::GetSegmentsCount)
+                  .def("SetSegmentsCount", &CUIStatic::SetSegmentsCount)
+        ,
 
             class_<CUIMiniMap, CUIStatic>("CUIMiniMap")
                   .def(constructor<>())
-                  .def("SetRounded", &CUIMiniMap::SetRounded)
                   .def("SetLocked", &CUIMiniMap::SetLocked)
                   .def("Init", &UIMiniMapInit)
                   .def("InitEx", &UIMiniMapInitEx)
                   .def("Zoom", &UIMiniMapZoom)
                   .def("SetActivePoint", &CUIMiniMap::SetActivePoint)
                   .def("GetActivePointDist", &CUIMiniMap::GetPointerDistance)
-                  .def("GetSegmentsCount", &CUIMiniMap::GetSegmentsCount)
-                  .def("SetSegmentsCount", &CUIMiniMap::SetSegmentsCount)
     )];
 }

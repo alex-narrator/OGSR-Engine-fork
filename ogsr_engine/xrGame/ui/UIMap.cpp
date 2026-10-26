@@ -11,7 +11,6 @@ CUICustomMap::CUICustomMap()
 {
     m_BoundRect.set(0, 0, 0, 0);
     SetWindowName("map");
-    m_flags.zero();
     SetPointerDistance(0.0f);
 }
 

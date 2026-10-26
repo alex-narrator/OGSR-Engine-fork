@@ -200,6 +200,15 @@ public:
 
     CUILines* m_pLines;
 
+    bool IsRounded() { return m_bRounded; }
+    void SetRounded(bool b) { m_bRounded = b; }
+    int GetSegmentsCount() { return m_iSegmentsCount; }
+    void SetSegmentsCount(int count)
+    {
+        m_iSegmentsCount = count;
+        clamp(m_iSegmentsCount, 3, UI_FRUSTUM_SAFE);
+    }
+
 protected:
     bool m_bEnableTextHighlighting;
     // Цвет подсветки
@@ -232,6 +241,9 @@ protected:
     void Elipsis(const Frect& rect, EElipsisPosition elipsisPos);
     int m_iElipsisIndent;
     Frect m_ClipRect;
+
+    bool m_bRounded{};
+    int m_iSegmentsCount{4};
 
 private:
     Frect m_originalSizeRect;

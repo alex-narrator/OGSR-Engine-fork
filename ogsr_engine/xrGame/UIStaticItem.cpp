@@ -6,21 +6,6 @@ void CreateUIGeom() { UIRender->CreateUIGeom(); }
 
 void DestroyUIGeom() { UIRender->DestroyUIGeom(); }
 
-CUIStaticItem::CUIStaticItem()
-{
-    dwColor = 0xffffffff;
-    iTileX = 1;
-    iTileY = 1;
-    iRemX = 0.0f;
-    iRemY = 0.0f;
-    alpha_ref = -1;
-#ifdef DEBUG
-    dbg_tex_name = NULL;
-#endif
-}
-
-CUIStaticItem::~CUIStaticItem() {}
-
 void CUIStaticItem::CreateShader(LPCSTR tex, LPCSTR sh)
 {
     hShader->create(sh, tex, !!uFlags.test(flNoShaderCache));
@@ -113,4 +98,18 @@ void CUIStaticItem::Render(float angle)
 
     if (alpha_ref != -1)
         UIRender->SetAlphaRef(alpha_ref);
+}
+
+void CUIStaticItem::Render(float angle, u32 segments_count)
+{
+    VERIFY(g_bRendering);
+    UIRender->SetShader(*hShader);
+
+    if (alpha_ref != -1)
+        UIRender->SetAlphaRef(alpha_ref);
+
+    inherited::Render(iPos, dwColor, angle, segments_count);
+
+    if (alpha_ref != -1)
+        UIRender->SetAlphaRef(0);
 }

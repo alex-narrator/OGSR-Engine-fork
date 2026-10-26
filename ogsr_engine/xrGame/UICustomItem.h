@@ -24,21 +24,21 @@ protected:
 
     //прямоугольник(в пикселях)
     //геом. регион  на который натягикается текстура с текстурными координатами iOriginalRect
-    Frect iVisRect;
+    Frect iVisRect{};
 
     //фрейм текстуры в пикселях отн. 0/0
-    Frect iOriginalRect;
+    Frect iOriginalRect{};
 
     // точка, относительно которой применяем поворот
-    Fvector2 iHeadingPivot;
-    Fvector2 iHeadingOffset;
+    Fvector2 iHeadingPivot{};
+    Fvector2 iHeadingOffset{};
 
-    Flags32 uFlags;
-    u32 uAlign;
+    Flags32 uFlags{};
+    u32 uAlign{alNone};
 
 public:
-    CUICustomItem();
-    virtual ~CUICustomItem();
+    CUICustomItem() {};
+    virtual ~CUICustomItem() {};
 
     IC void SetRect(float x1, float y1, float x2, float y2)
     {
@@ -67,6 +67,7 @@ public:
 
     void Render(const Fvector2& pos, u32 color);
     void Render(const Fvector2& pos, u32 color, float angle);
+    void Render(const Fvector2& pos, u32 color, float angle, u32 segments_count);
 
     IC void SetAlign(u32 align) { uAlign = align; };
     IC u32 GetAlign() { return uAlign; }

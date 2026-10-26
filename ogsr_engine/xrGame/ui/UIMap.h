@@ -11,12 +11,7 @@ protected:
     shared_str m_name{};
     Frect m_BoundRect{}; // real map size (meters)
 
-    enum EFlags
-    {
-        eLocked = (1 << 0),
-        eRounded = (1 << 1)
-    };
-    Flags16 m_flags{};
+    bool m_bLocked{};
 
     float m_pointer_dist{};
 
@@ -56,17 +51,11 @@ public:
     virtual bool IsRectVisible(Frect r);
     virtual bool NeedShowPointer(Frect r);
 
-    bool Locked() const { return !!m_flags.test(eLocked); }
-    void SetLocked(bool b) { m_flags.set(eLocked, b); }
-
-    bool IsRounded() const { return m_flags.test(eRounded); }
-    void SetRounded(bool b) { m_flags.set(eRounded, b); }
+    bool Locked() const { return m_bLocked; }
+    void SetLocked(bool b) { m_bLocked = b; }
 
     void SetPointerDistance(float d) { m_pointer_dist = d; };
     float GetPointerDistance() const { return m_pointer_dist; };
-
-    u32 GetSegmentsCount() { return m_segments_count; };
-    void SetSegmentsCount(u32 count) { m_segments_count = count; };
 
 protected:
     virtual void UpdateSpots(){};

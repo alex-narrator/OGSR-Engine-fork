@@ -12,13 +12,13 @@ class CUIStaticItem : public IUISimpleTextureControl, public CUICustomItem
 {
     ui_shader hShader;
 
-    Fvector2 iPos;
-    u32 dwColor;
-    int iTileX;
-    int iTileY;
-    float iRemX;
-    float iRemY;
-    int alpha_ref;
+    Fvector2 iPos{};
+    u32 dwColor{0xffffffff};
+    int iTileX{1};
+    int iTileY{1};
+    float iRemX{0.0f};
+    float iRemY{0.0f};
+    int alpha_ref{-1};
 
 protected:
     typedef CUICustomItem inherited;
@@ -27,11 +27,11 @@ public:
     using CUICustomItem::SetOriginalRect;
 
 #ifdef DEBUG
-    shared_str dbg_tex_name;
+    shared_str dbg_tex_name{};
 #endif
 
-    CUIStaticItem();
-    virtual ~CUIStaticItem();
+    CUIStaticItem() {};
+    virtual ~CUIStaticItem() {};
 
     void SetAlphaRef(int val) { alpha_ref = val; };
 
@@ -61,6 +61,7 @@ public:
 
     void Render();
     void Render(float angle);
+    void Render(float angle, u32 segments_count);
 
     IC void SetTile(int tile_x, int tile_y, float rem_x, float rem_y)
     {

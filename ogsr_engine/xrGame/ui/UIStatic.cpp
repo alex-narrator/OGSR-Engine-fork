@@ -213,12 +213,18 @@ void CUIStatic::DrawTexture()
             }
         }
 
-        if (Heading())
+        if (IsRounded())
+        {
+            m_UIStaticItem.Render(Heading() ? GetHeading() : 0.f, GetSegmentsCount());
+        }
+        else if (Heading())
         {
             m_UIStaticItem.Render(GetHeading());
         }
         else
+        {
             m_UIStaticItem.Render();
+        }
     }
 }
 

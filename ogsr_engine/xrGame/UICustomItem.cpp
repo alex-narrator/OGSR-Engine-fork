@@ -2,19 +2,6 @@
 #include "uicustomitem.h"
 #include "hudmanager.h"
 
-CUICustomItem::CUICustomItem()
-{
-    uAlign = alNone;
-    uFlags.zero();
-    iVisRect.set(0, 0, 0, 0);
-    iOriginalRect.set(0, 0, 0, 0);
-    iHeadingPivot.set(0, 0);
-    iHeadingOffset.set(0, 0);
-}
-//--------------------------------------------------------------------
-
-CUICustomItem::~CUICustomItem() {}
-
 void CUICustomItem::Render(const Fvector2& pos, u32 color, float x1, float y1, float x2, float y2)
 {
     Fvector2 ts;
@@ -156,6 +143,100 @@ void CUICustomItem::Render(const Fvector2& pos_ns, u32 color, float angle)
             UIRender->PushPoint((*R)[k + 2].pt.x, (*R)[k + 2].pt.y, 0, color, (*R)[k + 2].uv.x, (*R)[k + 2].uv.y);
         }
     }
+}
+
+void CUICustomItem::Render(const Fvector2& pos, u32 color, float angle, u32 segments_count)
+{
+    Fvector2 ts;
+    Fvector2 hp;
+
+    UIRender->GetActiveTextureResolution(ts);
+    hp.set(0.5f / ts.x, 0.5f / ts.y);
+
+    if (!uFlags.test(flValidRect))
+    {
+        SetRect(0, 0, ts.x, ts.y);
+    }
+
+    if (!uFlags.test(flValidOriginalRect))
+    {
+        iOriginalRect.set(0, 0, ts.x, ts.y);
+        uFlags.set(flValidOriginalRect, TRUE);
+    }
+
+    Fvector2 pivot, offset;
+    if (!uFlags.test(flValidHeadingPivot))
+        pivot.set(iVisRect.x2 * 0.5f, iVisRect.y2 * 0.5f);
+    else
+        pivot.set(iHeadingPivot.x, iHeadingPivot.y);
+
+    offset.set(pos);
+    offset.add(iHeadingOffset);
+
+    Fvector2 radius_pos{iVisRect.x2 * 0.5f, iVisRect.y2 * 0.5f};
+
+    Frect tex_rect = iOriginalRect;
+
+    float uv_x1 = tex_rect.x1 / ts.x + hp.x;
+    float uv_y1 = tex_rect.y1 / ts.y + hp.y;
+    float uv_w = tex_rect.width() / ts.x;
+    float uv_h = tex_rect.height() / ts.y;
+
+    Fvector2 center_tex{uv_x1 + uv_w * 0.5f, uv_y1 + uv_h * 0.5f};
+
+    Fvector2 radius_tex{uv_w * 0.5f, uv_h * 0.5f};
+
+    Fvector2 uv_pivot_offset{(pivot.x - (iVisRect.x2 * 0.5f)) / ts.x, (pivot.y - (iVisRect.y2 * 0.5f)) / ts.y};
+
+    const bool is_3d_ui = UI()->m_currentPointType == IUIRender::pttLIT;
+    float kx = UI()->is_widescreen() && !is_3d_ui ? UI()->get_current_kx() : 1.0f;
+
+    float angle_step = PI_MUL_2 / float(segments_count);
+
+    Fvector2 lt_clip{offset.x, offset.y};
+    Fvector2 rb_clip{offset.x + iVisRect.x2, offset.y + iVisRect.y2};
+
+    UI()->ClientToScreenScaled(lt_clip);
+    UI()->ClientToScreenScaled(rb_clip);
+
+    Frect scissor_rect = {lt_clip.x, lt_clip.y, rb_clip.x, rb_clip.y};
+    UI()->PushScissor(scissor_rect);
+
+    UIRender->StartPrimitive(segments_count * 3, IUIRender::ptTriList, UI()->m_currentPointType);
+
+    xr_vector<Fvector2> screen_pts(segments_count);
+    xr_vector<Fvector2> texture_uvs(segments_count);
+
+    for (u32 i = 0; i < segments_count; ++i)
+    {
+        float ch_angle = angle_step * float(i);
+
+        screen_pts[i].set(pivot.x + radius_pos.x * _cos(ch_angle) * kx, pivot.y - radius_pos.y * _sin(ch_angle));
+        screen_pts[i].add(offset);
+        UI()->ClientToScreenScaled(screen_pts[i]);
+
+        texture_uvs[i].x = center_tex.x + radius_tex.x * _cos(ch_angle - angle) + uv_pivot_offset.x;
+        texture_uvs[i].y = center_tex.y - radius_tex.y * _sin(ch_angle - angle) + uv_pivot_offset.y;
+    }
+
+    Fvector2 final_center_pos{pivot.x, pivot.y};
+    final_center_pos.add(offset);
+    UI()->ClientToScreenScaled(final_center_pos);
+
+    Fvector2 final_center_tex{center_tex.x + uv_pivot_offset.x, center_tex.y + uv_pivot_offset.y};
+
+    for (u32 i = 0; i < segments_count; ++i)
+    {
+        u32 next_i = (i + 1) % segments_count;
+
+        UIRender->PushPoint(final_center_pos.x, final_center_pos.y, 0, color, final_center_tex.x, final_center_tex.y);
+        UIRender->PushPoint(screen_pts[next_i].x, screen_pts[next_i].y, 0, color, texture_uvs[next_i].x, texture_uvs[next_i].y);
+        UIRender->PushPoint(screen_pts[i].x, screen_pts[i].y, 0, color, texture_uvs[i].x, texture_uvs[i].y);
+    }
+
+    UIRender->FlushPrimitive();
+
+    UI()->PopScissor();
 }
 
 Frect CUICustomItem::GetOriginalRectScaled()

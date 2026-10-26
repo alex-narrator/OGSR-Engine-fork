@@ -248,6 +248,9 @@ bool CUIXmlInit::InitStatic(CUIXml& xml_doc, LPCSTR path, int index, CUIStatic* 
     if (color_alpha < 255)
         pWnd->SetColor(subst_alpha(pWnd->GetColor(), color_alpha));
 
+    pWnd->SetRounded(!!xml_doc.ReadAttribInt(path, index, "rounded", 0));
+    pWnd->SetSegmentsCount(xml_doc.ReadAttribInt(path, index, "segments_count", 4));
+
     return true;
 }
 
