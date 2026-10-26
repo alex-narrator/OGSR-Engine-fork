@@ -193,15 +193,6 @@ void CUICustomItem::Render(const Fvector2& pos, u32 color, float angle, u32 segm
 
     float angle_step = PI_MUL_2 / float(segments_count);
 
-    Fvector2 lt_clip{offset.x, offset.y};
-    Fvector2 rb_clip{offset.x + iVisRect.x2, offset.y + iVisRect.y2};
-
-    UI()->ClientToScreenScaled(lt_clip);
-    UI()->ClientToScreenScaled(rb_clip);
-
-    Frect scissor_rect = {lt_clip.x, lt_clip.y, rb_clip.x, rb_clip.y};
-    UI()->PushScissor(scissor_rect);
-
     UIRender->StartPrimitive(segments_count * 3, IUIRender::ptTriList, UI()->m_currentPointType);
 
     xr_vector<Fvector2> screen_pts(segments_count);
@@ -235,8 +226,6 @@ void CUICustomItem::Render(const Fvector2& pos, u32 color, float angle, u32 segm
     }
 
     UIRender->FlushPrimitive();
-
-    UI()->PopScissor();
 }
 
 Frect CUICustomItem::GetOriginalRectScaled()
